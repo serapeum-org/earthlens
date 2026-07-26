@@ -20211,7 +20211,9 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <span class="normal"><a href="#__codelineno-0-1033">1033</a></span>
 <span class="normal"><a href="#__codelineno-0-1034">1034</a></span>
 <span class="normal"><a href="#__codelineno-0-1035">1035</a></span>
-<span class="normal"><a href="#__codelineno-0-1036">1036</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="k">class</span><span class="w"> </span><span class="nc">ECMWF</span><span class="p">(</span><span class="n">LazyClientMixin</span><span class="p">,</span> <span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-1036">1036</a></span>
+<span class="normal"><a href="#__codelineno-0-1037">1037</a></span>
+<span class="normal"><a href="#__codelineno-0-1038">1038</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="k">class</span><span class="w"> </span><span class="nc">ECMWF</span><span class="p">(</span><span class="n">LazyClientMixin</span><span class="p">,</span> <span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;ECMWF / Copernicus Climate Data Store backend.</span>
 <a id="__codelineno-0-191" name="__codelineno-0-191"></a>
 <a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">    Downloads ERA5 reanalysis (and ERA5-Land where the catalog</span>
@@ -20702,363 +20704,365 @@ dataset's own <code>grid_resolution</code> (e.g. GloFAS's 0.05° on EWDS).</p>
 <a id="__codelineno-0-677" name="__codelineno-0-677"></a>
 <a id="__codelineno-0-678" name="__codelineno-0-678"></a>        <span class="n">effective_aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <a id="__codelineno-0-679" name="__codelineno-0-679"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>            <span class="k">if</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>                <span class="n">effective_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>                    <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;out_dir&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="s2">&quot;aggregated&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>                <span class="p">)</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>                <span class="n">effective_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>  <span class="c1"># ECMWF requires a {dataset: [vars]} mapping</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>        <span class="k">for</span> <span class="n">dataset_name</span><span class="p">,</span> <span class="n">var_codes</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_codes</span><span class="p">:</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>                <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>                <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>                    <span class="sa">f</span><span class="s2">&quot;Download ECMWF </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> data for &quot;</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>                    <span class="sa">f</span><span class="s2">&quot;period </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2"> till </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>                <span class="p">)</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>                <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>                    <span class="n">var_info</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>                    <span class="n">nc_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_dataset</span><span class="p">(</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>                        <span class="n">var_info</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - log + continue so one bad variable doesn&#39;t kill the batch</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>                        <span class="sa">f</span><span class="s2">&quot;ECMWF download for </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> failed: &quot;</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a>                    <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span><span class="p">))</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a>                    <span class="k">continue</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a>                <span class="k">if</span> <span class="n">effective_aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a>                    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a>                        <span class="n">agg</span> <span class="o">=</span> <span class="n">aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">effective_aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - log + continue so one bad aggregate doesn&#39;t kill the batch</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a>                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a>                            <span class="sa">f</span><span class="s2">&quot;ECMWF aggregate for </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> failed: &quot;</span>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a>                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a>                        <span class="p">)</span>
-<a id="__codelineno-0-717" name="__codelineno-0-717"></a>                        <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span><span class="p">))</span>
-<a id="__codelineno-0-718" name="__codelineno-0-718"></a>                        <span class="k">continue</span>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a>                    <span class="n">out_paths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">agg</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-720" name="__codelineno-0-720"></a>                <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a>                    <span class="n">out_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nc_path</span><span class="p">)</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>                <span class="n">succeeded</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">))</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>            <span class="c1"># Only the written paths are kept below, so the reduced arrays are</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>            <span class="c1"># dropped as each window lands rather than accumulating: a daily</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>            <span class="c1"># reduction of a decade-long request would otherwise hold every</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a>            <span class="c1"># window in memory alongside the GeoTIFFs already on disk.</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a>            <span class="n">updates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;keep_arrays&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>            <span class="k">if</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>                <span class="n">updates</span><span class="p">[</span><span class="s2">&quot;out_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="s2">&quot;aggregated&quot;</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>            <span class="n">effective_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="n">updates</span><span class="p">)</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>  <span class="c1"># ECMWF requires a {dataset: [vars]} mapping</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>        <span class="k">for</span> <span class="n">dataset_name</span><span class="p">,</span> <span class="n">var_codes</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>            <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_codes</span><span class="p">:</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>                <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>                <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>                    <span class="sa">f</span><span class="s2">&quot;Download ECMWF </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> data for &quot;</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>                    <span class="sa">f</span><span class="s2">&quot;period </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2"> till </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>                <span class="p">)</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>                <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>                    <span class="n">var_info</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>                    <span class="n">nc_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_dataset</span><span class="p">(</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>                        <span class="n">var_info</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - log + continue so one bad variable doesn&#39;t kill the batch</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>                        <span class="sa">f</span><span class="s2">&quot;ECMWF download for </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> failed: &quot;</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>                    <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span><span class="p">))</span>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>                    <span class="k">continue</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>                <span class="k">if</span> <span class="n">effective_aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>                    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a>                        <span class="n">agg</span> <span class="o">=</span> <span class="n">aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">effective_aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - log + continue so one bad aggregate doesn&#39;t kill the batch</span>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a>                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a>                            <span class="sa">f</span><span class="s2">&quot;ECMWF aggregate for </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> failed: &quot;</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a>                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a>                        <span class="p">)</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a>                        <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span><span class="p">))</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a>                        <span class="k">continue</span>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a>                    <span class="n">out_paths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">agg</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a>                <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a>                    <span class="n">out_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nc_path</span><span class="p">)</span>
 <a id="__codelineno-0-724" name="__codelineno-0-724"></a>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a>        <span class="k">if</span> <span class="n">failed</span><span class="p">:</span>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a>            <span class="n">failed_summary</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span> <span class="ow">in</span> <span class="n">failed</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a>            <span class="p">)</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>                <span class="sa">f</span><span class="s2">&quot;ECMWF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">succeeded</span><span class="p">)</span><span class="si">}</span><span class="s2"> succeeded &quot;</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">succeeded</span><span class="si">}</span><span class="s2">), </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">failed</span><span class="p">)</span><span class="si">}</span><span class="s2"> failed (</span><span class="si">{</span><span class="n">failed_summary</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a>            <span class="p">)</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-734" name="__codelineno-0-734"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-735" name="__codelineno-0-735"></a>                <span class="sa">f</span><span class="s2">&quot;ECMWF download summary: all </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">succeeded</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a>                <span class="sa">f</span><span class="s2">&quot;variables succeeded (</span><span class="si">{</span><span class="n">succeeded</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>            <span class="p">)</span>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>        <span class="k">return</span> <span class="n">out_paths</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>                <span class="n">succeeded</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">))</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a>        <span class="k">if</span> <span class="n">failed</span><span class="p">:</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>            <span class="n">failed_summary</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span> <span class="ow">in</span> <span class="n">failed</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>            <span class="p">)</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a>                <span class="sa">f</span><span class="s2">&quot;ECMWF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">succeeded</span><span class="p">)</span><span class="si">}</span><span class="s2"> succeeded &quot;</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">succeeded</span><span class="si">}</span><span class="s2">), </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">failed</span><span class="p">)</span><span class="si">}</span><span class="s2"> failed (</span><span class="si">{</span><span class="n">failed_summary</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>            <span class="p">)</span>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>                <span class="sa">f</span><span class="s2">&quot;ECMWF download summary: all </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">succeeded</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>                <span class="sa">f</span><span class="s2">&quot;variables succeeded (</span><span class="si">{</span><span class="n">succeeded</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>            <span class="p">)</span>
 <a id="__codelineno-0-740" name="__codelineno-0-740"></a>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_download_dataset</span><span class="p">(</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a>        <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a>    <span class="p">):</span>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download a single variable from CDS.</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">        Thin wrapper around :meth:`_api` — builds the cdsapi request,</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">        submits it, and returns the absolute :class:`pathlib.Path`</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">        to the NetCDF that CDS wrote.</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="sd">        Per-date GeoTIFF slicing is **not** done here. Users who</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">        want per-date `.tif` outputs can run</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">        `examples/post_process_ecmwf_netcdf.py` against the</span>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">        returned NetCDF.</span>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">            var_info: Catalog row for the variable. See :meth:`_api`</span>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">                for the attributes consumed.</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">            progress_bar: Reserved; currently unused since the</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">                slicing pipeline that previously consumed it has</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">                been moved out of the package. Defaults to `True`</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">                so existing callers keep working.</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">            pathlib.Path: Absolute path to the downloaded NetCDF.</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">        See Also:</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">            :meth:`_api`: Builds and submits the CDS request, returns</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">                the path to the NetCDF.</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">            :class:`Catalog`: Loads `Variable` instances from the</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">                bundled CDS catalog (`catalog/`).</span>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">(</span><span class="n">var_info</span><span class="p">)</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">):</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Submit a CDS retrieve request for one variable and return the path.</span>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="sd">        Five-stage pipeline:</span>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>        <span class="k">return</span> <span class="n">out_paths</span>
+<a id="__codelineno-0-742" name="__codelineno-0-742"></a>
+<a id="__codelineno-0-743" name="__codelineno-0-743"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_download_dataset</span><span class="p">(</span>
+<a id="__codelineno-0-744" name="__codelineno-0-744"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-745" name="__codelineno-0-745"></a>        <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
+<a id="__codelineno-0-746" name="__codelineno-0-746"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-747" name="__codelineno-0-747"></a>    <span class="p">):</span>
+<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Download a single variable from CDS.</span>
+<a id="__codelineno-0-749" name="__codelineno-0-749"></a>
+<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">        Thin wrapper around :meth:`_api` — builds the cdsapi request,</span>
+<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">        submits it, and returns the absolute :class:`pathlib.Path`</span>
+<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="sd">        to the NetCDF that CDS wrote.</span>
+<a id="__codelineno-0-753" name="__codelineno-0-753"></a>
+<a id="__codelineno-0-754" name="__codelineno-0-754"></a><span class="sd">        Per-date GeoTIFF slicing is **not** done here. Users who</span>
+<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">        want per-date `.tif` outputs can run</span>
+<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">        `examples/post_process_ecmwf_netcdf.py` against the</span>
+<a id="__codelineno-0-757" name="__codelineno-0-757"></a><span class="sd">        returned NetCDF.</span>
+<a id="__codelineno-0-758" name="__codelineno-0-758"></a>
+<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">            var_info: Catalog row for the variable. See :meth:`_api`</span>
+<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">                for the attributes consumed.</span>
+<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">            progress_bar: Reserved; currently unused since the</span>
+<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">                slicing pipeline that previously consumed it has</span>
+<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">                been moved out of the package. Defaults to `True`</span>
+<a id="__codelineno-0-765" name="__codelineno-0-765"></a><span class="sd">                so existing callers keep working.</span>
+<a id="__codelineno-0-766" name="__codelineno-0-766"></a>
+<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">            pathlib.Path: Absolute path to the downloaded NetCDF.</span>
+<a id="__codelineno-0-769" name="__codelineno-0-769"></a>
+<a id="__codelineno-0-770" name="__codelineno-0-770"></a><span class="sd">        See Also:</span>
+<a id="__codelineno-0-771" name="__codelineno-0-771"></a><span class="sd">            :meth:`_api`: Builds and submits the CDS request, returns</span>
+<a id="__codelineno-0-772" name="__codelineno-0-772"></a><span class="sd">                the path to the NetCDF.</span>
+<a id="__codelineno-0-773" name="__codelineno-0-773"></a><span class="sd">            :class:`Catalog`: Loads `Variable` instances from the</span>
+<a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="sd">                bundled CDS catalog (`catalog/`).</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">(</span><span class="n">var_info</span><span class="p">)</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">):</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Submit a CDS retrieve request for one variable and return the path.</span>
 <a id="__codelineno-0-780" name="__codelineno-0-780"></a>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        1. Derive the dataset name from `var_info.cds_dataset`.</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">        2. Delegate request-dict assembly to :meth:`_build_request`.</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">        3. Pre-flight the request via</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">           :class:`earthlens.ecmwf.constraints.RequestValidator`</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">           (skipped when the constructor was given</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">           `skip_constraints=True`).</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">        4. Submit via :meth:`cdsapi.Client.retrieve`. The call blocks</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">           until CDS has served the request and written the NetCDF</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">           — typically minutes due to CDS queue times.</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">        5. On failure, rewrite licence-not-accepted exceptions into a</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">           :class:`PermissionError` carrying the dataset&#39;s licence</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">           page URL. All other exceptions propagate untouched.</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a><span class="sd">        Output filename:</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">        `&lt;self.root_dir&gt;/&lt;cds_variable&gt;_&lt;cds_dataset&gt;.nc`.</span>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">            var_info: Catalog row resolved by :class:`Catalog`.</span>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">                See :meth:`_build_request` for the full list of</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">                fields consumed during request assembly. `_api`</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">                itself reads `cds_dataset` (the retrieve target)</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">                and `cds_variable` (the output filename stem).</span>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">            pathlib.Path: Absolute path to the downloaded NetCDF</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">            file.</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">            PermissionError: When CDS rejects the request because</span>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">                the dataset&#39;s licence has not been accepted on the</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">                user&#39;s CDS account. Message links to the dataset&#39;s</span>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">                licence page.</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">            ValueError: Propagated from</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">                :class:`earthlens.ecmwf.constraints.RequestValidator`</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">                when the assembled request fails the pre-flight</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="sd">                check (variable typo, unknown extras, malformed</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">                date / area, ...). Skipped entirely when</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">                `skip_constraints=True`.</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">            Exception: Other transport-level errors from</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">                :meth:`cdsapi.Client.retrieve` (authentication</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">                failures, transient CDS 5xx, network drops)</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">                propagate untouched.</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">            - Inspect the variable + filename pattern this method</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">              produces (no network access — pure catalog read):</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">                &gt;&gt;&gt; from earthlens.ecmwf import Catalog</span>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">                &gt;&gt;&gt; spec = Catalog().get_variable(</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">                ...     &quot;reanalysis-era5-single-levels&quot;, &quot;2m-temperature&quot;</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">                &gt;&gt;&gt; spec.cds_dataset</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">                &#39;reanalysis-era5-single-levels&#39;</span>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="sd">                &gt;&gt;&gt; f&quot;{spec.cds_variable}_{spec.cds_dataset}.nc&quot;</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">                &#39;2m_temperature_reanalysis-era5-single-levels.nc&#39;</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a><span class="sd">            - Submit the request through the user-facing</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">              :class:`EarthLens` facade. Marked</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">              `# doctest: +SKIP` because it requires a configured</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">              `~/.cdsapirc` and several minutes of CDS queue time:</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthlens import EarthLens  # doctest: +SKIP</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">                &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">                ...     data_source=&quot;ecmwf&quot;,</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">                ...     temporal_resolution=&quot;daily&quot;,</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">                ...     start=&quot;2022-01-01&quot;,</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">                ...     end=&quot;2022-01-01&quot;,</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">                ...     variables={</span>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">                ...         &quot;reanalysis-era5-single-levels&quot;: [&quot;2m-temperature&quot;],</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">                ...     },</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">                ...     lat_lim=[4.0, 5.0],</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">                ...     lon_lim=[-75.0, -74.0],</span>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">                ...     path=&quot;examples/data/era5&quot;,</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">                &gt;&gt;&gt; earthlens.download()  # doctest: +SKIP</span>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a><span class="sd">        Five-stage pipeline:</span>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">        1. Derive the dataset name from `var_info.cds_dataset`.</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">        2. Delegate request-dict assembly to :meth:`_build_request`.</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">        3. Pre-flight the request via</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">           :class:`earthlens.ecmwf.constraints.RequestValidator`</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a><span class="sd">           (skipped when the constructor was given</span>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">           `skip_constraints=True`).</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">        4. Submit via :meth:`cdsapi.Client.retrieve`. The call blocks</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">           until CDS has served the request and written the NetCDF</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">           — typically minutes due to CDS queue times.</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">        5. On failure, rewrite licence-not-accepted exceptions into a</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">           :class:`PermissionError` carrying the dataset&#39;s licence</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a><span class="sd">           page URL. All other exceptions propagate untouched.</span>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">        Output filename:</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">        `&lt;self.root_dir&gt;/&lt;cds_variable&gt;_&lt;cds_dataset&gt;.nc`.</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">            var_info: Catalog row resolved by :class:`Catalog`.</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">                See :meth:`_build_request` for the full list of</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">                fields consumed during request assembly. `_api`</span>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">                itself reads `cds_dataset` (the retrieve target)</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a><span class="sd">                and `cds_variable` (the output filename stem).</span>
+<a id="__codelineno-0-805" name="__codelineno-0-805"></a>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">            pathlib.Path: Absolute path to the downloaded NetCDF</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">            file.</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">            PermissionError: When CDS rejects the request because</span>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="sd">                the dataset&#39;s licence has not been accepted on the</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">                user&#39;s CDS account. Message links to the dataset&#39;s</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">                licence page.</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">            ValueError: Propagated from</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="sd">                :class:`earthlens.ecmwf.constraints.RequestValidator`</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">                when the assembled request fails the pre-flight</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">                check (variable typo, unknown extras, malformed</span>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">                date / area, ...). Skipped entirely when</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">                `skip_constraints=True`.</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">            Exception: Other transport-level errors from</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">                :meth:`cdsapi.Client.retrieve` (authentication</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">                failures, transient CDS 5xx, network drops)</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">                propagate untouched.</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">            - Inspect the variable + filename pattern this method</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">              produces (no network access — pure catalog read):</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">                &gt;&gt;&gt; from earthlens.ecmwf import Catalog</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">                &gt;&gt;&gt; spec = Catalog().get_variable(</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">                ...     &quot;reanalysis-era5-single-levels&quot;, &quot;2m-temperature&quot;</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a><span class="sd">                &gt;&gt;&gt; spec.cds_dataset</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a><span class="sd">                &#39;reanalysis-era5-single-levels&#39;</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="sd">                &gt;&gt;&gt; f&quot;{spec.cds_variable}_{spec.cds_dataset}.nc&quot;</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a><span class="sd">                &#39;2m_temperature_reanalysis-era5-single-levels.nc&#39;</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a><span class="sd">            - Submit the request through the user-facing</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="sd">              :class:`EarthLens` facade. Marked</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="sd">              `# doctest: +SKIP` because it requires a configured</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a><span class="sd">              `~/.cdsapirc` and several minutes of CDS queue time:</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">                &gt;&gt;&gt; from earthlens.earthlens import EarthLens  # doctest: +SKIP</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a><span class="sd">                &gt;&gt;&gt; earthlens = EarthLens(  # doctest: +SKIP</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">                ...     data_source=&quot;ecmwf&quot;,</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">                ...     temporal_resolution=&quot;daily&quot;,</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">                ...     start=&quot;2022-01-01&quot;,</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">                ...     end=&quot;2022-01-01&quot;,</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">                ...     variables={</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">                ...         &quot;reanalysis-era5-single-levels&quot;: [&quot;2m-temperature&quot;],</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">                ...     },</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">                ...     lat_lim=[4.0, 5.0],</span>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="sd">                ...     lon_lim=[-75.0, -74.0],</span>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">                ...     path=&quot;examples/data/era5&quot;,</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">                &gt;&gt;&gt; earthlens.download()  # doctest: +SKIP</span>
 <a id="__codelineno-0-861" name="__codelineno-0-861"></a>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">        See Also:</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">            :meth:`_build_request`: Assembles the CDS request dict</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">                this method submits — the pure-builder collaborator.</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">            :class:`earthlens.ecmwf.constraints.RequestValidator`: The</span>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">                pre-flight check applied to the assembled request.</span>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">            :meth:`_download_dataset`: Thin pass-through wrapper —</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">                calls this method and returns the same path.</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">            :class:`Catalog`: Resolves `(dataset, variable)` pairs</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">                to :class:`Variable` rows.</span>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">            :class:`earthlens.earthlens.EarthLens`: User-facing facade</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">                that wires this method into the `download()` flow.</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">var_info</span><span class="o">.</span><span class="n">cds_dataset</span>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a>        <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_request</span><span class="p">(</span><span class="n">var_info</span><span class="p">)</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a>        <span class="c1"># Pre-flight check the assembled request against the CDS</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a>        <span class="c1"># `constraints.json` for this dataset. Catches typos and</span>
-<a id="__codelineno-0-879" name="__codelineno-0-879"></a>        <span class="c1"># invalid extras combinations client-side before they</span>
-<a id="__codelineno-0-880" name="__codelineno-0-880"></a>        <span class="c1"># consume a CDS queue slot. Pass `skip_constraints=True`</span>
-<a id="__codelineno-0-881" name="__codelineno-0-881"></a>        <span class="c1"># to `ECMWF(...)` to bypass.</span>
-<a id="__codelineno-0-882" name="__codelineno-0-882"></a>        <span class="n">RequestValidator</span><span class="p">(</span>
-<a id="__codelineno-0-883" name="__codelineno-0-883"></a>            <span class="n">dataset</span><span class="p">,</span>
-<a id="__codelineno-0-884" name="__codelineno-0-884"></a>            <span class="n">request</span><span class="p">,</span>
-<a id="__codelineno-0-885" name="__codelineno-0-885"></a>            <span class="n">skip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">skip_constraints</span><span class="p">,</span>
-<a id="__codelineno-0-886" name="__codelineno-0-886"></a>            <span class="n">base_url</span><span class="o">=</span><span class="n">constraints_base_url</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">endpoint</span><span class="p">),</span>
-<a id="__codelineno-0-887" name="__codelineno-0-887"></a>        <span class="p">)</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
-<a id="__codelineno-0-888" name="__codelineno-0-888"></a>
-<a id="__codelineno-0-889" name="__codelineno-0-889"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_info</span><span class="o">.</span><span class="n">cds_variable</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2">.nc&quot;</span>
-<a id="__codelineno-0-890" name="__codelineno-0-890"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client_for</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
-<a id="__codelineno-0-891" name="__codelineno-0-891"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-892" name="__codelineno-0-892"></a>            <span class="sa">f</span><span class="s2">&quot;Requesting </span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">var_info</span><span class="o">.</span><span class="n">endpoint</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">; &quot;</span>
-<a id="__codelineno-0-893" name="__codelineno-0-893"></a>            <span class="s2">&quot;this may take several minutes&quot;</span>
-<a id="__codelineno-0-894" name="__codelineno-0-894"></a>        <span class="p">)</span>
-<a id="__codelineno-0-895" name="__codelineno-0-895"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-896" name="__codelineno-0-896"></a>            <span class="n">client</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-<a id="__codelineno-0-897" name="__codelineno-0-897"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related</span>
-<a id="__codelineno-0-898" name="__codelineno-0-898"></a>            <span class="k">if</span> <span class="n">_looks_like_licence_not_accepted</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
-<a id="__codelineno-0-899" name="__codelineno-0-899"></a>                <span class="n">base</span> <span class="o">=</span> <span class="n">endpoint_url</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;/api&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-900" name="__codelineno-0-900"></a>                <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span>
-<a id="__codelineno-0-901" name="__codelineno-0-901"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_info</span><span class="o">.</span><span class="n">endpoint</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> rejected the request for &quot;</span>
-<a id="__codelineno-0-902" name="__codelineno-0-902"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="si">!r}</span><span class="s2">: licence not accepted. Open the dataset page &quot;</span>
-<a id="__codelineno-0-903" name="__codelineno-0-903"></a>                    <span class="sa">f</span><span class="s2">&quot;at </span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">/datasets/</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2"> and tick the licence at the &quot;</span>
-<a id="__codelineno-0-904" name="__codelineno-0-904"></a>                    <span class="s2">&quot;bottom of the &#39;Download&#39; tab. The acceptance is permanent &quot;</span>
-<a id="__codelineno-0-905" name="__codelineno-0-905"></a>                    <span class="s2">&quot;and tied to your Copernicus account.&quot;</span>
-<a id="__codelineno-0-906" name="__codelineno-0-906"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-907" name="__codelineno-0-907"></a>            <span class="k">raise</span>
-<a id="__codelineno-0-908" name="__codelineno-0-908"></a>        <span class="n">_unwrap_zipped_netcdf</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-909" name="__codelineno-0-909"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_mask_netcdf_to_geometry</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-910" name="__codelineno-0-910"></a>        <span class="k">return</span> <span class="n">target</span>
-<a id="__codelineno-0-911" name="__codelineno-0-911"></a>
-<a id="__codelineno-0-912" name="__codelineno-0-912"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_netcdf_to_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-913" name="__codelineno-0-913"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Mask a written NetCDF cube to a polygon `aoi=`, if one was given.</span>
-<a id="__codelineno-0-914" name="__codelineno-0-914"></a>
-<a id="__codelineno-0-915" name="__codelineno-0-915"></a><span class="sd">        The CDS `area` field already crops server-side to the bbox; this</span>
-<a id="__codelineno-0-916" name="__codelineno-0-916"></a><span class="sd">        trims the bbox corners to the exact polygon when the request&#39;s</span>
-<a id="__codelineno-0-917" name="__codelineno-0-917"></a><span class="sd">        `aoi=` was a polygon (carried on `self.space.geometry`). Every</span>
-<a id="__codelineno-0-918" name="__codelineno-0-918"></a><span class="sd">        variable / time slice is masked via `pyramids.NetCDF.crop`, written</span>
-<a id="__codelineno-0-919" name="__codelineno-0-919"></a><span class="sd">        through a sibling temp file that atomically replaces the original</span>
-<a id="__codelineno-0-920" name="__codelineno-0-920"></a><span class="sd">        so a partial write cannot corrupt the cube. A no-op for a bbox /</span>
-<a id="__codelineno-0-921" name="__codelineno-0-921"></a><span class="sd">        point `aoi=`.</span>
-<a id="__codelineno-0-922" name="__codelineno-0-922"></a>
-<a id="__codelineno-0-923" name="__codelineno-0-923"></a><span class="sd">        pyramids carries the CDS cube&#39;s non-spatial aux variables (ERA5&#39;s</span>
-<a id="__codelineno-0-924" name="__codelineno-0-924"></a><span class="sd">        `expver` / `number`) through the crop — numeric and string alike</span>
-<a id="__codelineno-0-925" name="__codelineno-0-925"></a><span class="sd">        (serapeum-org/pyramids#514, #567) — so the mask applies cleanly; any</span>
-<a id="__codelineno-0-926" name="__codelineno-0-926"></a><span class="sd">        genuine error (e.g. a polygon that does not overlap the data) is left</span>
-<a id="__codelineno-0-927" name="__codelineno-0-927"></a><span class="sd">        to propagate.</span>
-<a id="__codelineno-0-928" name="__codelineno-0-928"></a>
-<a id="__codelineno-0-929" name="__codelineno-0-929"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-930" name="__codelineno-0-930"></a><span class="sd">            target: Path to the NetCDF written by `_api`.</span>
-<a id="__codelineno-0-931" name="__codelineno-0-931"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-932" name="__codelineno-0-932"></a>        <span class="n">geometry</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-933" name="__codelineno-0-933"></a>        <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-934" name="__codelineno-0-934"></a>            <span class="k">return</span>
-<a id="__codelineno-0-935" name="__codelineno-0-935"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<a id="__codelineno-0-936" name="__codelineno-0-936"></a>
-<a id="__codelineno-0-937" name="__codelineno-0-937"></a>        <span class="n">cube</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-<a id="__codelineno-0-938" name="__codelineno-0-938"></a>        <span class="n">masked</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-939" name="__codelineno-0-939"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="s2">&quot;.masked&quot;</span> <span class="o">+</span> <span class="n">target</span><span class="o">.</span><span class="n">suffix</span><span class="p">)</span>
-<a id="__codelineno-0-940" name="__codelineno-0-940"></a>        <span class="n">wrote_tmp</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-0-941" name="__codelineno-0-941"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-942" name="__codelineno-0-942"></a>            <span class="n">masked</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-943" name="__codelineno-0-943"></a>            <span class="n">masked</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
-<a id="__codelineno-0-944" name="__codelineno-0-944"></a>            <span class="n">wrote_tmp</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-945" name="__codelineno-0-945"></a>        <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-946" name="__codelineno-0-946"></a>            <span class="n">cube</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-947" name="__codelineno-0-947"></a>            <span class="k">if</span> <span class="n">masked</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-948" name="__codelineno-0-948"></a>                <span class="n">masked</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-949" name="__codelineno-0-949"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">wrote_tmp</span><span class="p">:</span>
-<a id="__codelineno-0-950" name="__codelineno-0-950"></a>                <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-951" name="__codelineno-0-951"></a>        <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-952" name="__codelineno-0-952"></a>
-<a id="__codelineno-0-953" name="__codelineno-0-953"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_build_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-954" name="__codelineno-0-954"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Assemble the CDS retrieve-request dict for one variable.</span>
-<a id="__codelineno-0-955" name="__codelineno-0-955"></a>
-<a id="__codelineno-0-956" name="__codelineno-0-956"></a><span class="sd">        Pure function over `var_info`, `self.time.dates`,</span>
-<a id="__codelineno-0-957" name="__codelineno-0-957"></a><span class="sd">        `self.space`, and `self.temporal_resolution`. No I/O, no</span>
-<a id="__codelineno-0-958" name="__codelineno-0-958"></a><span class="sd">        validation, no client calls — just dictionary assembly.</span>
-<a id="__codelineno-0-959" name="__codelineno-0-959"></a><span class="sd">        :meth:`_api` consumes the result and submits it via</span>
-<a id="__codelineno-0-960" name="__codelineno-0-960"></a><span class="sd">        :meth:`cdsapi.Client.retrieve`.</span>
-<a id="__codelineno-0-961" name="__codelineno-0-961"></a>
-<a id="__codelineno-0-962" name="__codelineno-0-962"></a><span class="sd">        Build order (later steps override earlier ones):</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">        See Also:</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">            :meth:`_build_request`: Assembles the CDS request dict</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">                this method submits — the pure-builder collaborator.</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">            :class:`earthlens.ecmwf.constraints.RequestValidator`: The</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">                pre-flight check applied to the assembled request.</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">            :meth:`_download_dataset`: Thin pass-through wrapper —</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">                calls this method and returns the same path.</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">            :class:`Catalog`: Resolves `(dataset, variable)` pairs</span>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">                to :class:`Variable` rows.</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">            :class:`earthlens.earthlens.EarthLens`: User-facing facade</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">                that wires this method into the `download()` flow.</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">var_info</span><span class="o">.</span><span class="n">cds_dataset</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a>        <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_request</span><span class="p">(</span><span class="n">var_info</span><span class="p">)</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a>        <span class="c1"># Pre-flight check the assembled request against the CDS</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a>        <span class="c1"># `constraints.json` for this dataset. Catches typos and</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a>        <span class="c1"># invalid extras combinations client-side before they</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a>        <span class="c1"># consume a CDS queue slot. Pass `skip_constraints=True`</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a>        <span class="c1"># to `ECMWF(...)` to bypass.</span>
+<a id="__codelineno-0-884" name="__codelineno-0-884"></a>        <span class="n">RequestValidator</span><span class="p">(</span>
+<a id="__codelineno-0-885" name="__codelineno-0-885"></a>            <span class="n">dataset</span><span class="p">,</span>
+<a id="__codelineno-0-886" name="__codelineno-0-886"></a>            <span class="n">request</span><span class="p">,</span>
+<a id="__codelineno-0-887" name="__codelineno-0-887"></a>            <span class="n">skip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">skip_constraints</span><span class="p">,</span>
+<a id="__codelineno-0-888" name="__codelineno-0-888"></a>            <span class="n">base_url</span><span class="o">=</span><span class="n">constraints_base_url</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">endpoint</span><span class="p">),</span>
+<a id="__codelineno-0-889" name="__codelineno-0-889"></a>        <span class="p">)</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
+<a id="__codelineno-0-890" name="__codelineno-0-890"></a>
+<a id="__codelineno-0-891" name="__codelineno-0-891"></a>        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_info</span><span class="o">.</span><span class="n">cds_variable</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2">.nc&quot;</span>
+<a id="__codelineno-0-892" name="__codelineno-0-892"></a>        <span class="n">client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client_for</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
+<a id="__codelineno-0-893" name="__codelineno-0-893"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-894" name="__codelineno-0-894"></a>            <span class="sa">f</span><span class="s2">&quot;Requesting </span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">var_info</span><span class="o">.</span><span class="n">endpoint</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2">; &quot;</span>
+<a id="__codelineno-0-895" name="__codelineno-0-895"></a>            <span class="s2">&quot;this may take several minutes&quot;</span>
+<a id="__codelineno-0-896" name="__codelineno-0-896"></a>        <span class="p">)</span>
+<a id="__codelineno-0-897" name="__codelineno-0-897"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-898" name="__codelineno-0-898"></a>            <span class="n">client</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-899" name="__codelineno-0-899"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related</span>
+<a id="__codelineno-0-900" name="__codelineno-0-900"></a>            <span class="k">if</span> <span class="n">_looks_like_licence_not_accepted</span><span class="p">(</span><span class="n">exc</span><span class="p">):</span>
+<a id="__codelineno-0-901" name="__codelineno-0-901"></a>                <span class="n">base</span> <span class="o">=</span> <span class="n">endpoint_url</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;/api&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-902" name="__codelineno-0-902"></a>                <span class="k">raise</span> <span class="ne">PermissionError</span><span class="p">(</span>
+<a id="__codelineno-0-903" name="__codelineno-0-903"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_info</span><span class="o">.</span><span class="n">endpoint</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s2"> rejected the request for &quot;</span>
+<a id="__codelineno-0-904" name="__codelineno-0-904"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset</span><span class="si">!r}</span><span class="s2">: licence not accepted. Open the dataset page &quot;</span>
+<a id="__codelineno-0-905" name="__codelineno-0-905"></a>                    <span class="sa">f</span><span class="s2">&quot;at </span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">/datasets/</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2"> and tick the licence at the &quot;</span>
+<a id="__codelineno-0-906" name="__codelineno-0-906"></a>                    <span class="s2">&quot;bottom of the &#39;Download&#39; tab. The acceptance is permanent &quot;</span>
+<a id="__codelineno-0-907" name="__codelineno-0-907"></a>                    <span class="s2">&quot;and tied to your Copernicus account.&quot;</span>
+<a id="__codelineno-0-908" name="__codelineno-0-908"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-909" name="__codelineno-0-909"></a>            <span class="k">raise</span>
+<a id="__codelineno-0-910" name="__codelineno-0-910"></a>        <span class="n">_unwrap_zipped_netcdf</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-911" name="__codelineno-0-911"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_mask_netcdf_to_geometry</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-912" name="__codelineno-0-912"></a>        <span class="k">return</span> <span class="n">target</span>
+<a id="__codelineno-0-913" name="__codelineno-0-913"></a>
+<a id="__codelineno-0-914" name="__codelineno-0-914"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_netcdf_to_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-915" name="__codelineno-0-915"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Mask a written NetCDF cube to a polygon `aoi=`, if one was given.</span>
+<a id="__codelineno-0-916" name="__codelineno-0-916"></a>
+<a id="__codelineno-0-917" name="__codelineno-0-917"></a><span class="sd">        The CDS `area` field already crops server-side to the bbox; this</span>
+<a id="__codelineno-0-918" name="__codelineno-0-918"></a><span class="sd">        trims the bbox corners to the exact polygon when the request&#39;s</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a><span class="sd">        `aoi=` was a polygon (carried on `self.space.geometry`). Every</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a><span class="sd">        variable / time slice is masked via `pyramids.NetCDF.crop`, written</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a><span class="sd">        through a sibling temp file that atomically replaces the original</span>
+<a id="__codelineno-0-922" name="__codelineno-0-922"></a><span class="sd">        so a partial write cannot corrupt the cube. A no-op for a bbox /</span>
+<a id="__codelineno-0-923" name="__codelineno-0-923"></a><span class="sd">        point `aoi=`.</span>
+<a id="__codelineno-0-924" name="__codelineno-0-924"></a>
+<a id="__codelineno-0-925" name="__codelineno-0-925"></a><span class="sd">        pyramids carries the CDS cube&#39;s non-spatial aux variables (ERA5&#39;s</span>
+<a id="__codelineno-0-926" name="__codelineno-0-926"></a><span class="sd">        `expver` / `number`) through the crop — numeric and string alike</span>
+<a id="__codelineno-0-927" name="__codelineno-0-927"></a><span class="sd">        (serapeum-org/pyramids#514, #567) — so the mask applies cleanly; any</span>
+<a id="__codelineno-0-928" name="__codelineno-0-928"></a><span class="sd">        genuine error (e.g. a polygon that does not overlap the data) is left</span>
+<a id="__codelineno-0-929" name="__codelineno-0-929"></a><span class="sd">        to propagate.</span>
+<a id="__codelineno-0-930" name="__codelineno-0-930"></a>
+<a id="__codelineno-0-931" name="__codelineno-0-931"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-932" name="__codelineno-0-932"></a><span class="sd">            target: Path to the NetCDF written by `_api`.</span>
+<a id="__codelineno-0-933" name="__codelineno-0-933"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-934" name="__codelineno-0-934"></a>        <span class="n">geometry</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-935" name="__codelineno-0-935"></a>        <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-936" name="__codelineno-0-936"></a>            <span class="k">return</span>
+<a id="__codelineno-0-937" name="__codelineno-0-937"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+<a id="__codelineno-0-938" name="__codelineno-0-938"></a>
+<a id="__codelineno-0-939" name="__codelineno-0-939"></a>        <span class="n">cube</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+<a id="__codelineno-0-940" name="__codelineno-0-940"></a>        <span class="n">masked</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-941" name="__codelineno-0-941"></a>        <span class="n">tmp</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">stem</span> <span class="o">+</span> <span class="s2">&quot;.masked&quot;</span> <span class="o">+</span> <span class="n">target</span><span class="o">.</span><span class="n">suffix</span><span class="p">)</span>
+<a id="__codelineno-0-942" name="__codelineno-0-942"></a>        <span class="n">wrote_tmp</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="__codelineno-0-943" name="__codelineno-0-943"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-944" name="__codelineno-0-944"></a>            <span class="n">masked</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="n">geometry</span><span class="p">,</span> <span class="n">touch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-945" name="__codelineno-0-945"></a>            <span class="n">masked</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp</span><span class="p">))</span>
+<a id="__codelineno-0-946" name="__codelineno-0-946"></a>            <span class="n">wrote_tmp</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-0-947" name="__codelineno-0-947"></a>        <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-948" name="__codelineno-0-948"></a>            <span class="n">cube</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-949" name="__codelineno-0-949"></a>            <span class="k">if</span> <span class="n">masked</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-950" name="__codelineno-0-950"></a>                <span class="n">masked</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-951" name="__codelineno-0-951"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">wrote_tmp</span><span class="p">:</span>
+<a id="__codelineno-0-952" name="__codelineno-0-952"></a>                <span class="n">tmp</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-953" name="__codelineno-0-953"></a>        <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-954" name="__codelineno-0-954"></a>
+<a id="__codelineno-0-955" name="__codelineno-0-955"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_build_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-956" name="__codelineno-0-956"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Assemble the CDS retrieve-request dict for one variable.</span>
+<a id="__codelineno-0-957" name="__codelineno-0-957"></a>
+<a id="__codelineno-0-958" name="__codelineno-0-958"></a><span class="sd">        Pure function over `var_info`, `self.time.dates`,</span>
+<a id="__codelineno-0-959" name="__codelineno-0-959"></a><span class="sd">        `self.space`, and `self.temporal_resolution`. No I/O, no</span>
+<a id="__codelineno-0-960" name="__codelineno-0-960"></a><span class="sd">        validation, no client calls — just dictionary assembly.</span>
+<a id="__codelineno-0-961" name="__codelineno-0-961"></a><span class="sd">        :meth:`_api` consumes the result and submits it via</span>
+<a id="__codelineno-0-962" name="__codelineno-0-962"></a><span class="sd">        :meth:`cdsapi.Client.retrieve`.</span>
 <a id="__codelineno-0-963" name="__codelineno-0-963"></a>
-<a id="__codelineno-0-964" name="__codelineno-0-964"></a><span class="sd">        1. Template defaults (`variable`, `year`, `month`,</span>
-<a id="__codelineno-0-965" name="__codelineno-0-965"></a><span class="sd">           `data_format`, `area`, `product_type`).</span>
-<a id="__codelineno-0-966" name="__codelineno-0-966"></a><span class="sd">        2. Daily / monthly branch — daily adds `day` plus four</span>
-<a id="__codelineno-0-967" name="__codelineno-0-967"></a><span class="sd">           six-hourly `time` slots; monthly pins `time=[&quot;00:00&quot;]`</span>
-<a id="__codelineno-0-968" name="__codelineno-0-968"></a><span class="sd">           and omits `day` (CDS monthly-means datasets reject</span>
-<a id="__codelineno-0-969" name="__codelineno-0-969"></a><span class="sd">           `day`).</span>
-<a id="__codelineno-0-970" name="__codelineno-0-970"></a><span class="sd">        3. Pressure-level forward — `cds_pressure_level` becomes</span>
-<a id="__codelineno-0-971" name="__codelineno-0-971"></a><span class="sd">           `pressure_level` on the request.</span>
-<a id="__codelineno-0-972" name="__codelineno-0-972"></a><span class="sd">        4. `var_info.extras` merge — per-row catalog overrides win</span>
-<a id="__codelineno-0-973" name="__codelineno-0-973"></a><span class="sd">           over the template defaults.</span>
-<a id="__codelineno-0-974" name="__codelineno-0-974"></a><span class="sd">        5. `request_kind` strip — drop template-default keys the</span>
-<a id="__codelineno-0-975" name="__codelineno-0-975"></a><span class="sd">           dataset family rejects (e.g. ORAS5 rejects</span>
-<a id="__codelineno-0-976" name="__codelineno-0-976"></a><span class="sd">           `day`/`time`/`area`). Done after the extras merge so a</span>
-<a id="__codelineno-0-977" name="__codelineno-0-977"></a><span class="sd">           user can re-introduce a stripped key by setting it</span>
-<a id="__codelineno-0-978" name="__codelineno-0-978"></a><span class="sd">           explicitly in extras.</span>
-<a id="__codelineno-0-979" name="__codelineno-0-979"></a><span class="sd">        6. Per-row `None` opt-outs — any `extras` key set to `None`</span>
-<a id="__codelineno-0-980" name="__codelineno-0-980"></a><span class="sd">           is dropped from the request, the per-row escape hatch</span>
-<a id="__codelineno-0-981" name="__codelineno-0-981"></a><span class="sd">           for datasets that reject the default bbox without</span>
-<a id="__codelineno-0-982" name="__codelineno-0-982"></a><span class="sd">           forcing a new `request_kind`.</span>
-<a id="__codelineno-0-983" name="__codelineno-0-983"></a>
-<a id="__codelineno-0-984" name="__codelineno-0-984"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-985" name="__codelineno-0-985"></a><span class="sd">            var_info: Catalog row for the variable being requested.</span>
-<a id="__codelineno-0-986" name="__codelineno-0-986"></a><span class="sd">                Drives every field on the request except `area` /</span>
-<a id="__codelineno-0-987" name="__codelineno-0-987"></a><span class="sd">                `year` / `month` / `day` / `time` (which come from</span>
-<a id="__codelineno-0-988" name="__codelineno-0-988"></a><span class="sd">                `self.space` and `self.time`).</span>
-<a id="__codelineno-0-989" name="__codelineno-0-989"></a>
-<a id="__codelineno-0-990" name="__codelineno-0-990"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-991" name="__codelineno-0-991"></a><span class="sd">            dict[str, Any]: Request dict ready to pass as the</span>
-<a id="__codelineno-0-992" name="__codelineno-0-992"></a><span class="sd">            second positional argument to</span>
-<a id="__codelineno-0-993" name="__codelineno-0-993"></a><span class="sd">            :meth:`cdsapi.Client.retrieve`.</span>
-<a id="__codelineno-0-994" name="__codelineno-0-994"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-995" name="__codelineno-0-995"></a>        <span class="k">if</span> <span class="n">var_info</span><span class="o">.</span><span class="n">request_kind</span> <span class="o">==</span> <span class="s2">&quot;glofas&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporal_resolution</span> <span class="o">==</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-996" name="__codelineno-0-996"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-997" name="__codelineno-0-997"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_info</span><span class="o">.</span><span class="n">cds_dataset</span><span class="si">!r}</span><span class="s2"> (GloFAS) must be requested with &quot;</span>
-<a id="__codelineno-0-998" name="__codelineno-0-998"></a>                <span class="s2">&quot;temporal_resolution=&#39;daily&#39;: the monthly branch omits the &quot;</span>
-<a id="__codelineno-0-999" name="__codelineno-0-999"></a>                <span class="s2">&quot;&#39;day&#39; selector that the forecast-reference date requires. &quot;</span>
-<a id="__codelineno-0-1000" name="__codelineno-0-1000"></a>                <span class="s2">&quot;Set temporal_resolution=&#39;daily&#39;.&quot;</span>
-<a id="__codelineno-0-1001" name="__codelineno-0-1001"></a>            <span class="p">)</span>
-<a id="__codelineno-0-1002" name="__codelineno-0-1002"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">dates</span>
-<a id="__codelineno-0-1003" name="__codelineno-0-1003"></a>        <span class="n">request</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-0-1004" name="__codelineno-0-1004"></a>            <span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">var_info</span><span class="o">.</span><span class="n">cds_variable</span><span class="p">],</span>
-<a id="__codelineno-0-1005" name="__codelineno-0-1005"></a>            <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">}),</span>
-<a id="__codelineno-0-1006" name="__codelineno-0-1006"></a>            <span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">month</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">}),</span>
-<a id="__codelineno-0-1007" name="__codelineno-0-1007"></a>            <span class="s2">&quot;data_format&quot;</span><span class="p">:</span> <span class="s2">&quot;netcdf&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-1008" name="__codelineno-0-1008"></a>            <span class="s2">&quot;area&quot;</span><span class="p">:</span> <span class="p">[</span>
-<a id="__codelineno-0-1009" name="__codelineno-0-1009"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">,</span>
-<a id="__codelineno-0-1010" name="__codelineno-0-1010"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span>
-<a id="__codelineno-0-1011" name="__codelineno-0-1011"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span>
-<a id="__codelineno-0-1012" name="__codelineno-0-1012"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span>
-<a id="__codelineno-0-1013" name="__codelineno-0-1013"></a>            <span class="p">],</span>
-<a id="__codelineno-0-1014" name="__codelineno-0-1014"></a>            <span class="s2">&quot;product_type&quot;</span><span class="p">:</span> <span class="n">var_info</span><span class="o">.</span><span class="n">product_type</span><span class="p">,</span>
-<a id="__codelineno-0-1015" name="__codelineno-0-1015"></a>        <span class="p">}</span>
-<a id="__codelineno-0-1016" name="__codelineno-0-1016"></a>
-<a id="__codelineno-0-1017" name="__codelineno-0-1017"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporal_resolution</span> <span class="o">==</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-1018" name="__codelineno-0-1018"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;00:00&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-1019" name="__codelineno-0-1019"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-1020" name="__codelineno-0-1020"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;day&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">day</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">})</span>
-<a id="__codelineno-0-1021" name="__codelineno-0-1021"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;06:00&quot;</span><span class="p">,</span> <span class="s2">&quot;12:00&quot;</span><span class="p">,</span> <span class="s2">&quot;18:00&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-1022" name="__codelineno-0-1022"></a>
-<a id="__codelineno-0-1023" name="__codelineno-0-1023"></a>        <span class="k">if</span> <span class="n">var_info</span><span class="o">.</span><span class="n">cds_pressure_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-1024" name="__codelineno-0-1024"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;pressure_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_info</span><span class="o">.</span><span class="n">cds_pressure_level</span>
-<a id="__codelineno-0-1025" name="__codelineno-0-1025"></a>
-<a id="__codelineno-0-1026" name="__codelineno-0-1026"></a>        <span class="n">request</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="p">)</span>
+<a id="__codelineno-0-964" name="__codelineno-0-964"></a><span class="sd">        Build order (later steps override earlier ones):</span>
+<a id="__codelineno-0-965" name="__codelineno-0-965"></a>
+<a id="__codelineno-0-966" name="__codelineno-0-966"></a><span class="sd">        1. Template defaults (`variable`, `year`, `month`,</span>
+<a id="__codelineno-0-967" name="__codelineno-0-967"></a><span class="sd">           `data_format`, `area`, `product_type`).</span>
+<a id="__codelineno-0-968" name="__codelineno-0-968"></a><span class="sd">        2. Daily / monthly branch — daily adds `day` plus four</span>
+<a id="__codelineno-0-969" name="__codelineno-0-969"></a><span class="sd">           six-hourly `time` slots; monthly pins `time=[&quot;00:00&quot;]`</span>
+<a id="__codelineno-0-970" name="__codelineno-0-970"></a><span class="sd">           and omits `day` (CDS monthly-means datasets reject</span>
+<a id="__codelineno-0-971" name="__codelineno-0-971"></a><span class="sd">           `day`).</span>
+<a id="__codelineno-0-972" name="__codelineno-0-972"></a><span class="sd">        3. Pressure-level forward — `cds_pressure_level` becomes</span>
+<a id="__codelineno-0-973" name="__codelineno-0-973"></a><span class="sd">           `pressure_level` on the request.</span>
+<a id="__codelineno-0-974" name="__codelineno-0-974"></a><span class="sd">        4. `var_info.extras` merge — per-row catalog overrides win</span>
+<a id="__codelineno-0-975" name="__codelineno-0-975"></a><span class="sd">           over the template defaults.</span>
+<a id="__codelineno-0-976" name="__codelineno-0-976"></a><span class="sd">        5. `request_kind` strip — drop template-default keys the</span>
+<a id="__codelineno-0-977" name="__codelineno-0-977"></a><span class="sd">           dataset family rejects (e.g. ORAS5 rejects</span>
+<a id="__codelineno-0-978" name="__codelineno-0-978"></a><span class="sd">           `day`/`time`/`area`). Done after the extras merge so a</span>
+<a id="__codelineno-0-979" name="__codelineno-0-979"></a><span class="sd">           user can re-introduce a stripped key by setting it</span>
+<a id="__codelineno-0-980" name="__codelineno-0-980"></a><span class="sd">           explicitly in extras.</span>
+<a id="__codelineno-0-981" name="__codelineno-0-981"></a><span class="sd">        6. Per-row `None` opt-outs — any `extras` key set to `None`</span>
+<a id="__codelineno-0-982" name="__codelineno-0-982"></a><span class="sd">           is dropped from the request, the per-row escape hatch</span>
+<a id="__codelineno-0-983" name="__codelineno-0-983"></a><span class="sd">           for datasets that reject the default bbox without</span>
+<a id="__codelineno-0-984" name="__codelineno-0-984"></a><span class="sd">           forcing a new `request_kind`.</span>
+<a id="__codelineno-0-985" name="__codelineno-0-985"></a>
+<a id="__codelineno-0-986" name="__codelineno-0-986"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-987" name="__codelineno-0-987"></a><span class="sd">            var_info: Catalog row for the variable being requested.</span>
+<a id="__codelineno-0-988" name="__codelineno-0-988"></a><span class="sd">                Drives every field on the request except `area` /</span>
+<a id="__codelineno-0-989" name="__codelineno-0-989"></a><span class="sd">                `year` / `month` / `day` / `time` (which come from</span>
+<a id="__codelineno-0-990" name="__codelineno-0-990"></a><span class="sd">                `self.space` and `self.time`).</span>
+<a id="__codelineno-0-991" name="__codelineno-0-991"></a>
+<a id="__codelineno-0-992" name="__codelineno-0-992"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-993" name="__codelineno-0-993"></a><span class="sd">            dict[str, Any]: Request dict ready to pass as the</span>
+<a id="__codelineno-0-994" name="__codelineno-0-994"></a><span class="sd">            second positional argument to</span>
+<a id="__codelineno-0-995" name="__codelineno-0-995"></a><span class="sd">            :meth:`cdsapi.Client.retrieve`.</span>
+<a id="__codelineno-0-996" name="__codelineno-0-996"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-997" name="__codelineno-0-997"></a>        <span class="k">if</span> <span class="n">var_info</span><span class="o">.</span><span class="n">request_kind</span> <span class="o">==</span> <span class="s2">&quot;glofas&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporal_resolution</span> <span class="o">==</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-998" name="__codelineno-0-998"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-999" name="__codelineno-0-999"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_info</span><span class="o">.</span><span class="n">cds_dataset</span><span class="si">!r}</span><span class="s2"> (GloFAS) must be requested with &quot;</span>
+<a id="__codelineno-0-1000" name="__codelineno-0-1000"></a>                <span class="s2">&quot;temporal_resolution=&#39;daily&#39;: the monthly branch omits the &quot;</span>
+<a id="__codelineno-0-1001" name="__codelineno-0-1001"></a>                <span class="s2">&quot;&#39;day&#39; selector that the forecast-reference date requires. &quot;</span>
+<a id="__codelineno-0-1002" name="__codelineno-0-1002"></a>                <span class="s2">&quot;Set temporal_resolution=&#39;daily&#39;.&quot;</span>
+<a id="__codelineno-0-1003" name="__codelineno-0-1003"></a>            <span class="p">)</span>
+<a id="__codelineno-0-1004" name="__codelineno-0-1004"></a>        <span class="n">dates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">dates</span>
+<a id="__codelineno-0-1005" name="__codelineno-0-1005"></a>        <span class="n">request</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-1006" name="__codelineno-0-1006"></a>            <span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">var_info</span><span class="o">.</span><span class="n">cds_variable</span><span class="p">],</span>
+<a id="__codelineno-0-1007" name="__codelineno-0-1007"></a>            <span class="s2">&quot;year&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">({</span><span class="nb">str</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">year</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">}),</span>
+<a id="__codelineno-0-1008" name="__codelineno-0-1008"></a>            <span class="s2">&quot;month&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">month</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">}),</span>
+<a id="__codelineno-0-1009" name="__codelineno-0-1009"></a>            <span class="s2">&quot;data_format&quot;</span><span class="p">:</span> <span class="s2">&quot;netcdf&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-1010" name="__codelineno-0-1010"></a>            <span class="s2">&quot;area&quot;</span><span class="p">:</span> <span class="p">[</span>
+<a id="__codelineno-0-1011" name="__codelineno-0-1011"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">north</span><span class="p">,</span>
+<a id="__codelineno-0-1012" name="__codelineno-0-1012"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="p">,</span>
+<a id="__codelineno-0-1013" name="__codelineno-0-1013"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">south</span><span class="p">,</span>
+<a id="__codelineno-0-1014" name="__codelineno-0-1014"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="p">,</span>
+<a id="__codelineno-0-1015" name="__codelineno-0-1015"></a>            <span class="p">],</span>
+<a id="__codelineno-0-1016" name="__codelineno-0-1016"></a>            <span class="s2">&quot;product_type&quot;</span><span class="p">:</span> <span class="n">var_info</span><span class="o">.</span><span class="n">product_type</span><span class="p">,</span>
+<a id="__codelineno-0-1017" name="__codelineno-0-1017"></a>        <span class="p">}</span>
+<a id="__codelineno-0-1018" name="__codelineno-0-1018"></a>
+<a id="__codelineno-0-1019" name="__codelineno-0-1019"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">temporal_resolution</span> <span class="o">==</span> <span class="s2">&quot;monthly&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-1020" name="__codelineno-0-1020"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;00:00&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-1021" name="__codelineno-0-1021"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-1022" name="__codelineno-0-1022"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;day&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">day</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">})</span>
+<a id="__codelineno-0-1023" name="__codelineno-0-1023"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;00:00&quot;</span><span class="p">,</span> <span class="s2">&quot;06:00&quot;</span><span class="p">,</span> <span class="s2">&quot;12:00&quot;</span><span class="p">,</span> <span class="s2">&quot;18:00&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-1024" name="__codelineno-0-1024"></a>
+<a id="__codelineno-0-1025" name="__codelineno-0-1025"></a>        <span class="k">if</span> <span class="n">var_info</span><span class="o">.</span><span class="n">cds_pressure_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-1026" name="__codelineno-0-1026"></a>            <span class="n">request</span><span class="p">[</span><span class="s2">&quot;pressure_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_info</span><span class="o">.</span><span class="n">cds_pressure_level</span>
 <a id="__codelineno-0-1027" name="__codelineno-0-1027"></a>
-<a id="__codelineno-0-1028" name="__codelineno-0-1028"></a>        <span class="k">for</span> <span class="n">stripped</span> <span class="ow">in</span> <span class="n">_REQUEST_KIND_STRIPS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">request_kind</span><span class="p">,</span> <span class="p">()):</span>
-<a id="__codelineno-0-1029" name="__codelineno-0-1029"></a>            <span class="k">if</span> <span class="n">stripped</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="p">:</span>
-<a id="__codelineno-0-1030" name="__codelineno-0-1030"></a>                <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">stripped</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-1031" name="__codelineno-0-1031"></a>
-<a id="__codelineno-0-1032" name="__codelineno-0-1032"></a>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
-<a id="__codelineno-0-1033" name="__codelineno-0-1033"></a>            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-1034" name="__codelineno-0-1034"></a>                <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-1035" name="__codelineno-0-1035"></a>
-<a id="__codelineno-0-1036" name="__codelineno-0-1036"></a>        <span class="k">return</span> <span class="n">request</span>
+<a id="__codelineno-0-1028" name="__codelineno-0-1028"></a>        <span class="n">request</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="p">)</span>
+<a id="__codelineno-0-1029" name="__codelineno-0-1029"></a>
+<a id="__codelineno-0-1030" name="__codelineno-0-1030"></a>        <span class="k">for</span> <span class="n">stripped</span> <span class="ow">in</span> <span class="n">_REQUEST_KIND_STRIPS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">request_kind</span><span class="p">,</span> <span class="p">()):</span>
+<a id="__codelineno-0-1031" name="__codelineno-0-1031"></a>            <span class="k">if</span> <span class="n">stripped</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="p">:</span>
+<a id="__codelineno-0-1032" name="__codelineno-0-1032"></a>                <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">stripped</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-1033" name="__codelineno-0-1033"></a>
+<a id="__codelineno-0-1034" name="__codelineno-0-1034"></a>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+<a id="__codelineno-0-1035" name="__codelineno-0-1035"></a>            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-1036" name="__codelineno-0-1036"></a>                <span class="n">request</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-1037" name="__codelineno-0-1037"></a>
+<a id="__codelineno-0-1038" name="__codelineno-0-1038"></a>        <span class="k">return</span> <span class="n">request</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -21836,7 +21840,9 @@ declared under that dataset.</p>
 <span class="normal"><a href="#__codelineno-0-736">736</a></span>
 <span class="normal"><a href="#__codelineno-0-737">737</a></span>
 <span class="normal"><a href="#__codelineno-0-738">738</a></span>
-<span class="normal"><a href="#__codelineno-0-739">739</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-739">739</a></span>
+<span class="normal"><a href="#__codelineno-0-740">740</a></span>
+<span class="normal"><a href="#__codelineno-0-741">741</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-560" name="__codelineno-0-560"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-561" name="__codelineno-0-561"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -21956,66 +21962,68 @@ declared under that dataset.</p>
 <a id="__codelineno-0-677" name="__codelineno-0-677"></a>
 <a id="__codelineno-0-678" name="__codelineno-0-678"></a>    <span class="n">effective_aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <a id="__codelineno-0-679" name="__codelineno-0-679"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a>        <span class="k">if</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a>            <span class="n">effective_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a>                <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;out_dir&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="s2">&quot;aggregated&quot;</span><span class="p">}</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a>            <span class="p">)</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a>            <span class="n">effective_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>  <span class="c1"># ECMWF requires a {dataset: [vars]} mapping</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a>    <span class="k">for</span> <span class="n">dataset_name</span><span class="p">,</span> <span class="n">var_codes</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_codes</span><span class="p">:</span>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a>            <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a>            <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a>                <span class="sa">f</span><span class="s2">&quot;Download ECMWF </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> data for &quot;</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a>                <span class="sa">f</span><span class="s2">&quot;period </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2"> till </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a>            <span class="p">)</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>                <span class="n">var_info</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a>                <span class="n">nc_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_dataset</span><span class="p">(</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a>                    <span class="n">var_info</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a>                <span class="p">)</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - log + continue so one bad variable doesn&#39;t kill the batch</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a>                    <span class="sa">f</span><span class="s2">&quot;ECMWF download for </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> failed: &quot;</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>                <span class="p">)</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a>                <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span><span class="p">))</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a>                <span class="k">continue</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a>            <span class="k">if</span> <span class="n">effective_aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a>                <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a>                    <span class="n">agg</span> <span class="o">=</span> <span class="n">aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">effective_aggregate</span><span class="p">)</span>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a>                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - log + continue so one bad aggregate doesn&#39;t kill the batch</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a>                        <span class="sa">f</span><span class="s2">&quot;ECMWF aggregate for </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> failed: &quot;</span>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-717" name="__codelineno-0-717"></a>                    <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span><span class="p">))</span>
-<a id="__codelineno-0-718" name="__codelineno-0-718"></a>                    <span class="k">continue</span>
-<a id="__codelineno-0-719" name="__codelineno-0-719"></a>                <span class="n">out_paths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">agg</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-720" name="__codelineno-0-720"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a>                <span class="n">out_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nc_path</span><span class="p">)</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>            <span class="n">succeeded</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">))</span>
+<a id="__codelineno-0-680" name="__codelineno-0-680"></a>        <span class="c1"># Only the written paths are kept below, so the reduced arrays are</span>
+<a id="__codelineno-0-681" name="__codelineno-0-681"></a>        <span class="c1"># dropped as each window lands rather than accumulating: a daily</span>
+<a id="__codelineno-0-682" name="__codelineno-0-682"></a>        <span class="c1"># reduction of a decade-long request would otherwise hold every</span>
+<a id="__codelineno-0-683" name="__codelineno-0-683"></a>        <span class="c1"># window in memory alongside the GeoTIFFs already on disk.</span>
+<a id="__codelineno-0-684" name="__codelineno-0-684"></a>        <span class="n">updates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;keep_arrays&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<a id="__codelineno-0-685" name="__codelineno-0-685"></a>        <span class="k">if</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-686" name="__codelineno-0-686"></a>            <span class="n">updates</span><span class="p">[</span><span class="s2">&quot;out_dir&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="s2">&quot;aggregated&quot;</span>
+<a id="__codelineno-0-687" name="__codelineno-0-687"></a>        <span class="n">effective_aggregate</span> <span class="o">=</span> <span class="n">aggregate</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="n">updates</span><span class="p">)</span>
+<a id="__codelineno-0-688" name="__codelineno-0-688"></a>
+<a id="__codelineno-0-689" name="__codelineno-0-689"></a>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>  <span class="c1"># ECMWF requires a {dataset: [vars]} mapping</span>
+<a id="__codelineno-0-690" name="__codelineno-0-690"></a>    <span class="k">for</span> <span class="n">dataset_name</span><span class="p">,</span> <span class="n">var_codes</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-691" name="__codelineno-0-691"></a>        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">var_codes</span><span class="p">:</span>
+<a id="__codelineno-0-692" name="__codelineno-0-692"></a>            <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span>
+<a id="__codelineno-0-693" name="__codelineno-0-693"></a>            <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span>
+<a id="__codelineno-0-694" name="__codelineno-0-694"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-695" name="__codelineno-0-695"></a>                <span class="sa">f</span><span class="s2">&quot;Download ECMWF </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> data for &quot;</span>
+<a id="__codelineno-0-696" name="__codelineno-0-696"></a>                <span class="sa">f</span><span class="s2">&quot;period </span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2"> till </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-697" name="__codelineno-0-697"></a>            <span class="p">)</span>
+<a id="__codelineno-0-698" name="__codelineno-0-698"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-699" name="__codelineno-0-699"></a>                <span class="n">var_info</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span>
+<a id="__codelineno-0-700" name="__codelineno-0-700"></a>                <span class="n">nc_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_dataset</span><span class="p">(</span>
+<a id="__codelineno-0-701" name="__codelineno-0-701"></a>                    <span class="n">var_info</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span>
+<a id="__codelineno-0-702" name="__codelineno-0-702"></a>                <span class="p">)</span>
+<a id="__codelineno-0-703" name="__codelineno-0-703"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - log + continue so one bad variable doesn&#39;t kill the batch</span>
+<a id="__codelineno-0-704" name="__codelineno-0-704"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a>                    <span class="sa">f</span><span class="s2">&quot;ECMWF download for </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> failed: &quot;</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a>                <span class="p">)</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a>                <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span><span class="p">))</span>
+<a id="__codelineno-0-709" name="__codelineno-0-709"></a>                <span class="k">continue</span>
+<a id="__codelineno-0-710" name="__codelineno-0-710"></a>
+<a id="__codelineno-0-711" name="__codelineno-0-711"></a>            <span class="k">if</span> <span class="n">effective_aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-712" name="__codelineno-0-712"></a>                <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-713" name="__codelineno-0-713"></a>                    <span class="n">agg</span> <span class="o">=</span> <span class="n">aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">effective_aggregate</span><span class="p">)</span>
+<a id="__codelineno-0-714" name="__codelineno-0-714"></a>                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - log + continue so one bad aggregate doesn&#39;t kill the batch</span>
+<a id="__codelineno-0-715" name="__codelineno-0-715"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+<a id="__codelineno-0-716" name="__codelineno-0-716"></a>                        <span class="sa">f</span><span class="s2">&quot;ECMWF aggregate for </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> failed: &quot;</span>
+<a id="__codelineno-0-717" name="__codelineno-0-717"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-718" name="__codelineno-0-718"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-719" name="__codelineno-0-719"></a>                    <span class="n">failed</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span><span class="p">))</span>
+<a id="__codelineno-0-720" name="__codelineno-0-720"></a>                    <span class="k">continue</span>
+<a id="__codelineno-0-721" name="__codelineno-0-721"></a>                <span class="n">out_paths</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">agg</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-722" name="__codelineno-0-722"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-723" name="__codelineno-0-723"></a>                <span class="n">out_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nc_path</span><span class="p">)</span>
 <a id="__codelineno-0-724" name="__codelineno-0-724"></a>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a>    <span class="k">if</span> <span class="n">failed</span><span class="p">:</span>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a>        <span class="n">failed_summary</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span> <span class="ow">in</span> <span class="n">failed</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a>        <span class="p">)</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>            <span class="sa">f</span><span class="s2">&quot;ECMWF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">succeeded</span><span class="p">)</span><span class="si">}</span><span class="s2"> succeeded &quot;</span>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">succeeded</span><span class="si">}</span><span class="s2">), </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">failed</span><span class="p">)</span><span class="si">}</span><span class="s2"> failed (</span><span class="si">{</span><span class="n">failed_summary</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a>        <span class="p">)</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-734" name="__codelineno-0-734"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-735" name="__codelineno-0-735"></a>            <span class="sa">f</span><span class="s2">&quot;ECMWF download summary: all </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">succeeded</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a>            <span class="sa">f</span><span class="s2">&quot;variables succeeded (</span><span class="si">{</span><span class="n">succeeded</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a>        <span class="p">)</span>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>    <span class="k">return</span> <span class="n">out_paths</span>
+<a id="__codelineno-0-725" name="__codelineno-0-725"></a>            <span class="n">succeeded</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">dataset_name</span><span class="p">,</span> <span class="n">var</span><span class="p">))</span>
+<a id="__codelineno-0-726" name="__codelineno-0-726"></a>
+<a id="__codelineno-0-727" name="__codelineno-0-727"></a>    <span class="k">if</span> <span class="n">failed</span><span class="p">:</span>
+<a id="__codelineno-0-728" name="__codelineno-0-728"></a>        <span class="n">failed_summary</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<a id="__codelineno-0-729" name="__codelineno-0-729"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">var</span><span class="p">),</span> <span class="n">exc</span> <span class="ow">in</span> <span class="n">failed</span>
+<a id="__codelineno-0-730" name="__codelineno-0-730"></a>        <span class="p">)</span>
+<a id="__codelineno-0-731" name="__codelineno-0-731"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-732" name="__codelineno-0-732"></a>            <span class="sa">f</span><span class="s2">&quot;ECMWF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">succeeded</span><span class="p">)</span><span class="si">}</span><span class="s2"> succeeded &quot;</span>
+<a id="__codelineno-0-733" name="__codelineno-0-733"></a>            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">succeeded</span><span class="si">}</span><span class="s2">), </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">failed</span><span class="p">)</span><span class="si">}</span><span class="s2"> failed (</span><span class="si">{</span><span class="n">failed_summary</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-734" name="__codelineno-0-734"></a>        <span class="p">)</span>
+<a id="__codelineno-0-735" name="__codelineno-0-735"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-736" name="__codelineno-0-736"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-737" name="__codelineno-0-737"></a>            <span class="sa">f</span><span class="s2">&quot;ECMWF download summary: all </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">succeeded</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-738" name="__codelineno-0-738"></a>            <span class="sa">f</span><span class="s2">&quot;variables succeeded (</span><span class="si">{</span><span class="n">succeeded</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-739" name="__codelineno-0-739"></a>        <span class="p">)</span>
+<a id="__codelineno-0-740" name="__codelineno-0-740"></a>
+<a id="__codelineno-0-741" name="__codelineno-0-741"></a>    <span class="k">return</span> <span class="n">out_paths</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
