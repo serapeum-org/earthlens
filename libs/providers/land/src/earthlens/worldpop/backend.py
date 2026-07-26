@@ -537,7 +537,10 @@ class WorldPop(AbstractDataSource):
         # Stream to disk. A WorldPop national mosaic is routinely > 1 GB, and
         # buffering the whole body as `resp.content` before writing it holds
         # two copies at peak for no benefit.
-        return http.download(url, dest, progress=self._show_progress)
+        # No per-file bar: `_http_get` runs inside a 4-thread joblib pool and
+        # `download`'s tqdm takes no `position=`, so four bars would interleave
+        # on one stream. The caller already shows a per-product bar.
+        return http.download(url, dest, progress=False)
 
     def _group_for_mosaic(
         self, products: list[RemoteProduct]

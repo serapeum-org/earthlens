@@ -479,13 +479,21 @@ class NWP(AbstractDataSource):
         ]
         self._open_grib = open_grib
         self._write_cog = write_cog
-        out, _failed = self._run_items(
-            products,
-            self._fetch_one,
-            errors=getattr(self, "_errors", "warn"),
-            label="forecast step",
-            describe=lambda product: str(product.id),
-        )
+        try:
+            out, _failed = self._run_items(
+                products,
+                self._fetch_one,
+                errors=getattr(self, "_errors", "warn"),
+                label="forecast step",
+                describe=lambda product: str(product.id),
+            )
+        finally:
+            # Clear the batch context so a later stray `_fetch_one` fails
+            # loudly instead of silently reusing the previous download's crop
+            # box and pyramids handles.
+            self._crop_bbox = []
+            self._open_grib = None
+            self._write_cog = None
         return out
 
     def _fetch_one(self, product: RemoteProduct) -> Path:
@@ -511,6 +519,11 @@ class NWP(AbstractDataSource):
             meta.get("member"),
             whole=self._mode == "whole",
         )
+        if self._open_grib is None or self._write_cog is None:
+            raise RuntimeError(
+                "NWP._fetch_one was called outside a download: the per-batch "
+                "pyramids handles and crop box are only set up by _fetch()."
+            )
         dataset = self._open_grib(str(grib_path))
         dataset = self._normalise_longitude(dataset)
         # touch=False crops to the bbox *extent*; touch=True takes pyramids'

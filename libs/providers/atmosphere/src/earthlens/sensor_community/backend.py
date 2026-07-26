@@ -288,10 +288,15 @@ class SensorCommunity(AbstractDataSource):
                 frame_from_csv(text, columns, units, default_sensor_type=sensor_type)
             )
         non_empty = [frame for frame in frames if not frame.empty]
-        frames.clear()  # `concat` copies; don't hold the per-day sources too
         if not non_empty:
             return empty_frame()
-        return pd.concat(non_empty, ignore_index=True)
+        combined = pd.concat(non_empty, ignore_index=True)
+        # `concat` copied every frame, so release the per-day sources rather
+        # than holding them alongside the result. Clearing `frames` alone
+        # would free nothing: `non_empty` still references each frame.
+        frames.clear()
+        non_empty.clear()
+        return combined
 
     def _api(self) -> list[pd.DataFrame]:
         """Compose `_search` and `_fetch_one` into the canonical C3 shape.

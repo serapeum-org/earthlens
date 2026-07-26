@@ -802,7 +802,7 @@ def iter_aggregate_netcdf(
             close_quietly(handle)
 
 
-def _read_window(var: NetCDF, mask: np.ndarray) -> np.ndarray:
+def _read_window(var: Any, mask: np.ndarray) -> np.ndarray:
     """Read just the time steps `mask` selects, stacked as `(time, y, x)`.
 
     Reads band by band and stacks, rather than reading the whole cube and
@@ -811,11 +811,23 @@ def _read_window(var: NetCDF, mask: np.ndarray) -> np.ndarray:
     that step.
 
     Args:
-        var: The (optionally level-pinned) variable cube.
+        var: The (optionally level-pinned) variable cube. Typed loosely
+            because `get_variable` returns the same class as the container but
+            only the `read_array` surface is used here.
         mask: Boolean mask over the time axis selecting this window's steps.
 
     Returns:
         numpy.ndarray: The window's steps stacked along a leading time axis.
     """
     indices = np.flatnonzero(mask)
-    return np.stack([var.read_array(band=int(index)) for index in indices])
+    if indices.size == 0:
+        return np.empty((0, 0, 0))
+    # Fill a pre-sized buffer rather than `np.stack`ing a list: stacking holds
+    # every band plus the assembled copy at once, doubling the window's peak.
+    first = var.read_array(band=int(indices[0]))
+    out = np.empty((indices.size, *first.shape), dtype=first.dtype)
+    out[0] = first
+    del first
+    for position, index in enumerate(indices[1:], start=1):
+        out[position] = var.read_array(band=int(index))
+    return out
