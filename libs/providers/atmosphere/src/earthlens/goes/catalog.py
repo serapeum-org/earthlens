@@ -29,11 +29,12 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "goes_data_catalog.yaml"
 
-_CATALOG_CACHE: dict[tuple[str, int], Catalog] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -147,6 +148,63 @@ class GOESProduct(BaseModel):
     bands: list[str] = Field(default_factory=list)
 
 
+def _parse_catalog(files: list[Path]) -> Catalog:
+    """Parse the GOES catalog YAML into a fully-populated :class:`Catalog`.
+
+    Args:
+        files: The contributing YAML files (GOES ships a single file).
+
+    Returns:
+        Catalog: Products, domains, satellites and channels in one object.
+            The instance itself is cached, so repeated loads of an unchanged
+            file return the same object.
+
+    Raises:
+        ValueError: If the `products:` block is missing or empty, or any
+            product / domain / channel row fails validation.
+    """
+    path = files[0]
+    data = load_yaml_strict(path) or {}
+    products_yaml = data.get("products") or {}
+    if not products_yaml:
+        raise ValueError(
+            f"{path} is missing or has an empty 'products:' block. "
+            "The GOES catalog must list at least one product."
+        )
+    products: dict[str, GOESProduct] = {}
+    for key, body in products_yaml.items():
+        try:
+            products[key] = GOESProduct(product=key, **dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} product {key!r} failed validation:\n{exc}"
+            ) from exc
+    domains: dict[str, GOESDomain] = {}
+    for key, body in (data.get("domains") or {}).items():
+        try:
+            domains[key] = GOESDomain(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} domain {key!r} failed validation:\n{exc}"
+            ) from exc
+    channels: dict[str, GOESChannel] = {}
+    for key, body in (data.get("channels") or {}).items():
+        try:
+            channels[key] = GOESChannel(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} channel {key!r} failed validation:\n{exc}"
+            ) from exc
+    satellites = {str(k): str(v) for k, v in (data.get("satellites") or {}).items()}
+    catalog = Catalog(
+        datasets=products,
+        domains=domains,
+        satellites=satellites,
+        channels=channels,
+    )
+    return catalog
+
+
 class Catalog(AbstractCatalog):
     """Product / domain / satellite catalog for the GOES ABI backend.
 
@@ -239,55 +297,7 @@ class Catalog(AbstractCatalog):
                 validation.
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
-        try:
-            mtime = path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        cache_key = (str(path.resolve()), mtime)
-        cached = _CATALOG_CACHE.get(cache_key)
-        if cached is not None:
-            return cached
-
-        data = load_yaml_strict(path) or {}
-        products_yaml = data.get("products") or {}
-        if not products_yaml:
-            raise ValueError(
-                f"{path} is missing or has an empty 'products:' block. "
-                "The GOES catalog must list at least one product."
-            )
-        products: dict[str, GOESProduct] = {}
-        for key, body in products_yaml.items():
-            try:
-                products[key] = GOESProduct(product=key, **dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{path} product {key!r} failed validation:\n{exc}"
-                ) from exc
-        domains: dict[str, GOESDomain] = {}
-        for key, body in (data.get("domains") or {}).items():
-            try:
-                domains[key] = GOESDomain(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{path} domain {key!r} failed validation:\n{exc}"
-                ) from exc
-        channels: dict[str, GOESChannel] = {}
-        for key, body in (data.get("channels") or {}).items():
-            try:
-                channels[key] = GOESChannel(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{path} channel {key!r} failed validation:\n{exc}"
-                ) from exc
-        satellites = {str(k): str(v) for k, v in (data.get("satellites") or {}).items()}
-        catalog = cls(
-            datasets=products,
-            domains=domains,
-            satellites=satellites,
-            channels=channels,
-        )
-        _CATALOG_CACHE[cache_key] = catalog
-        return catalog
+        return load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="GOES")
 
     def get_catalog(self) -> dict[str, GOESProduct]:
         """Return the product map (satisfies the abstract contract).

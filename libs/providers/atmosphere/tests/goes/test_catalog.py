@@ -50,8 +50,8 @@ class TestCatalogLoad:
             Catalog.load(bad)
 
     def test_load_missing_file_raises(self, tmp_path):
-        """Loading a nonexistent path raises rather than silently succeeding."""
-        with pytest.raises(FileNotFoundError):
+        """Loading a nonexistent path raises, naming the path that is missing."""
+        with pytest.raises(ValueError, match="does not exist"):
             Catalog.load(tmp_path / "does-not-exist.yaml")
 
     def test_load_invalid_product_row_raises(self, tmp_path):

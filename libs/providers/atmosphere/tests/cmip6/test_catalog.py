@@ -137,9 +137,9 @@ def test_load_malformed_row_raises(tmp_path):
         Catalog.load(path)
 
 
-def test_load_missing_file_uses_zero_mtime(tmp_path):
-    """A missing catalog path falls to mtime=0 then fails opening the file."""
-    with pytest.raises(FileNotFoundError):
+def test_load_missing_file_raises_naming_the_path(tmp_path):
+    """A missing catalog path raises the shared loader's error."""
+    with pytest.raises(ValueError, match="does not exist"):
         Catalog.load(tmp_path / "does-not-exist.yaml")
 
 

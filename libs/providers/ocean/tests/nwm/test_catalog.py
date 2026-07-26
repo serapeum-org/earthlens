@@ -217,8 +217,8 @@ def test_unknown_config_without_close_match(catalog):
         catalog.get_config("zzzzzz")
 
 
-def test_load_missing_file_uses_zero_mtime(tmp_path):
-    """Loading a non-existent path takes the mtime=0 branch then fails to open."""
+def test_load_missing_file_raises_naming_the_path(tmp_path):
+    """Loading a non-existent path raises the shared loader's error."""
     clear_catalog_cache()
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(ValueError, match="does not exist"):
         Catalog.load(tmp_path / "does-not-exist.yaml")
