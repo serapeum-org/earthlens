@@ -543,3 +543,66 @@ class TestIsComplete:
         target = tmp_path / "adir"
         target.mkdir()
         assert self._backend(tmp_path)._is_complete(target, expected_size=0) is False
+
+
+class TestNoOverrideSilencers:
+    """ARC-5(c): no backend may silence an override error on a base hook.
+
+    A `# type: ignore[override]` on `_fetch` / `_fetch_one` meant the
+    subclass signature did not match the base, which is what let ten
+    mutually incompatible shapes accumulate — and it disabled the one
+    automated check that would have caught the drift.
+    """
+
+    #: Base hooks whose signature every backend must actually match.
+    HOOKS = ("_fetch", "_fetch_one", "_search", "_api", "_initialize")
+
+    def _backend_sources(self):
+        """Yield `(path, source)` for every provider backend module."""
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[3] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            yield path, path.read_text(encoding="utf-8")
+
+    def test_no_hook_carries_an_override_silencer(self):
+        """No `def _hook(...)  # type: ignore[override]` survives."""
+        import re
+
+        offenders = []
+        for path, source in self._backend_sources():
+            for hook in self.HOOKS:
+                pattern = (
+                    rf"def {hook}\((?:[^)]*\))?[^\n]*type:\s*ignore\[[^]]*override"
+                )
+                if re.search(pattern, source):
+                    offenders.append(f"{path.parent.name}.{hook}")
+        assert offenders == [], (
+            "these hooks silence an override mismatch instead of matching the "
+            f"base signature: {offenders}"
+        )
+
+    def test_backend_modules_were_actually_scanned(self):
+        """Guard the guard: the glob must find the real backend modules."""
+        found = [path.parent.name for path, _ in self._backend_sources()]
+        assert len(found) > 30, f"only scanned {len(found)} backends: {found[:5]}"
+        assert "nwp" in found and "soilgrids" in found, f"unexpected set: {found[:8]}"
+
+    def test_fetch_one_takes_only_a_product(self):
+        """Every `_fetch_one` override keeps the base's single-argument shape."""
+        import ast as ast_module
+
+        offenders = []
+        for path, source in self._backend_sources():
+            for node in ast_module.walk(ast_module.parse(source)):
+                if (
+                    isinstance(node, ast_module.FunctionDef)
+                    and node.name == "_fetch_one"
+                ):
+                    names = [a.arg for a in node.args.args]
+                    if names[1:] != ["product"]:
+                        offenders.append(f"{path.parent.name}: {names}")
+        assert offenders == [], (
+            "`_fetch_one` must take exactly `(self, product)`; extra per-batch "
+            f"context belongs on `self` or in `RemoteProduct.metadata`: {offenders}"
+        )

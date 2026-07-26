@@ -27,7 +27,7 @@ from __future__ import annotations
 import datetime as dt
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 
@@ -167,6 +167,11 @@ class NWP(AbstractDataSource):
             )
         self._mode = mode
         self._mirror = mirror
+        #: Per-batch context `_fetch` sets up for `_fetch_one`: the crop box
+        #: and the two pyramids entry points, imported once per download.
+        self._crop_bbox: list[float] = []
+        self._open_grib: Any = None
+        self._write_cog: Any = None
         self._steps_arg = steps
         self._horizon_arg = horizon
         self._members_arg = members
@@ -463,32 +468,34 @@ class NWP(AbstractDataSource):
         from pyramids.dataset.cog import write_cog
         from pyramids.grib import open_grib
 
-        bbox = [
+        # The crop box and the two pyramids entry points are the same for
+        # every item, so they ride on the instance for the batch instead of
+        # widening `_fetch_one` past the base hook's one-argument shape.
+        self._crop_bbox = [
             self.space.west,
             self.space.south,
             self.space.east,
             self.space.north,
         ]
+        self._open_grib = open_grib
+        self._write_cog = write_cog
         out, _failed = self._run_items(
             products,
-            lambda product: self._fetch_one(product, bbox, open_grib, write_cog),
+            self._fetch_one,
             errors=getattr(self, "_errors", "warn"),
             label="forecast step",
             describe=lambda product: str(product.id),
         )
         return out
 
-    def _fetch_one(  # type: ignore[override]
-        self, product: RemoteProduct, bbox, open_grib, write_cog
-    ) -> Path:
+    def _fetch_one(self, product: RemoteProduct) -> Path:
         """Fetch + crop + write the COG for one product (no error handling).
+
+        Reads the batch context :meth:`_fetch` set up — the crop box and the
+        two pyramids entry points it imported once — from the instance.
 
         Args:
             product: One product from :meth:`_search`.
-            bbox: `[west, south, east, north]` crop box in degrees.
-            open_grib: `pyramids.grib.open_grib`, passed in so the
-                import happens once in :meth:`_fetch`.
-            write_cog: `pyramids.dataset.cog.write_cog`, likewise.
 
         Returns:
             pathlib.Path: The written COG path.
@@ -504,17 +511,17 @@ class NWP(AbstractDataSource):
             meta.get("member"),
             whole=self._mode == "whole",
         )
-        dataset = open_grib(str(grib_path))
+        dataset = self._open_grib(str(grib_path))
         dataset = self._normalise_longitude(dataset)
         # touch=False crops to the bbox *extent*; touch=True takes pyramids'
         # cutline path, which masks the field but keeps the full grid extent
         # (and historically crashed on the GRIB driver's EPSG:9122 CRS — fixed
         # in pyramids 0.24.1, pyramids#403 / PY-1). We want the bbox window.
-        cropped = crop_to_aoi(dataset, self.space, bbox=bbox, touch=False)
+        cropped = crop_to_aoi(dataset, self.space, bbox=self._crop_bbox, touch=False)
         target = self.root_dir / cog_name(
             meta["model_key"], meta["cycle"], meta["step"], meta.get("member")
         )
-        write_cog(cropped, str(target))
+        self._write_cog(cropped, str(target))
         return target
 
     def _normalise_longitude(self, dataset):

@@ -227,7 +227,6 @@ class DEM(AbstractDataSource):
             list[Path]: One local path per tile that existed and was
                 downloaded, in `products` order.
         """
-        client = self._client()
         written: list[Path] = []
         missing = 0
         for product in tqdm(
@@ -236,7 +235,7 @@ class DEM(AbstractDataSource):
             desc=f"dem/{self._dataset_key}",
             unit="tile",
         ):
-            fetched = self._fetch_one(client, product)
+            fetched = self._fetch_one(product)
             if fetched is None:
                 missing += 1
                 continue
@@ -248,19 +247,17 @@ class DEM(AbstractDataSource):
             )
         return written
 
-    def _fetch_one(  # type: ignore[override]
-        self, client: Any, product: RemoteProduct
-    ) -> Path | None:
+    def _fetch_one(self, product: RemoteProduct) -> Path | None:
         """Head + download one candidate tile; return `None` if absent.
 
         Args:
-            client: The unsigned `boto3` S3 client.
             product: The candidate :class:`RemoteProduct` to fetch.
 
         Returns:
             Path | None: The written local path, or `None` when the key
                 is absent (ocean tile, outside coverage).
         """
+        client = self._client()
         bucket: str = product.metadata["bucket"]
         key: str = product.href or ""
         target = self.root_dir / Path(key).name
