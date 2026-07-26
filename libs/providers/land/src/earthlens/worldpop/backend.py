@@ -103,6 +103,9 @@ class WorldPop(AbstractDataSource):
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
 
+    #: Set by `download(force=...)`; bypasses the skip-if-exists check.
+    _force: bool = False
+
     def __init__(
         self,
         start: str,
@@ -519,7 +522,7 @@ class WorldPop(AbstractDataSource):
             requests.ConnectionError | requests.Timeout: If every retry of a
                 transient network error is exhausted.
         """
-        if self._is_complete(dest):
+        if self._is_complete(dest, force=self._force):
             return dest
         http = HttpClient(
             session=cast("requests.Session | None", _RequestsGet()),
@@ -889,7 +892,9 @@ class WorldPop(AbstractDataSource):
         """Dispatch the request (archive path or GeoTIFF search/fetch)."""
         return self._dispatch()
 
-    def download(self, progress_bar: bool = True, aggregate=None) -> list[Path]:
+    def download(
+        self, progress_bar: bool = True, aggregate=None, *, force: bool = False
+    ) -> list[Path]:
         """Fetch the requested products as AOI-cropped GeoTIFFs (+ tables).
 
         Args:
@@ -904,6 +909,7 @@ class WorldPop(AbstractDataSource):
             list[Path]: The written GeoTIFF / table paths.
         """
         self._show_progress = progress_bar
+        self._force = force
         self._aggregate_cfg = aggregate
         return self._dispatch()
 
