@@ -19955,8 +19955,19 @@ raise instead of silently rewriting <code>datasets</code>.</p>
 </ul>
 <h3 id="feat"><a class="toclink" href="#feat">Feat</a><a class="headerlink" href="#feat" title="Permanent link">#</a></h3>
 <ul>
-<li>A bounded-result contract on <code>AbstractDataSource</code>, so a large vector or
-tabular request no longer has to be held whole in memory:</li>
+<li>
+<p>HTTP requests are pooled by default. <code>HttpClient()</code> already built a
+<code>requests.Session</code>, but 22 call sites across 17 modules opted out by injecting
+the per-call <code>RequestsGet</code> adapter, so every request paid a fresh TCP+TLS
+handshake. They now take the pooled default, and the three backends that built
+a client per item (erddap per dataset row, bathymetry per file, gee per
+exported tile) hold one on the instance so the connection is actually reused.
+<code>RequestsGet</code> remains available for a caller that wants no pooling.</p>
+</li>
+<li>
+<p>A bounded-result contract on <code>AbstractDataSource</code>, so a large vector or
+tabular request no longer has to be held whole in memory:</p>
+</li>
 <li><code>EarthLens.iter_download(limit=...)</code> (and
     <code>AbstractDataSource.iter_download</code>) streams one fragment per product, so a
     caller can write or reduce each one and let it go. Backends with the
