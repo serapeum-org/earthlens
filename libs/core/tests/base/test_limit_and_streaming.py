@@ -197,15 +197,17 @@ class TestIterDownload:
     def test_invalid_limit_is_rejected_before_the_first_fetch(self, tmp_path):
         """A bad cap fails on first iteration, having fetched nothing."""
         backend = _build(_Backend, tmp_path)
+        stream = backend.iter_download(limit=0)
         with pytest.raises(ValueError, match="at least 1"):
-            next(backend.iter_download(limit=0))
+            next(stream)
         assert backend.fetched == []
 
     def test_a_whole_batch_backend_says_it_cannot_stream(self, tmp_path):
         """A backend with no per-product hook refuses rather than pretending."""
         backend = _build(_NoPerProductFetch, tmp_path)
+        stream = backend.iter_download()
         with pytest.raises(NotImplementedError, match="cannot stream"):
-            next(backend.iter_download())
+            next(stream)
 
 
 def _counting_pages(pulled):

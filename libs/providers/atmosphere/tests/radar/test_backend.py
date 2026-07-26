@@ -234,8 +234,9 @@ class TestFetch:
 
     def test_errors_rejects_an_unknown_policy(self, tmp_path, fake_s3):
         """An unrecognised errors= value is refused before any request."""
+        b = _make(tmp_path)
         with pytest.raises(ValueError, match="errors"):
-            _make(tmp_path).download(errors="explode")
+            b.download(errors="explode")
 
 
 class TestDownload:

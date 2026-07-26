@@ -200,6 +200,31 @@ def _reject_unsigned_for_nodata_sentinel(dtype: np.dtype) -> None:
         )
 
 
+def _log_date_failures(
+    ds_key: str,
+    var: Variable,
+    failed: list[tuple[pd.Timestamp, BaseException]],
+    *,
+    total: int,
+) -> None:
+    """Warn once for a batch's per-date failures, naming the first three.
+
+    Args:
+        ds_key: The catalog dataset key.
+        var: The variable being fetched.
+        failed: The `(date, exception)` pairs that failed.
+        total: How many dates were attempted, for the ratio.
+    """
+    sample = ", ".join(
+        f"{date.date()} ({type(exc).__name__})" for date, exc in failed[:3]
+    )
+    tail = "" if len(failed) <= 3 else f" (+{len(failed) - 3} more)"
+    logger.warning(
+        f"{ds_key}/{var.name}: {len(failed)}/{total} dates "
+        f"failed; first 3: {sample}{tail}"
+    )
+
+
 def _describe_pair(pair: tuple[str, str]) -> str:
     """Render a `(dataset, variable)` pair for the `_run_items` log lines.
 
@@ -560,9 +585,43 @@ class CHIRPS(AbstractDataSource):
                 ds_key, dataset, var, progress_bar=progress_bar
             )
 
+        dates = self._overlapping_dates(ds_key, dataset)
+        if dates is None:
+            return []
+        # M1: catch per-date failures so a single transient (TCP reset,
+        # FTP 550, a one-off bad raster) doesn't abort the rest of the
+        # batch for this `(ds, var)`. The outer `download()` loop kept
+        # its (ds, var)-level policy as defence in depth for
+        # catalog-resolution / never-reach-the-network failures.
+        if cores:
+            paths, failed = self._fetch_dates_parallel(
+                ds_key, dataset, var, dates, cores
+            )
+        else:
+            paths, failed = self._fetch_dates_sequential(
+                ds_key, dataset, var, dates, progress_bar=progress_bar
+            )
+        if failed:
+            _log_date_failures(ds_key, var, failed, total=len(dates))
+        return paths
+
+    def _overlapping_dates(
+        self, ds_key: str, dataset: ChcDataset
+    ) -> pd.DatetimeIndex | None:
+        """Clamp the request window to the dataset's own and expand it to dates.
+
+        Args:
+            ds_key: The catalog dataset key, named in the no-overlap warning.
+            dataset: The resolved catalog row (carries its publication window
+                and cadence).
+
+        Returns:
+            pandas.DatetimeIndex | None: The dates to fetch, or `None` when the
+                request window does not overlap the dataset at all — which is a
+                warning and an empty result, not an error.
+        """
         ds_start = pd.Timestamp(dataset.start_date)
         ds_end = pd.Timestamp(dataset.end_date) if dataset.end_date else None
-
         window_start = max(self.time.start_date, ds_start)
         window_end = (
             self.time.end_date if ds_end is None else min(self.time.end_date, ds_end)
@@ -575,57 +634,81 @@ class CHIRPS(AbstractDataSource):
                 f"window [{ds_start.date()}, "
                 f"{ds_end.date() if ds_end else 'now'}]; skipping"
             )
-            return []
+            return None
+        return date_windows(window_start, window_end, dataset.pandas_freq)
 
-        dates = date_windows(window_start, window_end, dataset.pandas_freq)
-        # M1: catch per-date failures so a single transient (TCP reset,
-        # FTP 550, a one-off bad raster) doesn't abort the rest of the
-        # batch for this `(ds, var)`. The outer `download()` loop kept
-        # its (ds, var)-level try/except as defence in depth for
-        # catalog-resolution / never-reach-the-network failures.
-        #
-        # L5: the sequential branch shares one FTP login across every
-        # date in this batch (one anonymous-login round-trip instead
-        # of N). On any per-date failure the session is closed and a
-        # fresh one is opened before the next iteration so a broken
-        # socket from one bad date doesn't poison the rest of the
-        # batch. The parallel branch keeps a per-file login because
-        # joblib workers can't share the unpicklable FTP socket.
+    def _fetch_dates_sequential(
+        self,
+        ds_key: str,
+        dataset: ChcDataset,
+        var: Variable,
+        dates: pd.DatetimeIndex,
+        *,
+        progress_bar: bool,
+    ) -> tuple[list[Path], list[tuple[pd.Timestamp, BaseException]]]:
+        """Fetch every date over one shared FTP session.
+
+        L5: one anonymous login serves the whole batch instead of one per date.
+        A per-date failure closes the session and opens a fresh one before the
+        next iteration, so a broken socket from one bad date cannot poison the
+        rest — the recovery step that keeps this loop out of `_run_items`.
+
+        Args:
+            ds_key: The catalog dataset key.
+            dataset: The resolved catalog row.
+            var: The variable being fetched.
+            dates: The dates to fetch.
+            progress_bar: Whether to show the per-dataset tqdm bar.
+
+        Returns:
+            Tuple of the written paths and the `(date, exception)` failures.
+        """
         paths: list[Path] = []
-        if not cores:
-            failed: list[tuple[pd.Timestamp, BaseException]] = []
-            ftp_session = _open_ftp()
-            try:
-                for date in tqdm(
-                    dates, desc=f"CHIRPS {ds_key}", disable=not progress_bar
-                ):
-                    try:
-                        path = self._api(ds_key, dataset, var, date, ftp=ftp_session)
-                    except Exception as exc:  # noqa: BLE001 - log + continue per date
-                        failed.append((date, exc))
-                        ftp_session = _reopen_ftp(ftp_session)
-                    else:
-                        if path is not None:
-                            paths.append(path)
-            finally:
-                _close_ftp_quietly(ftp_session)
-        else:
-            results = Parallel(n_jobs=cores)(
-                delayed(self._api_or_capture)(ds_key, dataset, var, date)
-                for date in dates
-            )
-            paths = [p for p, _exc in results if p is not None]
-            failed = [exc for _p, exc in results if exc is not None]
-        if failed:
-            sample = ", ".join(
-                f"{d.date()} ({type(exc).__name__})" for d, exc in failed[:3]
-            )
-            tail = "" if len(failed) <= 3 else f" (+{len(failed) - 3} more)"
-            logger.warning(
-                f"{ds_key}/{var.name}: {len(failed)}/{len(dates)} dates "
-                f"failed; first 3: {sample}{tail}"
-            )
-        return paths
+        failed: list[tuple[pd.Timestamp, BaseException]] = []
+        ftp_session = _open_ftp()
+        try:
+            for date in tqdm(dates, desc=f"CHIRPS {ds_key}", disable=not progress_bar):
+                try:
+                    path = self._api(ds_key, dataset, var, date, ftp=ftp_session)
+                except Exception as exc:  # noqa: BLE001 - log + continue per date
+                    failed.append((date, exc))
+                    ftp_session = _reopen_ftp(ftp_session)
+                else:
+                    if path is not None:
+                        paths.append(path)
+        finally:
+            _close_ftp_quietly(ftp_session)
+        return paths, failed
+
+    def _fetch_dates_parallel(
+        self,
+        ds_key: str,
+        dataset: ChcDataset,
+        var: Variable,
+        dates: pd.DatetimeIndex,
+        cores: int,
+    ) -> tuple[list[Path], list[tuple[pd.Timestamp, BaseException]]]:
+        """Fetch the dates across joblib workers, each with its own login.
+
+        A worker cannot share the unpicklable FTP socket, so this branch pays a
+        login per file — the trade for the parallelism.
+
+        Args:
+            ds_key: The catalog dataset key.
+            dataset: The resolved catalog row.
+            var: The variable being fetched.
+            dates: The dates to fetch.
+            cores: Number of joblib workers.
+
+        Returns:
+            Tuple of the written paths and the `(date, exception)` failures.
+        """
+        results = Parallel(n_jobs=cores)(
+            delayed(self._api_or_capture)(ds_key, dataset, var, date) for date in dates
+        )
+        paths = [path for path, _exc in results if path is not None]
+        failed = [exc for _path, exc in results if exc is not None]
+        return paths, failed
 
     def _api_or_capture(
         self,

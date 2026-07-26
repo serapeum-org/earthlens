@@ -488,6 +488,38 @@ class Catalog(AbstractCatalog):
             raise KeyError(name) from exc
 
 
+def _merge_shards(
+    files: list[Path],
+) -> tuple[list[str], dict[str, dict[str, Any]], dict[str, Path]]:
+    """Union the `available_datasets:` and `datasets:` blocks across shards.
+
+    Args:
+        files: The contributing YAML files, in sorted order.
+
+    Returns:
+        Tuple of the merged available-id list, the raw row bodies keyed by
+            dataset key, and the file each row came from (for error messages).
+
+    Raises:
+        ValueError: If the same dataset key is declared in two files.
+    """
+    merged_rows: dict[str, dict[str, Any]] = {}
+    row_origin: dict[str, Path] = {}
+    available: list[str] = []
+    for file_path in files:
+        data = load_yaml_strict(file_path) or {}
+        available.extend(str(ident) for ident in data.get("available_datasets") or [])
+        for key, body in (data.get("datasets") or {}).items():
+            if key in merged_rows:
+                raise ValueError(
+                    f"dataset {key!r} declared in two catalog files: "
+                    f"{row_origin[key]} and {file_path}"
+                )
+            merged_rows[key] = dict(body or {})
+            row_origin[key] = file_path
+    return available, merged_rows, row_origin
+
+
 def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     """Merge and validate the JAXA catalog shards into construction kwargs.
 
@@ -506,22 +538,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     # Name the directory when the catalog is sharded, the file when it is not,
     # so the "empty datasets:" error points at what the caller passed.
     path = files[0].parent if len(files) > 1 else files[0]
-    merged_rows: dict[str, dict[str, Any]] = {}
-    row_origin: dict[str, Path] = {}
-    available: list[str] = []
-    for file_path in files:
-        data = load_yaml_strict(file_path) or {}
-        for ident in data.get("available_datasets") or []:
-            available.append(str(ident))
-        for key, body in (data.get("datasets") or {}).items():
-            if key in merged_rows:
-                raise ValueError(
-                    f"dataset {key!r} declared in two catalog files: "
-                    f"{row_origin[key]} and {file_path}"
-                )
-            merged_rows[key] = dict(body or {})
-            row_origin[key] = file_path
-
+    available, merged_rows, row_origin = _merge_shards(files)
     if not merged_rows:
         raise ValueError(
             f"{path} is missing or has an empty 'datasets:' block. "
