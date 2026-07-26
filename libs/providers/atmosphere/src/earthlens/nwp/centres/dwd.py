@@ -47,6 +47,80 @@ _CHUNK_SIZE = 1 << 20
 _GRIB_MAGIC = b"GRIB"
 
 
+class _Bz2Streams:
+    """Decodes a possibly-multi-stream `.bz2` body fed to it block by block.
+
+    Holds the state that makes streamed decoding equivalent to
+    `bz2.decompress`: which decompressor is current, whether it has been fed
+    anything, and whether any stream has completed — that last one decides
+    whether trailing junk is ignored or raised. Keeping it in a small class
+    leaves :func:`_decompress_stream` a plain loop.
+    """
+
+    def __init__(self, handle: IO[bytes]) -> None:
+        """Start with a fresh decompressor writing into `handle`.
+
+        Args:
+            handle: Binary file object decoded bytes are appended to.
+        """
+        self.written = 0
+        self._handle = handle
+        self._decompressor = bz2.BZ2Decompressor()
+        self._completed_a_stream = False
+        self._fed_current = False
+
+    def feed(self, block: bytes) -> None:
+        """Decode one block, crossing stream boundaries as needed.
+
+        Args:
+            block: The next chunk of the compressed body. An empty block (a
+                keep-alive) is a no-op.
+
+        Raises:
+            OSError: If the very first stream is not valid bzip2 at all.
+        """
+        data = block
+        while data:
+            if self._decompressor.eof:
+                # The previous stream finished; anything left is the next one.
+                self._decompressor = bz2.BZ2Decompressor()
+                self._fed_current = False
+            try:
+                chunk = self._decompressor.decompress(data)
+            except OSError:
+                if self._completed_a_stream:
+                    # Not a further stream — trailing bytes. `bz2.decompress`
+                    # ignores these once it has decoded something.
+                    return
+                raise
+            self._fed_current = True
+            self._handle.write(chunk)
+            self.written += len(chunk)
+            # Only a finished stream can leave bytes over; while it is still
+            # consuming, the whole chunk was absorbed.
+            if self._decompressor.eof:
+                self._completed_a_stream = True
+                data = self._decompressor.unused_data
+            else:
+                data = b""
+
+    def finish(self, url: str) -> None:
+        """Reject a body that ended part-way through a stream.
+
+        Args:
+            url: Source URL, redacted into the message.
+
+        Raises:
+            ValueError: If the data ended before its end-of-stream marker.
+        """
+        if self._fed_current and not self._decompressor.eof:
+            raise ValueError(
+                f"{redact_url(url)} returned a truncated bz2 body: the stream "
+                "ended before its end-of-stream marker, so the decompressed "
+                "GRIB2 would be short. Retry the download."
+            )
+
+
 def _head_at(path: Path, offset: int, size: int = 8) -> bytes:
     """Return up to `size` bytes of `path` starting at `offset`.
 
@@ -119,42 +193,11 @@ def _decompress_stream(blocks: Iterable[bytes], handle: IO[bytes], url: str) -> 
             the download was truncated.
         OSError: If the very first stream is not valid bzip2 at all.
     """
-    written = 0
-    decompressor = bz2.BZ2Decompressor()
-    completed_a_stream = False
-    fed_current = False
+    streams = _Bz2Streams(handle)
     for block in blocks:
-        data = block
-        while data:
-            if decompressor.eof:
-                # The previous stream finished; anything left is the next one.
-                decompressor = bz2.BZ2Decompressor()
-                fed_current = False
-            try:
-                chunk = decompressor.decompress(data)
-            except OSError:
-                if completed_a_stream:
-                    # Not a further stream — trailing bytes. `bz2.decompress`
-                    # ignores these once it has decoded something.
-                    return written
-                raise
-            fed_current = True
-            handle.write(chunk)
-            written += len(chunk)
-            # Only a finished stream can leave bytes over; while it is still
-            # consuming, the whole chunk was absorbed.
-            if decompressor.eof:
-                completed_a_stream = True
-                data = decompressor.unused_data
-            else:
-                data = b""
-    if fed_current and not decompressor.eof:
-        raise ValueError(
-            f"{redact_url(url)} returned a truncated bz2 body: the stream "
-            "ended before its end-of-stream marker, so the decompressed GRIB2 "
-            "would be short. Retry the download."
-        )
-    return written
+        streams.feed(block)
+    streams.finish(url)
+    return streams.written
 
 
 class DWDCentre(_NWPCentre):

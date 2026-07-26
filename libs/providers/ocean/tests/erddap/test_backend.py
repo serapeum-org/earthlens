@@ -287,8 +287,9 @@ class TestGriddap:
             return FakeResponse(content=b"<html><body>Resource not found</body></html>")
 
         monkeypatch.setattr("earthlens.erddap.backend.requests.get", _get)
+        backend = _grid_backend(tmp_path)
         with pytest.raises(ValueError, match="non-NetCDF body"):
-            _grid_backend(tmp_path).download()
+            backend.download()
         assert not (tmp_path / f"{GRIDDAP_ID}.nc").exists()
 
 

@@ -382,7 +382,8 @@ class TestBathymetryStreams:
             return _NoBufferResponse(b"<html>server busy</html>")
 
         monkeypatch.setattr(backend_module.requests, "get", _fake_get)
+        backend = _make("gebco_2020", tmp_path)
         with pytest.raises(ValueError, match="non-NetCDF body"):
-            _make("gebco_2020", tmp_path).download()
+            backend.download()
         assert list(tmp_path.glob("*.nc")) == [], "an error page must not be written"
         assert list(tmp_path.glob("*.part")) == [], "no temp may be left behind"

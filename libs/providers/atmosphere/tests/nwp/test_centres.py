@@ -1320,12 +1320,10 @@ class TestDecompressStream:
         from earthlens.nwp.centres.dwd import _decompress_stream
 
         whole = bz2.compress(b"body" * 200)
+        blocks = iter([whole[: len(whole) // 2]])
+        sink = io.BytesIO()
         with pytest.raises(ValueError) as exc:
-            _decompress_stream(
-                iter([whole[: len(whole) // 2]]),
-                io.BytesIO(),
-                "https://h/x.bz2?token=SECRET",
-            )
+            _decompress_stream(blocks, sink, "https://h/x.bz2?token=SECRET")
         assert "SECRET" not in str(exc.value), f"secret leaked: {exc.value}"
 
     def test_empty_band_body_aborts_the_fetch(self, monkeypatch, tmp_path):
@@ -1338,9 +1336,11 @@ class TestDecompressStream:
         module.get = fake_get
         monkeypatch.setitem(sys.modules, "requests", module)
 
+        centre = DWDCentre(tmp_path)
+        model = TestDWDCentre._icon(TestDWDCentre())
         with pytest.raises(ValueError, match="empty body for band"):
-            DWDCentre(tmp_path).fetch_one(
-                TestDWDCentre._icon(TestDWDCentre()),
+            centre.fetch_one(
+                model,
                 dt.datetime(2024, 6, 1, 0),
                 0,
                 ["temperature_2m"],
@@ -1362,9 +1362,11 @@ class TestDecompressStream:
         module.get = fake_get
         monkeypatch.setitem(sys.modules, "requests", module)
 
+        centre = DWDCentre(tmp_path)
+        model = TestDWDCentre._icon(TestDWDCentre())
         with pytest.raises(ValueError, match="truncated bz2 body"):
-            DWDCentre(tmp_path).fetch_one(
-                TestDWDCentre._icon(TestDWDCentre()),
+            centre.fetch_one(
+                model,
                 dt.datetime(2024, 6, 1, 0),
                 0,
                 ["temperature_2m"],
@@ -1390,9 +1392,11 @@ class TestGribMagicValidation:
         module.get = fake_get
         monkeypatch.setitem(sys.modules, "requests", module)
 
+        centre = DWDCentre(tmp_path)
+        model = TestDWDCentre._icon(TestDWDCentre())
         with pytest.raises(ValueError, match="did not return GRIB2"):
-            DWDCentre(tmp_path).fetch_one(
-                TestDWDCentre._icon(TestDWDCentre()),
+            centre.fetch_one(
+                model,
                 dt.datetime(2024, 6, 1, 0),
                 0,
                 ["temperature_2m"],
@@ -1419,9 +1423,11 @@ class TestGribMagicValidation:
         module.get = fake_get
         monkeypatch.setitem(sys.modules, "requests", module)
 
+        centre = DWDCentre(tmp_path)
+        model = TestDWDCentre._icon(TestDWDCentre())
         with pytest.raises(ValueError, match="did not return GRIB2"):
-            DWDCentre(tmp_path).fetch_one(
-                TestDWDCentre._icon(TestDWDCentre()),
+            centre.fetch_one(
+                model,
                 dt.datetime(2024, 6, 1, 0),
                 0,
                 ["temperature_2m", "precipitation_acc"],
@@ -1440,9 +1446,11 @@ class TestGribMagicValidation:
         module.get = fake_get
         monkeypatch.setitem(sys.modules, "requests", module)
 
+        centre = MeteoFranceAPICentre(tmp_path)
+        model = TestMeteoFranceAPICentre._arpege(TestMeteoFranceAPICentre())
         with pytest.raises(ValueError, match="did not return GRIB2"):
-            MeteoFranceAPICentre(tmp_path).fetch_one(
-                TestMeteoFranceAPICentre._arpege(TestMeteoFranceAPICentre()),
+            centre.fetch_one(
+                model,
                 dt.datetime(2024, 6, 1, 0),
                 24,
                 ["temperature_2m"],

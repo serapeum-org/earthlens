@@ -1304,8 +1304,9 @@ class TestStreamingAggregation:
         """A failure mid-reduction still releases the handles on the way out."""
         nc = self._nc()
         _patch_netcdf_read(monkeypatch, nc)
+        config = AggregationConfig(freq="nonsense")
         with pytest.raises(ValueError):
-            aggregate_netcdf("x.nc", state_var, AggregationConfig(freq="nonsense"))
+            aggregate_netcdf("x.nc", state_var, config)
         assert nc.closed, "handles must be released on the error path too"
 
     def test_iterator_yields_lazily(self, monkeypatch, state_var):

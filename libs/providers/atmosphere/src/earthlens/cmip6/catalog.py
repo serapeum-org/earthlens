@@ -185,18 +185,18 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     tables = Catalog._parse_block(path, data.get("tables"), Table)
     sources = Catalog._parse_block(path, data.get("sources"), Source)
     defaults = data.get("defaults") or {}
-    return dict(
-        csv_url=csv_url,
-        bucket=data.get("bucket", "cmip6"),
-        facet_columns=list(data.get("facet_columns") or []),
-        default_member_id=defaults.get("member_id", "r1i1p1f1"),
-        default_version=defaults.get("version", "latest"),
-        default_terms_note=data.get("default_terms_note", ""),
-        datasets=variables,
-        experiments=experiments,
-        tables=tables,
-        sources=sources,
-    )
+    return {
+        "csv_url": csv_url,
+        "bucket": data.get("bucket", "cmip6"),
+        "facet_columns": list(data.get("facet_columns") or []),
+        "default_member_id": defaults.get("member_id", "r1i1p1f1"),
+        "default_version": defaults.get("version", "latest"),
+        "default_terms_note": data.get("default_terms_note", ""),
+        "datasets": variables,
+        "experiments": experiments,
+        "tables": tables,
+        "sources": sources,
+    }
 
 
 class Catalog(AbstractCatalog):

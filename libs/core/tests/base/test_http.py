@@ -665,8 +665,9 @@ class TestDownload:
             [_Resp(blocks=[b"partial"], stream_error=OSError("mid-stream"))]
         )
         dest = tmp_path / "out.bin"
+        client = HttpClient(session=session)
         with pytest.raises(OSError):
-            HttpClient(session=session).download("http://x", dest, progress=False)
+            client.download("http://x", dest, progress=False)
         assert not dest.exists()
         assert not dest.with_name("out.bin.part").exists()
 
@@ -775,8 +776,9 @@ class TestDownload:
         session = _RecordingSession([_Resp(blocks=[b"data"])])
         dest = tmp_path / "out.bin"
         dest.mkdir()  # a directory target makes tmp.replace(dest) fail
+        client = HttpClient(session=session)
         with pytest.raises(OSError):
-            HttpClient(session=session).download("http://x", dest, progress=False)
+            client.download("http://x", dest, progress=False)
         assert not dest.with_name("out.bin.part").exists()
 
     def test_download_retries_on_predicate(self, tmp_path):
@@ -882,8 +884,9 @@ class TestDownloadExpectMagic:
         """A non-matching body raises ValueError and never becomes dest."""
         session = _RecordingSession([_Resp(blocks=[b"<html>error</html>"])])
         dest = tmp_path / "out.nc"
+        client = HttpClient(session=session)
         with pytest.raises(ValueError, match="does not start with"):
-            HttpClient(session=session).download(
+            client.download(
                 "http://x/out.nc", dest, progress=False, expect_magic=b"CDF"
             )
         assert not dest.exists(), "an error page must not be published as dest"
@@ -894,8 +897,9 @@ class TestDownloadExpectMagic:
         session = _RecordingSession([_Resp(blocks=[b"<html>error</html>"])])
         dest = tmp_path / "out.nc"
         dest.write_bytes(b"CDF\x01earlier good file")
+        client = HttpClient(session=session)
         with pytest.raises(ValueError):
-            HttpClient(session=session).download(
+            client.download(
                 "http://x/out.nc", dest, progress=False, expect_magic=b"CDF"
             )
         assert dest.read_bytes() == b"CDF\x01earlier good file"
@@ -911,8 +915,9 @@ class TestDownloadExpectMagic:
         """The rejected response is still released, not left open."""
         response = _Resp(blocks=[b"<html>"])
         session = _RecordingSession([response])
+        client = HttpClient(session=session)
         with pytest.raises(ValueError):
-            HttpClient(session=session).download(
+            client.download(
                 "http://x/out.nc",
                 tmp_path / "out.nc",
                 progress=False,

@@ -228,7 +228,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
             raise ValueError(
                 f"{path} configuration {key!r} failed validation:\n{exc}"
             ) from exc
-    return dict(datasets=products, configurations=configurations)
+    return {"datasets": products, "configurations": configurations}
 
 
 class Catalog(AbstractCatalog):
