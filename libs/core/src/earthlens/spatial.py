@@ -5,9 +5,11 @@
     is generic GIS geometry work — polygon gridding, cell counting, convex
     hulls, polygon splitting — with no provider knowledge in it, so under
     this repo's porting policy it belongs in `pyramids.feature`, not here.
-    Nothing in earthlens imports it: it is absent from
+    No *production* code imports it: it is absent from
     `earthlens.core.__all__` and from the docs navigation, and the only
-    references to it are its own doctests.
+    callers are its own doctests, `libs/core/tests/test_spatial.py`, and a
+    cross-reference in the gee backend's docstring — all of which go with it
+    when the port lands.
 
     Do not build on it. Once the `PY-2` port lands upstream, this module
     and its tests are deleted here and the functions are consumed from

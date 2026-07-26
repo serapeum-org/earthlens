@@ -463,9 +463,11 @@ class FDSN(AbstractDataSource):
                 written.append(self._write(product.id, collection))
 
         combined = events.concat_fcs(collections)
-        # Each network's events are already written and copied into
-        # `combined`; drop the per-network copies rather than carry them
-        # through the summary and the return.
+        # `concat_fcs` has copied every network's events, so the per-network
+        # copies are dead weight from here on. This does not lower the *peak* —
+        # that was reached inside the concat, with both sets live — but it stops
+        # them being held through the summary, the return, and however long the
+        # caller keeps the result.
         collections.clear()
         if written:
             logger.info(

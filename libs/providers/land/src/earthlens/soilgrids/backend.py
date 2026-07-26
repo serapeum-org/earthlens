@@ -374,7 +374,14 @@ class SoilGrids(AbstractDataSource):
         # the extension, so a driver-less suffix like `.part` would raise
         # DriverNotExistError.
         tmp_dir = self._tmp_dir
-        assert tmp_dir is not None  # `_fetch` sets it for the whole batch
+        if tmp_dir is None:
+            # A real check, not an `assert`: asserts vanish under `python -O`,
+            # and the next line would then fail as an obscure
+            # `TypeError: unsupported operand type(s) for /: NoneType and str`.
+            raise RuntimeError(
+                "SoilGrids._fetch_one was called outside a download: the "
+                "per-batch scratch directory is only set up by _api()."
+            )
         tmp_path = tmp_dir / out_path.name
         dataset = None
         result = None

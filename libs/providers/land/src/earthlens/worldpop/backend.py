@@ -907,6 +907,9 @@ class WorldPop(AbstractDataSource):
                 the **rasters** only — for demographic products the per-cohort
                 age/sex tables are still written per year (the table column is
                 not aggregated). Ignored by the archive products.
+            force: Re-fetch every raw file even when a complete one already
+                exists, bypassing the skip-if-exists check. Defaults to
+                `False`.
 
         Returns:
             list[Path]: The written GeoTIFF / table paths.

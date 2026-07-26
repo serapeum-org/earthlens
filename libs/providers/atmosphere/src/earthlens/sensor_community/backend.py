@@ -291,9 +291,11 @@ class SensorCommunity(AbstractDataSource):
         if not non_empty:
             return empty_frame()
         combined = pd.concat(non_empty, ignore_index=True)
-        # `concat` copied every frame, so release the per-day sources rather
-        # than holding them alongside the result. Clearing `frames` alone
-        # would free nothing: `non_empty` still references each frame.
+        # `concat` copied every frame, so the per-sensor sources are dead
+        # weight from here. Both lists have to be cleared — either alone frees
+        # nothing, since each holds the same frames. This does not lower the
+        # peak (reached inside the concat) but stops them being carried through
+        # the window filter and the return.
         frames.clear()
         non_empty.clear()
         return combined
