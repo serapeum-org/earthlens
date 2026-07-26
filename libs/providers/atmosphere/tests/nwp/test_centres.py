@@ -1478,6 +1478,7 @@ class TestGribMagicValidation:
             TestDWDCentre(), url_template="https://x/{var_lc}/f.grib2.bz2?key=SECRET"
         )
         cycle = dt.datetime(2024, 6, 1, 0)
+        centre = DWDCentre(tmp_path)
         with pytest.raises(ValueError) as exc:
-            DWDCentre(tmp_path).fetch_one(model, cycle, 0, ["temperature_2m"], "auto")
+            centre.fetch_one(model, cycle, 0, ["temperature_2m"], "auto")
         assert "SECRET" not in str(exc.value), f"secret leaked: {exc.value}"
