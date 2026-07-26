@@ -739,6 +739,91 @@ class BdcTokenSigner(_BaseSigner):
         )
 
 
+class _AnonymousS3Signer:
+    """Anonymous signer that also tells GDAL not to sign its S3 reads.
+
+    pyramids' `AnonymousSigner` contributes an empty GDAL config, which is
+    right for a plain-HTTPS anonymous asset but not for one on S3: GDAL's
+    `/vsis3/` driver then tries to *sign* the request, finds no AWS
+    credentials, and fails with `InvalidCredentials` — an error whose own text
+    tells you to set `AWS_NO_SIGN_REQUEST`. The anonymous STAC endpoints that
+    serve assets straight out of a public bucket (Digital Earth Africa, DEA,
+    VEDA) hit exactly that, which is why their e2e reads failed.
+
+    Setting the flag is safe here precisely *because* this signer is the
+    anonymous one: there are no credentials to use, so an unsigned request is
+    the only kind that can succeed. Requester-pays keeps its own signer, which
+    contributes real credentials plus `AWS_REQUEST_PAYER`, and is untouched.
+
+    Examples:
+        - The GDAL config opts out of request signing:
+            ```python
+            >>> from earthlens.stac.signers import build_signer
+            >>> build_signer("anonymous").gdal_env()["AWS_NO_SIGN_REQUEST"]
+            'YES'
+
+            ```
+        - Signing a request or an href is still a no-op — nothing to add:
+            ```python
+            >>> from earthlens.stac.signers import build_signer
+            >>> signer = build_signer("anonymous")
+            >>> signer.sign_href("s3://bucket/key.tif")
+            's3://bucket/key.tif'
+
+            ```
+    """
+
+    #: Signer name, matching the catalog's `signer:` value and the pyramids
+    #: signers' own attribute, so `_signer_for` logging reads the same.
+    name: str = "anonymous"
+
+    def gdal_env(self) -> dict[str, str]:
+        """Return the GDAL config for unsigned public-bucket reads.
+
+        Returns:
+            dict[str, str]: `AWS_NO_SIGN_REQUEST=YES` plus the standard
+                cloud-read knobs that avoid needless HEAD/list calls.
+        """
+        return {
+            "AWS_NO_SIGN_REQUEST": "YES",
+            "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
+            "CPL_VSIL_CURL_USE_HEAD": "NO",
+        }
+
+    def sign_request(self, request: Any) -> Any:
+        """Return `request` unchanged — an anonymous search needs no signing.
+
+        Args:
+            request: The outgoing search request.
+
+        Returns:
+            The same request object.
+        """
+        return request
+
+    def sign_href(self, href: str) -> str:
+        """Return `href` unchanged — the credential is the absence of one.
+
+        Args:
+            href: The asset href.
+
+        Returns:
+            The same href.
+        """
+        return href
+
+    def sign_item(self, item: Any) -> Any:
+        """Return `item` unchanged.
+
+        Args:
+            item: A STAC item.
+
+        Returns:
+            The same item.
+        """
+        return item
+
+
 def build_signer(signer_type: str, **creds: Any) -> Any:
     """Build the signer named by a catalog `signer:` field.
 
@@ -796,9 +881,7 @@ def build_signer(signer_type: str, **creds: Any) -> Any:
             ```
     """
     if signer_type == "anonymous":
-        from pyramids.stac import AnonymousSigner
-
-        return AnonymousSigner()
+        return _AnonymousS3Signer()
     if signer_type == "aws-requester-pays":
         from pyramids.stac import AWSRequesterPaysSigner
 
