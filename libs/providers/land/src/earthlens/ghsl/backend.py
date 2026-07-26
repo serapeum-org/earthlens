@@ -733,15 +733,22 @@ class GHSL(AbstractDataSource):
         # The real suffix is kept — pyramids picks its driver from the
         # extension, and a bare `.part` matches none.
         staged = target.with_name(f"{target.stem}.part{target.suffix}")
-        cropped.to_file(str(staged))
-        # pyramids keeps the written dataset's GDAL handle open, which holds a
-        # Windows lock and blocks the rename; release it first.
-        close_quietly(cropped)
-        staged.replace(target)
+        try:
+            cropped.to_file(str(staged))
+            # pyramids keeps the written dataset's GDAL handle open, which
+            # holds a Windows lock and blocks the rename; release it first.
+            close_quietly(cropped)
+            staged.replace(target)
+        except BaseException:
+            # A failed write must not strand the `.part` for the next run to
+            # trip over, and both handles have to go either way.
+            close_quietly(cropped)
+            close_quietly(dataset)
+            staged.unlink(missing_ok=True)
+            raise
         if has_legend:
             self._write_legend_sidecar(target, rp.metadata["product"])
         close_quietly(dataset)
-        close_quietly(cropped)
         # Best-effort cleanup of the merge intermediate; on Windows the GDAL
         # handle can briefly outlive the Python object, so a locked file is
         # left in the cache rather than raising.

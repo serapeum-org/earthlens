@@ -1338,3 +1338,49 @@ class TestDownloadEndToEnd:
 def test_gee_declares_raster_output_kind():
     """GEE declares OUTPUT_KIND='raster' so the facade forwards aggregate=."""
     assert GEE.OUTPUT_KIND == "raster"
+
+
+class TestGeeStreams:
+    """L7: the getDownloadURL body must reach disk without being buffered.
+
+    The other five ARC-4b migrations each carry a lock like this; gee was the
+    only site without one, and its fake still exposed `.content`.
+    """
+
+    def test_tile_fetch_never_touches_response_content(self, make_gee, monkeypatch):
+        """A regression to `response.content` fails this test."""
+
+        class _NoBufferResponse:
+            status_code = 200
+            headers: dict[str, str] = {}
+
+            def __init__(self, body: bytes):
+                self._body = body
+
+            @property
+            def content(self) -> bytes:
+                raise AssertionError(
+                    "the body must be streamed, not buffered via .content"
+                )
+
+            def raise_for_status(self) -> None:
+                """A 200 needs no action."""
+
+            def iter_content(self, chunk_size=None):
+                """Yield the body in small blocks, as a streamed response does."""
+                for start in range(0, len(self._body), 8):
+                    yield self._body[start : start + 8]
+
+            def close(self) -> None:
+                """No socket to release."""
+
+        seen: list[dict] = []
+
+        def fake_get(url, **kwargs):
+            seen.append(kwargs)
+            return _NoBufferResponse(_FAKE_TIFF_BYTES)
+
+        monkeypatch.setattr(requests, "get", fake_get)
+        make_gee().download(progress_bar=False)
+        assert seen, "the tile URL should have been fetched"
+        assert seen[0].get("stream") is True, f"the GET must stream: {seen[0]}"

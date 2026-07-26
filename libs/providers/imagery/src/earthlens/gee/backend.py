@@ -62,6 +62,7 @@ from earthlens.base import (
     LazyClientMixin,
     OutputKind,
     TemporalExtent,
+    close_quietly,
     date_windows,
     to_datetime,
 )
@@ -895,7 +896,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     path=str(target),
                 )
             else:
-                PyramidsDataset.read_file(str(staged)).to_file(str(target))
+                # Release the reader before the `finally` unlink: pyramids keeps
+                # the GDAL handle open, which holds a Windows lock on `staged`
+                # (the same reason ghsl closes before its rename).
+                reader = PyramidsDataset.read_file(str(staged))
+                try:
+                    reader.to_file(str(target))
+                finally:
+                    close_quietly(reader)
         finally:
             staged.unlink(missing_ok=True)
         logger.info(f"Wrote {target} ({size} bytes)")
