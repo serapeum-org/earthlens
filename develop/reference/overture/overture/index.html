@@ -20518,7 +20518,9 @@ newest first, from the bundled YAML's informational index.</p>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Theme/type catalog for the Overture Maps backend.</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    Reads the bundled `overture_data_catalog.yaml` (shipped as package</span>
@@ -20598,121 +20600,123 @@ newest first, from the bundled YAML's informational index.</p>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            ValueError: If the file has no `themes:` block, or a row</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                fails `Theme` validation.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_overture_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;Overture&quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="p">)</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>            <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="p">)</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Theme</span><span class="p">]:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the theme map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            dict[str, Theme]: Same object as `datasets`.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Theme</span><span class="p">:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Theme` for `name`, with a did-you-mean hint on miss.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Thin alias over `AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                contents fail validation.</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            ValueError: If the file has no `themes:` block, or a row</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">                fails `Theme` validation.</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_overture_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;Overture&quot;</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="p">)</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>            <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="p">)</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Theme</span><span class="p">]:</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the theme map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            dict[str, Theme]: Same object as `datasets`.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Theme</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Theme` for `name`, with a did-you-mean hint on miss.</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            name: A friendly theme name (`&quot;buildings&quot;`, `&quot;places&quot;`, …).</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            Theme: The matching theme row.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            ValueError: If `name` is not a registered theme.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            - Resolve a theme and read its primary type and geometry:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                &gt;&gt;&gt; theme = Catalog().get_theme(&quot;places&quot;)</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                &gt;&gt;&gt; theme.default_type</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                &#39;place&#39;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                &gt;&gt;&gt; theme.geometry</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                &#39;Point&#39;</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Theme&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">themes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered theme names, sorted.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            list[str]: The theme names</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">                (`[&quot;addresses&quot;, &quot;base&quot;, &quot;buildings&quot;, ...]`).</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">            - List the curated themes:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">                &gt;&gt;&gt; Catalog().themes()[:3]</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">                [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;]</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return every Overture feature type in the available index, sorted.</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        This is the provider&#39;s full queryable universe (all themes,</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        including the uncurated `base` / `addresses`); every curated</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        theme&#39;s `types` are a subset of it.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            list[str]: All Overture types</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                (`[&quot;address&quot;, &quot;bathymetry&quot;, &quot;building&quot;, ...]`).</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            - The full type universe includes every curated theme&#39;s types:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                &gt;&gt;&gt; types = Catalog().available_types()</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                &gt;&gt;&gt; &quot;building&quot; in types and &quot;address&quot; in types</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">                True</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">                &gt;&gt;&gt; len(types)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">                15</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">latest_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the newest indexed Overture release, or `None` if unindexed.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        Reads only the bundled `available_releases:` index (newest</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        first); it makes no network call. When the index is empty the</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        backend leaves `release=None` and lets the `overturemaps` SDK</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        auto-target the newest release at fetch time.</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">            str | None: The newest release id (e.g. `&quot;2026-05-20.0&quot;`), or</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">                `None` when the index is empty.</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">            - The newest release is the head of the index (no network):</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                &gt;&gt;&gt; release = Catalog().latest_release()</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">                &gt;&gt;&gt; release is None or release[:2] == &quot;20&quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">                True</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Thin alias over `AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            name: A friendly theme name (`&quot;buildings&quot;`, `&quot;places&quot;`, …).</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            Theme: The matching theme row.</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            ValueError: If `name` is not a registered theme.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            - Resolve a theme and read its primary type and geometry:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                &gt;&gt;&gt; theme = Catalog().get_theme(&quot;places&quot;)</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                &gt;&gt;&gt; theme.default_type</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                &#39;place&#39;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                &gt;&gt;&gt; theme.geometry</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                &#39;Point&#39;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Theme&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">themes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered theme names, sorted.</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            list[str]: The theme names</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">                (`[&quot;addresses&quot;, &quot;base&quot;, &quot;buildings&quot;, ...]`).</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            - List the curated themes:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">                &gt;&gt;&gt; Catalog().themes()[:3]</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">                [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;]</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return every Overture feature type in the available index, sorted.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        This is the provider&#39;s full queryable universe (all themes,</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        including the uncurated `base` / `addresses`); every curated</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        theme&#39;s `types` are a subset of it.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            list[str]: All Overture types</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">                (`[&quot;address&quot;, &quot;bathymetry&quot;, &quot;building&quot;, ...]`).</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            - The full type universe includes every curated theme&#39;s types:</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">                &gt;&gt;&gt; types = Catalog().available_types()</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">                &gt;&gt;&gt; &quot;building&quot; in types and &quot;address&quot; in types</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">                True</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                &gt;&gt;&gt; len(types)</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">                15</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">latest_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the newest indexed Overture release, or `None` if unindexed.</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        Reads only the bundled `available_releases:` index (newest</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        first); it makes no network call. When the index is empty the</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        backend leaves `release=None` and lets the `overturemaps` SDK</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        auto-target the newest release at fetch time.</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            str | None: The newest release id (e.g. `&quot;2026-05-20.0&quot;`), or</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">                `None` when the index is empty.</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            - The newest release is the head of the index (no network):</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">                &gt;&gt;&gt; release = Catalog().latest_release()</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">                &gt;&gt;&gt; release is None or release[:2] == &quot;20&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">                True</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span> <span class="k">else</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -20785,9 +20789,7 @@ theme's <code>types</code> are a subset of it.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-349">349</a></span>
 <span class="normal"><a href="#__codelineno-0-350">350</a></span>
 <span class="normal"><a href="#__codelineno-0-351">351</a></span>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
@@ -20808,30 +20810,32 @@ theme's <code>types</code> are a subset of it.</p>
 <span class="normal"><a href="#__codelineno-0-367">367</a></span>
 <span class="normal"><a href="#__codelineno-0-368">368</a></span>
 <span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="k">def</span><span class="w"> </span><span class="nf">available_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return every Overture feature type in the available index, sorted.</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    This is the provider&#39;s full queryable universe (all themes,</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    including the uncurated `base` / `addresses`); every curated</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    theme&#39;s `types` are a subset of it.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        list[str]: All Overture types</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            (`[&quot;address&quot;, &quot;bathymetry&quot;, &quot;building&quot;, ...]`).</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        - The full type universe includes every curated theme&#39;s types:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            &gt;&gt;&gt; types = Catalog().available_types()</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">            &gt;&gt;&gt; &quot;building&quot; in types and &quot;address&quot; in types</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            True</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            &gt;&gt;&gt; len(types)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            15</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-370">370</a></span>
+<span class="normal"><a href="#__codelineno-0-371">371</a></span>
+<span class="normal"><a href="#__codelineno-0-372">372</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="k">def</span><span class="w"> </span><span class="nf">available_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return every Overture feature type in the available index, sorted.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    This is the provider&#39;s full queryable universe (all themes,</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    including the uncurated `base` / `addresses`); every curated</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    theme&#39;s `types` are a subset of it.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        list[str]: All Overture types</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            (`[&quot;address&quot;, &quot;bathymetry&quot;, &quot;building&quot;, ...]`).</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        - The full type universe includes every curated theme&#39;s types:</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            &gt;&gt;&gt; types = Catalog().available_types()</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            &gt;&gt;&gt; &quot;building&quot; in types and &quot;address&quot; in types</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            True</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            &gt;&gt;&gt; len(types)</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">            15</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -20877,19 +20881,19 @@ theme's <code>types</code> are a subset of it.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-293">293</a></span>
-<span class="normal"><a href="#__codelineno-0-294">294</a></span>
-<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-295">295</a></span>
 <span class="normal"><a href="#__codelineno-0-296">296</a></span>
 <span class="normal"><a href="#__codelineno-0-297">297</a></span>
 <span class="normal"><a href="#__codelineno-0-298">298</a></span>
-<span class="normal"><a href="#__codelineno-0-299">299</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Theme</span><span class="p">]:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the theme map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        dict[str, Theme]: Same object as `datasets`.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Theme</span><span class="p">]:</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the theme map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        dict[str, Theme]: Same object as `datasets`.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21003,9 +21007,7 @@ theme's <code>types</code> are a subset of it.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-301">301</a></span>
-<span class="normal"><a href="#__codelineno-0-302">302</a></span>
-<span class="normal"><a href="#__codelineno-0-303">303</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
@@ -21029,33 +21031,35 @@ theme's <code>types</code> are a subset of it.</p>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Theme</span><span class="p">:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Theme` for `name`, with a did-you-mean hint on miss.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Thin alias over `AbstractCatalog.get_dataset`.</span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Theme</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Theme` for `name`, with a did-you-mean hint on miss.</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        name: A friendly theme name (`&quot;buildings&quot;`, `&quot;places&quot;`, …).</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Theme: The matching theme row.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        ValueError: If `name` is not a registered theme.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        - Resolve a theme and read its primary type and geometry:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            &gt;&gt;&gt; theme = Catalog().get_theme(&quot;places&quot;)</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            &gt;&gt;&gt; theme.default_type</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            &#39;place&#39;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            &gt;&gt;&gt; theme.geometry</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            &#39;Point&#39;</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Theme&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Thin alias over `AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        name: A friendly theme name (`&quot;buildings&quot;`, `&quot;places&quot;`, …).</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Theme: The matching theme row.</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        ValueError: If `name` is not a registered theme.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        - Resolve a theme and read its primary type and geometry:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            &gt;&gt;&gt; theme = Catalog().get_theme(&quot;places&quot;)</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            &gt;&gt;&gt; theme.default_type</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            &#39;place&#39;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            &gt;&gt;&gt; theme.geometry</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            &#39;Point&#39;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Theme&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21117,9 +21121,7 @@ auto-target the newest release at fetch time.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-374">374</a></span>
 <span class="normal"><a href="#__codelineno-0-375">375</a></span>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
@@ -21139,29 +21141,31 @@ auto-target the newest release at fetch time.</p>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="k">def</span><span class="w"> </span><span class="nf">latest_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the newest indexed Overture release, or `None` if unindexed.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    Reads only the bundled `available_releases:` index (newest</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    first); it makes no network call. When the index is empty the</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    backend leaves `release=None` and lets the `overturemaps` SDK</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    auto-target the newest release at fetch time.</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        str | None: The newest release id (e.g. `&quot;2026-05-20.0&quot;`), or</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">            `None` when the index is empty.</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        - The newest release is the head of the index (no network):</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            &gt;&gt;&gt; release = Catalog().latest_release()</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            &gt;&gt;&gt; release is None or release[:2] == &quot;20&quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            True</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span> <span class="k">else</span> <span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="k">def</span><span class="w"> </span><span class="nf">latest_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the newest indexed Overture release, or `None` if unindexed.</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    Reads only the bundled `available_releases:` index (newest</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    first); it makes no network call. When the index is empty the</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    backend leaves `release=None` and lets the `overturemaps` SDK</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    auto-target the newest release at fetch time.</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        str | None: The newest release id (e.g. `&quot;2026-05-20.0&quot;`), or</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            `None` when the index is empty.</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        - The newest release is the head of the index (no network):</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            &gt;&gt;&gt; release = Catalog().latest_release()</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            &gt;&gt;&gt; release is None or release[:2] == &quot;20&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            True</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span> <span class="k">else</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21256,6 +21260,17 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
+                <p>If <code>catalog_path</code> does not exist, or the file's
+contents fail validation.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
                 <p>If the file has no <code>themes:</code> block, or a row
 fails <code>Theme</code> validation.</p>
               </div>
@@ -21290,7 +21305,9 @@ fails <code>Theme</code> validation.</p>
 <span class="normal"><a href="#__codelineno-0-288">288</a></span>
 <span class="normal"><a href="#__codelineno-0-289">289</a></span>
 <span class="normal"><a href="#__codelineno-0-290">290</a></span>
-<span class="normal"><a href="#__codelineno-0-291">291</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="nd">@classmethod</span>
+<span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="nd">@classmethod</span>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Overture theme catalog from disk.</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a>
@@ -21302,18 +21319,20 @@ fails <code>Theme</code> validation.</p>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        ValueError: If the file has no `themes:` block, or a row</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            fails `Theme` validation.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_overture_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;Overture&quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="p">)</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="p">)</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            contents fail validation.</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        ValueError: If the file has no `themes:` block, or a row</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            fails `Theme` validation.</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_overture_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;Overture&quot;</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="p">)</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21449,9 +21468,7 @@ empty, or has a malformed theme row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
@@ -21465,23 +21482,25 @@ empty, or has a malformed theme row.</p>
 <span class="normal"><a href="#__codelineno-0-342">342</a></span>
 <span class="normal"><a href="#__codelineno-0-343">343</a></span>
 <span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="k">def</span><span class="w"> </span><span class="nf">themes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered theme names, sorted.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        list[str]: The theme names</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">            (`[&quot;addresses&quot;, &quot;base&quot;, &quot;buildings&quot;, ...]`).</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        - List the curated themes:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">            &gt;&gt;&gt; Catalog().themes()[:3]</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;]</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-345">345</a></span>
+<span class="normal"><a href="#__codelineno-0-346">346</a></span>
+<span class="normal"><a href="#__codelineno-0-347">347</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="k">def</span><span class="w"> </span><span class="nf">themes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered theme names, sorted.</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        list[str]: The theme names</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            (`[&quot;addresses&quot;, &quot;base&quot;, &quot;buildings&quot;, ...]`).</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        - List the curated themes:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">            &gt;&gt;&gt; Catalog().themes()[:3]</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;]</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27323,7 +27342,9 @@ newest first, from the bundled YAML's informational index.</p>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Theme/type catalog for the Overture Maps backend.</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    Reads the bundled `overture_data_catalog.yaml` (shipped as package</span>
@@ -27403,121 +27424,123 @@ newest first, from the bundled YAML's informational index.</p>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">            A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            ValueError: If the file has no `themes:` block, or a row</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                fails `Theme` validation.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_overture_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;Overture&quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="p">)</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>            <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="p">)</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Theme</span><span class="p">]:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the theme map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            dict[str, Theme]: Same object as `datasets`.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Theme</span><span class="p">:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Theme` for `name`, with a did-you-mean hint on miss.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">        Thin alias over `AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">                contents fail validation.</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">            ValueError: If the file has no `themes:` block, or a row</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">                fails `Theme` validation.</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_overture_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;Overture&quot;</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="p">)</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>            <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>        <span class="p">)</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Theme</span><span class="p">]:</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the theme map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">            dict[str, Theme]: Same object as `datasets`.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Theme</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Theme` for `name`, with a did-you-mean hint on miss.</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">            name: A friendly theme name (`&quot;buildings&quot;`, `&quot;places&quot;`, …).</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">            Theme: The matching theme row.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">            ValueError: If `name` is not a registered theme.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            - Resolve a theme and read its primary type and geometry:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                &gt;&gt;&gt; theme = Catalog().get_theme(&quot;places&quot;)</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                &gt;&gt;&gt; theme.default_type</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                &#39;place&#39;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                &gt;&gt;&gt; theme.geometry</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                &#39;Point&#39;</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Theme&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">themes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered theme names, sorted.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            list[str]: The theme names</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">                (`[&quot;addresses&quot;, &quot;base&quot;, &quot;buildings&quot;, ...]`).</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">            - List the curated themes:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">                &gt;&gt;&gt; Catalog().themes()[:3]</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">                [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;]</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return every Overture feature type in the available index, sorted.</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        This is the provider&#39;s full queryable universe (all themes,</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        including the uncurated `base` / `addresses`); every curated</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        theme&#39;s `types` are a subset of it.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            list[str]: All Overture types</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                (`[&quot;address&quot;, &quot;bathymetry&quot;, &quot;building&quot;, ...]`).</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            - The full type universe includes every curated theme&#39;s types:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                &gt;&gt;&gt; types = Catalog().available_types()</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                &gt;&gt;&gt; &quot;building&quot; in types and &quot;address&quot; in types</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">                True</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">                &gt;&gt;&gt; len(types)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">                15</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">latest_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the newest indexed Overture release, or `None` if unindexed.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        Reads only the bundled `available_releases:` index (newest</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        first); it makes no network call. When the index is empty the</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        backend leaves `release=None` and lets the `overturemaps` SDK</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        auto-target the newest release at fetch time.</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">            str | None: The newest release id (e.g. `&quot;2026-05-20.0&quot;`), or</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">                `None` when the index is empty.</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">            - The newest release is the head of the index (no network):</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                &gt;&gt;&gt; release = Catalog().latest_release()</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">                &gt;&gt;&gt; release is None or release[:2] == &quot;20&quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">                True</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        Thin alias over `AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">            name: A friendly theme name (`&quot;buildings&quot;`, `&quot;places&quot;`, …).</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">            Theme: The matching theme row.</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">            ValueError: If `name` is not a registered theme.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            - Resolve a theme and read its primary type and geometry:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                &gt;&gt;&gt; theme = Catalog().get_theme(&quot;places&quot;)</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">                &gt;&gt;&gt; theme.default_type</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                &#39;place&#39;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                &gt;&gt;&gt; theme.geometry</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                &#39;Point&#39;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Theme&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">themes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered theme names, sorted.</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            list[str]: The theme names</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">                (`[&quot;addresses&quot;, &quot;base&quot;, &quot;buildings&quot;, ...]`).</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            - List the curated themes:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">                &gt;&gt;&gt; Catalog().themes()[:3]</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">                [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;]</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return every Overture feature type in the available index, sorted.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        This is the provider&#39;s full queryable universe (all themes,</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        including the uncurated `base` / `addresses`); every curated</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        theme&#39;s `types` are a subset of it.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            list[str]: All Overture types</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">                (`[&quot;address&quot;, &quot;bathymetry&quot;, &quot;building&quot;, ...]`).</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            - The full type universe includes every curated theme&#39;s types:</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">                &gt;&gt;&gt; types = Catalog().available_types()</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">                &gt;&gt;&gt; &quot;building&quot; in types and &quot;address&quot; in types</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">                True</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                &gt;&gt;&gt; len(types)</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">                15</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">latest_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the newest indexed Overture release, or `None` if unindexed.</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        Reads only the bundled `available_releases:` index (newest</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        first); it makes no network call. When the index is empty the</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        backend leaves `release=None` and lets the `overturemaps` SDK</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        auto-target the newest release at fetch time.</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            str | None: The newest release id (e.g. `&quot;2026-05-20.0&quot;`), or</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">                `None` when the index is empty.</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            - The newest release is the head of the index (no network):</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">                &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">                &gt;&gt;&gt; release = Catalog().latest_release()</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">                &gt;&gt;&gt; release is None or release[:2] == &quot;20&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">                True</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span> <span class="k">else</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27590,9 +27613,7 @@ theme's <code>types</code> are a subset of it.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-349">349</a></span>
 <span class="normal"><a href="#__codelineno-0-350">350</a></span>
 <span class="normal"><a href="#__codelineno-0-351">351</a></span>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
@@ -27613,30 +27634,32 @@ theme's <code>types</code> are a subset of it.</p>
 <span class="normal"><a href="#__codelineno-0-367">367</a></span>
 <span class="normal"><a href="#__codelineno-0-368">368</a></span>
 <span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="k">def</span><span class="w"> </span><span class="nf">available_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return every Overture feature type in the available index, sorted.</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    This is the provider&#39;s full queryable universe (all themes,</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    including the uncurated `base` / `addresses`); every curated</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    theme&#39;s `types` are a subset of it.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        list[str]: All Overture types</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            (`[&quot;address&quot;, &quot;bathymetry&quot;, &quot;building&quot;, ...]`).</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        - The full type universe includes every curated theme&#39;s types:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            &gt;&gt;&gt; types = Catalog().available_types()</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">            &gt;&gt;&gt; &quot;building&quot; in types and &quot;address&quot; in types</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            True</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            &gt;&gt;&gt; len(types)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            15</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-370">370</a></span>
+<span class="normal"><a href="#__codelineno-0-371">371</a></span>
+<span class="normal"><a href="#__codelineno-0-372">372</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="k">def</span><span class="w"> </span><span class="nf">available_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return every Overture feature type in the available index, sorted.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">    This is the provider&#39;s full queryable universe (all themes,</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    including the uncurated `base` / `addresses`); every curated</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    theme&#39;s `types` are a subset of it.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        list[str]: All Overture types</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            (`[&quot;address&quot;, &quot;bathymetry&quot;, &quot;building&quot;, ...]`).</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        - The full type universe includes every curated theme&#39;s types:</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            &gt;&gt;&gt; types = Catalog().available_types()</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            &gt;&gt;&gt; &quot;building&quot; in types and &quot;address&quot; in types</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            True</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            &gt;&gt;&gt; len(types)</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">            15</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27682,19 +27705,19 @@ theme's <code>types</code> are a subset of it.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-293">293</a></span>
-<span class="normal"><a href="#__codelineno-0-294">294</a></span>
-<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-295">295</a></span>
 <span class="normal"><a href="#__codelineno-0-296">296</a></span>
 <span class="normal"><a href="#__codelineno-0-297">297</a></span>
 <span class="normal"><a href="#__codelineno-0-298">298</a></span>
-<span class="normal"><a href="#__codelineno-0-299">299</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Theme</span><span class="p">]:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the theme map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        dict[str, Theme]: Same object as `datasets`.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span>
+<span class="normal"><a href="#__codelineno-0-301">301</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Theme</span><span class="p">]:</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the theme map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">        dict[str, Theme]: Same object as `datasets`.</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27808,9 +27831,7 @@ theme's <code>types</code> are a subset of it.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-301">301</a></span>
-<span class="normal"><a href="#__codelineno-0-302">302</a></span>
-<span class="normal"><a href="#__codelineno-0-303">303</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-303">303</a></span>
 <span class="normal"><a href="#__codelineno-0-304">304</a></span>
 <span class="normal"><a href="#__codelineno-0-305">305</a></span>
 <span class="normal"><a href="#__codelineno-0-306">306</a></span>
@@ -27834,33 +27855,35 @@ theme's <code>types</code> are a subset of it.</p>
 <span class="normal"><a href="#__codelineno-0-324">324</a></span>
 <span class="normal"><a href="#__codelineno-0-325">325</a></span>
 <span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Theme</span><span class="p">:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Theme` for `name`, with a did-you-mean hint on miss.</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">    Thin alias over `AbstractCatalog.get_dataset`.</span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Theme</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Theme` for `name`, with a did-you-mean hint on miss.</span>
 <a id="__codelineno-0-305" name="__codelineno-0-305"></a>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        name: A friendly theme name (`&quot;buildings&quot;`, `&quot;places&quot;`, …).</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        Theme: The matching theme row.</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        ValueError: If `name` is not a registered theme.</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        - Resolve a theme and read its primary type and geometry:</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            &gt;&gt;&gt; theme = Catalog().get_theme(&quot;places&quot;)</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            &gt;&gt;&gt; theme.default_type</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            &#39;place&#39;</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            &gt;&gt;&gt; theme.geometry</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            &#39;Point&#39;</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Theme&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">    Thin alias over `AbstractCatalog.get_dataset`.</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">        name: A friendly theme name (`&quot;buildings&quot;`, `&quot;places&quot;`, …).</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Theme: The matching theme row.</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        ValueError: If `name` is not a registered theme.</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        - Resolve a theme and read its primary type and geometry:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            &gt;&gt;&gt; theme = Catalog().get_theme(&quot;places&quot;)</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            &gt;&gt;&gt; theme.default_type</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            &#39;place&#39;</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            &gt;&gt;&gt; theme.geometry</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            &#39;Point&#39;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Theme&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27922,9 +27945,7 @@ auto-target the newest release at fetch time.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-374">374</a></span>
 <span class="normal"><a href="#__codelineno-0-375">375</a></span>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
@@ -27944,29 +27965,31 @@ auto-target the newest release at fetch time.</p>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="k">def</span><span class="w"> </span><span class="nf">latest_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the newest indexed Overture release, or `None` if unindexed.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    Reads only the bundled `available_releases:` index (newest</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">    first); it makes no network call. When the index is empty the</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    backend leaves `release=None` and lets the `overturemaps` SDK</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    auto-target the newest release at fetch time.</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        str | None: The newest release id (e.g. `&quot;2026-05-20.0&quot;`), or</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">            `None` when the index is empty.</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        - The newest release is the head of the index (no network):</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            &gt;&gt;&gt; release = Catalog().latest_release()</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            &gt;&gt;&gt; release is None or release[:2] == &quot;20&quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            True</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span> <span class="k">else</span> <span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="k">def</span><span class="w"> </span><span class="nf">latest_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the newest indexed Overture release, or `None` if unindexed.</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">    Reads only the bundled `available_releases:` index (newest</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    first); it makes no network call. When the index is empty the</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    backend leaves `release=None` and lets the `overturemaps` SDK</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    auto-target the newest release at fetch time.</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        str | None: The newest release id (e.g. `&quot;2026-05-20.0&quot;`), or</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            `None` when the index is empty.</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        - The newest release is the head of the index (no network):</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            &gt;&gt;&gt; release = Catalog().latest_release()</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            &gt;&gt;&gt; release is None or release[:2] == &quot;20&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">            True</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">available_releases</span> <span class="k">else</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28061,6 +28084,17 @@ module-level <code>CATALOG_PATH</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
+                <p>If <code>catalog_path</code> does not exist, or the file's
+contents fail validation.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
                 <p>If the file has no <code>themes:</code> block, or a row
 fails <code>Theme</code> validation.</p>
               </div>
@@ -28095,7 +28129,9 @@ fails <code>Theme</code> validation.</p>
 <span class="normal"><a href="#__codelineno-0-288">288</a></span>
 <span class="normal"><a href="#__codelineno-0-289">289</a></span>
 <span class="normal"><a href="#__codelineno-0-290">290</a></span>
-<span class="normal"><a href="#__codelineno-0-291">291</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="nd">@classmethod</span>
+<span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="nd">@classmethod</span>
 <a id="__codelineno-0-269" name="__codelineno-0-269"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
 <a id="__codelineno-0-270" name="__codelineno-0-270"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Overture theme catalog from disk.</span>
 <a id="__codelineno-0-271" name="__codelineno-0-271"></a>
@@ -28107,18 +28143,20 @@ fails <code>Theme</code> validation.</p>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a><span class="sd">        A fully-populated `Catalog`.</span>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a>
 <a id="__codelineno-0-279" name="__codelineno-0-279"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        ValueError: If the file has no `themes:` block, or a row</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            fails `Theme` validation.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>    <span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_overture_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;Overture&quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="p">)</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>    <span class="p">)</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or the file&#39;s</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            contents fail validation.</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        ValueError: If the file has no `themes:` block, or a row</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">            fails `Theme` validation.</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="n">themes</span><span class="p">,</span> <span class="n">releases</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_overture_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;Overture&quot;</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="p">)</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">themes</span><span class="p">),</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="n">available_releases</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">releases</span><span class="p">),</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -28254,9 +28292,7 @@ empty, or has a malformed theme row.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/overture/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
@@ -28270,23 +28306,25 @@ empty, or has a malformed theme row.</p>
 <span class="normal"><a href="#__codelineno-0-342">342</a></span>
 <span class="normal"><a href="#__codelineno-0-343">343</a></span>
 <span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="k">def</span><span class="w"> </span><span class="nf">themes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered theme names, sorted.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        list[str]: The theme names</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">            (`[&quot;addresses&quot;, &quot;base&quot;, &quot;buildings&quot;, ...]`).</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        - List the curated themes:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">            &gt;&gt;&gt; Catalog().themes()[:3]</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;]</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-345">345</a></span>
+<span class="normal"><a href="#__codelineno-0-346">346</a></span>
+<span class="normal"><a href="#__codelineno-0-347">347</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="k">def</span><span class="w"> </span><span class="nf">themes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered theme names, sorted.</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        list[str]: The theme names</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">            (`[&quot;addresses&quot;, &quot;base&quot;, &quot;buildings&quot;, ...]`).</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        - List the curated themes:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            &gt;&gt;&gt; from earthlens.overture import Catalog</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">            &gt;&gt;&gt; Catalog().themes()[:3]</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            [&#39;addresses&#39;, &#39;base&#39;, &#39;buildings&#39;]</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

@@ -21468,7 +21468,7 @@ temporal axis).</p>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_coverage_crs</span> <span class="o">=</span> <span class="n">coverage_crs</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">=</span> <span class="n">timeout</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>        <span class="c1">#: Scratch dir for the in-flight batch; `_fetch` owns its lifetime.</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>        <span class="c1">#: Scratch dir for the in-flight batch; `_api` owns its lifetime.</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -21529,7 +21529,7 @@ temporal axis).</p>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;.soilgrids-tmp-&quot;</span><span class="p">))</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="c1"># Hand the scratch dir to `_fetch_one` through the instance rather than</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="c1"># as an extra parameter, so `_fetch_one(product)` keeps the base hook&#39;s</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="c1"># one-argument shape. `_fetch` owns its lifetime either way.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="c1"># one-argument shape. `_api` owns its lifetime either way.</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span> <span class="o">=</span> <span class="n">tmp_dir</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="k">try</span><span class="p">:</span>
@@ -21610,7 +21610,7 @@ temporal axis).</p>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        as stored integers, `G2`).</span>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        The coverage is fetched in-memory (`from_wcs(output=None)`), written into</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        `self._tmp_dir` (the per-download scratch dir `_fetch` owns), then atomically</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        `self._tmp_dir` (the per-download scratch dir `_api` owns), then atomically</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        renamed onto its final path only after a fully successful write. Because</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        the final path is touched only by that rename, any failure leaves a</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        pre-existing GeoTIFF from a prior run untouched and never leaves a partial</span>
@@ -21620,7 +21620,7 @@ temporal axis).</p>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            product: The `RemoteProduct` whose `metadata` carries the resolved</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">                property row + the `(depth, quantile)` cell. The scratch</span>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">                directory the write is staged in before the atomic rename is</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                read from `self._tmp_dir`, which :meth:`_fetch` creates and</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                read from `self._tmp_dir`, which :meth:`_api` creates and</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                removes around the whole batch.</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Returns:</span>
@@ -22273,7 +22273,7 @@ not a per-dataset map).</p>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_coverage_crs</span> <span class="o">=</span> <span class="n">coverage_crs</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">=</span> <span class="n">timeout</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="c1">#: Scratch dir for the in-flight batch; `_fetch` owns its lifetime.</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="c1">#: Scratch dir for the in-flight batch; `_api` owns its lifetime.</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -23735,7 +23735,7 @@ temporal axis).</p>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_coverage_crs</span> <span class="o">=</span> <span class="n">coverage_crs</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">=</span> <span class="n">timeout</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>        <span class="c1">#: Scratch dir for the in-flight batch; `_fetch` owns its lifetime.</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>        <span class="c1">#: Scratch dir for the in-flight batch; `_api` owns its lifetime.</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -23796,7 +23796,7 @@ temporal axis).</p>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;.soilgrids-tmp-&quot;</span><span class="p">))</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="c1"># Hand the scratch dir to `_fetch_one` through the instance rather than</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="c1"># as an extra parameter, so `_fetch_one(product)` keeps the base hook&#39;s</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="c1"># one-argument shape. `_fetch` owns its lifetime either way.</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="c1"># one-argument shape. `_api` owns its lifetime either way.</span>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span> <span class="o">=</span> <span class="n">tmp_dir</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="n">written</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 <a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="k">try</span><span class="p">:</span>
@@ -23877,7 +23877,7 @@ temporal axis).</p>
 <a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        as stored integers, `G2`).</span>
 <a id="__codelineno-0-344" name="__codelineno-0-344"></a>
 <a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        The coverage is fetched in-memory (`from_wcs(output=None)`), written into</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        `self._tmp_dir` (the per-download scratch dir `_fetch` owns), then atomically</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        `self._tmp_dir` (the per-download scratch dir `_api` owns), then atomically</span>
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        renamed onto its final path only after a fully successful write. Because</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        the final path is touched only by that rename, any failure leaves a</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        pre-existing GeoTIFF from a prior run untouched and never leaves a partial</span>
@@ -23887,7 +23887,7 @@ temporal axis).</p>
 <a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            product: The `RemoteProduct` whose `metadata` carries the resolved</span>
 <a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">                property row + the `(depth, quantile)` cell. The scratch</span>
 <a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">                directory the write is staged in before the atomic rename is</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                read from `self._tmp_dir`, which :meth:`_fetch` creates and</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                read from `self._tmp_dir`, which :meth:`_api` creates and</span>
 <a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                removes around the whole batch.</span>
 <a id="__codelineno-0-358" name="__codelineno-0-358"></a>
 <a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        Returns:</span>
@@ -24540,7 +24540,7 @@ not a per-dataset map).</p>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_coverage_crs</span> <span class="o">=</span> <span class="n">coverage_crs</span>
 <a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_timeout</span> <span class="o">=</span> <span class="n">timeout</span>
 <a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_show_progress</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="c1">#: Scratch dir for the in-flight batch; `_fetch` owns its lifetime.</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="c1">#: Scratch dir for the in-flight batch; `_api` owns its lifetime.</span>
 <a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <a id="__codelineno-0-206" name="__codelineno-0-206"></a>
 <a id="__codelineno-0-207" name="__codelineno-0-207"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
