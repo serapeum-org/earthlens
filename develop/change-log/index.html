@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19892,11 +19892,17 @@
 <h3 id="breaking-change"><a class="toclink" href="#breaking-change">BREAKING CHANGE</a><a class="headerlink" href="#breaking-change" title="Permanent link">#</a></h3>
 <ul>
 <li><code>Catalog.load(&lt;missing path&gt;)</code> now raises <code>ValueError</code> naming the path,
-where the 16 migrated catalogs previously raised <code>FileNotFoundError</code>. Every
-catalog reports a missing file the same way now that they share
-<code>earthlens.base.catalog_source.load_catalog</code>. No shipped caller catches
+where it previously raised <code>FileNotFoundError</code>. Every catalog reports a
+missing file the same way now that all 48 share
+<code>earthlens.base.catalog_source.load_catalog</code> — the last five hold-outs (chc,
+earthdata, gee, hdx, jaxa) and radar were migrated too, so no loader
+computes its own <code>st_mtime_ns</code> cache key any more. No shipped caller catches
 <code>FileNotFoundError</code> around a catalog load, but external code that does
 should catch <code>ValueError</code> instead.</li>
+<li><code>earthlens.jaxa.catalog.Catalog.load()</code> returns a fresh instance per call
+rather than a shared cached one (the parse payload is what is memoised), so
+mutating the result no longer corrupts later loads. <code>_yaml_files_for</code> is gone
+from the jaxa and gee catalog modules; <code>_mtime_ns</code> is gone from hdx's.</li>
 <li>The catalog-import error text changed from
 <code>"Backend 'gee' catalog is unavailable"</code> to
 <code>"Backend catalog for 'gee' is unavailable"</code>, since the registry and
