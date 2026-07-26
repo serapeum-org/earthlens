@@ -94,8 +94,13 @@ def _parse_datasets(files: list[Path]) -> dict[str, DEMDataset]:
 
     Returns:
         dict[str, DEMDataset]: One row per DEM dataset key. The rows are
-            cached, not a built Catalog — `load()` makes a fresh instance per
-            call so one caller mutating `.datasets` cannot reach another's.
+            cached, not a built Catalog, so `load()` makes a fresh instance per
+            call and one caller doing `datasets.pop(...)` cannot reach another's
+            mapping. The row objects inside it *are* shared and are frozen
+            pydantic models: treat them as read-only. A frozen model still
+            permits in-place mutation of a mutable field (`row.columns[...] =`),
+            which would reach every holder — deep-copying every row per load
+            would cost more than that edge is worth.
 
     Raises:
         ValueError: If the `datasets:` block is missing or empty, or a row

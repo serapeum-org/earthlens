@@ -192,9 +192,13 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
 
     Returns:
         dict[str, Any]: The validated construction kwargs. The payload is
-            cached, not a built Catalog — `load()` makes a fresh instance
-            per call so one caller mutating `.datasets` cannot reach
-            another's, nor the cache itself.
+            cached, not a built Catalog, so `load()` makes a fresh instance per
+            call and one caller doing `datasets.pop(...)` cannot reach another's
+            mapping. The row objects inside it *are* shared and are frozen
+            pydantic models: treat them as read-only. A frozen model still
+            permits in-place mutation of a mutable field (`row.columns[...] =`),
+            which would reach every holder — deep-copying every row per load
+            would cost more than that edge is worth.
 
     Raises:
         ValueError: If a required block is missing or a row fails

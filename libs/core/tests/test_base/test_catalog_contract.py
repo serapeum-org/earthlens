@@ -246,3 +246,23 @@ def test_did_you_mean_uses_entry_noun(module_name: str, class_name: str, noun: s
     cat = _build(module_name, class_name)
     with pytest.raises(ValueError, match=f"Known {noun}:"):
         cat.get_dataset("definitely-not-a-key")
+
+
+@pytest.mark.parametrize("module_name, class_name", CATALOG_BACKENDS)
+def test_catalog_rows_are_frozen(module_name: str, class_name: str):
+    """Every row model rejects attribute assignment.
+
+    The parse cache hands the *same* row objects to every `load()`, so a row
+    that allowed assignment would let one caller rewrite the catalog for the
+    whole process. `frozen=True` is what makes sharing them safe.
+    """
+    cat = _build(module_name, class_name)
+    if not cat.datasets:
+        pytest.skip(f"{module_name} exposes no rows to check")
+    row = cat.datasets[next(iter(cat.datasets))]
+    if not hasattr(row, "model_config"):
+        pytest.skip(f"{module_name} rows are not pydantic models")
+    assert row.model_config.get("frozen") is True, (
+        f"{module_name}.{type(row).__name__} is not frozen; the shared parse "
+        "cache would let one caller mutate every other caller's catalog"
+    )
