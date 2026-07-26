@@ -1234,11 +1234,18 @@ class AbstractDataSource(ABC):
         most multi-item backends are **skip-and-continue** — a single
         failed `(dataset, variable)` / chunk / sensor is logged and the
         batch proceeds, with a success/failure summary at the end
-        (CHIRPS, CMEMS, FDSN, FIRMS, …) — while single-shot backends
-        propagate the error. NWP exposes this as an explicit
-        `errors="warn" | "raise" | "ignore"` argument; new backends
-        with a per-item loop should follow that `errors=` convention so
-        the policy becomes uniformly caller-controllable.
+        (CHIRPS, CMEMS, FIRMS, …) — while single-shot backends
+        propagate the error.
+
+        Only three backends (`nwp`, `fdsn`, `soilgrids`) currently make
+        that policy caller-controllable, via an explicit
+        `errors="warn" | "raise" | "ignore"` argument routed through
+        :meth:`check_errors_policy` and :meth:`_run_items`. The rest hard-code
+        skip-and-continue, so **do not assume `errors=` is accepted** — check
+        the backend's own `download` signature. New backends with a per-item
+        loop should follow the convention so it eventually holds everywhere;
+        until then this docstring describes what the backends actually do
+        rather than what they ought to.
         """
         # loop over dates if the downloaded rasters/netcdf are for a specific date out of the required
         # list of dates

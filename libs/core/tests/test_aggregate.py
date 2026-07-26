@@ -717,11 +717,17 @@ class _FakeNetCDF:
     def read_array(
         self, variable: str | None = None, band: int | None = None
     ) -> np.ndarray:
-        """Return the stored array, or one 0-based band of it, like pyramids does."""
+        """Return the stored array, or one 0-based band of it, like pyramids does.
+
+        Returns a fresh copy, as a real reader does when it pulls bytes off
+        disk. That matters for the memory tests: handing back the stored
+        array would make a whole-cube read allocate nothing, so it could not
+        be told apart from a per-band one.
+        """
         self.band_reads.append(band)
         if band is None:
-            return self._array
-        return self._array[band]
+            return self._array.copy()
+        return self._array[band].copy()
 
     def close(self) -> None:
         """Record that the handle was released."""
@@ -1375,3 +1381,69 @@ class TestStreamingAggregation:
         assert label == pd.Timestamp("2020-01-01")
         assert array.shape == (2, 3)
         assert path is None
+
+
+class TestAggregationMemoryCeiling:
+    """ARC-13c: the cube is never materialised, only one window at a time."""
+
+    #: A grid big enough that the array dominates the fixed per-run overhead
+    #: (pandas index construction, pyramids metadata). At 16x16 the overhead
+    #: swamps the signal and a whole-cube read is indistinguishable.
+    SIDE = 96
+    DAYS = 8
+
+    @pytest.fixture
+    def state_var(self):
+        """A state-flagged variable stand-in.
+
+        Returns:
+            _RealVariable: carries the attributes `aggregate_netcdf` reads.
+        """
+        return _RealVariable(
+            is_flux=False, cds_variable="2m_temperature", nc_variable="t2m", units="K"
+        )
+
+    def _peak_and_cube_bytes(self, monkeypatch, state_var) -> tuple[int, int]:
+        """Aggregate a multi-day cube; return `(peak allocation, cube size)`."""
+        import tracemalloc
+
+        steps = self.DAYS * 24
+        times = pd.date_range("2020-01-01", periods=steps, freq="h")
+        array = np.zeros((steps, self.SIDE, self.SIDE), dtype="float64")
+        nc = _FakeNetCDF(
+            array=array, time_strs_by_var={"valid_time": [str(t) for t in times]}
+        )
+        _patch_netcdf_read(monkeypatch, nc)
+        tracemalloc.start()
+        try:
+            for _window in iter_aggregate_netcdf(
+                "x.nc", state_var, AggregationConfig(freq="1D", op="mean")
+            ):
+                pass
+            _current, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+        return peak, array.nbytes
+
+    def test_peak_stays_below_the_whole_cube(self, monkeypatch, state_var):
+        """Aggregating never allocates as much as the cube it reads.
+
+        This is the property ARC-3 bought: a whole-cube `read_array()` has to
+        allocate at least the cube, so a peak below it proves the read is
+        per-window. Measured on the reverted implementation, the peak is
+        ~1.26x the cube; streaming it is ~0.38x.
+        """
+        peak, cube = self._peak_and_cube_bytes(monkeypatch, state_var)
+        assert peak < cube, (
+            f"peak allocation {peak} >= cube size {cube}: the whole time axis "
+            "is being materialised instead of one window at a time"
+        )
+
+    def test_peak_is_a_small_multiple_of_one_window(self, monkeypatch, state_var):
+        """The working set tracks the window, not the number of windows."""
+        peak, cube = self._peak_and_cube_bytes(monkeypatch, state_var)
+        window = cube // self.DAYS
+        assert peak < window * 6, (
+            f"peak allocation {peak} is more than 6x one window ({window}); "
+            "windows appear to be accumulating rather than being released"
+        )

@@ -1,5 +1,18 @@
 """Polygon sizing and gridding helpers.
 
+!!! warning "Deprecated — pending a port to pyramids (`PY-2`)"
+    This module is **not supported API** and is scheduled for removal. It
+    is generic GIS geometry work — polygon gridding, cell counting, convex
+    hulls, polygon splitting — with no provider knowledge in it, so under
+    this repo's porting policy it belongs in `pyramids.feature`, not here.
+    Nothing in earthlens imports it: it is absent from
+    `earthlens.core.__all__` and from the docs navigation, and the only
+    references to it are its own doctests.
+
+    Do not build on it. Once the `PY-2` port lands upstream, this module
+    and its tests are deleted here and the functions are consumed from
+    pyramids instead.
+
 Pure-Shapely / pyproj / GeoPandas. Operates on `GeoDataFrame` polygons
 (or point sets, for the convex-hull helpers); no Earth Engine, no AOI
 semantics other than "is this polygon too big at this cell size?"
