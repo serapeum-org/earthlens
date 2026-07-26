@@ -576,7 +576,7 @@ class AggregationConfig(BaseModel):
     keep_arrays: bool = True
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class AggregatedWindow:
     """One reduced time window: its label, its array, and where it was written.
 
@@ -584,6 +584,12 @@ class AggregatedWindow:
     request set `keep_arrays=False` and the window was written to disk — the
     point of that mode is that a long run does not accumulate every window in
     memory alongside the GeoTIFFs it has already produced.
+
+    Comparison is left as identity (`eq=False`). A generated `__eq__` would
+    compare the `array` field with `==`, which for a numpy array yields an
+    elementwise array and then raises `ValueError: truth value ... ambiguous`;
+    the matching `__hash__` would raise `TypeError` because an ndarray is
+    unhashable. Compare the fields you actually care about instead.
 
     Attributes:
         label: The window's left-edge timestamp.
