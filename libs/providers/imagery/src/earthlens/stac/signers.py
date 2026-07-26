@@ -780,15 +780,18 @@ class _AnonymousS3Signer:
     def gdal_env(self) -> dict[str, str]:
         """Return the GDAL config for unsigned public-bucket reads.
 
+        Deliberately just the one option. Copying the requester-pays signer's
+        `GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR` and
+        `CPL_VSIL_CURL_USE_HEAD=NO` alongside it would apply to *every*
+        anonymous endpoint — the catalog default, so most of them — and
+        suppress the sidecar discovery (`.aux.xml`, `.msk`, overviews) that
+        some of those assets rely on. Those knobs are a billing optimisation
+        for requester-pays, not part of not signing a request.
+
         Returns:
-            dict[str, str]: `AWS_NO_SIGN_REQUEST=YES` plus the standard
-                cloud-read knobs that avoid needless HEAD/list calls.
+            dict[str, str]: `{"AWS_NO_SIGN_REQUEST": "YES"}`.
         """
-        return {
-            "AWS_NO_SIGN_REQUEST": "YES",
-            "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
-            "CPL_VSIL_CURL_USE_HEAD": "NO",
-        }
+        return {"AWS_NO_SIGN_REQUEST": "YES"}
 
     def sign_request(self, request: Any) -> Any:
         """Return `request` unchanged — an anonymous search needs no signing.
