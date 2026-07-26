@@ -451,15 +451,13 @@ class TestCatalogLoaderAdoption:
             )
             if reads_mtime:
                 offenders.append(path.parent.name)
-        # The five still to migrate, all large sharded catalogs whose loaders
-        # carry extra work beyond the plain resolve/stat/key dance (chc expands
-        # regions across two layouts; hdx / earthdata keep a huge `available_*`
-        # index in a sibling JSON; gee / jaxa merge per-family shards). Locked
-        # in as a list so a *new* hand-rolled key fails this test, and each
-        # migration shortens it.
-        remaining = ["chc", "earthdata", "gee", "hdx", "jaxa"]
-        assert sorted(offenders) == remaining, (
+        # All 48 now route through load_catalog, including the five sharded
+        # catalogs that used to carry extra work of their own: chc expands
+        # regions across two layouts, hdx / earthdata keep a huge `available_*`
+        # index in a sibling JSON, and gee / jaxa merge per-family shards. The
+        # list stays here (rather than the assertion becoming `not offenders`)
+        # so re-introducing a hand-rolled key names the catalog that did it.
+        assert sorted(offenders) == [], (
             "these catalogs re-implement the mtime cache key instead of using "
-            f"earthlens.base.catalog_source.load_catalog: {sorted(offenders)}; "
-            f"expected only {remaining}"
+            f"earthlens.base.catalog_source.load_catalog: {sorted(offenders)}"
         )

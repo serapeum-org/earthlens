@@ -61,7 +61,7 @@ if TYPE_CHECKING:
     from earthlens.gee.jobs import TaskInfo
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.catalog_source import yaml_files_for
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.providers import (
     Provider,
 )
@@ -82,24 +82,15 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # call on an unchanged tree should be ~1 ms. `_PROVIDERS_CACHE` below
 # applies the same pattern to `providers.yaml`; both are cleared
 # together by :func:`clear_catalog_cache`.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCache()
-
-
-def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted YAML files contributing to a load.
-
-    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
-    as a module-level name because the tests import and monkey-patch it.
-    """
-    return yaml_files_for(path, provider='gee')
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
-    """Parse, validate and cache the catalog at `path`.
+    """Return the catalog at `path`, memoised on the contributing files.
 
     Returns a `(available_datasets, datasets)` tuple of the same shape
     the :class:`Catalog` model exposes. The result is cached on the
-    resolved path + every contributing file's mtime, so a fresh
+    resolved path + every contributing file's stamp, so a fresh
     `Catalog()` on an unchanged tree skips YAML parsing and pydantic
     validation.
 
@@ -114,23 +105,32 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
         directory) and `datasets:` blocks.
 
     Raises:
-        ValueError: If the YAML is missing, has no `datasets:` block,
-            declares a duplicate dataset/band key, contains an unknown
-            band field, or lists a curated dataset that is absent from
-            `available_datasets`.
+        ValueError: If `path` does not exist, the YAML has no `datasets:`
+            block, declares a duplicate dataset/band key, contains an
+            unknown band field, or lists a curated dataset that is absent
+            from `available_datasets`.
     """
-    resolved = str(path.resolve())
-    files = _yaml_files_for(path)
-    mtime_tuple: tuple[tuple[str, int], ...]
-    try:
-        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
-    except FileNotFoundError:
-        mtime_tuple = ((resolved, 0),)
-    key = (resolved, mtime_tuple)
-    cached = _CATALOG_CACHE.get(key)
-    if cached is not None:
-        return cached
+    return load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="gee")
 
+
+def _parse_catalog(files: list[Path]) -> tuple[list[str], dict[str, Dataset]]:
+    """Merge and validate the per-category catalog shards.
+
+    Args:
+        files: The contributing YAML files, in sorted order.
+
+    Returns:
+        Tuple of `(list[str], dict[str, Dataset])` — the merged
+        `available_datasets:` and the validated `datasets:` rows.
+
+    Raises:
+        ValueError: If no file carries `datasets:` rows, a dataset or band
+            key is declared twice, a band field is unknown, or a curated
+            dataset is missing from `available_datasets`.
+    """
+    # Name the directory for a sharded catalog and the file for a single one, so
+    # the errors below point at whatever the caller handed in.
+    path = files[0].parent if len(files) > 1 else files[0]
     merged_available: list[str] = []
     merged_datasets_yaml: dict[str, Any] = {}
     asset_origin: dict[str, Path] = {}
@@ -180,8 +180,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
                 f"'available_datasets:' in {path}; add it there too."
             )
 
-    _CATALOG_CACHE[key] = (merged_available, datasets)
-    return _CATALOG_CACHE[key]
+    return merged_available, datasets
 
 
 def clear_catalog_cache() -> None:

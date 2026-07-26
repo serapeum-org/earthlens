@@ -5,11 +5,17 @@
 ### BREAKING CHANGE
 
 - `Catalog.load(<missing path>)` now raises `ValueError` naming the path,
-where the 16 migrated catalogs previously raised `FileNotFoundError`. Every
-catalog reports a missing file the same way now that they share
-`earthlens.base.catalog_source.load_catalog`. No shipped caller catches
+where it previously raised `FileNotFoundError`. Every catalog reports a
+missing file the same way now that all 48 share
+`earthlens.base.catalog_source.load_catalog` — the last five hold-outs (chc,
+earthdata, gee, hdx, jaxa) and radar were migrated too, so no loader
+computes its own `st_mtime_ns` cache key any more. No shipped caller catches
 `FileNotFoundError` around a catalog load, but external code that does
 should catch `ValueError` instead.
+- `earthlens.jaxa.catalog.Catalog.load()` returns a fresh instance per call
+rather than a shared cached one (the parse payload is what is memoised), so
+mutating the result no longer corrupts later loads. `_yaml_files_for` is gone
+from the jaxa and gee catalog modules; `_mtime_ns` is gone from hdx's.
 - The catalog-import error text changed from
 `"Backend 'gee' catalog is unavailable"` to
 `"Backend catalog for 'gee' is unavailable"`, since the registry and

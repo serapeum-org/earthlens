@@ -44,6 +44,7 @@ from pydantic import (
 from earthlens.base import AbstractCatalog
 from earthlens.base.catalog_source import (
     catalog_cache_key,
+    load_catalog,
     yaml_files_for,
 )
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
@@ -69,7 +70,7 @@ _PROVIDERS_CACHE: dict[Any, dict[str, EarthdataDAAC]] = CatalogParseCache()
 # …and for the auto-generated long-tail rows (kept as raw dicts — a model is
 # built only for the one key a caller resolves, so membership/resolution never
 # instantiates all ~8k pydantic rows).
-_AUTO_CACHE: dict[Any, dict[str, dict]] = CatalogParseCache()
+_AUTO_CACHE: CatalogParseCache = CatalogParseCache()
 
 OutputKindLiteral = Literal["raster", "vector", "tabular"]
 
@@ -162,17 +163,22 @@ def _load_auto_raw(path: Path) -> dict[str, dict]:
     """
     if not path.is_file():
         return {}
-    resolved = str(path.resolve())
-    key = (resolved, path.stat().st_mtime_ns)
-    cached = _AUTO_CACHE.get(key)
-    if cached is not None:
-        return cached
+    return load_catalog(path, _AUTO_CACHE, _parse_auto, provider="Earthdata")
+
+
+def _parse_auto(files: list[Path]) -> dict[str, dict]:
+    """Read the `auto_datasets` block out of `_auto.json`.
+
+    Args:
+        files: The single `_auto.json` path, from the shared loader.
+
+    Returns:
+        dict[str, dict]: Raw row bodies keyed by `short_name`.
+    """
     import json
 
-    data = json.loads(path.read_text(encoding="utf-8")) or {}
-    rows = {k: dict(v or {}) for k, v in (data.get("auto_datasets") or {}).items()}
-    _AUTO_CACHE[key] = rows
-    return rows
+    data = json.loads(files[0].read_text(encoding="utf-8")) or {}
+    return {k: dict(v or {}) for k, v in (data.get("auto_datasets") or {}).items()}
 
 
 def _load_catalog_data(
