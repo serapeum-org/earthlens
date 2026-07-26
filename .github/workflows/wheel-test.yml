@@ -99,16 +99,38 @@ jobs:
           META=$(ls dist/earthlens-[0-9]*.whl)
           MEMBERS=$(ls dist/earthlens_*.whl)
           pip install --find-links dist ${MEMBERS} "${META}[all]"
-          # Fail loudly if a sibling still came from PyPI rather than dist/.
+          # Assert the installed distributions really are the ones just built,
+          # not same-version wheels an index happened to serve. `direct_url.json`
+          # (PEP 610) is only written for a path/URL install, and the recorded
+          # URL is compared against dist/ so a local file from somewhere else
+          # would not pass either.
+          #
+          # The six code-carrying members only: all seven distributions share
+          # the `earthlens` PEP 420 namespace, so `distribution("earthlens")`
+          # is ambiguous and records no direct_url even when installed by path.
+          # The meta-package ships no modules, so it is the members that must
+          # be local for this job to be testing the built code.
           python - <<'PY'
-          import earthlens.core, pathlib, sys
+          import json, pathlib, sys
           from importlib.metadata import distribution
-          for name in ("earthlens-core", "earthlens-atmosphere", "earthlens-hazards",
-                       "earthlens-imagery", "earthlens-land", "earthlens-ocean"):
-              direct = distribution(name).read_text("direct_url.json")
-              if not direct:
-                  sys.exit(f"::error::{name} was resolved from an index, not dist/")
-          print("all earthlens distributions installed from dist/")
+
+          dist_dir = pathlib.Path("dist").resolve()
+          problems = []
+          for name in ("earthlens-core", "earthlens-atmosphere",
+                       "earthlens-hazards", "earthlens-imagery", "earthlens-land",
+                       "earthlens-ocean"):
+              raw = distribution(name).read_text("direct_url.json")
+              if not raw:
+                  problems.append(f"{name}: resolved from an index, not dist/")
+                  continue
+              url = json.loads(raw).get("url", "")
+              if dist_dir.as_uri() not in url:
+                  problems.append(f"{name}: installed from {url}, not {dist_dir}")
+          for problem in problems:
+              print(f"::error::{problem}")
+          if problems:
+              sys.exit(1)
+          print(f"all 6 earthlens members installed from {dist_dir}")
           PY
 
       - name: Verify package import

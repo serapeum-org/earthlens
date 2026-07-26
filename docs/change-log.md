@@ -5,7 +5,7 @@
 ### BREAKING CHANGE
 
 - `Catalog.load(<missing path>)` now raises `ValueError` naming the path,
-where 21 of the catalogs previously raised `FileNotFoundError`. Every
+where the 16 migrated catalogs previously raised `FileNotFoundError`. Every
 catalog reports a missing file the same way now that they share
 `earthlens.base.catalog_source.load_catalog`. No shipped caller catches
 `FileNotFoundError` around a catalog load, but external code that does
@@ -20,17 +20,22 @@ earthlens[...]"`. Only a genuinely absent third-party SDK gets that hint;
 a fault in earthlens' own code propagates unchanged so the real cause is
 visible.
 
+- `AbstractCatalog.catalog` is a read-only property rather than a pydantic
+field, so it no longer appears in `model_fields` or `model_dump()`, and
+`Catalog(catalog=...)` is ignored instead of setting it. Reads
+(`cat.catalog["key"]`, `in`, `len`, iteration) are unchanged; writes now
+raise instead of silently rewriting `datasets`.
+
 ### Fix
 
-- `AbstractCatalog.catalog` is a read-only view rather than a second name
-bound to the same `dict` as `datasets`, and `Catalog.load()` hands out a
-fresh instance per call. Previously one caller mutating `.datasets` could
-corrupt the catalog for the whole process.
+- `Catalog.load()` hands out a fresh instance per call. Previously one
+caller mutating `.datasets` corrupted the catalog for the whole process,
+including a later `Catalog()`. The row objects inside are still shared
+frozen models and should be treated as read-only.
 - A `download()` the backend rejects no longer leaves an empty output
 directory behind.
 - DWD NWP downloads reject a truncated `.bz2` body instead of publishing a
 short `.grib2`, and decode multi-stream `.bz2` fully.
-
 
 ## 0.11.0 (2026-07-20)
 

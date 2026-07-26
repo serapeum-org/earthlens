@@ -300,10 +300,8 @@ class Catalog(AbstractCatalog):
             A fully-populated :class:`Catalog`.
 
         Raises:
-            ValueError: If `catalog_path` does not exist, or the file's
-                contents fail validation.
-            ValueError: If the file is missing its `csv_url`, or any curated row
-                fails validation.
+            ValueError: If `catalog_path` does not exist, or if the file is missing
+                its `csv_url`, or any curated row fails validation.
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
         payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="CMIP6")

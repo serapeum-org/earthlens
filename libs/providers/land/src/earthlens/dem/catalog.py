@@ -197,10 +197,8 @@ class Catalog(AbstractCatalog):
             A fully-populated :class:`Catalog`.
 
         Raises:
-            ValueError: If `catalog_path` does not exist, or the file's
-                contents fail validation.
-            ValueError: If the file has no `datasets:` block, or any
-                row fails validation.
+            ValueError: If `catalog_path` does not exist, or if the file has no
+                `datasets:` block, or any row fails validation.
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
         rows = load_catalog(path, _CATALOG_CACHE, _parse_datasets, provider="DEM")

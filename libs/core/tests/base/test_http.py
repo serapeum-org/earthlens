@@ -580,13 +580,21 @@ class TestThrottle:
         assert max(overlaps) == 1, f"throttle ran concurrently: {overlaps}"
         assert len(overlaps) == 8, f"every caller should throttle: {overlaps}"
 
-    def test_zero_interval_takes_no_lock(self):
-        """The default (no throttle) short-circuits before touching the lock."""
+    def test_zero_interval_never_sleeps_or_records(self):
+        """The default (no throttle) is a no-op, not a zero-length wait.
+
+        Asserts the observable behaviour rather than sabotaging
+        `_throttle_lock` to prove the short-circuit: replacing the lock with
+        `None` tests an internal that no caller can reach.
+        """
         waits: list[float] = []
         client = HttpClient(session=_RecordingSession([]), sleep=waits.append)
-        client._throttle_lock = None
+        client._throttle()
         client._throttle()
         assert waits == [], "min_interval=0 must not sleep"
+        assert client._last_request is None, (
+            "with no throttle configured there is nothing to record"
+        )
 
 
 @pytest.mark.unit

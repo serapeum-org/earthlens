@@ -165,10 +165,8 @@ class Catalog(AbstractCatalog):
             A fully-populated :class:`Catalog`.
 
         Raises:
-            ValueError: If `catalog_path` does not exist, or the file's
-                contents fail validation.
-            ValueError: If the file has no `families:` block, or a row
-                fails :class:`Family` validation.
+            ValueError: If `catalog_path` does not exist, or if the file has no
+                `families:` block, or a row fails :class:`Family` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         cached = load_catalog(

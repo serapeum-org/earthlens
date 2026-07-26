@@ -38,13 +38,17 @@ rather than silently using the default.
 | `level` | `int \| float \| None` | `None` | Pin a pressure level for 4-D inputs. |
 | `skipna` | `bool` | `True` | NaN-aware reduction (`np.nanmean` etc.). |
 | `min_count` | `int \| None` | `None` | Minimum non-NaN samples for a window to produce a non-NaN value. |
+| `keep_arrays` | `bool` | `True` | Retain each window's reduced array. `False` drops it once written, so a long run does not accumulate every window beside the GeoTIFFs already on disk. Only meaningful with `out_dir` set — an unwritten window is always kept, since dropping it would lose the only copy. |
 
 ### `aggregate_netcdf(nc_path, var_info, config) -> list[tuple[...]]`
 
 Slices a CDS-shaped NetCDF into per-window aggregated outputs.
 Returns a list of `(window_label, array, geotiff_path)` tuples — one
-per non-empty window. `geotiff_path` is `None` when
-`config.out_dir` was `None`.
+per non-empty window. `geotiff_path` is `None` when `config.out_dir`
+was `None`, and `array` is `None` when `keep_arrays=False` and the
+window was written. Equivalent to
+`list(iter_aggregate_netcdf(...))` reshaped into tuples; prefer the
+iterator for anything large.
 
 Arguments:
 
@@ -55,6 +59,39 @@ Arguments:
   `nc_variable`).
 - `config` — :class:`AggregationConfig` describing the window,
   reduction, and output location.
+
+### `iter_aggregate_netcdf(nc_path, var_info, config) -> Iterator[AggregatedWindow]`
+
+The streaming form, and what `aggregate_netcdf` is built on. Two
+properties make it usable on cubes that do not fit in memory:
+
+- **one window resident at a time** — each window's time steps are read
+  band by band, so the whole `(time, y, x)` cube is never materialised. A
+  ten-year hourly ERA5 request over Europe at 0.25° is ~33.6 GB as one
+  array but ~9 MB per daily window;
+- **windows are not accumulated** — each is yielded then dropped. Pair it
+  with `keep_arrays=False` to drop the reduced array too once it is on
+  disk.
+
+Every NetCDF handle it opens — container, variable subset, level-pinned
+view — is closed when the generator finishes or is abandoned, so the file
+can be deleted or overwritten straight after.
+
+```python
+from earthlens.core import AggregationConfig, iter_aggregate_netcdf
+
+config = AggregationConfig(freq="1D", op="mean", out_dir="out", keep_arrays=False)
+for window in iter_aggregate_netcdf("era5.nc", var_info, config):
+    print(window.label, window.path)   # window.array is None here
+```
+
+### `AggregatedWindow`
+
+A frozen dataclass with `label` (the window's left-edge timestamp),
+`array` (the reduced 2-D array, or `None` when `keep_arrays=False` and the
+window was written) and `path` (the written GeoTIFF, or `None` when
+`out_dir` was `None`). Comparison is identity — a generated `__eq__` over
+an ndarray field would raise rather than answer.
 
 ### `ECMWF.download(aggregate=...)`
 

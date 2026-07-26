@@ -30,9 +30,9 @@ from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "airnow_data_catalog.yaml"
 
-#: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
-#: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
-#: the OpenAQ / FDSN / NWP loaders.
+#: Module-level parse cache, keyed by `load_catalog` on the resolved path
+#: plus each contributing file's `(mtime_ns, size)`, so a repeated
+#: `Catalog()` skips the YAML parse + pydantic validation.
 _CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
@@ -212,10 +212,8 @@ class Catalog(AbstractCatalog):
             A fully-populated `Catalog`.
 
         Raises:
-            ValueError: If `catalog_path` does not exist, or the file's
-                contents fail validation.
-            ValueError: If the file has no `pollutants:` block, or a row
-                fails `Pollutant` validation.
+            ValueError: If `catalog_path` does not exist, or if the file has no
+                `pollutants:` block, or a row fails `Pollutant` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         pollutants = load_catalog(

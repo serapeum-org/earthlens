@@ -216,10 +216,8 @@ class Catalog(AbstractCatalog):
             A fully-populated `Catalog`.
 
         Raises:
-            ValueError: If `catalog_path` does not exist, or the file's
-                contents fail validation.
-            ValueError: If the file has no `pollutants:` block, or a row
-                fails `Pollutant` validation.
+            ValueError: If `catalog_path` does not exist, or if the file has no
+                `pollutants:` block, or a row fails `Pollutant` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         cached = load_catalog(

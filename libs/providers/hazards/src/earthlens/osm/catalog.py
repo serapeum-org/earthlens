@@ -59,9 +59,9 @@ _PYROSM_METHODS: frozenset[str] = frozenset(
     }
 )
 
-#: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
-#: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
-#: the GDACS / FDSN / overture loaders. The cached value is the
+#: Module-level parse cache, keyed by `load_catalog` on the resolved path
+#: plus each contributing file's `(mtime_ns, size)`, so a repeated
+#: `Catalog()` skips the YAML parse + pydantic validation.
 #: `(datasets, regions)` pair the loader assembles.
 _CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
@@ -289,10 +289,8 @@ class Catalog(AbstractCatalog):
             A fully-populated `Catalog`.
 
         Raises:
-            ValueError: If `catalog_path` does not exist, or the file's
-                contents fail validation.
-            ValueError: If the file has no `datasets:` block, or a row
-                fails `Dataset` validation.
+            ValueError: If `catalog_path` does not exist, or if the file has no
+                `datasets:` block, or a row fails `Dataset` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         datasets, regions = load_catalog(
