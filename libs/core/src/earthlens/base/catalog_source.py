@@ -151,20 +151,23 @@ def catalog_cache_key(path: Path, files: Sequence[Path]) -> tuple[Any, ...]:
     """Build the memoisation key for a catalog load.
 
     The key is the resolved catalog path plus every contributing file's
-    `st_mtime_ns`, so editing any shard invalidates the entry without the loader
-    having to compare parsed contents. The resolved path is always element 0,
+    `(path, st_mtime_ns, st_size)` stamp, so editing any shard invalidates the
+    entry without the loader having to compare parsed contents. The size is
+    part of the stamp because timestamps are quantised: two writes inside one
+    filesystem tick share an mtime, and a content change of different length
+    would otherwise be served from cache. The resolved path is always element 0,
     which is what lets :class:`CatalogParseCache` evict superseded generations
     for the same catalog.
 
-    A file that disappears between the glob and the `stat` degrades to mtime `0`
-    rather than raising: the load that follows will surface the real error.
+    A file that disappears between the glob and the `stat` degrades to a zero
+    stamp rather than raising: the load that follows will surface the real error.
 
     Args:
         path: The catalog directory or file (becomes element 0 of the key).
         files: The contributing YAML files, from :func:`yaml_files_for`.
 
     Returns:
-        A hashable `(resolved_path, ((file, mtime_ns), ...))` key.
+        A hashable `(resolved_path, ((file, mtime_ns, size), ...))` key.
 
     Examples:
         - Touching a shard changes the key, so the parse is redone:

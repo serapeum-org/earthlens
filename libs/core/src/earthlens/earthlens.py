@@ -1570,11 +1570,14 @@ class EarthLens:
 
         Called by :meth:`load` when `path` was omitted: `load` only needs the
         in-memory object, so the incidental files go to a fresh temp directory
-        instead of the persistent `./earthlens-data/<source>/` default — and the
-        default directory is removed if construction left it empty, so a
+        instead of the persistent `./earthlens-data/<source>/` default, and a
         load-and-plot run never leaves files in the working tree. Creating the
         temp dir here (not at construction) means a construct-only or
         download-only run allocates no temp directory.
+
+        The `rmdir` below is now belt-and-braces: construction no longer
+        creates `root_dir` at all, so in a fresh process there is nothing to
+        remove. It still fires for a directory an earlier run left empty.
         """
         default_dir = getattr(self.datasource, "root_dir", None)
         tmp = Path(tempfile.mkdtemp(prefix="earthlens-load-"))

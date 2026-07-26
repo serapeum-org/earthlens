@@ -710,14 +710,18 @@ class HttpClient:
         `clock`, records the send time, and sleeps via the injected
         `sleep` so tests drive the rate limit deterministically.
 
-        Held under a lock for the whole read-sleep-write sequence. Several
-        backends fan their requests out across threads (`_run_items` with
-        `n_jobs > 1`) sharing one client; without the lock every thread
-        reads the same `_last_request`, computes the same "already
-        elapsed" answer, and they all fire at once — which is precisely
-        the burst the rate limit exists to prevent. Serialising here means
-        `min_interval` bounds the *aggregate* request rate, not the rate
-        per thread.
+        Held under a lock for the whole read-sleep-write sequence, so
+        `min_interval` bounds the *aggregate* request rate rather than the
+        rate per thread. Read-then-write without it is a race: every thread
+        sees the same `_last_request`, each concludes the interval has
+        elapsed, and they all fire together — the burst the limit exists to
+        prevent.
+
+        No backend shares one client across threads *today*: the three that
+        thread (worldpop, ghsl, hdx, all `prefer="threads"`) build a fresh
+        client inside each worker, and `_run_items` is a sequential loop. The
+        lock is cheap and makes a shared client safe whenever one appears,
+        rather than leaving a latent race for that change to trip over.
         """
         if self.min_interval <= 0:
             return

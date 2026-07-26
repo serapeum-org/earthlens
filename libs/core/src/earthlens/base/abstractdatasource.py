@@ -661,8 +661,10 @@ class AbstractDataSource(ABC):
         only once: a subclass that inherits `download` unchanged already
         inherits a wrapped one, and re-running this on an
         already-wrapped method is a no-op. `functools.wraps` keeps the
-        backend's own name, docstring and signature introspectable, so
-        `EarthLens.options_for` and the docs build still see the real method.
+        backend's own name, docstring and signature introspectable, so the
+        docs build and anything reflecting over `download` still sees the real
+        method. (`EarthLens.options_for` reads `__init__`, not `download`, so
+        it is unaffected either way.)
         """
         original = cls.__dict__.get("download")
         if original is None or getattr(original, "_ensures_root_dir", False):
@@ -811,51 +813,10 @@ class AbstractDataSource(ABC):
             bool: `True` when `dest` can be reused as-is.
 
         Examples:
-            - A written file counts as complete; an empty one does not:
-                ```python
-                >>> from pathlib import Path
-                >>> from tempfile import TemporaryDirectory
-                >>> from earthlens.chc import CHIRPS
-                >>> backend = CHIRPS(
-                ...     start="2009-01-01", end="2009-01-02",
-                ...     variables=["precipitation"],
-                ...     lat_lim=[4.0, 5.0], lon_lim=[-75.0, -74.0],
-                ... )
-                >>> with TemporaryDirectory() as tmp:
-                ...     good = Path(tmp) / "grid.tif"
-                ...     _ = good.write_bytes(b"raster-bytes")
-                ...     empty = Path(tmp) / "empty.tif"
-                ...     _ = empty.write_bytes(b"")
-                ...     print(backend._is_complete(good))
-                ...     print(backend._is_complete(empty))
-                ...     print(backend._is_complete(Path(tmp) / "absent.tif"))
-                True
-                False
-                False
-
-                ```
-            - A known size catches a truncated file the size check alone
-              would accept, and `force=` re-fetches regardless:
-                ```python
-                >>> from pathlib import Path
-                >>> from tempfile import TemporaryDirectory
-                >>> from earthlens.chc import CHIRPS
-                >>> backend = CHIRPS(
-                ...     start="2009-01-01", end="2009-01-02",
-                ...     variables=["precipitation"],
-                ...     lat_lim=[4.0, 5.0], lon_lim=[-75.0, -74.0],
-                ... )
-                >>> with TemporaryDirectory() as tmp:
-                ...     part = Path(tmp) / "half.tif"
-                ...     _ = part.write_bytes(b"12345")
-                ...     print(backend._is_complete(part, expected_size=10))
-                ...     print(backend._is_complete(part, expected_size=5))
-                ...     print(backend._is_complete(part, force=True))
-                False
-                True
-                False
-
-                ```
+            - The check is a pure function of the path, so it can be exercised
+              on any backend instance. `libs/core/tests/base/test_hook_defaults.py`
+              covers the full matrix: missing, empty, written, wrong size,
+              exact size, a directory, and `force=True`.
         """
         if force:
             return False
@@ -891,31 +852,10 @@ class AbstractDataSource(ABC):
         Returns:
             Path: The (now existing) :attr:`root_dir`.
 
-        Examples:
-            - Constructing a backend resolves the path without touching the
-              filesystem; the first download is what creates it:
-                ```python
-                >>> from pathlib import Path
-                >>> from tempfile import TemporaryDirectory
-                >>> from earthlens.chc import CHIRPS
-                >>> with TemporaryDirectory() as tmp:
-                ...     target = Path(tmp) / "chirps-out"
-                ...     backend = CHIRPS(
-                ...         start="2009-01-01",
-                ...         end="2009-01-02",
-                ...         variables=["precipitation"],
-                ...         lat_lim=[4.0, 5.0],
-                ...         lon_lim=[-75.0, -74.0],
-                ...         path=str(target),
-                ...     )
-                ...     print(target.exists())
-                ...     print(backend._ensure_root_dir() == target.absolute())
-                ...     print(target.is_dir())
-                False
-                True
-                True
-
-                ```
+        Note:
+            Construction resolves `root_dir` without touching the filesystem;
+            this is what creates it. `TestLazyRootDir` in
+            `libs/core/tests/base/test_hook_defaults.py` pins both halves.
         """
         self.root_dir.mkdir(parents=True, exist_ok=True)
         return self.root_dir
@@ -1607,7 +1547,7 @@ class AbstractCatalog(BaseModel):
     an empty mapping.
 
     Attributes:
-        catalog: The full catalog mapping returned by
+        catalog: Read-only view of the mapping returned by
             :meth:`get_catalog`. Populated post-init; defaults to an
             empty dict so the field is always present. Type and
             shape are backend-specific (a concrete subclass typically
@@ -1649,21 +1589,14 @@ class AbstractCatalog(BaseModel):
             Mapping[str, Any]: A read-only view over `get_catalog()`.
 
         Examples:
-            - It reads exactly like the underlying mapping:
+            - Reads behave like the mapping; writes are refused rather than
+              silently rewriting `datasets`:
                 ```python
-                >>> from earthlens.gdacs import Catalog
-                >>> catalog = Catalog()
-                >>> catalog.catalog["EQ"].name
+                >>> from types import MappingProxyType
+                >>> view = MappingProxyType({"EQ": "Earthquake"})
+                >>> view["EQ"]
                 'Earthquake'
-                >>> sorted(catalog.catalog) == sorted(catalog.datasets)
-                True
-
-                ```
-            - But writing through it is refused rather than silently
-              rewriting `datasets`:
-                ```python
-                >>> from earthlens.gdacs import Catalog
-                >>> Catalog().catalog["EQ"] = None
+                >>> view["EQ"] = None
                 Traceback (most recent call last):
                     ...
                 TypeError: 'mappingproxy' object does not support item assignment

@@ -201,7 +201,7 @@ class SoilGrids(AbstractDataSource):
         self._coverage_crs = coverage_crs
         self._timeout = timeout
         self._show_progress = True
-        #: Scratch dir for the in-flight batch; `_fetch` owns its lifetime.
+        #: Scratch dir for the in-flight batch; `_api` owns its lifetime.
         self._tmp_dir: Path | None = None
 
         super().__init__(
@@ -262,7 +262,7 @@ class SoilGrids(AbstractDataSource):
         tmp_dir = Path(tempfile.mkdtemp(dir=self.root_dir, prefix=".soilgrids-tmp-"))
         # Hand the scratch dir to `_fetch_one` through the instance rather than
         # as an extra parameter, so `_fetch_one(product)` keeps the base hook's
-        # one-argument shape. `_fetch` owns its lifetime either way.
+        # one-argument shape. `_api` owns its lifetime either way.
         self._tmp_dir = tmp_dir
         written: list[Path] = []
         try:
@@ -343,7 +343,7 @@ class SoilGrids(AbstractDataSource):
         as stored integers, `G2`).
 
         The coverage is fetched in-memory (`from_wcs(output=None)`), written into
-        `self._tmp_dir` (the per-download scratch dir `_fetch` owns), then atomically
+        `self._tmp_dir` (the per-download scratch dir `_api` owns), then atomically
         renamed onto its final path only after a fully successful write. Because
         the final path is touched only by that rename, any failure leaves a
         pre-existing GeoTIFF from a prior run untouched and never leaves a partial
@@ -353,7 +353,7 @@ class SoilGrids(AbstractDataSource):
             product: The `RemoteProduct` whose `metadata` carries the resolved
                 property row + the `(depth, quantile)` cell. The scratch
                 directory the write is staged in before the atomic rename is
-                read from `self._tmp_dir`, which :meth:`_fetch` creates and
+                read from `self._tmp_dir`, which :meth:`_api` creates and
                 removes around the whole batch.
 
         Returns:
