@@ -20,9 +20,11 @@ only the downstream crop assumes a regular raster.
 from __future__ import annotations
 
 import bz2
+from collections.abc import Iterable
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import IO, TYPE_CHECKING, cast
 
+from earthlens.base.http import _redact_url
 from earthlens.nwp._helpers import grib_name
 from earthlens.nwp.centres.base import _NWPCentre
 
@@ -38,6 +40,49 @@ _HTTP_TIMEOUT = 120
 
 #: Streaming block size (bytes) fed to the incremental bz2 decompressor.
 _CHUNK_SIZE = 1 << 20
+
+
+def _decompress_stream(blocks: Iterable[bytes], handle: IO[bytes], url: str) -> None:
+    """Decompress a `.bz2` byte stream into `handle`, rejecting a short body.
+
+    `bz2.decompress()` on a whole body raises when the data ends before the
+    end-of-stream marker, and transparently decodes a file made of several
+    concatenated streams. A bare `BZ2Decompressor` fed chunk by chunk does
+    neither: it returns what it has with `eof` still `False` for a truncated
+    body, and stops at the first stream's end, silently discarding the rest.
+    Either would publish a short `.grib2` that only fails later, inside
+    `open_grib`. This restores both behaviours while keeping the memory
+    profile of a streamed read.
+
+    Args:
+        blocks: The compressed body, in arbitrary-sized chunks.
+        handle: Binary file object the decompressed bytes are appended to.
+        url: Source URL, redacted into any error message.
+
+    Raises:
+        ValueError: If the stream ends before its end-of-stream marker — i.e.
+            the download was truncated.
+    """
+    decompressor = bz2.BZ2Decompressor()
+    saw_data = False
+    for block in blocks:
+        if not block:
+            continue
+        saw_data = True
+        handle.write(decompressor.decompress(block))
+        # A multi-stream `.bz2` (several concatenated streams) leaves the
+        # remainder in `unused_data`; keep going with a fresh decompressor so
+        # every stream is decoded, as `bz2.decompress()` does.
+        while decompressor.eof and decompressor.unused_data:
+            leftover = decompressor.unused_data
+            decompressor = bz2.BZ2Decompressor()
+            handle.write(decompressor.decompress(leftover))
+    if saw_data and not decompressor.eof:
+        raise ValueError(
+            f"{_redact_url(url)} returned a truncated bz2 body: the stream "
+            "ended before its end-of-stream marker, so the decompressed GRIB2 "
+            "would be short. Retry the download."
+        )
 
 
 class DWDCentre(_NWPCentre):
@@ -107,11 +152,10 @@ class DWDCentre(_NWPCentre):
                     # multi-hundred-MB .bz2, and `bz2.decompress(resp.content)`
                     # would hold both the whole compressed body and the whole
                     # decompressed result in memory at once.
-                    decompressor = bz2.BZ2Decompressor()
                     try:
-                        for block in response.iter_content(chunk_size=_CHUNK_SIZE):
-                            if block:
-                                handle.write(decompressor.decompress(block))
+                        _decompress_stream(
+                            response.iter_content(chunk_size=_CHUNK_SIZE), handle, url
+                        )
                     finally:
                         response.close()
             tmp.replace(out)

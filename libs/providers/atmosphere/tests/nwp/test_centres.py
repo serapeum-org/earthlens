@@ -1186,3 +1186,99 @@ class TestMeteoFranceAPIStreams:
         assert out.read_bytes() == b"GRIB-TEMPERATUREGRIB-TOTAL_PRECIPITATION"
         assert seen[0].get("stream") is True, f"got {seen[0]}"
         assert all(r.closed for r in responses), "responses must be released"
+
+
+class TestDecompressStream:
+    """The incremental bz2 reader must match `bz2.decompress()`'s guarantees."""
+
+    def _chunks(self, data: bytes, size: int = 64):
+        """Split `data` into fixed-size blocks, as a streamed response would."""
+        return (data[i : i + size] for i in range(0, len(data), size))
+
+    def test_whole_stream_round_trips(self, tmp_path):
+        """A complete body decompresses to exactly the original bytes."""
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        payload = b"GRIB2-body-" * 500
+        buf = io.BytesIO()
+        _decompress_stream(self._chunks(bz2.compress(payload)), buf, "https://h/x.bz2")
+        assert buf.getvalue() == payload
+
+    def test_truncated_stream_is_rejected(self):
+        """A body ending before the end-of-stream marker raises, never passes."""
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        whole = bz2.compress(b"GRIB2-body-" * 500)
+        with pytest.raises(ValueError, match="truncated bz2 body"):
+            _decompress_stream(
+                self._chunks(whole[: len(whole) // 2]), io.BytesIO(), "https://h/x.bz2"
+            )
+
+    def test_truncation_message_redacts_the_url(self):
+        """The error names the host only — never a URL-borne credential."""
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        whole = bz2.compress(b"body" * 200)
+        with pytest.raises(ValueError) as exc:
+            _decompress_stream(
+                self._chunks(whole[: len(whole) // 2]),
+                io.BytesIO(),
+                "https://h/x.bz2?token=SECRET",
+            )
+        assert "SECRET" not in str(exc.value), f"secret leaked: {exc.value}"
+
+    def test_multi_stream_body_is_fully_decoded(self):
+        """Concatenated bz2 streams all decode, as `bz2.decompress()` does."""
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        multi = bz2.compress(b"AAAA") + bz2.compress(b"BBBB") + bz2.compress(b"CCCC")
+        buf = io.BytesIO()
+        _decompress_stream(self._chunks(multi, 7), buf, "https://h/m.bz2")
+        assert buf.getvalue() == bz2.decompress(multi) == b"AAAABBBBCCCC"
+
+    def test_empty_body_writes_nothing_and_does_not_raise(self):
+        """A zero-byte response is not a truncated stream — it is just empty."""
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        buf = io.BytesIO()
+        _decompress_stream(iter([]), buf, "https://h/e.bz2")
+        assert buf.getvalue() == b""
+
+    def test_truncated_fetch_leaves_no_grib_behind(self, monkeypatch, tmp_path):
+        """A truncated band aborts `fetch_one` without publishing the .grib2."""
+        import bz2
+
+        whole = bz2.compress(b"<T_2M>" * 200)
+        short = whole[: len(whole) // 2]
+
+        def fake_get(url, timeout=None, **kwargs):
+            return _NoBufferResponse(short, block=16)
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        with pytest.raises(ValueError, match="truncated bz2 body"):
+            DWDCentre(tmp_path).fetch_one(
+                TestDWDCentre._icon(TestDWDCentre()),
+                dt.datetime(2024, 6, 1, 0),
+                0,
+                ["temperature_2m"],
+                "auto",
+            )
+        assert list(tmp_path.glob("*.grib2")) == [], "a short GRIB2 was published"
+        assert list(tmp_path.glob("*.part")) == [], "the partial write was left behind"
