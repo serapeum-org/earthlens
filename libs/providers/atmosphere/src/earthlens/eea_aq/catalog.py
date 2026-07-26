@@ -29,6 +29,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "eea_aq_data_catalog.yaml"
@@ -36,7 +37,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "eea_aq_data_catalog.yaml"
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
 #: the OpenAQ / AirNow / FDSN loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Pollutant]] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -90,6 +91,38 @@ class Pollutant(BaseModel):
     units: str = ""
     display_name: str = ""
     group: PollutantGroup = "other"
+
+
+def _parse_eea_aq_catalog(files: list[Path]):
+    """Parse and validate the EEA-AQ catalog rows.
+
+    Args:
+        files: The contributing YAML files (EEA-AQ ships a single file).
+
+    Returns:
+        The validated rows, in the shape the catalog caches.
+
+    Raises:
+        ValueError: If a required block is missing or a row fails
+            validation.
+    """
+    catalog_path = files[0]
+    data = load_yaml_strict(catalog_path) or {}
+    pollutants_yaml = data.get("pollutants") or {}
+    if not pollutants_yaml:
+        raise ValueError(
+            f"{catalog_path} is missing or has an empty 'pollutants:' "
+            "block. The EEA catalog must list at least one pollutant."
+        )
+    pollutants: dict[str, Pollutant] = {}
+    for name, body in pollutants_yaml.items():
+        try:
+            pollutants[name] = Pollutant(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{catalog_path} pollutant {name!r} failed validation:\n{exc}"
+            ) from exc
+    return pollutants
 
 
 class Catalog(AbstractCatalog):
@@ -190,32 +223,10 @@ class Catalog(AbstractCatalog):
                 fails `Pollutant` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        resolved = str(catalog_path.resolve())
-        try:
-            mtime = catalog_path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        key = (resolved, mtime)
-        cached = _CATALOG_CACHE.get(key)
-        if cached is not None:
-            return cls(datasets=dict(cached))
-        data = load_yaml_strict(catalog_path) or {}
-        pollutants_yaml = data.get("pollutants") or {}
-        if not pollutants_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'pollutants:' "
-                "block. The EEA catalog must list at least one pollutant."
-            )
-        pollutants: dict[str, Pollutant] = {}
-        for name, body in pollutants_yaml.items():
-            try:
-                pollutants[name] = Pollutant(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} pollutant {name!r} failed validation:\n{exc}"
-                ) from exc
-        _CATALOG_CACHE[key] = pollutants
-        return cls(datasets=dict(pollutants))
+        cached = load_catalog(
+            catalog_path, _CATALOG_CACHE, _parse_eea_aq_catalog, provider="EEA-AQ"
+        )
+        return cls(datasets=dict(cached))
 
     def get_catalog(self) -> dict[str, Pollutant]:
         """Return the pollutant map (satisfies the abstract contract).

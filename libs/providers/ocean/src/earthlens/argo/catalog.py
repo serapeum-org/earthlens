@@ -23,6 +23,7 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "argo_data_catalog.yaml"
@@ -30,7 +31,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "argo_data_catalog.yaml"
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation.
 #: Mirrors the FDSN / GDACS / usgs_water loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Family]] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -64,6 +65,38 @@ class Family(BaseModel):
 
     description: str = ""
     parameters: dict[str, str] = Field(default_factory=dict)
+
+
+def _parse_argo_catalog(files: list[Path]):
+    """Parse and validate the Argo catalog rows.
+
+    Args:
+        files: The contributing YAML files (Argo ships a single file).
+
+    Returns:
+        The validated rows, in the shape the catalog caches.
+
+    Raises:
+        ValueError: If a required block is missing or a row fails
+            validation.
+    """
+    catalog_path = files[0]
+    data = load_yaml_strict(catalog_path) or {}
+    families_yaml = data.get("families") or {}
+    if not families_yaml:
+        raise ValueError(
+            f"{catalog_path} is missing or has an empty 'families:' block. "
+            "The Argo catalog must list at least one parameter family."
+        )
+    families: dict[str, Family] = {}
+    for name, body in families_yaml.items():
+        try:
+            families[name] = Family(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{catalog_path} family {name!r} failed validation:\n{exc}"
+            ) from exc
+    return families
 
 
 class Catalog(AbstractCatalog):
@@ -136,32 +169,10 @@ class Catalog(AbstractCatalog):
                 fails :class:`Family` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        resolved = str(catalog_path.resolve())
-        try:
-            mtime = catalog_path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        key = (resolved, mtime)
-        cached = _CATALOG_CACHE.get(key)
-        if cached is not None:
-            return cls(datasets=dict(cached))
-        data = load_yaml_strict(catalog_path) or {}
-        families_yaml = data.get("families") or {}
-        if not families_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'families:' block. "
-                "The Argo catalog must list at least one parameter family."
-            )
-        families: dict[str, Family] = {}
-        for name, body in families_yaml.items():
-            try:
-                families[name] = Family(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} family {name!r} failed validation:\n{exc}"
-                ) from exc
-        _CATALOG_CACHE[key] = families
-        return cls(datasets=dict(families))
+        cached = load_catalog(
+            catalog_path, _CATALOG_CACHE, _parse_argo_catalog, provider="Argo"
+        )
+        return cls(datasets=dict(cached))
 
     def get_catalog(self) -> dict[str, Family]:
         """Return the family map (satisfies the abstract contract).
