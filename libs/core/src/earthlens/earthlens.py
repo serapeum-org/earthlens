@@ -246,13 +246,26 @@ def _is_missing_dependency(exc: ImportError, module_name: str) -> bool:
     * something inside the backend package is broken — the user needs a bug
       report, and an "install the extra" message actively misleads.
 
-    The discriminator is `ImportError.name`: the interpreter sets it to the
-    module that could not be found. `module_name` is always a backend inside
-    our own namespace (`earthlens.gee`, `earthlens.ecmwf`, …), so a missing
-    module sharing that root is our code and anything else is a third-party
-    import. A `None` name means the exception was raised by hand rather than
-    by the import system, so it is treated as internal — the conservative
-    choice, since it surfaces the original message rather than replacing it.
+    Two conditions must both hold, and each rules out a real misreport:
+
+    * the exception is a `ModuleNotFoundError` — a module was genuinely
+      absent. A plain `ImportError` means the module imported fine but a
+      *name* inside it did not (`from ee import Missing`), which is a
+      version skew or a bug, never something `pip install` fixes. Note
+      `ImportError.name` is set to the *present* module in that case, so
+      the name alone would misread it as absent;
+    * `ImportError.name` is outside our own namespace. `module_name` is
+      always a backend under `earthlens.*`, so an absent module sharing that
+      root is our code — a typo'd relative import, a missing sibling — and
+      the user needs the real error, not an install hint.
+
+    A `None` name means the exception was raised by hand rather than by the
+    import system, so it is treated as internal: the conservative choice,
+    since it surfaces the original message rather than replacing it.
+
+    An absent *transitive* dependency of the SDK (`No module named 'grpc'`
+    while importing `ee`) satisfies both conditions and keeps the hint, which
+    is correct — reinstalling the extra is what repairs it.
 
     Args:
         exc: The `ImportError` raised while importing the backend.
@@ -265,7 +278,7 @@ def _is_missing_dependency(exc: ImportError, module_name: str) -> bool:
         - A missing SDK is a dependency problem:
             ```python
             >>> from earthlens.earthlens import _is_missing_dependency
-            >>> exc = ImportError("No module named 'ee'", name="ee")
+            >>> exc = ModuleNotFoundError("No module named 'ee'", name="ee")
             >>> _is_missing_dependency(exc, "earthlens.gee")
             True
 
@@ -273,7 +286,19 @@ def _is_missing_dependency(exc: ImportError, module_name: str) -> bool:
         - A broken import inside the backend is not, so the real error shows:
             ```python
             >>> from earthlens.earthlens import _is_missing_dependency
-            >>> exc = ImportError("cannot import name 'x'", name="earthlens.gee._helpers")
+            >>> exc = ModuleNotFoundError(
+            ...     "No module named 'earthlens.gee._helpers'",
+            ...     name="earthlens.gee._helpers",
+            ... )
+            >>> _is_missing_dependency(exc, "earthlens.gee")
+            False
+
+            ```
+        - Neither is a missing *name* in a module that imported fine — that is
+          a version skew, and `pip install` would not fix it:
+            ```python
+            >>> from earthlens.earthlens import _is_missing_dependency
+            >>> exc = ImportError("cannot import name 'Missing' from 'ee'", name="ee")
             >>> _is_missing_dependency(exc, "earthlens.gee")
             False
 
@@ -286,6 +311,8 @@ def _is_missing_dependency(exc: ImportError, module_name: str) -> bool:
 
             ```
     """
+    if not isinstance(exc, ModuleNotFoundError):
+        return False
     missing = getattr(exc, "name", None)
     if not missing:
         return False

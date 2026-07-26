@@ -286,7 +286,7 @@ class TestMissingExtra:
             if name == "earthlens.gee":
                 # `name=` is what the interpreter sets, and what the facade
                 # reads to tell a missing SDK from a bug in our own code.
-                raise ImportError("No module named 'ee'", name="ee")
+                raise ModuleNotFoundError("No module named 'ee'", name="ee")
             return real_import(name, *args, **kwargs)
 
         monkeypatch.setattr("earthlens.earthlens.importlib.import_module", fake_import)

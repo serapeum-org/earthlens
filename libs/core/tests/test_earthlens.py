@@ -652,7 +652,7 @@ class TestTopLevelDiscovery:
 
         def _fake_guess(cls, source, text):
             if source == "broken":
-                raise ImportError("No module named 'ee'", name="ee")
+                raise ModuleNotFoundError("No module named 'ee'", name="ee")
             return [f"{source}-ds"] if source == "chc" else []
 
         monkeypatch.setattr(
@@ -1152,7 +1152,7 @@ class TestFacadeDiscovery:
         from earthlens import earthlens as facade_module
 
         def _boom(name):
-            raise ImportError("No module named 'ee'", name="ee")
+            raise ModuleNotFoundError("No module named 'ee'", name="ee")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
         with pytest.raises(ImportError, match="Backend catalog for"):
@@ -1175,7 +1175,7 @@ class TestImportBackendModule:
         from earthlens.earthlens import _import_backend_module
 
         def _boom(name):
-            raise ImportError("No module named 'ee'", name="ee")
+            raise ModuleNotFoundError("No module named 'ee'", name="ee")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
         with pytest.raises(ImportError) as exc:
@@ -1190,7 +1190,7 @@ class TestImportBackendModule:
         from earthlens.earthlens import _import_backend_module
 
         def _boom(name):
-            raise ImportError("No module named 'ftplib_x'", name="ftplib_x")
+            raise ModuleNotFoundError("No module named 'ftplib_x'", name="ftplib_x")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
         with pytest.raises(ImportError) as exc:
@@ -1203,7 +1203,7 @@ class TestImportBackendModule:
         from earthlens.earthlens import _import_backend_module
 
         def _boom(name):
-            raise ImportError("No module named 'ee'", name="ee")
+            raise ModuleNotFoundError("No module named 'ee'", name="ee")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
         with pytest.raises(ImportError, match="Backend catalog for 'gee'"):
@@ -1216,7 +1216,7 @@ class TestImportBackendModule:
         from earthlens import earthlens as facade_module
         from earthlens.earthlens import _import_backend_module
 
-        original = ImportError("No module named 'ee'", name="ee")
+        original = ModuleNotFoundError("No module named 'ee'", name="ee")
 
         def _boom(name):
             raise original
@@ -1262,7 +1262,7 @@ class TestImportBackendModule:
         from earthlens.earthlens import _import_backend_module
 
         def _boom(name):
-            raise ImportError("No module named 'ee'", name="ee")
+            raise ModuleNotFoundError("No module named 'ee'", name="ee")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
         with pytest.raises(ImportError, match=r"pip install earthlens\[gee\]"):
@@ -1273,7 +1273,7 @@ class TestImportBackendModule:
         from earthlens import earthlens as facade_module
 
         def _boom(name):
-            raise ImportError("No module named 'ee'", name="ee")
+            raise ModuleNotFoundError("No module named 'ee'", name="ee")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
         with pytest.raises(ImportError) as registry_exc:
