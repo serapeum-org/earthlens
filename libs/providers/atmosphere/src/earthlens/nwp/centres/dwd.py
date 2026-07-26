@@ -42,47 +42,80 @@ _HTTP_TIMEOUT = 120
 _CHUNK_SIZE = 1 << 20
 
 
-def _decompress_stream(blocks: Iterable[bytes], handle: IO[bytes], url: str) -> None:
-    """Decompress a `.bz2` byte stream into `handle`, rejecting a short body.
+def _decompress_stream(blocks: Iterable[bytes], handle: IO[bytes], url: str) -> int:
+    """Stream-decompress a `.bz2` body into `handle`, matching `bz2.decompress`.
 
-    `bz2.decompress()` on a whole body raises when the data ends before the
-    end-of-stream marker, and transparently decodes a file made of several
-    concatenated streams. A bare `BZ2Decompressor` fed chunk by chunk does
-    neither: it returns what it has with `eof` still `False` for a truncated
-    body, and stops at the first stream's end, silently discarding the rest.
-    Either would publish a short `.grib2` that only fails later, inside
-    `open_grib`. This restores both behaviours while keeping the memory
-    profile of a streamed read.
+    A bare `BZ2Decompressor` fed chunk by chunk is **not** equivalent to
+    `bz2.decompress()` on the whole body, and the difference matters here
+    because the result is published as a `.grib2`:
+
+    * a body ending before its end-of-stream marker leaves `eof` `False` and
+      raises nothing, so a truncated download would be published short;
+    * a multi-stream `.bz2` (concatenated streams, which bzip2 tooling
+      produces routinely) stops at the first stream, silently dropping the
+      rest;
+    * trailing bytes that are not a further stream — padding, a stray
+      newline — make a naive re-seed raise, where `bz2.decompress` ignores
+      them.
+
+    This mirrors CPython's `bz2.decompress` state machine exactly: one
+    decompressor per stream, re-seeded from `unused_data` when a stream ends,
+    an `OSError` after at least one complete stream treated as trailing
+    non-bz2 bytes and ignored, and the same truncation `ValueError`. Unlike
+    that function it never holds the whole body or the whole result.
 
     Args:
-        blocks: The compressed body, in arbitrary-sized chunks.
+        blocks: The compressed body, in arbitrary-sized chunks. A stream
+            boundary may fall anywhere, including exactly on a chunk edge.
         handle: Binary file object the decompressed bytes are appended to.
         url: Source URL, redacted into any error message.
 
+    Returns:
+        int: Decompressed bytes written. `0` for an empty body — the caller
+            decides whether that is acceptable, as `bz2.decompress(b"")`
+            likewise returns `b""` rather than raising.
+
     Raises:
-        ValueError: If the stream ends before its end-of-stream marker — i.e.
+        ValueError: If the data ends before its end-of-stream marker, i.e.
             the download was truncated.
+        OSError: If the very first stream is not valid bzip2 at all.
     """
+    written = 0
     decompressor = bz2.BZ2Decompressor()
-    saw_data = False
+    completed_a_stream = False
+    fed_current = False
     for block in blocks:
-        if not block:
-            continue
-        saw_data = True
-        handle.write(decompressor.decompress(block))
-        # A multi-stream `.bz2` (several concatenated streams) leaves the
-        # remainder in `unused_data`; keep going with a fresh decompressor so
-        # every stream is decoded, as `bz2.decompress()` does.
-        while decompressor.eof and decompressor.unused_data:
-            leftover = decompressor.unused_data
-            decompressor = bz2.BZ2Decompressor()
-            handle.write(decompressor.decompress(leftover))
-    if saw_data and not decompressor.eof:
+        data = block
+        while data:
+            if decompressor.eof:
+                # The previous stream finished; anything left is the next one.
+                decompressor = bz2.BZ2Decompressor()
+                fed_current = False
+            try:
+                chunk = decompressor.decompress(data)
+            except OSError:
+                if completed_a_stream:
+                    # Not a further stream — trailing bytes. `bz2.decompress`
+                    # ignores these once it has decoded something.
+                    return written
+                raise
+            fed_current = True
+            handle.write(chunk)
+            written += len(chunk)
+            # Only a finished stream can leave bytes over; while it is still
+            # consuming, the whole chunk was absorbed.
+            if decompressor.eof:
+                completed_a_stream = True
+                data = decompressor.unused_data
+            else:
+                data = b""
+    if fed_current and not decompressor.eof:
         raise ValueError(
             f"{redact_url(url)} returned a truncated bz2 body: the stream "
             "ended before its end-of-stream marker, so the decompressed GRIB2 "
             "would be short. Retry the download."
         )
+    return written
 
 
 class DWDCentre(_NWPCentre):
@@ -153,11 +186,22 @@ class DWDCentre(_NWPCentre):
                     # would hold both the whole compressed body and the whole
                     # decompressed result in memory at once.
                     try:
-                        _decompress_stream(
+                        written = _decompress_stream(
                             response.iter_content(chunk_size=_CHUNK_SIZE), handle, url
                         )
                     finally:
                         response.close()
+                    if not written:
+                        # Every requested band must contribute messages. An
+                        # empty body would otherwise drop that band from the
+                        # concatenated `.grib2` with nothing to show for it —
+                        # and under `errors="warn"` the whole step is skipped
+                        # with only a log line.
+                        raise ValueError(
+                            f"{redact_url(url)} returned an empty body for band "
+                            f"{param!r}: the decompressed GRIB2 would be missing "
+                            "that band entirely. Retry the download."
+                        )
             tmp.replace(out)
         except BaseException:
             tmp.unlink(missing_ok=True)

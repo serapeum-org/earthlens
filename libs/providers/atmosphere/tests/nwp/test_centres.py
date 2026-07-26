@@ -1189,36 +1189,126 @@ class TestMeteoFranceAPIStreams:
 
 
 class TestDecompressStream:
-    """The incremental bz2 reader must match `bz2.decompress()`'s guarantees."""
+    """The streamed bz2 reader must behave exactly like `bz2.decompress`."""
 
-    def _chunks(self, data: bytes, size: int = 64):
-        """Split `data` into fixed-size blocks, as a streamed response would."""
-        return (data[i : i + size] for i in range(0, len(data), size))
-
-    def test_whole_stream_round_trips(self, tmp_path):
-        """A complete body decompresses to exactly the original bytes."""
+    #: Bodies covering every shape the DWD feed can produce, plus the
+    #: pathological ones. Each is run at several chunk sizes, including sizes
+    #: that land a stream boundary exactly on a chunk edge — the case the
+    #: first version of this reader got wrong.
+    def _bodies(self):
+        """Return `{name: body}` for the differential cases."""
         import bz2
+
+        one = bz2.compress(b"AAAA")
+        two = bz2.compress(b"BBBB")
+        big = bz2.compress(b"C" * 5000)
+        return {
+            "single": one,
+            "multi_two": one + two,
+            "multi_three": one + two + big,
+            "trailing_nulls": one + b"\x00\x00\x00",
+            "trailing_garbage": one + b"not-a-stream",
+            "truncated": one[: len(one) // 2],
+            "truncated_second_stream": one + two[: len(two) // 2],
+            "empty": b"",
+            "not_bz2_at_all": b"plain bytes, never compressed",
+            "big_then_small": big + one,
+        }
+
+    def _run(self, body: bytes, chunk: int):
+        """Feed `body` through the reader in `chunk`-sized blocks."""
         import io
 
         from earthlens.nwp.centres.dwd import _decompress_stream
 
-        payload = b"GRIB2-body-" * 500
+        blocks = [body[i : i + chunk] for i in range(0, len(body), chunk)] or [b""]
         buf = io.BytesIO()
-        _decompress_stream(self._chunks(bz2.compress(payload)), buf, "https://h/x.bz2")
-        assert buf.getvalue() == payload
+        try:
+            _decompress_stream(iter(blocks), buf, "https://h/x.bz2")
+        except Exception as exc:  # noqa: BLE001 - the outcome is the assertion
+            return type(exc).__name__, None
+        return "ok", buf.getvalue()
 
-    def test_truncated_stream_is_rejected(self):
-        """A body ending before the end-of-stream marker raises, never passes."""
+    def _reference(self, body: bytes):
+        """The same body through `bz2.decompress`, the behaviour to match."""
+        import bz2
+
+        try:
+            return "ok", bz2.decompress(body)
+        except Exception as exc:  # noqa: BLE001 - the outcome is the assertion
+            return type(exc).__name__, None
+
+    @pytest.mark.parametrize(
+        "case",
+        [
+            "single",
+            "multi_two",
+            "multi_three",
+            "trailing_nulls",
+            "trailing_garbage",
+            "truncated",
+            "truncated_second_stream",
+            "empty",
+            "not_bz2_at_all",
+            "big_then_small",
+        ],
+    )
+    def test_matches_bz2_decompress_at_every_chunking(self, case):
+        """Streamed decoding agrees with `bz2.decompress` for any block split.
+
+        Args:
+            case: Key into the body table.
+        """
+        import bz2
+
+        body = self._bodies()[case]
+        expected = self._reference(body)
+        one_stream = len(bz2.compress(b"AAAA"))
+        sizes = sorted({1, 2, 7, 13, one_stream, one_stream + 1, len(body) or 1, 4096})
+        for chunk in sizes:
+            got = self._run(body, chunk)
+            assert got == expected, (
+                f"{case} at chunk={chunk}: got {got[0]} / {got[1]!r}, "
+                f"expected {expected[0]} / {expected[1]!r}"
+            )
+
+    def test_stream_boundary_on_a_chunk_edge(self):
+        """A boundary exactly at a block edge must not raise EOFError.
+
+        Regression: re-seeding only when `unused_data` was non-empty in the
+        same iteration left an exhausted decompressor to receive the next
+        block, which raises `EOFError: End of stream already reached`.
+        """
         import bz2
         import io
 
         from earthlens.nwp.centres.dwd import _decompress_stream
 
-        whole = bz2.compress(b"GRIB2-body-" * 500)
-        with pytest.raises(ValueError, match="truncated bz2 body"):
-            _decompress_stream(
-                self._chunks(whole[: len(whole) // 2]), io.BytesIO(), "https://h/x.bz2"
-            )
+        one, two = bz2.compress(b"AAAA"), bz2.compress(b"BBBB")
+        buf = io.BytesIO()
+        _decompress_stream(iter([one, two]), buf, "https://h/x.bz2")
+        assert buf.getvalue() == b"AAAABBBB"
+
+    def test_returns_the_decompressed_byte_count(self):
+        """The return value lets the caller reject an empty band."""
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        payload = b"GRIB2" * 100
+        written = _decompress_stream(
+            iter([bz2.compress(payload)]), io.BytesIO(), "https://h/x.bz2"
+        )
+        assert written == len(payload)
+
+    def test_empty_body_returns_zero_without_raising(self):
+        """An empty body is `bz2.decompress`'s no-op, not a truncation."""
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        assert _decompress_stream(iter([b""]), io.BytesIO(), "https://h/e.bz2") == 0
 
     def test_truncation_message_redacts_the_url(self):
         """The error names the host only — never a URL-borne credential."""
@@ -1230,33 +1320,31 @@ class TestDecompressStream:
         whole = bz2.compress(b"body" * 200)
         with pytest.raises(ValueError) as exc:
             _decompress_stream(
-                self._chunks(whole[: len(whole) // 2]),
+                iter([whole[: len(whole) // 2]]),
                 io.BytesIO(),
                 "https://h/x.bz2?token=SECRET",
             )
         assert "SECRET" not in str(exc.value), f"secret leaked: {exc.value}"
 
-    def test_multi_stream_body_is_fully_decoded(self):
-        """Concatenated bz2 streams all decode, as `bz2.decompress()` does."""
-        import bz2
-        import io
+    def test_empty_band_body_aborts_the_fetch(self, monkeypatch, tmp_path):
+        """A band that returns nothing fails rather than vanishing from the GRIB2."""
 
-        from earthlens.nwp.centres.dwd import _decompress_stream
+        def fake_get(url, timeout=None, **kwargs):
+            return _NoBufferResponse(b"", block=16)
 
-        multi = bz2.compress(b"AAAA") + bz2.compress(b"BBBB") + bz2.compress(b"CCCC")
-        buf = io.BytesIO()
-        _decompress_stream(self._chunks(multi, 7), buf, "https://h/m.bz2")
-        assert buf.getvalue() == bz2.decompress(multi) == b"AAAABBBBCCCC"
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
 
-    def test_empty_body_writes_nothing_and_does_not_raise(self):
-        """A zero-byte response is not a truncated stream — it is just empty."""
-        import io
-
-        from earthlens.nwp.centres.dwd import _decompress_stream
-
-        buf = io.BytesIO()
-        _decompress_stream(iter([]), buf, "https://h/e.bz2")
-        assert buf.getvalue() == b""
+        with pytest.raises(ValueError, match="empty body for band"):
+            DWDCentre(tmp_path).fetch_one(
+                TestDWDCentre._icon(TestDWDCentre()),
+                dt.datetime(2024, 6, 1, 0),
+                0,
+                ["temperature_2m"],
+                "auto",
+            )
+        assert list(tmp_path.glob("*.grib2")) == [], "no GRIB2 should be published"
 
     def test_truncated_fetch_leaves_no_grib_behind(self, monkeypatch, tmp_path):
         """A truncated band aborts `fetch_one` without publishing the .grib2."""
