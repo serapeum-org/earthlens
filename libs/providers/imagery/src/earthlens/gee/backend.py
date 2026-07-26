@@ -876,24 +876,29 @@ class GEE(LazyClientMixin, AbstractDataSource):
             session=cast("requests.Session | None", RequestsGet()),
             timeout=self.http_timeout,
         )
-        response = client.get(url)
-        body = response.content
-        if body[:4] == _ZIP_MAGIC:
-            zip_path = self.root_dir / f"{prefix}.zip"
-            zip_path.write_bytes(body)
-            try:
+        # Stream to a temp rather than buffering `response.content`: a tile is
+        # capped at 32768 px/axis, so a single band can run to hundreds of
+        # megabytes and the old path held it whole just to inspect four bytes.
+        # GEE returns either a bare GeoTIFF or a zip of them, so the format is
+        # decided from the leading bytes on disk.
+        staged = self.root_dir / f"{prefix}.download"
+        try:
+            client.download(url, staged, progress=False)
+            with open(staged, "rb") as handle:
+                is_zip = handle.read(4) == _ZIP_MAGIC
+            size = staged.stat().st_size
+            if is_zip:
                 PyramidsDataset.from_archive(
-                    zip_path,
+                    staged,
                     kind="zip",
                     member_glob="*.tif",
                     path=str(target),
                 )
-            finally:
-                zip_path.unlink(missing_ok=True)
-        else:
-            ds = PyramidsDataset.from_bytes(body, suffix=".tif")
-            ds.to_file(str(target))
-        logger.info(f"Wrote {target} ({len(body)} bytes)")
+            else:
+                PyramidsDataset.read_file(str(staged)).to_file(str(target))
+        finally:
+            staged.unlink(missing_ok=True)
+        logger.info(f"Wrote {target} ({size} bytes)")
         return target
 
     def _auto_split_and_download(

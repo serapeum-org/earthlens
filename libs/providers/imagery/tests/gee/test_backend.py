@@ -223,11 +223,19 @@ class _FakePyramidsDataset:
 
     from_bytes_calls: list[dict] = []
     from_archive_calls: list[dict] = []
+    read_file_calls: list[str] = []
 
     @classmethod
     def reset(cls) -> None:
         cls.from_bytes_calls = []
         cls.from_archive_calls = []
+        cls.read_file_calls = []
+
+    @classmethod
+    def read_file(cls, path, **kwargs):
+        """Record the staged path and hand back a handle over its bytes."""
+        cls.read_file_calls.append(str(path))
+        return _FakePyramidsHandle(Path(path).read_bytes())
 
     @classmethod
     def from_bytes(
