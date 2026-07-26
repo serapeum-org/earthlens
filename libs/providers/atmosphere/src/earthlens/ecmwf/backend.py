@@ -677,12 +677,14 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
         effective_aggregate: AggregationConfig | None = None
         if aggregate is not None:
+            # Only the written paths are kept below, so the reduced arrays are
+            # dropped as each window lands rather than accumulating: a daily
+            # reduction of a decade-long request would otherwise hold every
+            # window in memory alongside the GeoTIFFs already on disk.
+            updates: dict[str, object] = {"keep_arrays": False}
             if aggregate.out_dir is None:
-                effective_aggregate = aggregate.model_copy(
-                    update={"out_dir": self.root_dir / "aggregated"}
-                )
-            else:
-                effective_aggregate = aggregate
+                updates["out_dir"] = self.root_dir / "aggregated"
+            effective_aggregate = aggregate.model_copy(update=updates)
 
         assert isinstance(self.vars, dict)  # ECMWF requires a {dataset: [vars]} mapping
         for dataset_name, var_codes in self.vars.items():
