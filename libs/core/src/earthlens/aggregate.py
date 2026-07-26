@@ -817,17 +817,33 @@ def _read_window(var: Any, mask: np.ndarray) -> np.ndarray:
         mask: Boolean mask over the time axis selecting this window's steps.
 
     Returns:
-        numpy.ndarray: The window's steps stacked along a leading time axis.
+        numpy.ndarray: The window's steps stacked along a leading time axis,
+            in the widest dtype any contributing band needed.
+
+    Raises:
+        ValueError: If `mask` selects no time steps.
     """
     indices = np.flatnonzero(mask)
+    # `window_groups` never yields an all-False mask, so an empty window would
+    # be a caller bug; say so rather than returning a shape that silently
+    # loses the grid and breaks the reduction downstream.
     if indices.size == 0:
-        return np.empty((0, 0, 0))
+        raise ValueError(
+            "_read_window received a mask selecting no time steps; "
+            "window_groups only yields non-empty windows."
+        )
     # Fill a pre-sized buffer rather than `np.stack`ing a list: stacking holds
     # every band plus the assembled copy at once, doubling the window's peak.
-    first = var.read_array(band=int(indices[0]))
+    first = np.asarray(var.read_array(band=int(indices[0])))
     out = np.empty((indices.size, *first.shape), dtype=first.dtype)
     out[0] = first
     del first
     for position, index in enumerate(indices[1:], start=1):
-        out[position] = var.read_array(band=int(index))
+        band = np.asarray(var.read_array(band=int(index)))
+        if band.dtype != out.dtype:
+            # A band whose dtype differs from the first would be cast
+            # silently by the assignment below — e.g. float64 truncated into
+            # a float32 buffer. Widen instead of losing precision.
+            out = out.astype(np.promote_types(out.dtype, band.dtype))
+        out[position] = band
     return out

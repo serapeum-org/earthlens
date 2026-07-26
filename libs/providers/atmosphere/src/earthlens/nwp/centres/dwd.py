@@ -41,6 +41,45 @@ _HTTP_TIMEOUT = 120
 #: Streaming block size (bytes) fed to the incremental bz2 decompressor.
 _CHUNK_SIZE = 1 << 20
 
+#: Leading bytes of a GRIB edition-1/2 message. DWD serves an HTML error page
+#: with a 200 for an absent cycle, and bz2-of-HTML decompresses happily — so
+#: the decompressed result is checked rather than trusted.
+_GRIB_MAGIC = b"GRIB"
+
+
+def _head_at(path: Path, offset: int, size: int = 8) -> bytes:
+    """Return up to `size` bytes of `path` starting at `offset`.
+
+    Args:
+        path: The file being assembled.
+        offset: Byte offset the band's messages start at.
+        size: How many bytes to read.
+
+    Returns:
+        bytes: The leading bytes of that band's contribution.
+    """
+    with open(path, "rb") as handle:
+        handle.seek(offset)
+        return handle.read(size)
+
+
+def _starts_with_grib(path: Path, offset: int) -> bool:
+    """Report whether the bytes at `offset` begin a GRIB message.
+
+    Each band appends whole GRIB messages, so every band's contribution must
+    itself start with the `GRIB` magic. Checking per band — rather than only
+    at the head of the file — catches the case where the first band is real
+    data and a later one came back as an error page.
+
+    Args:
+        path: The file being assembled.
+        offset: Byte offset the band's messages start at.
+
+    Returns:
+        bool: `True` when that band's bytes start a GRIB message.
+    """
+    return _head_at(path, offset, len(_GRIB_MAGIC)) == _GRIB_MAGIC
+
 
 def _decompress_stream(blocks: Iterable[bytes], handle: IO[bytes], url: str) -> int:
     """Stream-decompress a `.bz2` body into `handle`, matching `bz2.decompress`.
@@ -179,6 +218,7 @@ class DWDCentre(_NWPCentre):
         try:
             with open(tmp, "wb") as handle:
                 for param in params:
+                    band_offset = handle.tell()
                     url = self._band_url(model, param, cycle, step)
                     response = client.get(url, timeout=_HTTP_TIMEOUT, stream=True)
                     # Decompress incrementally: a global ICON band is a
@@ -201,6 +241,16 @@ class DWDCentre(_NWPCentre):
                             f"{redact_url(url)} returned an empty body for band "
                             f"{param!r}: the decompressed GRIB2 would be missing "
                             "that band entirely. Retry the download."
+                        )
+                    # `_starts_with_grib` opens its own handle, so the buffered
+                    # writes have to reach disk before it can see them.
+                    handle.flush()
+                    if not _starts_with_grib(tmp, band_offset):
+                        raise ValueError(
+                            f"{redact_url(url)} did not return GRIB2 for band "
+                            f"{param!r}: the decompressed body starts "
+                            f"{_head_at(tmp, band_offset)!r}, not {_GRIB_MAGIC!r}. "
+                            "The cycle or step is probably not published yet."
                         )
             tmp.replace(out)
         except BaseException:

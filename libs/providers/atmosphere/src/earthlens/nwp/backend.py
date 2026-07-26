@@ -508,6 +508,12 @@ class NWP(AbstractDataSource):
         Returns:
             pathlib.Path: The written COG path.
         """
+        if not self._crop_bbox or self._open_grib is None or self._write_cog is None:
+            raise RuntimeError(
+                "NWP._fetch_one was called outside a download: the per-batch "
+                "crop box and pyramids handles are only set up by _fetch(). "
+                "Checked before the download so a stray call costs nothing."
+            )
         meta = product.metadata
         centre = self._centre_for(meta["model"].backend)
         grib_path = centre.fetch_one(
@@ -519,11 +525,6 @@ class NWP(AbstractDataSource):
             meta.get("member"),
             whole=self._mode == "whole",
         )
-        if self._open_grib is None or self._write_cog is None:
-            raise RuntimeError(
-                "NWP._fetch_one was called outside a download: the per-batch "
-                "pyramids handles and crop box are only set up by _fetch()."
-            )
         dataset = self._open_grib(str(grib_path))
         dataset = self._normalise_longitude(dataset)
         # touch=False crops to the bbox *extent*; touch=True takes pyramids'

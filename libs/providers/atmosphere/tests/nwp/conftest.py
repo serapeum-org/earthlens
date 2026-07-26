@@ -137,7 +137,7 @@ def fake_requests(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         # `{var_lc}` path segment and once in the filename. Recover it from
         # the path segment (robust to var tokens that contain underscores).
         var = Path(url).parent.name.upper()
-        return _FakeResponse(bz2.compress(b"<" + var.encode() + b">"))
+        return _FakeResponse(bz2.compress(b"GRIB<" + var.encode() + b">"))
 
     module = types.ModuleType("requests")
     module.get = fake_get

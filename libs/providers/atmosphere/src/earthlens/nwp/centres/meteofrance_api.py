@@ -33,7 +33,7 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
-from earthlens.base import AuthenticationError
+from earthlens.base import AuthenticationError, redact_url
 from earthlens.nwp._helpers import grib_name, valid_time
 from earthlens.nwp.centres.base import _NWPCentre
 
@@ -52,6 +52,11 @@ _HTTP_TIMEOUT = 300
 
 #: Streaming block size (bytes) for writing a coverage to disk.
 _CHUNK_SIZE = 1 << 20
+
+#: Leading bytes of a GRIB edition-1/2 message. A WSO2 gateway answers an
+#: expired key or an unpublished run with an XML/JSON fault at `200`, which
+#: would otherwise be appended into the `.grib2` as if it were data.
+_GRIB_MAGIC = b"GRIB"
 
 
 def resolve_api_key() -> str:
@@ -142,6 +147,7 @@ class MeteoFranceAPICentre(_NWPCentre):
         try:
             with open(tmp, "wb") as handle:
                 for param in params:
+                    band_offset = handle.tell()
                     params_qs = self._coverage_query(model.bands[param], cycle, valid)
                     response = client.get(
                         url,
@@ -159,6 +165,21 @@ class MeteoFranceAPICentre(_NWPCentre):
                                 handle.write(block)
                     finally:
                         response.close()
+                    # Each band appends whole GRIB messages, so each one must
+                    # itself start with the magic — checking per band catches a
+                    # gateway fault returned for a later band only. The buffered
+                    # writes are flushed first so the read sees them.
+                    handle.flush()
+                    with open(tmp, "rb") as probe:
+                        probe.seek(band_offset)
+                        head = probe.read(len(_GRIB_MAGIC))
+                    if head != _GRIB_MAGIC:
+                        raise ValueError(
+                            f"{redact_url(url)} did not return GRIB2 for band "
+                            f"{param!r}: the body starts {head!r}, not "
+                            f"{_GRIB_MAGIC!r}. The API key may be rejected, or "
+                            "the run is not published yet."
+                        )
             tmp.replace(out)
         except BaseException:
             tmp.unlink(missing_ok=True)

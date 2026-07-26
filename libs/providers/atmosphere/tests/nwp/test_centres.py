@@ -453,7 +453,7 @@ class TestDWDCentre:
             "https://x/00/t_2m/icon_2024060100_003_T_2M.grib2.bz2",
             "https://x/00/tot_prec/icon_2024060100_003_TOT_PREC.grib2.bz2",
         ]
-        assert out.read_bytes() == b"<T_2M><TOT_PREC>"
+        assert out.read_bytes() == b"GRIB<T_2M>GRIB<TOT_PREC>"
         assert out.name == "icon_2024060100_f003.grib2"
 
     def test_fetch_one_without_template_raises(self, tmp_path):
@@ -1111,7 +1111,7 @@ class TestDWDStreams:
         def fake_get(url: str, timeout=None, **kwargs):
             state["kwargs"].append(kwargs)
             var = pathlib.Path(url).parent.name.upper()
-            payload = bz2.compress(b"<" + var.encode() + b">")
+            payload = bz2.compress(b"GRIB<" + var.encode() + b">")
             response = _NoBufferResponse(payload, block=block)
             state["responses"].append(response)
             return response
@@ -1135,7 +1135,7 @@ class TestDWDStreams:
             ["temperature_2m", "precipitation_acc"],
             "auto",
         )
-        assert out.read_bytes() == b"<T_2M><TOT_PREC>"
+        assert out.read_bytes() == b"GRIB<T_2M>GRIB<TOT_PREC>"
         assert all(r.closed for r in state["responses"]), "responses must be released"
 
     def test_get_is_streaming(self, monkeypatch, tmp_path):
@@ -1152,7 +1152,9 @@ class TestDWDStreams:
         out = DWDCentre(tmp_path).fetch_one(
             self._icon(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
         )
-        assert out.read_bytes() == b"<T_2M>", "bz2 must be decompressed incrementally"
+        assert out.read_bytes() == b"GRIB<T_2M>", (
+            "bz2 must be decompressed incrementally"
+        )
 
 
 class TestMeteoFranceAPIStreams:
@@ -1350,7 +1352,7 @@ class TestDecompressStream:
         """A truncated band aborts `fetch_one` without publishing the .grib2."""
         import bz2
 
-        whole = bz2.compress(b"<T_2M>" * 200)
+        whole = bz2.compress(b"GRIB<T_2M>" * 200)
         short = whole[: len(whole) // 2]
 
         def fake_get(url, timeout=None, **kwargs):
@@ -1370,3 +1372,100 @@ class TestDecompressStream:
             )
         assert list(tmp_path.glob("*.grib2")) == [], "a short GRIB2 was published"
         assert list(tmp_path.glob("*.part")) == [], "the partial write was left behind"
+
+
+class TestGribMagicValidation:
+    """A non-GRIB body must never be appended into the assembled `.grib2`."""
+
+    def test_dwd_rejects_an_html_error_page(self, monkeypatch, tmp_path):
+        """DWD serves HTML with a 200 for an absent cycle; bz2-of-HTML decodes fine."""
+        import bz2
+
+        def fake_get(url, timeout=None, **kwargs):
+            return _NoBufferResponse(
+                bz2.compress(b"<html>not published</html>"), block=16
+            )
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        with pytest.raises(ValueError, match="did not return GRIB2"):
+            DWDCentre(tmp_path).fetch_one(
+                TestDWDCentre._icon(TestDWDCentre()),
+                dt.datetime(2024, 6, 1, 0),
+                0,
+                ["temperature_2m"],
+                "auto",
+            )
+        assert list(tmp_path.glob("*.grib2")) == [], "no GRIB2 should be published"
+        assert list(tmp_path.glob("*.part")) == [], "no partial should survive"
+
+    def test_dwd_rejects_a_bad_second_band(self, monkeypatch, tmp_path):
+        """A good first band must not let a faulty later band through."""
+        import bz2
+
+        bodies = iter(
+            [
+                bz2.compress(b"GRIB<T_2M>"),
+                bz2.compress(b"<html>gateway fault</html>"),
+            ]
+        )
+
+        def fake_get(url, timeout=None, **kwargs):
+            return _NoBufferResponse(next(bodies), block=16)
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        with pytest.raises(ValueError, match="did not return GRIB2"):
+            DWDCentre(tmp_path).fetch_one(
+                TestDWDCentre._icon(TestDWDCentre()),
+                dt.datetime(2024, 6, 1, 0),
+                0,
+                ["temperature_2m", "precipitation_acc"],
+                "auto",
+            )
+        assert list(tmp_path.glob("*.grib2")) == []
+
+    def test_meteofrance_rejects_a_gateway_fault(self, monkeypatch, tmp_path):
+        """The WSO2 gateway answers a rejected key with an XML fault at 200."""
+        monkeypatch.setenv("MF_API_KEY", "k")
+
+        def fake_get(url, params=None, headers=None, timeout=None, **kwargs):
+            return _NoBufferResponse(b"<fault>invalid credentials</fault>", block=8)
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        with pytest.raises(ValueError, match="did not return GRIB2"):
+            MeteoFranceAPICentre(tmp_path).fetch_one(
+                TestMeteoFranceAPICentre._arpege(TestMeteoFranceAPICentre()),
+                dt.datetime(2024, 6, 1, 0),
+                24,
+                ["temperature_2m"],
+                "auto",
+            )
+        assert list(tmp_path.glob("*.grib2")) == []
+
+    def test_the_error_redacts_the_url(self, monkeypatch, tmp_path):
+        """A DWD URL can carry a query; only the host may appear."""
+        import bz2
+
+        def fake_get(url, timeout=None, **kwargs):
+            return _NoBufferResponse(bz2.compress(b"<html>x</html>"), block=8)
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        model = TestDWDCentre._icon(
+            TestDWDCentre(), url_template="https://x/{var_lc}/f.grib2.bz2?key=SECRET"
+        )
+        with pytest.raises(ValueError) as exc:
+            DWDCentre(tmp_path).fetch_one(
+                model, dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
+            )
+        assert "SECRET" not in str(exc.value), f"secret leaked: {exc.value}"
