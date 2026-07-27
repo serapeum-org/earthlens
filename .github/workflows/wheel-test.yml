@@ -148,12 +148,16 @@ jobs:
         # merely detecting one afterwards.
         #
         # `--only-binary :all:` keeps pip from falling back to an sdist, whose
-        # build backend would run arbitrary setup code. The two exceptions
-        # publish no wheel at all and must be built; a third package joining
-        # them fails this step with pip naming it.
+        # build backend would run arbitrary setup code. Three packages are
+        # named as exceptions and must be built: docopt and ratelimit publish
+        # no wheel at all, and cartopy publishes none for 3.14 (checked across
+        # every release), so the matrix's newest leg has to compile it — which
+        # is what this job already did before the installs were pinned. The
+        # conda step above provides the GEOS/PROJ that build needs. A fourth
+        # package joining them fails this step with pip naming it.
         run: |
           set -euo pipefail
-          pip install --only-binary :all: --no-binary docopt,ratelimit \
+          pip install --only-binary :all: --no-binary docopt,ratelimit,cartopy \
             --require-hashes -r dist/requirements-wheel.txt
           for wheel in dist/earthlens*.whl; do
             printf '%s --hash=sha256:%s\n' \
