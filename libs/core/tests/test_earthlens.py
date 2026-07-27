@@ -416,12 +416,14 @@ class TestTopLevelReExports:
         import earthlens.core
 
         assert sorted(earthlens.core.__all__) == [
+            "AggregatedWindow",
             "AggregationConfig",
             "EarthLens",
             "PolygonAoiWarning",
             "aggregate_netcdf",
             "download",
             "find",
+            "iter_aggregate_netcdf",
             "search",
             "sources",
         ], f"Unexpected top-level __all__: {earthlens.core.__all__!r}"
@@ -650,7 +652,7 @@ class TestTopLevelDiscovery:
 
         def _fake_guess(cls, source, text):
             if source == "broken":
-                raise ImportError("no SDK")
+                raise ModuleNotFoundError("No module named 'ee'", name="ee")
             return [f"{source}-ds"] if source == "chc" else []
 
         monkeypatch.setattr(
@@ -801,13 +803,18 @@ class TestFacadePath:
             start="2009-01-01",
             end="2009-01-02",
         )
-        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
-        facade.download(progress_bar=False)
         expected = Path.cwd() / "earthlens-data" / "chc"
         assert facade.datasource.root_dir == expected, (
             f"got {facade.datasource.root_dir}"
         )
-        assert expected.is_dir(), "download() should keep the default directory"
+        assert not expected.exists(), "construction must not create the directory"
+
+        # The stub replaces the backend's own download, which is what the
+        # base class wrapped, so drive the directory hook the wrapper runs.
+        monkeypatch.setattr(facade.datasource, "download", lambda *a, **k: [])
+        facade.datasource._ensure_root_dir()
+        facade.download(progress_bar=False)
+        assert expected.is_dir(), "download() should create the default directory"
 
     def test_omitted_path_load_uses_tempdir(self, tmp_path, monkeypatch):
         """load() redirects to a temp dir and removes the empty ./earthlens-data default."""
@@ -1145,11 +1152,137 @@ class TestFacadeDiscovery:
         from earthlens import earthlens as facade_module
 
         def _boom(name):
-            raise ImportError("no SDK")
+            raise ModuleNotFoundError("No module named 'ee'", name="ee")
 
         monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
-        with pytest.raises(ImportError, match="catalog is unavailable"):
+        with pytest.raises(ImportError, match="Backend catalog for"):
             EarthLens.catalog("gee")
+
+
+class TestImportBackendModule:
+    """The shared on-demand backend import used by the registry and catalog."""
+
+    def test_returns_the_imported_module(self):
+        """An installed backend is imported and handed back."""
+        from earthlens.earthlens import _import_backend_module
+
+        module = _import_backend_module("earthlens.chc", "chc", "")
+        assert module.__name__ == "earthlens.chc", f"got {module.__name__}"
+
+    def test_missing_sdk_names_the_key_and_extra(self, monkeypatch):
+        """A failed import reports the key plus the pip extra that fixes it."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ModuleNotFoundError("No module named 'ee'", name="ee")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError) as exc:
+            _import_backend_module("earthlens.gee", "gee", "gee")
+        message = str(exc.value)
+        assert "Backend 'gee' is unavailable" in message, f"got {message}"
+        assert "pip install earthlens[gee]" in message, f"hint missing from {message}"
+
+    def test_sdk_free_backend_gets_no_install_hint(self, monkeypatch):
+        """With no extra there is nothing to install, so no hint is offered."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ModuleNotFoundError("No module named 'ftplib_x'", name="ftplib_x")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError) as exc:
+            _import_backend_module("earthlens.chc", "chc", "")
+        assert "pip install" not in str(exc.value), f"unexpected hint: {exc.value}"
+
+    def test_subject_customises_the_opening(self, monkeypatch):
+        """The catalog path opens the message with its own subject."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ModuleNotFoundError("No module named 'ee'", name="ee")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError, match="Backend catalog for 'gee'"):
+            _import_backend_module(
+                "earthlens.gee", "gee", "gee", subject="Backend catalog for"
+            )
+
+    def test_original_error_is_chained(self, monkeypatch):
+        """The underlying ImportError is preserved as __cause__ for debugging."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        original = ModuleNotFoundError("No module named 'ee'", name="ee")
+
+        def _boom(name):
+            raise original
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError) as exc:
+            _import_backend_module("earthlens.gee", "gee", "gee")
+        assert exc.value.__cause__ is original, "the SDK error must stay reachable"
+
+    def test_internal_import_error_is_passed_through(self, monkeypatch):
+        """A bug inside the backend must not be reported as a missing extra."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ImportError(
+                "cannot import name 'helper' from 'earthlens.gee._helpers'",
+                name="earthlens.gee._helpers",
+            )
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError) as exc:
+            _import_backend_module("earthlens.gee", "gee", "gee")
+        message = str(exc.value)
+        assert "pip install" not in message, f"misleading install hint: {message}"
+        assert "earthlens.gee._helpers" in message, f"real cause lost: {message}"
+
+    def test_hand_rolled_import_error_is_passed_through(self, monkeypatch):
+        """An ImportError with no module name keeps its own message."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ImportError("the backend rejected this configuration")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError, match="rejected this configuration"):
+            _import_backend_module("earthlens.gee", "gee", "gee")
+
+    def test_missing_sdk_still_gets_the_hint(self, monkeypatch):
+        """A genuinely absent third-party SDK keeps the extras hint."""
+        from earthlens import earthlens as facade_module
+        from earthlens.earthlens import _import_backend_module
+
+        def _boom(name):
+            raise ModuleNotFoundError("No module named 'ee'", name="ee")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError, match=r"pip install earthlens\[gee\]"):
+            _import_backend_module("earthlens.gee", "gee", "gee")
+
+    def test_registry_and_catalog_share_the_wording(self, monkeypatch):
+        """Both entry points produce the same body, differing only in subject."""
+        from earthlens import earthlens as facade_module
+
+        def _boom(name):
+            raise ModuleNotFoundError("No module named 'ee'", name="ee")
+
+        monkeypatch.setattr(facade_module.importlib, "import_module", _boom)
+        with pytest.raises(ImportError) as registry_exc:
+            EarthLens.DataSources["gee"]
+        with pytest.raises(ImportError) as catalog_exc:
+            EarthLens.catalog("gee")
+        tail = "its runtime dependency is not installed. Install with `pip install earthlens[gee]`."
+        assert str(registry_exc.value).endswith(tail), f"got {registry_exc.value}"
+        assert str(catalog_exc.value).endswith(tail), f"got {catalog_exc.value}"
 
 
 @pytest.mark.chc

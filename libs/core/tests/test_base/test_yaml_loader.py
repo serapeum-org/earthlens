@@ -20,9 +20,36 @@ def _write(tmp_path, name, body):
 class TestStrictSafeLoader:
     """Tests for the `_StrictSafeLoader` class itself."""
 
-    def test_is_safe_loader_subclass(self):
-        """`_StrictSafeLoader` extends `yaml.SafeLoader` (no arbitrary objects)."""
-        assert issubclass(_StrictSafeLoader, yaml.SafeLoader)
+    def test_is_a_safe_loader(self):
+        """The strict loader extends a *safe* base — never the unsafe one.
+
+        The base is libyaml's `CSafeLoader` when PyYAML ships the C
+        extension, else the pure-Python `SafeLoader`; both refuse arbitrary
+        object instantiation.
+        """
+        safe_bases = tuple(
+            base
+            for base in (getattr(yaml, "CSafeLoader", None), yaml.SafeLoader)
+            if base is not None
+        )
+        assert issubclass(_StrictSafeLoader, safe_bases)
+        assert not issubclass(_StrictSafeLoader, yaml.UnsafeLoader)
+
+    def test_uses_libyaml_whenever_it_is_available(self):
+        """When PyYAML ships libyaml, the loader is built on it — not beside it.
+
+        Skipped rather than failed on a build without the C extension: the
+        wheel-test matrix installs PyYAML across 3.11-3.14 and a pure-Python
+        wheel there is an environment fact, not a regression in this code. What
+        must never happen is libyaml being *available and unused*, which is the
+        state this branch fixed.
+        """
+        if not hasattr(yaml, "CSafeLoader"):
+            pytest.skip("this PyYAML build ships no libyaml C extension")
+        assert issubclass(_StrictSafeLoader, yaml.CSafeLoader), (
+            "libyaml is available but the strict loader still extends the "
+            "pure-Python SafeLoader, so every catalog parse is ~3x slower"
+        )
 
 
 class TestLoadYamlStrict:

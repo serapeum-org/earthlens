@@ -44,7 +44,6 @@ from earthlens.base.abstractdatasource import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.base.spatial import crop_to_aoi, resolve_aoi
 from earthlens.worldpop._helpers import (
     cohort_of,
@@ -102,6 +101,9 @@ class WorldPop(AbstractDataSource):
 
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
+
+    #: Set by `download(force=...)`; bypasses the skip-if-exists check.
+    _force: bool = False
 
     def __init__(
         self,
@@ -494,7 +496,14 @@ class WorldPop(AbstractDataSource):
         return raw
 
     def _http_get(self, url: str, dest: Path) -> Path:
-        """Download `url` to `dest`, skipping when the file already exists.
+        """Stream `url` to `dest`, skipping when the file already exists.
+
+        The body is streamed to disk in blocks rather than buffered in
+        memory: a WorldPop national mosaic is routinely over a gigabyte, so
+        reading it whole before writing it would hold two copies at peak.
+        The write is atomic — the bytes land in a sibling `.part` that is
+        renamed only on success — so an interrupted download never leaves a
+        truncated GeoTIFF for the next run's skip check to accept.
 
         Transient connection / timeout errors are retried up to
         `_MAX_RETRIES` with exponential backoff; an HTTP status error (e.g.
@@ -512,10 +521,9 @@ class WorldPop(AbstractDataSource):
             requests.ConnectionError | requests.Timeout: If every retry of a
                 transient network error is exhausted.
         """
-        if dest.exists() and dest.stat().st_size > 0:
+        if self._is_complete(dest, force=self._force):
             return dest
         http = HttpClient(
-            session=cast("requests.Session | None", _RequestsGet()),
             retry_on_exceptions=(requests.ConnectionError, requests.Timeout),
             status_forcelist=(),
             max_retries=_MAX_RETRIES - 1,
@@ -524,9 +532,13 @@ class WorldPop(AbstractDataSource):
             timeout=_HTTP_TIMEOUT,
             sleep=lambda seconds: time.sleep(seconds),
         )
-        resp = http.get(url)
-        dest.write_bytes(resp.content)
-        return dest
+        # Stream to disk. A WorldPop national mosaic is routinely > 1 GB, and
+        # buffering the whole body as `resp.content` before writing it holds
+        # two copies at peak for no benefit.
+        # No per-file bar: `_http_get` runs inside a 4-thread joblib pool and
+        # `download`'s tqdm takes no `position=`, so four bars would interleave
+        # on one stream. The caller already shows a per-product bar.
+        return http.download(url, dest, progress=False)
 
     def _group_for_mosaic(
         self, products: list[RemoteProduct]
@@ -881,7 +893,9 @@ class WorldPop(AbstractDataSource):
         """Dispatch the request (archive path or GeoTIFF search/fetch)."""
         return self._dispatch()
 
-    def download(self, progress_bar: bool = True, aggregate=None) -> list[Path]:
+    def download(
+        self, progress_bar: bool = True, aggregate=None, *, force: bool = False
+    ) -> list[Path]:
         """Fetch the requested products as AOI-cropped GeoTIFFs (+ tables).
 
         Args:
@@ -891,11 +905,15 @@ class WorldPop(AbstractDataSource):
                 the **rasters** only — for demographic products the per-cohort
                 age/sex tables are still written per year (the table column is
                 not aggregated). Ignored by the archive products.
+            force: Re-fetch every raw file even when a complete one already
+                exists, bypassing the skip-if-exists check. Defaults to
+                `False`.
 
         Returns:
             list[Path]: The written GeoTIFF / table paths.
         """
         self._show_progress = progress_bar
+        self._force = force
         self._aggregate_cfg = aggregate
         return self._dispatch()
 

@@ -22,11 +22,12 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "dem_data_catalog.yaml"
 
-_CATALOG_CACHE: dict[tuple[str, int], Catalog] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -83,6 +84,45 @@ class DEMDataset(BaseModel):
     horizontal_datum: str = ""
     attribution: str = ""
     description: str = ""
+
+
+def _parse_datasets(files: list[Path]) -> dict[str, DEMDataset]:
+    """Parse the DEM catalog's `datasets:` block into validated rows.
+
+    Args:
+        files: The contributing YAML files (DEM ships a single file).
+
+    Returns:
+        dict[str, DEMDataset]: One row per DEM dataset key. The rows are
+            cached, not a built Catalog, so `load()` makes a fresh instance per
+            call and one caller doing `datasets.pop(...)` cannot reach another's
+            mapping. The row objects inside it *are* shared and are frozen
+            pydantic models: treat them as read-only. A frozen model still
+            permits in-place mutation of a mutable field (`row.columns[...] =`),
+            which would reach every holder — deep-copying every row per load
+            would cost more than that edge is worth.
+
+    Raises:
+        ValueError: If the `datasets:` block is missing or empty, or a row
+            fails :class:`DEMDataset` validation.
+    """
+    path = files[0]
+    data = load_yaml_strict(path) or {}
+    datasets_yaml = data.get("datasets") or {}
+    if not datasets_yaml:
+        raise ValueError(
+            f"{path} is missing or has an empty 'datasets:' block. "
+            "The DEM catalog must list at least one dataset."
+        )
+    datasets: dict[str, DEMDataset] = {}
+    for key, body in datasets_yaml.items():
+        try:
+            datasets[key] = DEMDataset(key=key, **dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} dataset {key!r} failed validation:\n{exc}"
+            ) from exc
+    return datasets
 
 
 class Catalog(AbstractCatalog):
@@ -157,37 +197,12 @@ class Catalog(AbstractCatalog):
             A fully-populated :class:`Catalog`.
 
         Raises:
-            ValueError: If the file has no `datasets:` block, or any
-                row fails validation.
+            ValueError: If `catalog_path` does not exist, or if the file has no
+                `datasets:` block, or any row fails validation.
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
-        try:
-            mtime = path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        cache_key = (str(path.resolve()), mtime)
-        cached = _CATALOG_CACHE.get(cache_key)
-        if cached is not None:
-            return cached
-
-        data = load_yaml_strict(path) or {}
-        datasets_yaml = data.get("datasets") or {}
-        if not datasets_yaml:
-            raise ValueError(
-                f"{path} is missing or has an empty 'datasets:' block. "
-                "The DEM catalog must list at least one dataset."
-            )
-        datasets: dict[str, DEMDataset] = {}
-        for key, body in datasets_yaml.items():
-            try:
-                datasets[key] = DEMDataset(key=key, **dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{path} dataset {key!r} failed validation:\n{exc}"
-                ) from exc
-        catalog = cls(datasets=datasets)
-        _CATALOG_CACHE[cache_key] = catalog
-        return catalog
+        rows = load_catalog(path, _CATALOG_CACHE, _parse_datasets, provider="DEM")
+        return cls(datasets=dict(rows))
 
     def get_catalog(self) -> dict[str, DEMDataset]:
         """Return the dataset map (satisfies the abstract contract).

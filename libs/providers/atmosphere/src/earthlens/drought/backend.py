@@ -44,7 +44,6 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.drought._helpers import (
     attribution_for,
     bbox_from_extent,
@@ -53,7 +52,6 @@ from earthlens.drought._helpers import (
 from earthlens.drought.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
-    import requests
     from pyramids.feature.collection import FeatureCollection
 
     from earthlens.aggregate import AggregationConfig
@@ -874,7 +872,6 @@ def _http_client() -> HttpClient:
     retry, and consistent User-Agent.
     """
     return HttpClient(
-        session=cast("requests.Session | None", _RequestsGet()),
         user_agent=_USER_AGENT,
         status_forcelist=(),
         max_backoff=None,

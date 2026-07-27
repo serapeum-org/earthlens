@@ -81,6 +81,10 @@ class FakeResponse:
         """No-op close; the HttpClient may release the response."""
         return None
 
+    def iter_content(self, chunk_size=None):
+        """Yield the canned body in one chunk, as a streamed response would."""
+        yield self.content
+
 
 @pytest.fixture
 def fake_nc_get(monkeypatch):

@@ -25,7 +25,6 @@ import requests  # noqa: F401  # runtime seam so tests can monkeypatch this modu
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 #: geoBoundaries gbOpen API base — `"{base}/{ISO3}/{ADM}/"` returns the metadata
 #: whose `gjDownloadURL` is the GeoJSON to read (`geoboundaries_resolve`).
@@ -79,7 +78,6 @@ def geoboundaries_resolve(iso: str, adm: str, timeout: float = 60.0) -> str:
         KeyError: If the metadata carries no `gjDownloadURL`.
     """
     http = HttpClient(
-        session=cast("requests.Session | None", _RequestsGet()),
         timeout=timeout,
         max_retries=0,
         status_forcelist=(),

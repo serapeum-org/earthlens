@@ -175,11 +175,11 @@ class TestCatalog:
         assert report["basin_unknown_source"] == ["broken:jtwc"]
 
     def test_load_nonexistent_path_raises(self, tmp_path):
-        """Loading a non-existent catalog path raises FileNotFoundError."""
+        """Loading a non-existent catalog path raises, naming the missing path."""
         from earthlens.tropycal.catalog import clear_catalog_cache
 
         clear_catalog_cache()
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(ValueError, match="does not exist"):
             Catalog.load(catalog_path=tmp_path / "does_not_exist.yaml")
 
 

@@ -262,6 +262,9 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> FakePyramids:
     fp = FakePyramids()
 
     stac_mod = types.ModuleType("pyramids.stac")
+    # earthlens no longer builds pyramids' `AnonymousSigner` — `build_signer`
+    # returns its own `_AnonymousS3Signer`, which adds AWS_NO_SIGN_REQUEST — so
+    # this binding is only here for any test that reaches for it directly.
     stac_mod.AnonymousSigner = _AnonymousSigner
     stac_mod.AWSRequesterPaysSigner = _AWSRequesterPaysSigner
     stac_mod.PlanetaryComputerSigner = _PlanetaryComputerSigner

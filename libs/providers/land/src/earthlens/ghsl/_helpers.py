@@ -33,7 +33,7 @@ from typing import cast
 import requests
 
 from earthlens.base.archive import extract_members
-from earthlens.base.http import HttpClient, RequestsGet
+from earthlens.base.http import HttpClient, thread_local_session
 from earthlens.ghsl.catalog import RES_TO_TOKEN, native_source_crs
 
 #: Root of the JRC open-data GHSL file tree (anonymous HTTPS, no auth).
@@ -280,7 +280,7 @@ def list_remote_dir(
     client = HttpClient(
         session=cast(
             "requests.Session | None",
-            session if session is not None else RequestsGet(),
+            session,
         )
     )
     resp = client.get(url if url.endswith("/") else url + "/", timeout=timeout)
@@ -397,7 +397,7 @@ def _download(
     client = HttpClient(
         session=cast(
             "requests.Session | None",
-            session if session is not None else RequestsGet(),
+            session if session is not None else thread_local_session("ghsl"),
         ),
         status_forcelist=(429, 500, 502, 503, 504),
         retry_on_exceptions=(requests.RequestException, OSError),

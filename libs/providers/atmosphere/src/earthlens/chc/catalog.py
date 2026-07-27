@@ -59,6 +59,7 @@ Examples:
 from __future__ import annotations
 
 import warnings
+from functools import partial
 from pathlib import Path
 from typing import Any, Literal
 
@@ -66,6 +67,7 @@ import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog, FluxableLeaf
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 #: Canonical `temporal_resolution` vocabulary for CHC datasets (M1).
@@ -95,28 +97,11 @@ _TEMPORAL_RESOLUTIONS: tuple[str, ...] = (
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 
-# Module-level cache of parsed catalog data. The cache key is
-# `(resolved_path, fingerprint)`, where the fingerprint is:
-#
-#   * For a single-file catalog (legacy back-compat): the file's
-#     `stat().st_mtime_ns`.
-#   * For the directory layout: a tuple of `(filename, mtime_ns)`
-#     pairs sorted by filename. This is collision-free under
-#     permutations of mtimes -- if file A's mtime increases by N
-#     and file B's decreases by N (rare but legitimate, e.g.
-#     after a manual `touch -r ...`), the tuple still differs
-#     because both names are pinned. The previous sum-of-mtimes
-#     fingerprint (pre-H4) collapsed those cases to a collision.
-#
-# Any real file mutation invalidates the entry naturally. Mirrors
-# the GEE / ECMWF pattern so repeated `Catalog()` construction is
-# ~1 ms instead of paying YAML parse + pydantic validation each
-# time.
-_CacheKey = tuple[str, int | tuple[tuple[str, int], ...]]
-_CATALOG_CACHE: dict[
-    _CacheKey,
-    tuple[list[str], dict[str, dict[str, list[float]]], dict[str, Dataset]],
-] = CatalogParseCache()
+# Module-level cache of parsed catalog data, keyed by the shared
+# `catalog_cache_key` over every contributing YAML, so editing any per-family
+# file invalidates the entry naturally. Repeated `Catalog()` construction is
+# then ~1 ms instead of paying YAML parse + pydantic validation each time.
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -513,31 +498,38 @@ def _load_catalog_data(
             keys across files, or any region key / field validation
             fails.
     """
-    resolved = str(path.resolve())
-    fingerprint: int | tuple[tuple[str, int], ...]
-    try:
-        if path.is_dir():
-            # Tuple of (name, mtime) pairs sorted by name. Collision-
-            # free under mtime permutations (see _CATALOG_CACHE comment).
-            fingerprint = tuple(
-                (child.name, child.stat().st_mtime_ns)
-                for child in sorted(path.glob("*.yaml"))
-            )
-        else:
-            fingerprint = path.stat().st_mtime_ns
-    except FileNotFoundError:
-        fingerprint = 0
-    key: _CacheKey = (resolved, fingerprint)
-    cached = _CATALOG_CACHE.get(key)
-    if cached is not None:
-        return cached
+    return load_catalog(
+        path,
+        _CATALOG_CACHE,
+        partial(_parse_catalog, path),
+        provider="CHC",
+        shard_noun="per-family",
+    )
 
+
+def _parse_catalog(
+    path: Path, files: list[Path]
+) -> tuple[list[str], dict[str, dict[str, list[float]]], dict[str, Dataset]]:
+    """Read either catalog layout into the standard triple.
+
+    Args:
+        path: The catalog directory or single YAML file, as handed to
+            :func:`_load_catalog_data` — it is what decides the layout.
+        files: The contributing YAML files. Used only for the single-file
+            layout; the directory reader re-reads `_index.yaml` and its
+            siblings by name.
+
+    Returns:
+        Tuple of `(available_datasets, regions_map, datasets)`.
+
+    Raises:
+        ValueError: On a missing `datasets:` block, no variables under any
+            dataset, duplicate dataset keys across files, or a region /
+            field validation failure.
+    """
     if path.is_dir():
-        result = _load_catalog_directory(path)
-    else:
-        result = _load_catalog_file(path)
-    _CATALOG_CACHE[key] = result
-    return result
+        return _load_catalog_directory(path)
+    return _load_catalog_file(files[0])
 
 
 def _load_catalog_file(

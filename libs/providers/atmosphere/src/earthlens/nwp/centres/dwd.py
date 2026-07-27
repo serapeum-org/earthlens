@@ -20,21 +20,257 @@ only the downstream crop assumes a regular raster.
 from __future__ import annotations
 
 import bz2
+from collections.abc import Iterable
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import IO, TYPE_CHECKING, cast
 
+from earthlens.base import redact_url
 from earthlens.nwp._helpers import grib_name
 from earthlens.nwp.centres.base import _NWPCentre
 
 if TYPE_CHECKING:
     import datetime as dt
 
-    import requests
-
     from earthlens.nwp.catalog import NWPModel
 
 #: HTTP timeout (seconds) for one per-variable `.bz2` download.
 _HTTP_TIMEOUT = 120
+
+#: Streaming block size (bytes) fed to the incremental bz2 decompressor.
+_CHUNK_SIZE = 1 << 20
+
+#: Leading bytes of a GRIB edition-1/2 message. DWD serves an HTML error page
+#: with a 200 for an absent cycle, and bz2-of-HTML decompresses happily — so
+#: the decompressed result is checked rather than trusted.
+_GRIB_MAGIC = b"GRIB"
+
+
+#: A bzip2 stream starts `BZh` followed by the block-size digit `1`-`9`. After
+#: one stream ends, this is what tells a genuine next stream apart from
+#: trailing padding — see :meth:`_Bz2Streams._start_next_stream`.
+_BZ2_MAGIC = b"BZh"
+_BZ2_HEADER_LEN = 4
+
+
+def _starts_a_bz2_stream(header: bytes) -> bool:
+    """Report whether `header` opens a bzip2 stream.
+
+    Args:
+        header: The first :data:`_BZ2_HEADER_LEN` bytes after a stream ended.
+
+    Returns:
+        bool: `True` for `BZh1`..`BZh9`.
+    """
+    return header[:3] == _BZ2_MAGIC and header[3:4].isdigit() and header[3:4] != b"0"
+
+
+class _Bz2Streams:
+    """Decodes a possibly-multi-stream `.bz2` body fed to it block by block.
+
+    Holds the state that makes streamed decoding equivalent to
+    `bz2.decompress`: which decompressor is current, whether it has been fed
+    anything, and whether what follows a finished stream is another stream or
+    trailing padding. Keeping it in a small class leaves
+    :func:`_decompress_stream` a plain loop.
+
+    After a stream ends, the next bytes are buffered until the four-byte header
+    can be inspected rather than handed straight to a new decompressor. The
+    earlier version relied on `BZ2Decompressor.decompress` raising `OSError`
+    promptly on padding, which **Python 3.13 changed**: fed a few bytes at a
+    time it buffers instead of raising, so the padding looked like a stream
+    that never finished and a perfectly good download was rejected as
+    truncated. The magic check does not depend on when the error arrives.
+    """
+
+    def __init__(self, handle: IO[bytes]) -> None:
+        """Start with a fresh decompressor writing into `handle`.
+
+        Args:
+            handle: Binary file object decoded bytes are appended to.
+        """
+        self.written = 0
+        self._handle = handle
+        self._decompressor = bz2.BZ2Decompressor()
+        self._completed_a_stream = False
+        self._fed_current = False
+        self._awaiting_header = False
+        self._header = b""
+        self._trailing_junk = False
+
+    def feed(self, block: bytes) -> None:
+        """Decode one block, crossing stream boundaries as needed.
+
+        Args:
+            block: The next chunk of the compressed body. An empty block (a
+                keep-alive) is a no-op.
+
+        Raises:
+            OSError: If the very first stream is not valid bzip2 at all.
+        """
+        data = block
+        while data and not self._trailing_junk:
+            if self._awaiting_header:
+                data = self._start_next_stream(data)
+                continue
+            data = self._decompress(data)
+
+    def _start_next_stream(self, data: bytes) -> bytes:
+        """Buffer the post-stream bytes until the header can be judged.
+
+        Args:
+            data: The bytes available after the previous stream ended.
+
+        Returns:
+            bytes: What is left to decompress — the buffered header plus the
+                remainder once a real stream is recognised, else empty (either
+                more bytes are needed, or the tail was padding).
+        """
+        wanted = _BZ2_HEADER_LEN - len(self._header)
+        self._header += data[:wanted]
+        rest = data[wanted:]
+        if len(self._header) < _BZ2_HEADER_LEN:
+            return b""  # Undecidable yet; wait for the next block.
+        if not _starts_a_bz2_stream(self._header):
+            # Padding, not a further stream. `bz2.decompress` ignores it once
+            # it has decoded something.
+            self._trailing_junk = True
+            return b""
+        self._decompressor = bz2.BZ2Decompressor()
+        self._fed_current = False
+        self._awaiting_header = False
+        header, self._header = self._header, b""
+        return header + rest
+
+    def _decompress(self, data: bytes) -> bytes:
+        """Push `data` through the current decompressor.
+
+        Args:
+            data: Bytes belonging to the stream in progress.
+
+        Returns:
+            bytes: Whatever the stream did not consume, when it ended on this
+                call; empty while it is still consuming.
+
+        Raises:
+            OSError: If the very first stream is not valid bzip2 at all.
+        """
+        try:
+            chunk = self._decompressor.decompress(data)
+        except OSError:
+            if self._completed_a_stream:
+                self._trailing_junk = True
+                return b""
+            raise
+        self._fed_current = True
+        self._handle.write(chunk)
+        self.written += len(chunk)
+        # Only a finished stream can leave bytes over; while it is still
+        # consuming, the whole chunk was absorbed.
+        if not self._decompressor.eof:
+            return b""
+        self._completed_a_stream = True
+        self._awaiting_header = True
+        return self._decompressor.unused_data
+
+    def finish(self, url: str) -> None:
+        """Reject a body that ended part-way through a stream.
+
+        A tail that never became a stream — padding, or too few bytes to be one
+        — is not truncation and is ignored, matching `bz2.decompress`.
+
+        Args:
+            url: Source URL, redacted into the message.
+
+        Raises:
+            ValueError: If the data ended before its end-of-stream marker.
+        """
+        if self._trailing_junk or self._awaiting_header:
+            return
+        if self._fed_current and not self._decompressor.eof:
+            raise ValueError(
+                f"{redact_url(url)} returned a truncated bz2 body: the stream "
+                "ended before its end-of-stream marker, so the decompressed "
+                "GRIB2 would be short. Retry the download."
+            )
+
+
+def _head_at(path: Path, offset: int, size: int = 8) -> bytes:
+    """Return up to `size` bytes of `path` starting at `offset`.
+
+    Args:
+        path: The file being assembled.
+        offset: Byte offset the band's messages start at.
+        size: How many bytes to read.
+
+    Returns:
+        bytes: The leading bytes of that band's contribution.
+    """
+    with open(path, "rb") as handle:
+        handle.seek(offset)
+        return handle.read(size)
+
+
+def _starts_with_grib(path: Path, offset: int) -> bool:
+    """Report whether the bytes at `offset` begin a GRIB message.
+
+    Each band appends whole GRIB messages, so every band's contribution must
+    itself start with the `GRIB` magic. Checking per band — rather than only
+    at the head of the file — catches the case where the first band is real
+    data and a later one came back as an error page.
+
+    Args:
+        path: The file being assembled.
+        offset: Byte offset the band's messages start at.
+
+    Returns:
+        bool: `True` when that band's bytes start a GRIB message.
+    """
+    return _head_at(path, offset, len(_GRIB_MAGIC)) == _GRIB_MAGIC
+
+
+def _decompress_stream(blocks: Iterable[bytes], handle: IO[bytes], url: str) -> int:
+    """Stream-decompress a `.bz2` body into `handle`, matching `bz2.decompress`.
+
+    A bare `BZ2Decompressor` fed chunk by chunk is **not** equivalent to
+    `bz2.decompress()` on the whole body, and the difference matters here
+    because the result is published as a `.grib2`:
+
+    * a body ending before its end-of-stream marker leaves `eof` `False` and
+      raises nothing, so a truncated download would be published short;
+    * a multi-stream `.bz2` (concatenated streams, which bzip2 tooling
+      produces routinely) stops at the first stream, silently dropping the
+      rest;
+    * trailing bytes that are not a further stream — padding, a stray
+      newline — make a naive re-seed raise, where `bz2.decompress` ignores
+      them.
+
+    This mirrors CPython's `bz2.decompress` state machine exactly: one
+    decompressor per stream, re-seeded from `unused_data` when a stream ends,
+    an `OSError` after at least one complete stream treated as trailing
+    non-bz2 bytes and ignored, and the same truncation `ValueError`. Unlike
+    that function it never holds the whole body or the whole result.
+
+    Args:
+        blocks: The compressed body, in arbitrary-sized chunks. A stream
+            boundary may fall anywhere, including exactly on a chunk edge.
+        handle: Binary file object the decompressed bytes are appended to.
+        url: Source URL, redacted into any error message.
+
+    Returns:
+        int: Decompressed bytes written. `0` for an empty body — the caller
+            decides whether that is acceptable, as `bz2.decompress(b"")`
+            likewise returns `b""` rather than raising.
+
+    Raises:
+        ValueError: If the data ends before its end-of-stream marker, i.e.
+            the download was truncated.
+        OSError: If the very first stream is not valid bzip2 at all.
+    """
+    streams = _Bz2Streams(handle)
+    for block in blocks:
+        streams.feed(block)
+    streams.finish(url)
+    return streams.written
 
 
 class DWDCentre(_NWPCentre):
@@ -52,6 +288,13 @@ class DWDCentre(_NWPCentre):
         whole: bool = False,
     ) -> Path:
         """Download + decompress one `.bz2` per variable into one GRIB2.
+
+        Each variable is streamed and fed through an incremental
+        `bz2.BZ2Decompressor`, so neither the compressed body nor the
+        decompressed result is ever held whole in memory — a global ICON
+        band runs to hundreds of megabytes on each side. The decompressed
+        messages are appended to a single `.part` that is renamed only once
+        every variable has succeeded.
 
         `member` and `whole` are accepted for interface parity but ignored
         — the ICON rows here are deterministic (ICON-EPS is a separate
@@ -80,9 +323,9 @@ class DWDCentre(_NWPCentre):
                 partial file is removed first, so no truncated `.grib2`
                 is left for a later `open_grib` to misread.
         """
-        from earthlens.base.http import HttpClient, RequestsGet
+        from earthlens.base.http import HttpClient
 
-        client = HttpClient(session=cast("requests.Session | None", RequestsGet()))
+        client = HttpClient()
         out = self.save_dir / grib_name(model.model_family, cycle, step)
         # Stream into a sibling .part and atomically rename on full success, so
         # a failure partway through (variable 2 of N) never leaves a truncated
@@ -91,9 +334,40 @@ class DWDCentre(_NWPCentre):
         try:
             with open(tmp, "wb") as handle:
                 for param in params:
+                    band_offset = handle.tell()
                     url = self._band_url(model, param, cycle, step)
-                    response = client.get(url, timeout=_HTTP_TIMEOUT)
-                    handle.write(bz2.decompress(response.content))
+                    response = client.get(url, timeout=_HTTP_TIMEOUT, stream=True)
+                    # Decompress incrementally: a global ICON band is a
+                    # multi-hundred-MB .bz2, and `bz2.decompress(resp.content)`
+                    # would hold both the whole compressed body and the whole
+                    # decompressed result in memory at once.
+                    try:
+                        written = _decompress_stream(
+                            response.iter_content(chunk_size=_CHUNK_SIZE), handle, url
+                        )
+                    finally:
+                        response.close()
+                    if not written:
+                        # Every requested band must contribute messages. An
+                        # empty body would otherwise drop that band from the
+                        # concatenated `.grib2` with nothing to show for it —
+                        # and under `errors="warn"` the whole step is skipped
+                        # with only a log line.
+                        raise ValueError(
+                            f"{redact_url(url)} returned an empty body for band "
+                            f"{param!r}: the decompressed GRIB2 would be missing "
+                            "that band entirely. Retry the download."
+                        )
+                    # `_starts_with_grib` opens its own handle, so the buffered
+                    # writes have to reach disk before it can see them.
+                    handle.flush()
+                    if not _starts_with_grib(tmp, band_offset):
+                        raise ValueError(
+                            f"{redact_url(url)} did not return GRIB2 for band "
+                            f"{param!r}: the decompressed body starts "
+                            f"{_head_at(tmp, band_offset)!r}, not {_GRIB_MAGIC!r}. "
+                            "The cycle or step is probably not published yet."
+                        )
             tmp.replace(out)
         except BaseException:
             tmp.unlink(missing_ok=True)

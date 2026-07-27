@@ -108,6 +108,8 @@ class DEM(AbstractDataSource):
         self._dataset_key = dataset
         self._dataset: DEMDataset = self._catalog.get_dataset(dataset)
         self._show_progress = True
+        #: Set by `download(force=...)`; bypasses the skip-if-exists check.
+        self._force = False
         # `_initialize` (called by `super().__init__` below) builds `self._auth`.
 
         super().__init__(
@@ -227,7 +229,6 @@ class DEM(AbstractDataSource):
             list[Path]: One local path per tile that existed and was
                 downloaded, in `products` order.
         """
-        client = self._client()
         written: list[Path] = []
         missing = 0
         for product in tqdm(
@@ -236,7 +237,7 @@ class DEM(AbstractDataSource):
             desc=f"dem/{self._dataset_key}",
             unit="tile",
         ):
-            fetched = self._fetch_one(client, product)
+            fetched = self._fetch_one(product)
             if fetched is None:
                 missing += 1
                 continue
@@ -248,23 +249,21 @@ class DEM(AbstractDataSource):
             )
         return written
 
-    def _fetch_one(  # type: ignore[override]
-        self, client: Any, product: RemoteProduct
-    ) -> Path | None:
+    def _fetch_one(self, product: RemoteProduct) -> Path | None:
         """Head + download one candidate tile; return `None` if absent.
 
         Args:
-            client: The unsigned `boto3` S3 client.
             product: The candidate :class:`RemoteProduct` to fetch.
 
         Returns:
             Path | None: The written local path, or `None` when the key
                 is absent (ocean tile, outside coverage).
         """
+        client = self._client()
         bucket: str = product.metadata["bucket"]
         key: str = product.href or ""
         target = self.root_dir / Path(key).name
-        if target.exists():
+        if self._is_complete(target, force=self._force):
             return target
         try:
             client.head_object(Bucket=bucket, Key=key)
@@ -290,12 +289,16 @@ class DEM(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: Any | None = None,
+        *,
+        force: bool = False,
     ) -> list[Path]:
         """Fetch every 1° Copernicus DEM tile the bbox intersects.
 
         Args:
             progress_bar: Show a per-tile progress bar. Defaults to
                 `True`.
+            force: Re-fetch even when a complete output already exists,
+                bypassing the skip-if-exists check. Defaults to `False`.
             aggregate: Must be `None`. DEM is a raw-COG whole-tile
                 backend (`G4` — no server-side subset, `G5` — no
                 decode), so a time-window reduce has nothing to reduce.
@@ -319,6 +322,7 @@ class DEM(AbstractDataSource):
                 "multi-tile mosaic)."
             )
         self._show_progress = progress_bar
+        self._force = force
         return self._api_via_search_fetch()
 
 

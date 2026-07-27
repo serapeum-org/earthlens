@@ -104,8 +104,12 @@ class TestLoaderErrors:
 class TestParseCache:
     """The `(path, mtime)` cache keeps repeat loads cheap."""
 
-    def test_cache_hit_returns_same_object(self, tmp_path: Path):
-        """A second `Catalog.load(path)` reuses the cached instance."""
+    def test_cache_hit_reuses_the_parse_but_not_the_instance(self, tmp_path: Path):
+        """A second load skips the parse yet hands back a separate Catalog.
+
+        Sharing one instance let any caller's `.datasets` mutation reach every
+        other caller, and the cache itself.
+        """
         clear_catalog_cache()
         path = tmp_path / "cat.yaml"
         path.write_text(
@@ -120,13 +124,18 @@ class TestParseCache:
         )
         first = Catalog.load(path)
         second = Catalog.load(path)
-        assert first is second
+        assert first is not second, "callers must not share one Catalog"
+        assert first.datasets == second.datasets, "the parse should be reused"
+        first.datasets.pop("cop-dem-glo-30")
+        assert "cop-dem-glo-30" in Catalog.load(path).datasets, (
+            "one caller's mutation leaked into the shared parse cache"
+        )
 
-    def test_missing_file_reported_by_pydantic(self, tmp_path: Path):
-        """`load(nonexistent_path)` reports the missing / empty catalog."""
+    def test_missing_file_reported_by_the_shared_loader(self, tmp_path: Path):
+        """`load(nonexistent_path)` names the missing catalog path."""
         clear_catalog_cache()
         ghost = tmp_path / "does-not-exist.yaml"
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(ValueError, match="does not exist"):
             Catalog.load(ghost)
 
     def test_get_catalog_returns_datasets_map(self):

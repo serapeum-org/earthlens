@@ -25,14 +25,15 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "airnow_data_catalog.yaml"
 
-#: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
-#: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
-#: the OpenAQ / FDSN / NWP loaders.
-_CATALOG_CACHE: dict[tuple[str, int], dict[str, Pollutant]] = CatalogParseCache()
+#: Module-level parse cache, keyed by `load_catalog` on the resolved path
+#: plus each contributing file's `(mtime_ns, size)`, so a repeated
+#: `Catalog()` skips the YAML parse + pydantic validation.
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -84,6 +85,38 @@ class Pollutant(BaseModel):
     units: str = ""
     display_name: str = ""
     group: PollutantGroup = "other"
+
+
+def _parse_pollutants(files: list[Path]) -> dict[str, Pollutant]:
+    """Parse the AirNow catalog's `pollutants:` block into validated rows.
+
+    Args:
+        files: The contributing YAML files (AirNow ships a single file).
+
+    Returns:
+        dict[str, Pollutant]: One row per pollutant name.
+
+    Raises:
+        ValueError: If the `pollutants:` block is missing or empty, or a row
+            fails :class:`Pollutant` validation.
+    """
+    catalog_path = files[0]
+    data = load_yaml_strict(catalog_path) or {}
+    pollutants_yaml = data.get("pollutants") or {}
+    if not pollutants_yaml:
+        raise ValueError(
+            f"{catalog_path} is missing or has an empty 'pollutants:' "
+            "block. The AirNow catalog must list at least one pollutant."
+        )
+    pollutants: dict[str, Pollutant] = {}
+    for name, body in pollutants_yaml.items():
+        try:
+            pollutants[name] = Pollutant(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{catalog_path} pollutant {name!r} failed validation:\n{exc}"
+            ) from exc
+    return pollutants
 
 
 class Catalog(AbstractCatalog):
@@ -179,35 +212,13 @@ class Catalog(AbstractCatalog):
             A fully-populated `Catalog`.
 
         Raises:
-            ValueError: If the file has no `pollutants:` block, or a row
-                fails `Pollutant` validation.
+            ValueError: If `catalog_path` does not exist, or if the file has no
+                `pollutants:` block, or a row fails `Pollutant` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        resolved = str(catalog_path.resolve())
-        try:
-            mtime = catalog_path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        key = (resolved, mtime)
-        cached = _CATALOG_CACHE.get(key)
-        if cached is not None:
-            return cls(datasets=dict(cached))
-        data = load_yaml_strict(catalog_path) or {}
-        pollutants_yaml = data.get("pollutants") or {}
-        if not pollutants_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'pollutants:' "
-                "block. The AirNow catalog must list at least one pollutant."
-            )
-        pollutants: dict[str, Pollutant] = {}
-        for name, body in pollutants_yaml.items():
-            try:
-                pollutants[name] = Pollutant(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} pollutant {name!r} failed validation:\n{exc}"
-                ) from exc
-        _CATALOG_CACHE[key] = pollutants
+        pollutants = load_catalog(
+            catalog_path, _CATALOG_CACHE, _parse_pollutants, provider="AirNow"
+        )
         return cls(datasets=dict(pollutants))
 
     def get_catalog(self) -> dict[str, Pollutant]:

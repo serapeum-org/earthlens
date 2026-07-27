@@ -151,20 +151,23 @@ def catalog_cache_key(path: Path, files: Sequence[Path]) -> tuple[Any, ...]:
     """Build the memoisation key for a catalog load.
 
     The key is the resolved catalog path plus every contributing file's
-    `st_mtime_ns`, so editing any shard invalidates the entry without the loader
-    having to compare parsed contents. The resolved path is always element 0,
+    `(path, st_mtime_ns, st_size)` stamp, so editing any shard invalidates the
+    entry without the loader having to compare parsed contents. The size is
+    part of the stamp because timestamps are quantised: two writes inside one
+    filesystem tick share an mtime, and a content change of different length
+    would otherwise be served from cache. The resolved path is always element 0,
     which is what lets :class:`CatalogParseCache` evict superseded generations
     for the same catalog.
 
-    A file that disappears between the glob and the `stat` degrades to mtime `0`
-    rather than raising: the load that follows will surface the real error.
+    A file that disappears between the glob and the `stat` degrades to a zero
+    stamp rather than raising: the load that follows will surface the real error.
 
     Args:
         path: The catalog directory or file (becomes element 0 of the key).
         files: The contributing YAML files, from :func:`yaml_files_for`.
 
     Returns:
-        A hashable `(resolved_path, ((file, mtime_ns), ...))` key.
+        A hashable `(resolved_path, ((file, mtime_ns, size), ...))` key.
 
     Examples:
         - Touching a shard changes the key, so the parse is redone:
@@ -187,10 +190,30 @@ def catalog_cache_key(path: Path, files: Sequence[Path]) -> tuple[Any, ...]:
     """
     resolved = str(path.resolve())
     try:
-        stamps = tuple((str(f), f.stat().st_mtime_ns) for f in files)
+        stamps = tuple(_file_stamp(f) for f in files)
     except FileNotFoundError:
-        stamps = ((resolved, 0),)
-    return (resolved, stamps or ((resolved, 0),))
+        stamps = ((resolved, 0, 0),)
+    return (resolved, stamps or ((resolved, 0, 0),))
+
+
+def _file_stamp(path: Path) -> tuple[str, int, int]:
+    """Return `(path, mtime_ns, size)` — the change signature for one file.
+
+    The size is part of the stamp because `st_mtime_ns` alone is not
+    reliable for back-to-back rewrites: filesystems quantise timestamps, so
+    two writes within the same tick produce the same mtime and a
+    content-changed file would be served from cache. Length rarely survives
+    a real catalog edit unchanged, so pairing the two closes the common
+    case at the cost of one already-performed `stat`.
+
+    Args:
+        path: The contributing YAML file.
+
+    Returns:
+        tuple[str, int, int]: The file's path, mtime in nanoseconds, and size.
+    """
+    info = path.stat()
+    return (str(path), info.st_mtime_ns, info.st_size)
 
 
 def load_catalog(

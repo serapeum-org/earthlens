@@ -36,7 +36,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.catalog_source import yaml_files_for
+from earthlens.base.catalog_source import load_catalog, yaml_files_for
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "catalog"
@@ -45,14 +45,14 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 # plus a tuple of `(file, mtime_ns)` for every YAML the load touched, so
 # editing any per-theme file invalidates the entry without inspecting
 # every row. Mirrors the Earthdata / CMEMS multi-file pattern.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, HdxDataset]]] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 # Same `(path, mtime_ns)` cache for the auto-generated `available_datasets`
 # index. The index is held as JSON (`_available.json`), not YAML, and parsed
 # separately from the curated per-theme YAMLs — so a `Catalog()` pays only the
 # fast JSON read (a flat list of ~7k ids) instead of a multi-hundred-millisecond
 # YAML parse, mirroring how `earthlens.earthdata` keeps its long tail in
 # `_auto.json` out of the curated YAML glob.
-_AVAILABLE_CACHE: dict[Any, dict[str, dict]] = CatalogParseCache()
+_AVAILABLE_CACHE: CatalogParseCache = CatalogParseCache()
 
 #: Filename of the gzipped JSON `available_datasets` index, kept beside the
 #: curated per-theme YAMLs (and out of the `*.yaml` glob). Gzipped because the
@@ -75,25 +75,6 @@ def clear_catalog_cache() -> None:
     """
     _CATALOG_CACHE.clear()
     _AVAILABLE_CACHE.clear()
-
-
-def _mtime_ns(path: Path) -> int:
-    """Return a file's modification time in ns, or `0` if it is missing.
-
-    Used to key the parse cache resiliently — a file vanishing between
-    the directory glob and the `stat` (a TOCTOU race) contributes `0`
-    rather than raising, so a concurrent edit cannot crash the loader.
-
-    Args:
-        path: The file to stat.
-
-    Returns:
-        int: `st_mtime_ns`, or `0` when the file does not exist.
-    """
-    try:
-        return path.stat().st_mtime_ns
-    except FileNotFoundError:
-        return 0
 
 
 def _available_index_path(catalog_path: Path) -> Path:
@@ -137,10 +118,19 @@ def _load_available(json_path: Path) -> dict[str, dict]:
     """
     if not json_path.is_file():
         return {}
-    key = (str(json_path.resolve()), json_path.stat().st_mtime_ns)
-    cached = _AVAILABLE_CACHE.get(key)
-    if cached is not None:
-        return cached
+    return load_catalog(json_path, _AVAILABLE_CACHE, _parse_available, provider="HDX")
+
+
+def _parse_available(files: list[Path]) -> dict[str, dict]:
+    """Read the long-tail index out of `_available.json[.gz]`.
+
+    Args:
+        files: The single index path, from the shared loader.
+
+    Returns:
+        dict[str, dict]: Map from HDX id to its `{org, title}` row.
+    """
+    json_path = files[0]
     import json
 
     if json_path.suffix == ".gz":
@@ -152,11 +142,8 @@ def _load_available(json_path: Path) -> dict[str, dict]:
         data = json.loads(json_path.read_text(encoding="utf-8")) or {}
     rows = data.get("datasets")
     if isinstance(rows, dict):
-        index = {key_: dict(body or {}) for key_, body in rows.items()}
-    else:
-        index = {name: {} for name in (data.get("available_datasets") or [])}
-    _AVAILABLE_CACHE[key] = index
-    return index
+        return {key_: dict(body or {}) for key_, body in rows.items()}
+    return {name: {} for name in (data.get("available_datasets") or [])}
 
 
 def _yaml_files_for(path: Path) -> list[Path]:
@@ -189,14 +176,32 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, HdxDataset]]:
         ValueError: If no file has a `datasets:` block, a dataset key
             is declared in two files, or a dataset fails validation.
     """
-    resolved = str(path.resolve())
-    files = _yaml_files_for(path)
-    mtime_tuple = tuple((str(f), _mtime_ns(f)) for f in files)
-    key = (resolved, mtime_tuple)
-    cached = _CATALOG_CACHE.get(key)
-    if cached is not None:
-        return cached
+    return load_catalog(
+        path,
+        _CATALOG_CACHE,
+        _parse_catalog,
+        provider="HDX",
+        shard_noun="per-theme",
+    )
 
+
+def _parse_catalog(files: list[Path]) -> tuple[list[str], dict[str, HdxDataset]]:
+    """Merge and validate the per-theme catalog shards.
+
+    Args:
+        files: The contributing YAML files, in sorted order.
+
+    Returns:
+        Tuple of `(list[str], dict[str, HdxDataset])` — the merged
+            `available_datasets:` index and the curated `datasets:` map.
+
+    Raises:
+        ValueError: If no file has a `datasets:` block, a dataset key is
+            declared in two files, or a dataset fails validation.
+    """
+    # Name the directory for a sharded catalog and the file for a single one, so
+    # the "empty datasets:" error points at what the caller passed.
+    path = files[0].parent if len(files) > 1 else files[0]
     merged_available: list[str] = []
     merged_datasets_yaml: dict[str, Any] = {}
     origin: dict[str, Path] = {}
@@ -227,8 +232,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, HdxDataset]]:
                 f"{origin[ds_key]} dataset {ds_key!r} failed validation:\n{exc}"
             ) from exc
 
-    _CATALOG_CACHE[key] = (merged_available, structural)
-    return _CATALOG_CACHE[key]
+    return merged_available, structural
 
 
 class HdxDataset(BaseModel):

@@ -30,6 +30,7 @@ window) arrive as explicit constructor keyword arguments.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
@@ -123,7 +124,8 @@ class OpenAQ(AbstractDataSource):
         max_locations: int | None = 500,
         max_sensors_per_location: int | None = None,
         max_measurements_per_sensor: int | None = None,
-        limit: int = 1000,
+        page_size: int = 1000,
+        limit: int | None = None,
         file_format: FileFormat = "csv",
     ):
         """Initialise an OpenAQ backend instance.
@@ -165,8 +167,14 @@ class OpenAQ(AbstractDataSource):
                 can have tens of thousands of readings. `None` (default)
                 means no cap. When a cap truncates a sensor, a warning is
                 logged.
-            limit: Page size for the paginated OpenAQ list endpoints.
-                Defaults to `1000`.
+            page_size: Page size for the paginated OpenAQ list endpoints.
+                Defaults to `1000`. This bounds one HTTP response, not the
+                result — it was previously called `limit`, which read like a
+                total and was not one.
+            limit: Total cap on the measurement rows `download()` returns and
+                writes, across every sensor. Enforced while the per-sensor
+                frames arrive, so sensors past the cap are never fetched.
+                `None` (default) means no cap.
             file_format: Output format — `"csv"` (default) or
                 `"parquet"`.
         """
@@ -182,7 +190,8 @@ class OpenAQ(AbstractDataSource):
         self._max_locations = max_locations
         self._max_sensors_per_location = max_sensors_per_location
         self._max_measurements_per_sensor = max_measurements_per_sensor
-        self._page_limit = limit
+        self._page_limit = page_size
+        self._limit = self.check_limit(limit)
         self._file_format: FileFormat = file_format
         self._auth: OpenaqAuth | None = None
         self._client_obj: OpenaqClient | None = None
@@ -463,9 +472,12 @@ class OpenAQ(AbstractDataSource):
                 "(hourly/daily/monthly/yearly) instead."
             )
 
-        frames = self._api_via_search_fetch_with_progress(progress_bar)
-        non_empty = [frame for frame in frames if not frame.empty]
-        df = pd.concat(non_empty, ignore_index=True) if non_empty else _empty_frame()
+        frames = self._take_limited(
+            self._iter_non_empty_frames(progress_bar),
+            limit=self._limit,
+        )
+        df = pd.concat(frames, ignore_index=True) if frames else _empty_frame()
+        non_empty = frames
 
         out_path = self._output_path()
         if self._file_format == "parquet":
@@ -514,6 +526,35 @@ class OpenAQ(AbstractDataSource):
         return self._search_fetch_each(
             progress_bar=progress_bar, desc="OpenAQ sensors", unit="sensor"
         )
+
+    def _iter_non_empty_frames(self, progress_bar: bool) -> Iterator[pd.DataFrame]:
+        """Yield each sensor's measurements, skipping the sensors with none.
+
+        Lazy on purpose: `download()` caps the total row count as the frames
+        arrive, so with a `limit=` in force the sensors beyond it are never
+        requested — which is the difference between a cap on the result and a
+        cap on the work.
+
+        Args:
+            progress_bar: Show the per-sensor `tqdm` bar when `True`.
+
+        Yields:
+            pd.DataFrame: One non-empty frame per sensor, in `_search` order.
+        """
+        from tqdm import tqdm
+
+        products = self._search()
+        if not products:
+            return
+        for product in tqdm(
+            products,
+            disable=not progress_bar,
+            desc="OpenAQ sensors",
+            unit="sensor",
+        ):
+            frame = self._fetch_one(product)
+            if not frame.empty:
+                yield frame
 
 
 def _empty_frame() -> pd.DataFrame:

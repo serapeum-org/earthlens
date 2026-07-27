@@ -290,7 +290,15 @@ class SensorCommunity(AbstractDataSource):
         non_empty = [frame for frame in frames if not frame.empty]
         if not non_empty:
             return empty_frame()
-        return pd.concat(non_empty, ignore_index=True)
+        combined = pd.concat(non_empty, ignore_index=True)
+        # `concat` copied every frame, so the per-sensor sources are dead
+        # weight from here. Both lists have to be cleared — either alone frees
+        # nothing, since each holds the same frames. This does not lower the
+        # peak (reached inside the concat) but stops them being carried through
+        # the window filter and the return.
+        frames.clear()
+        non_empty.clear()
+        return combined
 
     def _api(self) -> list[pd.DataFrame]:
         """Compose `_search` and `_fetch_one` into the canonical C3 shape.
@@ -365,13 +373,19 @@ class SensorCommunity(AbstractDataSource):
             progress_bar=progress_bar, desc="Sensor.Community sensors", unit="sensor"
         )
         non_empty = [frame for frame in frames if not frame.empty]
+        # Release the per-sensor frames as we go: `concat` copies, so holding
+        # the sources alongside the combined frame — and then alongside the
+        # windowed copy — keeps up to three full copies of the request in RAM.
+        frames.clear()
         if non_empty:
             combined = pd.concat(non_empty, ignore_index=True)
+            non_empty.clear()
             lower, upper = self._window()
             mask = (combined["datetime_utc"] >= lower) & (
                 combined["datetime_utc"] < upper
             )
             df = combined[mask].reset_index(drop=True)
+            del combined
         else:
             df = empty_frame()
 

@@ -106,6 +106,10 @@ class _FakeResponse:
     def close(self) -> None:
         """No-op — the fake holds no socket."""
 
+    def iter_content(self, chunk_size=None):
+        """Yield the canned body in one chunk, as a streamed response would."""
+        yield self.content
+
 
 @pytest.fixture
 def patch_http(monkeypatch, tiny_tif_bytes):

@@ -30,8 +30,9 @@ without `NetCDF.reduce` raises a clear `NotImplementedError`.
 from __future__ import annotations
 
 from collections import Counter
+from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, cast
 
 from loguru import logger
 from pydantic import SecretStr
@@ -58,6 +59,18 @@ if TYPE_CHECKING:
 
 
 FileFormat = Literal["netcdf", "zarr"]
+
+
+def _describe_product(product: RemoteProduct) -> str:
+    """Render a product for the `_run_items` log lines.
+
+    Args:
+        product: The product whose subset failed.
+
+    Returns:
+        str: The CMEMS dataset id.
+    """
+    return str(product.id)
 
 
 class CMEMS(AbstractDataSource):
@@ -251,6 +264,7 @@ class CMEMS(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ) -> list[Path]:
         """Subset every `(dataset_id, variables)` pair in `self.vars`.
 
@@ -294,6 +308,7 @@ class CMEMS(AbstractDataSource):
                 at construction.
             NotImplementedError: When `aggregate` is set but the
                 installed pyramids has no `NetCDF.reduce`.
+            ValueError: If `errors` is not a recognised policy.
             RuntimeError: When **every** `(dataset_id, variables)`
                 pair fails its subset (total failure). Raised rather
                 than returning `[]` so a caller cannot silently
@@ -301,6 +316,7 @@ class CMEMS(AbstractDataSource):
                 dataset ids and exception types, and the per-product
                 toolbox exceptions are logged at ERROR.
         """
+        self._errors = self.check_errors_policy(errors)
         # Authenticate lazily on first download (deferred out of __init__).
         assert self._auth is not None  # set by _initialize() before download()
         self._auth.configure()
@@ -571,7 +587,7 @@ class CMEMS(AbstractDataSource):
     def _fetch_with_progress(
         self, products: list[RemoteProduct], progress_bar: bool
     ) -> list[Path]:
-        """Subset every product, logging per-product failures.
+        """Subset every product under the caller's partial-failure policy.
 
         Args:
             products: The products to subset.
@@ -580,37 +596,34 @@ class CMEMS(AbstractDataSource):
 
         Returns:
             list[Path]: Successful output paths.
+
+        Raises:
+            RuntimeError: When every product failed, so a caller cannot
+                silently process nothing.
         """
-        out_paths: list[Path] = []
-        failed: list[tuple[str, BaseException]] = []
-        for product in products:
-            try:
-                out_paths.append(self._subset_one(product, progress_bar))
-            except Exception as exc:  # noqa: BLE001 - log + continue
-                logger.error(
-                    f"CMEMS subset for {product.id!r} failed: "
-                    f"{type(exc).__name__}: {exc}"
-                )
-                failed.append((product.id, exc))
-        if failed:
+        out_paths, failed = self._run_items(
+            products,
+            partial(self._subset_one, progress_bar=progress_bar),
+            errors=self._errors,
+            label="subset",
+            describe=_describe_product,
+        )
+        # Partial failure (some products wrote) returns the successes so a
+        # multi-dataset request is not all-or-nothing. Total failure raises
+        # rather than returning an empty list, so a caller doing
+        # `paths = download(); use(paths)` cannot silently process nothing.
+        if failed and not out_paths:
             failed_summary = ", ".join(
                 f"{ds_id} ({type(exc).__name__})" for ds_id, exc in failed
             )
-            logger.warning(f"{len(failed)} CMEMS subset(s) failed: {failed_summary}")
-            # Partial failure (some products wrote) returns the successes
-            # so a multi-dataset request is not all-or-nothing. Total
-            # failure raises rather than returning an empty list, so a
-            # caller doing `paths = download(); use(paths)` cannot
-            # silently process nothing.
-            if not out_paths:
-                raise RuntimeError(
-                    f"all {len(failed)} CMEMS subset(s) failed: "
-                    f"{failed_summary}. See the per-product ERROR logs "
-                    "above for the underlying toolbox exceptions."
-                )
-        return out_paths
+            raise RuntimeError(
+                f"all {len(failed)} CMEMS subset(s) failed: "
+                f"{failed_summary}. See the per-product ERROR logs "
+                "above for the underlying toolbox exceptions."
+            )
+        return cast("list[Path]", out_paths)
 
-    def _subset_one(self, product: RemoteProduct, progress_bar: bool) -> Path:
+    def _subset_one(self, product: RemoteProduct, *, progress_bar: bool) -> Path:
         """Submit one `copernicusmarine.subset` request.
 
         Args:

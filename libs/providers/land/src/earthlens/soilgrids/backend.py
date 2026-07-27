@@ -201,6 +201,8 @@ class SoilGrids(AbstractDataSource):
         self._coverage_crs = coverage_crs
         self._timeout = timeout
         self._show_progress = True
+        #: Scratch dir for the in-flight batch; `_api` owns its lifetime.
+        self._tmp_dir: Path | None = None
 
         super().__init__(
             start=start,
@@ -258,6 +260,10 @@ class SoilGrids(AbstractDataSource):
         # pre-existing file of that name.
         self.root_dir.mkdir(parents=True, exist_ok=True)
         tmp_dir = Path(tempfile.mkdtemp(dir=self.root_dir, prefix=".soilgrids-tmp-"))
+        # Hand the scratch dir to `_fetch_one` through the instance rather than
+        # as an extra parameter, so `_fetch_one(product)` keeps the base hook's
+        # one-argument shape. `_api` owns its lifetime either way.
+        self._tmp_dir = tmp_dir
         written: list[Path] = []
         try:
             fetched, failures = self._run_items(
@@ -267,7 +273,7 @@ class SoilGrids(AbstractDataSource):
                     desc="soilgrids",
                     unit="coverage",
                 ),
-                lambda product: self._fetch_one(product, tmp_dir),
+                self._fetch_one,
                 errors=self._errors,
                 label="coverage",
                 describe=lambda product: str(product.id),
@@ -275,6 +281,7 @@ class SoilGrids(AbstractDataSource):
             written.extend(fetched)
             failed = [described for described, _exc in failures]
         finally:
+            self._tmp_dir = None
             shutil.rmtree(tmp_dir, ignore_errors=True)
         if failed and not written:
             raise RuntimeError(
@@ -323,9 +330,7 @@ class SoilGrids(AbstractDataSource):
             )
         return plan
 
-    def _fetch_one(  # type: ignore[override]
-        self, product: RemoteProduct, tmp_dir: Path
-    ) -> Path:
+    def _fetch_one(self, product: RemoteProduct) -> Path:
         """Fetch one coverage's bbox window as a GeoTIFF over WCS.
 
         Uses `pyramids.dataset.Dataset.from_wcs` — GDAL's WCS driver inside
@@ -338,7 +343,7 @@ class SoilGrids(AbstractDataSource):
         as stored integers, `G2`).
 
         The coverage is fetched in-memory (`from_wcs(output=None)`), written into
-        `tmp_dir` (the per-download scratch dir owned by `_api`), then atomically
+        `self._tmp_dir` (the per-download scratch dir `_api` owns), then atomically
         renamed onto its final path only after a fully successful write. Because
         the final path is touched only by that rename, any failure leaves a
         pre-existing GeoTIFF from a prior run untouched and never leaves a partial
@@ -346,9 +351,10 @@ class SoilGrids(AbstractDataSource):
 
         Args:
             product: The `RemoteProduct` whose `metadata` carries the resolved
-                property row + the `(depth, quantile)` cell.
-            tmp_dir: The scratch directory to stage the write in before the
-                atomic rename (created + removed by :meth:`_api`).
+                property row + the `(depth, quantile)` cell. The scratch
+                directory the write is staged in before the atomic rename is
+                read from `self._tmp_dir`, which :meth:`_api` creates and
+                removes around the whole batch.
 
         Returns:
             Path: The written GeoTIFF at
@@ -367,6 +373,15 @@ class SoilGrids(AbstractDataSource):
         # The temp keeps the `.tif` suffix — pyramids picks the GDAL driver from
         # the extension, so a driver-less suffix like `.part` would raise
         # DriverNotExistError.
+        tmp_dir = self._tmp_dir
+        if tmp_dir is None:
+            # A real check, not an `assert`: asserts vanish under `python -O`,
+            # and the next line would then fail as an obscure
+            # `TypeError: unsupported operand type(s) for /: NoneType and str`.
+            raise RuntimeError(
+                "SoilGrids._fetch_one was called outside a download: the "
+                "per-batch scratch directory is only set up by _api()."
+            )
         tmp_path = tmp_dir / out_path.name
         dataset = None
         result = None

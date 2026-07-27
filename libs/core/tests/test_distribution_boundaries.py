@@ -414,3 +414,50 @@ class TestAuthDefaultPredicate:
         assert not offenders, (
             f"{offenders} re-declare the inherited default; drop the override"
         )
+
+
+class TestCatalogLoaderAdoption:
+    """ARC-8: a catalog must not re-implement the shared cache-key dance."""
+
+    def _catalog_sources(self):
+        """Yield `(path, source)` for every provider `catalog.py`."""
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/catalog.py")):
+            yield path, path.read_text(encoding="utf-8")
+
+    def test_catalog_modules_were_scanned(self):
+        """Guard the guard: the glob must actually find the catalogs."""
+        found = [p.parent.name for p, _ in self._catalog_sources()]
+        assert len(found) > 40, f"only scanned {len(found)} catalogs: {found[:5]}"
+
+    def test_no_catalog_rebuilds_the_mtime_cache_key(self):
+        """No loader hand-rolls `st_mtime_ns` — they go through load_catalog.
+
+        Each hand-rolled copy drifts on its own: the size half of the key, the
+        missing-file error, and whether a cache hit hands out a shared mutable
+        object were all inconsistent before the migration.
+        """
+        import ast as ast_module
+
+        offenders = []
+        for path, source in self._catalog_sources():
+            # A mention in a comment or docstring is fine — only a real
+            # attribute read means the loader is computing its own key.
+            reads_mtime = any(
+                isinstance(node, ast_module.Attribute) and node.attr == "st_mtime_ns"
+                for node in ast_module.walk(ast_module.parse(source))
+            )
+            if reads_mtime:
+                offenders.append(path.parent.name)
+        # All 48 now route through load_catalog, including the five sharded
+        # catalogs that used to carry extra work of their own: chc expands
+        # regions across two layouts, hdx / earthdata keep a huge `available_*`
+        # index in a sibling JSON, and gee / jaxa merge per-family shards. The
+        # list stays here (rather than the assertion becoming `not offenders`)
+        # so re-introducing a hand-rolled key names the catalog that did it.
+        assert sorted(offenders) == [], (
+            "these catalogs re-implement the mtime cache key instead of using "
+            f"earthlens.base.catalog_source.load_catalog: {sorted(offenders)}"
+        )

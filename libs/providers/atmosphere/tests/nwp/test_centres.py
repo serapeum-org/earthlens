@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import pathlib
 import sys
 import types
 
@@ -452,7 +453,7 @@ class TestDWDCentre:
             "https://x/00/t_2m/icon_2024060100_003_T_2M.grib2.bz2",
             "https://x/00/tot_prec/icon_2024060100_003_TOT_PREC.grib2.bz2",
         ]
-        assert out.read_bytes() == b"<T_2M><TOT_PREC>"
+        assert out.read_bytes() == b"GRIB<T_2M>GRIB<TOT_PREC>"
         assert out.name == "icon_2024060100_f003.grib2"
 
     def test_fetch_one_without_template_raises(self, tmp_path):
@@ -659,6 +660,14 @@ class TestMeteoFranceAPICentre:
             def raise_for_status(self):
                 pass
 
+            def iter_content(self, chunk_size=None):
+                """Yield the canned body in one chunk, as a streamed response would."""
+                yield self.content
+
+            def close(self):
+                """Release the response, as the streaming call sites do."""
+                self.closed = True
+
         def fake_get(url, params=None, headers=None, timeout=None, **kwargs):
             calls.append({"url": url, "params": params, "headers": headers})
             return _Resp(b"GRIB-" + dict(params)["coverageid"].split("__")[0].encode())
@@ -741,7 +750,7 @@ class TestMeteoFranceAPICentre:
         """A GetCoverage failure unlinks the partial file and re-raises."""
         monkeypatch.setenv("MF_API_KEY", "k")
 
-        def failing_get(url, params=None, headers=None, timeout=None):
+        def failing_get(url, params=None, headers=None, timeout=None, **kwargs):
             raise RuntimeError("gateway down")
 
         module = types.ModuleType("requests")
@@ -1061,3 +1070,490 @@ def test_base_centre_fetch_one_raises_not_implemented(tmp_path):
 
     with pytest.raises(NotImplementedError):
         _Bare(tmp_path).fetch_one(None, dt.datetime(2026, 1, 1), 0, [], "auto")
+
+
+class _NoBufferResponse:
+    """Streams its body in small blocks; reading `.content` is a failure."""
+
+    def __init__(self, body: bytes, block: int = 8):
+        self._body = body
+        self._block = block
+        self.status_code = 200
+        self.headers: dict[str, str] = {}
+        self.closed = False
+
+    @property
+    def content(self) -> bytes:
+        raise AssertionError("the body must be streamed, not buffered via .content")
+
+    def raise_for_status(self) -> None:
+        """A 200 needs no action."""
+
+    def iter_content(self, chunk_size=None):
+        """Yield the body in fixed-size blocks, as a streamed response does."""
+        for start in range(0, len(self._body), self._block):
+            yield self._body[start : start + self._block]
+
+    def close(self) -> None:
+        """Record release of the response."""
+        self.closed = True
+
+
+class TestDWDStreams:
+    """DWD decompresses its .bz2 incrementally rather than whole-body."""
+
+    def _stream_requests(self, monkeypatch, block: int = 8):
+        """Install a requests whose get streams a bz2 body across many blocks."""
+        import bz2
+
+        state: dict[str, object] = {"responses": [], "kwargs": []}
+
+        def fake_get(url: str, timeout=None, **kwargs):
+            state["kwargs"].append(kwargs)
+            var = pathlib.Path(url).parent.name.upper()
+            payload = bz2.compress(b"GRIB<" + var.encode() + b">")
+            response = _NoBufferResponse(payload, block=block)
+            state["responses"].append(response)
+            return response
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+        return state
+
+    def _icon(self, **overrides) -> NWPModel:
+        """Reuse the DWD centre's ICON row builder."""
+        return TestDWDCentre._icon(TestDWDCentre(), **overrides)
+
+    def test_body_is_decompressed_without_buffering(self, monkeypatch, tmp_path):
+        """A regression to `bz2.decompress(response.content)` fails this test."""
+        state = self._stream_requests(monkeypatch)
+        out = DWDCentre(tmp_path).fetch_one(
+            self._icon(),
+            dt.datetime(2024, 6, 1, 0),
+            3,
+            ["temperature_2m", "precipitation_acc"],
+            "auto",
+        )
+        assert out.read_bytes() == b"GRIB<T_2M>GRIB<TOT_PREC>"
+        assert all(r.closed for r in state["responses"]), "responses must be released"
+
+    def test_get_is_streaming(self, monkeypatch, tmp_path):
+        """The per-variable GET passes stream=True."""
+        state = self._stream_requests(monkeypatch)
+        DWDCentre(tmp_path).fetch_one(
+            self._icon(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
+        )
+        assert state["kwargs"][0].get("stream") is True, f"got {state['kwargs'][0]}"
+
+    def test_decompression_spans_block_boundaries(self, monkeypatch, tmp_path):
+        """A single-byte block stream still reassembles the exact payload."""
+        self._stream_requests(monkeypatch, block=1)
+        out = DWDCentre(tmp_path).fetch_one(
+            self._icon(), dt.datetime(2024, 6, 1, 0), 0, ["temperature_2m"], "auto"
+        )
+        assert out.read_bytes() == b"GRIB<T_2M>", (
+            "bz2 must be decompressed incrementally"
+        )
+
+
+class TestMeteoFranceAPIStreams:
+    """The WCS coverage body is copied block by block, not buffered."""
+
+    def test_coverage_is_streamed(self, monkeypatch, tmp_path):
+        """A regression to `response.content` fails this test."""
+        monkeypatch.setenv("MF_API_KEY", "k")
+        responses: list[_NoBufferResponse] = []
+        seen: list[dict] = []
+
+        def fake_get(url, params=None, headers=None, timeout=None, **kwargs):
+            seen.append(kwargs)
+            coverage = dict(params)["coverageid"].split("__")[0]
+            response = _NoBufferResponse(b"GRIB-" + coverage.encode())
+            responses.append(response)
+            return response
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        centre = MeteoFranceAPICentre(tmp_path)
+        out = centre.fetch_one(
+            TestMeteoFranceAPICentre._arpege(TestMeteoFranceAPICentre()),
+            dt.datetime(2024, 6, 1, 0),
+            24,
+            ["temperature_2m", "precipitation_acc"],
+            "auto",
+        )
+        assert out.read_bytes() == b"GRIB-TEMPERATUREGRIB-TOTAL_PRECIPITATION"
+        assert seen[0].get("stream") is True, f"got {seen[0]}"
+        assert all(r.closed for r in responses), "responses must be released"
+
+
+class TestDecompressStream:
+    """The streamed bz2 reader must behave exactly like `bz2.decompress`."""
+
+    #: Bodies covering every shape the DWD feed can produce, plus the
+    #: pathological ones. Each is run at several chunk sizes, including sizes
+    #: that land a stream boundary exactly on a chunk edge — the case the
+    #: first version of this reader got wrong.
+    def _bodies(self):
+        """Return `{name: body}` for the differential cases."""
+        import bz2
+
+        one = bz2.compress(b"AAAA")
+        two = bz2.compress(b"BBBB")
+        big = bz2.compress(b"C" * 5000)
+        return {
+            "single": one,
+            "multi_two": one + two,
+            "multi_three": one + two + big,
+            "trailing_nulls": one + b"\x00\x00\x00",
+            "trailing_garbage": one + b"not-a-stream",
+            "truncated": one[: len(one) // 2],
+            "truncated_second_stream": one + two[: len(two) // 2],
+            "empty": b"",
+            "not_bz2_at_all": b"plain bytes, never compressed",
+            "big_then_small": big + one,
+        }
+
+    def _run(self, body: bytes, chunk: int):
+        """Feed `body` through the reader in `chunk`-sized blocks."""
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        blocks = [body[i : i + chunk] for i in range(0, len(body), chunk)] or [b""]
+        buf = io.BytesIO()
+        try:
+            _decompress_stream(iter(blocks), buf, "https://h/x.bz2")
+        except Exception as exc:  # noqa: BLE001 - the outcome is the assertion
+            return type(exc).__name__, None
+        return "ok", buf.getvalue()
+
+    def _reference(self, body: bytes):
+        """The same body through `bz2.decompress`, the behaviour to match."""
+        import bz2
+
+        try:
+            return "ok", bz2.decompress(body)
+        except Exception as exc:  # noqa: BLE001 - the outcome is the assertion
+            return type(exc).__name__, None
+
+    @pytest.mark.parametrize(
+        "case",
+        [
+            "single",
+            "multi_two",
+            "multi_three",
+            "trailing_nulls",
+            "trailing_garbage",
+            "truncated",
+            "truncated_second_stream",
+            "empty",
+            "not_bz2_at_all",
+            "big_then_small",
+        ],
+    )
+    def test_matches_bz2_decompress_at_every_chunking(self, case):
+        """Streamed decoding agrees with `bz2.decompress` for any block split.
+
+        Args:
+            case: Key into the body table.
+        """
+        import bz2
+
+        body = self._bodies()[case]
+        expected = self._reference(body)
+        one_stream = len(bz2.compress(b"AAAA"))
+        sizes = sorted({1, 2, 7, 13, one_stream, one_stream + 1, len(body) or 1, 4096})
+        for chunk in sizes:
+            got = self._run(body, chunk)
+            assert got == expected, (
+                f"{case} at chunk={chunk}: got {got[0]} / {got[1]!r}, "
+                f"expected {expected[0]} / {expected[1]!r}"
+            )
+
+    def test_trailing_padding_split_across_blocks_is_not_truncation(self):
+        """Padding arriving a byte at a time must not look like a short stream.
+
+        Regression, and version-dependent: the reader used to decide this from
+        `BZ2Decompressor.decompress` raising `OSError` on the padding, which
+        Python 3.13 stopped doing promptly — fed a few bytes at a time it
+        buffers. The padding then looked like a stream that never ended and a
+        valid GRIB2 was rejected. The header check does not depend on when the
+        error arrives, so this holds on every version.
+        """
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        body = bz2.compress(b"AAAA") + b"not-a-stream"
+        buf = io.BytesIO()
+
+        written = _decompress_stream(
+            (body[i : i + 1] for i in range(len(body))), buf, "https://h/x.bz2"
+        )
+
+        assert buf.getvalue() == b"AAAA", "the real stream must still be decoded"
+        assert written == 4
+
+    def test_padding_shorter_than_a_header_is_ignored(self):
+        """A tail too short to be a stream is padding, not truncation."""
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        for tail in (b"B", b"BZ", b"BZh"):
+            buf = io.BytesIO()
+            body = bz2.compress(b"AAAA") + tail
+            _decompress_stream(iter([body]), buf, "https://h/x.bz2")
+            assert buf.getvalue() == b"AAAA", f"tail {tail!r} should be ignored"
+
+    def test_a_truncated_second_stream_still_raises(self):
+        """Ignoring padding must not also swallow a genuinely short stream."""
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        two = bz2.compress(b"BBBB")
+        body = bz2.compress(b"AAAA") + two[: len(two) // 2]
+        buf = io.BytesIO()
+        blocks = (body[i : i + 1] for i in range(len(body)))
+
+        with pytest.raises(ValueError, match="truncated bz2 body"):
+            _decompress_stream(blocks, buf, "https://h/x.bz2")
+
+    @pytest.mark.parametrize(
+        ("header", "expected"),
+        [
+            (b"BZh1", True),
+            (b"BZh9", True),
+            (b"BZh0", False),
+            (b"BZhX", False),
+            (b"GRIB", False),
+            (b"\x00\x00\x00\x00", False),
+        ],
+    )
+    def test_recognises_a_stream_header(self, header, expected):
+        """`BZh1`..`BZh9` opens a stream; anything else is padding.
+
+        Args:
+            header: The four bytes following a finished stream.
+            expected: Whether they start a further stream.
+        """
+        from earthlens.nwp.centres.dwd import _starts_a_bz2_stream
+
+        assert _starts_a_bz2_stream(header) is expected
+
+    def test_stream_boundary_on_a_chunk_edge(self):
+        """A boundary exactly at a block edge must not raise EOFError.
+
+        Regression: re-seeding only when `unused_data` was non-empty in the
+        same iteration left an exhausted decompressor to receive the next
+        block, which raises `EOFError: End of stream already reached`.
+        """
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        one, two = bz2.compress(b"AAAA"), bz2.compress(b"BBBB")
+        buf = io.BytesIO()
+        _decompress_stream(iter([one, two]), buf, "https://h/x.bz2")
+        assert buf.getvalue() == b"AAAABBBB"
+
+    def test_returns_the_decompressed_byte_count(self):
+        """The return value lets the caller reject an empty band."""
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        payload = b"GRIB2" * 100
+        written = _decompress_stream(
+            iter([bz2.compress(payload)]), io.BytesIO(), "https://h/x.bz2"
+        )
+        assert written == len(payload)
+
+    def test_empty_body_returns_zero_without_raising(self):
+        """An empty body is `bz2.decompress`'s no-op, not a truncation."""
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        assert _decompress_stream(iter([b""]), io.BytesIO(), "https://h/e.bz2") == 0
+
+    def test_truncation_message_redacts_the_url(self):
+        """The error names the host only — never a URL-borne credential."""
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        whole = bz2.compress(b"body" * 200)
+        blocks = iter([whole[: len(whole) // 2]])
+        sink = io.BytesIO()
+        with pytest.raises(ValueError) as exc:
+            _decompress_stream(blocks, sink, "https://h/x.bz2?token=SECRET")
+        assert "SECRET" not in str(exc.value), f"secret leaked: {exc.value}"
+
+    def test_empty_band_body_aborts_the_fetch(self, monkeypatch, tmp_path):
+        """A band that returns nothing fails rather than vanishing from the GRIB2."""
+
+        def fake_get(url, timeout=None, **kwargs):
+            return _NoBufferResponse(b"", block=16)
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        centre = DWDCentre(tmp_path)
+        model = TestDWDCentre._icon(TestDWDCentre())
+        cycle = dt.datetime(2024, 6, 1, 0)
+        with pytest.raises(ValueError, match="empty body for band"):
+            centre.fetch_one(
+                model,
+                cycle,
+                0,
+                ["temperature_2m"],
+                "auto",
+            )
+        assert list(tmp_path.glob("*.grib2")) == [], "no GRIB2 should be published"
+
+    def test_truncated_fetch_leaves_no_grib_behind(self, monkeypatch, tmp_path):
+        """A truncated band aborts `fetch_one` without publishing the .grib2."""
+        import bz2
+
+        whole = bz2.compress(b"GRIB<T_2M>" * 200)
+        short = whole[: len(whole) // 2]
+
+        def fake_get(url, timeout=None, **kwargs):
+            return _NoBufferResponse(short, block=16)
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        centre = DWDCentre(tmp_path)
+        model = TestDWDCentre._icon(TestDWDCentre())
+        cycle = dt.datetime(2024, 6, 1, 0)
+        with pytest.raises(ValueError, match="truncated bz2 body"):
+            centre.fetch_one(
+                model,
+                cycle,
+                0,
+                ["temperature_2m"],
+                "auto",
+            )
+        assert list(tmp_path.glob("*.grib2")) == [], "a short GRIB2 was published"
+        assert list(tmp_path.glob("*.part")) == [], "the partial write was left behind"
+
+
+class TestGribMagicValidation:
+    """A non-GRIB body must never be appended into the assembled `.grib2`."""
+
+    def test_dwd_rejects_an_html_error_page(self, monkeypatch, tmp_path):
+        """DWD serves HTML with a 200 for an absent cycle; bz2-of-HTML decodes fine."""
+        import bz2
+
+        def fake_get(url, timeout=None, **kwargs):
+            return _NoBufferResponse(
+                bz2.compress(b"<html>not published</html>"), block=16
+            )
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        centre = DWDCentre(tmp_path)
+        model = TestDWDCentre._icon(TestDWDCentre())
+        cycle = dt.datetime(2024, 6, 1, 0)
+        with pytest.raises(ValueError, match="did not return GRIB2"):
+            centre.fetch_one(
+                model,
+                cycle,
+                0,
+                ["temperature_2m"],
+                "auto",
+            )
+        assert list(tmp_path.glob("*.grib2")) == [], "no GRIB2 should be published"
+        assert list(tmp_path.glob("*.part")) == [], "no partial should survive"
+
+    def test_dwd_rejects_a_bad_second_band(self, monkeypatch, tmp_path):
+        """A good first band must not let a faulty later band through."""
+        import bz2
+
+        bodies = iter(
+            [
+                bz2.compress(b"GRIB<T_2M>"),
+                bz2.compress(b"<html>gateway fault</html>"),
+            ]
+        )
+
+        def fake_get(url, timeout=None, **kwargs):
+            return _NoBufferResponse(next(bodies), block=16)
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        centre = DWDCentre(tmp_path)
+        model = TestDWDCentre._icon(TestDWDCentre())
+        cycle = dt.datetime(2024, 6, 1, 0)
+        with pytest.raises(ValueError, match="did not return GRIB2"):
+            centre.fetch_one(
+                model,
+                cycle,
+                0,
+                ["temperature_2m", "precipitation_acc"],
+                "auto",
+            )
+        assert list(tmp_path.glob("*.grib2")) == []
+
+    def test_meteofrance_rejects_a_gateway_fault(self, monkeypatch, tmp_path):
+        """The WSO2 gateway answers a rejected key with an XML fault at 200."""
+        monkeypatch.setenv("MF_API_KEY", "k")
+
+        def fake_get(url, params=None, headers=None, timeout=None, **kwargs):
+            return _NoBufferResponse(b"<fault>invalid credentials</fault>", block=8)
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        centre = MeteoFranceAPICentre(tmp_path)
+        model = TestMeteoFranceAPICentre._arpege(TestMeteoFranceAPICentre())
+        cycle = dt.datetime(2024, 6, 1, 0)
+        with pytest.raises(ValueError, match="did not return GRIB2"):
+            centre.fetch_one(
+                model,
+                cycle,
+                24,
+                ["temperature_2m"],
+                "auto",
+            )
+        assert list(tmp_path.glob("*.grib2")) == []
+
+    def test_the_error_redacts_the_url(self, monkeypatch, tmp_path):
+        """A DWD URL can carry a query; only the host may appear."""
+        import bz2
+
+        def fake_get(url, timeout=None, **kwargs):
+            return _NoBufferResponse(bz2.compress(b"<html>x</html>"), block=8)
+
+        module = types.ModuleType("requests")
+        module.get = fake_get
+        monkeypatch.setitem(sys.modules, "requests", module)
+
+        model = TestDWDCentre._icon(
+            TestDWDCentre(), url_template="https://x/{var_lc}/f.grib2.bz2?key=SECRET"
+        )
+        cycle = dt.datetime(2024, 6, 1, 0)
+        centre = DWDCentre(tmp_path)
+        with pytest.raises(ValueError) as exc:
+            centre.fetch_one(model, cycle, 0, ["temperature_2m"], "auto")
+        assert "SECRET" not in str(exc.value), f"secret leaked: {exc.value}"

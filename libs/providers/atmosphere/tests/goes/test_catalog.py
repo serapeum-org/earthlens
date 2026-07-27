@@ -36,11 +36,19 @@ class TestCatalogLoad:
         assert len(catalog) == len(catalog.datasets), "len == dataset count"
 
     def test_parse_cache_reused(self):
-        """A second load with an unchanged file returns the cached instance."""
+        """A second load skips the parse but hands back a separate Catalog.
+
+        Sharing one instance let any caller's `.datasets` mutation reach every
+        other caller, and the shared parse cache itself.
+        """
         clear_catalog_cache()
         first = Catalog.load()
         second = Catalog.load()
-        assert first is second, "the (path, mtime) cache should return the same object"
+        assert first is not second, "callers must not share one Catalog"
+        assert first.datasets == second.datasets, "the parse should be reused"
+        key = next(iter(first.datasets))
+        first.datasets.pop(key)
+        assert key in Catalog.load().datasets, "a mutation leaked into the cache"
 
     def test_load_missing_products_block_raises(self, tmp_path):
         """A catalog file with no products block raises ValueError."""
@@ -50,8 +58,8 @@ class TestCatalogLoad:
             Catalog.load(bad)
 
     def test_load_missing_file_raises(self, tmp_path):
-        """Loading a nonexistent path raises rather than silently succeeding."""
-        with pytest.raises(FileNotFoundError):
+        """Loading a nonexistent path raises, naming the path that is missing."""
+        with pytest.raises(ValueError, match="does not exist"):
             Catalog.load(tmp_path / "does-not-exist.yaml")
 
     def test_load_invalid_product_row_raises(self, tmp_path):

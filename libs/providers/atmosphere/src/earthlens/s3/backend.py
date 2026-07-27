@@ -555,7 +555,9 @@ class S3(AbstractDataSource):
         out_dir = (
             Path(aggregate.out_dir) if aggregate.out_dir else self.path / "aggregated"
         )
-        config = aggregate.model_copy(update={"out_dir": out_dir})
+        # Only `w[2]` (the written path) is collected below, so the reduced
+        # arrays are dropped per window instead of accumulating.
+        config = aggregate.model_copy(update={"out_dir": out_dir, "keep_arrays": False})
         outputs: list[Path] = []
         for product in products:
             raw = self._download_raw(client, product, raw_dir)

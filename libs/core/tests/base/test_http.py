@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from typing import Any
 
 import pytest
@@ -12,10 +13,11 @@ from earthlens.base.http import (
     DEFAULT_TIMEOUT,
     HttpClient,
     RequestsGet,
+    _check_magic,
     _default_user_agent,
     _parse_retry_after,
     _progress_total,
-    _redact_url,
+    redact_url,
 )
 
 
@@ -170,7 +172,7 @@ class TestRedactUrl:
     )
     def test_redact(self, url: str, expected: str):
         """Path, query, and userinfo are stripped to scheme://host."""
-        assert _redact_url(url) == expected
+        assert redact_url(url) == expected
 
     def test_retry_log_omits_url_path_and_query(self):
         """A retry warning logs only the host — never a path/query secret."""
@@ -233,6 +235,43 @@ class TestDefaults:
         """The session property returns the injected transport."""
         session = _RecordingSession([])
         assert HttpClient(session=session).session is session
+
+    def test_default_transport_is_a_pooled_session(self, real_pooled_session):
+        """With no session injected, the client pools (ARC-4a).
+
+        The suite's autouse seam swaps the default for the `requests`-module
+        adapter so module-level fakes keep working, which would otherwise leave
+        the shipped default untested. `real_pooled_session` puts it back.
+        """
+        import requests
+
+        assert isinstance(HttpClient().session, requests.Session)
+
+    def test_each_client_gets_its_own_pooled_session(self, real_pooled_session):
+        """Two clients do not share one session, so their headers cannot collide."""
+        first, second = HttpClient(), HttpClient()
+        assert first.session is not second.session
+
+    def test_repeated_requests_reuse_one_session(self, real_pooled_session):
+        """Pooling is the point: every call goes through the same session object."""
+        client = HttpClient(max_retries=0, raise_for_status=False)
+        pooled = client.session
+        seen: list[str] = []
+
+        def record(url, **_kwargs):
+            seen.append(url)
+            return _Resp(status=200)
+
+        pooled.get = record
+
+        client.get("https://example.invalid/a")
+        client.get("https://example.invalid/b")
+
+        assert client.session is pooled, "the client must not rebuild its session"
+        assert seen == [
+            "https://example.invalid/a",
+            "https://example.invalid/b",
+        ], f"both calls should reach the one pooled session; got {seen}"
 
 
 @pytest.mark.unit
@@ -541,6 +580,59 @@ class TestThrottle:
         client.get("http://x")
         assert waits == []
 
+    def test_throttle_serialises_concurrent_callers(self):
+        """Threads sharing a client take the throttle one at a time.
+
+        Without the lock every thread reads the same `_last_request`, decides
+        the interval has elapsed, and they all fire at once — the burst the
+        rate limit exists to prevent.
+        """
+        import threading
+
+        overlaps: list[int] = []
+        inside = 0
+        guard = threading.Lock()
+
+        def slow_sleep(seconds: float) -> None:
+            nonlocal inside
+            with guard:
+                inside += 1
+                overlaps.append(inside)
+            time.sleep(0.01)
+            with guard:
+                inside -= 1
+
+        client = HttpClient(
+            session=_RecordingSession([]),
+            sleep=slow_sleep,
+            clock=lambda: 0.0,
+            min_interval=1.0,
+        )
+        client._last_request = 0.0
+        threads = [threading.Thread(target=client._throttle) for _ in range(8)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        assert max(overlaps) == 1, f"throttle ran concurrently: {overlaps}"
+        assert len(overlaps) == 8, f"every caller should throttle: {overlaps}"
+
+    def test_zero_interval_never_sleeps_or_records(self):
+        """The default (no throttle) is a no-op, not a zero-length wait.
+
+        Asserts the observable behaviour rather than sabotaging
+        `_throttle_lock` to prove the short-circuit: replacing the lock with
+        `None` tests an internal that no caller can reach.
+        """
+        waits: list[float] = []
+        client = HttpClient(session=_RecordingSession([]), sleep=waits.append)
+        client._throttle()
+        client._throttle()
+        assert waits == [], "min_interval=0 must not sleep"
+        assert client._last_request is None, (
+            "with no throttle configured there is nothing to record"
+        )
+
 
 @pytest.mark.unit
 class TestDownload:
@@ -610,8 +702,9 @@ class TestDownload:
             [_Resp(blocks=[b"partial"], stream_error=OSError("mid-stream"))]
         )
         dest = tmp_path / "out.bin"
+        client = HttpClient(session=session)
         with pytest.raises(OSError):
-            HttpClient(session=session).download("http://x", dest, progress=False)
+            client.download("http://x", dest, progress=False)
         assert not dest.exists()
         assert not dest.with_name("out.bin.part").exists()
 
@@ -720,8 +813,9 @@ class TestDownload:
         session = _RecordingSession([_Resp(blocks=[b"data"])])
         dest = tmp_path / "out.bin"
         dest.mkdir()  # a directory target makes tmp.replace(dest) fail
+        client = HttpClient(session=session)
         with pytest.raises(OSError):
-            HttpClient(session=session).download("http://x", dest, progress=False)
+            client.download("http://x", dest, progress=False)
         assert not dest.with_name("out.bin.part").exists()
 
     def test_download_retries_on_predicate(self, tmp_path):
@@ -748,6 +842,125 @@ class TestDownload:
         )
         assert dest.read_bytes() == b"data"
         assert not dest.with_name("out.bin.part").exists()
+
+
+class TestCheckMagic:
+    """The leading-bytes guard that rejects an error page served as a file."""
+
+    def test_accepts_matching_single_prefix(self, tmp_path):
+        """A body starting with the one expected prefix passes silently."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"CDF\x01payload")
+        assert _check_magic(path, b"CDF", "http://host/grid.nc") is None
+
+    def test_accepts_any_of_several_prefixes(self, tmp_path):
+        """With a tuple of prefixes, matching any one is enough."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"\x89HDF\r\n\x1a\npayload")
+        assert _check_magic(path, (b"CDF", b"\x89HDF"), "http://host/g.nc") is None
+
+    def test_rejects_html_error_page(self, tmp_path):
+        """An HTML body served under a .nc name raises ValueError."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"<html>Error 500</html>")
+        with pytest.raises(ValueError, match="does not start with") as exc:
+            _check_magic(path, b"CDF", "http://host/grid.nc")
+        assert "<html>" in str(exc.value), (
+            f"message should show what arrived: {exc.value}"
+        )
+
+    def test_message_reports_size_and_head(self, tmp_path):
+        """The message carries the byte count and the first 24 bytes seen."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"x" * 100)
+        with pytest.raises(ValueError) as exc:
+            _check_magic(path, b"CDF", "http://host/grid.nc")
+        message = str(exc.value)
+        assert "100 bytes" in message, f"size missing from: {message}"
+        assert repr(b"x" * 24) in message, f"head missing from: {message}"
+
+    def test_message_redacts_the_url(self, tmp_path):
+        """Only scheme://host reaches the message, never a URL-borne secret."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"nope")
+        with pytest.raises(ValueError) as exc:
+            _check_magic(path, b"CDF", "https://host/api?token=SECRET")
+        message = str(exc.value)
+        assert "SECRET" not in message, f"secret leaked into: {message}"
+        assert "https://host" in message, f"host missing from: {message}"
+
+    def test_short_body_shorter_than_prefix_is_rejected(self, tmp_path):
+        """A truncated body too short to hold the prefix still raises."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"CD")
+        with pytest.raises(ValueError, match="does not start with"):
+            _check_magic(path, b"CDF", "http://host/grid.nc")
+
+    def test_empty_body_is_rejected(self, tmp_path):
+        """A zero-byte body raises rather than passing as a valid file."""
+        path = tmp_path / "grid.nc"
+        path.write_bytes(b"")
+        with pytest.raises(ValueError, match="0 bytes"):
+            _check_magic(path, b"CDF", "http://host/grid.nc")
+
+
+class TestDownloadExpectMagic:
+    """`download(expect_magic=...)` validates the body before publishing it."""
+
+    def test_matching_body_is_published(self, tmp_path):
+        """A body with the expected prefix lands at dest as usual."""
+        session = _RecordingSession([_Resp(blocks=[b"CDF\x01", b"payload"])])
+        dest = tmp_path / "out.nc"
+        result = HttpClient(session=session).download(
+            "http://x/out.nc", dest, progress=False, expect_magic=b"CDF"
+        )
+        assert result == dest
+        assert dest.read_bytes() == b"CDF\x01payload"
+
+    def test_wrong_body_raises_and_leaves_no_dest(self, tmp_path):
+        """A non-matching body raises ValueError and never becomes dest."""
+        session = _RecordingSession([_Resp(blocks=[b"<html>error</html>"])])
+        dest = tmp_path / "out.nc"
+        client = HttpClient(session=session)
+        with pytest.raises(ValueError, match="does not start with"):
+            client.download(
+                "http://x/out.nc", dest, progress=False, expect_magic=b"CDF"
+            )
+        assert not dest.exists(), "an error page must not be published as dest"
+        assert not dest.with_name("out.nc.part").exists(), "temp must be cleaned"
+
+    def test_wrong_body_keeps_a_previous_dest(self, tmp_path):
+        """A rejected re-download leaves the previously good dest intact."""
+        session = _RecordingSession([_Resp(blocks=[b"<html>error</html>"])])
+        dest = tmp_path / "out.nc"
+        dest.write_bytes(b"CDF\x01earlier good file")
+        client = HttpClient(session=session)
+        with pytest.raises(ValueError):
+            client.download(
+                "http://x/out.nc", dest, progress=False, expect_magic=b"CDF"
+            )
+        assert dest.read_bytes() == b"CDF\x01earlier good file"
+
+    def test_omitting_expect_magic_skips_the_check(self, tmp_path):
+        """Without expect_magic any body is written, preserving the old contract."""
+        session = _RecordingSession([_Resp(blocks=[b"<html>error</html>"])])
+        dest = tmp_path / "out.nc"
+        HttpClient(session=session).download("http://x/out.nc", dest, progress=False)
+        assert dest.read_bytes() == b"<html>error</html>"
+
+    def test_response_is_closed_when_magic_fails(self, tmp_path):
+        """The rejected response is still released, not left open."""
+        response = _Resp(blocks=[b"<html>"])
+        session = _RecordingSession([response])
+        client = HttpClient(session=session)
+        with pytest.raises(ValueError):
+            client.download(
+                "http://x/out.nc",
+                tmp_path / "out.nc",
+                progress=False,
+                expect_magic=b"CDF",
+            )
+        assert response.closed, "the response must be closed even on rejection"
 
 
 class _Capture:
@@ -791,3 +1004,55 @@ class TestRequestsGet:
         monkeypatch.setattr(requests, "post", capture)
         RequestsGet().post("https://x/y")
         assert capture.kwargs["timeout"] == DEFAULT_TIMEOUT
+
+
+@pytest.mark.unit
+class TestThreadLocalSession:
+    """`thread_local_session` pools per thread without sharing across threads."""
+
+    def test_same_thread_and_key_reuses_one_session(self, real_pooled_session):
+        """Repeated calls hand back the same object — that is the pooling."""
+        from earthlens.base.http import thread_local_session
+
+        assert thread_local_session("demo") is thread_local_session("demo")
+
+    def test_different_keys_do_not_share_a_session(self, real_pooled_session):
+        """Two providers keep separate cookie jars and headers."""
+        from earthlens.base.http import thread_local_session
+
+        assert thread_local_session("a") is not thread_local_session("b")
+
+    def test_each_thread_gets_its_own_session(self, real_pooled_session):
+        """`requests.Session` is not guaranteed thread-safe, so none is shared."""
+        import threading
+
+        from earthlens.base.http import thread_local_session
+
+        seen: dict[str, object] = {}
+
+        def grab(name):
+            seen[name] = thread_local_session("demo")
+
+        workers = [threading.Thread(target=grab, args=(f"t{i}",)) for i in range(4)]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            worker.join()
+
+        assert len(seen) == 4
+        assert len({id(session) for session in seen.values()}) == 4, (
+            "each thread must get its own session, got "
+            f"{len({id(s) for s in seen.values()})} distinct for 4 threads"
+        )
+
+    def test_reset_forces_a_rebuild(self, real_pooled_session):
+        """Clearing the cache makes the next call build against the current transport."""
+        from earthlens.base.http import (
+            reset_thread_local_sessions,
+            thread_local_session,
+        )
+
+        first = thread_local_session("demo")
+        reset_thread_local_sessions()
+
+        assert thread_local_session("demo") is not first

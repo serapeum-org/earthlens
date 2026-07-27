@@ -591,6 +591,9 @@ class FIRMS(AbstractDataSource):
 
         collections = self._api_via_search_fetch_with_progress(progress_bar)
         collection = events.concat(collections)
+        # `concat` copied every chunk; keeping the per-chunk collections alive
+        # through the write and the return doubles the request's footprint.
+        collections.clear()
 
         if len(collection):
             out_path = self._write(collection)

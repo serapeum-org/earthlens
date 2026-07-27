@@ -82,9 +82,10 @@ class TestStationCatalog:
         assert cat.get_catalog() is cat.datasets
 
     def test_missing_file_raises(self, tmp_path):
-        """A non-existent catalog path raises FileNotFoundError from the loader."""
-        with pytest.raises(FileNotFoundError):
-            catalog_mod._load_stations(tmp_path / "absent.yaml")
+        """A non-existent catalog path names the provider and the layout."""
+        absent = tmp_path / "absent.yaml"
+        with pytest.raises(ValueError, match="NEXRAD catalog path"):
+            catalog_mod._load_stations(absent)
 
     def test_explicit_datasets_skip_autoload(self):
         """Supplying datasets= bypasses the bundled-YAML auto-load."""

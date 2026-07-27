@@ -25,6 +25,7 @@ module adds none. The public import is
 from __future__ import annotations
 
 import datetime as dt
+import threading
 import time
 from collections.abc import Callable
 from email.utils import parsedate_to_datetime
@@ -114,7 +115,7 @@ def _parse_retry_after(value: str | None) -> float | None:
     return max(0.0, (target - now).total_seconds())
 
 
-def _redact_url(url: str) -> str:
+def redact_url(url: str) -> str:
     """Return `scheme://host` for logging, hiding any secret in the URL.
 
     Retry warnings must never echo the full request URL: some backends
@@ -133,10 +134,10 @@ def _redact_url(url: str) -> str:
         - The path, query, and userinfo — where secrets ride — are
           stripped:
             ```python
-            >>> from earthlens.base.http import _redact_url
-            >>> _redact_url("https://firms.example/api/SECRETKEY/area?x=1")
+            >>> from earthlens.base.http import redact_url
+            >>> redact_url("https://firms.example/api/SECRETKEY/area?x=1")
             'https://firms.example'
-            >>> _redact_url("https://user:pass@host/p")
+            >>> redact_url("https://user:pass@host/p")
             'https://host'
 
             ```
@@ -145,6 +146,73 @@ def _redact_url(url: str) -> str:
     if not parts.scheme or not parts.hostname:
         return "<url>"
     return f"{parts.scheme}://{parts.hostname}"
+
+
+def _check_magic(path: Path, magic: bytes | tuple[bytes, ...], url: str) -> None:
+    """Raise unless the file at `path` starts with one of the `magic` prefixes.
+
+    A provider that reports failure in the *body* while still returning a
+    `200` (an ERDDAP error page, a portal's HTML login redirect) would
+    otherwise be written out under a `.nc`/`.tif` name and only fail much
+    later, when something tries to open it. Checking the leading bytes turns
+    that into an immediate, readable error at the download site.
+
+    Args:
+        path: The just-written file (typically the `.part` temp).
+        magic: One byte prefix, or a tuple of acceptable prefixes.
+        url: The source URL, redacted before it reaches the message.
+
+    Raises:
+        ValueError: When the file starts with none of the prefixes — the
+            message carries the size and the first bytes actually seen — or
+            when `magic` is an empty sequence, which is a caller error.
+
+    Examples:
+        - A NetCDF-3 body passes the classic `CDF` check:
+            ```python
+            >>> from pathlib import Path
+            >>> from tempfile import TemporaryDirectory
+            >>> from earthlens.base.http import _check_magic
+            >>> with TemporaryDirectory() as tmp:
+            ...     nc = Path(tmp) / "grid.nc"
+            ...     _ = nc.write_bytes(b"CDF\\x01rest-of-the-file")
+            ...     _check_magic(nc, (b"CDF", b"\\x89HDF"), "https://host/grid.nc")
+
+            ```
+        - An HTML error page served as a `.nc` is rejected, and the message
+          names the host and shows what arrived:
+            ```python
+            >>> from pathlib import Path
+            >>> from tempfile import TemporaryDirectory
+            >>> from earthlens.base.http import _check_magic
+            >>> with TemporaryDirectory() as tmp:
+            ...     nc = Path(tmp) / "grid.nc"
+            ...     _ = nc.write_bytes(b"<html>error</html>")
+            ...     _check_magic(nc, b"CDF", "https://host/grid.nc?token=secret")
+            Traceback (most recent call last):
+                ...
+            ValueError: https://host returned a body that does not start with b'CDF' (18 bytes, starts b'<html>error</html>'). The server likely returned an error page or a redirect instead of the file.
+
+            ```
+    """
+    options = (magic,) if isinstance(magic, bytes) else tuple(magic)
+    if not options:
+        # No prefixes to check against is a caller bug, not a bad download —
+        # say which rather than dying inside `max()` on an empty sequence.
+        raise ValueError(
+            "expect_magic was an empty sequence; pass at least one byte "
+            "prefix, or None to skip the check entirely."
+        )
+    with open(path, "rb") as handle:
+        head = handle.read(max(max(len(m) for m in options), 24))
+    if any(head.startswith(m) for m in options):
+        return
+    size = path.stat().st_size
+    raise ValueError(
+        f"{redact_url(url)} returned a body that does not start with "
+        f"{magic!r} ({size} bytes, starts {head[:24]!r}). The server likely "
+        f"returned an error page or a redirect instead of the file."
+    )
 
 
 def _progress_total(headers: Any) -> int | None:
@@ -188,6 +256,70 @@ def _default_user_agent() -> str:
     from earthlens.core import __version__
 
     return f"earthlens/{__version__}"
+
+
+def new_session() -> requests.Session:
+    """Return the pooled transport :class:`HttpClient` uses by default.
+
+    A single indirection so the default transport is decided in one place
+    rather than at 21 construction sites. A `requests.Session` keeps the
+    TCP+TLS connection open across calls, which is the difference between one
+    handshake per batch and one per request — and every backend that fetches
+    many small files from one host pays that difference.
+
+    Returns:
+        requests.Session: A fresh pooled session.
+    """
+    import requests
+
+    return requests.Session()
+
+
+#: Per-thread session cache behind :func:`thread_local_session`. A plain dict
+#: on a `threading.local` so each thread gets its own sessions and never shares
+#: one, keyed by caller so two providers do not end up on the same cookie jar.
+_THREAD_SESSIONS = threading.local()
+
+
+def thread_local_session(key: str) -> requests.Session:
+    """Return this thread's pooled session for `key`, creating it on first use.
+
+    For the download helpers that are *called* per item — one tile, one file,
+    one REST page — rather than holding a client. Constructing a session inside
+    such a helper pools nothing: each call gets a new connection, which is the
+    handshake-per-request cost all over again. Caching one per thread fixes
+    that without sharing a session between threads, which `requests` does not
+    guarantee is safe. GHSL, for instance, pulls its tiles through
+    `joblib.Parallel(prefer="threads")`, so each worker reuses its own
+    connection across the tiles it handles.
+
+    Args:
+        key: Names the caller (e.g. `"ghsl"`). Sessions are cached per key so
+            unrelated providers keep separate cookie jars and headers.
+
+    Returns:
+        requests.Session: The session for this thread and key.
+    """
+    cache = getattr(_THREAD_SESSIONS, "cache", None)
+    if cache is None:
+        cache = {}
+        _THREAD_SESSIONS.cache = cache
+    session = cache.get(key)
+    if session is None:
+        session = new_session()
+        cache[key] = session
+    return session
+
+
+def reset_thread_local_sessions() -> None:
+    """Drop this thread's cached sessions.
+
+    The cache outlives any one request, so a caller that has swapped the
+    transport underneath it — the suite does, per test — needs a way to make
+    the next :func:`thread_local_session` call rebuild rather than hand back a
+    session built against the previous one.
+    """
+    _THREAD_SESSIONS.cache = {}
 
 
 class RequestsGet:
@@ -323,7 +455,7 @@ class HttpClient:
                 throttle. Defaults to :func:`time.sleep`; injectable so
                 tests run without real delays.
         """
-        self._session = session if session is not None else requests.Session()
+        self._session = session if session is not None else new_session()
         self._user_agent = user_agent or _default_user_agent()
         self.timeout = timeout
         self.max_retries = max_retries
@@ -337,6 +469,7 @@ class HttpClient:
         self._clock = clock
         self._sleep = sleep
         self._last_request: float | None = None
+        self._throttle_lock = threading.Lock()
         self._default_headers: dict[str, str] = {
             "User-Agent": self._user_agent,
             "Accept-Encoding": "gzip, deflate",
@@ -494,6 +627,7 @@ class HttpClient:
         chunk: int = DEFAULT_CHUNK_SIZE,
         progress: bool = True,
         atomic: bool = True,
+        expect_magic: bytes | tuple[bytes, ...] | None = None,
         headers: dict[str, str] | None = None,
         timeout: float | None = None,
         **kwargs: Any,
@@ -526,6 +660,11 @@ class HttpClient:
                 failure path does not additionally delete it, but that is damage
                 limitation, not a guarantee — `atomic=False` is only appropriate
                 when `dest` is known to be disposable.
+            expect_magic: One or more byte prefixes the body must start with
+                (e.g. `b"CDF"` / `b"\\x89HDF"` for NetCDF). A body that starts
+                with none of them raises `ValueError` and the partial write is
+                discarded, so an HTML error page served with a 200 status never
+                lands as a `.nc`. `None` (the default) skips the check.
             headers: Per-request headers merged over the client defaults.
             timeout: Per-request timeout override (seconds).
             **kwargs: Extra keyword arguments forwarded to `requests`.
@@ -534,6 +673,8 @@ class HttpClient:
             Path: The `dest` path the bytes were written to.
 
         Raises:
+            ValueError: When `expect_magic` is given and the body does not
+                start with any of the supplied prefixes.
             requests.HTTPError: On an error status — `download` always
                 calls `raise_for_status` (the client's `raise_for_status`
                 flag governs the verb methods, not `download`; a file
@@ -548,18 +689,24 @@ class HttpClient:
         """
         dest = Path(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
-        tmp = dest.with_name(dest.name + ".part") if atomic else dest
+        # `expect_magic` promises a rejected body is discarded, which is only
+        # possible if `dest` has not been written yet — so a magic check forces
+        # staging even when the caller passed `atomic=False`. Otherwise the
+        # validation would run on a file that had already replaced a good one.
+        staged = atomic or expect_magic is not None
+        tmp = dest.with_name(dest.name + ".part") if staged else dest
 
         def discard_partial() -> None:
             """Remove the partial write, but never a caller-owned `dest`.
 
-            With `atomic` the partial lives at a private `<dest>.part`, so
-            removing it is always safe. Without it the stream writes straight to
-            `dest`, which `_stream_to_file` has already truncated by opening it
-            `"wb"` — deleting it as well would only turn a truncated file into a
-            missing one, and would destroy a file this call never owned.
+            When the write was staged (`atomic`, or a magic check forcing it)
+            the partial lives at a private `<dest>.part`, so removing it is
+            always safe. Otherwise the stream wrote straight to `dest`, which
+            `_stream_to_file` has already truncated by opening it `"wb"` —
+            deleting it as well would only turn a truncated file into a missing
+            one, and would destroy a file this call never owned.
             """
-            if atomic:
+            if staged:
                 tmp.unlink(missing_ok=True)
 
         merged = self._merge_headers(headers)
@@ -587,7 +734,7 @@ class HttpClient:
                         )
                         wait = self._backoff_wait(retry_after, attempt)
                         logger.warning(
-                            f"HTTP {response.status_code} on {_redact_url(url)}; retry "
+                            f"HTTP {response.status_code} on {redact_url(url)}; retry "
                             f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                         )
                         self._sleep(wait)
@@ -597,6 +744,8 @@ class HttpClient:
                     self._stream_to_file(
                         response, tmp, chunk=chunk, progress=progress, desc=dest.name
                     )
+                    if expect_magic is not None:
+                        _check_magic(tmp, expect_magic, url)
                 finally:
                     response.close()
             except self.retry_on_exceptions as exc:
@@ -605,7 +754,7 @@ class HttpClient:
                     raise
                 wait = self._backoff_wait(None, attempt)
                 logger.warning(
-                    f"{type(exc).__name__} on {_redact_url(url)}; retry "
+                    f"{type(exc).__name__} on {redact_url(url)}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                 )
                 self._sleep(wait)
@@ -614,7 +763,7 @@ class HttpClient:
             except BaseException:
                 discard_partial()
                 raise
-            if atomic:
+            if staged:
                 # Guard the rename too, so the "removes the temp on any
                 # failure" promise holds if the final replace fails.
                 try:
@@ -630,14 +779,28 @@ class HttpClient:
         A no-op when `min_interval` is `0`. Uses the injected monotonic
         `clock`, records the send time, and sleeps via the injected
         `sleep` so tests drive the rate limit deterministically.
+
+        Held under a lock for the whole read-sleep-write sequence, so
+        `min_interval` bounds the *aggregate* request rate rather than the
+        rate per thread. Read-then-write without it is a race: every thread
+        sees the same `_last_request`, each concludes the interval has
+        elapsed, and they all fire together — the burst the limit exists to
+        prevent.
+
+        No backend shares one client across threads *today*: the three that
+        thread (worldpop, ghsl, hdx, all `prefer="threads"`) build a fresh
+        client inside each worker, and `_run_items` is a sequential loop. The
+        lock is cheap and makes a shared client safe whenever one appears,
+        rather than leaving a latent race for that change to trip over.
         """
         if self.min_interval <= 0:
             return
-        if self._last_request is not None:
-            remaining = self.min_interval - (self._clock() - self._last_request)
-            if remaining > 0:
-                self._sleep(remaining)
-        self._last_request = self._clock()
+        with self._throttle_lock:
+            if self._last_request is not None:
+                remaining = self.min_interval - (self._clock() - self._last_request)
+                if remaining > 0:
+                    self._sleep(remaining)
+            self._last_request = self._clock()
 
     def _backoff_wait(self, retry_after: float | None, attempt: int) -> float:
         """Compute one retry wait: `Retry-After` else exponential back-off.
@@ -708,7 +871,7 @@ class HttpClient:
                     raise
                 wait = self._backoff_wait(None, attempt)
                 logger.warning(
-                    f"{type(exc).__name__} on {_redact_url(url)}; retry "
+                    f"{type(exc).__name__} on {redact_url(url)}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                 )
                 self._sleep(wait)
@@ -721,7 +884,7 @@ class HttpClient:
                 retry_after = _parse_retry_after(response.headers.get("Retry-After"))
                 wait = self._backoff_wait(retry_after, attempt)
                 logger.warning(
-                    f"HTTP {response.status_code} on {_redact_url(url)}; retry "
+                    f"HTTP {response.status_code} on {redact_url(url)}; retry "
                     f"{attempt + 1}/{self.max_retries} after {wait:.1f}s"
                 )
                 # Release the (possibly streamed) connection before retrying;

@@ -93,13 +93,24 @@ class CatalogParseCache(dict):
         super().__setitem__(key, value)
 
 
-class _StrictSafeLoader(yaml.SafeLoader):
-    """:class:`yaml.SafeLoader` that rejects duplicate keys in any mapping.
+#: Base loader for :class:`_StrictSafeLoader`. `CSafeLoader` is PyYAML's
+#: libyaml-backed parser — same safe semantics, roughly an order of magnitude
+#: faster, and it is what makes a cold cross-catalog scan bearable (the 48
+#: bundled catalogs are ~30 s of pure-Python parsing). PyYAML only exposes it
+#: when it was built against libyaml, so fall back to the Python parser when
+#: the wheel has no C extension. Both honour `add_constructor`, so the
+#: duplicate-key rejection below applies either way.
+_BaseSafeLoader: type = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
-    Behaves like `SafeLoader` (no arbitrary object instantiation) except
-    that a mapping declaring the same key twice raises a `ValueError`
+
+class _StrictSafeLoader(_BaseSafeLoader):  # type: ignore[misc,valid-type]
+    """Safe YAML loader that rejects duplicate keys in any mapping.
+
+    Behaves like PyYAML's safe loader (no arbitrary object instantiation)
+    except that a mapping declaring the same key twice raises a `ValueError`
     pinpointing the line/column rather than silently keeping the last
-    value.
+    value. Subclasses the libyaml-backed `CSafeLoader` where available —
+    see :data:`_BaseSafeLoader`.
     """
 
 

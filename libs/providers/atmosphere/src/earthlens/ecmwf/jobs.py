@@ -15,13 +15,9 @@ from __future__ import annotations
 
 import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any
 
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
-
-if TYPE_CHECKING:
-    import requests
 
 
 def read_cdsapirc() -> dict[str, str]:
@@ -71,7 +67,6 @@ def list_recent_jobs(
     if status:
         params["status"] = status
     client = HttpClient(
-        session=cast("requests.Session | None", _RequestsGet()),
         timeout=30,
         max_retries=0,
         status_forcelist=(),
@@ -129,7 +124,6 @@ def download_job(
         return target_path
     rurl = cfg["url"].rstrip("/") + f"/retrieve/v1/jobs/{job_id}/results"
     results_client = HttpClient(
-        session=cast("requests.Session | None", _RequestsGet()),
         timeout=30,
         max_retries=0,
         status_forcelist=(),
@@ -148,7 +142,6 @@ def download_job(
     if not href.startswith(("https://", "http://")):
         raise ValueError(f"refusing to download from non-http(s) href: {href!r}")
     asset_client = HttpClient(
-        session=cast("requests.Session | None", _RequestsGet()),
         timeout=60,
         max_retries=0,
         status_forcelist=(),

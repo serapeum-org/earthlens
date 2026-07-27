@@ -61,7 +61,7 @@ if TYPE_CHECKING:
     from earthlens.gee.jobs import TaskInfo
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.catalog_source import yaml_files_for
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.providers import (
     Provider,
 )
@@ -82,24 +82,15 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # call on an unchanged tree should be ~1 ms. `_PROVIDERS_CACHE` below
 # applies the same pattern to `providers.yaml`; both are cleared
 # together by :func:`clear_catalog_cache`.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCache()
-
-
-def _yaml_files_for(path: Path) -> list[Path]:
-    """Return the sorted YAML files contributing to a load.
-
-    Binds the shared `yaml_files_for` to this catalog's provider label. Kept
-    as a module-level name because the tests import and monkey-patch it.
-    """
-    return yaml_files_for(path, provider='gee')
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
-    """Parse, validate and cache the catalog at `path`.
+    """Return the catalog at `path`, memoised on the contributing files.
 
     Returns a `(available_datasets, datasets)` tuple of the same shape
     the :class:`Catalog` model exposes. The result is cached on the
-    resolved path + every contributing file's mtime, so a fresh
+    resolved path + every contributing file's stamp, so a fresh
     `Catalog()` on an unchanged tree skips YAML parsing and pydantic
     validation.
 
@@ -114,74 +105,129 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
         directory) and `datasets:` blocks.
 
     Raises:
-        ValueError: If the YAML is missing, has no `datasets:` block,
-            declares a duplicate dataset/band key, contains an unknown
-            band field, or lists a curated dataset that is absent from
-            `available_datasets`.
+        ValueError: If `path` does not exist, the YAML has no `datasets:`
+            block, declares a duplicate dataset/band key, contains an
+            unknown band field, or lists a curated dataset that is absent
+            from `available_datasets`.
     """
-    resolved = str(path.resolve())
-    files = _yaml_files_for(path)
-    mtime_tuple: tuple[tuple[str, int], ...]
-    try:
-        mtime_tuple = tuple((str(f), f.stat().st_mtime_ns) for f in files)
-    except FileNotFoundError:
-        mtime_tuple = ((resolved, 0),)
-    key = (resolved, mtime_tuple)
-    cached = _CATALOG_CACHE.get(key)
-    if cached is not None:
-        return cached
+    return load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="gee")
 
-    merged_available: list[str] = []
-    merged_datasets_yaml: dict[str, Any] = {}
-    asset_origin: dict[str, Path] = {}
-    for file_path in files:
-        data = load_yaml_strict(file_path) or {}
-        for aid in data.get("available_datasets") or []:
-            merged_available.append(aid)
-        for asset_id, body in (data.get("datasets") or {}).items():
-            if asset_id in merged_datasets_yaml:
-                first_seen = asset_origin[asset_id]
-                raise ValueError(
-                    f"dataset {asset_id!r} declared in two catalog files: "
-                    f"{first_seen} and {file_path}"
-                )
-            merged_datasets_yaml[asset_id] = body
-            asset_origin[asset_id] = file_path
 
+def _parse_catalog(files: list[Path]) -> tuple[list[str], dict[str, Dataset]]:
+    """Merge and validate the per-category catalog shards.
+
+    Args:
+        files: The contributing YAML files, in sorted order.
+
+    Returns:
+        Tuple of `(list[str], dict[str, Dataset])` — the merged
+        `available_datasets:` and the validated `datasets:` rows.
+
+    Raises:
+        ValueError: If no file carries `datasets:` rows, a dataset or band
+            key is declared twice, a band field is unknown, or a curated
+            dataset is missing from `available_datasets`.
+    """
+    # Name the directory for a sharded catalog and the file for a single one, so
+    # the errors below point at whatever the caller handed in.
+    path = files[0].parent if len(files) > 1 else files[0]
+    merged_available, merged_datasets_yaml, asset_origin = _merge_shards(files)
     if not merged_datasets_yaml:
         raise ValueError(
             f"{path} is missing or has an empty 'datasets:' block. "
             "The catalog must contain at least one curated dataset."
         )
+    datasets = {
+        asset_id: _build_dataset(
+            asset_id,
+            body,
+            origin=asset_origin[asset_id],
+            available=set(merged_available),
+            path=path,
+        )
+        for asset_id, body in merged_datasets_yaml.items()
+    }
+    return merged_available, datasets
 
-    available = set(merged_available)
-    datasets: dict[str, Dataset] = {}
-    for asset_id, body in merged_datasets_yaml.items():
-        body = dict(body or {})
-        bands_yaml = dict(body.pop("bands", {}) or {})
-        bands: dict[str, Band] = {}
-        for band_id, band_body in bands_yaml.items():
-            try:
-                bands[band_id] = Band(id=band_id, **dict(band_body or {}))
-            except ValidationError as exc:
+
+def _merge_shards(
+    files: list[Path],
+) -> tuple[list[str], dict[str, Any], dict[str, Path]]:
+    """Union the `available_datasets:` and `datasets:` blocks across shards.
+
+    Args:
+        files: The contributing YAML files, in sorted order.
+
+    Returns:
+        Tuple of the merged available-id list, the raw dataset bodies keyed by
+            asset id, and the file each row came from (for error messages).
+
+    Raises:
+        ValueError: If the same asset id is declared in two files.
+    """
+    merged_available: list[str] = []
+    merged_datasets_yaml: dict[str, Any] = {}
+    asset_origin: dict[str, Path] = {}
+    for file_path in files:
+        data = load_yaml_strict(file_path) or {}
+        merged_available.extend(data.get("available_datasets") or [])
+        for asset_id, body in (data.get("datasets") or {}).items():
+            if asset_id in merged_datasets_yaml:
                 raise ValueError(
-                    f"invalid band {band_id!r} under dataset {asset_id!r} "
-                    f"in {asset_origin[asset_id]}: {exc}"
-                ) from exc
+                    f"dataset {asset_id!r} declared in two catalog files: "
+                    f"{asset_origin[asset_id]} and {file_path}"
+                )
+            merged_datasets_yaml[asset_id] = body
+            asset_origin[asset_id] = file_path
+    return merged_available, merged_datasets_yaml, asset_origin
+
+
+def _build_dataset(
+    asset_id: str,
+    body: Any,
+    *,
+    origin: Path,
+    available: set[str],
+    path: Path,
+) -> Dataset:
+    """Validate one merged `datasets:` row and its bands.
+
+    Args:
+        asset_id: The Earth Engine asset id (the row's key).
+        body: The raw row body from the YAML.
+        origin: The file the row came from, named in any error.
+        available: The merged `available_datasets:` ids. Empty means the check
+            is skipped (a catalog with no index).
+        path: The catalog path, named when the index is missing the row.
+
+    Returns:
+        Dataset: The validated row.
+
+    Raises:
+        ValueError: If a band or the row fails validation, or the row is absent
+            from a non-empty `available_datasets:`.
+    """
+    body = dict(body or {})
+    bands_yaml = dict(body.pop("bands", {}) or {})
+    bands: dict[str, Band] = {}
+    for band_id, band_body in bands_yaml.items():
         try:
-            datasets[asset_id] = Dataset(id=asset_id, bands=bands, **body)
+            bands[band_id] = Band(id=band_id, **dict(band_body or {}))
         except ValidationError as exc:
             raise ValueError(
-                f"invalid dataset {asset_id!r} in {asset_origin[asset_id]}: {exc}"
+                f"invalid band {band_id!r} under dataset {asset_id!r} "
+                f"in {origin}: {exc}"
             ) from exc
-        if available and asset_id not in available:
-            raise ValueError(
-                f"dataset {asset_id!r} is in 'datasets:' but missing from "
-                f"'available_datasets:' in {path}; add it there too."
-            )
-
-    _CATALOG_CACHE[key] = (merged_available, datasets)
-    return _CATALOG_CACHE[key]
+    try:
+        dataset = Dataset(id=asset_id, bands=bands, **body)
+    except ValidationError as exc:
+        raise ValueError(f"invalid dataset {asset_id!r} in {origin}: {exc}") from exc
+    if available and asset_id not in available:
+        raise ValueError(
+            f"dataset {asset_id!r} is in 'datasets:' but missing from "
+            f"'available_datasets:' in {path}; add it there too."
+        )
+    return dataset
 
 
 def clear_catalog_cache() -> None:

@@ -38,6 +38,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "osm_data_catalog.yaml"
@@ -58,13 +59,11 @@ _PYROSM_METHODS: frozenset[str] = frozenset(
     }
 )
 
-#: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
-#: repeated `Catalog()` skips the YAML parse + pydantic validation. Mirrors
-#: the GDACS / FDSN / overture loaders. The cached value is the
+#: Module-level parse cache, keyed by `load_catalog` on the resolved path
+#: plus each contributing file's `(mtime_ns, size)`, so a repeated
+#: `Catalog()` skips the YAML parse + pydantic validation.
 #: `(datasets, regions)` pair the loader assembles.
-_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Dataset], dict[str, str]]] = (
-    CatalogParseCache()
-)
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -176,6 +175,41 @@ class Dataset(BaseModel):
                 )
 
 
+def _parse_osm_catalog(files: list[Path]):
+    """Parse and validate the OSM catalog rows.
+
+    Args:
+        files: The contributing YAML files (OSM ships a single file).
+
+    Returns:
+        The validated rows, in the shape the catalog caches.
+
+    Raises:
+        ValueError: If a required block is missing or a row fails
+            validation.
+    """
+    catalog_path = files[0]
+    data = load_yaml_strict(catalog_path) or {}
+    datasets_yaml = data.get("datasets") or {}
+    if not datasets_yaml:
+        raise ValueError(
+            f"{catalog_path} is missing or has an empty 'datasets:' block. "
+            "The OSM catalog must list at least one named query."
+        )
+    datasets: dict[str, Dataset] = {}
+    for query_id, body in datasets_yaml.items():
+        try:
+            datasets[query_id] = Dataset(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{catalog_path} query {query_id!r} failed validation:\n{exc}"
+            ) from exc
+    regions: dict[str, str] = {
+        str(name): str(path) for name, path in (data.get("regions") or {}).items()
+    }
+    return (datasets, regions)
+
+
 class Catalog(AbstractCatalog):
     """Named-query catalog for the OpenStreetMap backend.
 
@@ -255,39 +289,13 @@ class Catalog(AbstractCatalog):
             A fully-populated `Catalog`.
 
         Raises:
-            ValueError: If the file has no `datasets:` block, or a row
-                fails `Dataset` validation.
+            ValueError: If `catalog_path` does not exist, or if the file has no
+                `datasets:` block, or a row fails `Dataset` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        resolved = str(catalog_path.resolve())
-        try:
-            mtime = catalog_path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        key = (resolved, mtime)
-        cached = _CATALOG_CACHE.get(key)
-        if cached is not None:
-            cached_datasets, cached_regions = cached
-            return cls(datasets=dict(cached_datasets), regions=dict(cached_regions))
-        data = load_yaml_strict(catalog_path) or {}
-        datasets_yaml = data.get("datasets") or {}
-        if not datasets_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'datasets:' block. "
-                "The OSM catalog must list at least one named query."
-            )
-        datasets: dict[str, Dataset] = {}
-        for query_id, body in datasets_yaml.items():
-            try:
-                datasets[query_id] = Dataset(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} query {query_id!r} failed validation:\n{exc}"
-                ) from exc
-        regions: dict[str, str] = {
-            str(name): str(path) for name, path in (data.get("regions") or {}).items()
-        }
-        _CATALOG_CACHE[key] = (datasets, regions)
+        datasets, regions = load_catalog(
+            catalog_path, _CATALOG_CACHE, _parse_osm_catalog, provider="OSM"
+        )
         return cls(datasets=dict(datasets), regions=dict(regions))
 
     def get_catalog(self) -> dict[str, Dataset]:

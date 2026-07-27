@@ -28,10 +28,10 @@ only fetches and inventories them.
 from __future__ import annotations
 
 import datetime as dt
+from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
-from loguru import logger
 from tqdm import tqdm
 
 from earthlens.base import (
@@ -103,6 +103,18 @@ def _volume_start(chunk_key: str) -> dt.datetime:
     stamp = chunk_key.rsplit("/", 1)[-1]  # 20260524-005505-001-S
     date_part, time_part = stamp.split("-")[:2]
     return dt.datetime.strptime(date_part + time_part, "%Y%m%d%H%M%S")
+
+
+def _describe_product(product: RemoteProduct) -> str:
+    """Render a product for the `_run_items` log lines.
+
+    Args:
+        product: The product whose assembly failed.
+
+    Returns:
+        str: The product id.
+    """
+    return str(product.id)
 
 
 class Radar(AbstractDataSource):
@@ -337,18 +349,35 @@ class Radar(AbstractDataSource):
                 assembled volume, in product order.
         """
         client = _s3_client(self._region)
-        out: list[tuple[RemoteProduct, Path]] = []
-        for product in tqdm(
-            products, disable=not getattr(self, "_show_progress", True), desc="radar"
-        ):
-            try:
-                out.append((product, self._assemble(client, product)))
-            except Exception as exc:  # noqa: BLE001 - skip the bad volume, keep going
-                logger.warning(
-                    f"radar: skipping volume {product.id} — assembly failed: "
-                    f"{type(exc).__name__}: {exc}"
+        pairs, _failures = self._run_items(
+            list(
+                tqdm(
+                    products,
+                    disable=not getattr(self, "_show_progress", True),
+                    desc="radar",
                 )
-        return out
+            ),
+            partial(self._assemble_pair, client),
+            errors=self._errors,
+            label="volume",
+            describe=_describe_product,
+        )
+        return cast("list[tuple[RemoteProduct, Path]]", pairs)
+
+    def _assemble_pair(
+        self, client: Any, product: RemoteProduct
+    ) -> tuple[RemoteProduct, Path]:
+        """Assemble one volume, keeping it paired with its product.
+
+        Args:
+            client: The unsigned S3 client shared across the batch.
+            product: The product to assemble.
+
+        Returns:
+            tuple[RemoteProduct, Path]: The product and the `.ar2v` written
+                for it.
+        """
+        return product, self._assemble(client, product)
 
     def _assemble(self, client: Any, product: RemoteProduct) -> Path:
         """Download + concatenate one volume's chunks into a `.ar2v` file."""
@@ -373,11 +402,16 @@ class Radar(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        errors: str = "warn",
     ):
         """Assemble the in-window volumes and return a `GeoDataFrame` inventory.
 
         Args:
             progress_bar: Unused (kept for interface parity).
+            errors: Partial-failure policy across the in-window volumes —
+                `"warn"` (default) logs each failed assembly and continues,
+                `"raise"` propagates the first, `"ignore"` continues
+                silently.
             aggregate: Must be `None` — raw radar volumes are not
                 pyramids-reducible. The facade already rejects a non-`None`
                 `aggregate=` for a `"vector"` backend before reaching here.
@@ -399,12 +433,14 @@ class Radar(AbstractDataSource):
 
         Raises:
             NotImplementedError: If `aggregate` is not `None`.
+            ValueError: If `errors` is not a recognised policy.
         """
         if aggregate is not None:
             raise NotImplementedError(
                 "Radar.download(aggregate=...) is not supported — raw Level-II "
                 "volumes are not griddable by the pyramids reducer."
             )
+        self._errors = self.check_errors_policy(errors)
         self._show_progress = progress_bar
         products = self._search()
         pairs = self._fetch_pairs(products)

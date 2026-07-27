@@ -33,7 +33,6 @@ import requests
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 
 #: ThinkHazard! public REST base (no auth). Hazard reports live under
 #: `/report/{division_code}.json` and `/report/{division_code}/{hazard}.json`.
@@ -112,7 +111,6 @@ def _request_json(
             (the last error is re-raised; a 4xx fails fast without retrying).
     """
     client = HttpClient(
-        session=cast("requests.Session | None", _RequestsGet()),
         user_agent=_USER_AGENT,
         timeout=timeout,
         max_retries=_HTTP_RETRIES,

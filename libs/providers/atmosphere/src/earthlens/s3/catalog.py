@@ -27,6 +27,7 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 __all__ = ["Catalog", "Dataset", "Variable", "CATALOG_PATH"]
@@ -36,9 +37,7 @@ CATALOG_PATH: Path = Path(__file__).parent / "s3_data_catalog.yaml"
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Stores the
 #: `(datasets, available_datasets)` pair. Mirrors the Overture / FDSN loaders.
-_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Dataset], list[str]]] = (
-    CatalogParseCache()
-)
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -240,6 +239,39 @@ class Dataset(BaseModel):
         return None
 
 
+def _parse_s3_catalog(files: list[Path]):
+    """Parse and validate the ERA5-S3 catalog rows.
+
+    Args:
+        files: The contributing YAML files (ERA5-S3 ships a single file).
+
+    Returns:
+        The validated rows, in the shape the catalog caches.
+
+    Raises:
+        ValueError: If a required block is missing or a row fails
+            validation.
+    """
+    catalog_path = files[0]
+    data = load_yaml_strict(catalog_path) or {}
+    datasets_yaml = data.get("datasets") or {}
+    if not datasets_yaml:
+        raise ValueError(
+            f"{catalog_path} is missing or has an empty 'datasets:' block. "
+            "The S3 registry must list at least one dataset."
+        )
+    datasets = {}
+    for name, body in datasets_yaml.items():
+        try:
+            datasets[name] = Dataset(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{catalog_path} dataset {name!r} failed validation:\n{exc}"
+            ) from exc
+    available = list(data.get("available_datasets") or [])
+    return (datasets, available)
+
+
 class Catalog(AbstractCatalog):
     """Registry of the AWS Open-Data S3 datasets the backend can fetch.
 
@@ -319,37 +351,13 @@ class Catalog(AbstractCatalog):
             A fully-populated `Catalog`.
 
         Raises:
-            ValueError: If the file has no `datasets:` block, or a row
-                fails `Dataset` validation.
+            ValueError: If `catalog_path` does not exist, or if the file has no
+                `datasets:` block, or a row fails `Dataset` validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        resolved = str(catalog_path.resolve())
-        try:
-            mtime = catalog_path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        key = (resolved, mtime)
-        cached = _CATALOG_CACHE.get(key)
-        if cached is not None:
-            datasets, available = cached
-            return cls(datasets=dict(datasets), available_datasets=list(available))
-        data = load_yaml_strict(catalog_path) or {}
-        datasets_yaml = data.get("datasets") or {}
-        if not datasets_yaml:
-            raise ValueError(
-                f"{catalog_path} is missing or has an empty 'datasets:' block. "
-                "The S3 registry must list at least one dataset."
-            )
-        datasets = {}
-        for name, body in datasets_yaml.items():
-            try:
-                datasets[name] = Dataset(**dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{catalog_path} dataset {name!r} failed validation:\n{exc}"
-                ) from exc
-        available = list(data.get("available_datasets") or [])
-        _CATALOG_CACHE[key] = (datasets, available)
+        datasets, available = load_catalog(
+            catalog_path, _CATALOG_CACHE, _parse_s3_catalog, provider="ERA5-S3"
+        )
         return cls(datasets=dict(datasets), available_datasets=list(available))
 
     def get_catalog(self) -> dict[str, Dataset]:

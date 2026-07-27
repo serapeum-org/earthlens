@@ -31,8 +31,7 @@ import requests
 from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import box
 
-from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
+from earthlens.base.http import HttpClient, thread_local_session
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent
@@ -159,7 +158,7 @@ def _stream_download(
     http = HttpClient(
         session=cast(
             "requests.Session | None",
-            session if session is not None else _RequestsGet(),
+            session if session is not None else thread_local_session("glaciers"),
         ),
         retry_on_exceptions=(requests.RequestException, OSError),
         status_forcelist=(429, 500, 502, 503, 504),
@@ -316,7 +315,7 @@ def fetch_glims(
     Raises:
         requests.HTTPError: If the WFS returns a non-2xx status.
     """
-    from earthlens.base.http import HttpClient, RequestsGet
+    from earthlens.base.http import HttpClient
 
     url, params = glims_wfs_url(wfs_url, typename, bbox, max_features)
     # Route the single WFS GET through the shared HttpClient so it gains the
@@ -325,7 +324,7 @@ def fetch_glims(
     client = HttpClient(
         session=cast(
             "requests.Session | None",
-            session if session is not None else RequestsGet(),
+            session,
         )
     )
     resp = client.get(url, params=params, timeout=timeout)

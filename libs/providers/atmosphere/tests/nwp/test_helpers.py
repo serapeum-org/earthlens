@@ -409,10 +409,14 @@ class TestGetIdx:
 
         with pytest.raises(RuntimeError, match="network down"):
             get_idx(url, failing, ttl=0.0)
-        # The cache survives unchanged; no stray .part files are left in dir.
+        # The cache survives unchanged, and the failed attempt left no
+        # temp shadowing it. Scoped to this cache key's own temps rather
+        # than "the directory is empty": the contract is that a failure
+        # never strands a partial write for *this* entry, and asserting a
+        # pristine directory also fails on anything else sharing the dir.
         assert path.read_bytes() == good_bytes
-        siblings = [p.name for p in path.parent.iterdir() if p.name != path.name]
-        assert siblings == [], f"stray files left behind: {siblings}"
+        leftovers = [p.name for p in path.parent.glob(f"{path.name}.*")]
+        assert leftovers == [], f"stray partial writes left behind: {leftovers}"
 
     def test_stat_race_refetches(self, monkeypatch):
         """A cache file whose `stat()` raises `OSError` falls through to a refetch."""

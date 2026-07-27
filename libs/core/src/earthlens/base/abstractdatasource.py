@@ -3,16 +3,20 @@ from __future__ import annotations
 import difflib
 import functools
 import inspect
-import os
+import stat
 import warnings
 from abc import ABC, abstractmethod
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Literal, cast
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+if TYPE_CHECKING:
+    from earthlens.base.http import HttpClient
 
 OutputKind = Literal["raster", "vector", "tabular", "mixed"]
 """The four output shapes an `AbstractDataSource` subclass can emit.
@@ -496,6 +500,41 @@ class LazyClientMixin:
         self.__dict__["_client_obj"] = value
 
 
+def _head_rows(chunk: Any, count: int) -> Any:
+    """Return the first `count` rows of a fragment.
+
+    The default trimmer for :meth:`AbstractDataSource._take_limited` and
+    :meth:`AbstractDataSource.iter_download`. Prefers `.iloc` when the fragment
+    has it, because slicing a pandas object is label-based for some index types
+    and would not reliably keep the first n rows; falls back to `[:n]`, which
+    covers lists and `FeatureCollection`-style sequences.
+
+    Args:
+        chunk: The fragment to trim.
+        count: How many leading rows to keep.
+
+    Returns:
+        Any: The trimmed fragment, of the same type.
+    """
+    positional = getattr(chunk, "iloc", None)
+    if positional is not None:
+        return positional[:count]
+    return chunk[:count]
+
+
+def _describe_remote_product(product: Any) -> str:
+    """Render a product for the :meth:`AbstractDataSource._run_items` log lines.
+
+    Args:
+        product: The product whose fetch failed. Only its `id` is read, so a
+            backend passing anything id-shaped works.
+
+    Returns:
+        str: The product id, quoted.
+    """
+    return repr(getattr(product, "id", product))
+
+
 class AbstractDataSource(ABC):
     """Blueprint for every concrete data-source backend.
 
@@ -555,11 +594,19 @@ class AbstractDataSource(ABC):
     SUPPORTS_POLYGON_AOI: bool = False
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
-        """Give every backend the facade's ergonomic constructor sugar.
+        """Give every backend its `download` wrapper and constructor sugar.
 
-        Wraps each concrete backend's `__init__` so that — whether reached
-        through the `EarthLens` facade or by constructing the backend
-        class directly — it also accepts:
+        Two independent pieces of wiring run for each concrete backend:
+
+        1. :meth:`_wrap_download` wraps whichever `download` the class
+           defines so :attr:`root_dir` is created when a download starts
+           rather than at construction. This runs for *every* subclass,
+           including one that declares no `__init__` of its own.
+        2. The backend's `__init__` is wrapped so that — whether reached
+           through the `EarthLens` facade or by constructing the backend
+           class directly — it also accepts the ergonomic kwargs below.
+
+        The constructor sugar adds:
 
         * `aoi` (+ `buffer`): any shape :func:`earthlens.base.spatial.normalize_aoi`
           understands, reduced to `lat_lim` / `lon_lim`; a backend that
@@ -582,6 +629,9 @@ class AbstractDataSource(ABC):
             `temporal_resolution` / `variables`) instead.
         """
         super().__init_subclass__(**kwargs)
+        # Independent of the constructor sugar below: a backend that inherits
+        # `__init__` unchanged still needs its `download` to create `root_dir`.
+        cls._wrap_download()
         orig = cls.__dict__.get("__init__")
         if orig is None or getattr(orig, "_ergonomic", False):
             return
@@ -636,6 +686,57 @@ class AbstractDataSource(ABC):
         __init__._ergonomic = True  # type: ignore[attr-defined]
         cls.__init__ = __init__  # type: ignore[method-assign]
 
+    @classmethod
+    def _wrap_download(cls) -> None:
+        """Make the backend's own `download` create `root_dir` before it runs.
+
+        `root_dir` is resolved at construction but deliberately not created
+        there (see :meth:`_ensure_root_dir`). Rather than make every backend
+        remember to call it, :meth:`__init_subclass__` calls this so the
+        directory exists the moment a real download starts.
+
+        The wrap is applied only to a `download` the class defines itself, and
+        only once: a subclass that inherits `download` unchanged already
+        inherits a wrapped one, and re-running this on an
+        already-wrapped method is a no-op. `functools.wraps` keeps the
+        backend's own name, docstring and signature introspectable, so the
+        docs build and anything reflecting over `download` still sees the real
+        method. (`EarthLens.options_for` reads `__init__`, not `download`, so
+        it is unaffected either way.)
+        """
+        original = cls.__dict__.get("download")
+        if original is None or getattr(original, "_ensures_root_dir", False):
+            return
+
+        @functools.wraps(original)
+        def download(self, *args, **kw):
+            # Record which directories are missing *before* creating them, so
+            # the failure path can unwind exactly what this call added.
+            created = []
+            probe = self.root_dir
+            while not probe.exists() and probe != probe.parent:
+                created.append(probe)
+                probe = probe.parent
+            self._ensure_root_dir()
+            try:
+                return original(self, *args, **kw)
+            except BaseException:
+                # A request the backend rejects (an unsupported `aggregate=`,
+                # a bad dataset key) must not leave an output directory
+                # behind. Unwind leaf-first, and only the directories this
+                # call created and only while each is still empty — so a
+                # pre-existing tree, and anything a partially-successful
+                # download wrote, are both untouched.
+                for directory in created:
+                    try:
+                        directory.rmdir()
+                    except OSError:
+                        break
+                raise
+
+        download._ensures_root_dir = True  # type: ignore[attr-defined]
+        cls.download = download  # type: ignore[method-assign]
+
     def __init__(
         self,
         start: str,
@@ -667,7 +768,11 @@ class AbstractDataSource(ABC):
           `dates`. Same opt-in semantics as `self.space`.
         * `self.root_dir` — the absolute :class:`pathlib.Path` of the
           output directory. `self.path` is kept as a legacy alias so
-          older backends (CHIRPS, S3) continue to work.
+          older backends (CHIRPS, S3) continue to work. The directory is
+          *resolved* here but only *created* when a download actually
+          runs (see :meth:`_ensure_root_dir`), so merely constructing a
+          backend — to read its catalog, inspect its options, or validate
+          a request — never litters the filesystem.
 
         Args:
             start: Inclusive start date as a string. Format controlled
@@ -680,8 +785,9 @@ class AbstractDataSource(ABC):
             lon_lim: `[lon_min, lon_max]`.
             fmt: `strptime` format for `start` / `end`. Defaults
                 to `"%Y-%m-%d"`.
-            path: Output directory. Created if it does not exist.
-                Defaults to the current working directory.
+            path: Output directory. Resolved here and created on the first
+                download, not at construction. Defaults to the current
+                working directory.
 
         Raises:
             ValueError: If :attr:`REQUIRES_TIME_WINDOW` is `True` and either
@@ -717,8 +823,87 @@ class AbstractDataSource(ABC):
 
         self.root_dir = Path(path).absolute()
         self.path = self.root_dir
-        if not os.path.exists(self.root_dir):
-            os.makedirs(self.root_dir)
+
+    def _is_complete(
+        self,
+        dest: Path | str,
+        expected_size: int | None = None,
+        *,
+        force: bool = False,
+    ) -> bool:
+        """Report whether `dest` already holds a usable, complete download.
+
+        The shared form of the skip-if-exists check eight backends each
+        hand-rolled as `dest.exists() and dest.stat().st_size > 0`. Routing
+        them through one helper means a re-run skips what it already has, a
+        failed multi-gigabyte fetch resumes instead of restarting from zero,
+        and — where the caller knows the size — a *truncated* file is no
+        longer mistaken for a finished one.
+
+        "Non-empty" is a weak completeness signal on its own: it is only
+        trustworthy because the shared downloader writes to a sibling
+        `<dest>.part` and renames on success, so a file present at `dest`
+        was never a partial write. Pass `expected_size` whenever the
+        provider advertises one (a `Content-Length`, a catalog field) to get
+        a real check rather than a proxy.
+
+        Args:
+            dest: The output path to test.
+            expected_size: Exact size in bytes the finished file must have.
+                `None` (the default) falls back to the non-empty check.
+            force: When `True`, always report `False` so the caller re-fetches.
+                Wire a backend's `force=` download kwarg through here.
+
+        Returns:
+            bool: `True` when `dest` can be reused as-is.
+
+        Examples:
+            - The check is a pure function of the path, so it can be exercised
+              on any backend instance. `libs/core/tests/base/test_hook_defaults.py`
+              covers the full matrix: missing, empty, written, wrong size,
+              exact size, a directory, and `force=True`.
+        """
+        if force:
+            return False
+        dest = Path(dest)
+        try:
+            info = dest.stat()
+        except OSError:
+            return False
+        # A directory reports a size too, and on Windows that size is 0 — so
+        # `expected_size=0` would accept one as a finished download.
+        if not stat.S_ISREG(info.st_mode):
+            return False
+        if expected_size is not None:
+            return info.st_size == expected_size
+        return info.st_size > 0
+
+    def _ensure_root_dir(self) -> Path:
+        """Create :attr:`root_dir` if it does not exist yet, and return it.
+
+        Called by the `download` wrapper installed in
+        :meth:`__init_subclass__`, so every backend's output directory exists
+        by the time its own `download` body runs — without construction
+        itself creating one. Constructing a backend to read its catalog,
+        inspect `options_for`, or validate a request is a read-only act and
+        must not leave an empty directory behind (it also used to create the
+        directory before the request had been validated, so a rejected
+        request still made one).
+
+        Creating an existing directory is a no-op, and any missing parent is
+        created too, so a backend pointed at a deep path needs no
+        preparation from the caller.
+
+        Returns:
+            Path: The (now existing) :attr:`root_dir`.
+
+        Note:
+            Construction resolves `root_dir` without touching the filesystem;
+            this is what creates it. `TestLazyRootDir` in
+            `libs/core/tests/base/test_hook_defaults.py` pins both halves.
+        """
+        self.root_dir.mkdir(parents=True, exist_ok=True)
+        return self.root_dir
 
     def _check_time_window(self, start: Any, end: Any) -> None:
         """Reject a missing `start` / `end` when the backend needs both.
@@ -1044,28 +1229,31 @@ class AbstractDataSource(ABC):
         backends return their written `list[Path]` and also leave the
         files on disk under `self.root_dir`).
 
-        Partial-failure policy is per backend and currently varies:
-        most multi-item backends are **skip-and-continue** — a single
-        failed `(dataset, variable)` / chunk / sensor is logged and the
-        batch proceeds, with a success/failure summary at the end
-        (CHIRPS, CMEMS, FDSN, FIRMS, …) — while single-shot backends
-        propagate the error. NWP exposes this as an explicit
-        `errors="warn" | "raise" | "ignore"` argument; new backends
-        with a per-item loop should follow that `errors=` convention so
-        the policy becomes uniformly caller-controllable.
+        Partial-failure policy across a multi-item batch defaults to
+        **skip-and-continue** — a failed `(dataset, variable)` / chunk /
+        sensor is logged and the batch proceeds, with a summary at the end
+        — while single-shot backends propagate the error.
+
+        The backends whose batch is a genuine loop over independent items
+        (`chc`, `cmems`, `ecmwf`, `fdsn`, `nwp`, `radar`, `soilgrids`) make
+        that policy caller-controllable with an explicit
+        `errors="warn" | "raise" | "ignore"` argument, routed through
+        :meth:`check_errors_policy` and :meth:`_run_items`. A backend whose
+        `download` does not take `errors=` has nothing to apply it to — it
+        issues one request, or its loop needs per-failure recovery the
+        shared helper cannot express (chc re-opens its FTP session between
+        failed dates). So **check the backend's own `download` signature**
+        rather than assuming; :meth:`_search_fetch_each` also takes
+        `errors=` for backends composed from it.
         """
         # loop over dates if the downloaded rasters/netcdf are for a specific date out of the required
         # list of dates
         pass
 
-    def _download_dataset(self):
-        """Download a single variable/dataset (called by :meth:`download`)."""
-        pass
-
     def _api(self, *args: Any, **kwargs: Any) -> Any:
         """Send / receive the request(s) this download needs.
 
-        Called by :meth:`download` (or :meth:`_download_dataset`). The default
+        Called by :meth:`download`. The default
         is the search→fetch composition, :meth:`_api_via_search_fetch`, which
         is what a backend built on the :meth:`_search` / :meth:`_fetch` split
         wants — the great majority. Override it only for a backend that talks
@@ -1220,6 +1408,194 @@ class AbstractDataSource(ABC):
     #: :meth:`download`.
     ERROR_POLICIES: frozenset[str] = frozenset({"raise", "warn", "ignore", "skip"})
 
+    #: The policy :meth:`_run_items` applies when a backend's own `download`
+    #: was not given one. Declared here rather than per backend so a loop can
+    #: read `self._errors` unconditionally; a `download(errors=...)` overrides
+    #: it by assigning the :meth:`check_errors_policy` result.
+    _errors: str = "warn"
+
+    #: Slot for a backend's lazily-built `HttpClient`. Declared here so the
+    #: backends that hold one (rather than rebuilding it per item, which would
+    #: discard the pooled connection) can check `if self._http is None` without
+    #: each re-declaring the attribute. `None` until first use.
+    _http: HttpClient | None = None
+
+    @staticmethod
+    def check_limit(limit: int | None) -> int | None:
+        """Validate a total-row cap.
+
+        Args:
+            limit: The maximum number of rows / features the caller wants in
+                total, or `None` for no cap.
+
+        Returns:
+            int | None: `limit` unchanged, once known to be usable.
+
+        Raises:
+            TypeError: If `limit` is neither `None` nor an `int` (a `bool` is
+                rejected too — `limit=True` is a mistake, not a cap of 1).
+            ValueError: If `limit` is zero or negative. A request for no rows
+                is a caller bug, not a cheap no-op to serve.
+
+        Examples:
+            - A positive cap and `None` both pass through:
+                ```python
+                >>> from earthlens.base import AbstractDataSource
+                >>> AbstractDataSource.check_limit(500)
+                500
+                >>> AbstractDataSource.check_limit(None) is None
+                True
+
+                ```
+            - Zero is refused rather than silently returning nothing:
+                ```python
+                >>> from earthlens.base import AbstractDataSource
+                >>> try:
+                ...     AbstractDataSource.check_limit(0)
+                ... except ValueError as exc:
+                ...     print("rejected")
+                rejected
+
+                ```
+        """
+        if limit is None:
+            return None
+        if isinstance(limit, bool) or not isinstance(limit, int):
+            raise TypeError(
+                f"limit must be an int or None, got {type(limit).__name__}: {limit!r}."
+            )
+        if limit < 1:
+            raise ValueError(
+                f"limit must be at least 1, got {limit}. Pass None for no cap."
+            )
+        return limit
+
+    def _take_limited(
+        self,
+        chunks: Iterable[Any],
+        *,
+        limit: int | None,
+        size: Callable[[Any], int] | None = None,
+        head: Callable[[Any, int], Any] | None = None,
+    ) -> list[Any]:
+        """Consume `chunks` until `limit` rows have been collected.
+
+        The bounded counterpart to "append every fragment, concatenate at the
+        end". `chunks` is consumed lazily, so a backend whose per-item fetch is
+        a generator stops issuing requests once the cap is met instead of
+        pulling the whole result set and truncating afterwards — which is what
+        makes this a cap on *memory*, not just on the returned value.
+
+        The last fragment is trimmed so the total is exactly `limit`, which is
+        why a page-size argument is not a substitute: pages land in
+        page-size multiples, this does not.
+
+        Args:
+            chunks: The per-item fragments — `DataFrame`s,
+                `FeatureCollection`s, lists of paths. Consumed lazily.
+            limit: Total rows to keep, or `None` to collect everything.
+            size: Row count of one fragment. Defaults to `len`.
+            head: `(fragment, n) -> fragment` keeping the first `n` rows.
+                Defaults to slicing (`fragment[:n]`), which covers lists and
+                anything else sliceable; pass one for a type that is not.
+
+        Returns:
+            list[Any]: The collected fragments, the last one trimmed when it
+                straddled the cap.
+
+        Examples:
+            - The cap is exact even when it falls inside a fragment, and the
+              fragments past it are never consumed:
+                ```python
+                >>> from earthlens.base import AbstractDataSource
+                >>> pulled = []
+                >>> def pages():
+                ...     for page in ([1, 2, 3], [4, 5, 6], [7, 8, 9]):
+                ...         pulled.append(page[0])
+                ...         yield page
+                >>> class Demo(AbstractDataSource):
+                ...     def _initialize(self): pass
+                ...     def _create_grid(self): pass
+                ...     def _check_input_dates(self): pass
+                ...     def download(self): pass
+                >>> Demo._take_limited(Demo, pages(), limit=4)
+                [[1, 2, 3], [4]]
+                >>> pulled
+                [1, 4]
+
+                ```
+        """
+        if limit is None:
+            return list(chunks)
+        measure = size or len
+        take = head or _head_rows
+        collected: list[Any] = []
+        remaining = limit
+        for chunk in chunks:
+            length = measure(chunk)
+            # `>=`, not `>`: a chunk that exactly fills the cap must also end the
+            # loop here. Deciding on the *next* iteration would pull one more
+            # fragment first — the very work the cap exists to avoid.
+            if length >= remaining:
+                collected.append(
+                    take(chunk, remaining) if length > remaining else chunk
+                )
+                return collected
+            collected.append(chunk)
+            remaining -= length
+        return collected
+
+    def iter_download(self, *, limit: int | None = None) -> Iterator[Any]:
+        """Yield the download's artifacts one item at a time.
+
+        The streaming counterpart to :meth:`download`, for callers who want to
+        consume a large vector / tabular result without the whole thing being
+        resident: each `_search` product's fragment is yielded as it arrives
+        and can be dropped before the next is fetched. `download()` remains the
+        batch form and is unaffected.
+
+        The default implementation composes the `_search` / :meth:`_fetch_one`
+        split, so any backend with that split gets it for free. A backend whose
+        fetch is inherently whole-batch (one server-side request for
+        everything) does not override this and raises below, rather than
+        pretending to stream.
+
+        Args:
+            limit: Total rows / features to yield across every product, or
+                `None` for no cap. The fragment that straddles the cap is
+                trimmed so the total is exact, and the products past it are
+                never fetched.
+
+        Yields:
+            Any: One fragment per product — the same element type
+                :meth:`_fetch` returns for this backend's
+                :attr:`OUTPUT_KIND`.
+
+        Raises:
+            NotImplementedError: When the backend implements neither the
+                `_search` / `_fetch_one` split nor its own `iter_download`.
+            TypeError: If `limit` is neither `None` nor an `int`.
+            ValueError: If `limit` is less than 1.
+        """
+        if type(self)._fetch_one is AbstractDataSource._fetch_one:
+            raise NotImplementedError(
+                f"{type(self).__name__} cannot stream: it has no per-product "
+                "_fetch_one, so there is nothing to yield incrementally. Use "
+                "download() instead."
+            )
+        remaining = self.check_limit(limit)
+        for product in self._search():
+            fragment = self._fetch_one(product)
+            if remaining is None:
+                yield fragment
+                continue
+            length = len(fragment)
+            if length >= remaining:
+                yield _head_rows(fragment, remaining)
+                return
+            yield fragment
+            remaining -= length
+
     @staticmethod
     def check_errors_policy(errors: str) -> str:
         """Validate an `errors=` argument, normalising the `"skip"` alias.
@@ -1349,6 +1725,8 @@ class AbstractDataSource(ABC):
         progress_bar: bool = False,
         desc: str | None = None,
         unit: str = "item",
+        errors: str | None = None,
+        label: str = "product",
     ) -> list[Any]:
         """C3 composition with an optional per-product `tqdm` progress bar.
 
@@ -1364,11 +1742,22 @@ class AbstractDataSource(ABC):
             progress_bar: Show the per-product `tqdm` bar when `True`.
             desc: `tqdm` description; defaults to the class name.
             unit: `tqdm` unit label.
+            errors: The partial-failure policy to apply across the
+                products, normally `self._errors` from a backend whose
+                `download` accepts `errors=`. `None` — the default —
+                propagates the first failure, which is what a caller that
+                never opted into a policy already expects.
+            label: Noun for the :meth:`_run_items` log lines when a policy
+                is in force.
 
         Returns:
             list[Any]: One :meth:`_fetch_one` result per product
                 (element type tracks :attr:`OUTPUT_KIND`), or `[]` when
-                `_search` matched nothing.
+                `_search` matched nothing. With a policy in force, failed
+                products are absent rather than aborting the batch.
+
+        Raises:
+            ValueError: If `errors` is not a recognised policy.
         """
         products = self._search()
         if not products:
@@ -1381,7 +1770,16 @@ class AbstractDataSource(ABC):
             desc=desc or type(self).__name__,
             unit=unit,
         )
-        return [self._fetch_one(product) for product in iterator]
+        if errors is None:
+            return [self._fetch_one(product) for product in iterator]
+        results, _failures = self._run_items(
+            list(iterator),
+            self._fetch_one,
+            errors=errors,
+            label=label,
+            describe=_describe_remote_product,
+        )
+        return results
 
 
 class AbstractCatalog(BaseModel):
@@ -1392,7 +1790,7 @@ class AbstractCatalog(BaseModel):
     expose individual entries via :meth:`get_variable`. The
     :func:`model_post_init` hook eagerly populates :attr:`catalog`
     after pydantic validation runs, so subclasses can treat the
-    catalog as a dict thereafter without writing their own
+    catalog as a mapping thereafter without writing their own
     `__init__`.
 
     Subclasses pass through pydantic's normal `BaseModel.__init__`
@@ -1404,7 +1802,7 @@ class AbstractCatalog(BaseModel):
     an empty mapping.
 
     Attributes:
-        catalog: The full catalog mapping returned by
+        catalog: Read-only view of the mapping returned by
             :meth:`get_catalog`. Populated post-init; defaults to an
             empty dict so the field is always present. Type and
             shape are backend-specific (a concrete subclass typically
@@ -1426,20 +1824,50 @@ class AbstractCatalog(BaseModel):
     #: it (e.g. `"parameters"` for the openaq / usgs_water catalogs).
     _entry_noun: str = "datasets"
 
-    catalog: dict[str, Any] = Field(default_factory=dict)
     available_datasets: list[str] = Field(default_factory=list)
     datasets: dict[str, Any] = Field(default_factory=dict)
     providers: dict[str, Any] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Populate :attr:`catalog` after pydantic validation runs.
+    @property
+    def catalog(self) -> Mapping[str, Any]:
+        """Read-only view of the catalog mapping (see :meth:`get_catalog`).
 
-        Pydantic calls this hook automatically; subclasses that need
-        their own post-init wiring should override it and call
-        `super().model_post_init(__context)` first to keep the
-        catalog-loading behaviour.
+        For nearly every backend `get_catalog()` returns :attr:`datasets`
+        itself, so `catalog` used to be a second name bound to the very same
+        `dict` — assigning through one silently rewrote the other, and a
+        caller who mutated `cat.catalog` corrupted the shared parse cache
+        the loader hands out. Exposing a `MappingProxyType` keeps every read
+        working (`cat.catalog["key"]`, `in`, `len`, iteration) while making
+        that accidental write fail loudly.
+
+        Returns:
+            Mapping[str, Any]: A read-only view over `get_catalog()`.
+
+        Examples:
+            - Reads behave like the mapping; writes are refused rather than
+              silently rewriting `datasets`:
+                ```python
+                >>> from types import MappingProxyType
+                >>> view = MappingProxyType({"EQ": "Earthquake"})
+                >>> view["EQ"]
+                'Earthquake'
+                >>> view["EQ"] = None
+                Traceback (most recent call last):
+                    ...
+                TypeError: 'mappingproxy' object does not support item assignment
+
+                ```
         """
-        self.catalog = self.get_catalog()
+        return MappingProxyType(self.get_catalog())
+
+    def model_post_init(self, __context: Any) -> None:
+        """Hook run after pydantic validation.
+
+        Kept as an overridable no-op so subclasses can call
+        `super().model_post_init(__context)` first and keep their own
+        post-init wiring in one place. :attr:`catalog` is a property now, so
+        nothing has to be populated here.
+        """
 
     def get_catalog(self) -> Any:
         """Read the catalog of the datasource from disk or retrieve it from server.

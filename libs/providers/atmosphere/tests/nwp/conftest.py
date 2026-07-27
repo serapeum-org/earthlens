@@ -67,6 +67,14 @@ class _FakeResponse:
         """No-op success (the fake never returns an error status)."""
         self.raised = True
 
+    def iter_content(self, chunk_size=None):
+        """Yield the canned body in one chunk, as a streamed response would."""
+        yield self.content
+
+    def close(self):
+        """Release the response, as the streaming call sites do."""
+        self.closed = True
+
 
 class _FakeDataset:
     """Stand-in for a `pyramids` `Dataset` recording crop / longitude calls."""
@@ -129,7 +137,7 @@ def fake_requests(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         # `{var_lc}` path segment and once in the filename. Recover it from
         # the path segment (robust to var tokens that contain underscores).
         var = Path(url).parent.name.upper()
-        return _FakeResponse(bz2.compress(b"<" + var.encode() + b">"))
+        return _FakeResponse(bz2.compress(b"GRIB<" + var.encode() + b">"))
 
     module = types.ModuleType("requests")
     module.get = fake_get

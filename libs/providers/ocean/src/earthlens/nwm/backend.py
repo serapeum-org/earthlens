@@ -270,6 +270,7 @@ class NWM(AbstractDataSource):
         self._horizon_arg = horizon
         self._sites = sites
         self._region = region
+        self._s3_client: Any = None
         self._show_progress = True
 
         self._products: list[NWMProduct] = []
@@ -513,12 +514,11 @@ class NWM(AbstractDataSource):
             return self._fetch_retrospective(products)
         if self._wants_subset():
             return self._fetch_operational_subset(products)
-        client = self._client()
         out: list[Path] = []
         for product in tqdm(
             products, disable=not self._show_progress, desc="nwm", unit="file"
         ):
-            fetched = self._fetch_one(client, product)
+            fetched = self._fetch_one(product)
             if fetched is not None:
                 out.append(fetched)
         return out
@@ -733,13 +733,12 @@ class NWM(AbstractDataSource):
             list[Path]: The written output paths (Parquet for tabular,
                 GeoTIFF for raster), in order.
         """
-        client = self._client()
         reader = self._reader() if self.OUTPUT_KIND == "tabular" else None
         out: list[Path] = []
         for rp in tqdm(
             products, disable=not self._show_progress, desc="nwm", unit="file"
         ):
-            downloaded = self._fetch_one(client, rp)
+            downloaded = self._fetch_one(rp)
             if downloaded is None:
                 continue
             product = self._catalog.get_product(rp.metadata["product"])
@@ -760,7 +759,11 @@ class NWM(AbstractDataSource):
         return out
 
     def _client(self) -> Any:
-        """Build an unsigned `boto3` S3 client for the public NWM bucket.
+        """Return the unsigned `boto3` S3 client for the public NWM bucket.
+
+        Built once and cached on the instance: `_fetch_one` asks for it per
+        product, and constructing a fresh `boto3` client each time would
+        re-resolve endpoints and discard the connection pool.
 
         Returns:
             An anonymous `boto3` S3 client.
@@ -769,6 +772,8 @@ class NWM(AbstractDataSource):
             ImportError: When `boto3` is not installed (names
                 `earthlens[nwm]`).
         """
+        if self._s3_client is not None:
+            return self._s3_client
         try:
             import boto3
             from botocore import UNSIGNED
@@ -778,13 +783,12 @@ class NWM(AbstractDataSource):
                 "the National Water Model backend needs `boto3`; install "
                 "`pip install earthlens[nwm]`."
             ) from exc
-        return boto3.client(
+        self._s3_client = boto3.client(
             "s3", region_name=self._region, config=Config(signature_version=UNSIGNED)
         )
+        return self._s3_client
 
-    def _fetch_one(  # type: ignore[override]
-        self, client: Any, product: RemoteProduct
-    ) -> Path | None:
+    def _fetch_one(self, product: RemoteProduct) -> Path | None:
         """Download one product's NetCDF file (atomic `.part` rename).
 
         The output name flattens the **full** S3 key (date prefix +
@@ -796,13 +800,13 @@ class NWM(AbstractDataSource):
         (a `land` file can be ~220 MB).
 
         Args:
-            client: The unsigned boto3 client.
             product: One :class:`RemoteProduct` from :meth:`_search`.
 
         Returns:
             Path | None: The written path, or `None` when the key was not
                 published (logged and skipped).
         """
+        client = self._client()
         key = product.href
         assert key is not None  # NWM products always carry an S3 key href
         target = self.root_dir / safe_filename(key)

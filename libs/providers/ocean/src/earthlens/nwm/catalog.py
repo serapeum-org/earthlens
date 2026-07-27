@@ -28,11 +28,12 @@ from typing import Any, Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog, OutputKind
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "nwm_data_catalog.yaml"
 
-_CATALOG_CACHE: dict[tuple[str, int], Catalog] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -183,6 +184,53 @@ class NWMConfig(BaseModel):
     products: list[str] = Field(default_factory=list)
 
 
+def _parse_catalog(files: list[Path]) -> dict[str, Any]:
+    """Parse the NWM catalog YAML into a populated :class:`Catalog`.
+
+    Args:
+        files: The contributing YAML files (NWM ships a single file).
+
+    Returns:
+        dict[str, Any]: The validated construction kwargs. The payload is
+            cached, not a built Catalog, so `load()` makes a fresh instance per
+            call and one caller doing `datasets.pop(...)` cannot reach another's
+            mapping. The row objects inside it *are* shared and are frozen
+            pydantic models: treat them as read-only. A frozen model still
+            permits in-place mutation of a mutable field (`row.columns[...] =`),
+            which would reach every holder — deep-copying every row per load
+            would cost more than that edge is worth.
+
+    Raises:
+        ValueError: If a required block is missing or a row fails
+            validation.
+    """
+    path = files[0]
+    data = load_yaml_strict(path) or {}
+    products_yaml = data.get("products") or {}
+    if not products_yaml:
+        raise ValueError(
+            f"{path} is missing or has an empty 'products:' block. "
+            "The NWM catalog must list at least one product."
+        )
+    products: dict[str, NWMProduct] = {}
+    for key, body in products_yaml.items():
+        try:
+            products[key] = NWMProduct(product=key, **dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} product {key!r} failed validation:\n{exc}"
+            ) from exc
+    configurations: dict[str, NWMConfig] = {}
+    for key, body in (data.get("configurations") or {}).items():
+        try:
+            configurations[key] = NWMConfig(key=key, **dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} configuration {key!r} failed validation:\n{exc}"
+            ) from exc
+    return {"datasets": products, "configurations": configurations}
+
+
 class Catalog(AbstractCatalog):
     """Product + configuration catalog for the NWM backend.
 
@@ -268,45 +316,13 @@ class Catalog(AbstractCatalog):
             A fully-populated :class:`Catalog`.
 
         Raises:
-            ValueError: If the file has no `products:` block, or any
-                product / configuration row fails validation.
+            ValueError: If `catalog_path` does not exist, or if the file has no
+                `products:` block, or any product / configuration row fails
+                validation.
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
-        try:
-            mtime = path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        cache_key = (str(path.resolve()), mtime)
-        cached = _CATALOG_CACHE.get(cache_key)
-        if cached is not None:
-            return cached
-
-        data = load_yaml_strict(path) or {}
-        products_yaml = data.get("products") or {}
-        if not products_yaml:
-            raise ValueError(
-                f"{path} is missing or has an empty 'products:' block. "
-                "The NWM catalog must list at least one product."
-            )
-        products: dict[str, NWMProduct] = {}
-        for key, body in products_yaml.items():
-            try:
-                products[key] = NWMProduct(product=key, **dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{path} product {key!r} failed validation:\n{exc}"
-                ) from exc
-        configurations: dict[str, NWMConfig] = {}
-        for key, body in (data.get("configurations") or {}).items():
-            try:
-                configurations[key] = NWMConfig(key=key, **dict(body or {}))
-            except ValidationError as exc:
-                raise ValueError(
-                    f"{path} configuration {key!r} failed validation:\n{exc}"
-                ) from exc
-        catalog = cls(datasets=products, configurations=configurations)
-        _CATALOG_CACHE[cache_key] = catalog
-        return catalog
+        payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="NWM")
+        return cls(**payload)
 
     def get_catalog(self) -> dict[str, NWMProduct]:
         """Return the product map (satisfies the abstract contract).

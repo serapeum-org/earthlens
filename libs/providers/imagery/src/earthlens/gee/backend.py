@@ -48,7 +48,7 @@ import datetime as dt
 import os
 from collections.abc import Iterable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal
 
 import ee
 import pandas as pd
@@ -62,6 +62,7 @@ from earthlens.base import (
     LazyClientMixin,
     OutputKind,
     TemporalExtent,
+    close_quietly,
     date_windows,
     to_datetime,
 )
@@ -79,6 +80,8 @@ from earthlens.gee.jobs import TaskInfo, _op_to_taskinfo
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from geopandas import GeoDataFrame
+
+    from earthlens.base.http import HttpClient
 
 __all__ = ["GEE", "AuthenticationError"]
 
@@ -652,7 +655,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             outputs.extend(self._download_dataset(asset_id, list(bands), progress_bar))
         return outputs
 
-    def _download_dataset(  # type: ignore[override]  # base is a loose template
+    def _download_dataset(
         self, asset_id: str, bands: list[str], progress_bar: bool = True
     ) -> list[Path | str | TaskInfo]:
         """Download one dataset's requested bands across the time buckets.
@@ -853,6 +856,23 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         return self._download_one_url_tile(image, region, scale, prefix)
 
+    def _client(self) -> HttpClient:
+        """Return this instance's HTTP client, built once.
+
+        A tiled export issues one download per tile against the same host, so
+        the client (and its pooled connection) is held on the instance rather
+        than rebuilt per tile. The import stays local, as elsewhere in this
+        module, so importing the backend does not pull the HTTP stack.
+
+        Returns:
+            HttpClient: The shared client.
+        """
+        from earthlens.base.http import HttpClient
+
+        if self._http is None:
+            self._http = HttpClient(timeout=self.http_timeout)
+        return self._http
+
     def _download_one_url_tile(self, image, region, scale: float, prefix: str) -> Path:
         """Issue one `getDownloadURL` request → tif at `<prefix>.tif`.
 
@@ -861,10 +881,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
         expected to have already verified that the request fits the
         Earth Engine synchronous limit.
         """
-        import requests
-
-        from earthlens.base.http import HttpClient, RequestsGet
-
         url = image.getDownloadURL(
             {"scale": scale, "crs": self.crs, "region": region, "format": "GEO_TIFF"}
         )
@@ -872,28 +888,37 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # Route the (single-shot, expiring) getDownloadURL fetch through the
         # shared HttpClient so a transient 429/5xx is retried with back-off
         # instead of failing the tile outright.
-        client = HttpClient(
-            session=cast("requests.Session | None", RequestsGet()),
-            timeout=self.http_timeout,
-        )
-        response = client.get(url)
-        body = response.content
-        if body[:4] == _ZIP_MAGIC:
-            zip_path = self.root_dir / f"{prefix}.zip"
-            zip_path.write_bytes(body)
-            try:
+        client = self._client()
+        # Stream to a temp rather than buffering `response.content`: a tile is
+        # capped at 32768 px/axis, so a single band can run to hundreds of
+        # megabytes and the old path held it whole just to inspect four bytes.
+        # GEE returns either a bare GeoTIFF or a zip of them, so the format is
+        # decided from the leading bytes on disk.
+        staged = self.root_dir / f"{prefix}.download"
+        try:
+            client.download(url, staged, progress=False)
+            with open(staged, "rb") as handle:
+                is_zip = handle.read(4) == _ZIP_MAGIC
+            size = staged.stat().st_size
+            if is_zip:
                 PyramidsDataset.from_archive(
-                    zip_path,
+                    staged,
                     kind="zip",
                     member_glob="*.tif",
                     path=str(target),
                 )
-            finally:
-                zip_path.unlink(missing_ok=True)
-        else:
-            ds = PyramidsDataset.from_bytes(body, suffix=".tif")
-            ds.to_file(str(target))
-        logger.info(f"Wrote {target} ({len(body)} bytes)")
+            else:
+                # Release the reader before the `finally` unlink: pyramids keeps
+                # the GDAL handle open, which holds a Windows lock on `staged`
+                # (the same reason ghsl closes before its rename).
+                reader = PyramidsDataset.read_file(str(staged))
+                try:
+                    reader.to_file(str(target))
+                finally:
+                    close_quietly(reader)
+        finally:
+            staged.unlink(missing_ok=True)
+        logger.info(f"Wrote {target} ({size} bytes)")
         return target
 
     def _auto_split_and_download(

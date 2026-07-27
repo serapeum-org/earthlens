@@ -164,7 +164,12 @@ def test_parse_cache_returns_same_object(tmp_path):
     clear_catalog_cache()
     first = Catalog.load(path)
     second = Catalog.load(path)
-    assert first is second
+    assert first is not second, "callers must not share one Catalog"
+    assert first.datasets == second.datasets, "the parse should be reused"
+    first.datasets.pop("chrtout")
+    assert "chrtout" in Catalog.load(path).datasets, (
+        "one caller's mutation leaked into the shared parse cache"
+    )
 
 
 def test_injected_catalog_skips_disk(tmp_path):
@@ -217,8 +222,8 @@ def test_unknown_config_without_close_match(catalog):
         catalog.get_config("zzzzzz")
 
 
-def test_load_missing_file_uses_zero_mtime(tmp_path):
-    """Loading a non-existent path takes the mtime=0 branch then fails to open."""
+def test_load_missing_file_raises_naming_the_path(tmp_path):
+    """Loading a non-existent path raises the shared loader's error."""
     clear_catalog_cache()
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(ValueError, match="does not exist"):
         Catalog.load(tmp_path / "does-not-exist.yaml")

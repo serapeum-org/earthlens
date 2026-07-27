@@ -36,6 +36,10 @@ class _FakeResponse:
     def close(self) -> None:
         """No-op — the fake holds no socket."""
 
+    def iter_content(self, chunk_size=None):
+        """Yield the canned body in one chunk, as a streamed response would."""
+        yield self.content
+
 
 class _FakeBand:
     """Stand-in for a pyramids single-variable NetCDF, writing a stub GeoTIFF."""
@@ -308,3 +312,78 @@ def test_unparseable_resolution_skips_size_log(
         path=tmp_path,
     ).download()
     assert result[0].name == "custom.tif"
+
+
+class _NoBufferResponse:
+    """Streams its body, and fails loudly if anything reads `.content`."""
+
+    def __init__(self, body: bytes = _NETCDF_BODY):
+        self._body = body
+        self.status_code = 200
+        self.headers: dict[str, str] = {}
+        self.closed = False
+
+    @property
+    def content(self) -> bytes:
+        raise AssertionError("the body must be streamed, not buffered via .content")
+
+    def raise_for_status(self) -> None:
+        """A 200 needs no action."""
+
+    def iter_content(self, chunk_size=None):
+        """Yield the body in small blocks, as a streamed response does."""
+        for start in range(0, len(self._body), 8):
+            yield self._body[start : start + 8]
+
+    def close(self) -> None:
+        """Record release of the response."""
+        self.closed = True
+
+
+class TestBathymetryStreams:
+    """The DEM subset reaches disk without being buffered in memory."""
+
+    def test_download_never_touches_response_content(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_pyramids
+    ):
+        """A regression to `response.content` fails this test."""
+        responses: list[_NoBufferResponse] = []
+
+        def _fake_get(url: str, timeout: float = 0.0, **kwargs):
+            response = _NoBufferResponse()
+            responses.append(response)
+            return response
+
+        monkeypatch.setattr(backend_module.requests, "get", _fake_get)
+        result = _make("gebco_2020", tmp_path).download()
+        assert result, "download should return the written GeoTIFF"
+        assert responses[0].closed, "the streamed response must be released"
+
+    def test_download_requests_a_streaming_get(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_pyramids
+    ):
+        """The GET is issued with stream=True so blocks arrive incrementally."""
+        seen: list[dict] = []
+
+        def _fake_get(url: str, timeout: float = 0.0, **kwargs):
+            seen.append(kwargs)
+            return _NoBufferResponse()
+
+        monkeypatch.setattr(backend_module.requests, "get", _fake_get)
+        _make("gebco_2020", tmp_path).download()
+        assert seen[0].get("stream") is True, f"got {seen[0]}"
+
+    def test_non_netcdf_body_is_rejected_and_not_written(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """An HTML error page served with a 200 raises and leaves no .nc."""
+
+        def _fake_get(url: str, timeout: float = 0.0, **kwargs):
+            return _NoBufferResponse(b"<html>server busy</html>")
+
+        monkeypatch.setattr(backend_module.requests, "get", _fake_get)
+        backend = _make("gebco_2020", tmp_path)
+        with pytest.raises(ValueError, match="non-NetCDF body"):
+            backend.download()
+        assert list(tmp_path.glob("*.nc")) == [], "an error page must not be written"
+        assert list(tmp_path.glob("*.part")) == [], "no temp may be left behind"

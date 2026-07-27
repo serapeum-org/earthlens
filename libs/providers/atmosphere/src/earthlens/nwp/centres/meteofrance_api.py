@@ -31,16 +31,14 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
-from earthlens.base import AuthenticationError
+from earthlens.base import AuthenticationError, redact_url
 from earthlens.nwp._helpers import grib_name, valid_time
 from earthlens.nwp.centres.base import _NWPCentre
 
 if TYPE_CHECKING:
     import datetime as dt
-
-    import requests
 
     from earthlens.nwp.catalog import NWPModel
 
@@ -49,6 +47,14 @@ _API_KEY_ENV = ("METEO_FRANCE_API_KEY", "MF_API_KEY")
 
 #: HTTP timeout (seconds) for one WCS GetCoverage request.
 _HTTP_TIMEOUT = 300
+
+#: Streaming block size (bytes) for writing a coverage to disk.
+_CHUNK_SIZE = 1 << 20
+
+#: Leading bytes of a GRIB edition-1/2 message. A WSO2 gateway answers an
+#: expired key or an unpublished run with an XML/JSON fault at `200`, which
+#: would otherwise be appended into the `.grib2` as if it were data.
+_GRIB_MAGIC = b"GRIB"
 
 
 def resolve_api_key() -> str:
@@ -88,6 +94,12 @@ class MeteoFranceAPICentre(_NWPCentre):
     ) -> Path:
         """Fetch each variable via WCS GetCoverage into one `.grib2`.
 
+        Each coverage is streamed to disk block by block rather than
+        buffered whole, so a full-globe ARPEGE band does not have to fit in
+        memory alongside the file being written. The per-variable bodies are
+        appended to a single `.part` that is renamed only once every
+        requested band has arrived.
+
         `member` and `whole` are accepted for interface parity but
         ignored (the Météo-France rows here are deterministic;
         PEARP/PEAROME are a follow-on — and each WCS `GetCoverage`
@@ -122,9 +134,9 @@ class MeteoFranceAPICentre(_NWPCentre):
                 f"model with backend {model.backend!r} needs request_options "
                 "with 'api_base' and 'coverage_service' for the WCS API centre."
             )
-        from earthlens.base.http import HttpClient, RequestsGet
+        from earthlens.base.http import HttpClient
 
-        client = HttpClient(session=cast("requests.Session | None", RequestsGet()))
+        client = HttpClient()
         headers = {"apikey": resolve_api_key()}
         url = f"{api_base}/wcs/{coverage_service}/GetCoverage"
         valid = valid_time(cycle, step)
@@ -133,11 +145,39 @@ class MeteoFranceAPICentre(_NWPCentre):
         try:
             with open(tmp, "wb") as handle:
                 for param in params:
+                    band_offset = handle.tell()
                     params_qs = self._coverage_query(model.bands[param], cycle, valid)
                     response = client.get(
-                        url, params=params_qs, headers=headers, timeout=_HTTP_TIMEOUT
+                        url,
+                        params=params_qs,
+                        headers=headers,
+                        timeout=_HTTP_TIMEOUT,
+                        stream=True,
                     )
-                    handle.write(response.content)
+                    # Copy block by block: a full-globe ARPEGE coverage is
+                    # large enough that buffering `response.content` before
+                    # writing it doubles the peak footprint per band.
+                    try:
+                        for block in response.iter_content(chunk_size=_CHUNK_SIZE):
+                            if block:
+                                handle.write(block)
+                    finally:
+                        response.close()
+                    # Each band appends whole GRIB messages, so each one must
+                    # itself start with the magic — checking per band catches a
+                    # gateway fault returned for a later band only. The buffered
+                    # writes are flushed first so the read sees them.
+                    handle.flush()
+                    with open(tmp, "rb") as probe:
+                        probe.seek(band_offset)
+                        head = probe.read(len(_GRIB_MAGIC))
+                    if head != _GRIB_MAGIC:
+                        raise ValueError(
+                            f"{redact_url(url)} did not return GRIB2 for band "
+                            f"{param!r}: the body starts {head!r}, not "
+                            f"{_GRIB_MAGIC!r}. The API key may be rejected, or "
+                            "the run is not published yet."
+                        )
             tmp.replace(out)
         except BaseException:
             tmp.unlink(missing_ok=True)

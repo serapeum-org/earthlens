@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
 import requests
@@ -40,7 +40,6 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.climate_indices import _helpers
 from earthlens.climate_indices.catalog import Catalog
 
@@ -328,7 +327,6 @@ class ClimateIndices(AbstractDataSource):
         if url is None:
             raise ValueError(f"climate index {index_id!r}: no URL to fetch.")
         http = HttpClient(
-            session=cast("requests.Session | None", _RequestsGet()),
             timeout=_HTTP_TIMEOUT,
             max_retries=_HTTP_RETRIES,
             backoff_factor=_HTTP_RETRY_BACKOFF,

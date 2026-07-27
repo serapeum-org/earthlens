@@ -223,7 +223,7 @@ class OBIS(AbstractDataSource):
             "size": self._size,
         }
 
-    def _fetch(self) -> FeatureCollection:  # type: ignore[override]
+    def _fetch_all(self) -> FeatureCollection:
         """Search every requested species and map the rows to a FeatureCollection.
 
         Imports `pyobis` lazily (so the package imports without the
@@ -261,7 +261,7 @@ class OBIS(AbstractDataSource):
 
     def _api(self) -> FeatureCollection:
         """Run the occurrence search (satisfies the abstract contract)."""
-        return self._fetch()
+        return self._fetch_all()
 
     def download(
         self,
@@ -292,7 +292,7 @@ class OBIS(AbstractDataSource):
                 "download() without aggregate= and post-process the returned "
                 "FeatureCollection (a GeoDataFrame) directly."
             )
-        collection = self._fetch()
+        collection = self._fetch_all()
         if self._user_path and len(collection):
             written = self._write(collection)
             logger.info(

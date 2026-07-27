@@ -30,11 +30,12 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "cmip6_data_catalog.yaml"
 
-_CATALOG_CACHE: dict[tuple[str, int], Catalog] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -151,6 +152,53 @@ class Source(BaseModel):
     description: str = ""
 
 
+def _parse_catalog(files: list[Path]) -> dict[str, Any]:
+    """Parse the CMIP6 catalog YAML into a populated :class:`Catalog`.
+
+    Args:
+        files: The contributing YAML files (CMIP6 ships a single file).
+
+    Returns:
+        dict[str, Any]: The validated construction kwargs. The payload is
+            cached, not a built Catalog, so `load()` makes a fresh instance per
+            call and one caller doing `datasets.pop(...)` cannot reach another's
+            mapping. The row objects inside it *are* shared and are frozen
+            pydantic models: treat them as read-only. A frozen model still
+            permits in-place mutation of a mutable field (`row.columns[...] =`),
+            which would reach every holder — deep-copying every row per load
+            would cost more than that edge is worth.
+
+    Raises:
+        ValueError: If a required block is missing or a row fails
+            validation.
+    """
+    path = files[0]
+    data = load_yaml_strict(path) or {}
+    csv_url = data.get("csv_url")
+    if not csv_url:
+        raise ValueError(
+            f"{path} is missing its 'csv_url:'. The CMIP6 catalog must name "
+            "the consolidated-stores CSV."
+        )
+    variables = Catalog._parse_block(path, data.get("variables"), Cmip6Variable)
+    experiments = Catalog._parse_block(path, data.get("experiments"), Experiment)
+    tables = Catalog._parse_block(path, data.get("tables"), Table)
+    sources = Catalog._parse_block(path, data.get("sources"), Source)
+    defaults = data.get("defaults") or {}
+    return {
+        "csv_url": csv_url,
+        "bucket": data.get("bucket", "cmip6"),
+        "facet_columns": list(data.get("facet_columns") or []),
+        "default_member_id": defaults.get("member_id", "r1i1p1f1"),
+        "default_version": defaults.get("version", "latest"),
+        "default_terms_note": data.get("default_terms_note", ""),
+        "datasets": variables,
+        "experiments": experiments,
+        "tables": tables,
+        "sources": sources,
+    }
+
+
 class Catalog(AbstractCatalog):
     """Config + curated-vocabulary catalog for the CMIP6 backend.
 
@@ -252,45 +300,12 @@ class Catalog(AbstractCatalog):
             A fully-populated :class:`Catalog`.
 
         Raises:
-            ValueError: If the file is missing its `csv_url`, or any curated row
-                fails validation.
+            ValueError: If `catalog_path` does not exist, or if the file is missing
+                its `csv_url`, or any curated row fails validation.
         """
         path = catalog_path if catalog_path is not None else CATALOG_PATH
-        try:
-            mtime = path.stat().st_mtime_ns
-        except FileNotFoundError:
-            mtime = 0
-        cache_key = (str(path.resolve()), mtime)
-        cached = _CATALOG_CACHE.get(cache_key)
-        if cached is not None:
-            return cached
-
-        data = load_yaml_strict(path) or {}
-        csv_url = data.get("csv_url")
-        if not csv_url:
-            raise ValueError(
-                f"{path} is missing its 'csv_url:'. The CMIP6 catalog must name "
-                "the consolidated-stores CSV."
-            )
-        variables = cls._parse_block(path, data.get("variables"), Cmip6Variable)
-        experiments = cls._parse_block(path, data.get("experiments"), Experiment)
-        tables = cls._parse_block(path, data.get("tables"), Table)
-        sources = cls._parse_block(path, data.get("sources"), Source)
-        defaults = data.get("defaults") or {}
-        catalog = cls(
-            csv_url=csv_url,
-            bucket=data.get("bucket", "cmip6"),
-            facet_columns=list(data.get("facet_columns") or []),
-            default_member_id=defaults.get("member_id", "r1i1p1f1"),
-            default_version=defaults.get("version", "latest"),
-            default_terms_note=data.get("default_terms_note", ""),
-            datasets=variables,
-            experiments=experiments,
-            tables=tables,
-            sources=sources,
-        )
-        _CATALOG_CACHE[cache_key] = catalog
-        return catalog
+        payload = load_catalog(path, _CATALOG_CACHE, _parse_catalog, provider="CMIP6")
+        return cls(**payload)
 
     @staticmethod
     def _parse_block(path: Path, block: Any, model: type[BaseModel]) -> dict[str, Any]:

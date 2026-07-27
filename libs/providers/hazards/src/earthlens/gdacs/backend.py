@@ -30,7 +30,7 @@ sentinel `"all"`.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Literal
 
 import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 from loguru import logger
@@ -42,7 +42,6 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.gdacs import events
 from earthlens.gdacs.catalog import Catalog
 
@@ -281,7 +280,6 @@ class GDACS(AbstractDataSource):
             f"(levels {params['alertlevel']})"
         )
         http = HttpClient(
-            session=cast("requests.Session | None", _RequestsGet()),
             timeout=self._timeout,
             max_retries=0,
             status_forcelist=(),

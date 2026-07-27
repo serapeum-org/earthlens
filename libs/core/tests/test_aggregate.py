@@ -30,6 +30,7 @@ from earthlens.aggregate import (
     _resolve_op,
     _resolve_pressure_level,
     aggregate_netcdf,
+    iter_aggregate_netcdf,
     reduce_time_axis,
     window_groups,
 )
@@ -706,14 +707,31 @@ class _FakeNetCDF:
         self.dimension_names = dimension_names
         self.geotransform = geotransform
         self._on_sel = on_sel
+        self.band_reads: list[int | None] = []
+        self.closed = False
 
     def get_variable(self, name: str) -> _FakeNetCDF:
         """Return self — fake's variable cube has the same surface."""
         return self
 
-    def read_array(self, variable: str | None = None) -> np.ndarray:
-        """Return the stored array regardless of variable name (test stub)."""
-        return self._array
+    def read_array(
+        self, variable: str | None = None, band: int | None = None
+    ) -> np.ndarray:
+        """Return the stored array, or one 0-based band of it, like pyramids does.
+
+        Returns a fresh copy, as a real reader does when it pulls bytes off
+        disk. That matters for the memory tests: handing back the stored
+        array would make a whole-cube read allocate nothing, so it could not
+        be told apart from a per-band one.
+        """
+        self.band_reads.append(band)
+        if band is None:
+            return self._array.copy()
+        return self._array[band].copy()
+
+    def close(self) -> None:
+        """Record that the handle was released."""
+        self.closed = True
 
     def get_time_variable(self, var_name: str) -> list[str] | None:
         """Look up the time strings registered for `var_name`."""
@@ -1209,3 +1227,224 @@ class TestAggregateNetcdfRoundTrip:
             f"expected {source_geo}, got {geo}"
         )
         assert epsg == 4326, f"EPSG should be 4326 (WGS84); got {epsg}"
+
+
+class TestStreamingAggregation:
+    """ARC-3/ARC-12: windows are read one at a time and handles are released."""
+
+    @pytest.fixture
+    def state_var(self):
+        """A state-flagged variable stand-in.
+
+        Returns:
+            _RealVariable: carries the attributes `aggregate_netcdf` reads.
+        """
+        return _RealVariable(
+            is_flux=False, cds_variable="2m_temperature", nc_variable="t2m", units="K"
+        )
+
+    def _nc(self, steps: int = 48) -> _FakeNetCDF:
+        """Build a fake NetCDF holding `steps` hourly bands over two days."""
+        times = pd.date_range("2020-01-01", periods=steps, freq="h")
+        array = np.arange(steps * 2 * 3, dtype="float64").reshape(steps, 2, 3)
+        return _FakeNetCDF(
+            array=array,
+            time_strs_by_var={"valid_time": [str(t) for t in times]},
+        )
+
+    def test_the_whole_cube_is_never_read_at_once(self, monkeypatch, state_var):
+        """Every read names a band; a bare read_array() would defeat the point."""
+        nc = self._nc()
+        _patch_netcdf_read(monkeypatch, nc)
+        aggregate_netcdf("x.nc", state_var, AggregationConfig(freq="1D", op="mean"))
+        assert nc.band_reads, "no reads were issued at all"
+        assert all(band is not None for band in nc.band_reads), (
+            f"a whole-cube read slipped through: {nc.band_reads}"
+        )
+
+    def test_each_band_is_read_exactly_once(self, monkeypatch, state_var):
+        """Two daily windows over 48 hourly steps read bands 0..47, once each."""
+        nc = self._nc()
+        _patch_netcdf_read(monkeypatch, nc)
+        aggregate_netcdf("x.nc", state_var, AggregationConfig(freq="1D", op="mean"))
+        assert sorted(nc.band_reads) == list(range(48)), f"got {sorted(nc.band_reads)}"
+
+    def test_values_match_a_whole_cube_reduction(self, monkeypatch, state_var):
+        """Per-window reads reduce to exactly what slicing the full cube gives."""
+        nc = self._nc()
+        _patch_netcdf_read(monkeypatch, nc)
+        results = aggregate_netcdf(
+            "x.nc", state_var, AggregationConfig(freq="1D", op="mean")
+        )
+        assert len(results) == 2, f"expected two daily windows, got {len(results)}"
+        assert np.allclose(results[0][1], nc._array[:24].mean(axis=0))
+        assert np.allclose(results[1][1], nc._array[24:].mean(axis=0))
+
+    def test_handles_are_closed_after_aggregation(self, monkeypatch, state_var):
+        """The container is released so the NetCDF can be deleted afterwards."""
+        nc = self._nc()
+        _patch_netcdf_read(monkeypatch, nc)
+        aggregate_netcdf("x.nc", state_var, AggregationConfig(freq="1D", op="mean"))
+        assert nc.closed, "aggregate_netcdf must close what it opens"
+
+    def test_handles_are_closed_when_the_generator_is_abandoned(
+        self, monkeypatch, state_var
+    ):
+        """Dropping the iterator part-way still releases the handles."""
+        nc = self._nc()
+        _patch_netcdf_read(monkeypatch, nc)
+        windows = iter_aggregate_netcdf(
+            "x.nc", state_var, AggregationConfig(freq="1D", op="mean")
+        )
+        next(windows)
+        windows.close()
+        assert nc.closed, "an abandoned generator must still close its handles"
+
+    def test_handles_are_closed_when_a_window_raises(self, monkeypatch, state_var):
+        """A failure mid-reduction still releases the handles on the way out."""
+        nc = self._nc()
+        _patch_netcdf_read(monkeypatch, nc)
+        config = AggregationConfig(freq="nonsense")
+        with pytest.raises(ValueError):
+            aggregate_netcdf("x.nc", state_var, config)
+        assert nc.closed, "handles must be released on the error path too"
+
+    def test_iterator_yields_lazily(self, monkeypatch, state_var):
+        """Taking one window does not read the bands of the next."""
+        nc = self._nc()
+        _patch_netcdf_read(monkeypatch, nc)
+        windows = iter_aggregate_netcdf(
+            "x.nc", state_var, AggregationConfig(freq="1D", op="mean")
+        )
+        next(windows)
+        assert sorted(nc.band_reads) == list(range(24)), (
+            f"only the first window's bands should be read; got {sorted(nc.band_reads)}"
+        )
+        windows.close()
+
+    def test_keep_arrays_false_drops_written_arrays(self, monkeypatch, state_var):
+        """With out_dir set, keep_arrays=False returns the path but no array."""
+        nc = self._nc()
+        _patch_netcdf_read(monkeypatch, nc)
+        writes = _patch_geotiff_write(monkeypatch)
+        windows = list(
+            iter_aggregate_netcdf(
+                "x.nc",
+                state_var,
+                AggregationConfig(
+                    freq="1D", op="mean", out_dir=Path("out"), keep_arrays=False
+                ),
+            )
+        )
+        assert [w.array for w in windows] == [None, None], "arrays should be dropped"
+        assert all(w.path is not None for w in windows), "paths must survive"
+        assert len(writes) == 2, f"both windows should still be written: {writes}"
+
+    def test_keep_arrays_false_still_returns_in_memory_windows(
+        self, monkeypatch, state_var
+    ):
+        """Without out_dir there is nowhere to read a dropped array back from."""
+        nc = self._nc()
+        _patch_netcdf_read(monkeypatch, nc)
+        windows = list(
+            iter_aggregate_netcdf(
+                "x.nc",
+                state_var,
+                AggregationConfig(freq="1D", op="mean", keep_arrays=False),
+            )
+        )
+        assert all(w.array is not None for w in windows), (
+            "dropping the only copy of an unwritten window would lose it"
+        )
+
+    def test_keep_arrays_defaults_to_retaining(self, monkeypatch, state_var):
+        """The default keeps arrays, so existing callers are unaffected."""
+        nc = self._nc()
+        _patch_netcdf_read(monkeypatch, nc)
+        _patch_geotiff_write(monkeypatch)
+        windows = list(
+            iter_aggregate_netcdf(
+                "x.nc",
+                state_var,
+                AggregationConfig(freq="1D", op="mean", out_dir=Path("out")),
+            )
+        )
+        assert all(w.array is not None for w in windows)
+
+    def test_aggregate_netcdf_returns_the_same_tuples(self, monkeypatch, state_var):
+        """The eager wrapper still yields (label, array, path) triples."""
+        nc = self._nc()
+        _patch_netcdf_read(monkeypatch, nc)
+        results = aggregate_netcdf(
+            "x.nc", state_var, AggregationConfig(freq="1D", op="mean")
+        )
+        label, array, path = results[0]
+        assert label == pd.Timestamp("2020-01-01")
+        assert array.shape == (2, 3)
+        assert path is None
+
+
+class TestAggregationMemoryCeiling:
+    """ARC-13c: the cube is never materialised, only one window at a time."""
+
+    #: A grid big enough that the array dominates the fixed per-run overhead
+    #: (pandas index construction, pyramids metadata). At 16x16 the overhead
+    #: swamps the signal and a whole-cube read is indistinguishable.
+    SIDE = 96
+    DAYS = 8
+
+    @pytest.fixture
+    def state_var(self):
+        """A state-flagged variable stand-in.
+
+        Returns:
+            _RealVariable: carries the attributes `aggregate_netcdf` reads.
+        """
+        return _RealVariable(
+            is_flux=False, cds_variable="2m_temperature", nc_variable="t2m", units="K"
+        )
+
+    def _peak_and_cube_bytes(self, monkeypatch, state_var) -> tuple[int, int]:
+        """Aggregate a multi-day cube; return `(peak allocation, cube size)`."""
+        import tracemalloc
+
+        steps = self.DAYS * 24
+        times = pd.date_range("2020-01-01", periods=steps, freq="h")
+        array = np.zeros((steps, self.SIDE, self.SIDE), dtype="float64")
+        nc = _FakeNetCDF(
+            array=array, time_strs_by_var={"valid_time": [str(t) for t in times]}
+        )
+        _patch_netcdf_read(monkeypatch, nc)
+        tracemalloc.start()
+        try:
+            for _window in iter_aggregate_netcdf(
+                "x.nc", state_var, AggregationConfig(freq="1D", op="mean")
+            ):
+                pass
+            _current, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+        return peak, array.nbytes
+
+    def test_peak_stays_below_the_whole_cube(self, monkeypatch, state_var):
+        """Aggregating never allocates as much as the cube it reads.
+
+        This is the property ARC-3 bought: a whole-cube `read_array()` has to
+        allocate at least the cube, so a peak below it proves the read is
+        per-window. Measured on the reverted implementation, the peak is
+        ~1.26x the cube; streaming it is ~0.38x.
+        """
+        peak, cube = self._peak_and_cube_bytes(monkeypatch, state_var)
+        assert peak < cube, (
+            f"peak allocation {peak} >= cube size {cube}: the whole time axis "
+            "is being materialised instead of one window at a time"
+        )
+
+    def test_peak_is_a_small_multiple_of_one_window(self, monkeypatch, state_var):
+        """The working set tracks the window, not the number of windows."""
+        peak, cube = self._peak_and_cube_bytes(monkeypatch, state_var)
+        window = cube // self.DAYS
+        assert peak < window * 6, (
+            f"peak allocation {peak} is more than 6x one window ({window}); "
+            "windows appear to be accumulating rather than being released"
+        )

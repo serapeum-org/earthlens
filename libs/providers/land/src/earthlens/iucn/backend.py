@@ -197,7 +197,7 @@ class IUCN(AbstractDataSource):
         """
         return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
-    def _fetch(self) -> pd.DataFrame:  # type: ignore[override]
+    def _fetch_all(self) -> pd.DataFrame:
         """Fetch every selector's assessments into one DataFrame.
 
         Routes each `variables` entry to the species (two-step) or country
@@ -208,11 +208,11 @@ class IUCN(AbstractDataSource):
                 `_rest.IUCN_COLUMNS`; empty (schema-only) when nothing
                 matched.
         """
-        assert self._auth is not None  # set by _initialize before _fetch runs
+        assert self._auth is not None  # set by _initialize before _fetch_all runs
         token = self._auth.token
         rows: list[dict] = []
         for selector in self.vars:
-            rows.extend(self._fetch_one(token, selector))
+            rows.extend(self._fetch_selector(token, selector))
         if rows:
             warn_license(
                 IUCN_LICENSE,
@@ -221,7 +221,7 @@ class IUCN(AbstractDataSource):
             )
         return _frame(rows)
 
-    def _fetch_one(self, token: str, selector: str) -> list[dict]:  # type: ignore[override]
+    def _fetch_selector(self, token: str, selector: str) -> list[dict]:
         """Fetch one selector (species binomial or country ISO2).
 
         Args:
@@ -247,7 +247,7 @@ class IUCN(AbstractDataSource):
 
     def _api(self) -> pd.DataFrame:
         """Fetch assessments (satisfies the abstract contract)."""
-        return self._fetch()
+        return self._fetch_all()
 
     def download(
         self,
@@ -277,7 +277,7 @@ class IUCN(AbstractDataSource):
                 "download() without aggregate= and post-process the returned "
                 "DataFrame directly."
             )
-        frame = self._fetch()
+        frame = self._fetch_all()
         if self._user_path and len(frame):
             written = self._write(frame)
             logger.info(

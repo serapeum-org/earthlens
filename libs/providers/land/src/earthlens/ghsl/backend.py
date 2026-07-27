@@ -70,6 +70,9 @@ class GHSL(AbstractDataSource):
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
 
+    #: Set by `download(force=...)`; bypasses the skip-if-exists check.
+    _force: bool = False
+
     def __init__(
         self,
         start: str,
@@ -327,11 +330,15 @@ class GHSL(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        *,
+        force: bool = False,
     ) -> list[Path]:
         """Fetch the requested products as AOI-cropped GeoTIFFs.
 
         Args:
             progress_bar: Whether per-download progress is shown.
+            force: Re-fetch even when a complete output already exists,
+                bypassing the skip-if-exists check. Defaults to `False`.
             aggregate: Optional `earthlens.aggregate.AggregationConfig`;
                 reduces the per-epoch raster stack across the epochs in range
                 (`C6`). Rejected for categorical products (averaging class
@@ -346,6 +353,7 @@ class GHSL(AbstractDataSource):
                 categorical.
         """
         self._show_progress = progress_bar
+        self._force = force
         if aggregate is not None:
             categorical = [c for c in self._codes if self._catalog.get(c).categorical]
             if categorical:
@@ -673,7 +681,7 @@ class GHSL(AbstractDataSource):
 
         resolution = rp.metadata["resolution"]
         target = Path(self.path) / (f"{rp.id}_{resolution}_epsg{self._output_epsg}.tif")
-        if target.exists():
+        if self._is_complete(target, force=self._force):
             return target
         categorical = rp.metadata["categorical"]
         resampling = "nearest neighbor" if categorical else "bilinear"
@@ -720,11 +728,27 @@ class GHSL(AbstractDataSource):
                     "legend sidecar is still written."
                 )
 
-        cropped.to_file(str(target))
+        # Write through a sibling and rename, so a crash mid-write cannot
+        # leave a partial file that the skip-if-exists check would accept.
+        # The real suffix is kept — pyramids picks its driver from the
+        # extension, and a bare `.part` matches none.
+        staged = target.with_name(f"{target.stem}.part{target.suffix}")
+        try:
+            cropped.to_file(str(staged))
+            # pyramids keeps the written dataset's GDAL handle open, which
+            # holds a Windows lock and blocks the rename; release it first.
+            close_quietly(cropped)
+            staged.replace(target)
+        except BaseException:
+            # A failed write must not strand the `.part` for the next run to
+            # trip over, and both handles have to go either way.
+            close_quietly(cropped)
+            close_quietly(dataset)
+            staged.unlink(missing_ok=True)
+            raise
         if has_legend:
             self._write_legend_sidecar(target, rp.metadata["product"])
         close_quietly(dataset)
-        close_quietly(cropped)
         # Best-effort cleanup of the merge intermediate; on Windows the GDAL
         # handle can briefly outlive the Python object, so a locked file is
         # left in the cache rather than raising.

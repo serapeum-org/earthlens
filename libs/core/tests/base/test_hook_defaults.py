@@ -377,3 +377,232 @@ class TestRunItems:
     def test_empty_items_is_a_noop(self, tmp_path):
         """No items means no results, no failures, and no logging."""
         assert self._backend(tmp_path)._run_items([], lambda n: n) == ([], [])
+
+
+class TestLazyRootDir:
+    """`root_dir` is resolved at construction but only created on download."""
+
+    def test_construction_creates_no_directory(self, tmp_path):
+        """Building a backend must not touch the filesystem."""
+        target = tmp_path / "not-yet"
+        backend = _build(_WithSearchFetch, target)
+        assert backend.root_dir == target.absolute(), f"got {backend.root_dir}"
+        assert not target.exists(), "construction must leave no directory behind"
+
+    def test_download_creates_the_directory(self, tmp_path):
+        """The first download materialises root_dir."""
+        target = tmp_path / "made-on-demand"
+        backend = _build(_WithSearchFetch, target)
+        backend.download()
+        assert target.is_dir(), "download() must create root_dir"
+
+    def test_download_creates_nested_parents(self, tmp_path):
+        """A multi-level path is created in full, not just its last segment."""
+        target = tmp_path / "a" / "b" / "c"
+        _build(_WithSearchFetch, target).download()
+        assert target.is_dir(), "nested parents must be created too"
+
+    def test_download_tolerates_an_existing_directory(self, tmp_path):
+        """Downloading twice is fine; the second call is a no-op."""
+        target = tmp_path / "twice"
+        backend = _build(_WithSearchFetch, target)
+        backend.download()
+        backend.download()
+        assert target.is_dir()
+
+    def test_ensure_root_dir_returns_the_path(self, tmp_path):
+        """The helper hands back the directory it just guaranteed."""
+        target = tmp_path / "returned"
+        backend = _build(_WithSearchFetch, target)
+        assert backend._ensure_root_dir() == target.absolute()
+        assert target.is_dir()
+
+    def test_a_rejected_request_leaves_no_directory(self, tmp_path):
+        """A constructor that raises must not have created the output dir first."""
+        target = tmp_path / "rejected"
+
+        class _Strict(_WithSearchFetch):
+            REQUIRES_TIME_WINDOW = True
+
+        with pytest.raises(ValueError):
+            _build(_Strict, target)
+        assert not target.exists(), "a rejected request must leave no directory"
+
+    def test_wrapper_preserves_the_download_signature(self):
+        """functools.wraps keeps the backend's own download introspectable."""
+        import inspect
+
+        assert _WithSearchFetch.download.__name__ == "download"
+        params = inspect.signature(_WithSearchFetch.download).parameters
+        assert "progress_bar" in params, f"got {list(params)}"
+
+    def test_wrapper_is_installed_once_per_class(self, tmp_path):
+        """A subclass that does not redefine download is not double-wrapped."""
+
+        class _Inheriting(_WithSearchFetch):
+            pass
+
+        assert _Inheriting.download is _WithSearchFetch.download
+        target = tmp_path / "inherited"
+        _build(_Inheriting, target).download()
+        assert target.is_dir()
+
+    def test_download_return_value_is_passed_through(self, tmp_path):
+        """The wrapper returns whatever the backend's download returned."""
+
+        class _Returns(_WithSearchFetch):
+            def download(self, progress_bar: bool = True, **kwargs):
+                return ["sentinel"]
+
+        assert _build(_Returns, tmp_path / "rv").download() == ["sentinel"]
+
+    def test_wrap_download_is_idempotent(self, tmp_path):
+        """Re-wrapping an already-wrapped download leaves it untouched."""
+
+        class _Once(_WithSearchFetch):
+            def download(self, progress_bar: bool = True, **kwargs):
+                return self._api()
+
+        wrapped = _Once.download
+        _Once._wrap_download()
+        assert _Once.download is wrapped, "download must not be wrapped twice"
+        _build(_Once, tmp_path / "idem").download()
+        assert (tmp_path / "idem").is_dir()
+
+    def test_every_registered_backend_download_is_wrapped(self):
+        """No backend escapes the wrapper — including those with no own __init__."""
+        from earthlens.earthlens import EarthLens
+
+        unwrapped = [
+            key
+            for key, _module, _extra in EarthLens.DataSources.entries()
+            if not getattr(
+                EarthLens.DataSources[key].download, "_ensures_root_dir", False
+            )
+        ]
+        assert unwrapped == [], f"these backends would not create root_dir: {unwrapped}"
+
+
+class TestIsComplete:
+    """ARC-15: the shared skip-if-exists / resume check."""
+
+    def _backend(self, tmp_path):
+        """Build a minimal backend rooted at `tmp_path`."""
+        return _build(_WithSearchFetch, tmp_path)
+
+    def test_missing_file_is_incomplete(self, tmp_path):
+        """A path that does not exist is never reusable."""
+        backend = self._backend(tmp_path)
+        assert backend._is_complete(tmp_path / "absent.tif") is False
+
+    def test_empty_file_is_incomplete(self, tmp_path):
+        """A zero-byte file is the classic failed-download leftover."""
+        target = tmp_path / "empty.tif"
+        target.write_bytes(b"")
+        assert self._backend(tmp_path)._is_complete(target) is False
+
+    def test_written_file_is_complete(self, tmp_path):
+        """A non-empty file is reusable when no size is known."""
+        target = tmp_path / "grid.tif"
+        target.write_bytes(b"raster-bytes")
+        assert self._backend(tmp_path)._is_complete(target) is True
+
+    def test_expected_size_catches_a_truncated_file(self, tmp_path):
+        """A short file is rejected once the real size is known."""
+        target = tmp_path / "half.tif"
+        target.write_bytes(b"12345")
+        assert self._backend(tmp_path)._is_complete(target, expected_size=10) is False
+
+    def test_expected_size_accepts_an_exact_match(self, tmp_path):
+        """A file of exactly the advertised size is complete."""
+        target = tmp_path / "whole.tif"
+        target.write_bytes(b"12345")
+        assert self._backend(tmp_path)._is_complete(target, expected_size=5) is True
+
+    def test_expected_size_rejects_an_overlong_file(self, tmp_path):
+        """More bytes than advertised is as wrong as fewer."""
+        target = tmp_path / "long.tif"
+        target.write_bytes(b"1234567890")
+        assert self._backend(tmp_path)._is_complete(target, expected_size=5) is False
+
+    def test_force_ignores_a_complete_file(self, tmp_path):
+        """force=True re-fetches even when the file is present and sized right."""
+        target = tmp_path / "grid.tif"
+        target.write_bytes(b"12345")
+        backend = self._backend(tmp_path)
+        assert backend._is_complete(target, expected_size=5, force=True) is False
+
+    def test_accepts_a_string_path(self, tmp_path):
+        """A str path works as well as a Path."""
+        target = tmp_path / "grid.tif"
+        target.write_bytes(b"bytes")
+        assert self._backend(tmp_path)._is_complete(str(target)) is True
+
+    def test_a_directory_is_not_a_complete_download(self, tmp_path):
+        """A directory at the destination must not be mistaken for a file."""
+        target = tmp_path / "adir"
+        target.mkdir()
+        assert self._backend(tmp_path)._is_complete(target, expected_size=0) is False
+
+
+class TestNoOverrideSilencers:
+    """ARC-5(c): no backend may silence an override error on a base hook.
+
+    A `# type: ignore[override]` on `_fetch` / `_fetch_one` meant the
+    subclass signature did not match the base, which is what let ten
+    mutually incompatible shapes accumulate — and it disabled the one
+    automated check that would have caught the drift.
+    """
+
+    #: Base hooks whose signature every backend must actually match.
+    HOOKS = ("_fetch", "_fetch_one", "_search", "_api", "_initialize")
+
+    def _backend_sources(self):
+        """Yield `(path, source)` for every provider backend module."""
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[3] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            yield path, path.read_text(encoding="utf-8")
+
+    def test_no_hook_carries_an_override_silencer(self):
+        """No `def _hook(...)  # type: ignore[override]` survives."""
+        import re
+
+        offenders = []
+        for path, source in self._backend_sources():
+            for hook in self.HOOKS:
+                pattern = (
+                    rf"def {hook}\((?:[^)]*\))?[^\n]*type:\s*ignore\[[^]]*override"
+                )
+                if re.search(pattern, source):
+                    offenders.append(f"{path.parent.name}.{hook}")
+        assert offenders == [], (
+            "these hooks silence an override mismatch instead of matching the "
+            f"base signature: {offenders}"
+        )
+
+    def test_backend_modules_were_actually_scanned(self):
+        """Guard the guard: the glob must find the real backend modules."""
+        found = [path.parent.name for path, _ in self._backend_sources()]
+        assert len(found) > 30, f"only scanned {len(found)} backends: {found[:5]}"
+        assert "nwp" in found and "soilgrids" in found, f"unexpected set: {found[:8]}"
+
+    def test_fetch_one_takes_only_a_product(self):
+        """Every `_fetch_one` override keeps the base's single-argument shape."""
+        import ast as ast_module
+
+        offenders = []
+        for path, source in self._backend_sources():
+            for node in ast_module.walk(ast_module.parse(source)):
+                if (
+                    isinstance(node, ast_module.FunctionDef)
+                    and node.name == "_fetch_one"
+                ):
+                    names = [a.arg for a in node.args.args]
+                    if names[1:] != ["product"]:
+                        offenders.append(f"{path.parent.name}: {names}")
+        assert offenders == [], (
+            "`_fetch_one` must take exactly `(self, product)`; extra per-batch "
+            f"context belongs on `self` or in `RemoteProduct.metadata`: {offenders}"
+        )

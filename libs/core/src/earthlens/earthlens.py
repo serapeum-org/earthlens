@@ -161,6 +161,165 @@ def _detach_and_cleanup(temp_dir: Path, result: Any) -> Any:
     return detached
 
 
+def _import_backend_module(
+    module_name: str,
+    label: str,
+    extras: str,
+    *,
+    subject: str = "Backend",
+) -> Any:
+    """Import a backend module, rewriting a missing SDK into a friendly error.
+
+    Both entry points that import a backend on demand — indexing the lazy
+    registry and loading a backend's catalog — need the same rewrite: the
+    raw `ImportError` names the missing SDK, not the earthlens extra that
+    installs it. Keeping one helper means the two paths cannot drift into
+    telling the user different things.
+
+    Args:
+        module_name: The dotted module to import (e.g. `earthlens.gee`).
+        label: The data-source key to name in the message (e.g. `"gee"`).
+        extras: The pip extra that provides the SDK, or `""` when the
+            backend needs none (then no install hint is added).
+        subject: What is unavailable, used to open the message. The default
+            reads `Backend 'gee' is unavailable`; the catalog path passes
+            `"Backend catalog for"`.
+
+    Returns:
+        The imported module.
+
+    Raises:
+        ImportError: When the module cannot be imported. The message names
+            the key and, when `extras` is set, the `pip install` line that
+            fixes it; the original error is chained as `__cause__`.
+
+    Examples:
+        - An installed backend imports normally:
+            ```python
+            >>> from earthlens.earthlens import _import_backend_module
+            >>> module = _import_backend_module("earthlens.chc", "chc", "")
+            >>> module.__name__
+            'earthlens.chc'
+
+            ```
+        - A failure *inside* earthlens is re-raised untouched, so a bug in our
+          own code is never reported as somebody's missing dependency:
+            ```python
+            >>> from earthlens.earthlens import _import_backend_module
+            >>> _import_backend_module("earthlens.no_such_backend", "gee", "gee")
+            Traceback (most recent call last):
+                ...
+            ModuleNotFoundError: No module named 'earthlens.no_such_backend'
+
+            ```
+
+        When the missing module is a third-party SDK instead — `ee` for gee,
+        `cdsapi` for ecmwf — the raised `ImportError` reads
+        `Backend 'gee' is unavailable — its runtime dependency is not
+        installed. Install with `pip install earthlens[gee]`.` That path needs
+        the SDK to be genuinely absent, so it is covered by the unit tests
+        rather than a doctest.
+    """
+    try:
+        return importlib.import_module(module_name)
+    except ImportError as exc:
+        if not _is_missing_dependency(exc, module_name):
+            # A bug inside the backend's own code — a typo'd relative import,
+            # a broken sibling module. Telling the user to install an extra
+            # they already have sends them after the wrong thing entirely, so
+            # the real error is re-raised untouched.
+            raise
+        hint = f" Install with `pip install earthlens[{extras}]`." if extras else ""
+        raise ImportError(
+            f"{subject} {label!r} is unavailable — its runtime "
+            f"dependency is not installed.{hint}"
+        ) from exc
+
+
+def _is_missing_dependency(exc: ImportError, module_name: str) -> bool:
+    """Report whether `exc` is a genuinely absent third-party dependency.
+
+    Distinguishes the two very different failures that both surface as
+    `ImportError` when a backend module is imported:
+
+    * the optional SDK is not installed — the user needs the pip extra;
+    * something inside the backend package is broken — the user needs a bug
+      report, and an "install the extra" message actively misleads.
+
+    Two conditions must both hold, and each rules out a real misreport:
+
+    * the exception is a `ModuleNotFoundError` — a module was genuinely
+      absent. A plain `ImportError` means the module imported fine but a
+      *name* inside it did not (`from ee import Missing`), which is a
+      version skew or a bug, never something `pip install` fixes. Note
+      `ImportError.name` is set to the *present* module in that case, so
+      the name alone would misread it as absent;
+    * `ImportError.name` is outside our own namespace. `module_name` is
+      always a backend under `earthlens.*`, so an absent module sharing that
+      root is our code — a typo'd relative import, a missing sibling — and
+      the user needs the real error, not an install hint.
+
+    A `None` name means the exception was raised by hand rather than by the
+    import system, so it is treated as internal: the conservative choice,
+    since it surfaces the original message rather than replacing it.
+
+    An absent *transitive* dependency of the SDK (`No module named 'grpc'`
+    while importing `ee`) satisfies both conditions and keeps the hint, which
+    is correct — reinstalling the extra is what repairs it.
+
+    Args:
+        exc: The `ImportError` raised while importing the backend.
+        module_name: The backend module that was being imported.
+
+    Returns:
+        bool: `True` when the failure is a missing external dependency.
+
+    Examples:
+        - A missing SDK is a dependency problem:
+            ```python
+            >>> from earthlens.earthlens import _is_missing_dependency
+            >>> exc = ModuleNotFoundError("No module named 'ee'", name="ee")
+            >>> _is_missing_dependency(exc, "earthlens.gee")
+            True
+
+            ```
+        - A broken import inside the backend is not, so the real error shows:
+            ```python
+            >>> from earthlens.earthlens import _is_missing_dependency
+            >>> exc = ModuleNotFoundError(
+            ...     "No module named 'earthlens.gee._helpers'",
+            ...     name="earthlens.gee._helpers",
+            ... )
+            >>> _is_missing_dependency(exc, "earthlens.gee")
+            False
+
+            ```
+        - Neither is a missing *name* in a module that imported fine — that is
+          a version skew, and `pip install` would not fix it:
+            ```python
+            >>> from earthlens.earthlens import _is_missing_dependency
+            >>> exc = ImportError("cannot import name 'Missing' from 'ee'", name="ee")
+            >>> _is_missing_dependency(exc, "earthlens.gee")
+            False
+
+            ```
+        - So is an ImportError raised by hand, with no module name at all:
+            ```python
+            >>> from earthlens.earthlens import _is_missing_dependency
+            >>> _is_missing_dependency(ImportError("hand-rolled"), "earthlens.gee")
+            False
+
+            ```
+    """
+    if not isinstance(exc, ModuleNotFoundError):
+        return False
+    missing = getattr(exc, "name", None)
+    if not missing:
+        return False
+    root = module_name.split(".")[0]
+    return not (missing == root or missing.startswith(f"{root}."))
+
+
 class _LazyRegistry(Mapping):
     """Maps a data-source key to its backend class, importing on demand.
 
@@ -254,14 +413,7 @@ class _LazyRegistry(Mapping):
 
     def __getitem__(self, key: str) -> type[AbstractDataSource]:
         module_name, class_name, extras, _defaults = self._mapping[key]
-        try:
-            module = importlib.import_module(module_name)
-        except ImportError as exc:
-            hint = f" Install with `pip install earthlens[{extras}]`." if extras else ""
-            raise ImportError(
-                f"Backend {key!r} is unavailable — its runtime "
-                f"dependency is not installed.{hint}"
-            ) from exc
+        module = _import_backend_module(module_name, key, extras)
         return cast("type[AbstractDataSource]", getattr(module, class_name))
 
 
@@ -1014,14 +1166,9 @@ class EarthLens:
             for key, mod, extra in cls.DataSources.entries()
             if key == data_source
         )
-        try:
-            module = importlib.import_module(module_name)
-        except ImportError as exc:
-            hint = f" Install with `pip install earthlens[{extras}]`." if extras else ""
-            raise ImportError(
-                f"Backend {data_source!r} catalog is unavailable — its "
-                f"runtime dependency is not installed.{hint}"
-            ) from exc
+        module = _import_backend_module(
+            module_name, data_source, extras, subject="Backend catalog for"
+        )
         catalog_cls = getattr(module, "Catalog", None)
         if catalog_cls is None:
             raise NotImplementedError(
@@ -1445,16 +1592,69 @@ class EarthLens:
             *args, progress_bar=progress_bar, aggregate=aggregate, **kwargs
         )
 
+    def iter_download(self, *, limit: int | None = None) -> Iterator[Any]:
+        """Stream the backend's artifacts one item at a time.
+
+        The streaming counterpart to :meth:`download`, for a vector / tabular
+        result too large to want resident all at once: each product's fragment
+        is yielded as it arrives, so a caller can write or reduce it and let it
+        go before the next one is fetched.
+
+        Whether a backend can stream depends on it having a per-product fetch
+        hook — most search/fetch backends do; a backend that answers the whole
+        request in one server-side call cannot, and says so rather than
+        pretending. `aggregate=` is not accepted: a reduction needs the whole
+        cube, so ask for it through :meth:`download`.
+
+        Args:
+            limit: Total rows / features to yield across every product, or
+                `None` for no cap. Products past the cap are never fetched.
+
+        Yields:
+            Any: One fragment per product, of the same type the backend's
+                `download` collects (a `FeatureCollection` /
+                `GeoDataFrame` / `DataFrame` fragment, or written paths).
+
+        Raises:
+            NotImplementedError: When the bound backend has no per-product
+                fetch to stream from.
+            TypeError: If `limit` is neither `None` nor an `int`.
+            ValueError: If `limit` is less than 1.
+
+        Examples:
+            - Consume a large query without holding every page. Marked
+              `# doctest: +SKIP` because it performs a live request:
+                ```python
+                >>> from earthlens.core import EarthLens
+                >>> earthlens = EarthLens(  # doctest: +SKIP
+                ...     data_source="obis",
+                ...     start="2024-01-01",
+                ...     end="2024-01-31",
+                ...     lat_lim=[50.0, 54.0],
+                ...     lon_lim=[2.0, 7.0],
+                ... )
+                >>> total = 0  # doctest: +SKIP
+                >>> for fragment in earthlens.iter_download():  # doctest: +SKIP
+                ...     total += len(fragment)
+
+                ```
+        """
+        self.datasource._ensure_root_dir()
+        return self.datasource.iter_download(limit=limit)
+
     def _redirect_output_to_tempdir(self) -> None:
         """Point the backend output at a throwaway temp dir for an in-memory load.
 
         Called by :meth:`load` when `path` was omitted: `load` only needs the
         in-memory object, so the incidental files go to a fresh temp directory
-        instead of the persistent `./earthlens-data/<source>/` default — and the
-        default directory is removed if construction left it empty, so a
+        instead of the persistent `./earthlens-data/<source>/` default, and a
         load-and-plot run never leaves files in the working tree. Creating the
         temp dir here (not at construction) means a construct-only or
         download-only run allocates no temp directory.
+
+        The `rmdir` below is now belt-and-braces: construction no longer
+        creates `root_dir` at all, so in a fresh process there is nothing to
+        remove. It still fires for a directory an earlier run left empty.
         """
         default_dir = getattr(self.datasource, "root_dir", None)
         tmp = Path(tempfile.mkdtemp(prefix="earthlens-load-"))

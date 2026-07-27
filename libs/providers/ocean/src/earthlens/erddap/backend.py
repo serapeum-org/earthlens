@@ -48,7 +48,6 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
-from earthlens.base.http import RequestsGet as _RequestsGet
 from earthlens.erddap._helpers import (
     build_constraints,
     build_griddap_url,
@@ -352,11 +351,34 @@ class ERDDAP(AbstractDataSource):
                 return empty_canonical(variables)
             raise
 
+    def _client(self) -> HttpClient:
+        """Return this instance's HTTP client, built once.
+
+        Held on the instance so a multi-dataset request reuses one pooled
+        connection to the ERDDAP host rather than re-handshaking per row.
+
+        Returns:
+            HttpClient: The shared client.
+        """
+        if self._http is None:
+            self._http = HttpClient(
+                timeout=self._timeout,
+                max_retries=0,
+                status_forcelist=(),
+                raise_for_status=True,
+            )
+        return self._http
+
     def _fetch_grid(self, row: Dataset, variables: list[str]) -> Path:
-        """Download a griddap subset to a `.nc` file and return its path.
+        """Stream a griddap subset to a `.nc` file and return its path.
 
         Builds the OPeNDAP URL directly (avoiding erddapy's axis-fetch)
-        and GETs it. An out-of-coverage / no-data response surfaces as a
+        and streams the response to disk in blocks — a griddap window can
+        run to gigabytes, so holding the body in memory to then write it
+        would double the peak footprint. The leading bytes are checked
+        against the NetCDF magic before the file is published, so an HTML
+        error page (which ERDDAP sometimes serves with a `200`) never lands
+        as a `.nc`. An out-of-coverage / no-data response surfaces as a
         clear :class:`ValueError` naming the dataset and bbox, not a bare
         HTTP stack trace.
 
@@ -379,37 +401,31 @@ class ERDDAP(AbstractDataSource):
         )
         dest = self.root_dir / f"{row.dataset_id}.nc"
         logger.info(f"ERDDAP griddap {row.dataset_id}: GET {url}")
-        http = HttpClient(
-            session=cast("requests.Session | None", _RequestsGet()),
-            timeout=self._timeout,
-            max_retries=0,
-            status_forcelist=(),
-            raise_for_status=True,
-        )
+        http = self._client()
+        # Stream to disk rather than materialising `response.content`: a
+        # griddap window can run to gigabytes, and holding the whole body in
+        # memory to then write it doubles the peak footprint for no gain.
+        #
+        # ERDDAP does not uniformly use 4xx/5xx for griddap problems: an
+        # out-of-coverage request, a maintenance notice, or a proxy
+        # interstitial can arrive as a 200 with an HTML body. Writing that
+        # to `<id>.nc` would yield a corrupt file that only fails much later
+        # (in pyramids or the user's own read), so `expect_magic` validates
+        # the leading bytes and discards the partial write instead.
         try:
-            response = http.get(url)
+            http.download(url, dest, progress=False, expect_magic=_NETCDF_MAGIC)
         except requests.exceptions.HTTPError as exc:
             raise ValueError(
                 f"ERDDAP griddap request for {row.dataset_id!r} failed over "
                 f"{self._extent_label()}: {exc}. The window may be outside "
                 f"the dataset's coverage."
             ) from exc
-        # ERDDAP does not uniformly use 4xx/5xx for griddap problems: an
-        # out-of-coverage request, a maintenance notice, or a proxy
-        # interstitial can arrive as a 200 with an HTML body. Writing that
-        # to `<id>.nc` would yield a corrupt file that only fails much later
-        # (in pyramids or the user's own read). Validate the magic bytes and
-        # fail loud here instead.
-        content = response.content
-        if not content.startswith(_NETCDF_MAGIC):
+        except ValueError as exc:
             raise ValueError(
-                f"ERDDAP griddap {row.dataset_id!r} returned a non-NetCDF "
-                f"body ({len(content)} bytes, starts {content[:24]!r}) over "
-                f"{self._extent_label()}. The server likely returned an error "
-                f"page instead of data; the bbox/time may be outside the "
-                f"dataset's coverage."
-            )
-        dest.write_bytes(content)
+                f"ERDDAP griddap {row.dataset_id!r} returned a non-NetCDF body "
+                f"over {self._extent_label()}: {exc} The bbox/time may be "
+                f"outside the dataset's coverage."
+            ) from exc
         return dest
 
     def _extent_label(self) -> str:

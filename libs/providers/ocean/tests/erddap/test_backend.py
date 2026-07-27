@@ -287,6 +287,79 @@ class TestGriddap:
             return FakeResponse(content=b"<html><body>Resource not found</body></html>")
 
         monkeypatch.setattr("earthlens.erddap.backend.requests.get", _get)
+        backend = _grid_backend(tmp_path)
+        with pytest.raises(ValueError, match="non-NetCDF body"):
+            backend.download()
+        assert not (tmp_path / f"{GRIDDAP_ID}.nc").exists()
+
+
+class _NoBufferResponse:
+    """Streams its body, and fails loudly if anything reads `.content`."""
+
+    def __init__(self, body: bytes):
+        self._body = body
+        self.status_code = 200
+        self.headers: dict[str, str] = {}
+        self.closed = False
+
+    @property
+    def content(self) -> bytes:
+        raise AssertionError("the body must be streamed, not buffered via .content")
+
+    def raise_for_status(self) -> None:
+        """A 200 needs no action."""
+
+    def iter_content(self, chunk_size=None):
+        """Yield the body in small blocks, as a streamed response does."""
+        for start in range(0, len(self._body), 8):
+            yield self._body[start : start + 8]
+
+    def close(self) -> None:
+        """Record release of the response."""
+        self.closed = True
+
+
+class TestGriddapStreams:
+    """The griddap body reaches disk without being buffered in memory."""
+
+    def test_download_never_touches_response_content(self, tmp_path, monkeypatch):
+        """A regression to `response.content` fails this test."""
+        from .conftest import FAKE_NETCDF_BYTES
+
+        responses: list[_NoBufferResponse] = []
+
+        def _get(url: str, **kwargs):
+            response = _NoBufferResponse(FAKE_NETCDF_BYTES)
+            responses.append(response)
+            return response
+
+        monkeypatch.setattr("earthlens.erddap.backend.requests.get", _get)
+        result = _grid_backend(tmp_path).download()
+        assert result[0].read_bytes() == FAKE_NETCDF_BYTES
+        assert responses[0].closed, "the streamed response must be released"
+
+    def test_download_requests_a_streaming_get(self, tmp_path, monkeypatch):
+        """The GET is issued with stream=True so blocks arrive incrementally."""
+        from .conftest import FAKE_NETCDF_BYTES
+
+        seen: list[dict] = []
+
+        def _get(url: str, **kwargs):
+            seen.append(kwargs)
+            return _NoBufferResponse(FAKE_NETCDF_BYTES)
+
+        monkeypatch.setattr("earthlens.erddap.backend.requests.get", _get)
+        _grid_backend(tmp_path).download()
+        assert seen[0].get("stream") is True, f"got {seen[0]}"
+
+    def test_non_netcdf_body_is_rejected_and_not_written(self, tmp_path, monkeypatch):
+        """An HTML error page served with a 200 raises and leaves no .nc."""
+
+        def _get(url: str, **kwargs):
+            return _NoBufferResponse(b"<html>ERDDAP error</html>")
+
+        monkeypatch.setattr("earthlens.erddap.backend.requests.get", _get)
         with pytest.raises(ValueError, match="non-NetCDF body"):
             _grid_backend(tmp_path).download()
-        assert not (tmp_path / f"{GRIDDAP_ID}.nc").exists()
+        assert list(tmp_path.glob("*.nc")) == [], "an error page must not be written"
+        assert list(tmp_path.glob("*.part")) == [], "no temp may be left behind"

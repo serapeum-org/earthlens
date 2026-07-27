@@ -8,7 +8,9 @@ here, in `earthlens.core`:
 * :class:`EarthLens` — the facade. Importing it succeeds without any backend
   extras installed; each backend is imported lazily on first use through the
   registry.
-* :class:`AggregationConfig` and :func:`aggregate_netcdf` — temporal
+* :class:`AggregationConfig`, :func:`aggregate_netcdf` and its streaming
+  counterpart :func:`iter_aggregate_netcdf` (yielding
+  :class:`AggregatedWindow`) — temporal
   aggregation (pure pyramids/numpy/pandas, no backend SDK).
 
 The concrete backends (`earthlens.ecmwf.ECMWF`, `earthlens.chc.CHIRPS`, …) are
@@ -27,15 +29,22 @@ from __future__ import annotations
 
 from importlib.metadata import PackageNotFoundError, version
 
-from earthlens.aggregate import AggregationConfig, aggregate_netcdf
+from earthlens.aggregate import (
+    AggregatedWindow,
+    AggregationConfig,
+    aggregate_netcdf,
+    iter_aggregate_netcdf,
+)
 from earthlens.base import PolygonAoiWarning
 from earthlens.earthlens import EarthLens, download, find, search, sources
 
 __all__ = [
+    "AggregatedWindow",
     "AggregationConfig",
     "EarthLens",
     "PolygonAoiWarning",
     "aggregate_netcdf",
+    "iter_aggregate_netcdf",
     "download",
     "find",
     "search",

@@ -20,12 +20,12 @@ from typing import Any, cast
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from earthlens.base import AbstractCatalog
-from earthlens.base.catalog_source import catalog_cache_key
+from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "radar_data_catalog.yaml"
 
-_CATALOG_CACHE: dict[Any, dict[str, Station]] = CatalogParseCache()
+_CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
 def clear_catalog_cache() -> None:
@@ -34,7 +34,7 @@ def clear_catalog_cache() -> None:
 
 
 def _load_stations(path: Path) -> dict[str, Station]:
-    """Parse, validate, and cache the station registry at `path`.
+    """Return the station registry at `path`, memoised on the file's mtime.
 
     Args:
         path: Path to `radar_data_catalog.yaml` (or a test override).
@@ -43,14 +43,26 @@ def _load_stations(path: Path) -> dict[str, Station]:
         dict[str, Station]: The `stations:` map keyed by site id.
 
     Raises:
+        ValueError: If `path` does not exist, the file has no `stations:`
+            block, or a row fails validation.
+    """
+    return load_catalog(path, _CATALOG_CACHE, _parse_stations, provider="NEXRAD")
+
+
+def _parse_stations(files: list[Path]) -> dict[str, Station]:
+    """Parse and validate the station registry.
+
+    Args:
+        files: The contributing YAML files (radar ships a single file).
+
+    Returns:
+        dict[str, Station]: The `stations:` map keyed by site id.
+
+    Raises:
         ValueError: If the file has no `stations:` block or a row fails
             validation.
     """
-    key = catalog_cache_key(path, [path])
-    cached = _CATALOG_CACHE.get(key)
-    if cached is not None:
-        return cached
-
+    path = files[0]
     data = load_yaml_strict(path) or {}
     rows = data.get("stations") or {}
     if not rows:
@@ -63,7 +75,6 @@ def _load_stations(path: Path) -> dict[str, Station]:
             raise ValueError(
                 f"{path} station {site_id!r} failed validation:\n{exc}"
             ) from exc
-    _CATALOG_CACHE[key] = stations
     return stations
 
 

@@ -203,7 +203,7 @@ class WDPA(AbstractDataSource):
         """
         return self._whole_window_extent(start, end, fmt=fmt, resolution="all")
 
-    def _fetch(self):  # type: ignore[override]
+    def _fetch_all(self):
         """Fetch every selector's protected areas as one GeoDataFrame.
 
         Routes each `variables` entry to the country or by-id v4 fetch,
@@ -212,9 +212,9 @@ class WDPA(AbstractDataSource):
         Returns:
             gpd.GeoDataFrame: The protected-area polygons, CRS `EPSG:4326`.
         """
-        assert self._auth is not None  # set by _initialize before _fetch runs
+        assert self._auth is not None  # set by _initialize before _fetch_all runs
         token = self._auth.token
-        frames = [self._fetch_one(token, selector) for selector in self.vars]
+        frames = [self._fetch_selector(token, selector) for selector in self.vars]
         non_empty = [frame for frame in frames if len(frame)]
         if not non_empty:
             return frames[0]
@@ -223,7 +223,7 @@ class WDPA(AbstractDataSource):
         merged = pd.concat(non_empty, ignore_index=True)
         return gpd.GeoDataFrame(merged, geometry="geometry", crs=_rest.CRS)
 
-    def _fetch_one(self, token: str, selector: str):  # type: ignore[override]
+    def _fetch_selector(self, token: str, selector: str):
         """Fetch one selector (country or WDPA id).
 
         A numeric selector is a WDPA id; anything else is resolved to an
@@ -246,7 +246,7 @@ class WDPA(AbstractDataSource):
 
     def _api(self) -> FeatureCollection:
         """Fetch protected areas (satisfies the abstract contract)."""
-        return FeatureCollection(self._fetch())
+        return FeatureCollection(self._fetch_all())
 
     def download(
         self,
@@ -276,7 +276,7 @@ class WDPA(AbstractDataSource):
                 "download() without aggregate= and post-process the returned "
                 "FeatureCollection (a GeoDataFrame) directly."
             )
-        collection = FeatureCollection(self._fetch())
+        collection = FeatureCollection(self._fetch_all())
         if len(collection):
             warn_license(
                 WDPA_LICENSE,
