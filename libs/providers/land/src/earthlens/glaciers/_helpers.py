@@ -31,7 +31,7 @@ import requests
 from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import box
 
-from earthlens.base.http import HttpClient
+from earthlens.base.http import HttpClient, thread_local_session
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent
@@ -158,7 +158,7 @@ def _stream_download(
     http = HttpClient(
         session=cast(
             "requests.Session | None",
-            session,
+            session if session is not None else thread_local_session("glaciers"),
         ),
         retry_on_exceptions=(requests.RequestException, OSError),
         status_forcelist=(429, 500, 502, 503, 504),

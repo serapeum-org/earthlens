@@ -51,9 +51,9 @@ def _rest_json(
         requests.HTTPError: If the endpoint returns a non-2xx status after
             the retry budget is exhausted.
     """
-    from earthlens.base.http import HttpClient
+    from earthlens.base.http import HttpClient, thread_local_session
 
-    shim = session
+    shim = session if session is not None else thread_local_session("worldpop")
     client = HttpClient(session=cast("requests.Session | None", shim))
     return client.get_json(url, params=params, timeout=timeout)
 

@@ -37,6 +37,9 @@ def _unpooled_http_transport(monkeypatch: pytest.MonkeyPatch) -> None:
     from earthlens.base import http
 
     monkeypatch.setattr(http, "new_session", http.RequestsGet)
+    # The per-thread cache outlives a test, so a session built against the
+    # previous test's transport would otherwise be handed to this one.
+    http.reset_thread_local_sessions()
 
 
 @pytest.fixture

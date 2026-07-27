@@ -1004,3 +1004,55 @@ class TestRequestsGet:
         monkeypatch.setattr(requests, "post", capture)
         RequestsGet().post("https://x/y")
         assert capture.kwargs["timeout"] == DEFAULT_TIMEOUT
+
+
+@pytest.mark.unit
+class TestThreadLocalSession:
+    """`thread_local_session` pools per thread without sharing across threads."""
+
+    def test_same_thread_and_key_reuses_one_session(self, real_pooled_session):
+        """Repeated calls hand back the same object — that is the pooling."""
+        from earthlens.base.http import thread_local_session
+
+        assert thread_local_session("demo") is thread_local_session("demo")
+
+    def test_different_keys_do_not_share_a_session(self, real_pooled_session):
+        """Two providers keep separate cookie jars and headers."""
+        from earthlens.base.http import thread_local_session
+
+        assert thread_local_session("a") is not thread_local_session("b")
+
+    def test_each_thread_gets_its_own_session(self, real_pooled_session):
+        """`requests.Session` is not guaranteed thread-safe, so none is shared."""
+        import threading
+
+        from earthlens.base.http import thread_local_session
+
+        seen: dict[str, object] = {}
+
+        def grab(name):
+            seen[name] = thread_local_session("demo")
+
+        workers = [threading.Thread(target=grab, args=(f"t{i}",)) for i in range(4)]
+        for worker in workers:
+            worker.start()
+        for worker in workers:
+            worker.join()
+
+        assert len(seen) == 4
+        assert len({id(session) for session in seen.values()}) == 4, (
+            "each thread must get its own session, got "
+            f"{len({id(s) for s in seen.values()})} distinct for 4 threads"
+        )
+
+    def test_reset_forces_a_rebuild(self, real_pooled_session):
+        """Clearing the cache makes the next call build against the current transport."""
+        from earthlens.base.http import (
+            reset_thread_local_sessions,
+            thread_local_session,
+        )
+
+        first = thread_local_session("demo")
+        reset_thread_local_sessions()
+
+        assert thread_local_session("demo") is not first
