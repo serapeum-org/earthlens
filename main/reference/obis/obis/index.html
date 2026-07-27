@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20870,7 +20870,7 @@ WKT polygon; the <code>.execute()</code> DataFrame is mapped to a points
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>            <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">,</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="p">}</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>  <span class="c1"># type: ignore[override]</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search every requested species and map the rows to a FeatureCollection.</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        Imports `pyobis` lazily (so the package imports without the</span>
@@ -20908,7 +20908,7 @@ WKT polygon; the <code>.execute()</code> DataFrame is mapped to a points
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the occurrence search (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="bp">self</span><span class="p">,</span>
@@ -20939,7 +20939,7 @@ WKT polygon; the <code>.execute()</code> DataFrame is mapped to a points
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>                <span class="s2">&quot;download() without aggregate= and post-process the returned &quot;</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>                <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>            <span class="p">)</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -21547,7 +21547,7 @@ under <code>path</code> when <code>path</code> is set.</p>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="s2">&quot;download() without aggregate= and post-process the returned &quot;</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="p">)</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -22270,7 +22270,7 @@ WKT polygon; the <code>.execute()</code> DataFrame is mapped to a points
 <a id="__codelineno-0-223" name="__codelineno-0-223"></a>            <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">,</span>
 <a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="p">}</span>
 <a id="__codelineno-0-225" name="__codelineno-0-225"></a>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>  <span class="c1"># type: ignore[override]</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Search every requested species and map the rows to a FeatureCollection.</span>
 <a id="__codelineno-0-228" name="__codelineno-0-228"></a>
 <a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">        Imports `pyobis` lazily (so the package imports without the</span>
@@ -22308,7 +22308,7 @@ WKT polygon; the <code>.execute()</code> DataFrame is mapped to a points
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the occurrence search (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="bp">self</span><span class="p">,</span>
@@ -22339,7 +22339,7 @@ WKT polygon; the <code>.execute()</code> DataFrame is mapped to a points
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>                <span class="s2">&quot;download() without aggregate= and post-process the returned &quot;</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>                <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>            <span class="p">)</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -22947,7 +22947,7 @@ under <code>path</code> when <code>path</code> is set.</p>
 <a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="s2">&quot;download() without aggregate= and post-process the returned &quot;</span>
 <a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="s2">&quot;FeatureCollection (a GeoDataFrame) directly.&quot;</span>
 <a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="p">)</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>

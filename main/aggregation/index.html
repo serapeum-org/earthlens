@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -677,6 +677,28 @@
     <span class="md-ellipsis">
       
         aggregate_netcdf(nc_path, var_info, config) -&gt; list[tuple[...]]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iter_aggregate_netcdfnc_path-var_info-config-iteratoraggregatedwindow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iter_aggregate_netcdf(nc_path, var_info, config) -&gt; Iterator[AggregatedWindow]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregatedwindow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AggregatedWindow
       
     </span>
   </a>
@@ -19209,6 +19231,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#iter_aggregate_netcdfnc_path-var_info-config-iteratoraggregatedwindow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iter_aggregate_netcdf(nc_path, var_info, config) -&gt; Iterator[AggregatedWindow]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregatedwindow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AggregatedWindow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ecmwfdownloadaggregate" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -19493,13 +19537,22 @@ rather than silently using the default.</p>
 <td><code>None</code></td>
 <td>Minimum non-NaN samples for a window to produce a non-NaN value.</td>
 </tr>
+<tr>
+<td><code>keep_arrays</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Retain each window's reduced array. <code>False</code> drops it once written, so a long run does not accumulate every window beside the GeoTIFFs already on disk. Only meaningful with <code>out_dir</code> set — an unwritten window is always kept, since dropping it would lose the only copy.</td>
+</tr>
 </tbody>
 </table>
 <h3 id="aggregate_netcdfnc_path-var_info-config-listtuple"><a class="toclink" href="#aggregate_netcdfnc_path-var_info-config-listtuple"><code>aggregate_netcdf(nc_path, var_info, config) -&gt; list[tuple[...]]</code></a><a class="headerlink" href="#aggregate_netcdfnc_path-var_info-config-listtuple" title="Permanent link">#</a></h3>
 <p>Slices a CDS-shaped NetCDF into per-window aggregated outputs.
 Returns a list of <code>(window_label, array, geotiff_path)</code> tuples — one
-per non-empty window. <code>geotiff_path</code> is <code>None</code> when
-<code>config.out_dir</code> was <code>None</code>.</p>
+per non-empty window. <code>geotiff_path</code> is <code>None</code> when <code>config.out_dir</code>
+was <code>None</code>, and <code>array</code> is <code>None</code> when <code>keep_arrays=False</code> and the
+window was written. Equivalent to
+<code>list(iter_aggregate_netcdf(...))</code> reshaped into tuples; prefer the
+iterator for anything large.</p>
 <p>Arguments:</p>
 <ul>
 <li><code>nc_path</code> — path to the NetCDF on disk.</li>
@@ -19510,6 +19563,33 @@ per non-empty window. <code>geotiff_path</code> is <code>None</code> when
 <li><code>config</code> — :class:<code>AggregationConfig</code> describing the window,
   reduction, and output location.</li>
 </ul>
+<h3 id="iter_aggregate_netcdfnc_path-var_info-config-iteratoraggregatedwindow"><a class="toclink" href="#iter_aggregate_netcdfnc_path-var_info-config-iteratoraggregatedwindow"><code>iter_aggregate_netcdf(nc_path, var_info, config) -&gt; Iterator[AggregatedWindow]</code></a><a class="headerlink" href="#iter_aggregate_netcdfnc_path-var_info-config-iteratoraggregatedwindow" title="Permanent link">#</a></h3>
+<p>The streaming form, and what <code>aggregate_netcdf</code> is built on. Two
+properties make it usable on cubes that do not fit in memory:</p>
+<ul>
+<li><strong>one window resident at a time</strong> — each window's time steps are read
+  band by band, so the whole <code>(time, y, x)</code> cube is never materialised. A
+  ten-year hourly ERA5 request over Europe at 0.25° is ~33.6 GB as one
+  array but ~9 MB per daily window;</li>
+<li><strong>windows are not accumulated</strong> — each is yielded then dropped. Pair it
+  with <code>keep_arrays=False</code> to drop the reduced array too once it is on
+  disk.</li>
+</ul>
+<p>Every NetCDF handle it opens — container, variable subset, level-pinned
+view — is closed when the generator finishes or is abandoned, so the file
+can be deleted or overwritten straight after.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">iter_aggregate_netcdf</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">config</span> <span class="o">=</span> <span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="n">keep_arrays</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">iter_aggregate_netcdf</span><span class="p">(</span><span class="s2">&quot;era5.nc&quot;</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">window</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">window</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>   <span class="c1"># window.array is None here</span>
+</code></pre></div>
+<h3 id="aggregatedwindow"><a class="toclink" href="#aggregatedwindow"><code>AggregatedWindow</code></a><a class="headerlink" href="#aggregatedwindow" title="Permanent link">#</a></h3>
+<p>A frozen dataclass with <code>label</code> (the window's left-edge timestamp),
+<code>array</code> (the reduced 2-D array, or <code>None</code> when <code>keep_arrays=False</code> and the
+window was written) and <code>path</code> (the written GeoTIFF, or <code>None</code> when
+<code>out_dir</code> was <code>None</code>). Comparison is identity — a generated <code>__eq__</code> over
+an ndarray field would raise rather than answer.</p>
 <h3 id="ecmwfdownloadaggregate"><a class="toclink" href="#ecmwfdownloadaggregate"><code>ECMWF.download(aggregate=...)</code></a><a class="headerlink" href="#ecmwfdownloadaggregate" title="Permanent link">#</a></h3>
 <p>Adds an <code>aggregate: AggregationConfig | None</code> keyword-only argument.
 When supplied, every retrieved NetCDF is fed through
@@ -19599,10 +19679,10 @@ for the full grammar (e.g. <code>"3H"</code>, <code>"30min"</code>, <code>"6MS"<
 <h2 id="opauto-semantics-flux-vs-state"><a class="toclink" href="#opauto-semantics-flux-vs-state"><code>op="auto"</code> semantics — flux vs state</a><a class="headerlink" href="#opauto-semantics-flux-vs-state" title="Permanent link">#</a></h2>
 <p><code>op="auto"</code> is a sentinel that defers the choice of reducer to the
 catalog. The resolver is <code>_resolve_op</code> in <code>earthlens.aggregate</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_resolve_op</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">var_info</span><span class="p">):</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="k">if</span> <span class="n">op</span> <span class="o">!=</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="k">return</span> <span class="n">op</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="k">return</span> <span class="s2">&quot;sum&quot;</span> <span class="k">if</span> <span class="n">var_info</span><span class="o">.</span><span class="n">is_flux</span> <span class="k">else</span> <span class="s2">&quot;mean&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_resolve_op</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">var_info</span><span class="p">):</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="k">if</span> <span class="n">op</span> <span class="o">!=</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="k">return</span> <span class="n">op</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">return</span> <span class="s2">&quot;sum&quot;</span> <span class="k">if</span> <span class="n">var_info</span><span class="o">.</span><span class="n">is_flux</span> <span class="k">else</span> <span class="s2">&quot;mean&quot;</span>
 </code></pre></div>
 <p>Two-line decision:</p>
 <ul>
@@ -19666,7 +19746,7 @@ of water equivalent):</p>
 </table>
 <p>The physically correct daily total is the sum of the four 6-hour
 accumulations:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>daily total = 0.001 + 0.002 + 0.005 + 0.004 = 0.012 m
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>daily total = 0.001 + 0.002 + 0.005 + 0.004 = 0.012 m
 </code></pre></div>
 <p><code>op="auto"</code> (resolves to <code>"sum"</code> for evaporation) writes
 <strong><code>0.012 m</code></strong> to the GeoTIFF — the actual daily total water that
@@ -19758,22 +19838,22 @@ supported — the user must pick a level explicitly.</p>
 <h2 id="worked-example-download-to-monthly-mean-geotiffs"><a class="toclink" href="#worked-example-download-to-monthly-mean-geotiffs">Worked example — download to monthly mean GeoTIFFs</a><a class="headerlink" href="#worked-example-download-to-monthly-mean-geotiffs" title="Permanent link">#</a></h2>
 <p>Single-call pipeline that downloads daily ERA5 2-metre temperature
 for January 2022 over a 1° box and writes one monthly-mean GeoTIFF:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;ecmwf&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2022-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2022-01-31&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;reanalysis-era5-single-levels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2m-temperature&quot;</span><span class="p">]},</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">75.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.0</span><span class="p">],</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/era5&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="p">)</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1MS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">),</span>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.earthlens</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">earthlens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;ecmwf&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2022-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2022-01-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;reanalysis-era5-single-levels&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2m-temperature&quot;</span><span class="p">]},</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">75.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.0</span><span class="p">],</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out/era5&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">)</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">download</span><span class="p">(</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="n">aggregate</span><span class="o">=</span><span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1MS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">),</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">)</span>
 </code></pre></div>
 <p>The retrieved NetCDF lands at
 <code>out/era5/2m_temperature_reanalysis-era5-single-levels.nc</code>; the
@@ -19782,22 +19862,6 @@ aggregated GeoTIFF lands at
 <code>out_dir = &lt;root_dir&gt;/aggregated/</code>).</p>
 <h2 id="worked-example-aggregate-later-separately"><a class="toclink" href="#worked-example-aggregate-later-separately">Worked example — aggregate later, separately</a><a class="headerlink" href="#worked-example-aggregate-later-separately" title="Permanent link">#</a></h2>
 <p>If you already have the NetCDF on disk:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">aggregate_netcdf</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">spec</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="s2">&quot;reanalysis-era5-single-levels&quot;</span><span class="p">,</span> <span class="s2">&quot;2m-temperature&quot;</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">)</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">results</span> <span class="o">=</span> <span class="n">aggregate_netcdf</span><span class="p">(</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="s2">&quot;out/era5/2m_temperature_reanalysis-era5-single-levels.nc&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">spec</span><span class="p">,</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1MS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s2">&quot;out/era5/monthly&quot;</span><span class="p">),</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">)</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="k">for</span> <span class="n">window_label</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">window_label</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="in-memory-mode-out_dirnone"><a class="toclink" href="#in-memory-mode-out_dirnone">In-memory mode (<code>out_dir=None</code>)</a><a class="headerlink" href="#in-memory-mode-out_dirnone" title="Permanent link">#</a></h2>
-<p>Skip GeoTIFF writes entirely and inspect the per-window arrays:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">aggregate_netcdf</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
@@ -19807,25 +19871,41 @@ aggregated GeoTIFF lands at
 <a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="n">results</span> <span class="o">=</span> <span class="n">aggregate_netcdf</span><span class="p">(</span>
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="s2">&quot;out/era5/2m_temperature_reanalysis-era5-single-levels.nc&quot;</span><span class="p">,</span>
 <a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="n">spec</span><span class="p">,</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">),</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1MS&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s2">&quot;out/era5/monthly&quot;</span><span class="p">),</span>
 <a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">)</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">first_label</span><span class="p">,</span> <span class="n">first_array</span><span class="p">,</span> <span class="n">first_path</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="k">assert</span> <span class="n">first_path</span> <span class="ow">is</span> <span class="kc">None</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="k">for</span> <span class="n">window_label</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">window_label</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="in-memory-mode-out_dirnone"><a class="toclink" href="#in-memory-mode-out_dirnone">In-memory mode (<code>out_dir=None</code>)</a><a class="headerlink" href="#in-memory-mode-out_dirnone" title="Permanent link">#</a></h2>
+<p>Skip GeoTIFF writes entirely and inspect the per-window arrays:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">aggregate_netcdf</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">spec</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="s2">&quot;reanalysis-era5-single-levels&quot;</span><span class="p">,</span> <span class="s2">&quot;2m-temperature&quot;</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">)</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">results</span> <span class="o">=</span> <span class="n">aggregate_netcdf</span><span class="p">(</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="s2">&quot;out/era5/2m_temperature_reanalysis-era5-single-levels.nc&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">spec</span><span class="p">,</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="n">AggregationConfig</span><span class="p">(</span><span class="n">freq</span><span class="o">=</span><span class="s2">&quot;1D&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">),</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">)</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="n">first_label</span><span class="p">,</span> <span class="n">first_array</span><span class="p">,</span> <span class="n">first_path</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="k">assert</span> <span class="n">first_path</span> <span class="ow">is</span> <span class="kc">None</span>
 </code></pre></div>
 <h2 id="cli-demo"><a class="toclink" href="#cli-demo">CLI demo</a><a class="headerlink" href="#cli-demo" title="Permanent link">#</a></h2>
 <p><code>examples/post_process_ecmwf_netcdf.py</code> is a thin CLI wrapper:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python<span class="w"> </span>examples/post_process_ecmwf_netcdf.py<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span>out/era5/2m_temperature_reanalysis-era5-single-levels.nc<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span>out/era5/daily<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span>reanalysis-era5-single-levels<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span>2m-temperature<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span>--freq<span class="w"> </span>1D<span class="w"> </span>--op<span class="w"> </span>auto
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>python<span class="w"> </span>examples/post_process_ecmwf_netcdf.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span>out/era5/2m_temperature_reanalysis-era5-single-levels.nc<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span>out/era5/daily<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span>reanalysis-era5-single-levels<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span>2m-temperature<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span>--freq<span class="w"> </span>1D<span class="w"> </span>--op<span class="w"> </span>auto
 </code></pre></div>
 <p>Flags map 1-to-1 to <code>AggregationConfig</code> fields. See <code>--help</code> for
 the full list.</p>
 <h2 id="output-filename-convention"><a class="toclink" href="#output-filename-convention">Output filename convention</a><a class="headerlink" href="#output-filename-convention" title="Permanent link">#</a></h2>
 <p>Per-window GeoTIFFs are named:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>&lt;cds_variable&gt;_&lt;freq&gt;_&lt;window-label-as-YYYYMMDD&gt;.tif
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>&lt;cds_variable&gt;_&lt;freq&gt;_&lt;window-label-as-YYYYMMDD&gt;.tif
 </code></pre></div>
 <p>Examples:</p>
 <ul>
