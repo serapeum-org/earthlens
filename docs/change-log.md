@@ -47,6 +47,12 @@ handshake. They now take the pooled default, and the three backends that built
 a client per item (erddap per dataset row, bathymetry per file, gee per
 exported tile) hold one on the instance so the connection is actually reused.
 `RequestsGet` remains available for a caller that wants no pooling.
+Three helpers are called *per item* rather than holding a client — ghsl's
+per-tile download, glaciers' per-file stream and worldpop's per-page REST call
+— and now take a session from `thread_local_session()`, one per thread so a
+worker reuses its connection across the items it handles. Per thread rather
+than shared because `requests.Session` is not guaranteed thread-safe and ghsl
+downloads its tiles across joblib threads.
 
 - A bounded-result contract on `AbstractDataSource`, so a large vector or
 tabular request no longer has to be held whole in memory:
