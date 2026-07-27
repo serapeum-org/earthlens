@@ -45,14 +45,41 @@ _CHUNK_SIZE = 1 << 20
 _GRIB_MAGIC = b"GRIB"
 
 
+#: A bzip2 stream starts `BZh` followed by the block-size digit `1`-`9`. After
+#: one stream ends, this is what tells a genuine next stream apart from
+#: trailing padding — see :meth:`_Bz2Streams._start_next_stream`.
+_BZ2_MAGIC = b"BZh"
+_BZ2_HEADER_LEN = 4
+
+
+def _starts_a_bz2_stream(header: bytes) -> bool:
+    """Report whether `header` opens a bzip2 stream.
+
+    Args:
+        header: The first :data:`_BZ2_HEADER_LEN` bytes after a stream ended.
+
+    Returns:
+        bool: `True` for `BZh1`..`BZh9`.
+    """
+    return header[:3] == _BZ2_MAGIC and header[3:4].isdigit() and header[3:4] != b"0"
+
+
 class _Bz2Streams:
     """Decodes a possibly-multi-stream `.bz2` body fed to it block by block.
 
     Holds the state that makes streamed decoding equivalent to
     `bz2.decompress`: which decompressor is current, whether it has been fed
-    anything, and whether any stream has completed — that last one decides
-    whether trailing junk is ignored or raised. Keeping it in a small class
-    leaves :func:`_decompress_stream` a plain loop.
+    anything, and whether what follows a finished stream is another stream or
+    trailing padding. Keeping it in a small class leaves
+    :func:`_decompress_stream` a plain loop.
+
+    After a stream ends, the next bytes are buffered until the four-byte header
+    can be inspected rather than handed straight to a new decompressor. The
+    earlier version relied on `BZ2Decompressor.decompress` raising `OSError`
+    promptly on padding, which **Python 3.13 changed**: fed a few bytes at a
+    time it buffers instead of raising, so the padding looked like a stream
+    that never finished and a perfectly good download was rejected as
+    truncated. The magic check does not depend on when the error arrives.
     """
 
     def __init__(self, handle: IO[bytes]) -> None:
@@ -66,6 +93,9 @@ class _Bz2Streams:
         self._decompressor = bz2.BZ2Decompressor()
         self._completed_a_stream = False
         self._fed_current = False
+        self._awaiting_header = False
+        self._header = b""
+        self._trailing_junk = False
 
     def feed(self, block: bytes) -> None:
         """Decode one block, crossing stream boundaries as needed.
@@ -78,32 +108,75 @@ class _Bz2Streams:
             OSError: If the very first stream is not valid bzip2 at all.
         """
         data = block
-        while data:
-            if self._decompressor.eof:
-                # The previous stream finished; anything left is the next one.
-                self._decompressor = bz2.BZ2Decompressor()
-                self._fed_current = False
-            try:
-                chunk = self._decompressor.decompress(data)
-            except OSError:
-                if self._completed_a_stream:
-                    # Not a further stream — trailing bytes. `bz2.decompress`
-                    # ignores these once it has decoded something.
-                    return
-                raise
-            self._fed_current = True
-            self._handle.write(chunk)
-            self.written += len(chunk)
-            # Only a finished stream can leave bytes over; while it is still
-            # consuming, the whole chunk was absorbed.
-            if self._decompressor.eof:
-                self._completed_a_stream = True
-                data = self._decompressor.unused_data
-            else:
-                data = b""
+        while data and not self._trailing_junk:
+            if self._awaiting_header:
+                data = self._start_next_stream(data)
+                continue
+            data = self._decompress(data)
+
+    def _start_next_stream(self, data: bytes) -> bytes:
+        """Buffer the post-stream bytes until the header can be judged.
+
+        Args:
+            data: The bytes available after the previous stream ended.
+
+        Returns:
+            bytes: What is left to decompress — the buffered header plus the
+                remainder once a real stream is recognised, else empty (either
+                more bytes are needed, or the tail was padding).
+        """
+        wanted = _BZ2_HEADER_LEN - len(self._header)
+        self._header += data[:wanted]
+        rest = data[wanted:]
+        if len(self._header) < _BZ2_HEADER_LEN:
+            return b""  # Undecidable yet; wait for the next block.
+        if not _starts_a_bz2_stream(self._header):
+            # Padding, not a further stream. `bz2.decompress` ignores it once
+            # it has decoded something.
+            self._trailing_junk = True
+            return b""
+        self._decompressor = bz2.BZ2Decompressor()
+        self._fed_current = False
+        self._awaiting_header = False
+        header, self._header = self._header, b""
+        return header + rest
+
+    def _decompress(self, data: bytes) -> bytes:
+        """Push `data` through the current decompressor.
+
+        Args:
+            data: Bytes belonging to the stream in progress.
+
+        Returns:
+            bytes: Whatever the stream did not consume, when it ended on this
+                call; empty while it is still consuming.
+
+        Raises:
+            OSError: If the very first stream is not valid bzip2 at all.
+        """
+        try:
+            chunk = self._decompressor.decompress(data)
+        except OSError:
+            if self._completed_a_stream:
+                self._trailing_junk = True
+                return b""
+            raise
+        self._fed_current = True
+        self._handle.write(chunk)
+        self.written += len(chunk)
+        # Only a finished stream can leave bytes over; while it is still
+        # consuming, the whole chunk was absorbed.
+        if not self._decompressor.eof:
+            return b""
+        self._completed_a_stream = True
+        self._awaiting_header = True
+        return self._decompressor.unused_data
 
     def finish(self, url: str) -> None:
         """Reject a body that ended part-way through a stream.
+
+        A tail that never became a stream — padding, or too few bytes to be one
+        — is not truncation and is ignored, matching `bz2.decompress`.
 
         Args:
             url: Source URL, redacted into the message.
@@ -111,6 +184,8 @@ class _Bz2Streams:
         Raises:
             ValueError: If the data ended before its end-of-stream marker.
         """
+        if self._trailing_junk or self._awaiting_header:
+            return
         if self._fed_current and not self._decompressor.eof:
             raise ValueError(
                 f"{redact_url(url)} returned a truncated bz2 body: the stream "

@@ -1274,6 +1274,81 @@ class TestDecompressStream:
                 f"expected {expected[0]} / {expected[1]!r}"
             )
 
+    def test_trailing_padding_split_across_blocks_is_not_truncation(self):
+        """Padding arriving a byte at a time must not look like a short stream.
+
+        Regression, and version-dependent: the reader used to decide this from
+        `BZ2Decompressor.decompress` raising `OSError` on the padding, which
+        Python 3.13 stopped doing promptly — fed a few bytes at a time it
+        buffers. The padding then looked like a stream that never ended and a
+        valid GRIB2 was rejected. The header check does not depend on when the
+        error arrives, so this holds on every version.
+        """
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        body = bz2.compress(b"AAAA") + b"not-a-stream"
+        buf = io.BytesIO()
+
+        written = _decompress_stream(
+            (body[i : i + 1] for i in range(len(body))), buf, "https://h/x.bz2"
+        )
+
+        assert buf.getvalue() == b"AAAA", "the real stream must still be decoded"
+        assert written == 4
+
+    def test_padding_shorter_than_a_header_is_ignored(self):
+        """A tail too short to be a stream is padding, not truncation."""
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        for tail in (b"B", b"BZ", b"BZh"):
+            buf = io.BytesIO()
+            body = bz2.compress(b"AAAA") + tail
+            _decompress_stream(iter([body]), buf, "https://h/x.bz2")
+            assert buf.getvalue() == b"AAAA", f"tail {tail!r} should be ignored"
+
+    def test_a_truncated_second_stream_still_raises(self):
+        """Ignoring padding must not also swallow a genuinely short stream."""
+        import bz2
+        import io
+
+        from earthlens.nwp.centres.dwd import _decompress_stream
+
+        two = bz2.compress(b"BBBB")
+        body = bz2.compress(b"AAAA") + two[: len(two) // 2]
+        buf = io.BytesIO()
+        blocks = (body[i : i + 1] for i in range(len(body)))
+
+        with pytest.raises(ValueError, match="truncated bz2 body"):
+            _decompress_stream(blocks, buf, "https://h/x.bz2")
+
+    @pytest.mark.parametrize(
+        ("header", "expected"),
+        [
+            (b"BZh1", True),
+            (b"BZh9", True),
+            (b"BZh0", False),
+            (b"BZhX", False),
+            (b"GRIB", False),
+            (b"\x00\x00\x00\x00", False),
+        ],
+    )
+    def test_recognises_a_stream_header(self, header, expected):
+        """`BZh1`..`BZh9` opens a stream; anything else is padding.
+
+        Args:
+            header: The four bytes following a finished stream.
+            expected: Whether they start a further stream.
+        """
+        from earthlens.nwp.centres.dwd import _starts_a_bz2_stream
+
+        assert _starts_a_bz2_stream(header) is expected
+
     def test_stream_boundary_on_a_chunk_edge(self):
         """A boundary exactly at a block edge must not raise EOFError.
 
