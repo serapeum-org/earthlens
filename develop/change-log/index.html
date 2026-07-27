@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19962,7 +19962,13 @@ the per-call <code>RequestsGet</code> adapter, so every request paid a fresh TCP
 handshake. They now take the pooled default, and the three backends that built
 a client per item (erddap per dataset row, bathymetry per file, gee per
 exported tile) hold one on the instance so the connection is actually reused.
-<code>RequestsGet</code> remains available for a caller that wants no pooling.</p>
+<code>RequestsGet</code> remains available for a caller that wants no pooling.
+Three helpers are called <em>per item</em> rather than holding a client — ghsl's
+per-tile download, glaciers' per-file stream and worldpop's per-page REST call
+— and now take a session from <code>thread_local_session()</code>, one per thread so a
+worker reuses its connection across the items it handles. Per thread rather
+than shared because <code>requests.Session</code> is not guaranteed thread-safe and ghsl
+downloads its tiles across joblib threads.</p>
 </li>
 <li>
 <p>A bounded-result contract on <code>AbstractDataSource</code>, so a large vector or
