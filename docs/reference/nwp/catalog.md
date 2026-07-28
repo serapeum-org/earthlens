@@ -8,37 +8,26 @@ The NWP backend's SDKs are an optional extra:
 pip install earthlens[nwp]      # herbie-data + ecmwf-opendata
 ```
 
-Two binary libraries are **environment requirements** (not on PyPI in a
-usable form on every platform), so install them via conda-forge if they
-are missing:
+That is the whole install — there is nothing to fetch from conda-forge.
 
-* **`libgdal-grib`** — the GRIB driver that `pyramids.grib.open_grib`
-  calls. Bundled in the `pyramids-gis` wheels; raises
-  `DriverNotExistError` if absent.
-* **`eccodes`** — the C library that `cfgrib`/`eccodes` need. Herbie's
-  import chain pulls `cfgrib`, so `import herbie` fails with
-  `RuntimeError: Cannot find the ecCodes library` if the binary is
-  missing (notably the pip `eccodes` wheel on Windows). earthlens itself
-  imports neither `cfgrib` nor `eccodes` directly.
+The GRIB **read** path is pyramids': `pyramids.grib.open_grib` uses the driver
+bundled in the `pyramids-gis` wheel, so nothing has to be installed alongside
+it.
 
-```bash
-conda install -c conda-forge eccodes libgdal-grib
-```
+The **decode** libraries Herbie needs (`cfgrib`, `eccodes`) come in as ordinary
+PyPI dependencies of `herbie-data`, and the ecCodes binary they bind to arrives
+with them: on Windows through `ecmwflibs`, which the `nwp` extra installs for
+that platform, and elsewhere in the `eccodes` wheel itself. earthlens imports
+neither `cfgrib` nor `eccodes` directly.
 
-The `earthlens[nwp]` extra installs only the Python SDKs (`herbie-data`,
-`ecmwf-opendata`); the two binary libraries above are not on PyPI, so install
-them from conda-forge as shown. earthlens' own GRIB read path decodes through
-`pyramids`' bundled driver, so `eccodes` is needed only to satisfy Herbie's
-`cfgrib` import chain, not by earthlens itself.
-
-!!! note "conda eccodes on Windows"
-    On Windows, conda installs the library as `Library\bin\eccodes.dll`,
-    but the pip `eccodes` binding's `findlibs` looks for `lib\libeccodes.dll`.
-    If `import herbie` still raises `Cannot find the ecCodes library` after
-    the conda install, copy (or symlink) the DLL to the name `findlibs`
-    expects: `copy Library\bin\eccodes.dll lib\libeccodes.dll` inside the
-    environment prefix. Linux / macOS resolve `lib/libeccodes.{so,dylib}`
-    automatically and need no such step.
+!!! note "If `import herbie` cannot find ecCodes"
+    Older `eccodes` wheels did not bundle the binary, and a mixed conda/pip
+    environment can still leave the binding unable to locate it — the symptom
+    is `RuntimeError: Cannot find the ecCodes library`. Upgrading the wheel
+    (`pip install -U eccodes`) is normally enough. On Windows, a conda-provided
+    library is installed as `Library\bin\eccodes.dll` while the pip binding's
+    `findlibs` looks for `lib\libeccodes.dll`; copying it to the expected name
+    inside the environment prefix resolves that case.
 
 ## Curated models
 
