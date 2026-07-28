@@ -1,87 +1,25 @@
 # Change Log
 
-## Unreleased
+## 0.12.0 (2026-07-27)
 
 ### BREAKING CHANGE
 
-- `Catalog.load(<missing path>)` now raises `ValueError` naming the path,
-where it previously raised `FileNotFoundError`. Every catalog reports a
-missing file the same way now that all 48 share
-`earthlens.base.catalog_source.load_catalog` — the last five hold-outs (chc,
-earthdata, gee, hdx, jaxa) and radar were migrated too, so no loader
-computes its own `st_mtime_ns` cache key any more. No shipped caller catches
-`FileNotFoundError` around a catalog load, but external code that does
-should catch `ValueError` instead.
-- `OpenAQ(limit=...)` was a *page size*, not a total. The page size is now
-`page_size=` and `limit=` is what it read like: a cap on the measurement rows
-`download()` returns and writes, across every sensor, enforced as the
-per-sensor frames arrive so sensors past the cap are never fetched. Code
-passing `limit=1000` for paging should pass `page_size=1000`.
-
-- `earthlens.jaxa.catalog.Catalog.load()` returns a fresh instance per call
-rather than a shared cached one (the parse payload is what is memoised), so
-mutating the result no longer corrupts later loads. `_yaml_files_for` is gone
-from the jaxa and gee catalog modules; `_mtime_ns` is gone from hdx's.
-- The catalog-import error text changed from
-`"Backend 'gee' catalog is unavailable"` to
-`"Backend catalog for 'gee' is unavailable"`, since the registry and
-catalog paths now share one message builder.
-- An `ImportError` raised *inside* a backend is no longer rewritten into
-`"its runtime dependency is not installed. Install with pip install
-earthlens[...]"`. Only a genuinely absent third-party SDK gets that hint;
-a fault in earthlens' own code propagates unchanged so the real cause is
-visible.
-
-- `AbstractCatalog.catalog` is a read-only property rather than a pydantic
-field, so it no longer appears in `model_fields` or `model_dump()`, and
-`Catalog(catalog=...)` is ignored instead of setting it. Reads
-(`cat.catalog["key"]`, `in`, `len`, iteration) are unchanged; writes now
-raise instead of silently rewriting `datasets`.
-
-### Feat
-
-- HTTP requests are pooled by default. `HttpClient()` already built a
-`requests.Session`, but 22 call sites across 17 modules opted out by injecting
-the per-call `RequestsGet` adapter, so every request paid a fresh TCP+TLS
-handshake. They now take the pooled default, and the three backends that built
-a client per item (erddap per dataset row, bathymetry per file, gee per
-exported tile) hold one on the instance so the connection is actually reused.
-`RequestsGet` remains available for a caller that wants no pooling.
-Three helpers are called *per item* rather than holding a client — ghsl's
-per-tile download, glaciers' per-file stream and worldpop's per-page REST call
-— and now take a session from `thread_local_session()`, one per thread so a
-worker reuses its connection across the items it handles. Per thread rather
-than shared because `requests.Session` is not guaranteed thread-safe and ghsl
-downloads its tiles across joblib threads.
-
-- A bounded-result contract on `AbstractDataSource`, so a large vector or
-tabular request no longer has to be held whole in memory:
-  - `EarthLens.iter_download(limit=...)` (and
-    `AbstractDataSource.iter_download`) streams one fragment per product, so a
-    caller can write or reduce each one and let it go. Backends with the
-    `_search` / `_fetch_one` split get it for free; a backend that answers the
-    whole request in one call raises `NotImplementedError` rather than
-    pretending to stream.
-  - `limit=` is a cap on **total** rows / features, not a page size. It is
-    exact when it lands mid-fragment, and it stops the work: products past the
-    cap are never fetched. `check_limit` rejects `0`, negatives and non-ints
-    instead of quietly returning nothing.
-  - `_take_limited` is the shared helper backends use to apply that cap while
-    their per-item fragments arrive.
-- Every backend whose batch is a loop over independent items now accepts
-`errors="warn" | "raise" | "ignore"`: `chc`, `cmems`, `ecmwf` and `radar` join
-`fdsn`, `nwp` and `soilgrids`. `_search_fetch_each` also takes `errors=`.
+- Catalog.load(<missing path>) raises ValueError, not
+FileNotFoundError, now that all 48 catalogs report a missing file through
+the shared loader. OpenAQ(limit=...) was a page size and is now
+page_size=; limit= is a total row cap, so code passing limit=1000 for
+paging must pass page_size=1000. earthlens.jaxa.catalog.Catalog.load()
+returns a fresh instance per call rather than a shared one.
+- an unsupported temporal_resolution now raises instead
+of silently downloading daily; cadence="weekly" maps to 7D rather than
+pandas W (which emits period ends and skips the window's first days);
+aggregate._reduce and _window_groups are now reduce_time_axis and
+window_groups.
 
 ### Fix
 
-- `Catalog.load()` hands out a fresh instance per call. Previously one
-caller mutating `.datasets` corrupted the catalog for the whole process,
-including a later `Catalog()`. The row objects inside are still shared
-frozen models and should be treated as read-only.
-- A `download()` the backend rejects no longer leaves an empty output
-directory behind.
-- DWD NWP downloads reject a truncated `.bz2` body instead of publishing a
-short `.grib2`, and decode multi-stream `.bz2` fully.
+- **base**: bound memory, pool connections and unify the duplicated base contracts (#824)
+- **base**: repair four data-source contract bugs and remove the duplication behind them (#804)
 
 ## 0.11.0 (2026-07-20)
 
