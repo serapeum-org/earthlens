@@ -25,7 +25,7 @@ the shared biodiversity home so the backend imports the one warning class.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import geopandas as gpd
 import pandas as pd
@@ -97,7 +97,7 @@ def bbox_wsen(space: SpatialExtent) -> tuple[float, float, float, float]:
     return (space.west, space.south, space.east, space.north)
 
 
-def shapely_bbox(space: SpatialExtent):
+def shapely_bbox(space: SpatialExtent) -> Polygon:
     """Return a shapely `box` for the extent (for any client-side geometry filter).
 
     Args:
@@ -165,7 +165,7 @@ def _row(osm_id: int, osm_type: str, geometry, tags: dict) -> dict:
     return {**dict(tags), "osm_id": osm_id, "osm_type": osm_type, "geometry": geometry}
 
 
-def overpy_to_gdf(result) -> gpd.GeoDataFrame:
+def overpy_to_gdf(result: Any) -> gpd.GeoDataFrame:
     """Build a WGS84 `GeoDataFrame` from a parsed overpy result.
 
     overpy returns parsed `.nodes` / `.ways` / `.relations` rather than a

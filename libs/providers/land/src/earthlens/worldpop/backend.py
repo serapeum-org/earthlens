@@ -25,7 +25,7 @@ from __future__ import annotations
 import re
 import time
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pandas as pd
@@ -54,6 +54,9 @@ from earthlens.worldpop._helpers import (
     load_iso3_bbox,
     normalise_iso3,
 )
+
+if TYPE_CHECKING:
+    from earthlens.aggregate import AggregationConfig
 from earthlens.worldpop.auth import WorldPopAuth
 from earthlens.worldpop.catalog import GENERATIONS, Catalog
 from earthlens.worldpop.rest import (
@@ -227,7 +230,7 @@ class WorldPop(AbstractDataSource):
         self._ssp = ssp
         self._allow_large_archive = allow_large_archive
         self._auth = WorldPopAuth()
-        self._aggregate_cfg = None
+        self._aggregate_cfg: AggregationConfig | None = None
         self._show_progress = True
 
         # Resolve + statically validate (product + selector → sub-alias) up
@@ -894,7 +897,11 @@ class WorldPop(AbstractDataSource):
         return self._dispatch()
 
     def download(
-        self, progress_bar: bool = True, aggregate=None, *, force: bool = False
+        self,
+        progress_bar: bool = True,
+        aggregate: AggregationConfig | None = None,
+        *,
+        force: bool = False,
     ) -> list[Path]:
         """Fetch the requested products as AOI-cropped GeoTIFFs (+ tables).
 

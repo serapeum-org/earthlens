@@ -19,7 +19,7 @@ the catalog does. An unknown id raises a `ValueError` naming the closest match.
 ## griddap → raster NetCDF
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="erddap",

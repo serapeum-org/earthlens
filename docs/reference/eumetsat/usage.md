@@ -7,7 +7,7 @@ This page covers the request shape, every backend-specific keyword, what
 ## The request shape
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(
     data_source="eumetsat",

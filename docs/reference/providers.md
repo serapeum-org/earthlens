@@ -11,7 +11,8 @@ pip install earthlens[<extra>]      # e.g. earthlens[ecmwf]
 pip install earthlens[all]          # every backend's SDK
 ```
 
-Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, AirNow, Sensor.Community, GHSL) need only the core install — they use anonymous FTP or plain HTTP.
+Backends with `—` in the **Extra** column need only the core install — they reach their provider over anonymous FTP or
+plain HTTP and pull in no additional SDK.
 
 ## Integrated providers
 
@@ -55,6 +56,16 @@ Backends with no extra (CHC, GDACS, FIRMS, OpenAQ, AirNow, Sensor.Community, GHS
 | Administrative boundaries (geoBoundaries / CGAZ / Natural Earth / TIGER) | `admin`, `admin-boundaries`, `geoboundaries`, `natural-earth`, `tiger` | vector | none (public) | — | [Administrative boundaries](admin/introduction.md) |
 | ISRIC SoilGrids 2.0 soil properties (250 m, OGC WCS) | `soilgrids`, `isric` | raster | none (public, CC-BY 4.0) | — | [SoilGrids](soilgrids/introduction.md) |
 | Drought indicators (USDM / Copernicus EDO + GDO / CSIC SPEIbase) | `drought`, `usdm`, `edo`, `gdo` | per-dataset (vector USDM polygons / raster EDO+GDO+SPEIbase) | none | — | [Drought](drought/introduction.md) |
+| Climate indices — NOAA PSL teleconnections (ENSO / NAO / PDO / …) | `climate-indices`, `climate_indices`, `teleconnections` | tabular | none (public) | — | [Climate indices](climate_indices/introduction.md) |
+| CMIP6 climate projections (Pangeo cloud archive) | `cmip6`, `climate-projections`, `pangeo-cmip6` | raster | none (public) | — | [CMIP6](cmip6/introduction.md) |
+| Copernicus DEM global land elevation | `dem`, `cop-dem`, `copernicus-dem`, `elevation` | raster | unsigned AWS (public bucket) | `s3` | [DEM](dem/introduction.md) |
+| Glacier outlines and mass balance (RGI / GLIMS / WGMS) | `glaciers`, `rgi`, `glims`, `wgms` | vector | none (public) | — | [Glaciers](glaciers/introduction.md) |
+| NOAA GOES-R ABI geostationary imagery | `goes` | raster | unsigned AWS (public bucket) | `s3` | [GOES](goes/introduction.md) |
+| NREL solar and wind resource (NSRDB / WIND Toolkit) | `nrel`, `nsrdb`, `wind-toolkit` | tabular | API key (`NREL_API_KEY` + `NREL_EMAIL`) | — | [NREL](nrel/introduction.md) |
+| OpenStreetMap features (Overpass / ohsome / PBF extracts) | `osm`, `openstreetmap`, `overpass`, `ohsome` | vector | none (public) | `osm` | [OSM](osm/introduction.md) |
+| PVGIS solar radiation and PV performance (EU JRC) | `pvgis`, `solar-pv` | tabular | none (public) | — | [PVGIS](pvgis/introduction.md) |
+| Risk indicators (ThinkHazard! / INFORM / Global Forest Watch) | `risk-indicators`, `thinkhazard`, `inform`, `gfw`, `global-forest-watch` | tabular | none, except GFW (`GFW_API_KEY`) | — | [Risk indicators](risk_indicators/introduction.md) |
+| Global Solar Atlas and Global Wind Atlas (World Bank / ESMAP) | `solar-wind-atlas`, `global-solar-atlas`, `global-wind-atlas`, `gsa`, `gwa` | raster | none (public) | — | [Solar & Wind Atlas](solar_wind_atlas/introduction.md) |
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
 (GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX, Sentinel Hub, WorldPop)

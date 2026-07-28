@@ -46,6 +46,23 @@ theme:
     repo: fontawesome/brands/github
 
 
+# Notebook runs write their downloads next to the notebook, and mkdocs copies
+# everything under docs/ into the site verbatim — which shipped ~4.8 GB of raw
+# granules (docs/examples/showcases/out/ alone is 4.5 GB). None of it is
+# tracked, and none of it belongs in the published site: the notebooks render
+# from their stored outputs, not from these files.
+exclude_docs: |
+  examples/*/out/
+  examples/*/data/
+  examples/*/earthlens-data/
+  examples/*/_nb_out/
+  examples/*/_overture_out/
+  examples/*/*_out/
+  examples/*/*_output/
+  examples/*/ohsome_log/
+  examples/*/insar_stack*/
+  examples/*/soilgrids_*/
+
 plugins:
   - search
   - mkdocs-jupyter:
@@ -114,9 +131,13 @@ nav:
   - Guide:
     - Installation: installation.md
     - Getting started: getting-started.md
+    - Discovering datasets: discovery.md
     - Architecture: overview/architecture.md
     - Temporal aggregation: aggregation.md
     - Command-line interface: reference/cli.md
+    - Troubleshooting: troubleshooting.md
+    - Migration guide: migration.md
+    - Contributing: contributing.md
   - Data Sources:
     - Supported providers: reference/providers.md
     - Deferred providers: reference/deferred-providers.md
@@ -344,6 +365,7 @@ nav:
       - Reference: reference/worldpop/worldpop.md
     - Biodiversity (overview):
       - Introduction: reference/biodiversity/introduction.md
+      - Usage: reference/biodiversity/usage.md
     - GBIF (species occurrences):
       - Introduction: reference/gbif/introduction.md
       - Usage: reference/gbif/usage.md
@@ -396,6 +418,8 @@ nav:
       - Great Aletsch Glacier retreat, 1986-2023 (time-lapse): examples/showcases/aletsch_glacier_retreat.ipynb
       - Typhoon Bavi 2020 (time-lapse): examples/showcases/typhoon_bavi_2020.ipynb
       - Hurricanes Ida & Milton from GOES (sub-daily): examples/showcases/hurricanes_goes_subdaily.ipynb
+      - Europe temperature animation, June-July 2026 (ECMWF): examples/showcases/europe_temperature_2026.ipynb
+      - Netherlands 2026 water shortage (multi-source): examples/showcases/netherlands_drought_2026.ipynb
     - June 2026 European heat wave:
       - Full case study: examples/heatwave/european_heatwave_2026.ipynb
       - True-colour time-lapse: examples/heatwave/european_heatwave_timelapse_2026.ipynb
@@ -496,6 +520,7 @@ nav:
       - Catalog explorer (no network): examples/jaxa/01_catalog_explorer.ipynb
       - AW3D30 elevation quickstart (live): examples/jaxa/02_aw3d30_quickstart.ipynb
       - G-Portal search (anonymous): examples/jaxa/03_gportal_search.ipynb
+      - P-Tree Himawari-9 AHI full disk (live): examples/jaxa/04_ptree_himawari.ipynb
     - ERDDAP (multi-server client):
       - Catalog explorer (no network): examples/erddap/01_catalog_explorer.ipynb
       - CRW SST anomaly — griddap (live): examples/erddap/02_griddap_sst_anomaly.ipynb
@@ -652,9 +677,16 @@ nav:
       - Catalog, selectors & T–S diagram: examples/argo/catalog_and_selectors.ipynb
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
+    - Core functions: reference/core-functions.md
+    - Aggregation API: reference/aggregation-api.md
     - AbstractDataSource: reference/abstract-datasource.md
+    - Base contracts: reference/base/contracts.md
+    - Extents & warnings: reference/base/extents.md
+    - Authentication API: reference/base/auth-api.md
+    - Catalog & utilities: reference/base/catalog-api.md
     - HTTP client (base): reference/base/http-client.md
     - Region affinity (base): reference/base/region-affinity.md
+    - Biodiversity helpers: reference/biodiversity/api.md
   - About:
     - Change Log: change-log.md
     - License: LICENSE.md

@@ -14,7 +14,7 @@ the top ten GEE asset ids each have an `earthlens.stac` equivalent. This page li
   `usgs-landsat`, S3 keys on `cdse`.
 * **You want a server-side reduction** (e.g. composites, mosaics, indices computed on EE's
   cluster) → `earthlens.openeo` (the openEO process-graph backend). See
-  [`Dynamic World`](#server-side-reductions-google-dynamicworld-v1) below.
+  [`Dynamic World`](#server-side-reductions-googledynamicworldv1) below.
 * **You want GEE-only assets** (e.g. Google's proprietary atmospheric correction, internal LST
   products) → keep `earthlens.gee`; nothing in `earthlens.stac` substitutes for it.
 

@@ -9,7 +9,7 @@ for how the WCS transport and scaled-integer units work.
 ## A two-property subset
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="soilgrids",

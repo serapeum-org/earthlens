@@ -8,7 +8,7 @@ are open). See [Available datasets](datasets.md) for the `dataset=` ids and
 ## A GEBCO bathymetry subset
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="bathymetry",

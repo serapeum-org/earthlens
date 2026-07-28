@@ -29,7 +29,7 @@ export EUMETSAT_CONSUMER_SECRET="your-consumer-secret"
 ### 2. Constructor / facade keyword arguments
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(
     data_source="eumetsat",

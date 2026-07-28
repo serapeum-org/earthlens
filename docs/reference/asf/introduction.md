@@ -110,7 +110,7 @@ the lazy `import asf_search`.
 ## Aliases at the facade
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 EarthLens(data_source="asf",                    # canonical key
           ...)

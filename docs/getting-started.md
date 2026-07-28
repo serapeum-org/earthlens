@@ -84,8 +84,12 @@ to `authenticate(...)`; see each backend's reference page.)
 
 ## Next steps
 
+- [Discovering datasets](discovery.md) — find which of the 48 providers has
+  what you need, with `sources()` / `find()` / `search()`.
 - [Temporal aggregation](aggregation.md) — reduce a downloaded stack into
   windowed composites (daily mean, monthly sum, …).
 - [Architecture](overview/architecture.md) — how the facade, backends, and
   catalogs fit together.
+- [Troubleshooting](troubleshooting.md) — when a download fails, and what to
+  change.
 - The **Examples** tab — a quickstart notebook for every backend.

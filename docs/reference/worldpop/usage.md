@@ -7,7 +7,7 @@ credentials are needed.
 ## The request shape
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="worldpop",

@@ -15,7 +15,7 @@ All examples go through the [`EarthLens`](../earthlens.md) facade with
 | `["tmy"]` | typical meteorological year | One synthetic 8760-hour year of meteo variables |
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 series = EarthLens(
     data_source="pvgis",

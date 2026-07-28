@@ -11,7 +11,7 @@ See [Available datasets](datasets.md) for the two `dataset=` ids and
 ## A GLO-30 request over one tile
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="dem",
@@ -86,7 +86,7 @@ coast produces a ragged coverage; the missing tiles are logged at
 WARNING and the download proceeds:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="dem",

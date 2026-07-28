@@ -47,6 +47,8 @@ from earthlens.glaciers import _helpers
 from earthlens.glaciers.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
+    from pyramids.feature.collection import FeatureCollection
+
     from earthlens.aggregate import AggregationConfig
 
 OutputFormat = Literal["csv", "parquet"]
@@ -343,7 +345,7 @@ class Glaciers(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
-    ):
+    ) -> FeatureCollection | pd.DataFrame:
         """Fetch the dataset and return its per-instance shape.
 
         Args:

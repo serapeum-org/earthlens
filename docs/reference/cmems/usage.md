@@ -85,7 +85,7 @@ earthlens = EarthLens(
     service_username="YOUR_CMEMS_USERNAME",
     service_password="YOUR_CMEMS_PASSWORD",
 )
-earthlens.core.download()
+earthlens.download()
 ```
 
 The facade forwards every extra kwarg (`service_username`,

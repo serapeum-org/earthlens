@@ -61,7 +61,7 @@ and the obligations.
 ## How it maps onto the facade
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="overture",

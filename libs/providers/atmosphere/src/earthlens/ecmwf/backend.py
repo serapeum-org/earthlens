@@ -421,7 +421,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         return client
 
     @property
-    def client(self):
+    def client(self) -> Any:
         """The default (CDS) cdsapi client — opened lazily and cached per endpoint.
 
         Overrides :class:`~earthlens.base.LazyClientMixin` so that reading

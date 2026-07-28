@@ -119,9 +119,11 @@ def create_feature(
 
     Raises:
         ValueError: If any row's geometry cannot be converted via
-            :func:`create_geometry` (e.g. a `LineString`).
+            `create_geometry` (e.g. a `LineString`).
         KeyError: If `gdf` has no `geometry` column, or if any of the
             requested `columns` is missing from `gdf`.
+
+    Note:
         Other exceptions raised by `pandas` / `geopandas` /
         `earthengine-api` propagate verbatim (with their original type
         and traceback).

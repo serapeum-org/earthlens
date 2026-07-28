@@ -43,6 +43,8 @@ from earthlens.base import (
 from earthlens.radar.catalog import Catalog, Station
 
 if TYPE_CHECKING:
+    import geopandas as gpd
+
     from earthlens.aggregate import AggregationConfig
 
 #: The unsigned AWS bucket holding the real-time Level-II chunk feed.
@@ -403,7 +405,7 @@ class Radar(AbstractDataSource):
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
         errors: str = "warn",
-    ):
+    ) -> gpd.GeoDataFrame:
         """Assemble the in-window volumes and return a `GeoDataFrame` inventory.
 
         Args:

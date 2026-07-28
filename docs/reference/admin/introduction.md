@@ -67,7 +67,7 @@ Each request names **one (or more) dataset id(s)** (via `variables=`) plus the
 selector that dataset needs:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # geoBoundaries ADM1 for Kenya -> a FeatureCollection of 47 county polygons
 fc = EarthLens(

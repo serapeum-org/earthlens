@@ -21,7 +21,7 @@ shipped as package data — the token stays user-supplied.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
 from loguru import logger
@@ -36,6 +36,9 @@ from earthlens.biodiversity import IUCN_LICENSE, warn_license
 from earthlens.iucn import _rest
 from earthlens.iucn.auth import IucnAuth, IucnCredentials
 from earthlens.iucn.catalog import Catalog
+
+if TYPE_CHECKING:
+    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["csv", "parquet"]
 
@@ -252,7 +255,7 @@ class IUCN(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate=None,
+        aggregate: AggregationConfig | None = None,
     ) -> pd.DataFrame:
         """Fetch the assessment records and return them as a DataFrame.
 

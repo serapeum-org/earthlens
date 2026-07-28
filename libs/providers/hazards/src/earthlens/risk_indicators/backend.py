@@ -46,6 +46,8 @@ from earthlens.risk_indicators.auth import GfwAuth, GfwCredentials
 from earthlens.risk_indicators.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
+    from pyramids.feature.collection import FeatureCollection
+
     from earthlens.aggregate import AggregationConfig
 
 OutputFormat = Literal["csv", "parquet"]
@@ -338,7 +340,7 @@ class RiskIndicators(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
-    ):
+    ) -> pd.DataFrame | FeatureCollection:
         """Fetch the dataset and return its per-instance shape.
 
         Args:

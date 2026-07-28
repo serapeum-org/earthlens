@@ -6,7 +6,7 @@ The NWP backend takes a `variables` mapping of **model key → list of
 parameters** (the same shape as the GEE and STAC backends):
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 lens = EarthLens(
     data_source="nwp",

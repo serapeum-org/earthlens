@@ -50,7 +50,7 @@ parses each CSV into a long-format frame tagged with `lat` / `lon` / `year` /
 `product`, and concatenates them.
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 df = EarthLens(
     data_source="nrel",                 # aliases: "nsrdb", "wind-toolkit"

@@ -78,7 +78,7 @@ Or — equivalently — open the backend with
 `EarthLens.authenticate()`:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(data_source="asf", variables=["sentinel-1-slc"],
                start="2024-01-01", end="2024-01-31",

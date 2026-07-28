@@ -32,7 +32,7 @@ A request is a **bbox** (or explicit `sites=`) + a **time window** + a list of
 table you can write to CSV or Parquet.
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 df = EarthLens(
     data_source="usgs-water",      # aliases: "usgs-nwis", "nwis"

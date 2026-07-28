@@ -9,7 +9,7 @@ through the `EarthLens` facade with `data_source="risk-indicators"` (aliases:
 ## Selecting a dataset and a country
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 df = EarthLens(
     data_source="risk-indicators",

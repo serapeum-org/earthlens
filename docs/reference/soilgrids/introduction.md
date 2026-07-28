@@ -36,7 +36,7 @@ quantile)`** and returns their paths (`list[Path]`), named
 earthlens never imports an OGC-WCS SDK or a competing array stack.
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="soilgrids",

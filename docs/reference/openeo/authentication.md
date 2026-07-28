@@ -33,7 +33,7 @@ No kwargs needed — the first `download()` triggers the device flow and prints 
 URL + code:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 facade = EarthLens(
     data_source="openeo",

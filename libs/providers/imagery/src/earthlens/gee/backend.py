@@ -578,18 +578,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
             One entry per `(dataset, band-set, time-bucket)`. The
             shape depends on the sink:
 
-            * `export_via="url"` — :class:`pathlib.Path` to the
-              written GeoTIFF (always synchronous).
+            * `export_via="url"` — `pathlib.Path` to the
+                written GeoTIFF (always synchronous).
             * `export_via="drive"` / `"gcs"` / `"asset"` with the
-              default `wait_for_export=True` — destination string
-              (`"drive://<folder>/<prefix>"` / `"gs://<bucket>/<prefix>"` /
-              `"ee://<asset_id>/<prefix>"`), populated only once
-              the task reaches `COMPLETED`.
+                default `wait_for_export=True` — destination string
+                (`"drive://<folder>/<prefix>"` / `"gs://<bucket>/<prefix>"` /
+                `"ee://<asset_id>/<prefix>"`), populated only once
+                the task reaches `COMPLETED`.
             * `export_via="drive"` / `"gcs"` / `"asset"` with
-              `wait_for_export=False` — :class:`TaskInfo` captured
-              at submission time; follow up via
-              :mod:`earthlens.gee.jobs` (`get_task_status`,
-              `wait_for_task_id`, etc.).
+                `wait_for_export=False` — `TaskInfo` captured
+                at submission time; follow up via
+                `earthlens.gee.jobs` (`get_task_status`,
+                `wait_for_task_id`, etc.).
 
         Raises:
             NotImplementedError: If `aggregate` is not `None`.

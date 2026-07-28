@@ -9,7 +9,7 @@
 [![codecov](https://codecov.io/gh/serapeum-org/earthlens/branch/main/graph/badge.svg)](https://codecov.io/gh/serapeum-org/earthlens)
 
 **earthlens** is a Python package providing a single, unified API for downloading
-satellite, climate, and geospatial data from **30 providers** — climate
+satellite, climate, and geospatial data from **48 providers** — climate
 reanalysis, satellite imagery, ocean models, weather forecasts, natural-hazard
 feeds, air quality, biodiversity, population, and more. Pick a `data_source`, describe the area
 and dates you want, and call `download()`; the matching backend handles auth,
@@ -22,24 +22,29 @@ as `data_source=`.
 
 | Domain | Provider (`data_source` key) |
 |--------|------------------------------|
-| **Climate & weather** | Climate Hazards Center — CHIRPS / CHIRTS / SPI / SPEI (`chc`) · ECMWF Copernicus CDS (`ecmwf`) · Open NWP forecasts — GFS / ICON / ECMWF Open Data (`nwp`) |
-| **Satellite imagery & EO platforms** | Google Earth Engine (`gee`) · STAC — Planetary Computer / Earth Search / CDSE (`stac`) · Sentinel Hub server-side render (`sentinel-hub`) · openEO server-side processing (`openeo`) · EUMETSAT Data Store (`eumetsat`) · NASA Earthdata (`earthdata`) |
-| **Ocean & marine** | Copernicus Marine — CMEMS (`cmems`) |
+| **Climate & weather** | Climate Hazards Center — CHIRPS / CHIRTS / SPI / SPEI (`chc`) · ECMWF Copernicus CDS (`ecmwf`) · Open NWP forecasts — GFS / ICON / ECMWF Open Data (`nwp`) · CMIP6 climate projections (`cmip6`) · NOAA PSL teleconnection indices (`climate-indices`) |
+| **Satellite imagery & EO platforms** | Google Earth Engine (`gee`) · STAC — Planetary Computer / Earth Search / CDSE (`stac`) · Sentinel Hub server-side render (`sentinel-hub`) · openEO server-side processing (`openeo`) · EUMETSAT Data Store (`eumetsat`) · NASA Earthdata (`earthdata`) · Alaska Satellite Facility SAR (`asf`) · JAXA Earth observation (`jaxa`) · NOAA GOES-R ABI (`goes`) |
+| **Ocean & marine** | Copernicus Marine — CMEMS (`cmems`) · Argo float profiles (`argo`) · ERDDAP servers (`erddap`) · Bathymetry — GEBCO / ETOPO (`bathymetry`) · OBIS marine occurrences (`obis`) |
 | **Cloud-hosted archives** | AWS Open Data — ERA5 / Sentinel-2 / Copernicus DEM / ESA WorldCover (`amazon-s3`) |
-| **Natural hazards & events** | GDACS disaster alerts (`gdacs`) · FDSN earthquakes (`fdsn`) · FIRMS active fires (`firms`) · Tropycal cyclone tracks (`tropycal`) · NEXRAD radar (`radar`) |
+| **Natural hazards & events** | GDACS disaster alerts (`gdacs`) · FDSN earthquakes (`fdsn`) · FIRMS active fires (`firms`) · Tropycal cyclone tracks (`tropycal`) · NEXRAD radar (`radar`) · Risk indicators — ThinkHazard! / INFORM / GFW (`risk-indicators`) · Drought — USDM / EDO / GDO / SPEIbase (`drought`) |
 | **Air quality** | OpenAQ — global aggregator (`openaq`) · AirNow — US/Canada EPA (`airnow`) · EEA — Europe (`eea-aq`) · Sensor.Community — crowdsourced (`sensor-community`) |
 | **Population & settlement** | JRC Global Human Settlement Layer (`ghsl`) · WorldPop (`worldpop`) |
 | **Hydrology** | USGS Water — NWIS (`usgs-water`) · NOAA National Water Model (`nwm`) |
-| **Vector & humanitarian** | Overture Maps basemap (`overture`) · Humanitarian Data Exchange — HDX (`hdx`) |
+| **Terrain, soil & cryosphere** | Copernicus DEM (`dem`) · ISRIC SoilGrids (`soilgrids`) · Glaciers — RGI / GLIMS / WGMS (`glaciers`) |
+| **Energy resource** | PVGIS — EU JRC (`pvgis`) · NREL NSRDB / WIND Toolkit (`nrel`) · Global Solar & Wind Atlas (`solar-wind-atlas`) |
+| **Biodiversity & conservation** | GBIF species occurrences (`gbif`) · IUCN Red List (`iucn`) · Protected Planet — WDPA (`wdpa`) |
+| **Vector, admin & humanitarian** | Overture Maps basemap (`overture`) · OpenStreetMap features (`osm`) · Administrative boundaries (`admin`) · Humanitarian Data Exchange — HDX (`hdx`) |
 
 ```mermaid
 graph LR
-    EarthLens --> Climate["Climate & weather<br/>chc · ecmwf · nwp"]
-    EarthLens --> Imagery["Satellite imagery<br/>gee · stac · sentinel-hub<br/>openeo · eumetsat · earthdata"]
-    EarthLens --> Ocean["Ocean & archives<br/>cmems · amazon-s3"]
-    EarthLens --> Hazards["Hazards & events<br/>gdacs · fdsn · firms<br/>tropycal · radar"]
+    EarthLens --> Climate["Climate & weather<br/>chc · ecmwf · nwp<br/>cmip6 · climate-indices"]
+    EarthLens --> Imagery["Satellite imagery<br/>gee · stac · sentinel-hub · openeo<br/>eumetsat · earthdata · asf · jaxa · goes"]
+    EarthLens --> Ocean["Ocean & archives<br/>cmems · argo · erddap<br/>bathymetry · obis · amazon-s3"]
+    EarthLens --> Hazards["Hazards & events<br/>gdacs · fdsn · firms · tropycal<br/>radar · risk-indicators · drought"]
     EarthLens --> People["Air, population & water<br/>openaq · airnow · eea-aq · sensor-community<br/>ghsl · worldpop · usgs-water · nwm"]
-    EarthLens --> Vector["Vector & humanitarian<br/>overture · hdx"]
+    EarthLens --> Earth["Terrain, soil & energy<br/>dem · soilgrids · glaciers<br/>pvgis · nrel · solar-wind-atlas"]
+    EarthLens --> Life["Biodiversity<br/>gbif · iucn · wdpa"]
+    EarthLens --> Vector["Vector, admin & humanitarian<br/>overture · osm · admin · hdx"]
 ```
 
 See [Supported providers](reference/providers.md) for the full matrix, and the
@@ -48,7 +53,7 @@ per-provider pages under **Data Sources** for catalogs, authentication, and usag
 ## Quick Start
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 earthlens = EarthLens(
     data_source="chc",
@@ -60,7 +65,7 @@ earthlens = EarthLens(
     lon_lim=[-75.65, -74.73],
     path="examples/data/chirps",
 )
-earthlens.core.download()
+earthlens.download()
 ```
 
 ## Installation

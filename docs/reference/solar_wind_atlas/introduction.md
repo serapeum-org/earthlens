@@ -43,7 +43,7 @@ returns their paths (`list[Path]`). All raster I/O goes through pyramids —
 earthlens never imports a competing array stack.
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="solar-wind-atlas",

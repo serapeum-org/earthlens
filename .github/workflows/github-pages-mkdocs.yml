@@ -27,8 +27,26 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Gate every deploy on a warnings-as-errors build. The deploy action builds
+  # non-strict, so a broken nav entry, a dangling anchor or a malformed
+  # docstring would publish silently — this fails the run instead.
+  build-strict:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+
+    - uses: astral-sh/setup-uv@v5
+      with:
+        version: "0.11.29"
+
+    - name: Build docs with --strict
+      run: uv run --group docs --extra all mkdocs build --strict --site-dir /tmp/site
+
   deploy-pr:
       if: github.event_name == 'pull_request'
+      needs: build-strict
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v5
@@ -45,6 +63,7 @@ jobs:
 
   deploy-main:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build-strict
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -62,6 +81,7 @@ jobs:
     if: >-
       github.event_name == 'release' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    needs: build-strict
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5

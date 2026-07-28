@@ -252,7 +252,7 @@ for January 2022 over a 1° box and writes one monthly-mean GeoTIFF:
 
 ```python
 from earthlens.core import AggregationConfig
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 earthlens = EarthLens(
     data_source="ecmwf",
@@ -264,7 +264,7 @@ earthlens = EarthLens(
     lon_lim=[-75.0, -74.0],
     path="out/era5",
 )
-earthlens.core.download(
+earthlens.download(
     aggregate=AggregationConfig(freq="1MS", op="mean"),
 )
 ```

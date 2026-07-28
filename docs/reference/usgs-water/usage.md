@@ -7,7 +7,7 @@ the `earthlens.usgs_water.USGSWater` backend directly.
 ## Request shape
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 df = EarthLens(
     data_source="usgs-water",

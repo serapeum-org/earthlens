@@ -30,7 +30,7 @@ In priority order, the backend resolves the token from:
 2. the **`API_USGS_PAT`** environment variable.
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # explicit
 EarthLens(data_source="usgs-water", api_token="YOUR_PAT", ...)

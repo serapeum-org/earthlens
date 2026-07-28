@@ -54,7 +54,7 @@ the dataset's catalog row, routes to its provider, issues the keyed-or-public
 REST call, and parses the JSON into the right shape:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # ThinkHazard! river-flood level for Kenya -> a one-hazard DataFrame
 df = EarthLens(

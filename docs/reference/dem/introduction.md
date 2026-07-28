@@ -37,7 +37,7 @@ file `download_file` per tile that exists. `download()` returns the
 `list[Path]` of downloaded COGs, in bbox row-major order.
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="dem",
