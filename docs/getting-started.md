@@ -13,8 +13,7 @@ pip install earthlens[ecmwf]     # add a backend that needs an SDK
 pip install earthlens[all]       # everything
 ```
 
-See [Installation](installation.md) for the complete extras table and the GDAL
-note.
+See [Installation](installation.md) for the complete extras table.
 
 ## 2. Pick a backend
 

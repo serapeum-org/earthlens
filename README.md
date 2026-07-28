@@ -23,10 +23,11 @@ Current release info
 earthlens — a unified Python client for satellite & climate data
 =====================================================================
 
-**earthlens** gives you one consistent Python API for downloading satellite and
-climate data from four very different providers — UCSB CHIRPS, ERA5 on AWS,
-the ECMWF Climate Data Store, and Google Earth Engine — and turning the
-results into analysis-ready GeoTIFFs.
+**earthlens** gives you one consistent Python API for downloading satellite,
+climate, and geospatial data from **48 providers** — climate reanalysis,
+satellite imagery, ocean models, weather forecasts, natural-hazard feeds, air
+quality, biodiversity, population, and more — and turning the results into
+analysis-ready GeoTIFFs, GeoDataFrames, or tables.
 
 It is part of the [serapeum-org](https://github.com/serapeum-org)
 open-source ecosystem and is built on top of
@@ -36,11 +37,11 @@ open-source ecosystem and is built on top of
 Why earthlens?
 ------------
 
-Each provider speaks its own dialect: CHIRPS is anonymous FTP with date-coded
+Every provider speaks its own dialect: CHIRPS is anonymous FTP with date-coded
 filenames, ERA5-on-S3 is unsigned object storage with a per-month layout, the
 ECMWF CDS expects a JSON request body validated against a constraints graph,
-and Google Earth Engine is a server-side image-collection model. **earthlens**
-flattens that into one call:
+Google Earth Engine is a server-side image-collection model, and the other 44
+each have their own. **earthlens** flattens all of it into one call:
 
 ```python
 from earthlens.core import EarthLens
@@ -71,12 +72,16 @@ study, or anything else downstream.
 Features
 --------
 
-- **Four backends, one facade.** `EarthLens(data_source=...)` routes to CHIRPS,
-  ERA5-on-S3, ECMWF/CDS, or Google Earth Engine without changing the rest of
-  your code.
-- **YAML variable catalogs** for ECMWF and GEE — every variable carries
-  metadata: NetCDF name, units, accumulation semantics (`is_flux`), allowed
-  pressure levels, monthly counterparts. Browseable with `Catalog().get_variable(...)`.
+- **48 backends, one facade.** `EarthLens(data_source=...)` routes to any
+  provider without changing the rest of your code. Backends are discovered
+  through entry points and imported lazily, so the SDK for a provider you never
+  touch is never loaded.
+- **Cross-provider discovery.** `find("precipitation")` tells you which of the
+  48 providers serve a dataset, offline, before you commit to one; `search(...)`
+  dry-runs a request and lists exactly what it would fetch.
+- **YAML variable catalogs** per provider — every variable carries metadata:
+  NetCDF name, units, accumulation semantics (`is_flux`), allowed pressure
+  levels, monthly counterparts. Browseable with `Catalog().get_variable(...)`.
 - **Pre-flight request validation** against the live CDS `constraints.json`
   graph. Bad date / area / variable combinations are rejected before bytes
   go over the wire, with actionable error messages.
@@ -92,8 +97,11 @@ Features
   under the hood.
 - **Modular install extras** — only install the SDK for the backend you need
   (`pip install earthlens[ecmwf]`, `[s3]`, `[gee]`).
+- **Bounded by design.** Streamed, atomic downloads; pooled HTTP connections
+  with `Retry-After`-aware back-off; an exact `limit=` cap for vector/tabular
+  requests; re-runs skip artefacts that are already complete.
 - **Strictly typed.** Pydantic v2 models for catalog rows and request specs;
-  modern PEP 585/604 type hints; Python 3.11 / 3.12 tested in CI.
+  modern PEP 585/604 type hints; Python 3.11 – 3.14 tested in CI.
 
 
 Supported data sources
@@ -137,7 +145,7 @@ for the full walkthrough of each one.
 | <img src="docs/_images/logos/fdsn.png" height="20"> | [FDSN](https://www.fdsn.org/) | `fdsn` |
 | <img src="docs/_images/logos/gdacs.png" height="20"> | [GDACS](https://www.gdacs.org/) | `gdacs` |
 | <img src="docs/_images/logos/firms.png" height="20"> | [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) | `firms` |
-| <img src="docs/_images/logos/risk_indicators.svg" height="20"> | [ThinkHazard! (GFDRR/World Bank)](https://thinkhazard.org) | `thinkhazard` |
+| <img src="docs/_images/logos/risk_indicators.svg" height="20"> | [ThinkHazard! (GFDRR/World Bank)](https://thinkhazard.org) | `risk-indicators` |
 
 **Elevation & bathymetry**
 
@@ -259,11 +267,11 @@ Installation
 `earthlens` is published on conda-forge and PyPI.
 
 ```bash
-# conda (recommended — pulls GDAL automatically)
-conda install -c conda-forge earthlens
-
 # pip — latest release
-pip install earthlens==0.3.0
+pip install earthlens
+
+# conda
+conda install -c conda-forge earthlens
 
 # pip — bleeding edge
 pip install git+https://github.com/serapeum-org/earthlens
@@ -275,21 +283,30 @@ To list all available versions on your platform:
 conda search earthlens --channel conda-forge
 ```
 
-GDAL is required and is **not** on PyPI. If you install via pip, get GDAL from
-the [large-image-wheels](https://girder.github.io/large_image_wheels) index:
-
-```bash
-pip install --find-links=https://girder.github.io/large_image_wheels --no-cache GDAL==3.10.0
-```
+A plain `pip install` is enough — earthlens pulls in everything it needs.
 
 Backend SDKs are optional and pulled in by extras:
 
 ```bash
 pip install earthlens[ecmwf]   # cdsapi
-pip install earthlens[s3]      # boto3 + unicloud
+pip install earthlens[s3]      # boto3 + botocore
 pip install earthlens[gee]     # earthengine-api
-pip install earthlens[dev,test]  # full dev environment
+pip install earthlens[all]     # every backend SDK
 ```
+
+`[all]` deliberately omits `argo`, `osm`, and `osm-pbf`: `argopy` requires
+`xarray>=2025.7` while `openeo` requires `xarray<2025.1.2`, which cannot be
+satisfied together. Install those extras individually if you need them.
+
+For a development environment the repo is a [uv](https://docs.astral.sh/uv/)
+workspace — `dev` and `docs` are dependency **groups**, not extras:
+
+```bash
+uv sync --extra all --group dev
+```
+
+See [Contributing](https://serapeum-org.github.io/earthlens/contributing/) for
+the full setup.
 
 
 Quick examples per backend
@@ -351,18 +368,23 @@ EarthLens(
 ).download(aggregate=AggregationConfig(freq="1MS", op="auto"))
 ```
 
-**Google Earth Engine** — server-side collection, downloaded as GeoTIFFs.
+**Google Earth Engine** — server-side collection, downloaded as GeoTIFFs. The
+request is `{asset_id: [band, ...]}`, and GEE needs a service account:
 
 ```python
 EarthLens(
     data_source="gee",
-    temporal_resolution="daily",
-    start="2023-01-01",
-    end="2023-01-10",
-    variables=["MODIS/061/MOD13Q1/NDVI"],
-    lat_lim=[30.0, 31.0],
-    lon_lim=[31.0, 32.0],
-    path="data/gee-ndvi",
+    temporal_resolution="monthly",       # one composite image per month
+    start="2020-06-01",
+    end="2020-08-31",
+    variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+    lat_lim=[28.0, 32.0],
+    lon_lim=[30.0, 34.0],
+    path="data/gee",
+    scale=5566,                          # output pixel size in metres
+).authenticate(
+    service_account="my-sa@my-project.iam.gserviceaccount.com",
+    service_key="/path/to/key.json",
 ).download()
 ```
 
@@ -398,12 +420,21 @@ better than the catalog.
 Authentication
 --------------
 
-| Source       | What you need                                                                  |
-|--------------|--------------------------------------------------------------------------------|
-| CHIRPS       | Nothing — anonymous FTP.                                                       |
-| Amazon S3    | Nothing — unsigned, public bucket.                                             |
-| ECMWF / CDS  | A free CDS account and a `~/.cdsapirc` with your API key.                     |
-| GEE          | A Google Earth Engine project and a service-account JSON key.                  |
+Roughly half the backends need no credentials at all. Common ones:
+
+| Source | What you need |
+|---|---|
+| CHIRPS / CHC | Nothing — anonymous FTP. |
+| Amazon S3, Copernicus DEM, GOES, NWM, NEXRAD | Nothing — unsigned, public buckets. |
+| GDACS, GHSL, Overture, HDX, SoilGrids, PVGIS, admin | Nothing — public HTTP. |
+| ECMWF / CDS | A free CDS account and a `~/.cdsapirc` with your API key. |
+| GEE | A Google Earth Engine project and a service-account JSON key. |
+| CMEMS, Earthdata, ASF, EUMETSAT, Sentinel Hub, openEO | A provider login. |
+| OpenAQ, AirNow, FIRMS, WDPA, IUCN, NREL, GFW | A free API key or token. |
+
+Credentials are **not** constructor arguments — pass them to `authenticate(...)`
+or set the documented environment variables. The full per-provider matrix is in
+[Supported providers](https://serapeum-org.github.io/earthlens/reference/providers/).
 
 
 Documentation
@@ -415,14 +446,30 @@ heat waves, drought, snow & cryosphere, climate-change anomalies) live at:
 
 > **<https://serapeum-org.github.io/earthlens/>**
 
+Start here:
+
+| Page | What it covers |
+|---|---|
+| [Getting started](https://serapeum-org.github.io/earthlens/getting-started/) | Install to first file on disk. |
+| [Discovering datasets](https://serapeum-org.github.io/earthlens/discovery/) | `sources()` / `find()` / `search()` across all 48 providers. |
+| [Supported providers](https://serapeum-org.github.io/earthlens/reference/providers/) | Keys, output kinds, auth, and extras for every backend. |
+| [Temporal aggregation](https://serapeum-org.github.io/earthlens/aggregation/) | Reduce a stack into windowed composites. |
+| [Troubleshooting](https://serapeum-org.github.io/earthlens/troubleshooting/) | When a download fails, and what to change. |
+| [Migration guide](https://serapeum-org.github.io/earthlens/migration/) | Breaking changes by release. |
+| [Architecture](https://serapeum-org.github.io/earthlens/overview/architecture/) | How the facade, registry, and backends fit together. |
+
 
 Contributing
 ------------
 
 Issues, PRs, and discussions are welcome on
-[GitHub](https://github.com/serapeum-org/earthlens). The repo uses
-pre-commit (black, isort, flake8, bandit, pydocstyle) — install hooks once
-with `pre-commit install`.
+[GitHub](https://github.com/serapeum-org/earthlens). The repo uses pre-commit
+with **ruff** (`ruff-check` + `ruff-format`), mypy, and bandit — install the
+hooks once with `pre-commit install`.
+
+See the [contributing guide](https://serapeum-org.github.io/earthlens/contributing/)
+for the workspace layout, how to run the tests, and how to add a new provider
+backend.
 
 
 License

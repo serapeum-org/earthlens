@@ -12,7 +12,7 @@ The easiest way to install `earthlens` is using the `conda` package manager. `ea
 conda install -c conda-forge earthlens
 ```
 
-If this works, it will install earthlens with all dependencies including Python and GDAL, and you can skip the rest of the installation instructions.
+If this works, it will install earthlens with all its dependencies, and you can skip the rest of the installation instructions.
 
 ### uv
 
@@ -22,9 +22,9 @@ You can also use [uv](https://docs.astral.sh/uv/) to manage the environment:
 uv add earthlens
 ```
 
-### Installing Python and GDAL dependencies
+### Installing Python
 
-The main dependencies for earthlens are Python 3.11+ and GDAL.
+earthlens requires Python 3.11+.
 
 For Python we recommend using the [Anaconda Distribution](https://www.anaconda.com/download/) for Python 3.
 
@@ -250,7 +250,7 @@ Now you should be able to start Python and try `import earthlens` to verify the 
 Besides the recommended conda environment setup, you can also install earthlens with `pip`. For the more difficult to install Python dependencies, it is best to use conda:
 
 ```bash
-conda install numpy scipy gdal pyproj
+conda install numpy scipy pyproj
 ```
 
 Then install earthlens with pip, picking the backend extras you
