@@ -11,8 +11,8 @@ Intercomparison Project Phase 6 — as analysis-ready cloud Zarr on the open
 
 The archive is **anonymous** (no credentials, no auth), indexed by a single
 plain consolidated-stores CSV. There is no per-backend SDK to install — the CSV
-is read with `pandas` and the Zarr stores are read through **pyramids** (GDAL's
-`/vsigs/` multidimensional driver), so the `cmip6` extra is empty:
+is read with `pandas` and the Zarr stores are read through **pyramids**' virtual
+`/vsigs/` multidimensional reader, so the `cmip6` extra is empty:
 
 ```bash
 pip install earthlens        # cmip6 needs nothing beyond the core install
@@ -64,7 +64,7 @@ writes NetCDF**. `download()` maps the `[start, end]` date window to an integer
 time-index range and the `lat_lim` / `lon_lim` box to a grid crop, then has
 pyramids read only the requested cells and write one gridded NetCDF per store.
 earthlens never imports `xarray` / `zarr` / `gcsfs` — the Zarr read is entirely
-pyramids' (via GDAL `/vsigs/`, read anonymously; no `gcsfs` needed).
+pyramids' (via `/vsigs/`, read anonymously; no `gcsfs` needed).
 
 ## Volumes — always subset
 

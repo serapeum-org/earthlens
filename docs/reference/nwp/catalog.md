@@ -12,9 +12,9 @@ Two binary libraries are **environment requirements** (not on PyPI in a
 usable form on every platform), so install them via conda-forge if they
 are missing:
 
-* **`libgdal-grib`** — the GDAL GRIB driver that
-  `pyramids.grib.open_grib` calls. Bundled in the `pyramids-gis` wheels;
-  raises `DriverNotExistError` if absent.
+* **`libgdal-grib`** — the GRIB driver that `pyramids.grib.open_grib`
+  calls. Bundled in the `pyramids-gis` wheels; raises
+  `DriverNotExistError` if absent.
 * **`eccodes`** — the C library that `cfgrib`/`eccodes` need. Herbie's
   import chain pulls `cfgrib`, so `import herbie` fails with
   `RuntimeError: Cannot find the ecCodes library` if the binary is
@@ -28,7 +28,7 @@ conda install -c conda-forge eccodes libgdal-grib
 The `earthlens[nwp]` extra installs only the Python SDKs (`herbie-data`,
 `ecmwf-opendata`); the two binary libraries above are not on PyPI, so install
 them from conda-forge as shown. earthlens' own GRIB read path decodes through
-`pyramids`' bundled GDAL driver, so `eccodes` is needed only to satisfy Herbie's
+`pyramids`' bundled driver, so `eccodes` is needed only to satisfy Herbie's
 `cfgrib` import chain, not by earthlens itself.
 
 !!! note "conda eccodes on Windows"

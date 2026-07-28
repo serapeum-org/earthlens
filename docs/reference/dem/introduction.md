@@ -57,8 +57,8 @@ paths = EarthLens(
   and rendering a hillshade are all pyramids' job — its COG reader
   (`pyramids.Dataset.read_file`) plus `.crop` / `.to_crs` and
   `pyramids.dataset.merge.merge_rasters` (for a multi-tile mosaic)
-  already do this. earthlens does **not** import `rasterio`, `gdal`,
-  `osgeo`, or `xarray`.
+  already do this. earthlens does **not** import `rasterio`, `osgeo`,
+  or `xarray` — every raster read goes through pyramids.
 
 - **1° tile granularity.** The buckets serve one COG per 1° x 1° tile,
   so a coastal bbox spanning several tiles yields one file per tile. To

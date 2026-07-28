@@ -58,7 +58,7 @@ Herbie does not cover (DWD ICON), a small **direct module** downloads
 the per-variable `.bz2` files itself.
 
 GRIB **reading** is owned by [pyramids](https://github.com/serapeum-org/pyramids):
-`pyramids.grib.open_grib` (GDAL's native GRIB driver) reads the
+`pyramids.grib.open_grib` (its native GRIB reader) reads the
 downloaded subset, the result is cropped to the request bbox, and
 written as a COG — exactly like the other raster backends.
 
