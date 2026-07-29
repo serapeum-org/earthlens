@@ -20920,9 +20920,7 @@ results across entries are unioned into one polygon
 <span class="normal"><a href="#__codelineno-0-300">300</a></span>
 <span class="normal"><a href="#__codelineno-0-301">301</a></span>
 <span class="normal"><a href="#__codelineno-0-302">302</a></span>
-<span class="normal"><a href="#__codelineno-0-303">303</a></span>
-<span class="normal"><a href="#__codelineno-0-304">304</a></span>
-<span class="normal"><a href="#__codelineno-0-305">305</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="k">class</span><span class="w"> </span><span class="nc">WDPA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="k">class</span><span class="w"> </span><span class="nc">WDPA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Protected Planet (WDPA) backend (vector protected-area polygons).</span>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    Wraps the Protected Planet v4 REST API so a user can pull a country&#39;s</span>
@@ -21134,46 +21132,44 @@ results across entries are unioned into one polygon
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            FeatureCollection: The protected-area polygons, CRS</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">                `EPSG:4326`. Written to a file under `path` when set.</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">())</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="n">warn_license</span><span class="p">(</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>                <span class="n">WDPA_LICENSE</span><span class="p">,</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>                <span class="s2">&quot;wdpa&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;UNEP-WCMC terms: commercial use needs written permission &quot;</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>                <span class="s2">&quot;and redistribution is restricted&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>            <span class="p">)</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>                <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s) &quot;</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>            <span class="p">)</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>                <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s), &quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="p">)</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the protected areas to a vector file under `root_dir`.</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            collection: The protected-area FeatureCollection.</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_FORMATS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;wdpa_protected_areas.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">))</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">())</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="n">warn_license</span><span class="p">(</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>                <span class="n">WDPA_LICENSE</span><span class="p">,</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>                <span class="s2">&quot;wdpa&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;UNEP-WCMC terms: commercial use needs written permission &quot;</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>                <span class="s2">&quot;and redistribution is restricted&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>            <span class="p">)</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>                <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s) &quot;</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>            <span class="p">)</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s), &quot;</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>                <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="p">)</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the protected areas to a vector file under `root_dir`.</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            collection: The protected-area FeatureCollection.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_FORMATS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;wdpa_protected_areas.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">))</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -21644,7 +21640,6 @@ has no progress bar, so this is a no-op.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -21682,9 +21677,7 @@ has no progress bar, so this is a no-op.</p>
 <span class="normal"><a href="#__codelineno-0-283">283</a></span>
 <span class="normal"><a href="#__codelineno-0-284">284</a></span>
 <span class="normal"><a href="#__codelineno-0-285">285</a></span>
-<span class="normal"><a href="#__codelineno-0-286">286</a></span>
-<span class="normal"><a href="#__codelineno-0-287">287</a></span>
-<span class="normal"><a href="#__codelineno-0-288">288</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-286">286</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
@@ -21697,29 +21690,27 @@ has no progress bar, so this is a no-op.</p>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        FeatureCollection: The protected-area polygons, CRS</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">            `EPSG:4326`. Written to a file under `path` when set.</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">())</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="n">warn_license</span><span class="p">(</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="n">WDPA_LICENSE</span><span class="p">,</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="s2">&quot;wdpa&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>            <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;UNEP-WCMC terms: commercial use needs written permission &quot;</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>            <span class="s2">&quot;and redistribution is restricted&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>        <span class="p">)</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>            <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s) &quot;</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="p">)</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s), &quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>            <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="p">)</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">())</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="n">warn_license</span><span class="p">(</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="n">WDPA_LICENSE</span><span class="p">,</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="s2">&quot;wdpa&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;UNEP-WCMC terms: commercial use needs written permission &quot;</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="s2">&quot;and redistribution is restricted&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>        <span class="p">)</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>            <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s) &quot;</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="p">)</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>            <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s), &quot;</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="p">)</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -22787,9 +22778,7 @@ results across entries are unioned into one polygon
 <span class="normal"><a href="#__codelineno-0-300">300</a></span>
 <span class="normal"><a href="#__codelineno-0-301">301</a></span>
 <span class="normal"><a href="#__codelineno-0-302">302</a></span>
-<span class="normal"><a href="#__codelineno-0-303">303</a></span>
-<span class="normal"><a href="#__codelineno-0-304">304</a></span>
-<span class="normal"><a href="#__codelineno-0-305">305</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="k">class</span><span class="w"> </span><span class="nc">WDPA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="k">class</span><span class="w"> </span><span class="nc">WDPA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Protected Planet (WDPA) backend (vector protected-area polygons).</span>
 <a id="__codelineno-0-56" name="__codelineno-0-56"></a>
 <a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    Wraps the Protected Planet v4 REST API so a user can pull a country&#39;s</span>
@@ -23001,46 +22990,44 @@ results across entries are unioned into one polygon
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">            FeatureCollection: The protected-area polygons, CRS</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">                `EPSG:4326`. Written to a file under `path` when set.</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">())</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="n">warn_license</span><span class="p">(</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>                <span class="n">WDPA_LICENSE</span><span class="p">,</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>                <span class="s2">&quot;wdpa&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;UNEP-WCMC terms: commercial use needs written permission &quot;</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>                <span class="s2">&quot;and redistribution is restricted&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>            <span class="p">)</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>                <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s) &quot;</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>            <span class="p">)</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>                <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s), &quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="p">)</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the protected areas to a vector file under `root_dir`.</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            collection: The protected-area FeatureCollection.</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_FORMATS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;wdpa_protected_areas.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">))</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">())</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="n">warn_license</span><span class="p">(</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>                <span class="n">WDPA_LICENSE</span><span class="p">,</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>                <span class="s2">&quot;wdpa&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;UNEP-WCMC terms: commercial use needs written permission &quot;</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>                <span class="s2">&quot;and redistribution is restricted&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>            <span class="p">)</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>                <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s) &quot;</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>            <span class="p">)</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>                <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s), &quot;</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>                <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="p">)</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the protected areas to a vector file under `root_dir`.</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">            collection: The protected-area FeatureCollection.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_FORMATS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;wdpa_protected_areas.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">))</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -23511,7 +23498,6 @@ has no progress bar, so this is a no-op.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -23549,9 +23535,7 @@ has no progress bar, so this is a no-op.</p>
 <span class="normal"><a href="#__codelineno-0-283">283</a></span>
 <span class="normal"><a href="#__codelineno-0-284">284</a></span>
 <span class="normal"><a href="#__codelineno-0-285">285</a></span>
-<span class="normal"><a href="#__codelineno-0-286">286</a></span>
-<span class="normal"><a href="#__codelineno-0-287">287</a></span>
-<span class="normal"><a href="#__codelineno-0-288">288</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-286">286</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
@@ -23564,29 +23548,27 @@ has no progress bar, so this is a no-op.</p>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-264" name="__codelineno-0-264"></a><span class="sd">        FeatureCollection: The protected-area polygons, CRS</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">            `EPSG:4326`. Written to a file under `path` when set.</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">())</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="n">warn_license</span><span class="p">(</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="n">WDPA_LICENSE</span><span class="p">,</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="s2">&quot;wdpa&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>            <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;UNEP-WCMC terms: commercial use needs written permission &quot;</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>            <span class="s2">&quot;and redistribution is restricted&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>        <span class="p">)</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a>            <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s) &quot;</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="p">)</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s), &quot;</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>            <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="p">)</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">())</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="n">warn_license</span><span class="p">(</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="n">WDPA_LICENSE</span><span class="p">,</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="s2">&quot;wdpa&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;UNEP-WCMC terms: commercial use needs written permission &quot;</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="s2">&quot;and redistribution is restricted&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>        <span class="p">)</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>            <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s) &quot;</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>        <span class="p">)</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>            <span class="sa">f</span><span class="s2">&quot;WDPA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> protected area(s), &quot;</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>            <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="p">)</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

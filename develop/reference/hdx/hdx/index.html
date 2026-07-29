@@ -21342,9 +21342,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <span class="normal"><a href="#__codelineno-0-519">519</a></span>
 <span class="normal"><a href="#__codelineno-0-520">520</a></span>
 <span class="normal"><a href="#__codelineno-0-521">521</a></span>
-<span class="normal"><a href="#__codelineno-0-522">522</a></span>
-<span class="normal"><a href="#__codelineno-0-523">523</a></span>
-<span class="normal"><a href="#__codelineno-0-524">524</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="k">class</span><span class="w"> </span><span class="nc">HDX</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-522">522</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="k">class</span><span class="w"> </span><span class="nc">HDX</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Humanitarian Data Exchange backend (mixed-format file output).</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    Wraps the read-only `hdx-python-api` client so a user can resolve a</span>
@@ -21725,50 +21723,48 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">            list: One read pyramids object per resource (a</span>
 <a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">                `Dataset` / `FeatureCollection` / `DataFrame`), in the</span>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">                same order — when `read=True`.</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">read</span><span class="p">:</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="n">read_resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_reader</span><span class="p">()</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>            <span class="k">return</span> <span class="p">[]</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>            <span class="n">read_resource</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>            <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="p">]</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_load_reader</span><span class="p">():</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return `pyramids.read_resource`, or raise a clear upgrade error.</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        The reader (the `PY-D` capability) is the `pyramids.read_resource`</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        function, available in `pyramids-gis &gt;= 0.29.0`. The package floor</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">        already requires that, so this normally just imports; the guard</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        stays as defense for a partial / source install that predates the</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        reader, surfaced as a `NotImplementedError` (mirroring how the</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        Earthdata backend feature-detects its `pyramids` reducers).</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            The `pyramids.read_resource` callable.</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">            NotImplementedError: When the installed pyramids predates the</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">                reader.</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_resource</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>                <span class="s2">&quot;HDX.download(read=True) needs `pyramids.read_resource` &quot;</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>                <span class="s2">&quot;(pyramids-gis &gt;= 0.29.0); the installed pyramids does not &quot;</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>                <span class="s2">&quot;provide it. Upgrade pyramids, or call download() without &quot;</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>                <span class="s2">&quot;read= to get the resource file paths and read them yourself.&quot;</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>        <span class="k">return</span> <span class="n">read_resource</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">read</span><span class="p">:</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="n">read_resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_reader</span><span class="p">()</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>            <span class="k">return</span> <span class="p">[]</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>            <span class="n">read_resource</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>            <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="p">]</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_load_reader</span><span class="p">():</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return `pyramids.read_resource`, or raise a clear upgrade error.</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        The reader (the `PY-D` capability) is the `pyramids.read_resource`</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        function, available in `pyramids-gis &gt;= 0.29.0`. The package floor</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        already requires that, so this normally just imports; the guard</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        stays as defense for a partial / source install that predates the</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">        reader, surfaced as a `NotImplementedError` (mirroring how the</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        Earthdata backend feature-detects its `pyramids` reducers).</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            The `pyramids.read_resource` callable.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">            NotImplementedError: When the installed pyramids predates the</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">                reader.</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_resource</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>                <span class="s2">&quot;HDX.download(read=True) needs `pyramids.read_resource` &quot;</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>                <span class="s2">&quot;(pyramids-gis &gt;= 0.29.0); the installed pyramids does not &quot;</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>                <span class="s2">&quot;provide it. Upgrade pyramids, or call download() without &quot;</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>                <span class="s2">&quot;read= to get the resource file paths and read them yourself.&quot;</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="k">return</span> <span class="n">read_resource</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -22401,7 +22397,6 @@ same order — when <code>read=True</code>.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -22450,9 +22445,7 @@ same order — when <code>read=True</code>.</p>
 <span class="normal"><a href="#__codelineno-0-490">490</a></span>
 <span class="normal"><a href="#__codelineno-0-491">491</a></span>
 <span class="normal"><a href="#__codelineno-0-492">492</a></span>
-<span class="normal"><a href="#__codelineno-0-493">493</a></span>
-<span class="normal"><a href="#__codelineno-0-494">494</a></span>
-<span class="normal"><a href="#__codelineno-0-495">495</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-493">493</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="n">read</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -22484,21 +22477,19 @@ same order — when <code>read=True</code>.</p>
 <a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        list: One read pyramids object per resource (a</span>
 <a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">            `Dataset` / `FeatureCollection` / `DataFrame`), in the</span>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">            same order — when `read=True`.</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">read</span><span class="p">:</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>    <span class="n">read_resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_reader</span><span class="p">()</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="k">return</span> <span class="p">[]</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="n">read_resource</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="p">]</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">read</span><span class="p">:</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>    <span class="n">read_resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_reader</span><span class="p">()</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="k">return</span> <span class="p">[]</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>    <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="n">read_resource</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23350,9 +23341,7 @@ backend rejects it itself (<code>G1</code>).</p>
 <span class="normal"><a href="#__codelineno-0-519">519</a></span>
 <span class="normal"><a href="#__codelineno-0-520">520</a></span>
 <span class="normal"><a href="#__codelineno-0-521">521</a></span>
-<span class="normal"><a href="#__codelineno-0-522">522</a></span>
-<span class="normal"><a href="#__codelineno-0-523">523</a></span>
-<span class="normal"><a href="#__codelineno-0-524">524</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="k">class</span><span class="w"> </span><span class="nc">HDX</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-522">522</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="k">class</span><span class="w"> </span><span class="nc">HDX</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Humanitarian Data Exchange backend (mixed-format file output).</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    Wraps the read-only `hdx-python-api` client so a user can resolve a</span>
@@ -23733,50 +23722,48 @@ backend rejects it itself (<code>G1</code>).</p>
 <a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">            list: One read pyramids object per resource (a</span>
 <a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">                `Dataset` / `FeatureCollection` / `DataFrame`), in the</span>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">                same order — when `read=True`.</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">read</span><span class="p">:</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="n">read_resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_reader</span><span class="p">()</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>            <span class="k">return</span> <span class="p">[]</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>            <span class="n">read_resource</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>            <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="p">]</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_load_reader</span><span class="p">():</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return `pyramids.read_resource`, or raise a clear upgrade error.</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        The reader (the `PY-D` capability) is the `pyramids.read_resource`</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        function, available in `pyramids-gis &gt;= 0.29.0`. The package floor</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">        already requires that, so this normally just imports; the guard</span>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        stays as defense for a partial / source install that predates the</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        reader, surfaced as a `NotImplementedError` (mirroring how the</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        Earthdata backend feature-detects its `pyramids` reducers).</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">            The `pyramids.read_resource` callable.</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">            NotImplementedError: When the installed pyramids predates the</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">                reader.</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_resource</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>                <span class="s2">&quot;HDX.download(read=True) needs `pyramids.read_resource` &quot;</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>                <span class="s2">&quot;(pyramids-gis &gt;= 0.29.0); the installed pyramids does not &quot;</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>                <span class="s2">&quot;provide it. Upgrade pyramids, or call download() without &quot;</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>                <span class="s2">&quot;read= to get the resource file paths and read them yourself.&quot;</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>        <span class="k">return</span> <span class="n">read_resource</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">read</span><span class="p">:</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="n">read_resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_reader</span><span class="p">()</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>            <span class="k">return</span> <span class="p">[]</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>            <span class="n">read_resource</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>            <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="p">]</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_load_reader</span><span class="p">():</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return `pyramids.read_resource`, or raise a clear upgrade error.</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        The reader (the `PY-D` capability) is the `pyramids.read_resource`</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        function, available in `pyramids-gis &gt;= 0.29.0`. The package floor</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        already requires that, so this normally just imports; the guard</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        stays as defense for a partial / source install that predates the</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">        reader, surfaced as a `NotImplementedError` (mirroring how the</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        Earthdata backend feature-detects its `pyramids` reducers).</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">            The `pyramids.read_resource` callable.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">            NotImplementedError: When the installed pyramids predates the</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">                reader.</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_resource</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>                <span class="s2">&quot;HDX.download(read=True) needs `pyramids.read_resource` &quot;</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>                <span class="s2">&quot;(pyramids-gis &gt;= 0.29.0); the installed pyramids does not &quot;</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>                <span class="s2">&quot;provide it. Upgrade pyramids, or call download() without &quot;</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>                <span class="s2">&quot;read= to get the resource file paths and read them yourself.&quot;</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="k">return</span> <span class="n">read_resource</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24409,7 +24396,6 @@ same order — when <code>read=True</code>.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -24458,9 +24444,7 @@ same order — when <code>read=True</code>.</p>
 <span class="normal"><a href="#__codelineno-0-490">490</a></span>
 <span class="normal"><a href="#__codelineno-0-491">491</a></span>
 <span class="normal"><a href="#__codelineno-0-492">492</a></span>
-<span class="normal"><a href="#__codelineno-0-493">493</a></span>
-<span class="normal"><a href="#__codelineno-0-494">494</a></span>
-<span class="normal"><a href="#__codelineno-0-495">495</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-493">493</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-450" name="__codelineno-0-450"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="n">read</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -24492,21 +24476,19 @@ same order — when <code>read=True</code>.</p>
 <a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        list: One read pyramids object per resource (a</span>
 <a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">            `Dataset` / `FeatureCollection` / `DataFrame`), in the</span>
 <a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">            same order — when `read=True`.</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">read</span><span class="p">:</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>    <span class="n">read_resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_reader</span><span class="p">()</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="k">return</span> <span class="p">[]</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="n">read_resource</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="p">]</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">read</span><span class="p">:</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>    <span class="n">read_resource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_reader</span><span class="p">()</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>    <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="k">return</span> <span class="p">[]</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="n">paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>    <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="n">read_resource</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">product</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;format&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">products</span><span class="p">)</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

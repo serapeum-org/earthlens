@@ -20597,9 +20597,7 @@ WKT polygon; the paginated result is mapped to a points
 <span class="normal"><a href="#__codelineno-0-349">349</a></span>
 <span class="normal"><a href="#__codelineno-0-350">350</a></span>
 <span class="normal"><a href="#__codelineno-0-351">351</a></span>
-<span class="normal"><a href="#__codelineno-0-352">352</a></span>
-<span class="normal"><a href="#__codelineno-0-353">353</a></span>
-<span class="normal"><a href="#__codelineno-0-354">354</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="k">class</span><span class="w"> </span><span class="nc">GBIF</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-352">352</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="k">class</span><span class="w"> </span><span class="nc">GBIF</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;GBIF species-occurrence backend (vector point-feature output).</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    Wraps `pygbif.occurrences.search` so a user can pull a</span>
@@ -20840,39 +20838,37 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            FeatureCollection: The occurrence points, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                Empty (schema-only) when nothing matched. Written to a</span>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                file under `path` when `path` is set.</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>                <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s) &quot;</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s), &quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="p">)</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the occurrences to a vector file under `root_dir`.</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            collection: The occurrence FeatureCollection.</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_FORMATS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;gbif_occurrences.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">))</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>                <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s) &quot;</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>            <span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>                <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s), &quot;</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>                <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="p">)</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the occurrences to a vector file under `root_dir`.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            collection: The occurrence FeatureCollection.</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_FORMATS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;gbif_occurrences.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">))</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -21339,7 +21335,6 @@ file under <code>path</code> when <code>path</code> is set.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -21371,9 +21366,7 @@ file under <code>path</code> when <code>path</code> is set.</p>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
@@ -21387,22 +21380,20 @@ file under <code>path</code> when <code>path</code> is set.</p>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        FeatureCollection: The occurrence points, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            Empty (schema-only) when nothing matched. Written to a</span>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            file under `path` when `path` is set.</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>            <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s) &quot;</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s), &quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="p">)</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s) &quot;</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s), &quot;</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="p">)</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21995,9 +21986,7 @@ WKT polygon; the paginated result is mapped to a points
 <span class="normal"><a href="#__codelineno-0-349">349</a></span>
 <span class="normal"><a href="#__codelineno-0-350">350</a></span>
 <span class="normal"><a href="#__codelineno-0-351">351</a></span>
-<span class="normal"><a href="#__codelineno-0-352">352</a></span>
-<span class="normal"><a href="#__codelineno-0-353">353</a></span>
-<span class="normal"><a href="#__codelineno-0-354">354</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="k">class</span><span class="w"> </span><span class="nc">GBIF</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-352">352</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="k">class</span><span class="w"> </span><span class="nc">GBIF</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;GBIF species-occurrence backend (vector point-feature output).</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">    Wraps `pygbif.occurrences.search` so a user can pull a</span>
@@ -22238,39 +22227,37 @@ WKT polygon; the paginated result is mapped to a points
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            FeatureCollection: The occurrence points, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                Empty (schema-only) when nothing matched. Written to a</span>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                file under `path` when `path` is set.</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>                <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s) &quot;</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s), &quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="p">)</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the occurrences to a vector file under `root_dir`.</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">            collection: The occurrence FeatureCollection.</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_FORMATS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;gbif_occurrences.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">))</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>                <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s) &quot;</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>            <span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>                <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s), &quot;</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>                <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="p">)</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the occurrences to a vector file under `root_dir`.</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            collection: The occurrence FeatureCollection.</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_FORMATS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;gbif_occurrences.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="k">if</span> <span class="n">driver</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">))</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -22737,7 +22724,6 @@ file under <code>path</code> when <code>path</code> is set.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -22769,9 +22755,7 @@ file under <code>path</code> when <code>path</code> is set.</p>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-308" name="__codelineno-0-308"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
@@ -22785,22 +22769,20 @@ file under <code>path</code> when <code>path</code> is set.</p>
 <a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        FeatureCollection: The occurrence points, CRS `EPSG:4326`.</span>
 <a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            Empty (schema-only) when nothing matched. Written to a</span>
 <a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            file under `path` when `path` is set.</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>            <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s) &quot;</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s), &quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="s2">&quot;nothing written&quot;</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="p">)</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_all</span><span class="p">()</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_path</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="n">written</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s) &quot;</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">written</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="sa">f</span><span class="s2">&quot;GBIF download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> occurrence(s), &quot;</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="s2">&quot;nothing written&quot;</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="p">)</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

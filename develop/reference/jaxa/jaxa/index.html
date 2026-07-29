@@ -23039,9 +23039,7 @@ the output as gridded artefacts.</p>
 <span class="normal"><a href="#__codelineno-0-407">407</a></span>
 <span class="normal"><a href="#__codelineno-0-408">408</a></span>
 <span class="normal"><a href="#__codelineno-0-409">409</a></span>
-<span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="k">class</span><span class="w"> </span><span class="nc">JAXA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-410">410</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="k">class</span><span class="w"> </span><span class="nc">JAXA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Unified JAXA backend over three protocols (`jaxa-earth`, `gportal`, `ptree`).</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    Attributes:</span>
@@ -23359,29 +23357,27 @@ the output as gridded artefacts.</p>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            list[Path]: One or more files per resolved dataset, in</span>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                request order.</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            - Passing `aggregate=` raises because per-date stacks are not</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">              reduced yet:</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">                &gt;&gt;&gt; import tempfile</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">                &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">                &gt;&gt;&gt; backend = JAXA(</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">                ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">                ...     variables=[&quot;aw3d30&quot;],</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">                ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">                ...     path=tempfile.gettempdir(),</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">                &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">                Traceback (most recent call last):</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">                    ...</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">                NotImplementedError: JAXA does not yet support the aggregate=...</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="k">del</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            - Passing `aggregate=` raises because per-date stacks are not</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">              reduced yet:</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">                &gt;&gt;&gt; import tempfile</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">                &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">                &gt;&gt;&gt; backend = JAXA(</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">                ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">                ...     variables=[&quot;aw3d30&quot;],</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">                ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">                ...     path=tempfile.gettempdir(),</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">                &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">                Traceback (most recent call last):</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">                    ...</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">                NotImplementedError: JAXA does not yet support the aggregate=...</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="k">del</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24202,7 +24198,6 @@ request order.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -24263,9 +24258,7 @@ request order.</p>
 <span class="normal"><a href="#__codelineno-0-407">407</a></span>
 <span class="normal"><a href="#__codelineno-0-408">408</a></span>
 <span class="normal"><a href="#__codelineno-0-409">409</a></span>
-<span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-410">410</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
@@ -24281,29 +24274,27 @@ request order.</p>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        list[Path]: One or more files per resolved dataset, in</span>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            request order.</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        - Passing `aggregate=` raises because per-date stacks are not</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">          reduced yet:</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            &gt;&gt;&gt; import tempfile</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">            &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">            &gt;&gt;&gt; backend = JAXA(</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">            ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            ...     variables=[&quot;aw3d30&quot;],</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            ...     path=tempfile.gettempdir(),</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">            &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            NotImplementedError: JAXA does not yet support the aggregate=...</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>    <span class="k">del</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        - Passing `aggregate=` raises because per-date stacks are not</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">          reduced yet:</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">            &gt;&gt;&gt; import tempfile</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            &gt;&gt;&gt; backend = JAXA(</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">            ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">            ...     variables=[&quot;aw3d30&quot;],</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">            ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            ...     path=tempfile.gettempdir(),</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            NotImplementedError: JAXA does not yet support the aggregate=...</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>    <span class="k">del</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -26113,9 +26104,7 @@ the output as gridded artefacts.</p>
 <span class="normal"><a href="#__codelineno-0-407">407</a></span>
 <span class="normal"><a href="#__codelineno-0-408">408</a></span>
 <span class="normal"><a href="#__codelineno-0-409">409</a></span>
-<span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="k">class</span><span class="w"> </span><span class="nc">JAXA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-410">410</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="k">class</span><span class="w"> </span><span class="nc">JAXA</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Unified JAXA backend over three protocols (`jaxa-earth`, `gportal`, `ptree`).</span>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    Attributes:</span>
@@ -26433,29 +26422,27 @@ the output as gridded artefacts.</p>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            list[Path]: One or more files per resolved dataset, in</span>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">                request order.</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            - Passing `aggregate=` raises because per-date stacks are not</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">              reduced yet:</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">                &gt;&gt;&gt; import tempfile</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">                &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">                &gt;&gt;&gt; backend = JAXA(</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">                ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">                ...     variables=[&quot;aw3d30&quot;],</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">                ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">                ...     path=tempfile.gettempdir(),</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">                ... )</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">                &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">                Traceback (most recent call last):</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">                    ...</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">                NotImplementedError: JAXA does not yet support the aggregate=...</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="k">del</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            - Passing `aggregate=` raises because per-date stacks are not</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">              reduced yet:</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">                &gt;&gt;&gt; import tempfile</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">                &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">                &gt;&gt;&gt; backend = JAXA(</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">                ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">                ...     variables=[&quot;aw3d30&quot;],</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">                ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">                ...     path=tempfile.gettempdir(),</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">                ... )</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">                &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">                Traceback (most recent call last):</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">                    ...</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">                NotImplementedError: JAXA does not yet support the aggregate=...</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="k">del</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27276,7 +27263,6 @@ request order.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -27337,9 +27323,7 @@ request order.</p>
 <span class="normal"><a href="#__codelineno-0-407">407</a></span>
 <span class="normal"><a href="#__codelineno-0-408">408</a></span>
 <span class="normal"><a href="#__codelineno-0-409">409</a></span>
-<span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-410">410</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-376" name="__codelineno-0-376"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
@@ -27355,29 +27339,27 @@ request order.</p>
 <a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        list[Path]: One or more files per resolved dataset, in</span>
 <a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            request order.</span>
 <a id="__codelineno-0-389" name="__codelineno-0-389"></a>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        - Passing `aggregate=` raises because per-date stacks are not</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">          reduced yet:</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            &gt;&gt;&gt; import tempfile</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">            &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">            &gt;&gt;&gt; backend = JAXA(</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">            ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            ...     variables=[&quot;aw3d30&quot;],</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            ...     path=tempfile.gettempdir(),</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            ... )</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">            &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            Traceback (most recent call last):</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">                ...</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            NotImplementedError: JAXA does not yet support the aggregate=...</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>    <span class="k">del</span> <span class="n">progress_bar</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        - Passing `aggregate=` raises because per-date stacks are not</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">          reduced yet:</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">            &gt;&gt;&gt; import tempfile</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            &gt;&gt;&gt; from earthlens.jaxa import JAXA</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            &gt;&gt;&gt; backend = JAXA(</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">            ...     start=&quot;2020-01-01&quot;, end=&quot;2020-12-31&quot;,</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">            ...     variables=[&quot;aw3d30&quot;],</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">            ...     lat_lim=[35.0, 36.0], lon_lim=[138.0, 139.0],</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            ...     path=tempfile.gettempdir(),</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">            ... )</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            &gt;&gt;&gt; backend.download(aggregate=object())  # doctest: +ELLIPSIS</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            Traceback (most recent call last):</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">                ...</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            NotImplementedError: JAXA does not yet support the aggregate=...</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>    <span class="k">del</span> <span class="n">progress_bar</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

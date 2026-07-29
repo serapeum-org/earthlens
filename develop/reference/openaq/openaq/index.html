@@ -21824,9 +21824,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <span class="normal"><a href="#__codelineno-0-537">537</a></span>
 <span class="normal"><a href="#__codelineno-0-538">538</a></span>
 <span class="normal"><a href="#__codelineno-0-539">539</a></span>
-<span class="normal"><a href="#__codelineno-0-540">540</a></span>
-<span class="normal"><a href="#__codelineno-0-541">541</a></span>
-<span class="normal"><a href="#__codelineno-0-542">542</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenAQ</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-540">540</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenAQ</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;OpenAQ v3 air-quality backend (long-format tabular output).</span>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Fetches ground-station pollutant measurements for a bbox / date</span>
@@ -22195,92 +22193,90 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            pd.DataFrame: The long-format union of every sensor&#39;s</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">                measurements (schema columns, `datetime_utc` tz-aware</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">                UTC). Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_take_limited</span><span class="p">(</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_iter_non_empty_frames</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">),</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="n">limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">,</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>        <span class="p">)</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">frames</span> <span class="k">else</span> <span class="n">_empty_frame</span><span class="p">()</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="n">non_empty</span> <span class="o">=</span> <span class="n">frames</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>                <span class="sa">f</span><span class="s2">&quot;OpenAQ download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> measurement(s) across &quot;</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span><span class="si">}</span><span class="s2"> sensor(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="p">)</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>                <span class="s2">&quot;OpenAQ download summary: no measurements matched the request; &quot;</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>                <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>            <span class="p">)</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>        <span class="k">return</span> <span class="n">df</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_output_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose the per-request output file path under `root_dir`.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="n">params</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;openaq_</span><span class="si">{</span><span class="n">params</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api_via_search_fetch_with_progress</span><span class="p">(</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;C3 composition with an explicit per-sensor progress bar.</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        Mirrors the CMEMS backend&#39;s progress-aware composition: run the</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        cheap :meth:`_search`, then map :meth:`_fetch_one` over the</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        products wrapped in a `tqdm` bar (disabled when `progress_bar`</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        is `False`). Short-circuits on an empty search so `_fetch_one`</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        is never called when there is nothing to fetch.</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">            progress_bar: Show the per-sensor `tqdm` bar when `True`.</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            list[pd.DataFrame]: One frame per product (same order as</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">                `_search`), or `[]` when nothing matched.</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>            <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;OpenAQ sensors&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;sensor&quot;</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="p">)</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_iter_non_empty_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield each sensor&#39;s measurements, skipping the sensors with none.</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        Lazy on purpose: `download()` caps the total row count as the frames</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        arrive, so with a `limit=` in force the sensors beyond it are never</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        requested — which is the difference between a cap on the result and a</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        cap on the work.</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">            progress_bar: Show the per-sensor `tqdm` bar when `True`.</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        Yields:</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">            pd.DataFrame: One non-empty frame per sensor, in `_search` order.</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>            <span class="k">return</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>            <span class="n">products</span><span class="p">,</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress_bar</span><span class="p">,</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;OpenAQ sensors&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;sensor&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="p">):</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>                <span class="k">yield</span> <span class="n">frame</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_take_limited</span><span class="p">(</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_iter_non_empty_frames</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">),</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>            <span class="n">limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">,</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="p">)</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">frames</span> <span class="k">else</span> <span class="n">_empty_frame</span><span class="p">()</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>        <span class="n">non_empty</span> <span class="o">=</span> <span class="n">frames</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>                <span class="sa">f</span><span class="s2">&quot;OpenAQ download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> measurement(s) across &quot;</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span><span class="si">}</span><span class="s2"> sensor(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>            <span class="p">)</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>                <span class="s2">&quot;OpenAQ download summary: no measurements matched the request; &quot;</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>                <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>            <span class="p">)</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>        <span class="k">return</span> <span class="n">df</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_output_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose the per-request output file path under `root_dir`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="n">params</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;openaq_</span><span class="si">{</span><span class="n">params</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api_via_search_fetch_with_progress</span><span class="p">(</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;C3 composition with an explicit per-sensor progress bar.</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        Mirrors the CMEMS backend&#39;s progress-aware composition: run the</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        cheap :meth:`_search`, then map :meth:`_fetch_one` over the</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        products wrapped in a `tqdm` bar (disabled when `progress_bar`</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        is `False`). Short-circuits on an empty search so `_fetch_one`</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        is never called when there is nothing to fetch.</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">            progress_bar: Show the per-sensor `tqdm` bar when `True`.</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            list[pd.DataFrame]: One frame per product (same order as</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                `_search`), or `[]` when nothing matched.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;OpenAQ sensors&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;sensor&quot;</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="p">)</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_iter_non_empty_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield each sensor&#39;s measurements, skipping the sensors with none.</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">        Lazy on purpose: `download()` caps the total row count as the frames</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">        arrive, so with a `limit=` in force the sensors beyond it are never</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        requested — which is the difference between a cap on the result and a</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        cap on the work.</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">            progress_bar: Show the per-sensor `tqdm` bar when `True`.</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">        Yields:</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            pd.DataFrame: One non-empty frame per sensor, in `_search` order.</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>            <span class="k">return</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>            <span class="n">products</span><span class="p">,</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress_bar</span><span class="p">,</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;OpenAQ sensors&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;sensor&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a>        <span class="p">):</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>                <span class="k">yield</span> <span class="n">frame</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -22872,7 +22868,6 @@ UTC). Empty (schema-only) when nothing matched.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -22923,9 +22918,7 @@ UTC). Empty (schema-only) when nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-478">478</a></span>
 <span class="normal"><a href="#__codelineno-0-479">479</a></span>
 <span class="normal"><a href="#__codelineno-0-480">480</a></span>
-<span class="normal"><a href="#__codelineno-0-481">481</a></span>
-<span class="normal"><a href="#__codelineno-0-482">482</a></span>
-<span class="normal"><a href="#__codelineno-0-483">483</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-481">481</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
@@ -22947,33 +22940,31 @@ UTC). Empty (schema-only) when nothing matched.</p>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        pd.DataFrame: The long-format union of every sensor&#39;s</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">            measurements (schema columns, `datetime_utc` tz-aware</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">            UTC). Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_take_limited</span><span class="p">(</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_iter_non_empty_frames</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">),</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="n">limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">,</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="p">)</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">frames</span> <span class="k">else</span> <span class="n">_empty_frame</span><span class="p">()</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>    <span class="n">non_empty</span> <span class="o">=</span> <span class="n">frames</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>            <span class="sa">f</span><span class="s2">&quot;OpenAQ download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> measurement(s) across &quot;</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span><span class="si">}</span><span class="s2"> sensor(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>        <span class="p">)</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>            <span class="s2">&quot;OpenAQ download summary: no measurements matched the request; &quot;</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>            <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>        <span class="p">)</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>    <span class="k">return</span> <span class="n">df</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_take_limited</span><span class="p">(</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_iter_non_empty_frames</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">),</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="n">limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">,</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>    <span class="p">)</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">frames</span> <span class="k">else</span> <span class="n">_empty_frame</span><span class="p">()</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="n">non_empty</span> <span class="o">=</span> <span class="n">frames</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>            <span class="sa">f</span><span class="s2">&quot;OpenAQ download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> measurement(s) across &quot;</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span><span class="si">}</span><span class="s2"> sensor(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="p">)</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>            <span class="s2">&quot;OpenAQ download summary: no measurements matched the request; &quot;</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>            <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>        <span class="p">)</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>    <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24523,9 +24514,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <span class="normal"><a href="#__codelineno-0-537">537</a></span>
 <span class="normal"><a href="#__codelineno-0-538">538</a></span>
 <span class="normal"><a href="#__codelineno-0-539">539</a></span>
-<span class="normal"><a href="#__codelineno-0-540">540</a></span>
-<span class="normal"><a href="#__codelineno-0-541">541</a></span>
-<span class="normal"><a href="#__codelineno-0-542">542</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenAQ</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-540">540</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="k">class</span><span class="w"> </span><span class="nc">OpenAQ</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;OpenAQ v3 air-quality backend (long-format tabular output).</span>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a>
 <a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    Fetches ground-station pollutant measurements for a bbox / date</span>
@@ -24894,92 +24883,90 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            pd.DataFrame: The long-format union of every sensor&#39;s</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">                measurements (schema columns, `datetime_utc` tz-aware</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">                UTC). Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_take_limited</span><span class="p">(</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_iter_non_empty_frames</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">),</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="n">limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">,</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>        <span class="p">)</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">frames</span> <span class="k">else</span> <span class="n">_empty_frame</span><span class="p">()</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="n">non_empty</span> <span class="o">=</span> <span class="n">frames</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>                <span class="sa">f</span><span class="s2">&quot;OpenAQ download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> measurement(s) across &quot;</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span><span class="si">}</span><span class="s2"> sensor(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="p">)</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>                <span class="s2">&quot;OpenAQ download summary: no measurements matched the request; &quot;</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>                <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>            <span class="p">)</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>        <span class="k">return</span> <span class="n">df</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_output_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose the per-request output file path under `root_dir`.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="n">params</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;openaq_</span><span class="si">{</span><span class="n">params</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api_via_search_fetch_with_progress</span><span class="p">(</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;C3 composition with an explicit per-sensor progress bar.</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        Mirrors the CMEMS backend&#39;s progress-aware composition: run the</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        cheap :meth:`_search`, then map :meth:`_fetch_one` over the</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        products wrapped in a `tqdm` bar (disabled when `progress_bar`</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a><span class="sd">        is `False`). Short-circuits on an empty search so `_fetch_one`</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        is never called when there is nothing to fetch.</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">            progress_bar: Show the per-sensor `tqdm` bar when `True`.</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">            list[pd.DataFrame]: One frame per product (same order as</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a><span class="sd">                `_search`), or `[]` when nothing matched.</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>            <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;OpenAQ sensors&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;sensor&quot;</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="p">)</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_iter_non_empty_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield each sensor&#39;s measurements, skipping the sensors with none.</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        Lazy on purpose: `download()` caps the total row count as the frames</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        arrive, so with a `limit=` in force the sensors beyond it are never</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a><span class="sd">        requested — which is the difference between a cap on the result and a</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        cap on the work.</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">            progress_bar: Show the per-sensor `tqdm` bar when `True`.</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        Yields:</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">            pd.DataFrame: One non-empty frame per sensor, in `_search` order.</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>            <span class="k">return</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>            <span class="n">products</span><span class="p">,</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress_bar</span><span class="p">,</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;OpenAQ sensors&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;sensor&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>        <span class="p">):</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>                <span class="k">yield</span> <span class="n">frame</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_take_limited</span><span class="p">(</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_iter_non_empty_frames</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">),</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>            <span class="n">limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">,</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="p">)</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">frames</span> <span class="k">else</span> <span class="n">_empty_frame</span><span class="p">()</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>        <span class="n">non_empty</span> <span class="o">=</span> <span class="n">frames</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>                <span class="sa">f</span><span class="s2">&quot;OpenAQ download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> measurement(s) across &quot;</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span><span class="si">}</span><span class="s2"> sensor(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>            <span class="p">)</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>                <span class="s2">&quot;OpenAQ download summary: no measurements matched the request; &quot;</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>                <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>            <span class="p">)</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>        <span class="k">return</span> <span class="n">df</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_output_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose the per-request output file path under `root_dir`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>        <span class="n">params</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;openaq_</span><span class="si">{</span><span class="n">params</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api_via_search_fetch_with_progress</span><span class="p">(</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;C3 composition with an explicit per-sensor progress bar.</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a><span class="sd">        Mirrors the CMEMS backend&#39;s progress-aware composition: run the</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a><span class="sd">        cheap :meth:`_search`, then map :meth:`_fetch_one` over the</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a><span class="sd">        products wrapped in a `tqdm` bar (disabled when `progress_bar`</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a><span class="sd">        is `False`). Short-circuits on an empty search so `_fetch_one`</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="sd">        is never called when there is nothing to fetch.</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="sd">            progress_bar: Show the per-sensor `tqdm` bar when `True`.</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a><span class="sd">            list[pd.DataFrame]: One frame per product (same order as</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a><span class="sd">                `_search`), or `[]` when nothing matched.</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search_fetch_each</span><span class="p">(</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="n">progress_bar</span><span class="o">=</span><span class="n">progress_bar</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;OpenAQ sensors&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;sensor&quot;</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>        <span class="p">)</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_iter_non_empty_frames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield each sensor&#39;s measurements, skipping the sensors with none.</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a><span class="sd">        Lazy on purpose: `download()` caps the total row count as the frames</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a><span class="sd">        arrive, so with a `limit=` in force the sensors beyond it are never</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a><span class="sd">        requested — which is the difference between a cap on the result and a</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a><span class="sd">        cap on the work.</span>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a><span class="sd">            progress_bar: Show the per-sensor `tqdm` bar when `True`.</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a><span class="sd">        Yields:</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a><span class="sd">            pd.DataFrame: One non-empty frame per sensor, in `_search` order.</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>        <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">()</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">products</span><span class="p">:</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>            <span class="k">return</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>        <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>            <span class="n">products</span><span class="p">,</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>            <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">progress_bar</span><span class="p">,</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;OpenAQ sensors&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;sensor&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a>        <span class="p">):</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>            <span class="n">frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>                <span class="k">yield</span> <span class="n">frame</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25571,7 +25558,6 @@ UTC). Empty (schema-only) when nothing matched.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -25622,9 +25608,7 @@ UTC). Empty (schema-only) when nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-478">478</a></span>
 <span class="normal"><a href="#__codelineno-0-479">479</a></span>
 <span class="normal"><a href="#__codelineno-0-480">480</a></span>
-<span class="normal"><a href="#__codelineno-0-481">481</a></span>
-<span class="normal"><a href="#__codelineno-0-482">482</a></span>
-<span class="normal"><a href="#__codelineno-0-483">483</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-481">481</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
@@ -25646,33 +25630,31 @@ UTC). Empty (schema-only) when nothing matched.</p>
 <a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">        pd.DataFrame: The long-format union of every sensor&#39;s</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">            measurements (schema columns, `datetime_utc` tz-aware</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">            UTC). Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_take_limited</span><span class="p">(</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_iter_non_empty_frames</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">),</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="n">limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">,</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="p">)</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">frames</span> <span class="k">else</span> <span class="n">_empty_frame</span><span class="p">()</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>    <span class="n">non_empty</span> <span class="o">=</span> <span class="n">frames</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a>            <span class="sa">f</span><span class="s2">&quot;OpenAQ download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> measurement(s) across &quot;</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span><span class="si">}</span><span class="s2"> sensor(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>        <span class="p">)</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a>            <span class="s2">&quot;OpenAQ download summary: no measurements matched the request; &quot;</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a>            <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>        <span class="p">)</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a>    <span class="k">return</span> <span class="n">df</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_take_limited</span><span class="p">(</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_iter_non_empty_frames</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">),</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="n">limit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">,</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>    <span class="p">)</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">frames</span> <span class="k">else</span> <span class="n">_empty_frame</span><span class="p">()</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="n">non_empty</span> <span class="o">=</span> <span class="n">frames</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>            <span class="sa">f</span><span class="s2">&quot;OpenAQ download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> measurement(s) across &quot;</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">non_empty</span><span class="p">)</span><span class="si">}</span><span class="s2"> sensor(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="p">)</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>            <span class="s2">&quot;OpenAQ download summary: no measurements matched the request; &quot;</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a>            <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a>        <span class="p">)</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a>    <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

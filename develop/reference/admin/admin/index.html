@@ -20152,9 +20152,7 @@ so the facade rejects <code>aggregate=</code> with <code>NotImplementedError</co
 <span class="normal"><a href="#__codelineno-0-442">442</a></span>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
 <span class="normal"><a href="#__codelineno-0-444">444</a></span>
-<span class="normal"><a href="#__codelineno-0-445">445</a></span>
-<span class="normal"><a href="#__codelineno-0-446">446</a></span>
-<span class="normal"><a href="#__codelineno-0-447">447</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="k">class</span><span class="w"> </span><span class="nc">AdminBoundaries</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="k">class</span><span class="w"> </span><span class="nc">AdminBoundaries</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Administrative-boundary backend (vector polygon output, four public sources).</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">    Resolves a requested dataset against the bundled catalog, routes to the</span>
@@ -20437,70 +20435,68 @@ so the facade rejects <code>aggregate=</code> with <code>NotImplementedError</co
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">            FeatureCollection: The boundary polygons, CRS EPSG:4326. Empty</span>
 <a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">                (schema-only) when nothing was fetched.</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_write</span><span class="p">:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="sa">f</span><span class="s2">&quot;admin download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) &quot;</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>                <span class="s2">&quot;admin download summary: no features fetched, nothing written&quot;</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="p">)</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine one or more per-dataset collections into a single one.</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        A single collection is returned unchanged; several are concatenated</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        (a union of columns, EPSG:4326 preserved). An empty list yields the</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        schema-only empty collection.</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">            collections: The per-dataset collections from `_api`.</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            FeatureCollection: The combined boundaries (EPSG:4326).</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">collections</span><span class="p">:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>            <span class="k">return</span> <span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>            <span class="k">return</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="n">combined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the boundaries to one vector file under `root_dir`.</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        The filename embeds the requested dataset ids **and the active selectors**</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        (`admin_&lt;ids&gt;[_&lt;country&gt;][_&lt;scale&gt;][_&lt;year&gt;][_&lt;state&gt;].&lt;ext&gt;`, `:`</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        replaced by `_`), so two requests that differ only by selector — e.g.</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        the same dataset for two countries — land in distinct files instead of</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        silently overwriting one another.</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">            collection: The boundaries to write.</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;admin&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="n">parts</span> <span class="o">+=</span> <span class="p">[</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="nb">str</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="k">for</span> <span class="n">selector</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>            <span class="k">if</span> <span class="n">selector</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="p">]</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_write</span><span class="p">:</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="sa">f</span><span class="s2">&quot;admin download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) &quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="p">)</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>                <span class="s2">&quot;admin download summary: no features fetched, nothing written&quot;</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="p">)</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine one or more per-dataset collections into a single one.</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        A single collection is returned unchanged; several are concatenated</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        (a union of columns, EPSG:4326 preserved). An empty list yields the</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        schema-only empty collection.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            collections: The per-dataset collections from `_api`.</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            FeatureCollection: The combined boundaries (EPSG:4326).</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">collections</span><span class="p">:</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="k">return</span> <span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>            <span class="k">return</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="n">combined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the boundaries to one vector file under `root_dir`.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        The filename embeds the requested dataset ids **and the active selectors**</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        (`admin_&lt;ids&gt;[_&lt;country&gt;][_&lt;scale&gt;][_&lt;year&gt;][_&lt;state&gt;].&lt;ext&gt;`, `:`</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        replaced by `_`), so two requests that differ only by selector — e.g.</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        the same dataset for two countries — land in distinct files instead of</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        silently overwriting one another.</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            collection: The boundaries to write.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;admin&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="n">parts</span> <span class="o">+=</span> <span class="p">[</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="nb">str</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="k">for</span> <span class="n">selector</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="k">if</span> <span class="n">selector</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="p">]</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -21092,7 +21088,6 @@ backends.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -21128,9 +21123,7 @@ backends.</p>
 <span class="normal"><a href="#__codelineno-0-394">394</a></span>
 <span class="normal"><a href="#__codelineno-0-395">395</a></span>
 <span class="normal"><a href="#__codelineno-0-396">396</a></span>
-<span class="normal"><a href="#__codelineno-0-397">397</a></span>
-<span class="normal"><a href="#__codelineno-0-398">398</a></span>
-<span class="normal"><a href="#__codelineno-0-399">399</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-397">397</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
@@ -21148,22 +21141,20 @@ backends.</p>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        FeatureCollection: The boundary polygons, CRS EPSG:4326. Empty</span>
 <a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            (schema-only) when nothing was fetched.</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_write</span><span class="p">:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="sa">f</span><span class="s2">&quot;admin download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) &quot;</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>            <span class="s2">&quot;admin download summary: no features fetched, nothing written&quot;</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>        <span class="p">)</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_write</span><span class="p">:</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="sa">f</span><span class="s2">&quot;admin download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) &quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="p">)</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>            <span class="s2">&quot;admin download summary: no features fetched, nothing written&quot;</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="p">)</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -22587,9 +22578,7 @@ so the facade rejects <code>aggregate=</code> with <code>NotImplementedError</co
 <span class="normal"><a href="#__codelineno-0-442">442</a></span>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
 <span class="normal"><a href="#__codelineno-0-444">444</a></span>
-<span class="normal"><a href="#__codelineno-0-445">445</a></span>
-<span class="normal"><a href="#__codelineno-0-446">446</a></span>
-<span class="normal"><a href="#__codelineno-0-447">447</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="k">class</span><span class="w"> </span><span class="nc">AdminBoundaries</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="k">class</span><span class="w"> </span><span class="nc">AdminBoundaries</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Administrative-boundary backend (vector polygon output, four public sources).</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a><span class="sd">    Resolves a requested dataset against the bundled catalog, routes to the</span>
@@ -22872,70 +22861,68 @@ so the facade rejects <code>aggregate=</code> with <code>NotImplementedError</co
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">            FeatureCollection: The boundary polygons, CRS EPSG:4326. Empty</span>
 <a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">                (schema-only) when nothing was fetched.</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_write</span><span class="p">:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="sa">f</span><span class="s2">&quot;admin download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) &quot;</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>                <span class="s2">&quot;admin download summary: no features fetched, nothing written&quot;</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="p">)</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="nd">@staticmethod</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine one or more per-dataset collections into a single one.</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        A single collection is returned unchanged; several are concatenated</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        (a union of columns, EPSG:4326 preserved). An empty list yields the</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        schema-only empty collection.</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">            collections: The per-dataset collections from `_api`.</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            FeatureCollection: The combined boundaries (EPSG:4326).</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">collections</span><span class="p">:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>            <span class="k">return</span> <span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>            <span class="k">return</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="n">combined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the boundaries to one vector file under `root_dir`.</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        The filename embeds the requested dataset ids **and the active selectors**</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        (`admin_&lt;ids&gt;[_&lt;country&gt;][_&lt;scale&gt;][_&lt;year&gt;][_&lt;state&gt;].&lt;ext&gt;`, `:`</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        replaced by `_`), so two requests that differ only by selector — e.g.</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        the same dataset for two countries — land in distinct files instead of</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        silently overwriting one another.</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">            collection: The boundaries to write.</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;admin&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>        <span class="n">parts</span> <span class="o">+=</span> <span class="p">[</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="nb">str</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="k">for</span> <span class="n">selector</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>            <span class="k">if</span> <span class="n">selector</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="p">]</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_write</span><span class="p">:</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="sa">f</span><span class="s2">&quot;admin download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) &quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="p">)</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>                <span class="s2">&quot;admin download summary: no features fetched, nothing written&quot;</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>            <span class="p">)</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FeatureCollection</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine one or more per-dataset collections into a single one.</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        A single collection is returned unchanged; several are concatenated</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        (a union of columns, EPSG:4326 preserved). An empty list yields the</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        schema-only empty collection.</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            collections: The per-dataset collections from `_api`.</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            FeatureCollection: The combined boundaries (EPSG:4326).</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">collections</span><span class="p">:</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="k">return</span> <span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>            <span class="k">return</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="n">combined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">collections</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="k">return</span> <span class="n">FeatureCollection</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the boundaries to one vector file under `root_dir`.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">        The filename embeds the requested dataset ids **and the active selectors**</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">        (`admin_&lt;ids&gt;[_&lt;country&gt;][_&lt;scale&gt;][_&lt;year&gt;][_&lt;state&gt;].&lt;ext&gt;`, `:`</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="sd">        replaced by `_`), so two requests that differ only by selector — e.g.</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="sd">        the same dataset for two countries — land in distinct files instead of</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="sd">        silently overwriting one another.</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            collection: The boundaries to write.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;admin&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">]</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="n">parts</span> <span class="o">+=</span> <span class="p">[</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="nb">str</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="k">for</span> <span class="n">selector</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_country</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_year</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="k">if</span> <span class="n">selector</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="p">]</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -23527,7 +23514,6 @@ backends.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -23563,9 +23549,7 @@ backends.</p>
 <span class="normal"><a href="#__codelineno-0-394">394</a></span>
 <span class="normal"><a href="#__codelineno-0-395">395</a></span>
 <span class="normal"><a href="#__codelineno-0-396">396</a></span>
-<span class="normal"><a href="#__codelineno-0-397">397</a></span>
-<span class="normal"><a href="#__codelineno-0-398">398</a></span>
-<span class="normal"><a href="#__codelineno-0-399">399</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-397">397</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
@@ -23583,22 +23567,20 @@ backends.</p>
 <a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        FeatureCollection: The boundary polygons, CRS EPSG:4326. Empty</span>
 <a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            (schema-only) when nothing was fetched.</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_write</span><span class="p">:</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="sa">f</span><span class="s2">&quot;admin download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) &quot;</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="p">)</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>            <span class="s2">&quot;admin download summary: no features fetched, nothing written&quot;</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>        <span class="p">)</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_combine</span><span class="p">(</span><span class="n">collections</span><span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_write</span><span class="p">:</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="sa">f</span><span class="s2">&quot;admin download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> feature(s) &quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="sa">f</span><span class="s2">&quot;written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="p">)</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>            <span class="s2">&quot;admin download summary: no features fetched, nothing written&quot;</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="p">)</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

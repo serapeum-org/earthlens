@@ -21926,9 +21926,7 @@ the facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>
 <span class="normal"><a href="#__codelineno-0-511">511</a></span>
 <span class="normal"><a href="#__codelineno-0-512">512</a></span>
 <span class="normal"><a href="#__codelineno-0-513">513</a></span>
-<span class="normal"><a href="#__codelineno-0-514">514</a></span>
-<span class="normal"><a href="#__codelineno-0-515">515</a></span>
-<span class="normal"><a href="#__codelineno-0-516">516</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="k">class</span><span class="w"> </span><span class="nc">Overture</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-514">514</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="k">class</span><span class="w"> </span><span class="nc">Overture</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Overture Maps backend (vector GeoParquet output, per-row licensing).</span>
 <a id="__codelineno-0-89" name="__codelineno-0-89"></a>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    Wraps the public Overture GeoParquet so a user can pull a theme +</span>
@@ -22354,10 +22352,8 @@ the facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            list[Path]: The vector file(s) written under `path`, one per</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">                requested feature type.</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -23017,7 +23013,6 @@ requested feature type.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -23036,9 +23031,7 @@ requested feature type.</p>
 <span class="normal"><a href="#__codelineno-0-511">511</a></span>
 <span class="normal"><a href="#__codelineno-0-512">512</a></span>
 <span class="normal"><a href="#__codelineno-0-513">513</a></span>
-<span class="normal"><a href="#__codelineno-0-514">514</a></span>
-<span class="normal"><a href="#__codelineno-0-515">515</a></span>
-<span class="normal"><a href="#__codelineno-0-516">516</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-514">514</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-501" name="__codelineno-0-501"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-502" name="__codelineno-0-502"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
@@ -23051,10 +23044,8 @@ requested feature type.</p>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">        list[Path]: The vector file(s) written under `path`, one per</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">            requested feature type.</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25498,9 +25489,7 @@ the facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>
 <span class="normal"><a href="#__codelineno-0-511">511</a></span>
 <span class="normal"><a href="#__codelineno-0-512">512</a></span>
 <span class="normal"><a href="#__codelineno-0-513">513</a></span>
-<span class="normal"><a href="#__codelineno-0-514">514</a></span>
-<span class="normal"><a href="#__codelineno-0-515">515</a></span>
-<span class="normal"><a href="#__codelineno-0-516">516</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="k">class</span><span class="w"> </span><span class="nc">Overture</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-514">514</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="k">class</span><span class="w"> </span><span class="nc">Overture</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Overture Maps backend (vector GeoParquet output, per-row licensing).</span>
 <a id="__codelineno-0-89" name="__codelineno-0-89"></a>
 <a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    Wraps the public Overture GeoParquet so a user can pull a theme +</span>
@@ -25926,10 +25915,8 @@ the facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">        Returns:</span>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">            list[Path]: The vector file(s) written under `path`, one per</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">                requested feature type.</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26589,7 +26576,6 @@ requested feature type.</p>
           </tr>
       </tbody>
     </table>
-        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -26608,9 +26594,7 @@ requested feature type.</p>
 <span class="normal"><a href="#__codelineno-0-511">511</a></span>
 <span class="normal"><a href="#__codelineno-0-512">512</a></span>
 <span class="normal"><a href="#__codelineno-0-513">513</a></span>
-<span class="normal"><a href="#__codelineno-0-514">514</a></span>
-<span class="normal"><a href="#__codelineno-0-515">515</a></span>
-<span class="normal"><a href="#__codelineno-0-516">516</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-514">514</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-500" name="__codelineno-0-500"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-501" name="__codelineno-0-501"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-502" name="__codelineno-0-502"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <a id="__codelineno-0-503" name="__codelineno-0-503"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
@@ -26623,10 +26607,8 @@ requested feature type.</p>
 <a id="__codelineno-0-510" name="__codelineno-0-510"></a><span class="sd">    Returns:</span>
 <a id="__codelineno-0-511" name="__codelineno-0-511"></a><span class="sd">        list[Path]: The vector file(s) written under `path`, one per</span>
 <a id="__codelineno-0-512" name="__codelineno-0-512"></a><span class="sd">            requested feature type.</span>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;list[Path]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
