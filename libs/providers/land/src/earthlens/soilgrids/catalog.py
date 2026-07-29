@@ -194,22 +194,19 @@ class Catalog(AbstractCatalog):
 
     datasets: dict[str, Property] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no properties were supplied.
+    @classmethod
+    def _autoload(cls) -> dict[str, Any]:
+        """Read the bundled catalog from disk.
 
-        `Catalog()` with no args reads `CATALOG_PATH` (through the
-        `(path, mtime_ns)`-keyed parse cache); passing `datasets=...` bypasses
-        the disk read.
-
-        Raises:
-            ValueError: Propagated from `load` when the catalog is missing,
-                empty, or has a malformed row.
+        Returns:
+            dict[str, Any]: The `datasets`, `available_datasets` read from
+                the bundled catalog.
         """
-        if not self.datasets:
-            loaded = Catalog.load()
-            self.datasets = loaded.datasets
-            self.available_datasets = loaded.available_datasets
-        super().model_post_init(__context)
+        loaded = Catalog.load()
+        return {
+            "datasets": loaded.datasets,
+            "available_datasets": loaded.available_datasets,
+        }
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

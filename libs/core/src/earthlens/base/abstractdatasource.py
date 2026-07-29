@@ -2006,14 +2006,44 @@ class AbstractCatalog(BaseModel):
         """
         return MappingProxyType(self.get_catalog())
 
-    def model_post_init(self, __context: Any) -> None:
-        """Hook run after pydantic validation.
+    @classmethod
+    def _autoload(cls) -> Mapping[str, Any]:
+        """Return the payload to fill an empty catalog from disk.
 
-        Kept as an overridable no-op so subclasses can call
-        `super().model_post_init(__context)` first and keep their own
-        post-init wiring in one place. :attr:`catalog` is a property now, so
-        nothing has to be populated here.
+        The one part of post-init that genuinely differs per backend: *how* the
+        rows are read. Everything around it — only read when no rows were
+        supplied, never clobber what the caller passed — is the same everywhere
+        and lives in :meth:`model_post_init`.
+
+        Returns:
+            Mapping[str, Any]: Field name to value, e.g.
+                `{"datasets": ..., "available_datasets": ...}`. The default is
+                empty, meaning this catalog does not auto-load.
         """
+        return {}
+
+    def model_post_init(self, __context: Any) -> None:
+        """Fill an empty catalog from disk, then run the subclass's wiring.
+
+        `Catalog()` with no arguments reads from disk; passing `datasets=...`
+        skips the read, which is what lets a test build a catalog from literals.
+        A field the caller already supplied is never overwritten, so a partial
+        construction (`datasets=` but no `available_datasets=`) still gets the
+        rest filled in.
+
+        This used to be written out in all 48 provider catalogs. The bodies
+        differed only in the loader call, and the surrounding rule had drifted —
+        some defaulted `available_datasets`, some did not — which is the kind of
+        difference nobody notices until two catalogs disagree.
+
+        Args:
+            __context: Opaque context from the pydantic v2 lifecycle, forwarded
+                to the base unchanged.
+        """
+        if not self.datasets:
+            for field, value in self._autoload().items():
+                if not getattr(self, field, None):
+                    setattr(self, field, value)
 
     def get_catalog(self) -> Any:
         """Read the catalog of the datasource from disk or retrieve it from server.

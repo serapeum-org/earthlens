@@ -603,3 +603,51 @@ class TestDownloadSignatureContract:
                 if got != want:
                     offenders.append(f"{name}.{arg.arg}: {got} (want {want})")
         assert offenders == [], f"annotation drift: {offenders}"
+
+
+class TestCatalogAutoloadIsShared:
+    """ARC-4: the load-if-empty rule lives once, in `AbstractCatalog`."""
+
+    def _catalog_sources(self):
+        """Yield `(backend_name, source)` for every provider `catalog.py`."""
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/catalog.py")):
+            yield path.parent.name, path.read_text(encoding="utf-8")
+
+    def test_catalogs_were_scanned(self):
+        """Guard the guard: the glob must find the catalogs."""
+        names = [name for name, _ in self._catalog_sources()]
+        assert len(names) > 40, f"only scanned {len(names)}: {names[:5]}"
+
+    def test_most_catalogs_use_the_shared_autoload(self):
+        """The simple shape declares `_autoload`, not its own `model_post_init`.
+
+        A catalog with real post-init work (an alias index, a per-instance
+        `OUTPUT_KIND`, a second cache) still overrides `model_post_init` — the
+        point is that the *shared* rule is not restated alongside it. This pins
+        the ratio so the duplication cannot creep back one catalog at a time.
+        """
+        autoload, bespoke = [], []
+        for name, source in self._catalog_sources():
+            if "def _autoload" in source:
+                autoload.append(name)
+            elif "def model_post_init" in source:
+                bespoke.append(name)
+        assert len(autoload) >= 30, (
+            f"only {len(autoload)} catalogs use the shared autoload; "
+            f"still hand-rolling post-init: {bespoke}"
+        )
+
+    def test_no_catalog_reimplements_the_load_if_empty_guard(self):
+        """A converted catalog must not also carry the `if not self.datasets` test."""
+        offenders = [
+            name
+            for name, source in self._catalog_sources()
+            if "def _autoload" in source and "if not self.datasets" in source
+        ]
+        assert offenders == [], (
+            f"these declare _autoload and still guard on an empty catalog "
+            f"themselves, so the rule is applied twice: {offenders}"
+        )

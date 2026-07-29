@@ -413,24 +413,19 @@ class Catalog(AbstractCatalog):
     available_datasets: list[str] = Field(default_factory=list)
     datasets: dict[str, Dataset] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no datasets were supplied.
+    @classmethod
+    def _autoload(cls) -> dict[str, Any]:
+        """Read the bundled catalog from disk.
 
-        `Catalog()` with no args is sugar for `Catalog.load()` — it
-        reads the bundled `catalog/` directory through the
-        `(path, mtime)`-keyed cache so repeated construction is fast.
-        If the caller passed `datasets=...`, the disk read is
-        skipped.
-
-        Raises:
-            ValueError: When auto-loading, propagates the same
-                errors as :meth:`load`.
+        Returns:
+            dict[str, Any]: The `available_datasets`, `datasets` read from
+                the bundled catalog.
         """
-        if not self.datasets:
-            loaded = Catalog.load()
-            self.available_datasets = loaded.available_datasets
-            self.datasets = loaded.datasets
-        super().model_post_init(__context)
+        loaded = Catalog.load()
+        return {
+            "available_datasets": loaded.available_datasets,
+            "datasets": loaded.datasets,
+        }
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:
