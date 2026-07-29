@@ -638,6 +638,22 @@ class AbstractDataSource(ABC):
     #: caller than the generic one.
     AGGREGATE_REFUSAL_REASON: str = ""
 
+    #: Minimum seconds between consecutive requests to this provider — a
+    #: client-side politeness limit, passed to
+    #: :class:`~earthlens.base.http.HttpClient`'s `min_interval`. `0.0` (the
+    #: default) means the provider publishes no etiquette we are bound by.
+    #:
+    #: Declared on the backend rather than read from the `providers.yaml`
+    #: registry, which cannot answer it: only ecmwf, earthdata and gee ship one,
+    #: and all three authenticate through an SDK, while the backends that
+    #: actually get rate-limited (osm's Overpass / ohsome) have no provider
+    #: record at all.
+    #:
+    #: The throttle is per :class:`HttpClient`, so a backend fanning out over N
+    #: threads with a client each waits `min_interval` N times in parallel — see
+    #: the concurrency note on this class.
+    MIN_REQUEST_INTERVAL: float = 0.0
+
     def __init_subclass__(cls, **kwargs: Any) -> None:
         """Give every backend its `download` wrapper and constructor sugar.
 

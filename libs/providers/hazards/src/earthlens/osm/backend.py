@@ -161,6 +161,14 @@ class OSM(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "vector"
 
+    #: Overpass' usage policy asks for a single request at a time and a
+    #: pause between them; ohsome rate-limits per user. One second is the
+    #: commonly cited floor for both, and it is a floor, not a target —
+    #: raise it for a large sweep. Before this, `min_interval` existed on
+    #: HttpClient and no call site ever set it, so nothing in earthlens
+    #: paced itself against any provider.
+    MIN_REQUEST_INTERVAL: float = 1.0
+
     AGGREGATE_REFUSAL_REASON = "OSM features are vector, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     #: An Overpass current-state query has no window; ohsome supplies its own, so a
@@ -486,6 +494,7 @@ class OSM(AbstractDataSource):
         http = HttpClient(
             session=cast("requests.Session | None", _RequestsHttp()),
             user_agent=self._user_agent,
+            min_interval=self.MIN_REQUEST_INTERVAL,
             timeout=self._timeout,
             max_retries=0,
             status_forcelist=(),
@@ -580,6 +589,7 @@ class OSM(AbstractDataSource):
         http = HttpClient(
             user_agent=self._user_agent,
             timeout=self._timeout,
+            min_interval=self.MIN_REQUEST_INTERVAL,
             retry_on_exceptions=(
                 requests.ConnectionError,
                 requests.Timeout,

@@ -651,3 +651,51 @@ class TestCatalogAutoloadIsShared:
             f"these declare _autoload and still guard on an empty catalog "
             f"themselves, so the rule is applied twice: {offenders}"
         )
+
+
+class TestRateLimitDeclarationIsWired:
+    """ARC-10: a declared `MIN_REQUEST_INTERVAL` must reach an `HttpClient`."""
+
+    def _backend_sources(self):
+        """Yield `(backend_name, source)` for every provider `backend.py`."""
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            yield path.parent.name, path.read_text(encoding="utf-8")
+
+    def test_backends_were_scanned(self):
+        """Guard the guard: the glob must find the backends."""
+        names = [name for name, _ in self._backend_sources()]
+        assert len(names) > 40, f"only scanned {len(names)}"
+
+    def test_a_declared_interval_is_passed_to_a_client(self):
+        """Declaring a limit without passing it would be decorative.
+
+        `min_interval` sat on `HttpClient` unused by every call site, which is how
+        a feature, its lock and its tests end up carried for nothing. A backend
+        that now declares a limit has to hand it to the client that makes the
+        requests.
+        """
+        offenders = [
+            name
+            for name, source in self._backend_sources()
+            if "MIN_REQUEST_INTERVAL: float = " in source
+            and "min_interval=self.MIN_REQUEST_INTERVAL" not in source
+        ]
+        assert offenders == [], (
+            f"these declare MIN_REQUEST_INTERVAL but never pass it to an "
+            f"HttpClient, so nothing paces their requests: {offenders}"
+        )
+
+    def test_at_least_one_backend_paces_itself(self):
+        """The mechanism is live, not merely available."""
+        wired = [
+            name
+            for name, source in self._backend_sources()
+            if "min_interval=self.MIN_REQUEST_INTERVAL" in source
+        ]
+        assert wired, (
+            "no backend passes a rate limit to its client; min_interval is dead "
+            "code again"
+        )
