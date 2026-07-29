@@ -689,3 +689,48 @@ class TestBackendInheritanceIsGuarded:
             f"a backend subclasses another backend: {offenders}. Read the "
             f"__init_subclass__ docstring before adding `ergonomics_resolved=True`."
         )
+
+
+class TestConcurrencyContractIsDocumented:
+    """ARC-11: pin the pickling facts the class docstring states.
+
+    Documentation about what does and does not survive a process boundary drifts
+    silently, and the answer here is non-obvious: a bare `requests.Session`
+    pickles, an `HttpClient` does not, so a backend flips from picklable to
+    unpicklable the first time it caches a client.
+    """
+
+    def test_a_bare_session_pickles(self):
+        """The surprising half: `requests.Session` itself is picklable."""
+        import pickle
+
+        import requests
+
+        assert pickle.loads(pickle.dumps(requests.Session())) is not None
+
+    def test_an_http_client_does_not_pickle(self):
+        """`HttpClient` holds the throttle lock, and locks do not pickle."""
+        import pickle
+
+        from earthlens.base.http import HttpClient
+
+        with pytest.raises((TypeError, AttributeError)):
+            pickle.dumps(HttpClient())
+
+    def test_a_fresh_backend_pickles(self, tmp_path):
+        """Before any client materialises, a backend crosses a process boundary."""
+        import pickle
+
+        backend = _build(_Minimal, tmp_path)
+        assert pickle.loads(pickle.dumps(backend)) is not None
+
+    def test_a_backend_holding_a_client_does_not(self, tmp_path):
+        """Caching an `HttpClient` is what makes it unpicklable — the `_http` slot."""
+        import pickle
+
+        from earthlens.base.http import HttpClient
+
+        backend = _build(_Minimal, tmp_path)
+        backend._http = HttpClient()
+        with pytest.raises((TypeError, AttributeError)):
+            pickle.dumps(backend)

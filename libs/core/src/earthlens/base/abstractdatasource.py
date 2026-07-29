@@ -590,8 +590,37 @@ class AbstractDataSource(ABC):
             refused centrally, so the backend neither declares it nor writes
             its own refusal — `OUTPUT_KIND` alone cannot decide this, because
             plenty of `"raster"` backends (goes, dem, jaxa, radar, …) emit
-            grids the reducer has no time axis for. Only the seven backends
-            that actually wire the aggregator set it to `True`.
+            grids the reducer has no time axis for. Only the backends that
+            actually wire the aggregator set it to `True`.
+
+    Note:
+        **Threads.** A backend instance is not safe to share across threads.
+        It caches per-request state (`self.space` / `self.time`, an
+        `HttpClient`, a lazily-built SDK client), none of it guarded. Give each
+        thread its own instance. Where earthlens itself fans out — ghsl's tile
+        downloads run through `joblib.Parallel(prefer="threads")` — the shared
+        helpers take a session from
+        :func:`earthlens.base.http.thread_local_session`, one per thread,
+        because `requests.Session` is not guaranteed thread-safe either.
+
+        A consequence worth knowing: `min_interval` throttling is per
+        `HttpClient`, so N threads holding N clients each wait
+        `min_interval` *independently* — the effective request rate is N times
+        what a single-threaded run would produce.
+
+    Note:
+        **Processes.** A freshly constructed backend usually pickles, because
+        the SDK clients are lazy. Once one materialises — after
+        :meth:`authenticate` or the first download — it generally does not, and
+        a backend that caches an :class:`~earthlens.base.http.HttpClient` on
+        `self._http` (erddap, bathymetry, gee) never does: the client holds a
+        `threading.Lock` for the throttle, and locks do not pickle. (A bare
+        `requests.Session`, perhaps surprisingly, does.)
+
+        So distribute at the **request** level, not the object level: send the
+        request parameters to the worker and construct the backend there. That
+        is also the only shape that works with a rate limit, since a throttle
+        cannot span processes.
     """
 
     OUTPUT_KIND: OutputKind = "raster"
