@@ -635,16 +635,53 @@ class AbstractDataSource(ABC):
         so signature introspection (e.g. `EarthLens.options_for`) and the
         facade's kwarg validation still see the backend's real parameters.
 
-        Note:
-            No backend currently subclasses another backend. If one ever
-            does, its `__init__` must not forward the ergonomic kwargs
-            (`aoi` / `buffer` / `cadence` / `dataset`) up to
-            `super().__init__()`: the parent's wrapper would resolve them a
-            second time (e.g. re-running `resolve_aoi`). Forward only the
-            already-resolved native parameters (`lat_lim` / `lon_lim` /
-            `temporal_resolution` / `variables`) instead.
+        Raises:
+            TypeError: When a backend subclasses another backend without
+                passing `ergonomics_resolved=True`. Both classes get an
+                `__init__` wrapper, so if the child forwards an ergonomic kwarg
+                up to `super().__init__()` the parent's wrapper resolves it a
+                second time — `resolve_aoi` runs twice and the second call sees
+                an already-reduced bbox. All 48 backends inherit
+                `AbstractDataSource` directly, so this has never fired; it is
+                checked rather than left as a comment because the failure is
+                silent, and a plausible-looking bbox over roughly the right area
+                is the hardest kind of wrong output to notice.
+
+                A subclass that genuinely wants this declares
+                `class Child(Parent, ergonomics_resolved=True)`, which says "my
+                `__init__` forwards only the already-resolved native parameters
+                (`lat_lim` / `lon_lim` / `temporal_resolution` / `variables`)"
+                and skips the second wrap.
         """
+        resolved = kwargs.pop("ergonomics_resolved", False)
         super().__init_subclass__(**kwargs)
+        backend_bases = [
+            base
+            for base in cls.__bases__
+            if base is not AbstractDataSource
+            and isinstance(base, type)
+            and issubclass(base, AbstractDataSource)
+        ]
+        # Only a child that declares its *own* `__init__` is at risk: that is
+        # what earns a second wrapper. A child without one inherits the parent's
+        # already-wrapped constructor and cannot double-resolve anything, which
+        # is why the test helpers and any mixin-style subclass stay legal.
+        if backend_bases and not resolved and "__init__" in cls.__dict__:
+            names = ", ".join(base.__name__ for base in backend_bases)
+            raise TypeError(
+                f"{cls.__name__} declares its own __init__ and subclasses the "
+                f"backend(s) {names}, so both classes carry an __init__ wrapper "
+                f"and an ergonomic kwarg forwarded to super().__init__() would "
+                f"be resolved twice. Forward only the resolved native "
+                f"parameters (lat_lim, lon_lim, temporal_resolution, variables) "
+                f"and declare `class {cls.__name__}({names}, "
+                f"ergonomics_resolved=True)`."
+            )
+        if resolved:
+            # The child promises it forwards only resolved parameters, so it
+            # keeps the parent's wrapper and gains no second one.
+            cls._wrap_download()
+            return
         # Independent of the constructor sugar below: a backend that inherits
         # `__init__` unchanged still needs its `download` to create `root_dir`.
         cls._wrap_download()

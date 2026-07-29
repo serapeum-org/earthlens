@@ -606,3 +606,86 @@ class TestNoOverrideSilencers:
             "`_fetch_one` must take exactly `(self, product)`; extra per-batch "
             f"context belongs on `self` or in `RemoteProduct.metadata`: {offenders}"
         )
+
+
+class TestBackendInheritanceIsGuarded:
+    """ARC-6: the no-backend-subclasses-a-backend rule is enforced, not assumed.
+
+    Both a parent and a child backend get an `__init__` wrapper, so an ergonomic
+    kwarg forwarded to `super().__init__()` would be resolved twice — `resolve_aoi`
+    running on an already-reduced bbox. That produces a plausible-looking box over
+    roughly the right area, which is why it is worth failing at class-definition
+    time rather than trusting a docstring note.
+    """
+
+    def test_subclassing_with_its_own_init_is_refused(self):
+        """A child declaring its own `__init__` earns a second wrapper, so it raises."""
+        with pytest.raises(TypeError, match="resolved twice"):
+
+            class _Child(_Minimal):
+                def __init__(self, **kwargs):
+                    super().__init__(**kwargs)
+
+    def test_the_error_names_the_opt_out(self):
+        """The message tells the author how to declare the safe case."""
+        with pytest.raises(TypeError, match="ergonomics_resolved=True"):
+
+            class _Child(_Minimal):
+                def __init__(self, **kwargs):
+                    super().__init__(**kwargs)
+
+    def test_subclassing_without_an_init_is_allowed(self):
+        """A child that inherits the constructor cannot double-resolve, so it is legal.
+
+        This is the shape the test helpers in this module use, and it was the
+        first thing the guard wrongly rejected.
+        """
+
+        class _Child(_Minimal):
+            pass
+
+        assert issubclass(_Child, _Minimal)
+
+    def test_opting_in_is_allowed_and_skips_the_second_wrap(self):
+        """`ergonomics_resolved=True` permits the subclass and wraps only download."""
+
+        class _Child(_Minimal, ergonomics_resolved=True):
+            def __init__(self, **kwargs):
+                super().__init__(**kwargs)
+
+            def download(self, progress_bar: bool = True, **kwargs):
+                return ["child"]
+
+        # The download wrapper is still applied (root_dir creation), which is the
+        # piece a subclass must not lose.
+        assert getattr(_Child.download, "_ensures_root_dir", False)
+
+    def test_every_shipped_backend_inherits_the_abc_directly(self):
+        """No shipped backend relies on the opt-out, so the simple case holds."""
+        import ast as ast_module
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[3] / "providers"
+        offenders = []
+        defined: dict[str, str] = {}
+        trees = {}
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            tree = ast_module.parse(path.read_text(encoding="utf-8"))
+            trees[path] = tree
+            for node in tree.body:
+                if isinstance(node, ast_module.ClassDef) and any(
+                    "AbstractDataSource" in ast_module.unparse(b) for b in node.bases
+                ):
+                    defined[node.name] = path.parent.name
+        for path, tree in trees.items():
+            for node in tree.body:
+                if not isinstance(node, ast_module.ClassDef):
+                    continue
+                for base in node.bases:
+                    name = ast_module.unparse(base).split(".")[-1]
+                    if name in defined:
+                        offenders.append(f"{node.name} <- {name} ({path.parent.name})")
+        assert offenders == [], (
+            f"a backend subclasses another backend: {offenders}. Read the "
+            f"__init_subclass__ docstring before adding `ergonomics_resolved=True`."
+        )
