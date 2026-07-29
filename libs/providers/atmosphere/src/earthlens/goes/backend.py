@@ -60,7 +60,7 @@ from earthlens.goes._helpers import (
 from earthlens.goes.catalog import Catalog, GOESDomain, GOESProduct
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 #: `_search` lists one S3 prefix per hour of the window; beyond this many
 #: hours (30 days) it logs a warning so a wide window is not a silent
@@ -241,6 +241,8 @@ class GOES(AbstractDataSource):
     """
 
     OUTPUT_KIND = "raster"
+
+    AGGREGATE_REFUSAL_REASON = "â€” the granules are raw, undecoded geostationary NetCDF; read and reduce them downstream with pyramids / satpy"
 
     def __init__(
         self,
@@ -501,7 +503,6 @@ class GOES(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> list[Path]:
         """Fetch the in-window ABI granules and return the written paths.
 
@@ -513,22 +514,12 @@ class GOES(AbstractDataSource):
         Args:
             progress_bar: Show a per-granule progress bar. Defaults to
                 `True`.
-            aggregate: Must be `None`. GOES granules are raw geostationary
-                NetCDF served whole, so a time-window reduce would need
-                the downstream reader; aggregation is unsupported here.
 
         Returns:
             list[Path]: The written granule paths, or an empty list when
                 nothing in the window was available.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "GOES.download(aggregate=...) is not supported — the granules "
-                "are raw, undecoded geostationary NetCDF; read and reduce them "
-                "downstream with pyramids / satpy."
-            )
         self._show_progress = progress_bar
         return self._api_via_search_fetch()

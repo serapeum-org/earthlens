@@ -47,7 +47,7 @@ from earthlens.soilgrids._helpers import (
 from earthlens.soilgrids.catalog import Catalog, Property
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 
 class SoilGrids(AbstractDataSource):
@@ -84,6 +84,8 @@ class SoilGrids(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    AGGREGATE_REFUSAL_REASON = "SoilGrids is a static soil-property map with no temporal axis, so there is nothing to reduce. Call download() without aggregate="
 
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
@@ -422,7 +424,6 @@ class SoilGrids(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
         errors: str = "warn",
     ) -> list[Path]:
         """Fetch every requested coverage's bbox subset as a written GeoTIFF.
@@ -430,25 +431,13 @@ class SoilGrids(AbstractDataSource):
         Args:
             progress_bar: Show a per-coverage `tqdm` bar (a request can expand to
                 many coverages). Defaults to `True`.
-            aggregate: Must be `None`. SoilGrids is a single static prediction
-                with no temporal axis, so a non-`None` value raises
-                `NotImplementedError`. The facade forwards `aggregate=` to raster
-                backends without pre-rejecting it, so this guard is the actual
-                gate, not a secondary check.
 
         Returns:
             list[Path]: The written GeoTIFF path(s), one per
                 `(property, depth, quantile)` coverage requested.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "SoilGrids.download(aggregate=...) is not supported: SoilGrids "
-                "is a static soil-property map with no temporal axis, so there "
-                "is nothing to reduce. Call download() without aggregate=."
-            )
         self._show_progress = progress_bar
         self._errors = self.check_errors_policy(errors)
         paths = self._api()

@@ -64,7 +64,7 @@ from earthlens.eea_aq._helpers import (
 from earthlens.eea_aq.catalog import Catalog
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 FileFormat = Literal["csv", "parquet"]
 
@@ -102,6 +102,8 @@ class EEA_AQ(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "monitor observations are tabular per-row station data, not gridded rasters, so there is no meaningful gridded reduction"
 
     def __init__(
         self,
@@ -363,7 +365,6 @@ class EEA_AQ(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> pd.DataFrame:
         """Fetch observations, write them to `path`, and return the frame.
 
@@ -375,10 +376,6 @@ class EEA_AQ(AbstractDataSource):
         Args:
             progress_bar: Accepted for API parity with the other backends;
                 airbase owns its own download progress.
-            aggregate: Must be `None`. EEA output is tabular, so there is
-                no meaningful gridded reduction; the facade already rejects
-                a non-`None` `aggregate=` for a `tabular` backend, and this
-                is the belt-and-suspenders guard for direct callers.
 
         Returns:
             pd.DataFrame: The long-format observations (schema columns,
@@ -386,15 +383,7 @@ class EEA_AQ(AbstractDataSource):
                 nothing matched.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "EEA_AQ.download(aggregate=...) is not supported: monitor "
-                "observations are tabular per-row station data, not gridded "
-                "rasters, so there is no meaningful gridded reduction."
-            )
-
         df = self._api()
 
         out_path = self._output_path()

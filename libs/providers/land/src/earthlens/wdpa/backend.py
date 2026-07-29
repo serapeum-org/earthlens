@@ -39,7 +39,7 @@ from earthlens.wdpa.auth import WdpaAuth, WdpaCredentials
 from earthlens.wdpa.catalog import Catalog
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 FileFormat = Literal["geoparquet", "gpkg", "geojson"]
 
@@ -84,6 +84,8 @@ class WDPA(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "protected areas are vector polygons, not gridded rasters. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     def __init__(
         self,
@@ -251,31 +253,19 @@ class WDPA(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> FeatureCollection:
         """Fetch the protected-area polygons and return the FeatureCollection.
 
         Args:
             progress_bar: Accepted for signature parity; the REST client
                 has no progress bar, so this is a no-op.
-            aggregate: Must be `None`. Protected areas are vector, not
-                gridded; the facade already rejects a non-`None`
-                `aggregate=` for a `vector` backend.
 
         Returns:
             FeatureCollection: The protected-area polygons, CRS
                 `EPSG:4326`. Written to a file under `path` when set.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "WDPA.download(aggregate=...) is not supported: protected "
-                "areas are vector polygons, not gridded rasters. Call "
-                "download() without aggregate= and post-process the returned "
-                "FeatureCollection (a GeoDataFrame) directly."
-            )
         collection = FeatureCollection(self._fetch_all())
         if len(collection):
             warn_license(

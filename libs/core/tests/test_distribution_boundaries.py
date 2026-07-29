@@ -461,3 +461,81 @@ class TestCatalogLoaderAdoption:
             "these catalogs re-implement the mtime cache key instead of using "
             f"earthlens.base.catalog_source.load_catalog: {sorted(offenders)}"
         )
+
+
+class TestAggregateCapabilityIsCentral:
+    """ARC-1: no backend re-implements the `aggregate=` refusal."""
+
+    def _backend_sources(self):
+        """Yield `(path, source)` for every provider `backend.py`."""
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            yield path, path.read_text(encoding="utf-8")
+
+    def test_backends_were_scanned(self):
+        """Guard the guard: the glob must actually find the backends."""
+        found = [p.parent.name for p, _ in self._backend_sources()]
+        assert len(found) > 40, f"only scanned {len(found)}: {found[:5]}"
+
+    def test_no_backend_hand_rolls_the_refusal(self):
+        """The policy lives once, in `_refuse_unsupported_aggregate`.
+
+        40 backends used to each declare `aggregate=` and raise their own
+        `NotImplementedError`, so the rule was written 40 times and the argument
+        sat in the signature of backends it meant nothing to. A backend that
+        cannot aggregate now declares nothing; one that can sets
+        `SUPPORTS_AGGREGATE` and may add `AGGREGATE_REFUSAL_REASON`.
+        """
+        import re
+
+        # A *refusal*, not any use of the condition: an implementer legitimately
+        # writes `if aggregate is not None:` to branch into the reducer. What
+        # must not come back is that branch raising NotImplementedError.
+        refusal = re.compile(
+            r"if aggregate is not None:\s*\n\s+raise NotImplementedError", re.M
+        )
+        offenders = [
+            path.parent.name
+            for path, source in self._backend_sources()
+            if refusal.search(source)
+        ]
+        assert offenders == [], (
+            "these backends re-implement the aggregate= refusal instead of "
+            f"declaring SUPPORTS_AGGREGATE: {offenders}"
+        )
+
+    def test_only_real_implementers_declare_support(self):
+        """A backend claiming `SUPPORTS_AGGREGATE` must actually use the argument.
+
+        The reverse of the check above: declaring the capability without wiring
+        the reducer would silently accept `aggregate=` and ignore it, which is
+        worse than refusing it.
+        """
+        import ast as ast_module
+
+        liars = []
+        for path, source in self._backend_sources():
+            if "SUPPORTS_AGGREGATE = True" not in source:
+                continue
+            # Read the AST, not the text. A substring search is fooled by a
+            # backend that only *names* the aggregator in its error message —
+            # cmip6 did exactly that ("reduce them separately with
+            # ...aggregate_netcdf"), and a text scan classified it as an
+            # implementer.
+            uses_it = False
+            for node in ast_module.walk(ast_module.parse(source)):
+                if isinstance(node, ast_module.Name) and node.id == "aggregate":
+                    uses_it = True
+                    break
+                if isinstance(node, ast_module.Attribute) and node.attr.startswith(
+                    "_aggregate"
+                ):
+                    uses_it = True
+                    break
+            if not uses_it:
+                liars.append(path.parent.name)
+        assert liars == [], (
+            f"these declare SUPPORTS_AGGREGATE but never use aggregate: {liars}"
+        )

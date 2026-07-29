@@ -77,6 +77,9 @@ class SentinelHub(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "mixed"
 
+    #: Wires the temporal reducer (ARC-1).
+    SUPPORTS_AGGREGATE = True
+
     def __init__(
         self,
         start: str,

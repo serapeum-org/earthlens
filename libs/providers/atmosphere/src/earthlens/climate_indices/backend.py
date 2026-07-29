@@ -44,7 +44,7 @@ from earthlens.climate_indices import _helpers
 from earthlens.climate_indices.catalog import Catalog
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -96,6 +96,8 @@ class ClimateIndices(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "climate indices are tabular monthly scalars, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned DataFrame directly"
 
     def __init__(
         self,
@@ -345,7 +347,6 @@ class ClimateIndices(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> pd.DataFrame:
         """Fetch every requested index, write the table, and return it.
 
@@ -353,11 +354,6 @@ class ClimateIndices(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends; the per-index loop is short, so this is a
                 no-op.
-            aggregate: Must be `None`. Climate-index output is tabular
-                monthly scalars, so there is no gridded reduction; the
-                facade already rejects a non-`None` `aggregate=` for a
-                `tabular` backend, and this is the belt-and-suspenders
-                guard for direct callers.
 
         Returns:
             pd.DataFrame: The long-format table (`date`, `index`,
@@ -365,18 +361,9 @@ class ClimateIndices(AbstractDataSource):
                 window; an empty (schema-only) frame when nothing matched.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None` (`G1`).
             ValueError: If an index id is unknown, or a fetch fails
                 (`G8`).
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "ClimateIndices.download(aggregate=...) is not supported: "
-                "climate indices are tabular monthly scalars, not gridded "
-                "rasters, so there is no meaningful gridded reduction. Call "
-                "download() without aggregate= and post-process the returned "
-                "DataFrame directly."
-            )
         frames = [frame for frame in self._api() if len(frame)]
         df = (
             pd.concat(frames, ignore_index=True)

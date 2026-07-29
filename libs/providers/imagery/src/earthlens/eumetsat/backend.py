@@ -63,7 +63,7 @@ from earthlens.eumetsat.catalog import Catalog, DataStoreGroup, EumetsatDataset
 from earthlens.eumetsat.tailor import TailorConfig
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 #: Total wall-clock budget for polling one Data Tailor customisation to a
 #: terminal state before giving up (`G8`). A stuck job must not hang forever.
@@ -112,6 +112,8 @@ class EUMETSAT(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    AGGREGATE_REFUSAL_REASON = "EUMETSAT aggregate= is the temporal reducer (G1); it is not implemented for this backend. Download products (optionally with tailor= for server-side subset/reproject) and reduce NetCDF products client-side with pyramids"
 
     def __init__(
         self,
@@ -385,7 +387,6 @@ class EUMETSAT(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
         tailor: TailorConfig | None = None,
     ) -> list[Path]:
         """Search the Data Store and return product paths (native or tailored).
@@ -416,9 +417,6 @@ class EUMETSAT(AbstractDataSource):
         Args:
             progress_bar: Reserved for parity with the other backends;
                 `eumdac`'s streaming download has no built-in bar.
-            aggregate: Optional temporal
-                `earthlens.aggregate.AggregationConfig`. Rejected — see
-                above.
             tailor: Optional `TailorConfig` routing the request through
                 Data Tailor. `None` (the default) keeps the native fetch.
 
@@ -427,18 +425,9 @@ class EUMETSAT(AbstractDataSource):
                 given — the customised output paths.
 
         Raises:
-            NotImplementedError: When `aggregate` is not `None` (the
-                temporal reducer is not implemented for EUMETSAT, `G1`).
             ValueError: When `tailor=` names a dataset that is not
                 Data-Tailor-eligible (`G5`).
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "EUMETSAT aggregate= is the temporal reducer (G1); it is "
-                "not implemented for this backend. Download products "
-                "(optionally with tailor= for server-side subset/reproject) "
-                "and reduce NetCDF products client-side with pyramids."
-            )
         self._show_progress = progress_bar
         if tailor is not None:
             return self._tailor(tailor)

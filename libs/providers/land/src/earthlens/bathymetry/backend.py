@@ -43,7 +43,7 @@ from earthlens.bathymetry._helpers import (
 from earthlens.bathymetry.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 #: Leading magic bytes of the NetCDF container formats ERDDAP serves —
 #: classic NetCDF-3 (`CDF\x01/02/05`) and NetCDF-4/HDF5 (`\x89HDF`). A griddap
@@ -89,6 +89,8 @@ class Bathymetry(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    AGGREGATE_REFUSAL_REASON = "a topography / bathymetry DEM is a single static grid with no temporal axis, so there is nothing to reduce. Call download() without aggregate="
 
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
@@ -387,30 +389,17 @@ class Bathymetry(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> list[Path]:
         """Fetch the DEM subset(s) as written GeoTIFF(s).
 
         Args:
             progress_bar: Accepted for signature parity; one request per call.
-            aggregate: Must be `None`. A static DEM has no temporal axis to
-                reduce, so a non-`None` value raises `NotImplementedError`
-                (the facade already gates this; this is the belt-and-suspenders
-                guard for direct callers).
 
         Returns:
             list[Path]: The written GeoTIFF DEM subset path(s).
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
             ValueError: If a request is outside the DEM's coverage / oversize
                 (from :meth:`_download`).
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "Bathymetry.download(aggregate=...) is not supported: a "
-                "topography / bathymetry DEM is a single static grid with no "
-                "temporal axis, so there is nothing to reduce. Call "
-                "download() without aggregate=."
-            )
         return cast("list[Path]", self._api())

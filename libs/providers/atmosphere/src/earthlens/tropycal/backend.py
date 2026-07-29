@@ -51,7 +51,6 @@ from earthlens.tropycal.catalog import Catalog
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
 
-    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["gpkg", "geojson"]
 Geometry = Literal["point", "track"]
@@ -108,6 +107,8 @@ class TropicalCyclone(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "tropycal products are vector features or tabular guidance, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned GeoDataFrame / DataFrame directly"
 
     def __init__(
         self,
@@ -597,7 +598,6 @@ class TropicalCyclone(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> FeatureCollection | pd.DataFrame:
         """Load every requested basin and return the unioned tracks.
 
@@ -611,11 +611,6 @@ class TropicalCyclone(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends; tropycal has no progress bar, so this is a
                 no-op.
-            aggregate: Must be `None`. Tracks are vector, not gridded, so
-                there is no meaningful aggregation. The facade already
-                rejects a non-`None` `aggregate=` for a `vector` backend;
-                this is the belt-and-suspenders guard for direct backend
-                callers.
 
         Returns:
             FeatureCollection: The row-wise union of every requested
@@ -623,18 +618,8 @@ class TropicalCyclone(AbstractDataSource):
                 (schema-only) when nothing matched.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
             ImportError: If the `[tropycal]` extra is not installed.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "TropicalCyclone.download(aggregate=...) is not supported: "
-                "tropycal products are vector features or tabular guidance, "
-                "not gridded rasters, so there is no meaningful gridded "
-                "reduction. Call download() without aggregate= and "
-                "post-process the returned GeoDataFrame / DataFrame directly."
-            )
-
         if self._product == "ships":
             return self._download_ships()
         if self._product == "realtime":

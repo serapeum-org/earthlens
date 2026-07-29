@@ -43,7 +43,7 @@ from earthlens.base import (
 from earthlens.radar.catalog import Catalog, Station
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 #: The unsigned AWS bucket holding the real-time Level-II chunk feed.
 BUCKET = "unidata-nexrad-level2-chunks"
@@ -128,6 +128,10 @@ class Radar(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = (
+        "â€” raw Level-II volumes are not griddable by the pyramids reducer"
+    )
 
     def __init__(
         self,
@@ -401,7 +405,6 @@ class Radar(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
         errors: str = "warn",
     ):
         """Assemble the in-window volumes and return a `GeoDataFrame` inventory.
@@ -412,9 +415,6 @@ class Radar(AbstractDataSource):
                 `"warn"` (default) logs each failed assembly and continues,
                 `"raise"` propagates the first, `"ignore"` continues
                 silently.
-            aggregate: Must be `None` — raw radar volumes are not
-                pyramids-reducible. The facade already rejects a non-`None`
-                `aggregate=` for a `"vector"` backend before reaching here.
 
         Returns:
             geopandas.GeoDataFrame: One row per assembled volume —
@@ -432,14 +432,8 @@ class Radar(AbstractDataSource):
                 documented exception.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
             ValueError: If `errors` is not a recognised policy.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "Radar.download(aggregate=...) is not supported — raw Level-II "
-                "volumes are not griddable by the pyramids reducer."
-            )
         self._errors = self.check_errors_policy(errors)
         self._show_progress = progress_bar
         products = self._search()

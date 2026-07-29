@@ -264,6 +264,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    AGGREGATE_REFUSAL_REASON = (
+        "aggregate= is not yet supported by the GEE backend (planned)"
+    )
+
+    AGGREGATE_REFUSAL_REASON = "aggregate= is not yet supported by the GEE backend (planned â€” see the GEE plan task M3)"
+
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
 
@@ -563,16 +569,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
             dates=dates,
         )
 
-    def download(
-        self, progress_bar: bool = True, aggregate: Any = None
-    ) -> list[Path | str | TaskInfo]:
+    def download(self, progress_bar: bool = True) -> list[Path | str | TaskInfo]:
         """Download every requested band-set of every requested dataset.
 
         Args:
             progress_bar: Show a per-bucket `tqdm` bar. Defaults to `True`.
-            aggregate: Accepted for signature parity with the ECMWF
-                backend; not yet supported — passing a non-`None` value
-                raises `NotImplementedError` (see plan task `M3`).
 
         Returns:
             One entry per `(dataset, band-set, time-bucket)`. The
@@ -592,7 +593,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
               `wait_for_task_id`, etc.).
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
             ValueError: On an unknown asset id, an unknown band, or an
                 oversized `"url"` request (see :meth:`_api`).
             RuntimeError: If a `"drive"` / `"gcs"` / `"asset"` export
@@ -640,11 +640,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
             earthlens.gee.auth.EarthEngineAuth: Performs the one-time
                 `ee.Initialize` used by :meth:`_open_client`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "aggregate= is not yet supported by the GEE backend "
-                "(planned — see the GEE plan task M3)."
-            )
         # Trigger the lazy Earth Engine auth/init before any `ee` call.
         _ = self.client
         outputs: list[Path | str | TaskInfo] = []

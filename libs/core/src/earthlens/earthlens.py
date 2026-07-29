@@ -1696,16 +1696,12 @@ class EarthLens:
                 `OUTPUT_KIND` is `"vector"` or `"tabular"`.
         """
         if aggregate is not None:
-            output_kind = getattr(self.datasource, "OUTPUT_KIND", "raster")
-            if output_kind not in {"raster", "mixed"}:
-                raise NotImplementedError(
-                    f"aggregate= is not supported for "
-                    f"{type(self.datasource).__name__} backends "
-                    f"(OUTPUT_KIND={output_kind!r}). The aggregator only "
-                    f"handles gridded raster outputs; vector / tabular "
-                    f"backends emit GeoDataFrames or DataFrames that do "
-                    f"not have a meaningful gridded reduction."
-                )
+            # Forward it and let the backend's `download` wrapper decide. The
+            # wrapper checks `SUPPORTS_AGGREGATE`, which is the honest question:
+            # `OUTPUT_KIND` used to stand in for it here and could not answer it,
+            # because plenty of `"raster"` backends emit grids with no time axis
+            # to reduce. Keeping the check in one place also means a direct
+            # `backend.download(aggregate=...)` is refused identically.
             kwargs["aggregate"] = aggregate
 
         # The base `download(self)` is a minimal placeholder; every concrete

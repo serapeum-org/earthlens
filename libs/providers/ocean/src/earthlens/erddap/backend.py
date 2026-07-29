@@ -159,6 +159,13 @@ class ERDDAP(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Wires the temporal reducer (ARC-1).
+    SUPPORTS_AGGREGATE = True
+
+    AGGREGATE_REFUSAL_REASON = (
+        "a tabledap response is tabular; only griddap grids have an axis to reduce"
+    )
+
     def __init__(
         self,
         start: str,
@@ -470,14 +477,6 @@ class ERDDAP(AbstractDataSource):
                 coverage (from :meth:`_fetch_grid`).
         """
         if self.OUTPUT_KIND == "tabular":
-            if aggregate is not None:
-                raise NotImplementedError(
-                    "ERDDAP.download(aggregate=...) is not supported for a "
-                    "tabledap dataset: its output is a per-row table, not a "
-                    "gridded raster, so there is no meaningful gridded "
-                    "reduction. Use a griddap dataset (or the CMEMS backend) "
-                    "for gridded fields you want to aggregate."
-                )
             frames = self._api()
             df = (
                 pd.concat(frames, ignore_index=True)

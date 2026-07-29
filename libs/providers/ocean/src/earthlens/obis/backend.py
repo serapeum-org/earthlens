@@ -38,7 +38,6 @@ from earthlens.obis.catalog import Catalog
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
 
-    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["geoparquet", "gpkg", "geojson"]
 
@@ -98,6 +97,8 @@ class OBIS(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "occurrences are vector point features, not gridded rasters. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     def __init__(
         self,
@@ -266,16 +267,12 @@ class OBIS(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> FeatureCollection:
         """Run the occurrence search and return the points FeatureCollection.
 
         Args:
             progress_bar: Accepted for signature parity; OBIS search has no
                 progress bar, so this is a no-op.
-            aggregate: Must be `None`. Occurrences are vector, not gridded;
-                the facade already rejects a non-`None` `aggregate=` for a
-                `vector` backend.
 
         Returns:
             FeatureCollection: The occurrence points, CRS `EPSG:4326`.
@@ -283,15 +280,7 @@ class OBIS(AbstractDataSource):
                 under `path` when `path` is set.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "OBIS.download(aggregate=...) is not supported: occurrences "
-                "are vector point features, not gridded rasters. Call "
-                "download() without aggregate= and post-process the returned "
-                "FeatureCollection (a GeoDataFrame) directly."
-            )
         collection = self._fetch_all()
         if self._user_path and len(collection):
             written = self._write(collection)

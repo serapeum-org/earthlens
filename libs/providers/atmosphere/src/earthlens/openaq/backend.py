@@ -50,7 +50,7 @@ from earthlens.openaq.catalog import Catalog
 from earthlens.openaq.client import OpenaqClient
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 FileFormat = Literal["csv", "parquet"]
 
@@ -109,6 +109,8 @@ class OpenAQ(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "pollutant measurements are tabular per-row station observations, not gridded rasters, so there is no meaningful gridded reduction. Use the server-side temporal_resolution rollup (hourly/daily/monthly/yearly) instead"
 
     def __init__(
         self,
@@ -433,7 +435,6 @@ class OpenAQ(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> pd.DataFrame:
         """Fetch measurements, write them to `path`, and return the frame.
 
@@ -448,12 +449,6 @@ class OpenAQ(AbstractDataSource):
         Args:
             progress_bar: Show a per-sensor progress bar. Defaults to
                 `True`.
-            aggregate: Must be `None`. OpenAQ output is tabular, so
-                there is no meaningful gridded reduction; the facade
-                already rejects a non-`None` `aggregate=` for a
-                `tabular` backend, and this is the belt-and-suspenders
-                guard for direct backend callers. Use the server-side
-                `temporal_resolution` rollup instead.
 
         Returns:
             pd.DataFrame: The long-format union of every sensor's
@@ -461,17 +456,7 @@ class OpenAQ(AbstractDataSource):
                 UTC). Empty (schema-only) when nothing matched.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "OpenAQ.download(aggregate=...) is not supported: pollutant "
-                "measurements are tabular per-row station observations, not "
-                "gridded rasters, so there is no meaningful gridded "
-                "reduction. Use the server-side temporal_resolution rollup "
-                "(hourly/daily/monthly/yearly) instead."
-            )
-
         frames = self._take_limited(
             self._iter_non_empty_frames(progress_bar),
             limit=self._limit,

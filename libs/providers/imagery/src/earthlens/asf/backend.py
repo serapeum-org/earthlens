@@ -40,7 +40,7 @@ from earthlens.base import (
 )
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 
 class ASF(AbstractDataSource):
@@ -95,6 +95,8 @@ class ASF(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    AGGREGATE_REFUSAL_REASON = "ASF returns SAR products for downstream InSAR/RTC tooling; aggregate= is not supported. Post-process the downloaded SLC/RTC stack with a dedicated InSAR tool"
 
     def __init__(
         self,
@@ -479,17 +481,12 @@ class ASF(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> list[Path]:
         """Run the search/stack + download and return the written paths.
 
         Args:
             progress_bar: Accepted for facade-compatibility; not
                 used (the SDK manages its own per-file progress).
-            aggregate: Must be `None`. ASF returns SAR products for
-                downstream InSAR / RTC tooling, not gridded
-                summaries — passing an :class:`AggregationConfig`
-                raises `NotImplementedError`.
 
         Returns:
             list[Path]: The on-disk paths of every downloaded
@@ -497,7 +494,6 @@ class ASF(AbstractDataSource):
                 present and skipped.
 
         Raises:
-            NotImplementedError: When `aggregate` is not `None`.
 
         Examples:
             - Construct in search mode and reject an `aggregate=`
@@ -520,10 +516,4 @@ class ASF(AbstractDataSource):
 
                 ```
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "ASF returns SAR products for downstream InSAR/RTC tooling; "
-                "aggregate= is not supported. Post-process the downloaded "
-                "SLC/RTC stack with a dedicated InSAR tool."
-            )
         return cast("list[Path]", self._api())

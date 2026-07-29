@@ -103,6 +103,11 @@ class CMEMS(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Wires the temporal reducer (ARC-1).
+    SUPPORTS_AGGREGATE = True
+
+    AGGREGATE_REFUSAL_REASON = "this dataset resolves to a non-gridded output; only the gridded CMEMS datasets can be reduced"
+
     def __init__(
         self,
         start: str,

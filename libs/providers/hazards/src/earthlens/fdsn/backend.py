@@ -47,8 +47,6 @@ from earthlens.fdsn.catalog import Catalog, Provider
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
 
-    from earthlens.aggregate import AggregationConfig
-
 
 FileFormat = Literal["gpkg", "geojson"]
 
@@ -86,6 +84,8 @@ class FDSN(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "seismic events are vector point features, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     #: Partial-failure policy for the per-provider loop; `download(errors=...)`
     #: overrides it per call.
@@ -298,7 +298,6 @@ class FDSN(AbstractDataSource):
 
         Args:
             progress_bar: Whether to show per-provider progress.
-            aggregate: Rejected by the facade for a vector backend.
             errors: Partial-failure policy for the per-provider loop —
                 `"warn"` (default) logs each failed network and continues,
                 `"raise"` propagates the first failure, `"ignore"` continues
@@ -408,7 +407,6 @@ class FDSN(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
         errors: str = "warn",
     ) -> FeatureCollection:
         """Query every requested network and return the unioned events.
@@ -427,11 +425,6 @@ class FDSN(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends; obspy's `get_events` has no progress bar, so
                 this is currently a no-op.
-            aggregate: Must be `None`. Seismic events are vector, not
-                gridded, so there is no meaningful aggregation. The
-                facade already rejects a non-`None` `aggregate=` for a
-                `vector` backend; this is the belt-and-suspenders guard
-                for direct backend callers.
 
         Returns:
             FeatureCollection: The row-wise union of every requested
@@ -439,20 +432,10 @@ class FDSN(AbstractDataSource):
                 when no network matched anything.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
             RuntimeError: If **every** requested network's query failed
                 (propagated from :meth:`_fetch`). A partial failure does
                 not raise — the healthy networks' events are returned.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "FDSN.download(aggregate=...) is not supported: seismic "
-                "events are vector point features, not gridded rasters, so "
-                "there is no meaningful gridded reduction. Call download() "
-                "without aggregate= and post-process the returned "
-                "FeatureCollection (a GeoDataFrame) directly."
-            )
-
         self._errors = self.check_errors_policy(errors)
         products = self._search()
         collections = self._fetch(products) if products else []

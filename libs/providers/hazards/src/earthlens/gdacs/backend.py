@@ -48,8 +48,6 @@ from earthlens.gdacs.catalog import Catalog
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
 
-    from earthlens.aggregate import AggregationConfig
-
 
 #: GDACS SEARCH endpoint — returns the whole event list for a window in
 #: one GeoJSON response (verified against the live service).
@@ -101,6 +99,8 @@ class GDACS(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "disaster alerts are vector features, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     def __init__(
         self,
@@ -306,7 +306,6 @@ class GDACS(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> FeatureCollection:
         """Query GDACS once and return the matched alerts.
 
@@ -319,28 +318,13 @@ class GDACS(AbstractDataSource):
         Args:
             progress_bar: Accepted for signature parity with the other
                 backends; GDACS is a single request, so this is a no-op.
-            aggregate: Must be `None`. Alerts are vector, not gridded,
-                so there is no meaningful aggregation. The facade
-                already rejects a non-`None` `aggregate=` for a
-                `vector` backend; this is the belt-and-suspenders guard
-                for direct backend callers.
 
         Returns:
             FeatureCollection: The matched alerts, CRS `EPSG:4326`.
                 Empty (schema-only) when nothing matched.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "GDACS.download(aggregate=...) is not supported: disaster "
-                "alerts are vector features, not gridded rasters, so there "
-                "is no meaningful gridded reduction. Call download() without "
-                "aggregate= and post-process the returned FeatureCollection "
-                "(a GeoDataFrame) directly."
-            )
-
         collections = self._api()
         collection = collections[0] if collections else events.empty_fc()
 

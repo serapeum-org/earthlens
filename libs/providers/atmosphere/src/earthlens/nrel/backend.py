@@ -48,7 +48,7 @@ from earthlens.nrel.auth import NrelAuth, NrelCredentials
 from earthlens.nrel.catalog import Catalog, Product
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -94,6 +94,8 @@ class NREL(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "NREL output is a per-coordinate hourly time series (tabular), not a gridded raster, so there is no meaningful gridded reduction. NREL already returns the resolved hourly / TMY series"
 
     def __init__(
         self,
@@ -332,17 +334,11 @@ class NREL(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> pd.DataFrame:
         """Fetch every `(point, year)` call, write the table, and return it.
 
         Args:
             progress_bar: Show a per-call `tqdm` bar while fetching.
-            aggregate: Must be `None`. NREL output is tabular (the resolved
-                hourly / TMY series), so there is no gridded reduction; the
-                facade already rejects a non-`None` `aggregate=` for a
-                `tabular` backend, and this is the belt-and-suspenders guard for
-                direct callers.
 
         Returns:
             pd.DataFrame: The concatenated long-format frame — one block of
@@ -350,17 +346,9 @@ class NREL(AbstractDataSource):
                 `lat`/`lon`/`year`/`product`.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
             ValueError: If a single explicit point is out of NREL coverage, or
                 the fan-out exceeds `max_requests`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "NREL.download(aggregate=...) is not supported: NREL output is "
-                "a per-coordinate hourly time series (tabular), not a gridded "
-                "raster, so there is no meaningful gridded reduction. NREL "
-                "already returns the resolved hourly / TMY series."
-            )
         assert self._product is not None  # set by _initialize
         self._show_progress = progress_bar
         frames = [frame for frame in self._api() if frame is not None]

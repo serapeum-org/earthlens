@@ -46,7 +46,7 @@ from earthlens.risk_indicators.auth import GfwAuth, GfwCredentials
 from earthlens.risk_indicators.catalog import Catalog, Dataset
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -81,6 +81,8 @@ class RiskIndicators(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "risk indicators are pre-computed country-indexed indices / queries, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate="
 
     #: The indicator tables are a snapshot with no time axis, so a missing `start` /
     #: `end` is legal here.
@@ -337,18 +339,12 @@ class RiskIndicators(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ):
         """Fetch the dataset and return its per-instance shape.
 
         Args:
             progress_bar: Accepted for signature parity; one request is issued,
                 so this is a no-op.
-            aggregate: Must be `None`. Risk indicators are pre-computed
-                country-indexed indices, so there is no gridded reduction; the
-                facade already rejects a non-`None` `aggregate=` for `tabular` /
-                `vector`, and this is the belt-and-suspenders guard for direct
-                callers (`G8`).
 
         Returns:
             A :class:`pandas.DataFrame` (written to `root_dir` too) for a
@@ -357,16 +353,8 @@ class RiskIndicators(AbstractDataSource):
             `vector` one.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None` (`G8`).
             requests.HTTPError: If the upstream source returns a non-2xx status.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "RiskIndicators.download(aggregate=...) is not supported: risk "
-                "indicators are pre-computed country-indexed indices / queries, "
-                "not gridded rasters, so there is no meaningful gridded "
-                "reduction. Call download() without aggregate=."
-            )
         results = self._api()
         result = results[0]
         self._log_citation()

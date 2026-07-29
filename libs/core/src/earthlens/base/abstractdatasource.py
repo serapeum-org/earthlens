@@ -585,6 +585,13 @@ class AbstractDataSource(ABC):
             the polygon's bounding box — a plausible-looking raster over
             roughly the right area, which is the hardest kind of wrong
             output to notice.
+        SUPPORTS_AGGREGATE: Whether this backend implements the `aggregate=`
+            temporal reduction. `False` (the default) means the parameter is
+            refused centrally, so the backend neither declares it nor writes
+            its own refusal — `OUTPUT_KIND` alone cannot decide this, because
+            plenty of `"raster"` backends (goes, dem, jaxa, radar, …) emit
+            grids the reducer has no time axis for. Only the seven backends
+            that actually wire the aggregator set it to `True`.
     """
 
     OUTPUT_KIND: OutputKind = "raster"
@@ -592,6 +599,15 @@ class AbstractDataSource(ABC):
     REQUIRES_TIME_WINDOW: bool = True
 
     SUPPORTS_POLYGON_AOI: bool = False
+
+    SUPPORTS_AGGREGATE: bool = False
+
+    #: Optional sentence explaining why this backend refuses `aggregate=`,
+    #: appended to the central message by
+    #: :meth:`_refuse_unsupported_aggregate`. Worth setting: the specific reason
+    #: ("a single static prediction with no temporal axis") is more use to a
+    #: caller than the generic one.
+    AGGREGATE_REFUSAL_REASON: str = ""
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         """Give every backend its `download` wrapper and constructor sugar.
@@ -710,6 +726,20 @@ class AbstractDataSource(ABC):
 
         @functools.wraps(original)
         def download(self, *args, **kw):
+            # One place refuses `aggregate=`. Previously 40 backends each
+            # declared the parameter and wrote their own `NotImplementedError`,
+            # so the policy was stated 40 times and the argument sat in the
+            # signature of backends it meant nothing to.
+            #
+            # Both conditions have to permit it, and they answer different
+            # questions. `SUPPORTS_AGGREGATE` is per class — does this backend
+            # wire the reducer at all. `OUTPUT_KIND` is per *instance* for a few
+            # backends (earthdata, eumetsat, tropycal, cmems) whose shape is
+            # only known once the dataset resolves: cmems supports aggregation
+            # for its gridded datasets and must still refuse it for a vector
+            # one.
+            if kw.get("aggregate") is not None:
+                self._refuse_unsupported_aggregate()
             # Record which directories are missing *before* creating them, so
             # the failure path can unwind exactly what this call added.
             created = []
@@ -823,6 +853,39 @@ class AbstractDataSource(ABC):
 
         self.root_dir = Path(path).absolute()
         self.path = self.root_dir
+
+    def _refuse_unsupported_aggregate(self) -> None:
+        """Raise unless this instance can honour a non-`None` `aggregate=`.
+
+        The single implementation of a policy 40 backends used to each write for
+        themselves. Two independent questions have to pass:
+
+        * :attr:`SUPPORTS_AGGREGATE` — does the class wire the reducer at all;
+        * :attr:`OUTPUT_KIND` — is *this instance's* output gridded. A handful of
+          backends resolve their kind per request, so a backend that aggregates
+          its raster datasets must still refuse for a vector one.
+
+        A backend may set :attr:`AGGREGATE_REFUSAL_REASON` to a sentence saying
+        why, which is appended to the message. That is worth doing: "SoilGrids is
+        a single static prediction with no temporal axis" tells a caller
+        something the generic sentence cannot.
+
+        Raises:
+            NotImplementedError: When either check fails.
+        """
+        output_kind = getattr(self, "OUTPUT_KIND", "raster")
+        griddable = output_kind in {"raster", "mixed"}
+        if self.SUPPORTS_AGGREGATE and griddable:
+            return
+        reason = getattr(self, "AGGREGATE_REFUSAL_REASON", "") or (
+            "the temporal reducer needs a gridded output with a time axis to "
+            "reduce over, and this request has none"
+        )
+        raise NotImplementedError(
+            f"aggregate= is not supported by {type(self).__name__} "
+            f"(OUTPUT_KIND={output_kind!r}): {reason}. Reduce the downloaded "
+            f"output yourself, or use a backend that supports it."
+        )
 
     def _is_complete(
         self,

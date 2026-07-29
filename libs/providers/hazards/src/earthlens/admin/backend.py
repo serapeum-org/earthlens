@@ -52,7 +52,7 @@ from earthlens.base import (
 )
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 FileFormat = Literal["gpkg", "geojson"]
 
@@ -112,6 +112,8 @@ class AdminBoundaries(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "administrative boundaries are vector polygons, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     #: Administrative boundaries are a snapshot with no time axis, so a missing `start`
     #: / `end` is legal here.
@@ -364,7 +366,6 @@ class AdminBoundaries(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> FeatureCollection:
         """Fetch the requested administrative boundaries and return the polygons.
 
@@ -376,26 +377,13 @@ class AdminBoundaries(AbstractDataSource):
         Args:
             progress_bar: Accepted for signature parity with the other
                 backends.
-            aggregate: Must be `None`. Boundaries are vector, not gridded, so
-                there is no meaningful aggregation. The facade already rejects a
-                non-`None` `aggregate=` for a `vector` backend; this is the
-                belt-and-suspenders guard for direct callers.
 
         Returns:
             FeatureCollection: The boundary polygons, CRS EPSG:4326. Empty
                 (schema-only) when nothing was fetched.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "AdminBoundaries.download(aggregate=...) is not supported: "
-                "administrative boundaries are vector polygons, not gridded "
-                "rasters, so there is no meaningful gridded reduction. Call "
-                "download() without aggregate= and post-process the returned "
-                "FeatureCollection (a GeoDataFrame) directly."
-            )
         collections = self._api()
         collection = self._combine(collections)
         if len(collection) and self._should_write:

@@ -38,7 +38,7 @@ from typing import TYPE_CHECKING
 from pydantic import SecretStr
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 from earthlens.base import OutputKind, date_windows, resolve_cadence, to_datetime
 from earthlens.base.abstractdatasource import (
@@ -82,6 +82,8 @@ class JAXA(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    AGGREGATE_REFUSAL_REASON = "JAXA does not yet support the aggregate= argument. All three branches emit per-date artefacts today (jaxa-earth: per-date COGs; gportal: per-product SFTP downloads; ptree: per-slot HSD segments) â€” reducing them across dates is a planned follow-on (planning G6)"
 
     def __init__(
         self,
@@ -372,7 +374,6 @@ class JAXA(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> list[Path]:
         """Fetch the requested datasets and return the written paths.
 
@@ -381,16 +382,12 @@ class JAXA(AbstractDataSource):
                 each branch prints its own progress lines today
                 (jaxa-earth via `jaxa.earth`, gportal via the `gportal`
                 SDK, ptree via one segment-path write per FTP transfer).
-            aggregate: Not supported — JAXA requests return per-date
-                rasters; reducing them across dates is a follow-on.
 
         Returns:
             list[Path]: One or more files per resolved dataset, in
                 request order.
 
         Raises:
-            NotImplementedError: When `aggregate` is non-`None`. See `G6`
-                in the planning doc.
 
         Examples:
             - Passing `aggregate=` raises because per-date stacks are not
@@ -411,14 +408,5 @@ class JAXA(AbstractDataSource):
 
                 ```
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "JAXA does not yet support the aggregate= argument. "
-                "All three branches emit per-date artefacts today "
-                "(jaxa-earth: per-date COGs; gportal: per-product "
-                "SFTP downloads; ptree: per-slot HSD segments) — "
-                "reducing them across dates is a planned follow-on "
-                "(planning G6)."
-            )
         del progress_bar
         return self._api()

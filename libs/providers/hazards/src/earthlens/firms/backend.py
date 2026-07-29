@@ -57,7 +57,6 @@ from earthlens.firms.catalog import Catalog
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
 
-    from earthlens.aggregate import AggregationConfig
 
 #: FIRMS area-CSV endpoint. Filled with the MAP_KEY, sensor, bbox
 #: (W,S,E,N), day_range, and start_date path segments.
@@ -113,6 +112,8 @@ class FIRMS(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "fire detections are vector point features, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     def __init__(
         self,
@@ -547,7 +548,6 @@ class FIRMS(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> FeatureCollection:
         """Query FIRMS and return the matched detections.
 
@@ -561,28 +561,13 @@ class FIRMS(AbstractDataSource):
         Args:
             progress_bar: Show a per-chunk progress bar. Defaults to
                 `True`.
-            aggregate: Must be `None`. Detections are vector, not
-                gridded, so there is no meaningful aggregation. The
-                facade already rejects a non-`None` `aggregate=` for a
-                `vector` backend; this is the belt-and-suspenders guard
-                for direct backend callers.
 
         Returns:
             FeatureCollection: The matched detections, CRS `EPSG:4326`.
                 Empty (schema-only) when nothing matched.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "FIRMS.download(aggregate=...) is not supported: fire "
-                "detections are vector point features, not gridded rasters, so "
-                "there is no meaningful gridded reduction. Call download() "
-                "without aggregate= and post-process the returned "
-                "FeatureCollection (a GeoDataFrame) directly."
-            )
-
         # Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not
         # called explicitly, so EarthLens(...).download() still works when
         # the key lives in the environment.

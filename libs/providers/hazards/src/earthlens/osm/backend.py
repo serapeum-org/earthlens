@@ -72,7 +72,6 @@ from earthlens.osm.catalog import Catalog, Dataset
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
 
-    from earthlens.aggregate import AggregationConfig
 
 #: Canonical public Overpass endpoint. Overridable via `endpoint=`.
 OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter"
@@ -161,6 +160,8 @@ class OSM(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "OSM features are vector, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     #: An Overpass current-state query has no window; ohsome supplies its own, so a
     #: missing `start` / `end` is legal here.
@@ -637,7 +638,6 @@ class OSM(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> FeatureCollection:
         """Run the requested OSM queries and return the combined features.
 
@@ -650,26 +650,13 @@ class OSM(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends; OSM issues one query per named id, so this is a
                 no-op.
-            aggregate: Must be `None`. OSM features are vector, not gridded,
-                so there is no meaningful aggregation. The facade already
-                rejects a non-`None` `aggregate=` for a `vector` backend;
-                this is the belt-and-suspenders guard for direct callers.
 
         Returns:
             FeatureCollection: The matched features, CRS `EPSG:4326`. Empty
                 (schema-only) when nothing matched.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "OSM.download(aggregate=...) is not supported: OSM features are "
-                "vector, not gridded rasters, so there is no meaningful gridded "
-                "reduction. Call download() without aggregate= and post-process "
-                "the returned FeatureCollection (a GeoDataFrame) directly."
-            )
-
         collection = self._combine(self._api())
         # OSM is ODbL — warn on every result, even an empty one (the query
         # itself succeeded and the obligation rides with any data downloaded).

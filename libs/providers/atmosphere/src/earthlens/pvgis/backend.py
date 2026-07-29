@@ -46,7 +46,7 @@ from earthlens.pvgis import _helpers
 from earthlens.pvgis.catalog import Catalog, Product
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -86,6 +86,8 @@ class PVGIS(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "PVGIS output is a per-coordinate hourly time series (tabular), not a gridded raster, so there is no meaningful gridded reduction. PVGIS already returns the resolved hourly / TMY series"
 
     def __init__(
         self,
@@ -274,17 +276,11 @@ class PVGIS(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> pd.DataFrame:
         """Fetch every sampled point, write the table, and return it.
 
         Args:
             progress_bar: Show a per-point `tqdm` bar while fetching.
-            aggregate: Must be `None`. PVGIS output is tabular (the resolved
-                hourly / TMY series), so there is no gridded reduction; the
-                facade already rejects a non-`None` `aggregate=` for a
-                `tabular` backend, and this is the belt-and-suspenders guard
-                for direct callers.
 
         Returns:
             pd.DataFrame: The concatenated long-format frame — one block of
@@ -292,17 +288,9 @@ class PVGIS(AbstractDataSource):
                 `lat`/`lon`/`product`.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
             ValueError: If a single explicit point is out of PVGIS coverage,
                 or the grid exceeds `max_points`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "PVGIS.download(aggregate=...) is not supported: PVGIS output "
-                "is a per-coordinate hourly time series (tabular), not a "
-                "gridded raster, so there is no meaningful gridded reduction. "
-                "PVGIS already returns the resolved hourly / TMY series."
-            )
         assert self._product is not None  # set by _initialize
         self._show_progress = progress_bar
         frames = [frame for frame in self._api() if frame is not None]

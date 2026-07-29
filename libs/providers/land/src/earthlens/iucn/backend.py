@@ -80,6 +80,12 @@ class IUCN(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "tabular"
 
+    AGGREGATE_REFUSAL_REASON = (
+        "Red List assessments are tabular records, not gridded rasters"
+    )
+
+    AGGREGATE_REFUSAL_REASON = "red List assessments are tabular records, not gridded rasters. Call download() without aggregate= and post-process the returned DataFrame directly"
+
     def __init__(
         self,
         start: str,
@@ -259,24 +265,13 @@ class IUCN(AbstractDataSource):
         Args:
             progress_bar: Accepted for signature parity; the REST shim has
                 no progress bar, so this is a no-op.
-            aggregate: Must be `None`. Assessments are tabular, not gridded;
-                the facade already rejects a non-`None` `aggregate=` for a
-                `tabular` backend.
 
         Returns:
             pd.DataFrame: The assessment rows. Written to a CSV/Parquet file
                 under `path` when `path` is set and rows are present.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "IUCN.download(aggregate=...) is not supported: Red List "
-                "assessments are tabular records, not gridded rasters. Call "
-                "download() without aggregate= and post-process the returned "
-                "DataFrame directly."
-            )
         frame = self._fetch_all()
         if self._user_path and len(frame):
             written = self._write(frame)

@@ -54,7 +54,7 @@ from earthlens.usgs_water.auth import UsgsWaterAuth, UsgsWaterCredentials
 from earthlens.usgs_water.catalog import Catalog
 
 if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
+    pass
 
 ApiFlavour = Literal["auto", "waterdata", "legacy"]
 OutputFormat = Literal["csv", "parquet"]
@@ -150,6 +150,8 @@ class USGSWater(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "USGS water observations are tabular per-site rows, not gridded rasters, so there is no meaningful gridded reduction. Use service='statistics' for a server-side temporal rollup (daily/monthly/annual) instead"
 
     def __init__(
         self,
@@ -338,7 +340,6 @@ class USGSWater(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> pd.DataFrame:
         """Fetch the selected service, write the table, and return it.
 
@@ -347,33 +348,16 @@ class USGSWater(AbstractDataSource):
                 backends. USGS Water issues one bulk `dataretrieval`
                 call per service rather than a per-item loop, so there
                 is no progress bar to show — this is a no-op.
-            aggregate: Must be `None`. USGS Water output is tabular, so
-                there is no gridded reduction; the facade already
-                rejects a non-`None` `aggregate=` for a `tabular`
-                backend, and this is the belt-and-suspenders guard for
-                direct callers. Use `service="statistics"` for a
-                server-side temporal rollup instead.
 
         Returns:
             pd.DataFrame: The long-format observation table for the
                 selected `service`.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None` (tabular
-                output has no gridded reduction; use
-                `service="statistics"` instead).
             ValueError: If the selected `service` requires an explicit
                 `sites=` (`peaks` / `ratings` / `statistics`) but none
                 was supplied.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "USGSWater.download(aggregate=...) is not supported: USGS "
-                "water observations are tabular per-site rows, not gridded "
-                "rasters, so there is no meaningful gridded reduction. Use "
-                "service='statistics' for a server-side temporal rollup "
-                "(daily/monthly/annual) instead."
-            )
         # Each frame is already normalised to its service's schema (even
         # when empty), so concat all of them — preserving the right
         # columns for non-values services — rather than dropping empties.
