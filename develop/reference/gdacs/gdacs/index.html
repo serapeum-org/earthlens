@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20682,7 +20682,9 @@ features, so the facade rejects <code>aggregate=</code> with
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/hazards/src/earthlens/gdacs/backend.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-84"> 84</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-82"> 82</a></span>
+<span class="normal"><a href="#__codelineno-0-83"> 83</a></span>
+<span class="normal"><a href="#__codelineno-0-84"> 84</a></span>
 <span class="normal"><a href="#__codelineno-0-85"> 85</a></span>
 <span class="normal"><a href="#__codelineno-0-86"> 86</a></span>
 <span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
@@ -20964,42 +20966,28 @@ features, so the facade rejects <code>aggregate=</code> with
 <span class="normal"><a href="#__codelineno-0-363">363</a></span>
 <span class="normal"><a href="#__codelineno-0-364">364</a></span>
 <span class="normal"><a href="#__codelineno-0-365">365</a></span>
-<span class="normal"><a href="#__codelineno-0-366">366</a></span>
-<span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="k">class</span><span class="w"> </span><span class="nc">GDACS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;GDACS multi-hazard alert backend (vector point-feature output).</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    Wraps the public GDACS SEARCH feed so a user can pull a</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    space/time/hazard window of disaster alerts through the same</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    `download()` shape every other earthlens backend uses. All requested</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    hazard types come back in one combined GET; the GeoJSON is mapped to</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    a :class:`~pyramids.feature.collection.FeatureCollection` and, if the</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    feed did not honour a bbox, clipped to the requested box</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    client-side.</span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="k">class</span><span class="w"> </span><span class="nc">GDACS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;GDACS multi-hazard alert backend (vector point-feature output).</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">    Wraps the public GDACS SEARCH feed so a user can pull a</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    space/time/hazard window of disaster alerts through the same</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    `download()` shape every other earthlens backend uses. All requested</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    hazard types come back in one combined GET; the GeoJSON is mapped to</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    a :class:`~pyramids.feature.collection.FeatureCollection` and, if the</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    feed did not honour a bbox, clipped to the requested box</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    client-side.</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    The feed needs no credentials.</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    The feed needs no credentials.</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">        OUTPUT_KIND: `&quot;vector&quot;` — the result is a table of alert</span>
-<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">            features, so the facade rejects `aggregate=` with</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">            `NotImplementedError`.</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">        OUTPUT_KIND: `&quot;vector&quot;` — the result is a table of alert</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">            features, so the facade rejects `aggregate=` with</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">            `NotImplementedError`.</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a>    <span class="n">OUTPUT_KIND</span><span class="p">:</span> <span class="n">OutputKind</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">OUTPUT_KIND</span><span class="p">:</span> <span class="n">OutputKind</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">AGGREGATE_REFUSAL_REASON</span> <span class="o">=</span> <span class="s2">&quot;disaster alerts are vector features, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly&quot;</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>        <span class="bp">self</span><span class="p">,</span>
@@ -21205,80 +21193,64 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query GDACS once and return the matched alerts.</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Issues the single combined SEARCH GET, maps and clips the</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        result, writes it to one vector file under `path`, and returns</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        the in-memory :class:`FeatureCollection`. An empty result</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        returns a schema-correct empty FeatureCollection and writes</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        nothing.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                backends; GDACS is a single request, so this is a no-op.</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            aggregate: Must be `None`. Alerts are vector, not gridded,</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                so there is no meaningful aggregation. The facade</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                `vector` backend; this is the belt-and-suspenders guard</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                for direct backend callers.</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>                <span class="s2">&quot;GDACS.download(aggregate=...) is not supported: disaster &quot;</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>                <span class="s2">&quot;alerts are vector features, not gridded rasters, so there &quot;</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                <span class="s2">&quot;is no meaningful gridded reduction. Call download() without &quot;</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                <span class="s2">&quot;aggregate= and post-process the returned FeatureCollection &quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                <span class="s2">&quot;(a GeoDataFrame) directly.&quot;</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="p">)</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>                <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="p">)</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>                <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="p">)</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the alerts to one vector file under `root_dir`.</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        The filename embeds the query&#39;s date window</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        (`gdacs_alerts_&lt;from&gt;_&lt;to&gt;.&lt;ext&gt;`), so downloading successive</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        windows into the same `path` — the recommended way to page past</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        the 100-event cap — yields distinct files instead of silently</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        overwriting one another. Two downloads of the *same* window do</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        overwrite, which is the intended idempotent behaviour.</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            collection: The alerts to write.</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="sa">f</span><span class="s2">&quot;gdacs_alerts_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="p">)</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query GDACS once and return the matched alerts.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Issues the single combined SEARCH GET, maps and clips the</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        result, writes it to one vector file under `path`, and returns</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        the in-memory :class:`FeatureCollection`. An empty result</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        returns a schema-correct empty FeatureCollection and writes</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        nothing.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                backends; GDACS is a single request, so this is a no-op.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="p">)</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="p">)</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the alerts to one vector file under `root_dir`.</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        The filename embeds the query&#39;s date window</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        (`gdacs_alerts_&lt;from&gt;_&lt;to&gt;.&lt;ext&gt;`), so downloading successive</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        windows into the same `path` — the recommended way to page past</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        the 100-event cap — yields distinct files instead of silently</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        overwriting one another. Two downloads of the *same* window do</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        overwrite, which is the intended idempotent behaviour.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            collection: The alerts to write.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>            <span class="sa">f</span><span class="s2">&quot;gdacs_alerts_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="p">)</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -21702,7 +21674,7 @@ hazard codes.</p>
 
 
 <h4 id="earthlens.gdacs.GDACS.download" class="doc doc-heading"><a href="#earthlens.gdacs.GDACS.download" class="toclink">
-            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.gdacs.GDACS.download" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -21745,26 +21717,6 @@ backends; GDACS is a single request, so this is a no-op.</p>
                   <code>True</code>
             </td>
           </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>aggregate</code>
-            </td>
-            <td>
-                  <code><span title="earthlens.aggregate.AggregationConfig">AggregationConfig</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Must be <code>None</code>. Alerts are vector, not gridded,
-so there is no meaningful aggregation. The facade
-already rejects a non-<code>None</code> <code>aggregate=</code> for a
-<code>vector</code> backend; this is the belt-and-suspenders guard
-for direct backend callers.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
       </tbody>
     </table>
 
@@ -21791,29 +21743,7 @@ Empty (schema-only) when nothing matched.</p>
           </tr>
       </tbody>
     </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="NotImplementedError">NotImplementedError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>aggregate</code> is not <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -21853,74 +21783,42 @@ Empty (schema-only) when nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
 <span class="normal"><a href="#__codelineno-0-339">339</a></span>
 <span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span>
-<span class="normal"><a href="#__codelineno-0-350">350</a></span>
-<span class="normal"><a href="#__codelineno-0-351">351</a></span>
-<span class="normal"><a href="#__codelineno-0-352">352</a></span>
-<span class="normal"><a href="#__codelineno-0-353">353</a></span>
-<span class="normal"><a href="#__codelineno-0-354">354</a></span>
-<span class="normal"><a href="#__codelineno-0-355">355</a></span>
-<span class="normal"><a href="#__codelineno-0-356">356</a></span>
-<span class="normal"><a href="#__codelineno-0-357">357</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Query GDACS once and return the matched alerts.</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Issues the single combined SEARCH GET, maps and clips the</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    result, writes it to one vector file under `path`, and returns</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    the in-memory :class:`FeatureCollection`. An empty result</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    returns a schema-correct empty FeatureCollection and writes</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    nothing.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            backends; GDACS is a single request, so this is a no-op.</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        aggregate: Must be `None`. Alerts are vector, not gridded,</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            so there is no meaningful aggregation. The facade</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            `vector` backend; this is the belt-and-suspenders guard</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            for direct backend callers.</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="s2">&quot;GDACS.download(aggregate=...) is not supported: disaster &quot;</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="s2">&quot;alerts are vector features, not gridded rasters, so there &quot;</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="s2">&quot;is no meaningful gridded reduction. Call download() without &quot;</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="s2">&quot;aggregate= and post-process the returned FeatureCollection &quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="s2">&quot;(a GeoDataFrame) directly.&quot;</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="p">)</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>            <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="p">)</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="p">)</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Query GDACS once and return the matched alerts.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Issues the single combined SEARCH GET, maps and clips the</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    result, writes it to one vector file under `path`, and returns</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    the in-memory :class:`FeatureCollection`. An empty result</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    returns a schema-correct empty FeatureCollection and writes</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    nothing.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            backends; GDACS is a single request, so this is a no-op.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="p">)</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="p">)</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -22676,7 +22574,9 @@ features, so the facade rejects <code>aggregate=</code> with
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/hazards/src/earthlens/gdacs/backend.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-84"> 84</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-82"> 82</a></span>
+<span class="normal"><a href="#__codelineno-0-83"> 83</a></span>
+<span class="normal"><a href="#__codelineno-0-84"> 84</a></span>
 <span class="normal"><a href="#__codelineno-0-85"> 85</a></span>
 <span class="normal"><a href="#__codelineno-0-86"> 86</a></span>
 <span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
@@ -22958,42 +22858,28 @@ features, so the facade rejects <code>aggregate=</code> with
 <span class="normal"><a href="#__codelineno-0-363">363</a></span>
 <span class="normal"><a href="#__codelineno-0-364">364</a></span>
 <span class="normal"><a href="#__codelineno-0-365">365</a></span>
-<span class="normal"><a href="#__codelineno-0-366">366</a></span>
-<span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span>
-<span class="normal"><a href="#__codelineno-0-370">370</a></span>
-<span class="normal"><a href="#__codelineno-0-371">371</a></span>
-<span class="normal"><a href="#__codelineno-0-372">372</a></span>
-<span class="normal"><a href="#__codelineno-0-373">373</a></span>
-<span class="normal"><a href="#__codelineno-0-374">374</a></span>
-<span class="normal"><a href="#__codelineno-0-375">375</a></span>
-<span class="normal"><a href="#__codelineno-0-376">376</a></span>
-<span class="normal"><a href="#__codelineno-0-377">377</a></span>
-<span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="k">class</span><span class="w"> </span><span class="nc">GDACS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;GDACS multi-hazard alert backend (vector point-feature output).</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    Wraps the public GDACS SEARCH feed so a user can pull a</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    space/time/hazard window of disaster alerts through the same</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    `download()` shape every other earthlens backend uses. All requested</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    hazard types come back in one combined GET; the GeoJSON is mapped to</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    a :class:`~pyramids.feature.collection.FeatureCollection` and, if the</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    feed did not honour a bbox, clipped to the requested box</span>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    client-side.</span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="k">class</span><span class="w"> </span><span class="nc">GDACS</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;GDACS multi-hazard alert backend (vector point-feature output).</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">    Wraps the public GDACS SEARCH feed so a user can pull a</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">    space/time/hazard window of disaster alerts through the same</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">    `download()` shape every other earthlens backend uses. All requested</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    hazard types come back in one combined GET; the GeoJSON is mapped to</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    a :class:`~pyramids.feature.collection.FeatureCollection` and, if the</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    feed did not honour a bbox, clipped to the requested box</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">    client-side.</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">    The feed needs no credentials.</span>
 <a id="__codelineno-0-94" name="__codelineno-0-94"></a>
-<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    The feed needs no credentials.</span>
-<a id="__codelineno-0-96" name="__codelineno-0-96"></a>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">        OUTPUT_KIND: `&quot;vector&quot;` — the result is a table of alert</span>
-<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">            features, so the facade rejects `aggregate=` with</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">            `NotImplementedError`.</span>
-<a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">        OUTPUT_KIND: `&quot;vector&quot;` — the result is a table of alert</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="sd">            features, so the facade rejects `aggregate=` with</span>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">            `NotImplementedError`.</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a>
+<a id="__codelineno-0-101" name="__codelineno-0-101"></a>    <span class="n">OUTPUT_KIND</span><span class="p">:</span> <span class="n">OutputKind</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">OUTPUT_KIND</span><span class="p">:</span> <span class="n">OutputKind</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">AGGREGATE_REFUSAL_REASON</span> <span class="o">=</span> <span class="s2">&quot;disaster alerts are vector features, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly&quot;</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>        <span class="bp">self</span><span class="p">,</span>
@@ -23199,80 +23085,64 @@ features, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-306" name="__codelineno-0-306"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query GDACS once and return the matched alerts.</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Issues the single combined SEARCH GET, maps and clips the</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        result, writes it to one vector file under `path`, and returns</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        the in-memory :class:`FeatureCollection`. An empty result</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        returns a schema-correct empty FeatureCollection and writes</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        nothing.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">                backends; GDACS is a single request, so this is a no-op.</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            aggregate: Must be `None`. Alerts are vector, not gridded,</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">                so there is no meaningful aggregation. The facade</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">                `vector` backend; this is the belt-and-suspenders guard</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">                for direct backend callers.</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">            FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>                <span class="s2">&quot;GDACS.download(aggregate=...) is not supported: disaster &quot;</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>                <span class="s2">&quot;alerts are vector features, not gridded rasters, so there &quot;</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                <span class="s2">&quot;is no meaningful gridded reduction. Call download() without &quot;</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                <span class="s2">&quot;aggregate= and post-process the returned FeatureCollection &quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                <span class="s2">&quot;(a GeoDataFrame) directly.&quot;</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="p">)</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>                <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="p">)</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>                <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="p">)</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="k">return</span> <span class="n">collection</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the alerts to one vector file under `root_dir`.</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        The filename embeds the query&#39;s date window</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        (`gdacs_alerts_&lt;from&gt;_&lt;to&gt;.&lt;ext&gt;`), so downloading successive</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        windows into the same `path` — the recommended way to page past</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        the 100-event cap — yields distinct files instead of silently</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        overwriting one another. Two downloads of the *same* window do</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        overwrite, which is the intended idempotent behaviour.</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            collection: The alerts to write.</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            Path: Absolute path of the file written.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="sa">f</span><span class="s2">&quot;gdacs_alerts_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="p">)</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Query GDACS once and return the matched alerts.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">        Issues the single combined SEARCH GET, maps and clips the</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        result, writes it to one vector file under `path`, and returns</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        the in-memory :class:`FeatureCollection`. An empty result</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        returns a schema-correct empty FeatureCollection and writes</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        nothing.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">                backends; GDACS is a single request, so this is a no-op.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="p">)</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="p">)</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection</span><span class="p">:</span> <span class="n">FeatureCollection</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the alerts to one vector file under `root_dir`.</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        The filename embeds the query&#39;s date window</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        (`gdacs_alerts_&lt;from&gt;_&lt;to&gt;.&lt;ext&gt;`), so downloading successive</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        windows into the same `path` — the recommended way to page past</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        the 100-event cap — yields distinct files instead of silently</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        overwriting one another. Two downloads of the *same* window do</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        overwrite, which is the intended idempotent behaviour.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            collection: The alerts to write.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            Path: Absolute path of the file written.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="n">driver</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_DRIVERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span><span class="p">]</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>            <span class="sa">f</span><span class="s2">&quot;gdacs_alerts_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="si">:</span><span class="s2">%Y-%m-%d</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="p">)</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="n">collection</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">out_path</span><span class="p">),</span> <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">)</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="k">return</span> <span class="n">out_path</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -23696,7 +23566,7 @@ hazard codes.</p>
 
 
 <h4 id="earthlens.gdacs.backend.GDACS.download" class="doc doc-heading"><a href="#earthlens.gdacs.backend.GDACS.download" class="toclink">
-            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.gdacs.backend.GDACS.download" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -23739,26 +23609,6 @@ backends; GDACS is a single request, so this is a no-op.</p>
                   <code>True</code>
             </td>
           </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>aggregate</code>
-            </td>
-            <td>
-                  <code><span title="earthlens.aggregate.AggregationConfig">AggregationConfig</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Must be <code>None</code>. Alerts are vector, not gridded,
-so there is no meaningful aggregation. The facade
-already rejects a non-<code>None</code> <code>aggregate=</code> for a
-<code>vector</code> backend; this is the belt-and-suspenders guard
-for direct backend callers.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
       </tbody>
     </table>
 
@@ -23785,29 +23635,7 @@ Empty (schema-only) when nothing matched.</p>
           </tr>
       </tbody>
     </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="NotImplementedError">NotImplementedError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>aggregate</code> is not <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Raises:</p>
 
 
             <details class="mkdocstrings-source">
@@ -23847,74 +23675,42 @@ Empty (schema-only) when nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-338">338</a></span>
 <span class="normal"><a href="#__codelineno-0-339">339</a></span>
 <span class="normal"><a href="#__codelineno-0-340">340</a></span>
-<span class="normal"><a href="#__codelineno-0-341">341</a></span>
-<span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span>
-<span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span>
-<span class="normal"><a href="#__codelineno-0-348">348</a></span>
-<span class="normal"><a href="#__codelineno-0-349">349</a></span>
-<span class="normal"><a href="#__codelineno-0-350">350</a></span>
-<span class="normal"><a href="#__codelineno-0-351">351</a></span>
-<span class="normal"><a href="#__codelineno-0-352">352</a></span>
-<span class="normal"><a href="#__codelineno-0-353">353</a></span>
-<span class="normal"><a href="#__codelineno-0-354">354</a></span>
-<span class="normal"><a href="#__codelineno-0-355">355</a></span>
-<span class="normal"><a href="#__codelineno-0-356">356</a></span>
-<span class="normal"><a href="#__codelineno-0-357">357</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="n">aggregate</span><span class="p">:</span> <span class="n">AggregationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Query GDACS once and return the matched alerts.</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Issues the single combined SEARCH GET, maps and clips the</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    result, writes it to one vector file under `path`, and returns</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    the in-memory :class:`FeatureCollection`. An empty result</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    returns a schema-correct empty FeatureCollection and writes</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    nothing.</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">            backends; GDACS is a single request, so this is a no-op.</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        aggregate: Must be `None`. Alerts are vector, not gridded,</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            so there is no meaningful aggregation. The facade</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            already rejects a non-`None` `aggregate=` for a</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            `vector` backend; this is the belt-and-suspenders guard</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            for direct backend callers.</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        NotImplementedError: If `aggregate` is not `None`.</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">if</span> <span class="n">aggregate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="s2">&quot;GDACS.download(aggregate=...) is not supported: disaster &quot;</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="s2">&quot;alerts are vector features, not gridded rasters, so there &quot;</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="s2">&quot;is no meaningful gridded reduction. Call download() without &quot;</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="s2">&quot;aggregate= and post-process the returned FeatureCollection &quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="s2">&quot;(a GeoDataFrame) directly.&quot;</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="p">)</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>            <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="p">)</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="p">)</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="k">return</span> <span class="n">collection</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FeatureCollection</span><span class="p">:</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Query GDACS once and return the matched alerts.</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="sd">    Issues the single combined SEARCH GET, maps and clips the</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    result, writes it to one vector file under `path`, and returns</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    the in-memory :class:`FeatureCollection`. An empty result</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    returns a schema-correct empty FeatureCollection and writes</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    nothing.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            backends; GDACS is a single request, so this is a no-op.</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        FeatureCollection: The matched alerts, CRS `EPSG:4326`.</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            Empty (schema-only) when nothing matched.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="n">collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="n">collection</span> <span class="o">=</span> <span class="n">collections</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">collections</span> <span class="k">else</span> <span class="n">events</span><span class="o">.</span><span class="n">empty_fc</span><span class="p">()</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">):</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="sa">f</span><span class="s2">&quot;GDACS download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span><span class="si">}</span><span class="s2"> alert(s) written &quot;</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="sa">f</span><span class="s2">&quot;to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="p">)</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="s2">&quot;GDACS download summary: no alerts matched the request, nothing written&quot;</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="p">)</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">return</span> <span class="n">collection</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
