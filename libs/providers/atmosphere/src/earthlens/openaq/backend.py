@@ -454,8 +454,6 @@ class OpenAQ(AbstractDataSource):
             pd.DataFrame: The long-format union of every sensor's
                 measurements (schema columns, `datetime_utc` tz-aware
                 UTC). Empty (schema-only) when nothing matched.
-
-        Raises:
         """
         frames = self._take_limited(
             self._iter_non_empty_frames(progress_bar),

@@ -381,8 +381,6 @@ class EEA_AQ(AbstractDataSource):
             pd.DataFrame: The long-format observations (schema columns,
                 `datetime_utc` tz-aware UTC). Empty (schema-only) when
                 nothing matched.
-
-        Raises:
         """
         df = self._api()
 

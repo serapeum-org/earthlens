@@ -851,8 +851,6 @@ class NWM(AbstractDataSource):
                 plain operational request, or Parquet tables for a
                 subset / retrospective read. Empty when nothing in the
                 window was available.
-
-        Raises:
         """
         self._show_progress = progress_bar
         return self._api_via_search_fetch()

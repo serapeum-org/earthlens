@@ -387,8 +387,6 @@ class JAXA(AbstractDataSource):
             list[Path]: One or more files per resolved dataset, in
                 request order.
 
-        Raises:
-
         Examples:
             - Passing `aggregate=` raises because per-date stacks are not
               reduced yet:

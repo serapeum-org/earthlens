@@ -510,8 +510,6 @@ class Overture(AbstractDataSource):
         Returns:
             list[Path]: The vector file(s) written under `path`, one per
                 requested feature type.
-
-        Raises:
         """
         return cast("list[Path]", self._api())
 

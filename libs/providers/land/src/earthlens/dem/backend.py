@@ -305,8 +305,6 @@ class DEM(AbstractDataSource):
             list[Path]: The local paths of the downloaded COG tiles, in
                 bbox row-major order. Empty when every candidate tile is
                 absent from the bucket.
-
-        Raises:
         """
         self._show_progress = progress_bar
         self._force = force

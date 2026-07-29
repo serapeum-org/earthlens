@@ -493,8 +493,6 @@ class ASF(AbstractDataSource):
                 product, including the products that were already
                 present and skipped.
 
-        Raises:
-
         Examples:
             - Construct in search mode and reject an `aggregate=`
               argument before any network call (the check happens

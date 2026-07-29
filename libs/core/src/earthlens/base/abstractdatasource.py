@@ -1562,6 +1562,12 @@ class AbstractDataSource(ABC):
     #: it by assigning the :meth:`check_errors_policy` result.
     _errors: str = "warn"
 
+    #: The total-row cap a backend's `download(limit=...)` recorded, read by
+    #: whichever method assembles the result (often `_fetch_all`, not `download`
+    #: itself). `None` means no cap. Declared here so an adopting backend does
+    #: not have to initialise it in `__init__`.
+    _limit: int | None = None
+
     #: Slot for a backend's lazily-built `HttpClient`. Declared here so the
     #: backends that hold one (rather than rebuilding it per item, which would
     #: discard the pooled connection) can check `if self._http is None` without

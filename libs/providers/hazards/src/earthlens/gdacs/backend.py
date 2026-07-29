@@ -322,8 +322,6 @@ class GDACS(AbstractDataSource):
         Returns:
             FeatureCollection: The matched alerts, CRS `EPSG:4326`.
                 Empty (schema-only) when nothing matched.
-
-        Raises:
         """
         collections = self._api()
         collection = collections[0] if collections else events.empty_fc()

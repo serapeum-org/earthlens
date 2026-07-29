@@ -289,8 +289,6 @@ class ARGO(AbstractDataSource):
 
         Returns:
             pd.DataFrame: The long-format profile table.
-
-        Raises:
         """
         frames = self._api()
         df = (

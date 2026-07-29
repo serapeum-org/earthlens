@@ -252,8 +252,6 @@ class SolarWindAtlas(AbstractDataSource):
 
         Returns:
             list[Path]: The written GeoTIFF path(s), one per requested layer.
-
-        Raises:
         """
         self._warn_large_downloads()
         paths = cast("list[Path]", self._api())

@@ -699,3 +699,52 @@ class TestRateLimitDeclarationIsWired:
             "no backend passes a rate limit to its client; min_interval is dead "
             "code again"
         )
+
+
+class TestDocstringSectionsHaveBodies:
+    """No Google-style section header is left without content.
+
+    A sweep that deletes the last entry from a `Raises:` block leaves the header
+    behind, which renders as an empty section in the docs. That happened here:
+    removing the `aggregate=` refusals orphaned 22 `Raises:` headers, and nothing
+    objected — ruff and mypy do not read docstring structure.
+    """
+
+    def _source_files(self):
+        """Yield every provider and core source file, skipping build artefacts."""
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[3]
+        for pattern in (
+            "libs/providers/*/src/earthlens/**/*.py",
+            "libs/core/src/earthlens/**/*.py",
+        ):
+            for path in sorted(root.glob(pattern)):
+                if "build" not in path.parts:
+                    yield path
+
+    def test_files_were_scanned(self):
+        """Guard the guard: the globs must find the sources."""
+        assert len(list(self._source_files())) > 200
+
+    def test_no_orphaned_section_headers(self):
+        """Every `Args:` / `Returns:` / `Raises:` / `Yields:` has an indented body."""
+        import re
+
+        orphans = []
+        for path in self._source_files():
+            lines = path.read_text(encoding="utf-8").splitlines()
+            for index, line in enumerate(lines):
+                match = re.match(r"^(\s+)(Raises|Args|Returns|Yields):\s*$", line)
+                if not match:
+                    continue
+                indent = len(match.group(1))
+                nxt = lines[index + 1] if index + 1 < len(lines) else ""
+                body_indent = len(nxt) - len(nxt.lstrip()) if nxt.strip() else -1
+                if (
+                    not nxt.strip()
+                    or nxt.strip().startswith('"""')
+                    or body_indent <= indent
+                ):
+                    orphans.append(f"{path.name}:{index + 1} {match.group(2)}:")
+        assert orphans == [], f"empty docstring sections: {orphans}"

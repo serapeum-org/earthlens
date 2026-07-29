@@ -268,8 +268,6 @@ class IUCN(AbstractDataSource):
         Returns:
             pd.DataFrame: The assessment rows. Written to a CSV/Parquet file
                 under `path` when `path` is set and rows are present.
-
-        Raises:
         """
         frame = self._fetch_all()
         if self._user_path and len(frame):

@@ -263,8 +263,6 @@ class WDPA(AbstractDataSource):
         Returns:
             FeatureCollection: The protected-area polygons, CRS
                 `EPSG:4326`. Written to a file under `path` when set.
-
-        Raises:
         """
         collection = FeatureCollection(self._fetch_all())
         if len(collection):

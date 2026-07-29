@@ -664,8 +664,6 @@ class OSM(AbstractDataSource):
         Returns:
             FeatureCollection: The matched features, CRS `EPSG:4326`. Empty
                 (schema-only) when nothing matched.
-
-        Raises:
         """
         collection = self._combine(self._api())
         # OSM is ODbL — warn on every result, even an empty one (the query

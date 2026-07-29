@@ -319,8 +319,6 @@ class GBIF(AbstractDataSource):
             FeatureCollection: The occurrence points, CRS `EPSG:4326`.
                 Empty (schema-only) when nothing matched. Written to a
                 file under `path` when `path` is set.
-
-        Raises:
         """
         collection = self._fetch_all()
         if self._user_path and len(collection):

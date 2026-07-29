@@ -565,8 +565,6 @@ class FIRMS(AbstractDataSource):
         Returns:
             FeatureCollection: The matched detections, CRS `EPSG:4326`.
                 Empty (schema-only) when nothing matched.
-
-        Raises:
         """
         # Resolve the MAP_KEY from FIRMS_MAP_KEY if authenticate() was not
         # called explicitly, so EarthLens(...).download() still works when

@@ -518,8 +518,6 @@ class GOES(AbstractDataSource):
         Returns:
             list[Path]: The written granule paths, or an empty list when
                 nothing in the window was available.
-
-        Raises:
         """
         self._show_progress = progress_bar
         return self._api_via_search_fetch()

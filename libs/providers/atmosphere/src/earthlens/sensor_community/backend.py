@@ -353,8 +353,6 @@ class SensorCommunity(AbstractDataSource):
             pd.DataFrame: The long-format readings (schema columns,
                 `datetime_utc` tz-aware UTC). Empty (schema-only) when
                 nothing matched.
-
-        Raises:
         """
         warnings.warn(_LICENSE_TEXT, LicenseWarning, stacklevel=2)
 

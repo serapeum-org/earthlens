@@ -435,8 +435,6 @@ class SoilGrids(AbstractDataSource):
         Returns:
             list[Path]: The written GeoTIFF path(s), one per
                 `(property, depth, quantile)` coverage requested.
-
-        Raises:
         """
         self._show_progress = progress_bar
         self._errors = self.check_errors_policy(errors)

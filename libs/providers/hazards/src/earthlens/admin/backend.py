@@ -381,8 +381,6 @@ class AdminBoundaries(AbstractDataSource):
         Returns:
             FeatureCollection: The boundary polygons, CRS EPSG:4326. Empty
                 (schema-only) when nothing was fetched.
-
-        Raises:
         """
         collections = self._api()
         collection = self._combine(collections)

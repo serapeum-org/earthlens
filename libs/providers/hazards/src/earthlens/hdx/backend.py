@@ -478,8 +478,6 @@ class HDX(AbstractDataSource):
             list: One read pyramids object per resource (a
                 `Dataset` / `FeatureCollection` / `DataFrame`), in the
                 same order — when `read=True`.
-
-        Raises:
         """
         if not read:
             return self._api_via_search_fetch()

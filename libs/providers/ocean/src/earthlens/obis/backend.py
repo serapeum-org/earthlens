@@ -224,6 +224,22 @@ class OBIS(AbstractDataSource):
             "size": self._size,
         }
 
+    def _iter_selector_frames(self):
+        """Yield one occurrence frame per requested selector, lazily.
+
+        Lazy so a `limit=` can stop the search: a selector past the cap is never
+        sent to OBIS, which is the difference between capping the result and
+        capping the work.
+
+        Yields:
+            pandas.DataFrame: The raw occurrence rows for one selector.
+        """
+        from pyobis import occurrences
+
+        for selector in self.vars:
+            name = self._catalog.resolve_scientific_name(selector)
+            yield occurrences.search(**self._plan_search(name)).execute()
+
     def _fetch_all(self) -> FeatureCollection:
         """Search every requested species and map the rows to a FeatureCollection.
 
@@ -237,19 +253,18 @@ class OBIS(AbstractDataSource):
             FeatureCollection: The occurrence points, CRS `EPSG:4326`;
                 empty (schema-only) when nothing matched.
         """
-        from pyobis import occurrences
-
-        frames: list[pd.DataFrame] = []
+        frames = self._take_limited(self._iter_selector_frames(), limit=self._limit)
+        if not frames:
+            combined = pd.DataFrame()
+        elif len(frames) > 1:
+            combined = pd.concat(frames, ignore_index=True)
+        else:
+            combined = frames[0]
+        # Licences are read off the rows actually kept, not every row fetched, so
+        # a capped request does not warn about a dataset it did not return.
         licenses: set[str] = set()
-        for selector in self.vars:
-            name = self._catalog.resolve_scientific_name(selector)
-            frame = occurrences.search(**self._plan_search(name)).execute()
-            frames.append(frame)
-            if "license" in frame.columns:
-                licenses.update(frame["license"].dropna())
-        combined = (
-            pd.concat(frames, ignore_index=True) if len(frames) > 1 else frames[0]
-        )
+        if "license" in combined.columns:
+            licenses.update(combined["license"].dropna())
         collection = occurrences_to_fc(
             combined,
             lat_field="decimalLatitude",
@@ -267,12 +282,18 @@ class OBIS(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> FeatureCollection:
         """Run the occurrence search and return the points FeatureCollection.
 
         Args:
             progress_bar: Accepted for signature parity; OBIS search has no
                 progress bar, so this is a no-op.
+            limit: Cap on the total occurrence rows returned, across every
+                requested selector. Applied as the per-selector frames arrive,
+                so a selector past the cap is never searched. `None` (the
+                default) fetches everything, which for a broad taxon over a
+                wide bbox is bounded only by memory.
 
         Returns:
             FeatureCollection: The occurrence points, CRS `EPSG:4326`.
@@ -280,7 +301,10 @@ class OBIS(AbstractDataSource):
                 under `path` when `path` is set.
 
         Raises:
+            TypeError: If `limit` is neither `None` nor an `int`.
+            ValueError: If `limit` is less than 1.
         """
+        self._limit = self.check_limit(limit)
         collection = self._fetch_all()
         if self._user_path and len(collection):
             written = self._write(collection)
