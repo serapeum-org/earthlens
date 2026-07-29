@@ -21,7 +21,7 @@ import inspect
 import shutil
 import tempfile
 import warnings
-from collections.abc import Iterator, Mapping
+from collections.abc import Callable, Iterator, Mapping
 from datetime import date, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
@@ -1704,11 +1704,18 @@ class EarthLens:
             # `backend.download(aggregate=...)` is refused identically.
             kwargs["aggregate"] = aggregate
 
-        # The base `download(self)` is a minimal placeholder; every concrete
-        # backend override accepts `progress_bar` (and its own extra kwargs).
-        return self.datasource.download(  # type: ignore[call-arg]
-            *args, progress_bar=progress_bar, **kwargs
-        )
+        # The abstract `download` now declares `(self, progress_bar)` and each
+        # backend adds its own optional arguments (ARC-2), which is exactly what
+        # cannot be typed at this call site: the facade is handed a backend
+        # chosen at runtime by string key, so the extra keywords it forwards are
+        # only checkable against the concrete class. The narrow ignore below is
+        # the price of that dispatch; a wrong keyword still fails loudly at the
+        # backend, and `options_for` validates the request up front.
+        # Cast rather than a stack of ignores: at this point the signature
+        # genuinely is not statically known, and saying so is more honest than
+        # suppressing three separate errors about it.
+        download = cast("Callable[..., Any]", self.datasource.download)
+        return download(*args, progress_bar=progress_bar, **kwargs)
 
     def load(self, *args: object, **kwargs: Any) -> Any:
         """Download and return the data in memory instead of only on disk.

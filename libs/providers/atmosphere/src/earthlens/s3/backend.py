@@ -44,6 +44,7 @@ from earthlens.s3.catalog import Catalog, Dataset
 from earthlens.s3.layouts import plan_products
 
 if TYPE_CHECKING:
+    from earthlens.aggregate import AggregationConfig
     from earthlens.ecmwf import Variable
 
 __all__ = ["S3"]
@@ -508,7 +509,7 @@ class S3(AbstractDataSource):
     # -- public API ----------------------------------------------------
 
     def download(
-        self, progress_bar: bool = True, aggregate: Any | None = None
+        self, progress_bar: bool = True, aggregate: AggregationConfig | None = None
     ) -> list[Path]:
         """Download every planned product, cropped to the AOI.
 

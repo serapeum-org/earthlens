@@ -539,3 +539,67 @@ class TestAggregateCapabilityIsCentral:
         assert liars == [], (
             f"these declare SUPPORTS_AGGREGATE but never use aggregate: {liars}"
         )
+
+
+class TestDownloadSignatureContract:
+    """ARC-2: `download` has one shape every backend satisfies."""
+
+    def _download_defs(self):
+        """Yield `(backend_name, ast.FunctionDef)` for each `download` override."""
+        import ast as ast_module
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            tree = ast_module.parse(path.read_text(encoding="utf-8"))
+            for node in ast_module.walk(tree):
+                if isinstance(node, ast_module.FunctionDef) and node.name == "download":
+                    yield path.parent.name, node
+
+    def test_download_overrides_were_found(self):
+        """Guard the guard: the walk must actually find the overrides."""
+        names = [name for name, _ in self._download_defs()]
+        assert len(names) > 40, f"only found {len(names)}: {names[:5]}"
+
+    def test_every_download_takes_progress_bar_first(self):
+        """`progress_bar` is the one universal argument, so it comes first.
+
+        The base used to declare `download(self)` while every override took two
+        to five arguments. Nothing could catch drift, and the argument order
+        varied. Pinning the first parameter keeps a positional
+        `download(False)` meaning the same thing on all 48.
+        """
+        offenders = []
+        for name, node in self._download_defs():
+            args = [a.arg for a in node.args.args]
+            if args[:2] != ["self", "progress_bar"]:
+                offenders.append(f"{name}: {args}")
+        assert offenders == [], (
+            f"download must start with (self, progress_bar, ...): {offenders}"
+        )
+
+    def test_capability_arguments_are_annotated(self):
+        """A shared argument carries the same annotation everywhere it appears.
+
+        `aggregate=` was spelled four ways across the tree
+        (`AggregationConfig | None`, `Any`, `Any | None`, and unannotated), which
+        is how a shared contract stops being checkable.
+        """
+        import ast as ast_module
+
+        expected = {
+            "aggregate": "AggregationConfig | None",
+            "progress_bar": "bool",
+            "errors": "str",
+            "force": "bool",
+        }
+        offenders = []
+        for name, node in self._download_defs():
+            for arg in node.args.args + node.args.kwonlyargs:
+                want = expected.get(arg.arg)
+                if want is None:
+                    continue
+                got = ast_module.unparse(arg.annotation) if arg.annotation else "(none)"
+                if got != want:
+                    offenders.append(f"{name}.{arg.arg}: {got} (want {want})")
+        assert offenders == [], f"annotation drift: {offenders}"

@@ -1280,17 +1280,37 @@ class AbstractDataSource(ABC):
         return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     @abstractmethod
-    def download(self):
+    def download(self, progress_bar: bool = True) -> Any:
         """Download every requested variable and return the produced artifacts.
 
-        The return shape tracks :attr:`OUTPUT_KIND`: `"raster"` /
-        `"mixed"` file-writing backends return the list of written
-        paths (`list[Path]`); `"vector"` backends return an in-memory
-        `FeatureCollection` (radar returns a `GeoDataFrame`);
-        `"tabular"` backends return a `pandas.DataFrame`. Every backend
-        now returns its produced artifacts (the legacy CHIRPS / ECMWF
-        backends return their written `list[Path]` and also leave the
-        files on disk under `self.root_dir`).
+        Declares exactly the parameter every backend shares. A subclass may add
+        further **optional** arguments — that stays substitutable, so mypy checks
+        the overrides rather than waving them through. Deliberately *not*
+        `**kwargs`: putting that here would oblige all 48 overrides to accept
+        arbitrary keywords, which is the opposite of a contract.
+
+        Capability-gated arguments appear only where they are honoured
+        (`aggregate=` on the backends declaring :attr:`SUPPORTS_AGGREGATE`,
+        `errors=` where the batch is a loop over independent items, `force=`
+        where a re-run can skip completed artefacts), alongside genuinely
+        backend-specific ones (`cores=` on chc, `tailor=` on eumetsat). Read the
+        backend's own signature for those.
+
+        Args:
+            progress_bar: Whether to show this backend's progress bar. The one
+                universal parameter, which is why it is declared here: this
+                method used to be `download(self)` while all 48 overrides took
+                two to five arguments, so nothing — not mypy, not a test — could
+                catch a signature drifting.
+
+        Returns:
+            Any: The produced artifacts, shaped by :attr:`OUTPUT_KIND` —
+                `"raster"` / `"mixed"` file-writing backends return the written
+                paths (`list[Path]`); `"vector"` backends return an in-memory
+                `FeatureCollection` (radar returns a `GeoDataFrame`);
+                `"tabular"` backends return a `pandas.DataFrame`. Every backend
+                returns its artifacts; the file-writing ones also leave them on
+                disk under :attr:`root_dir`.
 
         Partial-failure policy across a multi-item batch defaults to
         **skip-and-continue** — a failed `(dataset, variable)` / chunk /
@@ -1309,9 +1329,6 @@ class AbstractDataSource(ABC):
         rather than assuming; :meth:`_search_fetch_each` also takes
         `errors=` for backends composed from it.
         """
-        # loop over dates if the downloaded rasters/netcdf are for a specific date out of the required
-        # list of dates
-        pass
 
     def _api(self, *args: Any, **kwargs: Any) -> Any:
         """Send / receive the request(s) this download needs.

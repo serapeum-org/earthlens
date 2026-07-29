@@ -258,7 +258,6 @@ class IUCN(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate=None,
     ) -> pd.DataFrame:
         """Fetch the assessment records and return them as a DataFrame.
 
