@@ -24572,7 +24572,37 @@ for the ECMWF backend).</p>
 <span class="normal"><a href="#__codelineno-0-2218">2218</a></span>
 <span class="normal"><a href="#__codelineno-0-2219">2219</a></span>
 <span class="normal"><a href="#__codelineno-0-2220">2220</a></span>
-<span class="normal"><a href="#__codelineno-0-2221">2221</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1931" name="__codelineno-0-1931"></a><span class="k">class</span><span class="w"> </span><span class="nc">AbstractCatalog</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-2221">2221</a></span>
+<span class="normal"><a href="#__codelineno-0-2222">2222</a></span>
+<span class="normal"><a href="#__codelineno-0-2223">2223</a></span>
+<span class="normal"><a href="#__codelineno-0-2224">2224</a></span>
+<span class="normal"><a href="#__codelineno-0-2225">2225</a></span>
+<span class="normal"><a href="#__codelineno-0-2226">2226</a></span>
+<span class="normal"><a href="#__codelineno-0-2227">2227</a></span>
+<span class="normal"><a href="#__codelineno-0-2228">2228</a></span>
+<span class="normal"><a href="#__codelineno-0-2229">2229</a></span>
+<span class="normal"><a href="#__codelineno-0-2230">2230</a></span>
+<span class="normal"><a href="#__codelineno-0-2231">2231</a></span>
+<span class="normal"><a href="#__codelineno-0-2232">2232</a></span>
+<span class="normal"><a href="#__codelineno-0-2233">2233</a></span>
+<span class="normal"><a href="#__codelineno-0-2234">2234</a></span>
+<span class="normal"><a href="#__codelineno-0-2235">2235</a></span>
+<span class="normal"><a href="#__codelineno-0-2236">2236</a></span>
+<span class="normal"><a href="#__codelineno-0-2237">2237</a></span>
+<span class="normal"><a href="#__codelineno-0-2238">2238</a></span>
+<span class="normal"><a href="#__codelineno-0-2239">2239</a></span>
+<span class="normal"><a href="#__codelineno-0-2240">2240</a></span>
+<span class="normal"><a href="#__codelineno-0-2241">2241</a></span>
+<span class="normal"><a href="#__codelineno-0-2242">2242</a></span>
+<span class="normal"><a href="#__codelineno-0-2243">2243</a></span>
+<span class="normal"><a href="#__codelineno-0-2244">2244</a></span>
+<span class="normal"><a href="#__codelineno-0-2245">2245</a></span>
+<span class="normal"><a href="#__codelineno-0-2246">2246</a></span>
+<span class="normal"><a href="#__codelineno-0-2247">2247</a></span>
+<span class="normal"><a href="#__codelineno-0-2248">2248</a></span>
+<span class="normal"><a href="#__codelineno-0-2249">2249</a></span>
+<span class="normal"><a href="#__codelineno-0-2250">2250</a></span>
+<span class="normal"><a href="#__codelineno-0-2251">2251</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1931" name="__codelineno-0-1931"></a><span class="k">class</span><span class="w"> </span><span class="nc">AbstractCatalog</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <a id="__codelineno-0-1932" name="__codelineno-0-1932"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for per-data-source variable catalogs.</span>
 <a id="__codelineno-0-1933" name="__codelineno-0-1933"></a>
 <a id="__codelineno-0-1934" name="__codelineno-0-1934"></a><span class="sd">    Subclasses load a backend-specific catalog (a YAML file, an</span>
@@ -24650,219 +24680,249 @@ for the ECMWF backend).</p>
 <a id="__codelineno-0-2006" name="__codelineno-0-2006"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-2007" name="__codelineno-0-2007"></a>        <span class="k">return</span> <span class="n">MappingProxyType</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_catalog</span><span class="p">())</span>
 <a id="__codelineno-0-2008" name="__codelineno-0-2008"></a>
-<a id="__codelineno-0-2009" name="__codelineno-0-2009"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-2010" name="__codelineno-0-2010"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Hook run after pydantic validation.</span>
-<a id="__codelineno-0-2011" name="__codelineno-0-2011"></a>
-<a id="__codelineno-0-2012" name="__codelineno-0-2012"></a><span class="sd">        Kept as an overridable no-op so subclasses can call</span>
-<a id="__codelineno-0-2013" name="__codelineno-0-2013"></a><span class="sd">        `super().model_post_init(__context)` first and keep their own</span>
-<a id="__codelineno-0-2014" name="__codelineno-0-2014"></a><span class="sd">        post-init wiring in one place. :attr:`catalog` is a property now, so</span>
-<a id="__codelineno-0-2015" name="__codelineno-0-2015"></a><span class="sd">        nothing has to be populated here.</span>
-<a id="__codelineno-0-2016" name="__codelineno-0-2016"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2009" name="__codelineno-0-2009"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-2010" name="__codelineno-0-2010"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-2011" name="__codelineno-0-2011"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the payload to fill an empty catalog from disk.</span>
+<a id="__codelineno-0-2012" name="__codelineno-0-2012"></a>
+<a id="__codelineno-0-2013" name="__codelineno-0-2013"></a><span class="sd">        The one part of post-init that genuinely differs per backend: *how* the</span>
+<a id="__codelineno-0-2014" name="__codelineno-0-2014"></a><span class="sd">        rows are read. Everything around it — only read when no rows were</span>
+<a id="__codelineno-0-2015" name="__codelineno-0-2015"></a><span class="sd">        supplied, never clobber what the caller passed — is the same everywhere</span>
+<a id="__codelineno-0-2016" name="__codelineno-0-2016"></a><span class="sd">        and lives in :meth:`model_post_init`.</span>
 <a id="__codelineno-0-2017" name="__codelineno-0-2017"></a>
-<a id="__codelineno-0-2018" name="__codelineno-0-2018"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2019" name="__codelineno-0-2019"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the catalog of the datasource from disk or retrieve it from server.</span>
-<a id="__codelineno-0-2020" name="__codelineno-0-2020"></a>
-<a id="__codelineno-0-2021" name="__codelineno-0-2021"></a><span class="sd">        Abstract; concrete subclasses must override and return their</span>
-<a id="__codelineno-0-2022" name="__codelineno-0-2022"></a><span class="sd">        backend-specific catalog object (e.g. a pydantic `Catalog`</span>
-<a id="__codelineno-0-2023" name="__codelineno-0-2023"></a><span class="sd">        instance, a `dict`, or whatever shape the backend uses).</span>
+<a id="__codelineno-0-2018" name="__codelineno-0-2018"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-2019" name="__codelineno-0-2019"></a><span class="sd">            Mapping[str, Any]: Field name to value, e.g.</span>
+<a id="__codelineno-0-2020" name="__codelineno-0-2020"></a><span class="sd">                `{&quot;datasets&quot;: ..., &quot;available_datasets&quot;: ...}`. The default is</span>
+<a id="__codelineno-0-2021" name="__codelineno-0-2021"></a><span class="sd">                empty, meaning this catalog does not auto-load.</span>
+<a id="__codelineno-0-2022" name="__codelineno-0-2022"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2023" name="__codelineno-0-2023"></a>        <span class="k">return</span> <span class="p">{}</span>
 <a id="__codelineno-0-2024" name="__codelineno-0-2024"></a>
-<a id="__codelineno-0-2025" name="__codelineno-0-2025"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-2026" name="__codelineno-0-2026"></a><span class="sd">            NotImplementedError: Always, until overridden by a subclass.</span>
-<a id="__codelineno-0-2027" name="__codelineno-0-2027"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2028" name="__codelineno-0-2028"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-<a id="__codelineno-0-2029" name="__codelineno-0-2029"></a>
-<a id="__codelineno-0-2030" name="__codelineno-0-2030"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2031" name="__codelineno-0-2031"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one leaf (variable / band / asset) of a dataset.</span>
-<a id="__codelineno-0-2032" name="__codelineno-0-2032"></a>
-<a id="__codelineno-0-2033" name="__codelineno-0-2033"></a><span class="sd">        Shared two-argument contract for the two-level catalogs: a leaf</span>
-<a id="__codelineno-0-2034" name="__codelineno-0-2034"></a><span class="sd">        is addressed by its `(dataset_key, variable_name)` pair, because</span>
-<a id="__codelineno-0-2035" name="__codelineno-0-2035"></a><span class="sd">        the same leaf code can appear under more than one dataset (e.g.</span>
-<a id="__codelineno-0-2036" name="__codelineno-0-2036"></a><span class="sd">        `&quot;2m-temperature&quot;` lives under several CDS datasets). Concrete</span>
-<a id="__codelineno-0-2037" name="__codelineno-0-2037"></a><span class="sd">        overrides return their typed leaf row and raise `ValueError`</span>
-<a id="__codelineno-0-2038" name="__codelineno-0-2038"></a><span class="sd">        (with a did-you-mean hint) on an unknown key:</span>
-<a id="__codelineno-0-2039" name="__codelineno-0-2039"></a>
-<a id="__codelineno-0-2040" name="__codelineno-0-2040"></a><span class="sd">        * chc / ecmwf / cmems — return a `Variable`.</span>
-<a id="__codelineno-0-2041" name="__codelineno-0-2041"></a><span class="sd">        * gee — return a `Band` (also exposed as `get_band`).</span>
-<a id="__codelineno-0-2042" name="__codelineno-0-2042"></a><span class="sd">        * firms — return a `SensorColumn` (also exposed as `get_column`).</span>
-<a id="__codelineno-0-2043" name="__codelineno-0-2043"></a><span class="sd">        * tropycal — return a `TrackField` (also exposed as `get_field`).</span>
-<a id="__codelineno-0-2044" name="__codelineno-0-2044"></a>
-<a id="__codelineno-0-2045" name="__codelineno-0-2045"></a><span class="sd">        Single-level catalogs (where one row *is* the leaf — fdsn, gdacs,</span>
-<a id="__codelineno-0-2046" name="__codelineno-0-2046"></a><span class="sd">        radar, openaq, overture, usgs_water) do not implement this; their</span>
-<a id="__codelineno-0-2047" name="__codelineno-0-2047"></a><span class="sd">        rows are addressed directly with :meth:`get_dataset` / `[key]`.</span>
-<a id="__codelineno-0-2048" name="__codelineno-0-2048"></a>
-<a id="__codelineno-0-2049" name="__codelineno-0-2049"></a><span class="sd">        Note:</span>
-<a id="__codelineno-0-2050" name="__codelineno-0-2050"></a><span class="sd">            This supersedes the former single-argument</span>
-<a id="__codelineno-0-2051" name="__codelineno-0-2051"></a><span class="sd">            `get_variable(var_name)`, which returned `self.catalog.get(var_name)`.</span>
-<a id="__codelineno-0-2052" name="__codelineno-0-2052"></a><span class="sd">            External callers/subclassers that relied on the one-argument</span>
-<a id="__codelineno-0-2053" name="__codelineno-0-2053"></a><span class="sd">            form must pass the parent `dataset_key` as well.</span>
+<a id="__codelineno-0-2025" name="__codelineno-0-2025"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-2026" name="__codelineno-0-2026"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fill an empty catalog from disk, then run the subclass&#39;s wiring.</span>
+<a id="__codelineno-0-2027" name="__codelineno-0-2027"></a>
+<a id="__codelineno-0-2028" name="__codelineno-0-2028"></a><span class="sd">        `Catalog()` with no arguments reads from disk; passing `datasets=...`</span>
+<a id="__codelineno-0-2029" name="__codelineno-0-2029"></a><span class="sd">        skips the read, which is what lets a test build a catalog from literals.</span>
+<a id="__codelineno-0-2030" name="__codelineno-0-2030"></a><span class="sd">        A field the caller already supplied is never overwritten, so a partial</span>
+<a id="__codelineno-0-2031" name="__codelineno-0-2031"></a><span class="sd">        construction (`datasets=` but no `available_datasets=`) still gets the</span>
+<a id="__codelineno-0-2032" name="__codelineno-0-2032"></a><span class="sd">        rest filled in.</span>
+<a id="__codelineno-0-2033" name="__codelineno-0-2033"></a>
+<a id="__codelineno-0-2034" name="__codelineno-0-2034"></a><span class="sd">        This used to be written out in all 48 provider catalogs. The bodies</span>
+<a id="__codelineno-0-2035" name="__codelineno-0-2035"></a><span class="sd">        differed only in the loader call, and the surrounding rule had drifted —</span>
+<a id="__codelineno-0-2036" name="__codelineno-0-2036"></a><span class="sd">        some defaulted `available_datasets`, some did not — which is the kind of</span>
+<a id="__codelineno-0-2037" name="__codelineno-0-2037"></a><span class="sd">        difference nobody notices until two catalogs disagree.</span>
+<a id="__codelineno-0-2038" name="__codelineno-0-2038"></a>
+<a id="__codelineno-0-2039" name="__codelineno-0-2039"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-2040" name="__codelineno-0-2040"></a><span class="sd">            __context: Opaque context from the pydantic v2 lifecycle, forwarded</span>
+<a id="__codelineno-0-2041" name="__codelineno-0-2041"></a><span class="sd">                to the base unchanged.</span>
+<a id="__codelineno-0-2042" name="__codelineno-0-2042"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2043" name="__codelineno-0-2043"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-2044" name="__codelineno-0-2044"></a>            <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_autoload</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-2045" name="__codelineno-0-2045"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-0-2046" name="__codelineno-0-2046"></a>                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<a id="__codelineno-0-2047" name="__codelineno-0-2047"></a>
+<a id="__codelineno-0-2048" name="__codelineno-0-2048"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2049" name="__codelineno-0-2049"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the catalog of the datasource from disk or retrieve it from server.</span>
+<a id="__codelineno-0-2050" name="__codelineno-0-2050"></a>
+<a id="__codelineno-0-2051" name="__codelineno-0-2051"></a><span class="sd">        Abstract; concrete subclasses must override and return their</span>
+<a id="__codelineno-0-2052" name="__codelineno-0-2052"></a><span class="sd">        backend-specific catalog object (e.g. a pydantic `Catalog`</span>
+<a id="__codelineno-0-2053" name="__codelineno-0-2053"></a><span class="sd">        instance, a `dict`, or whatever shape the backend uses).</span>
 <a id="__codelineno-0-2054" name="__codelineno-0-2054"></a>
-<a id="__codelineno-0-2055" name="__codelineno-0-2055"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-2056" name="__codelineno-0-2056"></a><span class="sd">            dataset_key: The parent dataset / collection key.</span>
-<a id="__codelineno-0-2057" name="__codelineno-0-2057"></a><span class="sd">            variable_name: The leaf code within that dataset.</span>
-<a id="__codelineno-0-2058" name="__codelineno-0-2058"></a>
-<a id="__codelineno-0-2059" name="__codelineno-0-2059"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-2060" name="__codelineno-0-2060"></a><span class="sd">            The backend-specific leaf row.</span>
-<a id="__codelineno-0-2061" name="__codelineno-0-2061"></a>
-<a id="__codelineno-0-2062" name="__codelineno-0-2062"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-2063" name="__codelineno-0-2063"></a><span class="sd">            NotImplementedError: If the backend has no per-dataset leaf</span>
-<a id="__codelineno-0-2064" name="__codelineno-0-2064"></a><span class="sd">                level.</span>
-<a id="__codelineno-0-2065" name="__codelineno-0-2065"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2066" name="__codelineno-0-2066"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-2067" name="__codelineno-0-2067"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no per-dataset variable level; &quot;</span>
-<a id="__codelineno-0-2068" name="__codelineno-0-2068"></a>            <span class="s2">&quot;address its rows with get_dataset() / [key].&quot;</span>
-<a id="__codelineno-0-2069" name="__codelineno-0-2069"></a>        <span class="p">)</span>
-<a id="__codelineno-0-2070" name="__codelineno-0-2070"></a>
-<a id="__codelineno-0-2071" name="__codelineno-0-2071"></a>    <span class="c1"># -- shared dict-like surface over `datasets` (M1 from catalog-cross-backend-comparison)</span>
-<a id="__codelineno-0-2072" name="__codelineno-0-2072"></a>
-<a id="__codelineno-0-2073" name="__codelineno-0-2073"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2074" name="__codelineno-0-2074"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dataset record for `name`, with a did-you-mean hint on miss.</span>
-<a id="__codelineno-0-2075" name="__codelineno-0-2075"></a>
-<a id="__codelineno-0-2076" name="__codelineno-0-2076"></a><span class="sd">        Backend-generic: looks up `name` in :attr:`datasets` and raises</span>
-<a id="__codelineno-0-2077" name="__codelineno-0-2077"></a><span class="sd">        `ValueError` (not `KeyError`) with the closest known name when</span>
-<a id="__codelineno-0-2078" name="__codelineno-0-2078"></a><span class="sd">        absent. Concrete subclasses can override to narrow the return</span>
-<a id="__codelineno-0-2079" name="__codelineno-0-2079"></a><span class="sd">        type or customise the error message.</span>
-<a id="__codelineno-0-2080" name="__codelineno-0-2080"></a>
-<a id="__codelineno-0-2081" name="__codelineno-0-2081"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-2082" name="__codelineno-0-2082"></a><span class="sd">            name: Catalog key (e.g. CDS dataset short name, EE asset id,</span>
-<a id="__codelineno-0-2083" name="__codelineno-0-2083"></a><span class="sd">                CHC dataset key).</span>
+<a id="__codelineno-0-2055" name="__codelineno-0-2055"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-2056" name="__codelineno-0-2056"></a><span class="sd">            NotImplementedError: Always, until overridden by a subclass.</span>
+<a id="__codelineno-0-2057" name="__codelineno-0-2057"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2058" name="__codelineno-0-2058"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<a id="__codelineno-0-2059" name="__codelineno-0-2059"></a>
+<a id="__codelineno-0-2060" name="__codelineno-0-2060"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2061" name="__codelineno-0-2061"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one leaf (variable / band / asset) of a dataset.</span>
+<a id="__codelineno-0-2062" name="__codelineno-0-2062"></a>
+<a id="__codelineno-0-2063" name="__codelineno-0-2063"></a><span class="sd">        Shared two-argument contract for the two-level catalogs: a leaf</span>
+<a id="__codelineno-0-2064" name="__codelineno-0-2064"></a><span class="sd">        is addressed by its `(dataset_key, variable_name)` pair, because</span>
+<a id="__codelineno-0-2065" name="__codelineno-0-2065"></a><span class="sd">        the same leaf code can appear under more than one dataset (e.g.</span>
+<a id="__codelineno-0-2066" name="__codelineno-0-2066"></a><span class="sd">        `&quot;2m-temperature&quot;` lives under several CDS datasets). Concrete</span>
+<a id="__codelineno-0-2067" name="__codelineno-0-2067"></a><span class="sd">        overrides return their typed leaf row and raise `ValueError`</span>
+<a id="__codelineno-0-2068" name="__codelineno-0-2068"></a><span class="sd">        (with a did-you-mean hint) on an unknown key:</span>
+<a id="__codelineno-0-2069" name="__codelineno-0-2069"></a>
+<a id="__codelineno-0-2070" name="__codelineno-0-2070"></a><span class="sd">        * chc / ecmwf / cmems — return a `Variable`.</span>
+<a id="__codelineno-0-2071" name="__codelineno-0-2071"></a><span class="sd">        * gee — return a `Band` (also exposed as `get_band`).</span>
+<a id="__codelineno-0-2072" name="__codelineno-0-2072"></a><span class="sd">        * firms — return a `SensorColumn` (also exposed as `get_column`).</span>
+<a id="__codelineno-0-2073" name="__codelineno-0-2073"></a><span class="sd">        * tropycal — return a `TrackField` (also exposed as `get_field`).</span>
+<a id="__codelineno-0-2074" name="__codelineno-0-2074"></a>
+<a id="__codelineno-0-2075" name="__codelineno-0-2075"></a><span class="sd">        Single-level catalogs (where one row *is* the leaf — fdsn, gdacs,</span>
+<a id="__codelineno-0-2076" name="__codelineno-0-2076"></a><span class="sd">        radar, openaq, overture, usgs_water) do not implement this; their</span>
+<a id="__codelineno-0-2077" name="__codelineno-0-2077"></a><span class="sd">        rows are addressed directly with :meth:`get_dataset` / `[key]`.</span>
+<a id="__codelineno-0-2078" name="__codelineno-0-2078"></a>
+<a id="__codelineno-0-2079" name="__codelineno-0-2079"></a><span class="sd">        Note:</span>
+<a id="__codelineno-0-2080" name="__codelineno-0-2080"></a><span class="sd">            This supersedes the former single-argument</span>
+<a id="__codelineno-0-2081" name="__codelineno-0-2081"></a><span class="sd">            `get_variable(var_name)`, which returned `self.catalog.get(var_name)`.</span>
+<a id="__codelineno-0-2082" name="__codelineno-0-2082"></a><span class="sd">            External callers/subclassers that relied on the one-argument</span>
+<a id="__codelineno-0-2083" name="__codelineno-0-2083"></a><span class="sd">            form must pass the parent `dataset_key` as well.</span>
 <a id="__codelineno-0-2084" name="__codelineno-0-2084"></a>
-<a id="__codelineno-0-2085" name="__codelineno-0-2085"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-2086" name="__codelineno-0-2086"></a><span class="sd">            The matching dataset record (type depends on the subclass).</span>
-<a id="__codelineno-0-2087" name="__codelineno-0-2087"></a>
-<a id="__codelineno-0-2088" name="__codelineno-0-2088"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-2089" name="__codelineno-0-2089"></a><span class="sd">            ValueError: If `name` is not a key of :attr:`datasets`.</span>
-<a id="__codelineno-0-2090" name="__codelineno-0-2090"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2091" name="__codelineno-0-2091"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-2092" name="__codelineno-0-2092"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-<a id="__codelineno-0-2093" name="__codelineno-0-2093"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-2094" name="__codelineno-0-2094"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-2095" name="__codelineno-0-2095"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-2096" name="__codelineno-0-2096"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-2097" name="__codelineno-0-2097"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2">. &quot;</span>
-<a id="__codelineno-0-2098" name="__codelineno-0-2098"></a>                <span class="sa">f</span><span class="s2">&quot;Known </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_entry_noun</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-2099" name="__codelineno-0-2099"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<a id="__codelineno-0-2085" name="__codelineno-0-2085"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-2086" name="__codelineno-0-2086"></a><span class="sd">            dataset_key: The parent dataset / collection key.</span>
+<a id="__codelineno-0-2087" name="__codelineno-0-2087"></a><span class="sd">            variable_name: The leaf code within that dataset.</span>
+<a id="__codelineno-0-2088" name="__codelineno-0-2088"></a>
+<a id="__codelineno-0-2089" name="__codelineno-0-2089"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-2090" name="__codelineno-0-2090"></a><span class="sd">            The backend-specific leaf row.</span>
+<a id="__codelineno-0-2091" name="__codelineno-0-2091"></a>
+<a id="__codelineno-0-2092" name="__codelineno-0-2092"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-2093" name="__codelineno-0-2093"></a><span class="sd">            NotImplementedError: If the backend has no per-dataset leaf</span>
+<a id="__codelineno-0-2094" name="__codelineno-0-2094"></a><span class="sd">                level.</span>
+<a id="__codelineno-0-2095" name="__codelineno-0-2095"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2096" name="__codelineno-0-2096"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-2097" name="__codelineno-0-2097"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no per-dataset variable level; &quot;</span>
+<a id="__codelineno-0-2098" name="__codelineno-0-2098"></a>            <span class="s2">&quot;address its rows with get_dataset() / [key].&quot;</span>
+<a id="__codelineno-0-2099" name="__codelineno-0-2099"></a>        <span class="p">)</span>
 <a id="__codelineno-0-2100" name="__codelineno-0-2100"></a>
-<a id="__codelineno-0-2101" name="__codelineno-0-2101"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2102" name="__codelineno-0-2102"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;`cat[name]` — dict-style lookup; raises `KeyError` on miss.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-2103" name="__codelineno-0-2103"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-2104" name="__codelineno-0-2104"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<a id="__codelineno-0-2105" name="__codelineno-0-2105"></a>        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-2106" name="__codelineno-0-2106"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-2107" name="__codelineno-0-2107"></a>
-<a id="__codelineno-0-2108" name="__codelineno-0-2108"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-2109" name="__codelineno-0-2109"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;`name in cat` — True when `name` is a curated dataset.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-2110" name="__codelineno-0-2110"></a>        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-2111" name="__codelineno-0-2111"></a>
-<a id="__codelineno-0-2112" name="__codelineno-0-2112"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-2113" name="__codelineno-0-2113"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterate over the curated dataset keys.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-2114" name="__codelineno-0-2114"></a>        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
-<a id="__codelineno-0-2115" name="__codelineno-0-2115"></a>
-<a id="__codelineno-0-2116" name="__codelineno-0-2116"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-2117" name="__codelineno-0-2117"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of curated datasets in the catalog.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-2118" name="__codelineno-0-2118"></a>        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
-<a id="__codelineno-0-2119" name="__codelineno-0-2119"></a>
-<a id="__codelineno-0-2120" name="__codelineno-0-2120"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-2121" name="__codelineno-0-2121"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compact developer repr — counts, not contents.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-2122" name="__codelineno-0-2122"></a>        <span class="k">return</span> <span class="p">(</span>
-<a id="__codelineno-0-2123" name="__codelineno-0-2123"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(datasets=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
-<a id="__codelineno-0-2124" name="__codelineno-0-2124"></a>            <span class="sa">f</span><span class="s2">&quot;available_datasets=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-2125" name="__codelineno-0-2125"></a>        <span class="p">)</span>
-<a id="__codelineno-0-2126" name="__codelineno-0-2126"></a>
-<a id="__codelineno-0-2127" name="__codelineno-0-2127"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2128" name="__codelineno-0-2128"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the provider record for `slug` (with a did-you-mean hint on miss).</span>
-<a id="__codelineno-0-2129" name="__codelineno-0-2129"></a>
-<a id="__codelineno-0-2130" name="__codelineno-0-2130"></a><span class="sd">        The value type depends on the backend&#39;s :attr:`providers` field:</span>
-<a id="__codelineno-0-2131" name="__codelineno-0-2131"></a><span class="sd">        most backends store an :class:`earthlens.base.Provider`, but some</span>
-<a id="__codelineno-0-2132" name="__codelineno-0-2132"></a><span class="sd">        mirror a domain-specific record (earthdata mirrors its</span>
-<a id="__codelineno-0-2133" name="__codelineno-0-2133"></a><span class="sd">        `EarthdataDAAC` from `daacs`, stac its `Endpoint` from</span>
-<a id="__codelineno-0-2134" name="__codelineno-0-2134"></a><span class="sd">        `endpoints`).</span>
-<a id="__codelineno-0-2135" name="__codelineno-0-2135"></a>
-<a id="__codelineno-0-2136" name="__codelineno-0-2136"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-2137" name="__codelineno-0-2137"></a><span class="sd">            slug: A registered provider slug (e.g. `&quot;nasa-lp-daac&quot;`,</span>
-<a id="__codelineno-0-2138" name="__codelineno-0-2138"></a><span class="sd">                `&quot;ucsb-chc&quot;`, `&quot;copernicus&quot;`).</span>
-<a id="__codelineno-0-2139" name="__codelineno-0-2139"></a>
-<a id="__codelineno-0-2140" name="__codelineno-0-2140"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-2141" name="__codelineno-0-2141"></a><span class="sd">            The matching provider record (a `Provider`, or the backend&#39;s</span>
-<a id="__codelineno-0-2142" name="__codelineno-0-2142"></a><span class="sd">            domain-specific provider model).</span>
-<a id="__codelineno-0-2143" name="__codelineno-0-2143"></a>
-<a id="__codelineno-0-2144" name="__codelineno-0-2144"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-2145" name="__codelineno-0-2145"></a><span class="sd">            ValueError: If `slug` is not a registered provider.</span>
-<a id="__codelineno-0-2146" name="__codelineno-0-2146"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2147" name="__codelineno-0-2147"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-2148" name="__codelineno-0-2148"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span>
-<a id="__codelineno-0-2149" name="__codelineno-0-2149"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-2150" name="__codelineno-0-2150"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-2151" name="__codelineno-0-2151"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-2152" name="__codelineno-0-2152"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-2153" name="__codelineno-0-2153"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">slug</span><span class="si">!r}</span><span class="s2"> is not a registered provider. &quot;</span>
-<a id="__codelineno-0-2154" name="__codelineno-0-2154"></a>                <span class="sa">f</span><span class="s2">&quot;Known providers: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-2155" name="__codelineno-0-2155"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<a id="__codelineno-0-2101" name="__codelineno-0-2101"></a>    <span class="c1"># -- shared dict-like surface over `datasets` (M1 from catalog-cross-backend-comparison)</span>
+<a id="__codelineno-0-2102" name="__codelineno-0-2102"></a>
+<a id="__codelineno-0-2103" name="__codelineno-0-2103"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2104" name="__codelineno-0-2104"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dataset record for `name`, with a did-you-mean hint on miss.</span>
+<a id="__codelineno-0-2105" name="__codelineno-0-2105"></a>
+<a id="__codelineno-0-2106" name="__codelineno-0-2106"></a><span class="sd">        Backend-generic: looks up `name` in :attr:`datasets` and raises</span>
+<a id="__codelineno-0-2107" name="__codelineno-0-2107"></a><span class="sd">        `ValueError` (not `KeyError`) with the closest known name when</span>
+<a id="__codelineno-0-2108" name="__codelineno-0-2108"></a><span class="sd">        absent. Concrete subclasses can override to narrow the return</span>
+<a id="__codelineno-0-2109" name="__codelineno-0-2109"></a><span class="sd">        type or customise the error message.</span>
+<a id="__codelineno-0-2110" name="__codelineno-0-2110"></a>
+<a id="__codelineno-0-2111" name="__codelineno-0-2111"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-2112" name="__codelineno-0-2112"></a><span class="sd">            name: Catalog key (e.g. CDS dataset short name, EE asset id,</span>
+<a id="__codelineno-0-2113" name="__codelineno-0-2113"></a><span class="sd">                CHC dataset key).</span>
+<a id="__codelineno-0-2114" name="__codelineno-0-2114"></a>
+<a id="__codelineno-0-2115" name="__codelineno-0-2115"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-2116" name="__codelineno-0-2116"></a><span class="sd">            The matching dataset record (type depends on the subclass).</span>
+<a id="__codelineno-0-2117" name="__codelineno-0-2117"></a>
+<a id="__codelineno-0-2118" name="__codelineno-0-2118"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-2119" name="__codelineno-0-2119"></a><span class="sd">            ValueError: If `name` is not a key of :attr:`datasets`.</span>
+<a id="__codelineno-0-2120" name="__codelineno-0-2120"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2121" name="__codelineno-0-2121"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-2122" name="__codelineno-0-2122"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+<a id="__codelineno-0-2123" name="__codelineno-0-2123"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-2124" name="__codelineno-0-2124"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-2125" name="__codelineno-0-2125"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-2126" name="__codelineno-0-2126"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-2127" name="__codelineno-0-2127"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-2128" name="__codelineno-0-2128"></a>                <span class="sa">f</span><span class="s2">&quot;Known </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_entry_noun</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-2129" name="__codelineno-0-2129"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<a id="__codelineno-0-2130" name="__codelineno-0-2130"></a>
+<a id="__codelineno-0-2131" name="__codelineno-0-2131"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2132" name="__codelineno-0-2132"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;`cat[name]` — dict-style lookup; raises `KeyError` on miss.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-2133" name="__codelineno-0-2133"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-2134" name="__codelineno-0-2134"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-2135" name="__codelineno-0-2135"></a>        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-2136" name="__codelineno-0-2136"></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-2137" name="__codelineno-0-2137"></a>
+<a id="__codelineno-0-2138" name="__codelineno-0-2138"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-2139" name="__codelineno-0-2139"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;`name in cat` — True when `name` is a curated dataset.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-2140" name="__codelineno-0-2140"></a>        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-2141" name="__codelineno-0-2141"></a>
+<a id="__codelineno-0-2142" name="__codelineno-0-2142"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-0-2143" name="__codelineno-0-2143"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterate over the curated dataset keys.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-2144" name="__codelineno-0-2144"></a>        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-2145" name="__codelineno-0-2145"></a>
+<a id="__codelineno-0-2146" name="__codelineno-0-2146"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-2147" name="__codelineno-0-2147"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of curated datasets in the catalog.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-2148" name="__codelineno-0-2148"></a>        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-2149" name="__codelineno-0-2149"></a>
+<a id="__codelineno-0-2150" name="__codelineno-0-2150"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-2151" name="__codelineno-0-2151"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compact developer repr — counts, not contents.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-2152" name="__codelineno-0-2152"></a>        <span class="k">return</span> <span class="p">(</span>
+<a id="__codelineno-0-2153" name="__codelineno-0-2153"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(datasets=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
+<a id="__codelineno-0-2154" name="__codelineno-0-2154"></a>            <span class="sa">f</span><span class="s2">&quot;available_datasets=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-2155" name="__codelineno-0-2155"></a>        <span class="p">)</span>
 <a id="__codelineno-0-2156" name="__codelineno-0-2156"></a>
-<a id="__codelineno-0-2157" name="__codelineno-0-2157"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2158" name="__codelineno-0-2158"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Map a user-facing key to the concrete thing a request needs.</span>
+<a id="__codelineno-0-2157" name="__codelineno-0-2157"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2158" name="__codelineno-0-2158"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the provider record for `slug` (with a did-you-mean hint on miss).</span>
 <a id="__codelineno-0-2159" name="__codelineno-0-2159"></a>
-<a id="__codelineno-0-2160" name="__codelineno-0-2160"></a><span class="sd">        Shared convention for every backend that implements a resolve</span>
-<a id="__codelineno-0-2161" name="__codelineno-0-2161"></a><span class="sd">        step: take a *logical* catalog key (a friendly name, collection</span>
-<a id="__codelineno-0-2162" name="__codelineno-0-2162"></a><span class="sd">        key, or model key) and return the backend-specific value the</span>
-<a id="__codelineno-0-2163" name="__codelineno-0-2163"></a><span class="sd">        download path consumes. The return type and any extra</span>
-<a id="__codelineno-0-2164" name="__codelineno-0-2164"></a><span class="sd">        positional / keyword arguments are backend-specific by</span>
-<a id="__codelineno-0-2165" name="__codelineno-0-2165"></a><span class="sd">        necessity — the catalogs resolve to different things — so this</span>
-<a id="__codelineno-0-2166" name="__codelineno-0-2166"></a><span class="sd">        base method only fixes the *verb*, not the signature. The</span>
-<a id="__codelineno-0-2167" name="__codelineno-0-2167"></a><span class="sd">        concrete overrides:</span>
-<a id="__codelineno-0-2168" name="__codelineno-0-2168"></a>
-<a id="__codelineno-0-2169" name="__codelineno-0-2169"></a><span class="sd">        * `nwp.resolve(model_key)` / `usgs_water.resolve(code_or_name)`</span>
-<a id="__codelineno-0-2170" name="__codelineno-0-2170"></a><span class="sd">          — return a model key / 5-digit parameter code (`str`).</span>
-<a id="__codelineno-0-2171" name="__codelineno-0-2171"></a><span class="sd">        * `stac.resolve(endpoint, collection_key)` — return the upstream</span>
-<a id="__codelineno-0-2172" name="__codelineno-0-2172"></a><span class="sd">          collection id for that endpoint (`str`).</span>
-<a id="__codelineno-0-2173" name="__codelineno-0-2173"></a><span class="sd">        * `openeo.resolve(key)` / `sentinel_hub.resolve(key)` — return a</span>
-<a id="__codelineno-0-2174" name="__codelineno-0-2174"></a><span class="sd">          normalised request object (a `ResolvedGraph` / `ResolvedRequest`)</span>
-<a id="__codelineno-0-2175" name="__codelineno-0-2175"></a><span class="sd">          covering both plain collections and recipes.</span>
-<a id="__codelineno-0-2176" name="__codelineno-0-2176"></a><span class="sd">        * `earthdata.resolve(key, daac=None)` /</span>
-<a id="__codelineno-0-2177" name="__codelineno-0-2177"></a><span class="sd">          `eumetsat.resolve(key, group=None)` — return the dataset row,</span>
-<a id="__codelineno-0-2178" name="__codelineno-0-2178"></a><span class="sd">          with an optional second argument to disambiguate a key shared</span>
-<a id="__codelineno-0-2179" name="__codelineno-0-2179"></a><span class="sd">          across DAACs / mission groups.</span>
-<a id="__codelineno-0-2180" name="__codelineno-0-2180"></a>
-<a id="__codelineno-0-2181" name="__codelineno-0-2181"></a><span class="sd">        Backends without a resolve step address their catalog directly</span>
-<a id="__codelineno-0-2182" name="__codelineno-0-2182"></a><span class="sd">        through :meth:`get_dataset` / `__getitem__`.</span>
-<a id="__codelineno-0-2183" name="__codelineno-0-2183"></a>
-<a id="__codelineno-0-2184" name="__codelineno-0-2184"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-2185" name="__codelineno-0-2185"></a><span class="sd">            key: The logical catalog key to resolve.</span>
-<a id="__codelineno-0-2186" name="__codelineno-0-2186"></a><span class="sd">            *args: Backend-specific positional arguments (e.g. the STAC</span>
-<a id="__codelineno-0-2187" name="__codelineno-0-2187"></a><span class="sd">                endpoint).</span>
-<a id="__codelineno-0-2188" name="__codelineno-0-2188"></a><span class="sd">            **kwargs: Backend-specific keyword arguments (e.g.</span>
-<a id="__codelineno-0-2189" name="__codelineno-0-2189"></a><span class="sd">                `daac=` / `group=`).</span>
-<a id="__codelineno-0-2190" name="__codelineno-0-2190"></a>
-<a id="__codelineno-0-2191" name="__codelineno-0-2191"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-2192" name="__codelineno-0-2192"></a><span class="sd">            The backend-specific resolved value (see the override list).</span>
-<a id="__codelineno-0-2193" name="__codelineno-0-2193"></a>
-<a id="__codelineno-0-2194" name="__codelineno-0-2194"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-2195" name="__codelineno-0-2195"></a><span class="sd">            NotImplementedError: If the backend has no resolve step.</span>
-<a id="__codelineno-0-2196" name="__codelineno-0-2196"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2197" name="__codelineno-0-2197"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-2198" name="__codelineno-0-2198"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no resolve() step; address its &quot;</span>
-<a id="__codelineno-0-2199" name="__codelineno-0-2199"></a>            <span class="s2">&quot;catalog with get_dataset() / [key] instead.&quot;</span>
-<a id="__codelineno-0-2200" name="__codelineno-0-2200"></a>        <span class="p">)</span>
-<a id="__codelineno-0-2201" name="__codelineno-0-2201"></a>
-<a id="__codelineno-0-2202" name="__codelineno-0-2202"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-2203" name="__codelineno-0-2203"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Pretty-print the curated `datasets` map as YAML.</span>
-<a id="__codelineno-0-2204" name="__codelineno-0-2204"></a>
-<a id="__codelineno-0-2205" name="__codelineno-0-2205"></a><span class="sd">        `None`-valued fields are omitted so the output stays readable;</span>
-<a id="__codelineno-0-2206" name="__codelineno-0-2206"></a><span class="sd">        the ordering of keys follows insertion. Concrete subclasses</span>
-<a id="__codelineno-0-2207" name="__codelineno-0-2207"></a><span class="sd">        whose dataset values aren&#39;t pydantic `BaseModel`s (rare) must</span>
-<a id="__codelineno-0-2208" name="__codelineno-0-2208"></a><span class="sd">        override.</span>
-<a id="__codelineno-0-2209" name="__codelineno-0-2209"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2210" name="__codelineno-0-2210"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
-<a id="__codelineno-0-2211" name="__codelineno-0-2211"></a>
-<a id="__codelineno-0-2212" name="__codelineno-0-2212"></a>        <span class="n">body</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-2213" name="__codelineno-0-2213"></a>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-2214" name="__codelineno-0-2214"></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-2215" name="__codelineno-0-2215"></a>                <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-2216" name="__codelineno-0-2216"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-2217" name="__codelineno-0-2217"></a>                <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
-<a id="__codelineno-0-2218" name="__codelineno-0-2218"></a>        <span class="n">dumped</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span>
-<a id="__codelineno-0-2219" name="__codelineno-0-2219"></a>            <span class="n">body</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_unicode</span><span class="o">=</span><span class="kc">True</span>
-<a id="__codelineno-0-2220" name="__codelineno-0-2220"></a>        <span class="p">)</span>
-<a id="__codelineno-0-2221" name="__codelineno-0-2221"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">dumped</span><span class="p">)</span>
+<a id="__codelineno-0-2160" name="__codelineno-0-2160"></a><span class="sd">        The value type depends on the backend&#39;s :attr:`providers` field:</span>
+<a id="__codelineno-0-2161" name="__codelineno-0-2161"></a><span class="sd">        most backends store an :class:`earthlens.base.Provider`, but some</span>
+<a id="__codelineno-0-2162" name="__codelineno-0-2162"></a><span class="sd">        mirror a domain-specific record (earthdata mirrors its</span>
+<a id="__codelineno-0-2163" name="__codelineno-0-2163"></a><span class="sd">        `EarthdataDAAC` from `daacs`, stac its `Endpoint` from</span>
+<a id="__codelineno-0-2164" name="__codelineno-0-2164"></a><span class="sd">        `endpoints`).</span>
+<a id="__codelineno-0-2165" name="__codelineno-0-2165"></a>
+<a id="__codelineno-0-2166" name="__codelineno-0-2166"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-2167" name="__codelineno-0-2167"></a><span class="sd">            slug: A registered provider slug (e.g. `&quot;nasa-lp-daac&quot;`,</span>
+<a id="__codelineno-0-2168" name="__codelineno-0-2168"></a><span class="sd">                `&quot;ucsb-chc&quot;`, `&quot;copernicus&quot;`).</span>
+<a id="__codelineno-0-2169" name="__codelineno-0-2169"></a>
+<a id="__codelineno-0-2170" name="__codelineno-0-2170"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-2171" name="__codelineno-0-2171"></a><span class="sd">            The matching provider record (a `Provider`, or the backend&#39;s</span>
+<a id="__codelineno-0-2172" name="__codelineno-0-2172"></a><span class="sd">            domain-specific provider model).</span>
+<a id="__codelineno-0-2173" name="__codelineno-0-2173"></a>
+<a id="__codelineno-0-2174" name="__codelineno-0-2174"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-2175" name="__codelineno-0-2175"></a><span class="sd">            ValueError: If `slug` is not a registered provider.</span>
+<a id="__codelineno-0-2176" name="__codelineno-0-2176"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2177" name="__codelineno-0-2177"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-2178" name="__codelineno-0-2178"></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span>
+<a id="__codelineno-0-2179" name="__codelineno-0-2179"></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-2180" name="__codelineno-0-2180"></a>            <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-2181" name="__codelineno-0-2181"></a>            <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-2182" name="__codelineno-0-2182"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-2183" name="__codelineno-0-2183"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">slug</span><span class="si">!r}</span><span class="s2"> is not a registered provider. &quot;</span>
+<a id="__codelineno-0-2184" name="__codelineno-0-2184"></a>                <span class="sa">f</span><span class="s2">&quot;Known providers: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-2185" name="__codelineno-0-2185"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+<a id="__codelineno-0-2186" name="__codelineno-0-2186"></a>
+<a id="__codelineno-0-2187" name="__codelineno-0-2187"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2188" name="__codelineno-0-2188"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Map a user-facing key to the concrete thing a request needs.</span>
+<a id="__codelineno-0-2189" name="__codelineno-0-2189"></a>
+<a id="__codelineno-0-2190" name="__codelineno-0-2190"></a><span class="sd">        Shared convention for every backend that implements a resolve</span>
+<a id="__codelineno-0-2191" name="__codelineno-0-2191"></a><span class="sd">        step: take a *logical* catalog key (a friendly name, collection</span>
+<a id="__codelineno-0-2192" name="__codelineno-0-2192"></a><span class="sd">        key, or model key) and return the backend-specific value the</span>
+<a id="__codelineno-0-2193" name="__codelineno-0-2193"></a><span class="sd">        download path consumes. The return type and any extra</span>
+<a id="__codelineno-0-2194" name="__codelineno-0-2194"></a><span class="sd">        positional / keyword arguments are backend-specific by</span>
+<a id="__codelineno-0-2195" name="__codelineno-0-2195"></a><span class="sd">        necessity — the catalogs resolve to different things — so this</span>
+<a id="__codelineno-0-2196" name="__codelineno-0-2196"></a><span class="sd">        base method only fixes the *verb*, not the signature. The</span>
+<a id="__codelineno-0-2197" name="__codelineno-0-2197"></a><span class="sd">        concrete overrides:</span>
+<a id="__codelineno-0-2198" name="__codelineno-0-2198"></a>
+<a id="__codelineno-0-2199" name="__codelineno-0-2199"></a><span class="sd">        * `nwp.resolve(model_key)` / `usgs_water.resolve(code_or_name)`</span>
+<a id="__codelineno-0-2200" name="__codelineno-0-2200"></a><span class="sd">          — return a model key / 5-digit parameter code (`str`).</span>
+<a id="__codelineno-0-2201" name="__codelineno-0-2201"></a><span class="sd">        * `stac.resolve(endpoint, collection_key)` — return the upstream</span>
+<a id="__codelineno-0-2202" name="__codelineno-0-2202"></a><span class="sd">          collection id for that endpoint (`str`).</span>
+<a id="__codelineno-0-2203" name="__codelineno-0-2203"></a><span class="sd">        * `openeo.resolve(key)` / `sentinel_hub.resolve(key)` — return a</span>
+<a id="__codelineno-0-2204" name="__codelineno-0-2204"></a><span class="sd">          normalised request object (a `ResolvedGraph` / `ResolvedRequest`)</span>
+<a id="__codelineno-0-2205" name="__codelineno-0-2205"></a><span class="sd">          covering both plain collections and recipes.</span>
+<a id="__codelineno-0-2206" name="__codelineno-0-2206"></a><span class="sd">        * `earthdata.resolve(key, daac=None)` /</span>
+<a id="__codelineno-0-2207" name="__codelineno-0-2207"></a><span class="sd">          `eumetsat.resolve(key, group=None)` — return the dataset row,</span>
+<a id="__codelineno-0-2208" name="__codelineno-0-2208"></a><span class="sd">          with an optional second argument to disambiguate a key shared</span>
+<a id="__codelineno-0-2209" name="__codelineno-0-2209"></a><span class="sd">          across DAACs / mission groups.</span>
+<a id="__codelineno-0-2210" name="__codelineno-0-2210"></a>
+<a id="__codelineno-0-2211" name="__codelineno-0-2211"></a><span class="sd">        Backends without a resolve step address their catalog directly</span>
+<a id="__codelineno-0-2212" name="__codelineno-0-2212"></a><span class="sd">        through :meth:`get_dataset` / `__getitem__`.</span>
+<a id="__codelineno-0-2213" name="__codelineno-0-2213"></a>
+<a id="__codelineno-0-2214" name="__codelineno-0-2214"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-2215" name="__codelineno-0-2215"></a><span class="sd">            key: The logical catalog key to resolve.</span>
+<a id="__codelineno-0-2216" name="__codelineno-0-2216"></a><span class="sd">            *args: Backend-specific positional arguments (e.g. the STAC</span>
+<a id="__codelineno-0-2217" name="__codelineno-0-2217"></a><span class="sd">                endpoint).</span>
+<a id="__codelineno-0-2218" name="__codelineno-0-2218"></a><span class="sd">            **kwargs: Backend-specific keyword arguments (e.g.</span>
+<a id="__codelineno-0-2219" name="__codelineno-0-2219"></a><span class="sd">                `daac=` / `group=`).</span>
+<a id="__codelineno-0-2220" name="__codelineno-0-2220"></a>
+<a id="__codelineno-0-2221" name="__codelineno-0-2221"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-2222" name="__codelineno-0-2222"></a><span class="sd">            The backend-specific resolved value (see the override list).</span>
+<a id="__codelineno-0-2223" name="__codelineno-0-2223"></a>
+<a id="__codelineno-0-2224" name="__codelineno-0-2224"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-2225" name="__codelineno-0-2225"></a><span class="sd">            NotImplementedError: If the backend has no resolve step.</span>
+<a id="__codelineno-0-2226" name="__codelineno-0-2226"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2227" name="__codelineno-0-2227"></a>        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-2228" name="__codelineno-0-2228"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no resolve() step; address its &quot;</span>
+<a id="__codelineno-0-2229" name="__codelineno-0-2229"></a>            <span class="s2">&quot;catalog with get_dataset() / [key] instead.&quot;</span>
+<a id="__codelineno-0-2230" name="__codelineno-0-2230"></a>        <span class="p">)</span>
+<a id="__codelineno-0-2231" name="__codelineno-0-2231"></a>
+<a id="__codelineno-0-2232" name="__codelineno-0-2232"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-2233" name="__codelineno-0-2233"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Pretty-print the curated `datasets` map as YAML.</span>
+<a id="__codelineno-0-2234" name="__codelineno-0-2234"></a>
+<a id="__codelineno-0-2235" name="__codelineno-0-2235"></a><span class="sd">        `None`-valued fields are omitted so the output stays readable;</span>
+<a id="__codelineno-0-2236" name="__codelineno-0-2236"></a><span class="sd">        the ordering of keys follows insertion. Concrete subclasses</span>
+<a id="__codelineno-0-2237" name="__codelineno-0-2237"></a><span class="sd">        whose dataset values aren&#39;t pydantic `BaseModel`s (rare) must</span>
+<a id="__codelineno-0-2238" name="__codelineno-0-2238"></a><span class="sd">        override.</span>
+<a id="__codelineno-0-2239" name="__codelineno-0-2239"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2240" name="__codelineno-0-2240"></a>        <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<a id="__codelineno-0-2241" name="__codelineno-0-2241"></a>
+<a id="__codelineno-0-2242" name="__codelineno-0-2242"></a>        <span class="n">body</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-2243" name="__codelineno-0-2243"></a>        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-2244" name="__codelineno-0-2244"></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-0-2245" name="__codelineno-0-2245"></a>                <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-2246" name="__codelineno-0-2246"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-2247" name="__codelineno-0-2247"></a>                <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
+<a id="__codelineno-0-2248" name="__codelineno-0-2248"></a>        <span class="n">dumped</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span>
+<a id="__codelineno-0-2249" name="__codelineno-0-2249"></a>            <span class="n">body</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_unicode</span><span class="o">=</span><span class="kc">True</span>
+<a id="__codelineno-0-2250" name="__codelineno-0-2250"></a>        <span class="p">)</span>
+<a id="__codelineno-0-2251" name="__codelineno-0-2251"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">dumped</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24963,11 +25023,11 @@ that accidental write fail loudly.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2108">2108</a></span>
-<span class="normal"><a href="#__codelineno-0-2109">2109</a></span>
-<span class="normal"><a href="#__codelineno-0-2110">2110</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2108" name="__codelineno-0-2108"></a><span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-2109" name="__codelineno-0-2109"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;`name in cat` — True when `name` is a curated dataset.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-2110" name="__codelineno-0-2110"></a>    <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2138">2138</a></span>
+<span class="normal"><a href="#__codelineno-0-2139">2139</a></span>
+<span class="normal"><a href="#__codelineno-0-2140">2140</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2138" name="__codelineno-0-2138"></a><span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-2139" name="__codelineno-0-2139"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;`name in cat` — True when `name` is a curated dataset.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-2140" name="__codelineno-0-2140"></a>    <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24990,17 +25050,17 @@ that accidental write fail loudly.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2101">2101</a></span>
-<span class="normal"><a href="#__codelineno-0-2102">2102</a></span>
-<span class="normal"><a href="#__codelineno-0-2103">2103</a></span>
-<span class="normal"><a href="#__codelineno-0-2104">2104</a></span>
-<span class="normal"><a href="#__codelineno-0-2105">2105</a></span>
-<span class="normal"><a href="#__codelineno-0-2106">2106</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2101" name="__codelineno-0-2101"></a><span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2102" name="__codelineno-0-2102"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;`cat[name]` — dict-style lookup; raises `KeyError` on miss.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-2103" name="__codelineno-0-2103"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-2104" name="__codelineno-0-2104"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-<a id="__codelineno-0-2105" name="__codelineno-0-2105"></a>    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-2106" name="__codelineno-0-2106"></a>        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2131">2131</a></span>
+<span class="normal"><a href="#__codelineno-0-2132">2132</a></span>
+<span class="normal"><a href="#__codelineno-0-2133">2133</a></span>
+<span class="normal"><a href="#__codelineno-0-2134">2134</a></span>
+<span class="normal"><a href="#__codelineno-0-2135">2135</a></span>
+<span class="normal"><a href="#__codelineno-0-2136">2136</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2131" name="__codelineno-0-2131"></a><span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2132" name="__codelineno-0-2132"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;`cat[name]` — dict-style lookup; raises `KeyError` on miss.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-2133" name="__codelineno-0-2133"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-2134" name="__codelineno-0-2134"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-2135" name="__codelineno-0-2135"></a>    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-2136" name="__codelineno-0-2136"></a>        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25023,11 +25083,11 @@ that accidental write fail loudly.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2112">2112</a></span>
-<span class="normal"><a href="#__codelineno-0-2113">2113</a></span>
-<span class="normal"><a href="#__codelineno-0-2114">2114</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2112" name="__codelineno-0-2112"></a><span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<a id="__codelineno-0-2113" name="__codelineno-0-2113"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Iterate over the curated dataset keys.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-2114" name="__codelineno-0-2114"></a>    <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2142">2142</a></span>
+<span class="normal"><a href="#__codelineno-0-2143">2143</a></span>
+<span class="normal"><a href="#__codelineno-0-2144">2144</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2142" name="__codelineno-0-2142"></a><span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-0-2143" name="__codelineno-0-2143"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Iterate over the curated dataset keys.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-2144" name="__codelineno-0-2144"></a>    <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25050,11 +25110,11 @@ that accidental write fail loudly.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2116">2116</a></span>
-<span class="normal"><a href="#__codelineno-0-2117">2117</a></span>
-<span class="normal"><a href="#__codelineno-0-2118">2118</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2116" name="__codelineno-0-2116"></a><span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-2117" name="__codelineno-0-2117"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of curated datasets in the catalog.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-2118" name="__codelineno-0-2118"></a>    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2146">2146</a></span>
+<span class="normal"><a href="#__codelineno-0-2147">2147</a></span>
+<span class="normal"><a href="#__codelineno-0-2148">2148</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2146" name="__codelineno-0-2146"></a><span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-2147" name="__codelineno-0-2147"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Number of curated datasets in the catalog.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-2148" name="__codelineno-0-2148"></a>    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25077,17 +25137,17 @@ that accidental write fail loudly.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2120">2120</a></span>
-<span class="normal"><a href="#__codelineno-0-2121">2121</a></span>
-<span class="normal"><a href="#__codelineno-0-2122">2122</a></span>
-<span class="normal"><a href="#__codelineno-0-2123">2123</a></span>
-<span class="normal"><a href="#__codelineno-0-2124">2124</a></span>
-<span class="normal"><a href="#__codelineno-0-2125">2125</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2120" name="__codelineno-0-2120"></a><span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-2121" name="__codelineno-0-2121"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compact developer repr — counts, not contents.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-2122" name="__codelineno-0-2122"></a>    <span class="k">return</span> <span class="p">(</span>
-<a id="__codelineno-0-2123" name="__codelineno-0-2123"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(datasets=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
-<a id="__codelineno-0-2124" name="__codelineno-0-2124"></a>        <span class="sa">f</span><span class="s2">&quot;available_datasets=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-2125" name="__codelineno-0-2125"></a>    <span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2150">2150</a></span>
+<span class="normal"><a href="#__codelineno-0-2151">2151</a></span>
+<span class="normal"><a href="#__codelineno-0-2152">2152</a></span>
+<span class="normal"><a href="#__codelineno-0-2153">2153</a></span>
+<span class="normal"><a href="#__codelineno-0-2154">2154</a></span>
+<span class="normal"><a href="#__codelineno-0-2155">2155</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2150" name="__codelineno-0-2150"></a><span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-2151" name="__codelineno-0-2151"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compact developer repr — counts, not contents.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-2152" name="__codelineno-0-2152"></a>    <span class="k">return</span> <span class="p">(</span>
+<a id="__codelineno-0-2153" name="__codelineno-0-2153"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(datasets=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">, &quot;</span>
+<a id="__codelineno-0-2154" name="__codelineno-0-2154"></a>        <span class="sa">f</span><span class="s2">&quot;available_datasets=</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-2155" name="__codelineno-0-2155"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25114,45 +25174,45 @@ override.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2202">2202</a></span>
-<span class="normal"><a href="#__codelineno-0-2203">2203</a></span>
-<span class="normal"><a href="#__codelineno-0-2204">2204</a></span>
-<span class="normal"><a href="#__codelineno-0-2205">2205</a></span>
-<span class="normal"><a href="#__codelineno-0-2206">2206</a></span>
-<span class="normal"><a href="#__codelineno-0-2207">2207</a></span>
-<span class="normal"><a href="#__codelineno-0-2208">2208</a></span>
-<span class="normal"><a href="#__codelineno-0-2209">2209</a></span>
-<span class="normal"><a href="#__codelineno-0-2210">2210</a></span>
-<span class="normal"><a href="#__codelineno-0-2211">2211</a></span>
-<span class="normal"><a href="#__codelineno-0-2212">2212</a></span>
-<span class="normal"><a href="#__codelineno-0-2213">2213</a></span>
-<span class="normal"><a href="#__codelineno-0-2214">2214</a></span>
-<span class="normal"><a href="#__codelineno-0-2215">2215</a></span>
-<span class="normal"><a href="#__codelineno-0-2216">2216</a></span>
-<span class="normal"><a href="#__codelineno-0-2217">2217</a></span>
-<span class="normal"><a href="#__codelineno-0-2218">2218</a></span>
-<span class="normal"><a href="#__codelineno-0-2219">2219</a></span>
-<span class="normal"><a href="#__codelineno-0-2220">2220</a></span>
-<span class="normal"><a href="#__codelineno-0-2221">2221</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2202" name="__codelineno-0-2202"></a><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-2203" name="__codelineno-0-2203"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Pretty-print the curated `datasets` map as YAML.</span>
-<a id="__codelineno-0-2204" name="__codelineno-0-2204"></a>
-<a id="__codelineno-0-2205" name="__codelineno-0-2205"></a><span class="sd">    `None`-valued fields are omitted so the output stays readable;</span>
-<a id="__codelineno-0-2206" name="__codelineno-0-2206"></a><span class="sd">    the ordering of keys follows insertion. Concrete subclasses</span>
-<a id="__codelineno-0-2207" name="__codelineno-0-2207"></a><span class="sd">    whose dataset values aren&#39;t pydantic `BaseModel`s (rare) must</span>
-<a id="__codelineno-0-2208" name="__codelineno-0-2208"></a><span class="sd">    override.</span>
-<a id="__codelineno-0-2209" name="__codelineno-0-2209"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2210" name="__codelineno-0-2210"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
-<a id="__codelineno-0-2211" name="__codelineno-0-2211"></a>
-<a id="__codelineno-0-2212" name="__codelineno-0-2212"></a>    <span class="n">body</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-2213" name="__codelineno-0-2213"></a>    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-2214" name="__codelineno-0-2214"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-2215" name="__codelineno-0-2215"></a>            <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-2216" name="__codelineno-0-2216"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-2217" name="__codelineno-0-2217"></a>            <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
-<a id="__codelineno-0-2218" name="__codelineno-0-2218"></a>    <span class="n">dumped</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span>
-<a id="__codelineno-0-2219" name="__codelineno-0-2219"></a>        <span class="n">body</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_unicode</span><span class="o">=</span><span class="kc">True</span>
-<a id="__codelineno-0-2220" name="__codelineno-0-2220"></a>    <span class="p">)</span>
-<a id="__codelineno-0-2221" name="__codelineno-0-2221"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">dumped</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2232">2232</a></span>
+<span class="normal"><a href="#__codelineno-0-2233">2233</a></span>
+<span class="normal"><a href="#__codelineno-0-2234">2234</a></span>
+<span class="normal"><a href="#__codelineno-0-2235">2235</a></span>
+<span class="normal"><a href="#__codelineno-0-2236">2236</a></span>
+<span class="normal"><a href="#__codelineno-0-2237">2237</a></span>
+<span class="normal"><a href="#__codelineno-0-2238">2238</a></span>
+<span class="normal"><a href="#__codelineno-0-2239">2239</a></span>
+<span class="normal"><a href="#__codelineno-0-2240">2240</a></span>
+<span class="normal"><a href="#__codelineno-0-2241">2241</a></span>
+<span class="normal"><a href="#__codelineno-0-2242">2242</a></span>
+<span class="normal"><a href="#__codelineno-0-2243">2243</a></span>
+<span class="normal"><a href="#__codelineno-0-2244">2244</a></span>
+<span class="normal"><a href="#__codelineno-0-2245">2245</a></span>
+<span class="normal"><a href="#__codelineno-0-2246">2246</a></span>
+<span class="normal"><a href="#__codelineno-0-2247">2247</a></span>
+<span class="normal"><a href="#__codelineno-0-2248">2248</a></span>
+<span class="normal"><a href="#__codelineno-0-2249">2249</a></span>
+<span class="normal"><a href="#__codelineno-0-2250">2250</a></span>
+<span class="normal"><a href="#__codelineno-0-2251">2251</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2232" name="__codelineno-0-2232"></a><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-2233" name="__codelineno-0-2233"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Pretty-print the curated `datasets` map as YAML.</span>
+<a id="__codelineno-0-2234" name="__codelineno-0-2234"></a>
+<a id="__codelineno-0-2235" name="__codelineno-0-2235"></a><span class="sd">    `None`-valued fields are omitted so the output stays readable;</span>
+<a id="__codelineno-0-2236" name="__codelineno-0-2236"></a><span class="sd">    the ordering of keys follows insertion. Concrete subclasses</span>
+<a id="__codelineno-0-2237" name="__codelineno-0-2237"></a><span class="sd">    whose dataset values aren&#39;t pydantic `BaseModel`s (rare) must</span>
+<a id="__codelineno-0-2238" name="__codelineno-0-2238"></a><span class="sd">    override.</span>
+<a id="__codelineno-0-2239" name="__codelineno-0-2239"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2240" name="__codelineno-0-2240"></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">yaml</span>
+<a id="__codelineno-0-2241" name="__codelineno-0-2241"></a>
+<a id="__codelineno-0-2242" name="__codelineno-0-2242"></a>    <span class="n">body</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-2243" name="__codelineno-0-2243"></a>    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-2244" name="__codelineno-0-2244"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-0-2245" name="__codelineno-0-2245"></a>            <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">exclude_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-2246" name="__codelineno-0-2246"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-2247" name="__codelineno-0-2247"></a>            <span class="n">body</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
+<a id="__codelineno-0-2248" name="__codelineno-0-2248"></a>    <span class="n">dumped</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_dump</span><span class="p">(</span>
+<a id="__codelineno-0-2249" name="__codelineno-0-2249"></a>        <span class="n">body</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_unicode</span><span class="o">=</span><span class="kc">True</span>
+<a id="__codelineno-0-2250" name="__codelineno-0-2250"></a>    <span class="p">)</span>
+<a id="__codelineno-0-2251" name="__codelineno-0-2251"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">dumped</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25201,27 +25261,27 @@ instance, a <code>dict</code>, or whatever shape the backend uses).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2018">2018</a></span>
-<span class="normal"><a href="#__codelineno-0-2019">2019</a></span>
-<span class="normal"><a href="#__codelineno-0-2020">2020</a></span>
-<span class="normal"><a href="#__codelineno-0-2021">2021</a></span>
-<span class="normal"><a href="#__codelineno-0-2022">2022</a></span>
-<span class="normal"><a href="#__codelineno-0-2023">2023</a></span>
-<span class="normal"><a href="#__codelineno-0-2024">2024</a></span>
-<span class="normal"><a href="#__codelineno-0-2025">2025</a></span>
-<span class="normal"><a href="#__codelineno-0-2026">2026</a></span>
-<span class="normal"><a href="#__codelineno-0-2027">2027</a></span>
-<span class="normal"><a href="#__codelineno-0-2028">2028</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2018" name="__codelineno-0-2018"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2019" name="__codelineno-0-2019"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the catalog of the datasource from disk or retrieve it from server.</span>
-<a id="__codelineno-0-2020" name="__codelineno-0-2020"></a>
-<a id="__codelineno-0-2021" name="__codelineno-0-2021"></a><span class="sd">    Abstract; concrete subclasses must override and return their</span>
-<a id="__codelineno-0-2022" name="__codelineno-0-2022"></a><span class="sd">    backend-specific catalog object (e.g. a pydantic `Catalog`</span>
-<a id="__codelineno-0-2023" name="__codelineno-0-2023"></a><span class="sd">    instance, a `dict`, or whatever shape the backend uses).</span>
-<a id="__codelineno-0-2024" name="__codelineno-0-2024"></a>
-<a id="__codelineno-0-2025" name="__codelineno-0-2025"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-2026" name="__codelineno-0-2026"></a><span class="sd">        NotImplementedError: Always, until overridden by a subclass.</span>
-<a id="__codelineno-0-2027" name="__codelineno-0-2027"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2028" name="__codelineno-0-2028"></a>    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2048">2048</a></span>
+<span class="normal"><a href="#__codelineno-0-2049">2049</a></span>
+<span class="normal"><a href="#__codelineno-0-2050">2050</a></span>
+<span class="normal"><a href="#__codelineno-0-2051">2051</a></span>
+<span class="normal"><a href="#__codelineno-0-2052">2052</a></span>
+<span class="normal"><a href="#__codelineno-0-2053">2053</a></span>
+<span class="normal"><a href="#__codelineno-0-2054">2054</a></span>
+<span class="normal"><a href="#__codelineno-0-2055">2055</a></span>
+<span class="normal"><a href="#__codelineno-0-2056">2056</a></span>
+<span class="normal"><a href="#__codelineno-0-2057">2057</a></span>
+<span class="normal"><a href="#__codelineno-0-2058">2058</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2048" name="__codelineno-0-2048"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2049" name="__codelineno-0-2049"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the catalog of the datasource from disk or retrieve it from server.</span>
+<a id="__codelineno-0-2050" name="__codelineno-0-2050"></a>
+<a id="__codelineno-0-2051" name="__codelineno-0-2051"></a><span class="sd">    Abstract; concrete subclasses must override and return their</span>
+<a id="__codelineno-0-2052" name="__codelineno-0-2052"></a><span class="sd">    backend-specific catalog object (e.g. a pydantic `Catalog`</span>
+<a id="__codelineno-0-2053" name="__codelineno-0-2053"></a><span class="sd">    instance, a `dict`, or whatever shape the backend uses).</span>
+<a id="__codelineno-0-2054" name="__codelineno-0-2054"></a>
+<a id="__codelineno-0-2055" name="__codelineno-0-2055"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-2056" name="__codelineno-0-2056"></a><span class="sd">        NotImplementedError: Always, until overridden by a subclass.</span>
+<a id="__codelineno-0-2057" name="__codelineno-0-2057"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2058" name="__codelineno-0-2058"></a>    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25326,59 +25386,59 @@ CHC dataset key).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2073">2073</a></span>
-<span class="normal"><a href="#__codelineno-0-2074">2074</a></span>
-<span class="normal"><a href="#__codelineno-0-2075">2075</a></span>
-<span class="normal"><a href="#__codelineno-0-2076">2076</a></span>
-<span class="normal"><a href="#__codelineno-0-2077">2077</a></span>
-<span class="normal"><a href="#__codelineno-0-2078">2078</a></span>
-<span class="normal"><a href="#__codelineno-0-2079">2079</a></span>
-<span class="normal"><a href="#__codelineno-0-2080">2080</a></span>
-<span class="normal"><a href="#__codelineno-0-2081">2081</a></span>
-<span class="normal"><a href="#__codelineno-0-2082">2082</a></span>
-<span class="normal"><a href="#__codelineno-0-2083">2083</a></span>
-<span class="normal"><a href="#__codelineno-0-2084">2084</a></span>
-<span class="normal"><a href="#__codelineno-0-2085">2085</a></span>
-<span class="normal"><a href="#__codelineno-0-2086">2086</a></span>
-<span class="normal"><a href="#__codelineno-0-2087">2087</a></span>
-<span class="normal"><a href="#__codelineno-0-2088">2088</a></span>
-<span class="normal"><a href="#__codelineno-0-2089">2089</a></span>
-<span class="normal"><a href="#__codelineno-0-2090">2090</a></span>
-<span class="normal"><a href="#__codelineno-0-2091">2091</a></span>
-<span class="normal"><a href="#__codelineno-0-2092">2092</a></span>
-<span class="normal"><a href="#__codelineno-0-2093">2093</a></span>
-<span class="normal"><a href="#__codelineno-0-2094">2094</a></span>
-<span class="normal"><a href="#__codelineno-0-2095">2095</a></span>
-<span class="normal"><a href="#__codelineno-0-2096">2096</a></span>
-<span class="normal"><a href="#__codelineno-0-2097">2097</a></span>
-<span class="normal"><a href="#__codelineno-0-2098">2098</a></span>
-<span class="normal"><a href="#__codelineno-0-2099">2099</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2073" name="__codelineno-0-2073"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2074" name="__codelineno-0-2074"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the dataset record for `name`, with a did-you-mean hint on miss.</span>
-<a id="__codelineno-0-2075" name="__codelineno-0-2075"></a>
-<a id="__codelineno-0-2076" name="__codelineno-0-2076"></a><span class="sd">    Backend-generic: looks up `name` in :attr:`datasets` and raises</span>
-<a id="__codelineno-0-2077" name="__codelineno-0-2077"></a><span class="sd">    `ValueError` (not `KeyError`) with the closest known name when</span>
-<a id="__codelineno-0-2078" name="__codelineno-0-2078"></a><span class="sd">    absent. Concrete subclasses can override to narrow the return</span>
-<a id="__codelineno-0-2079" name="__codelineno-0-2079"></a><span class="sd">    type or customise the error message.</span>
-<a id="__codelineno-0-2080" name="__codelineno-0-2080"></a>
-<a id="__codelineno-0-2081" name="__codelineno-0-2081"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-2082" name="__codelineno-0-2082"></a><span class="sd">        name: Catalog key (e.g. CDS dataset short name, EE asset id,</span>
-<a id="__codelineno-0-2083" name="__codelineno-0-2083"></a><span class="sd">            CHC dataset key).</span>
-<a id="__codelineno-0-2084" name="__codelineno-0-2084"></a>
-<a id="__codelineno-0-2085" name="__codelineno-0-2085"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-2086" name="__codelineno-0-2086"></a><span class="sd">        The matching dataset record (type depends on the subclass).</span>
-<a id="__codelineno-0-2087" name="__codelineno-0-2087"></a>
-<a id="__codelineno-0-2088" name="__codelineno-0-2088"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-2089" name="__codelineno-0-2089"></a><span class="sd">        ValueError: If `name` is not a key of :attr:`datasets`.</span>
-<a id="__codelineno-0-2090" name="__codelineno-0-2090"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2091" name="__codelineno-0-2091"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-2092" name="__codelineno-0-2092"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-<a id="__codelineno-0-2093" name="__codelineno-0-2093"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-2094" name="__codelineno-0-2094"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-2095" name="__codelineno-0-2095"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-2096" name="__codelineno-0-2096"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-2097" name="__codelineno-0-2097"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2">. &quot;</span>
-<a id="__codelineno-0-2098" name="__codelineno-0-2098"></a>            <span class="sa">f</span><span class="s2">&quot;Known </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_entry_noun</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-2099" name="__codelineno-0-2099"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2103">2103</a></span>
+<span class="normal"><a href="#__codelineno-0-2104">2104</a></span>
+<span class="normal"><a href="#__codelineno-0-2105">2105</a></span>
+<span class="normal"><a href="#__codelineno-0-2106">2106</a></span>
+<span class="normal"><a href="#__codelineno-0-2107">2107</a></span>
+<span class="normal"><a href="#__codelineno-0-2108">2108</a></span>
+<span class="normal"><a href="#__codelineno-0-2109">2109</a></span>
+<span class="normal"><a href="#__codelineno-0-2110">2110</a></span>
+<span class="normal"><a href="#__codelineno-0-2111">2111</a></span>
+<span class="normal"><a href="#__codelineno-0-2112">2112</a></span>
+<span class="normal"><a href="#__codelineno-0-2113">2113</a></span>
+<span class="normal"><a href="#__codelineno-0-2114">2114</a></span>
+<span class="normal"><a href="#__codelineno-0-2115">2115</a></span>
+<span class="normal"><a href="#__codelineno-0-2116">2116</a></span>
+<span class="normal"><a href="#__codelineno-0-2117">2117</a></span>
+<span class="normal"><a href="#__codelineno-0-2118">2118</a></span>
+<span class="normal"><a href="#__codelineno-0-2119">2119</a></span>
+<span class="normal"><a href="#__codelineno-0-2120">2120</a></span>
+<span class="normal"><a href="#__codelineno-0-2121">2121</a></span>
+<span class="normal"><a href="#__codelineno-0-2122">2122</a></span>
+<span class="normal"><a href="#__codelineno-0-2123">2123</a></span>
+<span class="normal"><a href="#__codelineno-0-2124">2124</a></span>
+<span class="normal"><a href="#__codelineno-0-2125">2125</a></span>
+<span class="normal"><a href="#__codelineno-0-2126">2126</a></span>
+<span class="normal"><a href="#__codelineno-0-2127">2127</a></span>
+<span class="normal"><a href="#__codelineno-0-2128">2128</a></span>
+<span class="normal"><a href="#__codelineno-0-2129">2129</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2103" name="__codelineno-0-2103"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2104" name="__codelineno-0-2104"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the dataset record for `name`, with a did-you-mean hint on miss.</span>
+<a id="__codelineno-0-2105" name="__codelineno-0-2105"></a>
+<a id="__codelineno-0-2106" name="__codelineno-0-2106"></a><span class="sd">    Backend-generic: looks up `name` in :attr:`datasets` and raises</span>
+<a id="__codelineno-0-2107" name="__codelineno-0-2107"></a><span class="sd">    `ValueError` (not `KeyError`) with the closest known name when</span>
+<a id="__codelineno-0-2108" name="__codelineno-0-2108"></a><span class="sd">    absent. Concrete subclasses can override to narrow the return</span>
+<a id="__codelineno-0-2109" name="__codelineno-0-2109"></a><span class="sd">    type or customise the error message.</span>
+<a id="__codelineno-0-2110" name="__codelineno-0-2110"></a>
+<a id="__codelineno-0-2111" name="__codelineno-0-2111"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-2112" name="__codelineno-0-2112"></a><span class="sd">        name: Catalog key (e.g. CDS dataset short name, EE asset id,</span>
+<a id="__codelineno-0-2113" name="__codelineno-0-2113"></a><span class="sd">            CHC dataset key).</span>
+<a id="__codelineno-0-2114" name="__codelineno-0-2114"></a>
+<a id="__codelineno-0-2115" name="__codelineno-0-2115"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-2116" name="__codelineno-0-2116"></a><span class="sd">        The matching dataset record (type depends on the subclass).</span>
+<a id="__codelineno-0-2117" name="__codelineno-0-2117"></a>
+<a id="__codelineno-0-2118" name="__codelineno-0-2118"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-2119" name="__codelineno-0-2119"></a><span class="sd">        ValueError: If `name` is not a key of :attr:`datasets`.</span>
+<a id="__codelineno-0-2120" name="__codelineno-0-2120"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2121" name="__codelineno-0-2121"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-2122" name="__codelineno-0-2122"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+<a id="__codelineno-0-2123" name="__codelineno-0-2123"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-2124" name="__codelineno-0-2124"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-2125" name="__codelineno-0-2125"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-2126" name="__codelineno-0-2126"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-2127" name="__codelineno-0-2127"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is not in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_catalog_kind</span><span class="si">}</span><span class="s2">. &quot;</span>
+<a id="__codelineno-0-2128" name="__codelineno-0-2128"></a>            <span class="sa">f</span><span class="s2">&quot;Known </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_entry_noun</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-2129" name="__codelineno-0-2129"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25494,63 +25554,63 @@ mirror a domain-specific record (earthdata mirrors its
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2127">2127</a></span>
-<span class="normal"><a href="#__codelineno-0-2128">2128</a></span>
-<span class="normal"><a href="#__codelineno-0-2129">2129</a></span>
-<span class="normal"><a href="#__codelineno-0-2130">2130</a></span>
-<span class="normal"><a href="#__codelineno-0-2131">2131</a></span>
-<span class="normal"><a href="#__codelineno-0-2132">2132</a></span>
-<span class="normal"><a href="#__codelineno-0-2133">2133</a></span>
-<span class="normal"><a href="#__codelineno-0-2134">2134</a></span>
-<span class="normal"><a href="#__codelineno-0-2135">2135</a></span>
-<span class="normal"><a href="#__codelineno-0-2136">2136</a></span>
-<span class="normal"><a href="#__codelineno-0-2137">2137</a></span>
-<span class="normal"><a href="#__codelineno-0-2138">2138</a></span>
-<span class="normal"><a href="#__codelineno-0-2139">2139</a></span>
-<span class="normal"><a href="#__codelineno-0-2140">2140</a></span>
-<span class="normal"><a href="#__codelineno-0-2141">2141</a></span>
-<span class="normal"><a href="#__codelineno-0-2142">2142</a></span>
-<span class="normal"><a href="#__codelineno-0-2143">2143</a></span>
-<span class="normal"><a href="#__codelineno-0-2144">2144</a></span>
-<span class="normal"><a href="#__codelineno-0-2145">2145</a></span>
-<span class="normal"><a href="#__codelineno-0-2146">2146</a></span>
-<span class="normal"><a href="#__codelineno-0-2147">2147</a></span>
-<span class="normal"><a href="#__codelineno-0-2148">2148</a></span>
-<span class="normal"><a href="#__codelineno-0-2149">2149</a></span>
-<span class="normal"><a href="#__codelineno-0-2150">2150</a></span>
-<span class="normal"><a href="#__codelineno-0-2151">2151</a></span>
-<span class="normal"><a href="#__codelineno-0-2152">2152</a></span>
-<span class="normal"><a href="#__codelineno-0-2153">2153</a></span>
-<span class="normal"><a href="#__codelineno-0-2154">2154</a></span>
-<span class="normal"><a href="#__codelineno-0-2155">2155</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2127" name="__codelineno-0-2127"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2128" name="__codelineno-0-2128"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the provider record for `slug` (with a did-you-mean hint on miss).</span>
-<a id="__codelineno-0-2129" name="__codelineno-0-2129"></a>
-<a id="__codelineno-0-2130" name="__codelineno-0-2130"></a><span class="sd">    The value type depends on the backend&#39;s :attr:`providers` field:</span>
-<a id="__codelineno-0-2131" name="__codelineno-0-2131"></a><span class="sd">    most backends store an :class:`earthlens.base.Provider`, but some</span>
-<a id="__codelineno-0-2132" name="__codelineno-0-2132"></a><span class="sd">    mirror a domain-specific record (earthdata mirrors its</span>
-<a id="__codelineno-0-2133" name="__codelineno-0-2133"></a><span class="sd">    `EarthdataDAAC` from `daacs`, stac its `Endpoint` from</span>
-<a id="__codelineno-0-2134" name="__codelineno-0-2134"></a><span class="sd">    `endpoints`).</span>
-<a id="__codelineno-0-2135" name="__codelineno-0-2135"></a>
-<a id="__codelineno-0-2136" name="__codelineno-0-2136"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-2137" name="__codelineno-0-2137"></a><span class="sd">        slug: A registered provider slug (e.g. `&quot;nasa-lp-daac&quot;`,</span>
-<a id="__codelineno-0-2138" name="__codelineno-0-2138"></a><span class="sd">            `&quot;ucsb-chc&quot;`, `&quot;copernicus&quot;`).</span>
-<a id="__codelineno-0-2139" name="__codelineno-0-2139"></a>
-<a id="__codelineno-0-2140" name="__codelineno-0-2140"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-2141" name="__codelineno-0-2141"></a><span class="sd">        The matching provider record (a `Provider`, or the backend&#39;s</span>
-<a id="__codelineno-0-2142" name="__codelineno-0-2142"></a><span class="sd">        domain-specific provider model).</span>
-<a id="__codelineno-0-2143" name="__codelineno-0-2143"></a>
-<a id="__codelineno-0-2144" name="__codelineno-0-2144"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-2145" name="__codelineno-0-2145"></a><span class="sd">        ValueError: If `slug` is not a registered provider.</span>
-<a id="__codelineno-0-2146" name="__codelineno-0-2146"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2147" name="__codelineno-0-2147"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-2148" name="__codelineno-0-2148"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span>
-<a id="__codelineno-0-2149" name="__codelineno-0-2149"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-<a id="__codelineno-0-2150" name="__codelineno-0-2150"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<a id="__codelineno-0-2151" name="__codelineno-0-2151"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-2152" name="__codelineno-0-2152"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-2153" name="__codelineno-0-2153"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">slug</span><span class="si">!r}</span><span class="s2"> is not a registered provider. &quot;</span>
-<a id="__codelineno-0-2154" name="__codelineno-0-2154"></a>            <span class="sa">f</span><span class="s2">&quot;Known providers: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-2155" name="__codelineno-0-2155"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2157">2157</a></span>
+<span class="normal"><a href="#__codelineno-0-2158">2158</a></span>
+<span class="normal"><a href="#__codelineno-0-2159">2159</a></span>
+<span class="normal"><a href="#__codelineno-0-2160">2160</a></span>
+<span class="normal"><a href="#__codelineno-0-2161">2161</a></span>
+<span class="normal"><a href="#__codelineno-0-2162">2162</a></span>
+<span class="normal"><a href="#__codelineno-0-2163">2163</a></span>
+<span class="normal"><a href="#__codelineno-0-2164">2164</a></span>
+<span class="normal"><a href="#__codelineno-0-2165">2165</a></span>
+<span class="normal"><a href="#__codelineno-0-2166">2166</a></span>
+<span class="normal"><a href="#__codelineno-0-2167">2167</a></span>
+<span class="normal"><a href="#__codelineno-0-2168">2168</a></span>
+<span class="normal"><a href="#__codelineno-0-2169">2169</a></span>
+<span class="normal"><a href="#__codelineno-0-2170">2170</a></span>
+<span class="normal"><a href="#__codelineno-0-2171">2171</a></span>
+<span class="normal"><a href="#__codelineno-0-2172">2172</a></span>
+<span class="normal"><a href="#__codelineno-0-2173">2173</a></span>
+<span class="normal"><a href="#__codelineno-0-2174">2174</a></span>
+<span class="normal"><a href="#__codelineno-0-2175">2175</a></span>
+<span class="normal"><a href="#__codelineno-0-2176">2176</a></span>
+<span class="normal"><a href="#__codelineno-0-2177">2177</a></span>
+<span class="normal"><a href="#__codelineno-0-2178">2178</a></span>
+<span class="normal"><a href="#__codelineno-0-2179">2179</a></span>
+<span class="normal"><a href="#__codelineno-0-2180">2180</a></span>
+<span class="normal"><a href="#__codelineno-0-2181">2181</a></span>
+<span class="normal"><a href="#__codelineno-0-2182">2182</a></span>
+<span class="normal"><a href="#__codelineno-0-2183">2183</a></span>
+<span class="normal"><a href="#__codelineno-0-2184">2184</a></span>
+<span class="normal"><a href="#__codelineno-0-2185">2185</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2157" name="__codelineno-0-2157"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_provider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slug</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2158" name="__codelineno-0-2158"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the provider record for `slug` (with a did-you-mean hint on miss).</span>
+<a id="__codelineno-0-2159" name="__codelineno-0-2159"></a>
+<a id="__codelineno-0-2160" name="__codelineno-0-2160"></a><span class="sd">    The value type depends on the backend&#39;s :attr:`providers` field:</span>
+<a id="__codelineno-0-2161" name="__codelineno-0-2161"></a><span class="sd">    most backends store an :class:`earthlens.base.Provider`, but some</span>
+<a id="__codelineno-0-2162" name="__codelineno-0-2162"></a><span class="sd">    mirror a domain-specific record (earthdata mirrors its</span>
+<a id="__codelineno-0-2163" name="__codelineno-0-2163"></a><span class="sd">    `EarthdataDAAC` from `daacs`, stac its `Endpoint` from</span>
+<a id="__codelineno-0-2164" name="__codelineno-0-2164"></a><span class="sd">    `endpoints`).</span>
+<a id="__codelineno-0-2165" name="__codelineno-0-2165"></a>
+<a id="__codelineno-0-2166" name="__codelineno-0-2166"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-2167" name="__codelineno-0-2167"></a><span class="sd">        slug: A registered provider slug (e.g. `&quot;nasa-lp-daac&quot;`,</span>
+<a id="__codelineno-0-2168" name="__codelineno-0-2168"></a><span class="sd">            `&quot;ucsb-chc&quot;`, `&quot;copernicus&quot;`).</span>
+<a id="__codelineno-0-2169" name="__codelineno-0-2169"></a>
+<a id="__codelineno-0-2170" name="__codelineno-0-2170"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-2171" name="__codelineno-0-2171"></a><span class="sd">        The matching provider record (a `Provider`, or the backend&#39;s</span>
+<a id="__codelineno-0-2172" name="__codelineno-0-2172"></a><span class="sd">        domain-specific provider model).</span>
+<a id="__codelineno-0-2173" name="__codelineno-0-2173"></a>
+<a id="__codelineno-0-2174" name="__codelineno-0-2174"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-2175" name="__codelineno-0-2175"></a><span class="sd">        ValueError: If `slug` is not a registered provider.</span>
+<a id="__codelineno-0-2176" name="__codelineno-0-2176"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2177" name="__codelineno-0-2177"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-2178" name="__codelineno-0-2178"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span>
+<a id="__codelineno-0-2179" name="__codelineno-0-2179"></a>    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+<a id="__codelineno-0-2180" name="__codelineno-0-2180"></a>        <span class="n">close</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-0-2181" name="__codelineno-0-2181"></a>        <span class="n">hint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot; Did you mean </span><span class="si">{</span><span class="n">close</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">!r}</span><span class="s2">?&quot;</span> <span class="k">if</span> <span class="n">close</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-2182" name="__codelineno-0-2182"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-2183" name="__codelineno-0-2183"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">slug</span><span class="si">!r}</span><span class="s2"> is not a registered provider. &quot;</span>
+<a id="__codelineno-0-2184" name="__codelineno-0-2184"></a>            <span class="sa">f</span><span class="s2">&quot;Known providers: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">hint</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-2185" name="__codelineno-0-2185"></a>        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25690,37 +25750,7 @@ level.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2030">2030</a></span>
-<span class="normal"><a href="#__codelineno-0-2031">2031</a></span>
-<span class="normal"><a href="#__codelineno-0-2032">2032</a></span>
-<span class="normal"><a href="#__codelineno-0-2033">2033</a></span>
-<span class="normal"><a href="#__codelineno-0-2034">2034</a></span>
-<span class="normal"><a href="#__codelineno-0-2035">2035</a></span>
-<span class="normal"><a href="#__codelineno-0-2036">2036</a></span>
-<span class="normal"><a href="#__codelineno-0-2037">2037</a></span>
-<span class="normal"><a href="#__codelineno-0-2038">2038</a></span>
-<span class="normal"><a href="#__codelineno-0-2039">2039</a></span>
-<span class="normal"><a href="#__codelineno-0-2040">2040</a></span>
-<span class="normal"><a href="#__codelineno-0-2041">2041</a></span>
-<span class="normal"><a href="#__codelineno-0-2042">2042</a></span>
-<span class="normal"><a href="#__codelineno-0-2043">2043</a></span>
-<span class="normal"><a href="#__codelineno-0-2044">2044</a></span>
-<span class="normal"><a href="#__codelineno-0-2045">2045</a></span>
-<span class="normal"><a href="#__codelineno-0-2046">2046</a></span>
-<span class="normal"><a href="#__codelineno-0-2047">2047</a></span>
-<span class="normal"><a href="#__codelineno-0-2048">2048</a></span>
-<span class="normal"><a href="#__codelineno-0-2049">2049</a></span>
-<span class="normal"><a href="#__codelineno-0-2050">2050</a></span>
-<span class="normal"><a href="#__codelineno-0-2051">2051</a></span>
-<span class="normal"><a href="#__codelineno-0-2052">2052</a></span>
-<span class="normal"><a href="#__codelineno-0-2053">2053</a></span>
-<span class="normal"><a href="#__codelineno-0-2054">2054</a></span>
-<span class="normal"><a href="#__codelineno-0-2055">2055</a></span>
-<span class="normal"><a href="#__codelineno-0-2056">2056</a></span>
-<span class="normal"><a href="#__codelineno-0-2057">2057</a></span>
-<span class="normal"><a href="#__codelineno-0-2058">2058</a></span>
-<span class="normal"><a href="#__codelineno-0-2059">2059</a></span>
-<span class="normal"><a href="#__codelineno-0-2060">2060</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2060">2060</a></span>
 <span class="normal"><a href="#__codelineno-0-2061">2061</a></span>
 <span class="normal"><a href="#__codelineno-0-2062">2062</a></span>
 <span class="normal"><a href="#__codelineno-0-2063">2063</a></span>
@@ -25729,46 +25759,76 @@ level.</p>
 <span class="normal"><a href="#__codelineno-0-2066">2066</a></span>
 <span class="normal"><a href="#__codelineno-0-2067">2067</a></span>
 <span class="normal"><a href="#__codelineno-0-2068">2068</a></span>
-<span class="normal"><a href="#__codelineno-0-2069">2069</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2030" name="__codelineno-0-2030"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2031" name="__codelineno-0-2031"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return one leaf (variable / band / asset) of a dataset.</span>
-<a id="__codelineno-0-2032" name="__codelineno-0-2032"></a>
-<a id="__codelineno-0-2033" name="__codelineno-0-2033"></a><span class="sd">    Shared two-argument contract for the two-level catalogs: a leaf</span>
-<a id="__codelineno-0-2034" name="__codelineno-0-2034"></a><span class="sd">    is addressed by its `(dataset_key, variable_name)` pair, because</span>
-<a id="__codelineno-0-2035" name="__codelineno-0-2035"></a><span class="sd">    the same leaf code can appear under more than one dataset (e.g.</span>
-<a id="__codelineno-0-2036" name="__codelineno-0-2036"></a><span class="sd">    `&quot;2m-temperature&quot;` lives under several CDS datasets). Concrete</span>
-<a id="__codelineno-0-2037" name="__codelineno-0-2037"></a><span class="sd">    overrides return their typed leaf row and raise `ValueError`</span>
-<a id="__codelineno-0-2038" name="__codelineno-0-2038"></a><span class="sd">    (with a did-you-mean hint) on an unknown key:</span>
-<a id="__codelineno-0-2039" name="__codelineno-0-2039"></a>
-<a id="__codelineno-0-2040" name="__codelineno-0-2040"></a><span class="sd">    * chc / ecmwf / cmems — return a `Variable`.</span>
-<a id="__codelineno-0-2041" name="__codelineno-0-2041"></a><span class="sd">    * gee — return a `Band` (also exposed as `get_band`).</span>
-<a id="__codelineno-0-2042" name="__codelineno-0-2042"></a><span class="sd">    * firms — return a `SensorColumn` (also exposed as `get_column`).</span>
-<a id="__codelineno-0-2043" name="__codelineno-0-2043"></a><span class="sd">    * tropycal — return a `TrackField` (also exposed as `get_field`).</span>
-<a id="__codelineno-0-2044" name="__codelineno-0-2044"></a>
-<a id="__codelineno-0-2045" name="__codelineno-0-2045"></a><span class="sd">    Single-level catalogs (where one row *is* the leaf — fdsn, gdacs,</span>
-<a id="__codelineno-0-2046" name="__codelineno-0-2046"></a><span class="sd">    radar, openaq, overture, usgs_water) do not implement this; their</span>
-<a id="__codelineno-0-2047" name="__codelineno-0-2047"></a><span class="sd">    rows are addressed directly with :meth:`get_dataset` / `[key]`.</span>
-<a id="__codelineno-0-2048" name="__codelineno-0-2048"></a>
-<a id="__codelineno-0-2049" name="__codelineno-0-2049"></a><span class="sd">    Note:</span>
-<a id="__codelineno-0-2050" name="__codelineno-0-2050"></a><span class="sd">        This supersedes the former single-argument</span>
-<a id="__codelineno-0-2051" name="__codelineno-0-2051"></a><span class="sd">        `get_variable(var_name)`, which returned `self.catalog.get(var_name)`.</span>
-<a id="__codelineno-0-2052" name="__codelineno-0-2052"></a><span class="sd">        External callers/subclassers that relied on the one-argument</span>
-<a id="__codelineno-0-2053" name="__codelineno-0-2053"></a><span class="sd">        form must pass the parent `dataset_key` as well.</span>
-<a id="__codelineno-0-2054" name="__codelineno-0-2054"></a>
-<a id="__codelineno-0-2055" name="__codelineno-0-2055"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-2056" name="__codelineno-0-2056"></a><span class="sd">        dataset_key: The parent dataset / collection key.</span>
-<a id="__codelineno-0-2057" name="__codelineno-0-2057"></a><span class="sd">        variable_name: The leaf code within that dataset.</span>
-<a id="__codelineno-0-2058" name="__codelineno-0-2058"></a>
-<a id="__codelineno-0-2059" name="__codelineno-0-2059"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-2060" name="__codelineno-0-2060"></a><span class="sd">        The backend-specific leaf row.</span>
-<a id="__codelineno-0-2061" name="__codelineno-0-2061"></a>
-<a id="__codelineno-0-2062" name="__codelineno-0-2062"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-2063" name="__codelineno-0-2063"></a><span class="sd">        NotImplementedError: If the backend has no per-dataset leaf</span>
-<a id="__codelineno-0-2064" name="__codelineno-0-2064"></a><span class="sd">            level.</span>
-<a id="__codelineno-0-2065" name="__codelineno-0-2065"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2066" name="__codelineno-0-2066"></a>    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-2067" name="__codelineno-0-2067"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no per-dataset variable level; &quot;</span>
-<a id="__codelineno-0-2068" name="__codelineno-0-2068"></a>        <span class="s2">&quot;address its rows with get_dataset() / [key].&quot;</span>
-<a id="__codelineno-0-2069" name="__codelineno-0-2069"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-2069">2069</a></span>
+<span class="normal"><a href="#__codelineno-0-2070">2070</a></span>
+<span class="normal"><a href="#__codelineno-0-2071">2071</a></span>
+<span class="normal"><a href="#__codelineno-0-2072">2072</a></span>
+<span class="normal"><a href="#__codelineno-0-2073">2073</a></span>
+<span class="normal"><a href="#__codelineno-0-2074">2074</a></span>
+<span class="normal"><a href="#__codelineno-0-2075">2075</a></span>
+<span class="normal"><a href="#__codelineno-0-2076">2076</a></span>
+<span class="normal"><a href="#__codelineno-0-2077">2077</a></span>
+<span class="normal"><a href="#__codelineno-0-2078">2078</a></span>
+<span class="normal"><a href="#__codelineno-0-2079">2079</a></span>
+<span class="normal"><a href="#__codelineno-0-2080">2080</a></span>
+<span class="normal"><a href="#__codelineno-0-2081">2081</a></span>
+<span class="normal"><a href="#__codelineno-0-2082">2082</a></span>
+<span class="normal"><a href="#__codelineno-0-2083">2083</a></span>
+<span class="normal"><a href="#__codelineno-0-2084">2084</a></span>
+<span class="normal"><a href="#__codelineno-0-2085">2085</a></span>
+<span class="normal"><a href="#__codelineno-0-2086">2086</a></span>
+<span class="normal"><a href="#__codelineno-0-2087">2087</a></span>
+<span class="normal"><a href="#__codelineno-0-2088">2088</a></span>
+<span class="normal"><a href="#__codelineno-0-2089">2089</a></span>
+<span class="normal"><a href="#__codelineno-0-2090">2090</a></span>
+<span class="normal"><a href="#__codelineno-0-2091">2091</a></span>
+<span class="normal"><a href="#__codelineno-0-2092">2092</a></span>
+<span class="normal"><a href="#__codelineno-0-2093">2093</a></span>
+<span class="normal"><a href="#__codelineno-0-2094">2094</a></span>
+<span class="normal"><a href="#__codelineno-0-2095">2095</a></span>
+<span class="normal"><a href="#__codelineno-0-2096">2096</a></span>
+<span class="normal"><a href="#__codelineno-0-2097">2097</a></span>
+<span class="normal"><a href="#__codelineno-0-2098">2098</a></span>
+<span class="normal"><a href="#__codelineno-0-2099">2099</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2060" name="__codelineno-0-2060"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2061" name="__codelineno-0-2061"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return one leaf (variable / band / asset) of a dataset.</span>
+<a id="__codelineno-0-2062" name="__codelineno-0-2062"></a>
+<a id="__codelineno-0-2063" name="__codelineno-0-2063"></a><span class="sd">    Shared two-argument contract for the two-level catalogs: a leaf</span>
+<a id="__codelineno-0-2064" name="__codelineno-0-2064"></a><span class="sd">    is addressed by its `(dataset_key, variable_name)` pair, because</span>
+<a id="__codelineno-0-2065" name="__codelineno-0-2065"></a><span class="sd">    the same leaf code can appear under more than one dataset (e.g.</span>
+<a id="__codelineno-0-2066" name="__codelineno-0-2066"></a><span class="sd">    `&quot;2m-temperature&quot;` lives under several CDS datasets). Concrete</span>
+<a id="__codelineno-0-2067" name="__codelineno-0-2067"></a><span class="sd">    overrides return their typed leaf row and raise `ValueError`</span>
+<a id="__codelineno-0-2068" name="__codelineno-0-2068"></a><span class="sd">    (with a did-you-mean hint) on an unknown key:</span>
+<a id="__codelineno-0-2069" name="__codelineno-0-2069"></a>
+<a id="__codelineno-0-2070" name="__codelineno-0-2070"></a><span class="sd">    * chc / ecmwf / cmems — return a `Variable`.</span>
+<a id="__codelineno-0-2071" name="__codelineno-0-2071"></a><span class="sd">    * gee — return a `Band` (also exposed as `get_band`).</span>
+<a id="__codelineno-0-2072" name="__codelineno-0-2072"></a><span class="sd">    * firms — return a `SensorColumn` (also exposed as `get_column`).</span>
+<a id="__codelineno-0-2073" name="__codelineno-0-2073"></a><span class="sd">    * tropycal — return a `TrackField` (also exposed as `get_field`).</span>
+<a id="__codelineno-0-2074" name="__codelineno-0-2074"></a>
+<a id="__codelineno-0-2075" name="__codelineno-0-2075"></a><span class="sd">    Single-level catalogs (where one row *is* the leaf — fdsn, gdacs,</span>
+<a id="__codelineno-0-2076" name="__codelineno-0-2076"></a><span class="sd">    radar, openaq, overture, usgs_water) do not implement this; their</span>
+<a id="__codelineno-0-2077" name="__codelineno-0-2077"></a><span class="sd">    rows are addressed directly with :meth:`get_dataset` / `[key]`.</span>
+<a id="__codelineno-0-2078" name="__codelineno-0-2078"></a>
+<a id="__codelineno-0-2079" name="__codelineno-0-2079"></a><span class="sd">    Note:</span>
+<a id="__codelineno-0-2080" name="__codelineno-0-2080"></a><span class="sd">        This supersedes the former single-argument</span>
+<a id="__codelineno-0-2081" name="__codelineno-0-2081"></a><span class="sd">        `get_variable(var_name)`, which returned `self.catalog.get(var_name)`.</span>
+<a id="__codelineno-0-2082" name="__codelineno-0-2082"></a><span class="sd">        External callers/subclassers that relied on the one-argument</span>
+<a id="__codelineno-0-2083" name="__codelineno-0-2083"></a><span class="sd">        form must pass the parent `dataset_key` as well.</span>
+<a id="__codelineno-0-2084" name="__codelineno-0-2084"></a>
+<a id="__codelineno-0-2085" name="__codelineno-0-2085"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-2086" name="__codelineno-0-2086"></a><span class="sd">        dataset_key: The parent dataset / collection key.</span>
+<a id="__codelineno-0-2087" name="__codelineno-0-2087"></a><span class="sd">        variable_name: The leaf code within that dataset.</span>
+<a id="__codelineno-0-2088" name="__codelineno-0-2088"></a>
+<a id="__codelineno-0-2089" name="__codelineno-0-2089"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-2090" name="__codelineno-0-2090"></a><span class="sd">        The backend-specific leaf row.</span>
+<a id="__codelineno-0-2091" name="__codelineno-0-2091"></a>
+<a id="__codelineno-0-2092" name="__codelineno-0-2092"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-2093" name="__codelineno-0-2093"></a><span class="sd">        NotImplementedError: If the backend has no per-dataset leaf</span>
+<a id="__codelineno-0-2094" name="__codelineno-0-2094"></a><span class="sd">            level.</span>
+<a id="__codelineno-0-2095" name="__codelineno-0-2095"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2096" name="__codelineno-0-2096"></a>    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-2097" name="__codelineno-0-2097"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no per-dataset variable level; &quot;</span>
+<a id="__codelineno-0-2098" name="__codelineno-0-2098"></a>        <span class="s2">&quot;address its rows with get_dataset() / [key].&quot;</span>
+<a id="__codelineno-0-2099" name="__codelineno-0-2099"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25786,30 +25846,95 @@ level.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Hook run after pydantic validation.</p>
-<p>Kept as an overridable no-op so subclasses can call
-<code>super().model_post_init(__context)</code> first and keep their own
-post-init wiring in one place. :attr:<code>catalog</code> is a property now, so
-nothing has to be populated here.</p>
+        <p>Fill an empty catalog from disk, then run the subclass's wiring.</p>
+<p><code>Catalog()</code> with no arguments reads from disk; passing <code>datasets=...</code>
+skips the read, which is what lets a test build a catalog from literals.
+A field the caller already supplied is never overwritten, so a partial
+construction (<code>datasets=</code> but no <code>available_datasets=</code>) still gets the
+rest filled in.</p>
+<p>This used to be written out in all 48 provider catalogs. The bodies
+differed only in the loader call, and the surrounding rule had drifted —
+some defaulted <code>available_datasets</code>, some did not — which is the kind of
+difference nobody notices until two catalogs disagree.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>__context</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Opaque context from the pydantic v2 lifecycle, forwarded
+to the base unchanged.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2009">2009</a></span>
-<span class="normal"><a href="#__codelineno-0-2010">2010</a></span>
-<span class="normal"><a href="#__codelineno-0-2011">2011</a></span>
-<span class="normal"><a href="#__codelineno-0-2012">2012</a></span>
-<span class="normal"><a href="#__codelineno-0-2013">2013</a></span>
-<span class="normal"><a href="#__codelineno-0-2014">2014</a></span>
-<span class="normal"><a href="#__codelineno-0-2015">2015</a></span>
-<span class="normal"><a href="#__codelineno-0-2016">2016</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2009" name="__codelineno-0-2009"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-2010" name="__codelineno-0-2010"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Hook run after pydantic validation.</span>
-<a id="__codelineno-0-2011" name="__codelineno-0-2011"></a>
-<a id="__codelineno-0-2012" name="__codelineno-0-2012"></a><span class="sd">    Kept as an overridable no-op so subclasses can call</span>
-<a id="__codelineno-0-2013" name="__codelineno-0-2013"></a><span class="sd">    `super().model_post_init(__context)` first and keep their own</span>
-<a id="__codelineno-0-2014" name="__codelineno-0-2014"></a><span class="sd">    post-init wiring in one place. :attr:`catalog` is a property now, so</span>
-<a id="__codelineno-0-2015" name="__codelineno-0-2015"></a><span class="sd">    nothing has to be populated here.</span>
-<a id="__codelineno-0-2016" name="__codelineno-0-2016"></a><span class="sd">    &quot;&quot;&quot;</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2025">2025</a></span>
+<span class="normal"><a href="#__codelineno-0-2026">2026</a></span>
+<span class="normal"><a href="#__codelineno-0-2027">2027</a></span>
+<span class="normal"><a href="#__codelineno-0-2028">2028</a></span>
+<span class="normal"><a href="#__codelineno-0-2029">2029</a></span>
+<span class="normal"><a href="#__codelineno-0-2030">2030</a></span>
+<span class="normal"><a href="#__codelineno-0-2031">2031</a></span>
+<span class="normal"><a href="#__codelineno-0-2032">2032</a></span>
+<span class="normal"><a href="#__codelineno-0-2033">2033</a></span>
+<span class="normal"><a href="#__codelineno-0-2034">2034</a></span>
+<span class="normal"><a href="#__codelineno-0-2035">2035</a></span>
+<span class="normal"><a href="#__codelineno-0-2036">2036</a></span>
+<span class="normal"><a href="#__codelineno-0-2037">2037</a></span>
+<span class="normal"><a href="#__codelineno-0-2038">2038</a></span>
+<span class="normal"><a href="#__codelineno-0-2039">2039</a></span>
+<span class="normal"><a href="#__codelineno-0-2040">2040</a></span>
+<span class="normal"><a href="#__codelineno-0-2041">2041</a></span>
+<span class="normal"><a href="#__codelineno-0-2042">2042</a></span>
+<span class="normal"><a href="#__codelineno-0-2043">2043</a></span>
+<span class="normal"><a href="#__codelineno-0-2044">2044</a></span>
+<span class="normal"><a href="#__codelineno-0-2045">2045</a></span>
+<span class="normal"><a href="#__codelineno-0-2046">2046</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2025" name="__codelineno-0-2025"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-2026" name="__codelineno-0-2026"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fill an empty catalog from disk, then run the subclass&#39;s wiring.</span>
+<a id="__codelineno-0-2027" name="__codelineno-0-2027"></a>
+<a id="__codelineno-0-2028" name="__codelineno-0-2028"></a><span class="sd">    `Catalog()` with no arguments reads from disk; passing `datasets=...`</span>
+<a id="__codelineno-0-2029" name="__codelineno-0-2029"></a><span class="sd">    skips the read, which is what lets a test build a catalog from literals.</span>
+<a id="__codelineno-0-2030" name="__codelineno-0-2030"></a><span class="sd">    A field the caller already supplied is never overwritten, so a partial</span>
+<a id="__codelineno-0-2031" name="__codelineno-0-2031"></a><span class="sd">    construction (`datasets=` but no `available_datasets=`) still gets the</span>
+<a id="__codelineno-0-2032" name="__codelineno-0-2032"></a><span class="sd">    rest filled in.</span>
+<a id="__codelineno-0-2033" name="__codelineno-0-2033"></a>
+<a id="__codelineno-0-2034" name="__codelineno-0-2034"></a><span class="sd">    This used to be written out in all 48 provider catalogs. The bodies</span>
+<a id="__codelineno-0-2035" name="__codelineno-0-2035"></a><span class="sd">    differed only in the loader call, and the surrounding rule had drifted —</span>
+<a id="__codelineno-0-2036" name="__codelineno-0-2036"></a><span class="sd">    some defaulted `available_datasets`, some did not — which is the kind of</span>
+<a id="__codelineno-0-2037" name="__codelineno-0-2037"></a><span class="sd">    difference nobody notices until two catalogs disagree.</span>
+<a id="__codelineno-0-2038" name="__codelineno-0-2038"></a>
+<a id="__codelineno-0-2039" name="__codelineno-0-2039"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-2040" name="__codelineno-0-2040"></a><span class="sd">        __context: Opaque context from the pydantic v2 lifecycle, forwarded</span>
+<a id="__codelineno-0-2041" name="__codelineno-0-2041"></a><span class="sd">            to the base unchanged.</span>
+<a id="__codelineno-0-2042" name="__codelineno-0-2042"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2043" name="__codelineno-0-2043"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-2044" name="__codelineno-0-2044"></a>        <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_autoload</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-2045" name="__codelineno-0-2045"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-0-2046" name="__codelineno-0-2046"></a>                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25966,37 +26091,7 @@ endpoint).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2157">2157</a></span>
-<span class="normal"><a href="#__codelineno-0-2158">2158</a></span>
-<span class="normal"><a href="#__codelineno-0-2159">2159</a></span>
-<span class="normal"><a href="#__codelineno-0-2160">2160</a></span>
-<span class="normal"><a href="#__codelineno-0-2161">2161</a></span>
-<span class="normal"><a href="#__codelineno-0-2162">2162</a></span>
-<span class="normal"><a href="#__codelineno-0-2163">2163</a></span>
-<span class="normal"><a href="#__codelineno-0-2164">2164</a></span>
-<span class="normal"><a href="#__codelineno-0-2165">2165</a></span>
-<span class="normal"><a href="#__codelineno-0-2166">2166</a></span>
-<span class="normal"><a href="#__codelineno-0-2167">2167</a></span>
-<span class="normal"><a href="#__codelineno-0-2168">2168</a></span>
-<span class="normal"><a href="#__codelineno-0-2169">2169</a></span>
-<span class="normal"><a href="#__codelineno-0-2170">2170</a></span>
-<span class="normal"><a href="#__codelineno-0-2171">2171</a></span>
-<span class="normal"><a href="#__codelineno-0-2172">2172</a></span>
-<span class="normal"><a href="#__codelineno-0-2173">2173</a></span>
-<span class="normal"><a href="#__codelineno-0-2174">2174</a></span>
-<span class="normal"><a href="#__codelineno-0-2175">2175</a></span>
-<span class="normal"><a href="#__codelineno-0-2176">2176</a></span>
-<span class="normal"><a href="#__codelineno-0-2177">2177</a></span>
-<span class="normal"><a href="#__codelineno-0-2178">2178</a></span>
-<span class="normal"><a href="#__codelineno-0-2179">2179</a></span>
-<span class="normal"><a href="#__codelineno-0-2180">2180</a></span>
-<span class="normal"><a href="#__codelineno-0-2181">2181</a></span>
-<span class="normal"><a href="#__codelineno-0-2182">2182</a></span>
-<span class="normal"><a href="#__codelineno-0-2183">2183</a></span>
-<span class="normal"><a href="#__codelineno-0-2184">2184</a></span>
-<span class="normal"><a href="#__codelineno-0-2185">2185</a></span>
-<span class="normal"><a href="#__codelineno-0-2186">2186</a></span>
-<span class="normal"><a href="#__codelineno-0-2187">2187</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-2187">2187</a></span>
 <span class="normal"><a href="#__codelineno-0-2188">2188</a></span>
 <span class="normal"><a href="#__codelineno-0-2189">2189</a></span>
 <span class="normal"><a href="#__codelineno-0-2190">2190</a></span>
@@ -26009,50 +26104,80 @@ endpoint).</p>
 <span class="normal"><a href="#__codelineno-0-2197">2197</a></span>
 <span class="normal"><a href="#__codelineno-0-2198">2198</a></span>
 <span class="normal"><a href="#__codelineno-0-2199">2199</a></span>
-<span class="normal"><a href="#__codelineno-0-2200">2200</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2157" name="__codelineno-0-2157"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<a id="__codelineno-0-2158" name="__codelineno-0-2158"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Map a user-facing key to the concrete thing a request needs.</span>
-<a id="__codelineno-0-2159" name="__codelineno-0-2159"></a>
-<a id="__codelineno-0-2160" name="__codelineno-0-2160"></a><span class="sd">    Shared convention for every backend that implements a resolve</span>
-<a id="__codelineno-0-2161" name="__codelineno-0-2161"></a><span class="sd">    step: take a *logical* catalog key (a friendly name, collection</span>
-<a id="__codelineno-0-2162" name="__codelineno-0-2162"></a><span class="sd">    key, or model key) and return the backend-specific value the</span>
-<a id="__codelineno-0-2163" name="__codelineno-0-2163"></a><span class="sd">    download path consumes. The return type and any extra</span>
-<a id="__codelineno-0-2164" name="__codelineno-0-2164"></a><span class="sd">    positional / keyword arguments are backend-specific by</span>
-<a id="__codelineno-0-2165" name="__codelineno-0-2165"></a><span class="sd">    necessity — the catalogs resolve to different things — so this</span>
-<a id="__codelineno-0-2166" name="__codelineno-0-2166"></a><span class="sd">    base method only fixes the *verb*, not the signature. The</span>
-<a id="__codelineno-0-2167" name="__codelineno-0-2167"></a><span class="sd">    concrete overrides:</span>
-<a id="__codelineno-0-2168" name="__codelineno-0-2168"></a>
-<a id="__codelineno-0-2169" name="__codelineno-0-2169"></a><span class="sd">    * `nwp.resolve(model_key)` / `usgs_water.resolve(code_or_name)`</span>
-<a id="__codelineno-0-2170" name="__codelineno-0-2170"></a><span class="sd">      — return a model key / 5-digit parameter code (`str`).</span>
-<a id="__codelineno-0-2171" name="__codelineno-0-2171"></a><span class="sd">    * `stac.resolve(endpoint, collection_key)` — return the upstream</span>
-<a id="__codelineno-0-2172" name="__codelineno-0-2172"></a><span class="sd">      collection id for that endpoint (`str`).</span>
-<a id="__codelineno-0-2173" name="__codelineno-0-2173"></a><span class="sd">    * `openeo.resolve(key)` / `sentinel_hub.resolve(key)` — return a</span>
-<a id="__codelineno-0-2174" name="__codelineno-0-2174"></a><span class="sd">      normalised request object (a `ResolvedGraph` / `ResolvedRequest`)</span>
-<a id="__codelineno-0-2175" name="__codelineno-0-2175"></a><span class="sd">      covering both plain collections and recipes.</span>
-<a id="__codelineno-0-2176" name="__codelineno-0-2176"></a><span class="sd">    * `earthdata.resolve(key, daac=None)` /</span>
-<a id="__codelineno-0-2177" name="__codelineno-0-2177"></a><span class="sd">      `eumetsat.resolve(key, group=None)` — return the dataset row,</span>
-<a id="__codelineno-0-2178" name="__codelineno-0-2178"></a><span class="sd">      with an optional second argument to disambiguate a key shared</span>
-<a id="__codelineno-0-2179" name="__codelineno-0-2179"></a><span class="sd">      across DAACs / mission groups.</span>
-<a id="__codelineno-0-2180" name="__codelineno-0-2180"></a>
-<a id="__codelineno-0-2181" name="__codelineno-0-2181"></a><span class="sd">    Backends without a resolve step address their catalog directly</span>
-<a id="__codelineno-0-2182" name="__codelineno-0-2182"></a><span class="sd">    through :meth:`get_dataset` / `__getitem__`.</span>
-<a id="__codelineno-0-2183" name="__codelineno-0-2183"></a>
-<a id="__codelineno-0-2184" name="__codelineno-0-2184"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-2185" name="__codelineno-0-2185"></a><span class="sd">        key: The logical catalog key to resolve.</span>
-<a id="__codelineno-0-2186" name="__codelineno-0-2186"></a><span class="sd">        *args: Backend-specific positional arguments (e.g. the STAC</span>
-<a id="__codelineno-0-2187" name="__codelineno-0-2187"></a><span class="sd">            endpoint).</span>
-<a id="__codelineno-0-2188" name="__codelineno-0-2188"></a><span class="sd">        **kwargs: Backend-specific keyword arguments (e.g.</span>
-<a id="__codelineno-0-2189" name="__codelineno-0-2189"></a><span class="sd">            `daac=` / `group=`).</span>
-<a id="__codelineno-0-2190" name="__codelineno-0-2190"></a>
-<a id="__codelineno-0-2191" name="__codelineno-0-2191"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-2192" name="__codelineno-0-2192"></a><span class="sd">        The backend-specific resolved value (see the override list).</span>
-<a id="__codelineno-0-2193" name="__codelineno-0-2193"></a>
-<a id="__codelineno-0-2194" name="__codelineno-0-2194"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-2195" name="__codelineno-0-2195"></a><span class="sd">        NotImplementedError: If the backend has no resolve step.</span>
-<a id="__codelineno-0-2196" name="__codelineno-0-2196"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-2197" name="__codelineno-0-2197"></a>    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-<a id="__codelineno-0-2198" name="__codelineno-0-2198"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no resolve() step; address its &quot;</span>
-<a id="__codelineno-0-2199" name="__codelineno-0-2199"></a>        <span class="s2">&quot;catalog with get_dataset() / [key] instead.&quot;</span>
-<a id="__codelineno-0-2200" name="__codelineno-0-2200"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-2200">2200</a></span>
+<span class="normal"><a href="#__codelineno-0-2201">2201</a></span>
+<span class="normal"><a href="#__codelineno-0-2202">2202</a></span>
+<span class="normal"><a href="#__codelineno-0-2203">2203</a></span>
+<span class="normal"><a href="#__codelineno-0-2204">2204</a></span>
+<span class="normal"><a href="#__codelineno-0-2205">2205</a></span>
+<span class="normal"><a href="#__codelineno-0-2206">2206</a></span>
+<span class="normal"><a href="#__codelineno-0-2207">2207</a></span>
+<span class="normal"><a href="#__codelineno-0-2208">2208</a></span>
+<span class="normal"><a href="#__codelineno-0-2209">2209</a></span>
+<span class="normal"><a href="#__codelineno-0-2210">2210</a></span>
+<span class="normal"><a href="#__codelineno-0-2211">2211</a></span>
+<span class="normal"><a href="#__codelineno-0-2212">2212</a></span>
+<span class="normal"><a href="#__codelineno-0-2213">2213</a></span>
+<span class="normal"><a href="#__codelineno-0-2214">2214</a></span>
+<span class="normal"><a href="#__codelineno-0-2215">2215</a></span>
+<span class="normal"><a href="#__codelineno-0-2216">2216</a></span>
+<span class="normal"><a href="#__codelineno-0-2217">2217</a></span>
+<span class="normal"><a href="#__codelineno-0-2218">2218</a></span>
+<span class="normal"><a href="#__codelineno-0-2219">2219</a></span>
+<span class="normal"><a href="#__codelineno-0-2220">2220</a></span>
+<span class="normal"><a href="#__codelineno-0-2221">2221</a></span>
+<span class="normal"><a href="#__codelineno-0-2222">2222</a></span>
+<span class="normal"><a href="#__codelineno-0-2223">2223</a></span>
+<span class="normal"><a href="#__codelineno-0-2224">2224</a></span>
+<span class="normal"><a href="#__codelineno-0-2225">2225</a></span>
+<span class="normal"><a href="#__codelineno-0-2226">2226</a></span>
+<span class="normal"><a href="#__codelineno-0-2227">2227</a></span>
+<span class="normal"><a href="#__codelineno-0-2228">2228</a></span>
+<span class="normal"><a href="#__codelineno-0-2229">2229</a></span>
+<span class="normal"><a href="#__codelineno-0-2230">2230</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-2187" name="__codelineno-0-2187"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<a id="__codelineno-0-2188" name="__codelineno-0-2188"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Map a user-facing key to the concrete thing a request needs.</span>
+<a id="__codelineno-0-2189" name="__codelineno-0-2189"></a>
+<a id="__codelineno-0-2190" name="__codelineno-0-2190"></a><span class="sd">    Shared convention for every backend that implements a resolve</span>
+<a id="__codelineno-0-2191" name="__codelineno-0-2191"></a><span class="sd">    step: take a *logical* catalog key (a friendly name, collection</span>
+<a id="__codelineno-0-2192" name="__codelineno-0-2192"></a><span class="sd">    key, or model key) and return the backend-specific value the</span>
+<a id="__codelineno-0-2193" name="__codelineno-0-2193"></a><span class="sd">    download path consumes. The return type and any extra</span>
+<a id="__codelineno-0-2194" name="__codelineno-0-2194"></a><span class="sd">    positional / keyword arguments are backend-specific by</span>
+<a id="__codelineno-0-2195" name="__codelineno-0-2195"></a><span class="sd">    necessity — the catalogs resolve to different things — so this</span>
+<a id="__codelineno-0-2196" name="__codelineno-0-2196"></a><span class="sd">    base method only fixes the *verb*, not the signature. The</span>
+<a id="__codelineno-0-2197" name="__codelineno-0-2197"></a><span class="sd">    concrete overrides:</span>
+<a id="__codelineno-0-2198" name="__codelineno-0-2198"></a>
+<a id="__codelineno-0-2199" name="__codelineno-0-2199"></a><span class="sd">    * `nwp.resolve(model_key)` / `usgs_water.resolve(code_or_name)`</span>
+<a id="__codelineno-0-2200" name="__codelineno-0-2200"></a><span class="sd">      — return a model key / 5-digit parameter code (`str`).</span>
+<a id="__codelineno-0-2201" name="__codelineno-0-2201"></a><span class="sd">    * `stac.resolve(endpoint, collection_key)` — return the upstream</span>
+<a id="__codelineno-0-2202" name="__codelineno-0-2202"></a><span class="sd">      collection id for that endpoint (`str`).</span>
+<a id="__codelineno-0-2203" name="__codelineno-0-2203"></a><span class="sd">    * `openeo.resolve(key)` / `sentinel_hub.resolve(key)` — return a</span>
+<a id="__codelineno-0-2204" name="__codelineno-0-2204"></a><span class="sd">      normalised request object (a `ResolvedGraph` / `ResolvedRequest`)</span>
+<a id="__codelineno-0-2205" name="__codelineno-0-2205"></a><span class="sd">      covering both plain collections and recipes.</span>
+<a id="__codelineno-0-2206" name="__codelineno-0-2206"></a><span class="sd">    * `earthdata.resolve(key, daac=None)` /</span>
+<a id="__codelineno-0-2207" name="__codelineno-0-2207"></a><span class="sd">      `eumetsat.resolve(key, group=None)` — return the dataset row,</span>
+<a id="__codelineno-0-2208" name="__codelineno-0-2208"></a><span class="sd">      with an optional second argument to disambiguate a key shared</span>
+<a id="__codelineno-0-2209" name="__codelineno-0-2209"></a><span class="sd">      across DAACs / mission groups.</span>
+<a id="__codelineno-0-2210" name="__codelineno-0-2210"></a>
+<a id="__codelineno-0-2211" name="__codelineno-0-2211"></a><span class="sd">    Backends without a resolve step address their catalog directly</span>
+<a id="__codelineno-0-2212" name="__codelineno-0-2212"></a><span class="sd">    through :meth:`get_dataset` / `__getitem__`.</span>
+<a id="__codelineno-0-2213" name="__codelineno-0-2213"></a>
+<a id="__codelineno-0-2214" name="__codelineno-0-2214"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-2215" name="__codelineno-0-2215"></a><span class="sd">        key: The logical catalog key to resolve.</span>
+<a id="__codelineno-0-2216" name="__codelineno-0-2216"></a><span class="sd">        *args: Backend-specific positional arguments (e.g. the STAC</span>
+<a id="__codelineno-0-2217" name="__codelineno-0-2217"></a><span class="sd">            endpoint).</span>
+<a id="__codelineno-0-2218" name="__codelineno-0-2218"></a><span class="sd">        **kwargs: Backend-specific keyword arguments (e.g.</span>
+<a id="__codelineno-0-2219" name="__codelineno-0-2219"></a><span class="sd">            `daac=` / `group=`).</span>
+<a id="__codelineno-0-2220" name="__codelineno-0-2220"></a>
+<a id="__codelineno-0-2221" name="__codelineno-0-2221"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-2222" name="__codelineno-0-2222"></a><span class="sd">        The backend-specific resolved value (see the override list).</span>
+<a id="__codelineno-0-2223" name="__codelineno-0-2223"></a>
+<a id="__codelineno-0-2224" name="__codelineno-0-2224"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-2225" name="__codelineno-0-2225"></a><span class="sd">        NotImplementedError: If the backend has no resolve step.</span>
+<a id="__codelineno-0-2226" name="__codelineno-0-2226"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-2227" name="__codelineno-0-2227"></a>    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+<a id="__codelineno-0-2228" name="__codelineno-0-2228"></a>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> has no resolve() step; address its &quot;</span>
+<a id="__codelineno-0-2229" name="__codelineno-0-2229"></a>        <span class="s2">&quot;catalog with get_dataset() / [key] instead.&quot;</span>
+<a id="__codelineno-0-2230" name="__codelineno-0-2230"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

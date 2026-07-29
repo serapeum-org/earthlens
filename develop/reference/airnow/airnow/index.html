@@ -5693,17 +5693,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#earthlens.airnow.Catalog.model_post_init" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        model_post_init
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -5854,17 +5843,6 @@
     <span class="md-ellipsis">
       
         load
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.airnow.catalog.Catalog.model_post_init" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        model_post_init
       
     </span>
   </a>
@@ -19712,17 +19690,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#earthlens.airnow.Catalog.model_post_init" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        model_post_init
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -19873,17 +19840,6 @@
     <span class="md-ellipsis">
       
         load
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.airnow.catalog.Catalog.model_post_init" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        model_post_init
       
     </span>
   </a>
@@ -22553,13 +22509,7 @@ loads and validates the YAML in one pass. Resolve a name with
 <span class="normal"><a href="#__codelineno-0-264">264</a></span>
 <span class="normal"><a href="#__codelineno-0-265">265</a></span>
 <span class="normal"><a href="#__codelineno-0-266">266</a></span>
-<span class="normal"><a href="#__codelineno-0-267">267</a></span>
-<span class="normal"><a href="#__codelineno-0-268">268</a></span>
-<span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span>
-<span class="normal"><a href="#__codelineno-0-271">271</a></span>
-<span class="normal"><a href="#__codelineno-0-272">272</a></span>
-<span class="normal"><a href="#__codelineno-0-273">273</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Pollutant catalog for the AirNow backend.</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    Reads the bundled `airnow_data_catalog.yaml` (shipped as package</span>
@@ -22625,92 +22575,86 @@ loads and validates the YAML in one pass. Resolve a name with
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no pollutants were supplied.</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH`; passing</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        `pollutants=...` (or `datasets=...`) skips the disk read (used in</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        tests).</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is missing,</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">                empty, or has a malformed pollutant row.</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the AirNow pollutant catalog from disk.</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">                `pollutants:` block, or a row fails `Pollutant` validation.</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="n">pollutants</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_pollutants</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;AirNow&quot;</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="p">)</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">pollutants</span><span class="p">))</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pollutant</span><span class="p">]:</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the pollutant map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the bundled pollutant catalog.</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">            dict[str, Any]: The `pollutants:` rows keyed by parameter name.</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span><span class="p">}</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the AirNow pollutant catalog from disk.</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">                `pollutants:` block, or a row fails `Pollutant` validation.</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>        <span class="n">pollutants</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_pollutants</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;AirNow&quot;</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="p">)</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">pollutants</span><span class="p">))</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pollutant</span><span class="p">]:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the pollutant map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">            dict[str, Pollutant]: Same object as `datasets` /</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">                `pollutants`.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            dict[str, Pollutant]: Same object as `datasets` /</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">                `pollutants`.</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_pollutant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pollutant</span><span class="p">:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its `Pollutant` row.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown name.</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_pollutant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pollutant</span><span class="p">:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its `Pollutant` row.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            name: A user-facing pollutant name (`&quot;pm25&quot;`, `&quot;o3&quot;`).</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">            Pollutant: The matching dispatch row.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            name: A user-facing pollutant name (`&quot;pm25&quot;`, `&quot;o3&quot;`).</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            Pollutant: The matching dispatch row.</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ValueError: If `name` is not a known pollutant; the message</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                adds a did-you-mean hint.</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            ValueError: If `name` is not a known pollutant; the message</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                adds a did-you-mean hint.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">codes_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve names to their AirNow `parameters` codes, order-stable.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Each name contributes its `Pollutant.code`; duplicates are dropped</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        (first occurrence wins).</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">codes_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve names to their AirNow `parameters` codes, order-stable.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            names: User-facing pollutant names to resolve.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Each name contributes its `Pollutant.code`; duplicates are dropped</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        (first occurrence wins).</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            names: User-facing pollutant names to resolve.</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            list[str]: The AirNow codes for `names`, de-duplicated,</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">                order-stable.</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            ValueError: If any name is unknown (via `get_pollutant`).</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="n">codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pollutant</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="k">if</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>                <span class="n">codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>        <span class="k">return</span> <span class="n">codes</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            list[str]: The AirNow codes for `names`, de-duplicated,</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">                order-stable.</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            ValueError: If any name is unknown (via `get_pollutant`).</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="n">codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pollutant</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>            <span class="k">if</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>                <span class="n">codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">return</span> <span class="n">codes</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -22868,7 +22812,13 @@ order-stable.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/airnow/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-252">252</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span>
+<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
 <span class="normal"><a href="#__codelineno-0-253">253</a></span>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span>
@@ -22883,34 +22833,28 @@ order-stable.</p>
 <span class="normal"><a href="#__codelineno-0-264">264</a></span>
 <span class="normal"><a href="#__codelineno-0-265">265</a></span>
 <span class="normal"><a href="#__codelineno-0-266">266</a></span>
-<span class="normal"><a href="#__codelineno-0-267">267</a></span>
-<span class="normal"><a href="#__codelineno-0-268">268</a></span>
-<span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span>
-<span class="normal"><a href="#__codelineno-0-271">271</a></span>
-<span class="normal"><a href="#__codelineno-0-272">272</a></span>
-<span class="normal"><a href="#__codelineno-0-273">273</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="k">def</span><span class="w"> </span><span class="nf">codes_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve names to their AirNow `parameters` codes, order-stable.</span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="k">def</span><span class="w"> </span><span class="nf">codes_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve names to their AirNow `parameters` codes, order-stable.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Each name contributes its `Pollutant.code`; duplicates are dropped</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    (first occurrence wins).</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        names: User-facing pollutant names to resolve.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Each name contributes its `Pollutant.code`; duplicates are dropped</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    (first occurrence wins).</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        names: User-facing pollutant names to resolve.</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        list[str]: The AirNow codes for `names`, de-duplicated,</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            order-stable.</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        ValueError: If any name is unknown (via `get_pollutant`).</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="n">codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pollutant</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="k">if</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="n">codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>    <span class="k">return</span> <span class="n">codes</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        list[str]: The AirNow codes for `names`, de-duplicated,</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            order-stable.</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        ValueError: If any name is unknown (via `get_pollutant`).</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="n">codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pollutant</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="k">if</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>            <span class="n">codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="k">return</span> <span class="n">codes</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -22957,21 +22901,21 @@ order-stable.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/airnow/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span>
-<span class="normal"><a href="#__codelineno-0-226">226</a></span>
-<span class="normal"><a href="#__codelineno-0-227">227</a></span>
-<span class="normal"><a href="#__codelineno-0-228">228</a></span>
-<span class="normal"><a href="#__codelineno-0-229">229</a></span>
-<span class="normal"><a href="#__codelineno-0-230">230</a></span>
-<span class="normal"><a href="#__codelineno-0-231">231</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pollutant</span><span class="p">]:</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the pollutant map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        dict[str, Pollutant]: Same object as `datasets` /</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">            `pollutants`.</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-218">218</a></span>
+<span class="normal"><a href="#__codelineno-0-219">219</a></span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span>
+<span class="normal"><a href="#__codelineno-0-221">221</a></span>
+<span class="normal"><a href="#__codelineno-0-222">222</a></span>
+<span class="normal"><a href="#__codelineno-0-223">223</a></span>
+<span class="normal"><a href="#__codelineno-0-224">224</a></span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pollutant</span><span class="p">]:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the pollutant map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        dict[str, Pollutant]: Same object as `datasets` /</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">            `pollutants`.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23075,7 +23019,13 @@ adds a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/airnow/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-233">233</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span>
+<span class="normal"><a href="#__codelineno-0-232">232</a></span>
+<span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
 <span class="normal"><a href="#__codelineno-0-235">235</a></span>
 <span class="normal"><a href="#__codelineno-0-236">236</a></span>
@@ -23086,30 +23036,24 @@ adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-241">241</a></span>
 <span class="normal"><a href="#__codelineno-0-242">242</a></span>
 <span class="normal"><a href="#__codelineno-0-243">243</a></span>
-<span class="normal"><a href="#__codelineno-0-244">244</a></span>
-<span class="normal"><a href="#__codelineno-0-245">245</a></span>
-<span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span>
-<span class="normal"><a href="#__codelineno-0-248">248</a></span>
-<span class="normal"><a href="#__codelineno-0-249">249</a></span>
-<span class="normal"><a href="#__codelineno-0-250">250</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_pollutant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pollutant</span><span class="p">:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its `Pollutant` row.</span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_pollutant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pollutant</span><span class="p">:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its `Pollutant` row.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        name: A user-facing pollutant name (`&quot;pm25&quot;`, `&quot;o3&quot;`).</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        Pollutant: The matching dispatch row.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        name: A user-facing pollutant name (`&quot;pm25&quot;`, `&quot;o3&quot;`).</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Pollutant: The matching dispatch row.</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        ValueError: If `name` is not a known pollutant; the message</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            adds a did-you-mean hint.</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        ValueError: If `name` is not a known pollutant; the message</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            adds a did-you-mean hint.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23215,7 +23159,13 @@ module-level <code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/airnow/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-203">203</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-197">197</a></span>
+<span class="normal"><a href="#__codelineno-0-198">198</a></span>
+<span class="normal"><a href="#__codelineno-0-199">199</a></span>
+<span class="normal"><a href="#__codelineno-0-200">200</a></span>
+<span class="normal"><a href="#__codelineno-0-201">201</a></span>
+<span class="normal"><a href="#__codelineno-0-202">202</a></span>
+<span class="normal"><a href="#__codelineno-0-203">203</a></span>
 <span class="normal"><a href="#__codelineno-0-204">204</a></span>
 <span class="normal"><a href="#__codelineno-0-205">205</a></span>
 <span class="normal"><a href="#__codelineno-0-206">206</a></span>
@@ -23228,108 +23178,26 @@ module-level <code>CATALOG_PATH</code>.</p>
 <span class="normal"><a href="#__codelineno-0-213">213</a></span>
 <span class="normal"><a href="#__codelineno-0-214">214</a></span>
 <span class="normal"><a href="#__codelineno-0-215">215</a></span>
-<span class="normal"><a href="#__codelineno-0-216">216</a></span>
-<span class="normal"><a href="#__codelineno-0-217">217</a></span>
-<span class="normal"><a href="#__codelineno-0-218">218</a></span>
-<span class="normal"><a href="#__codelineno-0-219">219</a></span>
-<span class="normal"><a href="#__codelineno-0-220">220</a></span>
-<span class="normal"><a href="#__codelineno-0-221">221</a></span>
-<span class="normal"><a href="#__codelineno-0-222">222</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the AirNow pollutant catalog from disk.</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            `pollutants:` block, or a row fails `Pollutant` validation.</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="n">pollutants</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_pollutants</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;AirNow&quot;</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="p">)</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">pollutants</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.airnow.Catalog.model_post_init" class="doc doc-heading"><a href="#earthlens.airnow.Catalog.model_post_init" class="toclink">
-            <code class="highlight language-python"><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span></code>
-
-</a><a href="#earthlens.airnow.Catalog.model_post_init" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Auto-load the bundled catalog when no pollutants were supplied.</p>
-<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code>; passing
-<code>pollutants=...</code> (or <code>datasets=...</code>) skips the disk read (used in
-tests).</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="ValueError">ValueError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Propagated from <code>load</code> when the YAML is missing,
-empty, or has a malformed pollutant row.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/airnow/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-188">188</a></span>
-<span class="normal"><a href="#__codelineno-0-189">189</a></span>
-<span class="normal"><a href="#__codelineno-0-190">190</a></span>
-<span class="normal"><a href="#__codelineno-0-191">191</a></span>
-<span class="normal"><a href="#__codelineno-0-192">192</a></span>
-<span class="normal"><a href="#__codelineno-0-193">193</a></span>
-<span class="normal"><a href="#__codelineno-0-194">194</a></span>
-<span class="normal"><a href="#__codelineno-0-195">195</a></span>
-<span class="normal"><a href="#__codelineno-0-196">196</a></span>
-<span class="normal"><a href="#__codelineno-0-197">197</a></span>
-<span class="normal"><a href="#__codelineno-0-198">198</a></span>
-<span class="normal"><a href="#__codelineno-0-199">199</a></span>
-<span class="normal"><a href="#__codelineno-0-200">200</a></span>
-<span class="normal"><a href="#__codelineno-0-201">201</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no pollutants were supplied.</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH`; passing</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">    `pollutants=...` (or `datasets=...`) skips the disk read (used in</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">    tests).</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is missing,</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            empty, or has a malformed pollutant row.</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-216">216</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the AirNow pollutant catalog from disk.</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            `pollutants:` block, or a row fails `Pollutant` validation.</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>    <span class="n">pollutants</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_pollutants</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;AirNow&quot;</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="p">)</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">pollutants</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25258,13 +25126,7 @@ loads and validates the YAML in one pass. Resolve a name with
 <span class="normal"><a href="#__codelineno-0-264">264</a></span>
 <span class="normal"><a href="#__codelineno-0-265">265</a></span>
 <span class="normal"><a href="#__codelineno-0-266">266</a></span>
-<span class="normal"><a href="#__codelineno-0-267">267</a></span>
-<span class="normal"><a href="#__codelineno-0-268">268</a></span>
-<span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span>
-<span class="normal"><a href="#__codelineno-0-271">271</a></span>
-<span class="normal"><a href="#__codelineno-0-272">272</a></span>
-<span class="normal"><a href="#__codelineno-0-273">273</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Pollutant catalog for the AirNow backend.</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">    Reads the bundled `airnow_data_catalog.yaml` (shipped as package</span>
@@ -25330,92 +25192,86 @@ loads and validates the YAML in one pass. Resolve a name with
 <a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        &quot;&quot;&quot;</span>
 <a id="__codelineno-0-186" name="__codelineno-0-186"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-187" name="__codelineno-0-187"></a>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no pollutants were supplied.</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH`; passing</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        `pollutants=...` (or `datasets=...`) skips the disk read (used in</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        tests).</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is missing,</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">                empty, or has a malformed pollutant row.</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the AirNow pollutant catalog from disk.</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">                `pollutants:` block, or a row fails `Pollutant` validation.</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="n">pollutants</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_pollutants</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;AirNow&quot;</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="p">)</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">pollutants</span><span class="p">))</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pollutant</span><span class="p">]:</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the pollutant map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the bundled pollutant catalog.</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">            dict[str, Any]: The `pollutants:` rows keyed by parameter name.</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a>        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span><span class="p">}</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the AirNow pollutant catalog from disk.</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">                `pollutants:` block, or a row fails `Pollutant` validation.</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>        <span class="n">pollutants</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_pollutants</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;AirNow&quot;</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="p">)</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">pollutants</span><span class="p">))</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pollutant</span><span class="p">]:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the pollutant map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">            dict[str, Pollutant]: Same object as `datasets` /</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">                `pollutants`.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 <a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">            dict[str, Pollutant]: Same object as `datasets` /</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">                `pollutants`.</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_pollutant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pollutant</span><span class="p">:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its `Pollutant` row.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown name.</span>
 <a id="__codelineno-0-232" name="__codelineno-0-232"></a>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_pollutant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pollutant</span><span class="p">:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its `Pollutant` row.</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">            name: A user-facing pollutant name (`&quot;pm25&quot;`, `&quot;o3&quot;`).</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Thin wrapper over the inherited `get_dataset`, which raises a</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">            Pollutant: The matching dispatch row.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            name: A user-facing pollutant name (`&quot;pm25&quot;`, `&quot;o3&quot;`).</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            Pollutant: The matching dispatch row.</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ValueError: If `name` is not a known pollutant; the message</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                adds a did-you-mean hint.</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">            ValueError: If `name` is not a known pollutant; the message</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">                names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                adds a did-you-mean hint.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">codes_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve names to their AirNow `parameters` codes, order-stable.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">        Each name contributes its `Pollutant.code`; duplicates are dropped</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">        (first occurrence wins).</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">codes_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve names to their AirNow `parameters` codes, order-stable.</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            names: User-facing pollutant names to resolve.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Each name contributes its `Pollutant.code`; duplicates are dropped</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        (first occurrence wins).</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">            names: User-facing pollutant names to resolve.</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            list[str]: The AirNow codes for `names`, de-duplicated,</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">                order-stable.</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">            ValueError: If any name is unknown (via `get_pollutant`).</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="n">codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pollutant</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="k">if</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>                <span class="n">codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>        <span class="k">return</span> <span class="n">codes</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">            list[str]: The AirNow codes for `names`, de-duplicated,</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">                order-stable.</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">            ValueError: If any name is unknown (via `get_pollutant`).</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="n">codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>            <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pollutant</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>            <span class="k">if</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>                <span class="n">codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="k">return</span> <span class="n">codes</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -25573,7 +25429,13 @@ order-stable.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/airnow/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-252">252</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span>
+<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
 <span class="normal"><a href="#__codelineno-0-253">253</a></span>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
 <span class="normal"><a href="#__codelineno-0-255">255</a></span>
@@ -25588,34 +25450,28 @@ order-stable.</p>
 <span class="normal"><a href="#__codelineno-0-264">264</a></span>
 <span class="normal"><a href="#__codelineno-0-265">265</a></span>
 <span class="normal"><a href="#__codelineno-0-266">266</a></span>
-<span class="normal"><a href="#__codelineno-0-267">267</a></span>
-<span class="normal"><a href="#__codelineno-0-268">268</a></span>
-<span class="normal"><a href="#__codelineno-0-269">269</a></span>
-<span class="normal"><a href="#__codelineno-0-270">270</a></span>
-<span class="normal"><a href="#__codelineno-0-271">271</a></span>
-<span class="normal"><a href="#__codelineno-0-272">272</a></span>
-<span class="normal"><a href="#__codelineno-0-273">273</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="k">def</span><span class="w"> </span><span class="nf">codes_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve names to their AirNow `parameters` codes, order-stable.</span>
+<span class="normal"><a href="#__codelineno-0-267">267</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="k">def</span><span class="w"> </span><span class="nf">codes_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve names to their AirNow `parameters` codes, order-stable.</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    Each name contributes its `Pollutant.code`; duplicates are dropped</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">    (first occurrence wins).</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">        names: User-facing pollutant names to resolve.</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Each name contributes its `Pollutant.code`; duplicates are dropped</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">    (first occurrence wins).</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">        names: User-facing pollutant names to resolve.</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        list[str]: The AirNow codes for `names`, de-duplicated,</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">            order-stable.</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a><span class="sd">        ValueError: If any name is unknown (via `get_pollutant`).</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>    <span class="n">codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pollutant</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>        <span class="k">if</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="n">codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>    <span class="k">return</span> <span class="n">codes</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        list[str]: The AirNow codes for `names`, de-duplicated,</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">            order-stable.</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        ValueError: If any name is unknown (via `get_pollutant`).</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="n">codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="n">code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_pollutant</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">code</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="k">if</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">codes</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>            <span class="n">codes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>    <span class="k">return</span> <span class="n">codes</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25662,21 +25518,21 @@ order-stable.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/airnow/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span>
-<span class="normal"><a href="#__codelineno-0-226">226</a></span>
-<span class="normal"><a href="#__codelineno-0-227">227</a></span>
-<span class="normal"><a href="#__codelineno-0-228">228</a></span>
-<span class="normal"><a href="#__codelineno-0-229">229</a></span>
-<span class="normal"><a href="#__codelineno-0-230">230</a></span>
-<span class="normal"><a href="#__codelineno-0-231">231</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pollutant</span><span class="p">]:</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the pollutant map (satisfies the abstract contract).</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">        dict[str, Pollutant]: Same object as `datasets` /</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">            `pollutants`.</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-218">218</a></span>
+<span class="normal"><a href="#__codelineno-0-219">219</a></span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span>
+<span class="normal"><a href="#__codelineno-0-221">221</a></span>
+<span class="normal"><a href="#__codelineno-0-222">222</a></span>
+<span class="normal"><a href="#__codelineno-0-223">223</a></span>
+<span class="normal"><a href="#__codelineno-0-224">224</a></span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pollutant</span><span class="p">]:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the pollutant map (satisfies the abstract contract).</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a><span class="sd">        dict[str, Pollutant]: Same object as `datasets` /</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="sd">            `pollutants`.</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25780,7 +25636,13 @@ adds a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/airnow/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-233">233</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span>
+<span class="normal"><a href="#__codelineno-0-232">232</a></span>
+<span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
 <span class="normal"><a href="#__codelineno-0-235">235</a></span>
 <span class="normal"><a href="#__codelineno-0-236">236</a></span>
@@ -25791,30 +25653,24 @@ adds a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-241">241</a></span>
 <span class="normal"><a href="#__codelineno-0-242">242</a></span>
 <span class="normal"><a href="#__codelineno-0-243">243</a></span>
-<span class="normal"><a href="#__codelineno-0-244">244</a></span>
-<span class="normal"><a href="#__codelineno-0-245">245</a></span>
-<span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span>
-<span class="normal"><a href="#__codelineno-0-248">248</a></span>
-<span class="normal"><a href="#__codelineno-0-249">249</a></span>
-<span class="normal"><a href="#__codelineno-0-250">250</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_pollutant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pollutant</span><span class="p">:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its `Pollutant` row.</span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_pollutant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Pollutant</span><span class="p">:</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a pollutant name to its `Pollutant` row.</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        name: A user-facing pollutant name (`&quot;pm25&quot;`, `&quot;o3&quot;`).</span>
 <a id="__codelineno-0-235" name="__codelineno-0-235"></a>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Thin wrapper over the inherited `get_dataset`, which raises a</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    `ValueError` with a did-you-mean hint on an unknown name.</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        Pollutant: The matching dispatch row.</span>
 <a id="__codelineno-0-238" name="__codelineno-0-238"></a>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        name: A user-facing pollutant name (`&quot;pm25&quot;`, `&quot;o3&quot;`).</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        Pollutant: The matching dispatch row.</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        ValueError: If `name` is not a known pollutant; the message</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            adds a did-you-mean hint.</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        ValueError: If `name` is not a known pollutant; the message</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            names the catalog kind and, when a close match exists,</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            adds a did-you-mean hint.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25920,7 +25776,13 @@ module-level <code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/airnow/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-203">203</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-197">197</a></span>
+<span class="normal"><a href="#__codelineno-0-198">198</a></span>
+<span class="normal"><a href="#__codelineno-0-199">199</a></span>
+<span class="normal"><a href="#__codelineno-0-200">200</a></span>
+<span class="normal"><a href="#__codelineno-0-201">201</a></span>
+<span class="normal"><a href="#__codelineno-0-202">202</a></span>
+<span class="normal"><a href="#__codelineno-0-203">203</a></span>
 <span class="normal"><a href="#__codelineno-0-204">204</a></span>
 <span class="normal"><a href="#__codelineno-0-205">205</a></span>
 <span class="normal"><a href="#__codelineno-0-206">206</a></span>
@@ -25933,108 +25795,26 @@ module-level <code>CATALOG_PATH</code>.</p>
 <span class="normal"><a href="#__codelineno-0-213">213</a></span>
 <span class="normal"><a href="#__codelineno-0-214">214</a></span>
 <span class="normal"><a href="#__codelineno-0-215">215</a></span>
-<span class="normal"><a href="#__codelineno-0-216">216</a></span>
-<span class="normal"><a href="#__codelineno-0-217">217</a></span>
-<span class="normal"><a href="#__codelineno-0-218">218</a></span>
-<span class="normal"><a href="#__codelineno-0-219">219</a></span>
-<span class="normal"><a href="#__codelineno-0-220">220</a></span>
-<span class="normal"><a href="#__codelineno-0-221">221</a></span>
-<span class="normal"><a href="#__codelineno-0-222">222</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the AirNow pollutant catalog from disk.</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            `pollutants:` block, or a row fails `Pollutant` validation.</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>    <span class="n">pollutants</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_pollutants</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;AirNow&quot;</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="p">)</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">pollutants</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.airnow.catalog.Catalog.model_post_init" class="doc doc-heading"><a href="#earthlens.airnow.catalog.Catalog.model_post_init" class="toclink">
-            <code class="highlight language-python"><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span></code>
-
-</a><a href="#earthlens.airnow.catalog.Catalog.model_post_init" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Auto-load the bundled catalog when no pollutants were supplied.</p>
-<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code>; passing
-<code>pollutants=...</code> (or <code>datasets=...</code>) skips the disk read (used in
-tests).</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="ValueError">ValueError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Propagated from <code>load</code> when the YAML is missing,
-empty, or has a malformed pollutant row.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/airnow/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-188">188</a></span>
-<span class="normal"><a href="#__codelineno-0-189">189</a></span>
-<span class="normal"><a href="#__codelineno-0-190">190</a></span>
-<span class="normal"><a href="#__codelineno-0-191">191</a></span>
-<span class="normal"><a href="#__codelineno-0-192">192</a></span>
-<span class="normal"><a href="#__codelineno-0-193">193</a></span>
-<span class="normal"><a href="#__codelineno-0-194">194</a></span>
-<span class="normal"><a href="#__codelineno-0-195">195</a></span>
-<span class="normal"><a href="#__codelineno-0-196">196</a></span>
-<span class="normal"><a href="#__codelineno-0-197">197</a></span>
-<span class="normal"><a href="#__codelineno-0-198">198</a></span>
-<span class="normal"><a href="#__codelineno-0-199">199</a></span>
-<span class="normal"><a href="#__codelineno-0-200">200</a></span>
-<span class="normal"><a href="#__codelineno-0-201">201</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no pollutants were supplied.</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH`; passing</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">    `pollutants=...` (or `datasets=...`) skips the disk read (used in</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">    tests).</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is missing,</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            empty, or has a malformed pollutant row.</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-216">216</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the AirNow pollutant catalog from disk.</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            `pollutants:` block, or a row fails `Pollutant` validation.</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>    <span class="n">pollutants</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_pollutants</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;AirNow&quot;</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>    <span class="p">)</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">pollutants</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

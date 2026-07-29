@@ -1237,17 +1237,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.s3.Catalog.model_post_init" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        model_post_init
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.s3.Catalog.resolve" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -19284,17 +19273,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#earthlens.s3.Catalog.model_post_init" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        model_post_init
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#earthlens.s3.Catalog.resolve" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -21508,9 +21486,7 @@ name; rebuilt by <code>tools/s3/refresh_s3_catalog.py</code>.</p>
 <span class="normal"><a href="#__codelineno-0-408">408</a></span>
 <span class="normal"><a href="#__codelineno-0-409">409</a></span>
 <span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span>
-<span class="normal"><a href="#__codelineno-0-413">413</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-411">411</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-275" name="__codelineno-0-275"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
 <a id="__codelineno-0-276" name="__codelineno-0-276"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Registry of the AWS Open-Data S3 datasets the backend can fetch.</span>
 <a id="__codelineno-0-277" name="__codelineno-0-277"></a>
 <a id="__codelineno-0-278" name="__codelineno-0-278"></a><span class="sd">    Reads the bundled `s3_data_catalog.yaml` and exposes its `datasets:`</span>
@@ -21561,94 +21537,92 @@ name; rebuilt by <code>tools/s3/refresh_s3_catalog.py</code>.</p>
 <a id="__codelineno-0-323" name="__codelineno-0-323"></a>
 <a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <a id="__codelineno-0-325" name="__codelineno-0-325"></a>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        `Catalog()` with no args reads `CATALOG_PATH`; passing</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        `datasets=...` skips the disk read (used in tests).</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">            ValueError: Propagated from `load` when the YAML is missing,</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">                empty, or has a malformed dataset row.</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the dataset registry from disk.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">            A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">                `datasets:` block, or a row fails `Dataset` validation.</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="n">datasets</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_s3_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;ERA5-S3&quot;</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="p">)</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span> <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">))</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset selector to a validated `Dataset`.</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        The single entry point the backend calls. Accepts a registered</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        dataset name, an inline spec dict (the passthrough path), or an</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        already-built `Dataset` — returning a `Dataset` in every case so</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        registered and ad-hoc datasets share identical downstream code.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            dataset: A registered name (`&quot;era5&quot;`), an inline spec dict</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">                (`{&quot;bucket&quot;: ..., &quot;format&quot;: &quot;cog&quot;, &quot;layout&quot;: ...}`), or a</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">                `Dataset` instance.</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">            The resolved `Dataset`.</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">            ValueError: If `dataset` is an unknown name, or an inline spec</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">                that fails `Dataset` validation.</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="k">return</span> <span class="n">dataset</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="k">return</span> <span class="n">Dataset</span><span class="p">(</span><span class="o">**</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>                    <span class="sa">f</span><span class="s2">&quot;inline dataset spec failed validation:</span><span class="se">\n</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dataset_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered dataset names, sorted.</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            The sorted registry names.</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            - List every registered dataset:</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">                &gt;&gt;&gt; from earthlens.s3 import Catalog</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">                &gt;&gt;&gt; Catalog().dataset_names()</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">                [&#39;copernicus-dem&#39;, &#39;era5&#39;, &#39;esa-worldcover&#39;, &#39;goes&#39;, &#39;naip-source&#39;, &#39;sentinel-2-l2a&#39;, &#39;usgs-landsat&#39;]</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the bundled catalog from disk.</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">            dict[str, Any]: The `datasets`, `available_datasets` read from</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">                the bundled catalog.</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">return</span> <span class="p">{</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="s2">&quot;available_datasets&quot;</span><span class="p">:</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">,</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="p">}</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the dataset registry from disk.</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">            catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">                module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">            ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">                `datasets:` block, or a row fails `Dataset` validation.</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="n">datasets</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_s3_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;ERA5-S3&quot;</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="p">)</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span> <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">))</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a dataset selector to a validated `Dataset`.</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        The single entry point the backend calls. Accepts a registered</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        dataset name, an inline spec dict (the passthrough path), or an</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        already-built `Dataset` — returning a `Dataset` in every case so</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        registered and ad-hoc datasets share identical downstream code.</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            dataset: A registered name (`&quot;era5&quot;`), an inline spec dict</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">                (`{&quot;bucket&quot;: ..., &quot;format&quot;: &quot;cog&quot;, &quot;layout&quot;: ...}`), or a</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">                `Dataset` instance.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">            The resolved `Dataset`.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">            ValueError: If `dataset` is an unknown name, or an inline spec</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">                that fails `Dataset` validation.</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="k">return</span> <span class="n">Dataset</span><span class="p">(</span><span class="o">**</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                    <span class="sa">f</span><span class="s2">&quot;inline dataset spec failed validation:</span><span class="se">\n</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">dataset_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the registered dataset names, sorted.</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">            The sorted registry names.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            - List every registered dataset:</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">                &gt;&gt;&gt; from earthlens.s3 import Catalog</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">                &gt;&gt;&gt; Catalog().dataset_names()</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">                [&#39;copernicus-dem&#39;, &#39;era5&#39;, &#39;esa-worldcover&#39;, &#39;goes&#39;, &#39;naip-source&#39;, &#39;sentinel-2-l2a&#39;, &#39;usgs-landsat&#39;]</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -21714,7 +21688,9 @@ name; rebuilt by <code>tools/s3/refresh_s3_catalog.py</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/s3/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-398">398</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-396">396</a></span>
+<span class="normal"><a href="#__codelineno-0-397">397</a></span>
+<span class="normal"><a href="#__codelineno-0-398">398</a></span>
 <span class="normal"><a href="#__codelineno-0-399">399</a></span>
 <span class="normal"><a href="#__codelineno-0-400">400</a></span>
 <span class="normal"><a href="#__codelineno-0-401">401</a></span>
@@ -21727,24 +21703,22 @@ name; rebuilt by <code>tools/s3/refresh_s3_catalog.py</code>.</p>
 <span class="normal"><a href="#__codelineno-0-408">408</a></span>
 <span class="normal"><a href="#__codelineno-0-409">409</a></span>
 <span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span>
-<span class="normal"><a href="#__codelineno-0-413">413</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="k">def</span><span class="w"> </span><span class="nf">dataset_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered dataset names, sorted.</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        The sorted registry names.</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        - List every registered dataset:</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            &gt;&gt;&gt; from earthlens.s3 import Catalog</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            &gt;&gt;&gt; Catalog().dataset_names()</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            [&#39;copernicus-dem&#39;, &#39;era5&#39;, &#39;esa-worldcover&#39;, &#39;goes&#39;, &#39;naip-source&#39;, &#39;sentinel-2-l2a&#39;, &#39;usgs-landsat&#39;]</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-411">411</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="k">def</span><span class="w"> </span><span class="nf">dataset_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the registered dataset names, sorted.</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        The sorted registry names.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        - List every registered dataset:</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">            &gt;&gt;&gt; from earthlens.s3 import Catalog</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">            &gt;&gt;&gt; Catalog().dataset_names()</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">            [&#39;copernicus-dem&#39;, &#39;era5&#39;, &#39;esa-worldcover&#39;, &#39;goes&#39;, &#39;naip-source&#39;, &#39;sentinel-2-l2a&#39;, &#39;usgs-landsat&#39;]</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21767,11 +21741,11 @@ name; rebuilt by <code>tools/s3/refresh_s3_catalog.py</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/s3/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-363">363</a></span>
-<span class="normal"><a href="#__codelineno-0-364">364</a></span>
-<span class="normal"><a href="#__codelineno-0-365">365</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-361">361</a></span>
+<span class="normal"><a href="#__codelineno-0-362">362</a></span>
+<span class="normal"><a href="#__codelineno-0-363">363</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the dataset map (satisfies the abstract contract).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -21877,7 +21851,9 @@ module-level <code>CATALOG_PATH</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/s3/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-342">342</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span>
+<span class="normal"><a href="#__codelineno-0-342">342</a></span>
 <span class="normal"><a href="#__codelineno-0-343">343</a></span>
 <span class="normal"><a href="#__codelineno-0-344">344</a></span>
 <span class="normal"><a href="#__codelineno-0-345">345</a></span>
@@ -21894,105 +21870,26 @@ module-level <code>CATALOG_PATH</code>.</p>
 <span class="normal"><a href="#__codelineno-0-356">356</a></span>
 <span class="normal"><a href="#__codelineno-0-357">357</a></span>
 <span class="normal"><a href="#__codelineno-0-358">358</a></span>
-<span class="normal"><a href="#__codelineno-0-359">359</a></span>
-<span class="normal"><a href="#__codelineno-0-360">360</a></span>
-<span class="normal"><a href="#__codelineno-0-361">361</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the dataset registry from disk.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            `datasets:` block, or a row fails `Dataset` validation.</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="n">datasets</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_s3_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;ERA5-S3&quot;</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="p">)</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span> <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">))</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="earthlens.s3.Catalog.model_post_init" class="doc doc-heading"><a href="#earthlens.s3.Catalog.model_post_init" class="toclink">
-            <code class="highlight language-python"><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span></code>
-
-</a><a href="#earthlens.s3.Catalog.model_post_init" class="headerlink" title="Permanent link">#</a></h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Auto-load the bundled catalog when no datasets were supplied.</p>
-<p><code>Catalog()</code> with no args reads <code>CATALOG_PATH</code>; passing
-<code>datasets=...</code> skips the disk read (used in tests).</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="ValueError">ValueError</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Propagated from <code>load</code> when the YAML is missing,
-empty, or has a malformed dataset row.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/s3/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-326">326</a></span>
-<span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
-<span class="normal"><a href="#__codelineno-0-330">330</a></span>
-<span class="normal"><a href="#__codelineno-0-331">331</a></span>
-<span class="normal"><a href="#__codelineno-0-332">332</a></span>
-<span class="normal"><a href="#__codelineno-0-333">333</a></span>
-<span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span>
-<span class="normal"><a href="#__codelineno-0-336">336</a></span>
-<span class="normal"><a href="#__codelineno-0-337">337</a></span>
-<span class="normal"><a href="#__codelineno-0-338">338</a></span>
-<span class="normal"><a href="#__codelineno-0-339">339</a></span>
-<span class="normal"><a href="#__codelineno-0-340">340</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Auto-load the bundled catalog when no datasets were supplied.</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    `Catalog()` with no args reads `CATALOG_PATH`; passing</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    `datasets=...` skips the disk read (used in tests).</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        ValueError: Propagated from `load` when the YAML is missing,</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">            empty, or has a malformed dataset row.</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span> <span class="o">=</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-359">359</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the dataset registry from disk.</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">        catalog_path: Path to the catalog YAML. Defaults to the</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">            module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        ValueError: If `catalog_path` does not exist, or if the file has no</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">            `datasets:` block, or a row fails `Dataset` validation.</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="n">datasets</span><span class="p">,</span> <span class="n">available</span> <span class="o">=</span> <span class="n">load_catalog</span><span class="p">(</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="n">catalog_path</span><span class="p">,</span> <span class="n">_CATALOG_CACHE</span><span class="p">,</span> <span class="n">_parse_s3_catalog</span><span class="p">,</span> <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;ERA5-S3&quot;</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="p">)</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span> <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -22099,7 +21996,9 @@ that fails <code>Dataset</code> validation.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/s3/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-367">367</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-365">365</a></span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span>
+<span class="normal"><a href="#__codelineno-0-367">367</a></span>
 <span class="normal"><a href="#__codelineno-0-368">368</a></span>
 <span class="normal"><a href="#__codelineno-0-369">369</a></span>
 <span class="normal"><a href="#__codelineno-0-370">370</a></span>
@@ -22126,38 +22025,36 @@ that fails <code>Dataset</code> validation.</p>
 <span class="normal"><a href="#__codelineno-0-391">391</a></span>
 <span class="normal"><a href="#__codelineno-0-392">392</a></span>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
-<span class="normal"><a href="#__codelineno-0-394">394</a></span>
-<span class="normal"><a href="#__codelineno-0-395">395</a></span>
-<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset selector to a validated `Dataset`.</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    The single entry point the backend calls. Accepts a registered</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">    dataset name, an inline spec dict (the passthrough path), or an</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    already-built `Dataset` — returning a `Dataset` in every case so</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">    registered and ad-hoc datasets share identical downstream code.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        dataset: A registered name (`&quot;era5&quot;`), an inline spec dict</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">            (`{&quot;bucket&quot;: ..., &quot;format&quot;: &quot;cog&quot;, &quot;layout&quot;: ...}`), or a</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">            `Dataset` instance.</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        The resolved `Dataset`.</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        ValueError: If `dataset` is an unknown name, or an inline spec</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">            that fails `Dataset` validation.</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="k">return</span> <span class="n">dataset</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="k">return</span> <span class="n">Dataset</span><span class="p">(</span><span class="o">**</span><span class="n">dataset</span><span class="p">)</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>                <span class="sa">f</span><span class="s2">&quot;inline dataset spec failed validation:</span><span class="se">\n</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a dataset selector to a validated `Dataset`.</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">    The single entry point the backend calls. Accepts a registered</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    dataset name, an inline spec dict (the passthrough path), or an</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    already-built `Dataset` — returning a `Dataset` in every case so</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">    registered and ad-hoc datasets share identical downstream code.</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        dataset: A registered name (`&quot;era5&quot;`), an inline spec dict</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            (`{&quot;bucket&quot;: ..., &quot;format&quot;: &quot;cog&quot;, &quot;layout&quot;: ...}`), or a</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            `Dataset` instance.</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        The resolved `Dataset`.</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        ValueError: If `dataset` is an unknown name, or an inline spec</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">            that fails `Dataset` validation.</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="k">return</span> <span class="n">dataset</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="k">return</span> <span class="n">Dataset</span><span class="p">(</span><span class="o">**</span><span class="n">dataset</span><span class="p">)</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="k">except</span> <span class="n">ValidationError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="sa">f</span><span class="s2">&quot;inline dataset spec failed validation:</span><span class="se">\n</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Dataset&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
