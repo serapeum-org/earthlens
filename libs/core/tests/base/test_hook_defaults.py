@@ -734,3 +734,59 @@ class TestConcurrencyContractIsDocumented:
         backend._http = HttpClient()
         with pytest.raises((TypeError, AttributeError)):
             pickle.dumps(backend)
+
+
+class TestHooksReturnOneShape:
+    """ARC-7: `_create_grid` / `_check_input_dates` return their model, only."""
+
+    def _hook_returns(self, hook: str):
+        """Yield `(backend_name, {return kinds})` for each override of `hook`."""
+        import ast as ast_module
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[3] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            tree = ast_module.parse(path.read_text(encoding="utf-8"))
+            for node in ast_module.walk(tree):
+                if not (isinstance(node, ast_module.FunctionDef) and node.name == hook):
+                    continue
+                kinds = set()
+                returns = [
+                    n for n in ast_module.walk(node) if isinstance(n, ast_module.Return)
+                ]
+                for ret in returns:
+                    if ret.value is None or (
+                        isinstance(ret.value, ast_module.Constant)
+                        and ret.value.value is None
+                    ):
+                        kinds.add("None")
+                    elif isinstance(ret.value, ast_module.Dict):
+                        kinds.add("dict")
+                    else:
+                        kinds.add("model")
+                if not returns:
+                    kinds.add("None")
+                yield path.parent.name, kinds
+
+    def test_overrides_were_found(self):
+        """Guard the guard: the walk must find the `_check_input_dates` overrides."""
+        found = list(self._hook_returns("_check_input_dates"))
+        assert len(found) > 40, f"only found {len(found)}"
+
+    @pytest.mark.parametrize("hook", ["_create_grid", "_check_input_dates"])
+    def test_no_override_returns_a_dict_or_none(self, hook):
+        """`__init__` assigns the result directly, so a dict or `None` breaks it.
+
+        These hooks used to accept three return shapes and `__init__` branched on
+        `isinstance` to cope. Every override returned the model, so the other two
+        branches were dead and are gone — which means a dict or `None` now leaves
+        `space` / `time` wrong instead of being quietly converted.
+        """
+        offenders = [
+            f"{name}: {sorted(kinds)}"
+            for name, kinds in self._hook_returns(hook)
+            if kinds - {"model"}
+        ]
+        assert offenders == [], (
+            f"{hook} must return its extent model; these do not: {offenders}"
+        )

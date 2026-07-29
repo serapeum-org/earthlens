@@ -871,13 +871,10 @@ class AbstractDataSource(ABC):
           :class:`S3`) keep their own assignment; the parent only sets
           the attribute when :meth:`_initialize` returns a non-`None`
           value.
-        * `self.space` — the dict returned by :meth:`_create_grid`,
-          containing `lat_lim` and `lon_lim`. Subclasses that
-          override :meth:`_create_grid` to set attributes directly (e.g.
-          :class:`CHIRPS`) and return `None` are unaffected.
-        * `self.time` — the dict returned by :meth:`_check_input_dates`,
-          containing `start_date`, `end_date`, `time_freq` and
-          `dates`. Same opt-in semantics as `self.space`.
+        * `self.space` — the :class:`SpatialExtent` returned by
+          :meth:`_create_grid`.
+        * `self.time` — the :class:`TemporalExtent` returned by
+          :meth:`_check_input_dates`.
         * `self.root_dir` — the absolute :class:`pathlib.Path` of the
           output directory. `self.path` is kept as a legacy alias so
           older backends (CHIRPS, S3) continue to work. The directory is
@@ -914,24 +911,15 @@ class AbstractDataSource(ABC):
         self.temporal_resolution = temporal_resolution
         self.vars = variables
 
-        space = self._create_grid(lat_lim, lon_lim)
-        if isinstance(space, SpatialExtent):
-            self.space = space
-        elif isinstance(space, dict):
-            self.space = SpatialExtent.from_pairs(
-                lat_lim=space["lat_lim"], lon_lim=space["lon_lim"]
-            )
-
-        time = self._check_input_dates(start, end, temporal_resolution, fmt)
-        if isinstance(time, TemporalExtent):
-            self.time = time
-        elif isinstance(time, dict):
-            self.time = TemporalExtent(
-                start_date=time["start_date"],
-                end_date=time["end_date"],
-                resolution=cast(str, time.get("resolution", time.get("time_freq"))),
-                dates=time["dates"],
-            )
+        # Both hooks return their validated model. They used to be allowed to
+        # return a plain dict or `None` instead, and this branched on
+        # `isinstance` to cope — three valid answers to one question, which a
+        # backend author could not infer without reading this. Every one of the
+        # 53 overrides in the tree returns the model, so the other two branches
+        # were dead; a hook returning something else now fails here rather than
+        # silently leaving `space` / `time` unset.
+        self.space = self._create_grid(lat_lim, lon_lim)
+        self.time = self._check_input_dates(start, end, temporal_resolution, fmt)
 
         self.root_dir = Path(path).absolute()
         self.path = self.root_dir
@@ -1162,7 +1150,7 @@ class AbstractDataSource(ABC):
     @abstractmethod
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
-    ):
+    ) -> TemporalExtent:
         """Check validity of input dates. Called by `__init__`.
 
         Still abstract, because the *shape* of a backend's time axis is a real
@@ -1336,9 +1324,7 @@ class AbstractDataSource(ABC):
         """
         return None
 
-    def _create_grid(
-        self, lat_lim: list[float], lon_lim: list[float]
-    ) -> SpatialExtent | dict | None:
+    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
         """Turn the requested lat/lon bounds into this backend's spatial extent.
 
         Called once by :meth:`__init__`; the result is captured onto
