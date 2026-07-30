@@ -42,6 +42,7 @@ the bundled catalog.
 from __future__ import annotations
 
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, cast
 
@@ -330,21 +331,13 @@ class EEA_AQ(AbstractDataSource):
             self.time.start_date.year, self.time.end_date.year
         )
 
-        frames: list[pd.DataFrame] = []
-        for dataset in datasets:
-            with tempfile.TemporaryDirectory(prefix="earthlens_eea_") as tmp:
-                request = client.request(dataset, *countries, poll=polls, verbose=False)
-                download_request(request, tmp)
-                parquets = sorted(Path(tmp).rglob("*.parquet"))
-                if not parquets:
-                    logger.info(
-                        f"EEA download: dataset {dataset!r} returned no Parquet "
-                        f"files for {countries} / {polls}."
-                    )
-                for parquet in parquets:
-                    frames.append(
-                        shape_frame(pd.read_parquet(parquet), dataset, code_to_name)
-                    )
+        # Lazy so a `limit=` stops the work where it costs: each dataset is a
+        # separate bulk download of every matching Parquet, so a cap met by the
+        # Verified era means the Unverified one is never requested at all.
+        frames = self._take_limited(
+            self._iter_dataset_frames(datasets, client, countries, polls, code_to_name),
+            limit=self._limit,
+        )
         non_empty = [frame for frame in frames if not frame.empty]
         if not non_empty:
             return empty_frame()
@@ -362,9 +355,50 @@ class EEA_AQ(AbstractDataSource):
         mask = (combined["datetime_utc"] >= lower) & (combined["datetime_utc"] < upper)
         return combined[mask].reset_index(drop=True)
 
+    def _iter_dataset_frames(
+        self,
+        datasets: list[Any],
+        client: Any,
+        countries: list[str],
+        polls: list[str],
+        code_to_name: dict[str, str],
+    ) -> Iterator[pd.DataFrame]:
+        """Yield one shaped frame per Parquet file, era by era.
+
+        A generator rather than a list so a caller that has already collected
+        enough rows never triggers the next era's bulk download. Each era's
+        temporary directory lives only for that era's reads; abandoning the
+        generator early unwinds the open one (`_take_limited` closes what it
+        stops consuming).
+
+        Args:
+            datasets: The airbase datasets (eras) to sweep, in priority order.
+            client: The airbase client to request through.
+            countries: Reporting-country codes the service serves.
+            polls: Pollutant codes to request.
+            code_to_name: Pollutant code to catalog name, restricted to the
+                requested pollutants.
+
+        Yields:
+            pd.DataFrame: One shaped frame per downloaded Parquet file.
+        """
+        for dataset in datasets:
+            with tempfile.TemporaryDirectory(prefix="earthlens_eea_") as tmp:
+                request = client.request(dataset, *countries, poll=polls, verbose=False)
+                download_request(request, tmp)
+                parquets = sorted(Path(tmp).rglob("*.parquet"))
+                if not parquets:
+                    logger.info(
+                        f"EEA download: dataset {dataset!r} returned no Parquet "
+                        f"files for {countries} / {polls}."
+                    )
+                for parquet in parquets:
+                    yield shape_frame(pd.read_parquet(parquet), dataset, code_to_name)
+
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch observations, write them to `path`, and return the frame.
 
@@ -376,12 +410,19 @@ class EEA_AQ(AbstractDataSource):
         Args:
             progress_bar: Accepted for API parity with the other backends;
                 airbase owns its own download progress.
+            limit: Cap on the total observations fetched, across every era and
+                Parquet file. Applied as each file is read, so an era past the
+                cap is never bulk-downloaded. `None` (the default) fetches
+                everything. The cap is on rows *fetched*, before the
+                cross-era de-duplication and the window filter, so the returned
+                frame can be shorter than the cap.
 
         Returns:
             pd.DataFrame: The long-format observations (schema columns,
                 `datetime_utc` tz-aware UTC). Empty (schema-only) when
                 nothing matched.
         """
+        self._limit = self.check_limit(limit)
         df = self._api()
 
         out_path = self._output_path()

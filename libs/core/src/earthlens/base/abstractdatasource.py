@@ -1691,18 +1691,30 @@ class AbstractDataSource(ABC):
         take = head or _head_rows
         collected: list[Any] = []
         remaining = limit
-        for chunk in chunks:
-            length = measure(chunk)
-            # `>=`, not `>`: a chunk that exactly fills the cap must also end the
-            # loop here. Deciding on the *next* iteration would pull one more
-            # fragment first — the very work the cap exists to avoid.
-            if length >= remaining:
-                collected.append(
-                    take(chunk, remaining) if length > remaining else chunk
-                )
-                return collected
-            collected.append(chunk)
-            remaining -= length
+        iterator = iter(chunks)
+        try:
+            for chunk in iterator:
+                length = measure(chunk)
+                # `>=`, not `>`: a chunk that exactly fills the cap must also end
+                # the loop here. Deciding on the *next* iteration would pull one
+                # more fragment first — the very work the cap exists to avoid.
+                if length >= remaining:
+                    collected.append(
+                        take(chunk, remaining) if length > remaining else chunk
+                    )
+                    return collected
+                collected.append(chunk)
+                remaining -= length
+        finally:
+            # Stopping early abandons the generator mid-`for`, which leaves any
+            # `with` block it is suspended inside — a temp directory holding a
+            # bulk download, an open session — unwound only whenever the object
+            # is collected. Closing it here makes that deterministic, which is
+            # the difference between a temp dir removed now and one removed at
+            # interpreter exit.
+            close = getattr(iterator, "close", None)
+            if close is not None:
+                close()
         return collected
 
     def iter_download(self, *, limit: int | None = None) -> Iterator[Any]:

@@ -459,3 +459,58 @@ class TestIterItemsPolicy:
         )
         with pytest.raises(RuntimeError, match="boom"):
             list(generator)
+
+
+class TestTakeLimitedClosesWhatItAbandons:
+    """Stopping early must release the abandoned generator's resources now.
+
+    The generators feeding `_take_limited` are not pure producers: eea_aq's is
+    suspended inside a `TemporaryDirectory` holding a bulk download. Leaving it
+    to be collected whenever means the directory survives for an indeterminate
+    time — and on an implementation without refcounting, until exit.
+    """
+
+    def test_the_generator_is_closed_when_the_cap_stops_it(self, tmp_path):
+        """The abandoned generator's cleanup runs before the call returns."""
+        backend = _build(_Backend, tmp_path)
+        released: list[str] = []
+
+        def frames():
+            try:
+                for index in range(5):
+                    yield pd.DataFrame({"n": [index, index, index]})
+            finally:
+                released.append("cleaned up")
+
+        collected = backend._take_limited(frames(), limit=4)
+
+        assert sum(len(frame) for frame in collected) == 4
+        assert released == ["cleaned up"], (
+            "the generator was abandoned without being closed, so whatever it "
+            "held open stays open until it is collected"
+        )
+
+    def test_full_consumption_still_cleans_up_once(self, tmp_path):
+        """Exhausting the generator normally is unaffected."""
+        backend = _build(_Backend, tmp_path)
+        released: list[str] = []
+
+        def frames():
+            try:
+                yield pd.DataFrame({"n": [1]})
+                yield pd.DataFrame({"n": [2]})
+            finally:
+                released.append("cleaned up")
+
+        collected = backend._take_limited(frames(), limit=99)
+
+        assert sum(len(frame) for frame in collected) == 2
+        assert released == ["cleaned up"]
+
+    def test_a_plain_list_without_close_is_accepted(self, tmp_path):
+        """Not every input is a generator; a list has no `close` to call."""
+        backend = _build(_Backend, tmp_path)
+        collected = backend._take_limited(
+            [pd.DataFrame({"n": [1, 2]}), pd.DataFrame({"n": [3, 4]})], limit=3
+        )
+        assert sum(len(frame) for frame in collected) == 3
