@@ -101,8 +101,17 @@ class Drought(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
-    #: Wires the temporal reducer (ARC-1).
-    SUPPORTS_AGGREGATE = True
+    # No `SUPPORTS_AGGREGATE = True`: neither transport reduces today, so the
+    # central gate refuses `aggregate=` before the body runs. The reason covers
+    # both, because `OUTPUT_KIND` is resolved per instance from the catalog row.
+    AGGREGATE_REFUSAL_REASON = (
+        "neither drought transport reduces across dates today. The USDM "
+        "(vector) route returns drought-class polygons, which have no gridded "
+        "reduction; the SPEIbase / EDO / GDO (raster) routes emit per-period "
+        "GeoTIFFs whose stack reducer is not wired yet — pass those through "
+        "earthlens.aggregate.aggregate_netcdf (or pyramids' "
+        "DatasetCollection.groupby) directly"
+    )
 
     def __init__(
         self,
@@ -794,12 +803,10 @@ class Drought(AbstractDataSource):
                 transports return written files, which a row cap cannot
                 describe, so passing one there is refused rather than
                 silently ignored.
-            aggregate: A temporal reducer over the requested date range.
-                Accepted for `OUTPUT_KIND == "raster"` (EDO/GDO/SPEIbase)
-                and forwarded to the standard `earthlens.aggregate`
-                pyramids reducer. **Rejected** for `OUTPUT_KIND ==
-                "vector"` (USDM) — drought-class polygons have no
-                gridded reduction.
+            aggregate: Refused on every transport today, by the shared gate
+                rather than here. The USDM (vector) route returns polygons,
+                which have no gridded reduction; the raster routes emit
+                per-period GeoTIFFs whose stack reducer is not wired yet.
 
         Returns:
             FeatureCollection | list[Path]: For the vector USDM transport,
@@ -808,10 +815,10 @@ class Drought(AbstractDataSource):
                 in period order.
 
         Raises:
-            NotImplementedError: When `aggregate is not None` on the
-                vector USDM transport (drought-class polygons have no
-                gridded reduction), or on any raster transport (the
-                cross-period stack reducer is not wired yet).
+            NotImplementedError: When `aggregate is not None`. Raised by the
+                shared gate before this body runs — the USDM (vector) route
+                has no gridded reduction, and the raster routes' cross-period
+                stack reducer is not wired yet.
             ValueError: When `limit` is not `None` on a raster transport,
                 where there are no rows to cap; or when it is zero or
                 negative.
@@ -824,25 +831,9 @@ class Drought(AbstractDataSource):
                 f"files, which a row cap cannot describe. Drop limit= and "
                 f"narrow the date range instead."
             )
-        if self.OUTPUT_KIND == "vector" and aggregate is not None:
-            raise NotImplementedError(
-                "Drought.download(aggregate=...) is not supported for the "
-                "USDM (vector) transport: drought-class polygons have no "
-                "gridded reduction. Call download() without aggregate= and "
-                "post-process the returned FeatureCollection directly."
-            )
         # Force `progress_bar` into the local scope so a future per-period
         # tqdm hook does not break the public signature when wired up.
         _ = progress_bar
-        if self.OUTPUT_KIND == "raster" and aggregate is not None:
-            raise NotImplementedError(
-                "Drought.download(aggregate=...) for raster transports is "
-                "not wired in this build. The SPEIbase / EDO / GDO outputs "
-                "are per-period GeoTIFFs; pass them through "
-                "`earthlens.aggregate.aggregate_netcdf` (or pyramids' "
-                "`DatasetCollection.groupby`) directly until the drought "
-                "stack reducer ships."
-            )
         result = self._api()
         logger.info(attribution_for(self._dataset.transport))
         return result

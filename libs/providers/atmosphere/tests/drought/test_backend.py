@@ -401,7 +401,7 @@ def test_crs_from_geojson_handles_variants():
 
 
 def test_usdm_aggregate_rejected(tmp_path):
-    """`aggregate=` is a NotImplementedError on the vector USDM route."""
+    """`aggregate=` is refused on the vector USDM route, by the shared gate."""
     backend = Drought(
         start="2026-06-23",
         end="2026-06-23",
@@ -410,7 +410,7 @@ def test_usdm_aggregate_rejected(tmp_path):
         dataset="usdm",
         path=str(tmp_path),
     )
-    with pytest.raises(NotImplementedError, match="vector"):
+    with pytest.raises(NotImplementedError, match="no gridded reduction"):
         backend.download(aggregate=object())
 
 
@@ -659,7 +659,7 @@ def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
 
 
 def test_raster_aggregate_rejected_until_reducer_lands(tmp_path):
-    """The raster `aggregate=` path raises a clear NotImplementedError."""
+    """The raster `aggregate=` path is refused too, with the reducer named."""
     backend = Drought(
         start="2026-06-01",
         end="2026-06-01",
@@ -668,7 +668,7 @@ def test_raster_aggregate_rejected_until_reducer_lands(tmp_path):
         dataset="speibase-12",
         path=str(tmp_path),
     )
-    with pytest.raises(NotImplementedError, match="not wired"):
+    with pytest.raises(NotImplementedError, match="not wired yet"):
         backend.download(aggregate=object())
 
 

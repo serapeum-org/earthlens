@@ -517,7 +517,20 @@ class TestAggregateCapabilityIsCentral:
 
         liars = []
         for path, source in self._backend_sources():
-            if "SUPPORTS_AGGREGATE = True" not in source:
+            # Read the declaration from the AST, not the text: this very test
+            # file's own explanatory comments contain the literal
+            # `SUPPORTS_AGGREGATE = True`, and so does drought's comment saying
+            # it deliberately does *not* declare it.
+            declares = any(
+                isinstance(node, ast_module.Assign)
+                and any(
+                    getattr(target, "id", "") == "SUPPORTS_AGGREGATE"
+                    for target in node.targets
+                )
+                and getattr(node.value, "value", None) is True
+                for node in ast_module.walk(ast_module.parse(source))
+            )
+            if not declares:
                 continue
             # Read the AST, not the text. A substring search is fooled by a
             # backend that only *names* the aggregator in its error message —
@@ -534,7 +547,34 @@ class TestAggregateCapabilityIsCentral:
                 ):
                     uses_it = True
                     break
-            if not uses_it:
+            # Merely *naming* `aggregate` is not using it. drought declared
+            # support while its only references were
+            # `if aggregate is not None: raise NotImplementedError` — the name
+            # appears, so a name-scan passed it, and the central gate then
+            # waved the call through on a declaration that was false. Consuming
+            # it means passing it to a call or storing it (openeo and worldpop
+            # assign it to an instance attribute rather than forwarding it
+            # directly, and both are genuine implementers).
+            #
+            # Note this cannot be "declares and also raises NotImplementedError
+            # about aggregate": s3 legitimately reduces NetCDF and refuses only
+            # its COG datasets, and that partial support is not a lie.
+            consumes_it = False
+            for node in ast_module.walk(ast_module.parse(source)):
+                if isinstance(node, ast_module.Call):
+                    passed = list(node.args) + [kw.value for kw in node.keywords]
+                    if any(
+                        isinstance(arg, ast_module.Name) and arg.id == "aggregate"
+                        for arg in passed
+                    ):
+                        consumes_it = True
+                        break
+                if isinstance(node, (ast_module.Assign, ast_module.AnnAssign)):
+                    value = node.value
+                    if isinstance(value, ast_module.Name) and value.id == "aggregate":
+                        consumes_it = True
+                        break
+            if not (uses_it and consumes_it):
                 liars.append(path.parent.name)
         assert liars == [], (
             f"these declare SUPPORTS_AGGREGATE but never use aggregate: {liars}"
