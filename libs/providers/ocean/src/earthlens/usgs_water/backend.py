@@ -249,7 +249,10 @@ class USGSWater(AbstractDataSource):
         self._api_flavour = api
         self._output_format: OutputFormat = output_format
         self._stat_type = stat_type
-        self._request_limit = limit
+        # Validated like fdsn's: this goes onto the wire as the modern
+        # endpoint's own `limit=`, where 0 / -5 / True is a caller bug the
+        # service would answer confusingly rather than reject.
+        self._request_limit = self.check_limit(limit)
         self._auth: UsgsWaterAuth | None = None
         self._catalog = Catalog()
         self._used_legacy_fallback = False

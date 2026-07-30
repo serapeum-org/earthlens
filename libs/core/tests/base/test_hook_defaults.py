@@ -832,3 +832,64 @@ class TestErgonomicsResolvedNeedsABackendBase:
                 super().__init__(**kwargs)
 
         assert issubclass(Child, Parent)
+
+
+class TestPositionalAggregateIsRefused:
+    """The central gate must see `aggregate` however it was passed.
+
+    `aggregate` is the second positional parameter on the backends that declare
+    it, so reading it out of `**kwargs` alone let `download(False, config)`
+    through. That mattered most for the backends whose own refusal was deleted
+    once the gate became central: they would silently ignore the argument
+    instead of raising.
+    """
+
+    def _backend(self, tmp_path):
+        """Build a raster backend that declares `aggregate` positionally."""
+
+        class _Positional(AbstractDataSource):
+            REQUIRES_TIME_WINDOW = False
+            OUTPUT_KIND = "raster"
+            AGGREGATE_REFUSAL_REASON = "not wired here"
+
+            def _check_input_dates(self, start, end, temporal_resolution, fmt):
+                return TemporalExtent(
+                    start_date=None,
+                    end_date=None,
+                    resolution="all",
+                    dates=pd.DatetimeIndex([]),
+                )
+
+            def download(self, progress_bar: bool = True, aggregate=None):
+                return ["ran"]
+
+        return _Positional(
+            start=None,
+            end=None,
+            variables=["x"],
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path=str(tmp_path),
+        )
+
+    def test_a_positional_aggregate_is_refused(self, tmp_path):
+        """`download(False, config)` raises, exactly as the keyword form does."""
+        backend = self._backend(tmp_path)
+        with pytest.raises(NotImplementedError, match="not wired here"):
+            backend.download(False, object())
+
+    def test_the_keyword_form_still_raises(self, tmp_path):
+        """The original path is unchanged."""
+        backend = self._backend(tmp_path)
+        with pytest.raises(NotImplementedError, match="not wired here"):
+            backend.download(aggregate=object())
+
+    def test_a_positional_progress_bar_alone_is_fine(self, tmp_path):
+        """Passing only `progress_bar` positionally must not trip the gate."""
+        backend = self._backend(tmp_path)
+        assert backend.download(False) == ["ran"]
+
+    def test_an_explicit_none_aggregate_is_fine(self, tmp_path):
+        """`aggregate=None` means "not asking for one"."""
+        backend = self._backend(tmp_path)
+        assert backend.download(True, None) == ["ran"]

@@ -528,6 +528,31 @@ def _head_rows(chunk: Any, count: int) -> Any:
 _MISSING = object()
 
 
+
+def _passed_aggregate(function: Any, args: tuple[Any, ...], kw: dict[str, Any]) -> bool:
+    """Whether this call supplied a non-`None` `aggregate`, positionally or not.
+
+    Args:
+        function: The unwrapped `download` whose signature names the parameters.
+        args: Positional arguments the caller passed, `self` excluded.
+        kw: Keyword arguments the caller passed.
+
+    Returns:
+        bool: `True` when an `aggregate` argument arrived with a value.
+    """
+    if kw.get("aggregate") is not None:
+        return True
+    if not args:
+        return False
+    try:
+        bound = inspect.signature(function).bind_partial(None, *args, **kw)
+    except TypeError:
+        # A call that does not match the signature will raise on its own once
+        # the wrapper forwards it; refusing here would report the wrong error.
+        return False
+    return bound.arguments.get("aggregate") is not None
+
+
 def _describe_remote_product(product: Any) -> str:
     """Render a product for the :meth:`AbstractDataSource._run_items` log lines.
 
@@ -837,7 +862,13 @@ class AbstractDataSource(ABC):
             # only known once the dataset resolves: cmems supports aggregation
             # for its gridded datasets and must still refuse it for a vector
             # one.
-            if kw.get("aggregate") is not None:
+            #
+            # Bound against the real signature rather than read out of `kw`:
+            # `aggregate` is the second positional parameter on the backends
+            # that declare it, so `download(False, cfg)` would slip past a
+            # keyword-only lookup and be silently ignored — the refusal these
+            # backends used to raise themselves.
+            if _passed_aggregate(original, args, kw):
                 self._refuse_unsupported_aggregate()
             # Record which directories are missing *before* creating them, so
             # the failure path can unwind exactly what this call added.
