@@ -6,14 +6,14 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="One Python facade for 48 Earth-observation data providers">
+        <meta name="description" content="Remote sensing package">
       
       
       
         <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/overview/architecture/">
       
       
-        <link rel="prev" href="../../discovery/">
+        <link rel="prev" href="../../getting-started/">
       
       
         <link rel="next" href="../../aggregation/">
@@ -22,7 +22,7 @@
         
       
       
-      <link rel="icon" href="../../_images/branding/earthlens-brand-kit/favicon/favicon-32.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
@@ -63,28 +63,8 @@
 
     
     
-  
-  <link rel="icon" sizes="any"
-        href="../../_images/branding/earthlens-brand-kit/favicon/favicon.ico">
-  <link rel="icon" type="image/png" sizes="16x16"
-        href="../../_images/branding/earthlens-brand-kit/favicon/favicon-16.png">
-  <link rel="icon" type="image/png" sizes="48x48"
-        href="../../_images/branding/earthlens-brand-kit/favicon/favicon-48.png">
-  <link rel="icon" type="image/png" sizes="192x192"
-        href="../../_images/branding/earthlens-brand-kit/favicon/favicon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512"
-        href="../../_images/branding/earthlens-brand-kit/favicon/favicon-512.png">
-  <link rel="apple-touch-icon" sizes="180x180"
-        href="../../_images/branding/earthlens-brand-kit/favicon/apple-touch-icon.png">
-  <meta name="theme-color" content="#0B2036">
-  <meta property="og:image"
-        content="../../_images/branding/earthlens-brand-kit/social/github-social-preview.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image"
-        content="../../_images/branding/earthlens-brand-kit/social/announcement-card.png">
-
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -125,7 +105,8 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="earthlens" class="md-header__button md-logo" aria-label="earthlens" data-md-component="logo">
       
-  <img src="../../_images/branding/earthlens-brand-kit/icon/earthlens-icon.svg" alt="logo">
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -404,7 +385,8 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="earthlens" class="md-nav__button md-logo" aria-label="earthlens" data-md-component="logo">
       
-  <img src="../../_images/branding/earthlens-brand-kit/icon/earthlens-icon.svg" alt="logo">
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
     earthlens
@@ -566,34 +548,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../../discovery/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Discovering datasets
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -660,7 +614,7 @@
   <a href="#system-overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        System overview
+        System Overview
       
     </span>
   </a>
@@ -668,10 +622,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#distribution-namespace-layout" class="md-nav__link">
+  <a href="#class-diagram" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Distribution &amp; namespace layout
+        Class Diagram
       
     </span>
   </a>
@@ -679,30 +633,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-data-source-contract" class="md-nav__link">
+  <a href="#gee-subpackage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The data-source contract
+        GEE Subpackage
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="The data-source contract">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#output_kind" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        OUTPUT_KIND
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -710,7 +647,7 @@
   <a href="#download-sequence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download sequence
+        Download Sequence
       
     </span>
   </a>
@@ -721,18 +658,7 @@
   <a href="#catalog-pattern" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Catalog pattern
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#shared-base-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shared base services
+        Catalog Pattern
       
     </span>
   </a>
@@ -852,90 +778,6 @@
     
   
     Command-line interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../troubleshooting/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Troubleshooting
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../migration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Migration guide
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../contributing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contributing
   
 
     
@@ -8616,34 +8458,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/biodiversity/usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -10326,62 +10140,6 @@
     
   
     Sub-daily hurricanes in true colour: Ida (2021) &amp; Milton (2024)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/showcases/europe_temperature_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    An ECMWF-style temperature animation over Europe — June → July 2026
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/showcases/netherlands_drought_2026/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Showcase — the Netherlands' 2026 water shortage, from orbit and from the ground
   
 
     
@@ -13662,34 +13420,6 @@
     
   
     G-Portal search + SFTP download — research scenario
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/jaxa/04_ptree_himawari/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    P-Tree — Himawari-9 AHI HSD full-disk download
   
 
     
@@ -19105,62 +18835,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/core-functions/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Core functions
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/aggregation-api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Aggregation API
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../reference/abstract-datasource/" class="md-nav__link">
         
   
@@ -19189,98 +18863,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/base/contracts/" class="md-nav__link">
+      <a href="../../reference/base/bounded-results/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Base contracts
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/base/extents/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Extents & warnings
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/base/auth-api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication API
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/base/catalog-api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Catalog & utilities
+    Bounded results (base)
   
 
     
@@ -19337,34 +18927,6 @@
     
   
     Region affinity (base)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/biodiversity/api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Biodiversity helpers
   
 
     
@@ -19528,7 +19090,7 @@
   <a href="#system-overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        System overview
+        System Overview
       
     </span>
   </a>
@@ -19536,10 +19098,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#distribution-namespace-layout" class="md-nav__link">
+  <a href="#class-diagram" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Distribution &amp; namespace layout
+        Class Diagram
       
     </span>
   </a>
@@ -19547,30 +19109,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-data-source-contract" class="md-nav__link">
+  <a href="#gee-subpackage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The data-source contract
+        GEE Subpackage
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="The data-source contract">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#output_kind" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        OUTPUT_KIND
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -19578,7 +19123,7 @@
   <a href="#download-sequence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download sequence
+        Download Sequence
       
     </span>
   </a>
@@ -19589,18 +19134,7 @@
   <a href="#catalog-pattern" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Catalog pattern
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#shared-base-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shared base services
+        Catalog Pattern
       
     </span>
   </a>
@@ -19702,12 +19236,9 @@
 
 
 <h1 id="architecture"><a class="toclink" href="#architecture">Architecture</a><a class="headerlink" href="#architecture" title="Permanent link">#</a></h1>
-<p>This page documents the internal architecture of <code>earthlens</code> using <a href="https://mermaid.js.org/">Mermaid</a> diagrams:
-how the facade, the backend registry, the shared base contracts, and the per-provider catalogs fit together.</p>
-<h2 id="system-overview"><a class="toclink" href="#system-overview">System overview</a><a class="headerlink" href="#system-overview" title="Permanent link">#</a></h2>
-<p><code>EarthLens</code> is a thin facade. It resolves a <code>data_source=</code> key to a backend class, instantiates it with the
-request you described, and delegates. Every one of the <strong>48 provider backends</strong> implements the same
-<code>AbstractDataSource</code> contract, so the call shape does not change when you switch providers.</p>
+<p>This page documents the internal architecture of <code>earthlens</code> using <a href="https://mermaid.js.org/">Mermaid</a> diagrams. It replaces the original draw.io class diagram.</p>
+<h2 id="system-overview"><a class="toclink" href="#system-overview">System Overview</a><a class="headerlink" href="#system-overview" title="Permanent link">#</a></h2>
+<p>The <code>EarthLens</code> facade exposes a uniform API on top of several concrete data-source backends. Each backend implements the <code>AbstractDataSource</code> interface, and each has a companion <code>Catalog</code> class that describes available variables.</p>
 <div class="panzoom-box" data-key="ctrl" id="panzoom0" oncontextmenu="return false;">
     <div class="panzoom-info-box panzoom-info-box-top panzoom-hidden">
 Hold "Ctrl" to enable pan &amp; zoom
@@ -19733,74 +19264,20 @@ Hold "Ctrl" to enable pan &amp; zoom
     </nav>
     <pre class="mermaid"><code>flowchart LR
     user([User])
-    facade["EarthLens facade&lt;br/&gt;(earthlens.core)"]
-    registry["_LazyRegistry&lt;br/&gt;entry-point discovery"]
-    user --&gt;|"data_source='chc'"| facade
-    facade --&gt; registry
-    registry --&gt;|"imports on demand"| backend["Concrete backend&lt;br/&gt;(AbstractDataSource subclass)"]
-    backend --&gt; catalog["Catalog&lt;br/&gt;(pydantic + YAML)"]
-    backend --&gt; remote[("Provider&lt;br/&gt;FTP · S3 · HTTP · SDK")]
-    backend --&gt; pyramids["pyramids-gis&lt;br/&gt;clip · convert · write"]</code></pre> 
+    earthlens[EarthLens]
+    user --&gt; earthlens
+    earthlens --&gt; CHIRPS
+    earthlens --&gt; S3
+    earthlens --&gt; ECMWF
+    earthlens --&gt; GEE
+    CHIRPS --&gt; FTP[(UCSB FTP&lt;br/&gt;data.chc.ucsb.edu)]
+    S3 --&gt; AWS[(AWS S3&lt;br/&gt;era5-pds bucket)]
+    ECMWF --&gt; CDS[(ECMWF&lt;br/&gt;Climate Data Store)]
+    GEE --&gt; Earth[(Google&lt;br/&gt;Earth Engine)]</code></pre> 
     
 </div>
-<p>The registry is <strong>lazy</strong> and <strong>discovered</strong>, not hard-coded. <code>earthlens._backends.discover_backends()</code> merges the
-<code>[project.entry-points."earthlens.backends"]</code> table that each provider distribution publishes, so core names no
-backend and the optional SDK for a provider you never touch is never imported.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">sources</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">sources</span><span class="p">()</span>          <span class="c1"># every registered key, aliases included</span>
-</code></pre></div>
-<h2 id="distribution-namespace-layout"><a class="toclink" href="#distribution-namespace-layout">Distribution &amp; namespace layout</a><a class="headerlink" href="#distribution-namespace-layout" title="Permanent link">#</a></h2>
-<p><code>earthlens</code> is a <strong>PEP 420 namespace package</strong> — there is no <code>earthlens/__init__.py</code>. Seven distributions each
-contribute their own <code>earthlens.&lt;name&gt;</code> subpackages into one namespace, and the repository is a
-<a href="https://docs.astral.sh/uv/">uv</a> workspace whose members they are.</p>
-<div class="panzoom-box" data-key="ctrl" id="panzoom0" oncontextmenu="return false;">
-    <div class="panzoom-info-box panzoom-info-box-top panzoom-hidden">
-Hold "Ctrl" to enable pan &amp; zoom
-</div>
-    <nav class="panzoom-nav panzoom-top-nav">
-    <button class="panzoom-info panzoom-button">
-    <svg class="panzoom-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-        <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3l58.3 0c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24l0-13.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1l-58.3 0c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
-    </svg>
-</button><button class="panzoom-reset panzoom-button">
-    <svg class="panzoom-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-        <path d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"></path>
-    </svg>
-</button><button class="panzoom-max panzoom-button">
-    <svg class="panzoom-icon" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
-        <path d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z"></path>
-    </svg>
-</button><button class="panzoom-min panzoom-button panzoom-hidden">
-    <svg class="panzoom-icon" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
-        <path d="M160 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96zM32 320c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM352 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 320c-17.7 0-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0z"></path>
-    </svg>
-</button>
-    </nav>
-    <pre class="mermaid"><code>flowchart TB
-    meta["earthlens&lt;br/&gt;&lt;i&gt;meta-package&lt;/i&gt;"]
-    core["earthlens-core&lt;br/&gt;facade · base · cli · aggregate"]
-    atm["earthlens-atmosphere&lt;br/&gt;chc · ecmwf · nwp · goes · …"]
-    ocn["earthlens-ocean&lt;br/&gt;cmems · argo · erddap · …"]
-    img["earthlens-imagery&lt;br/&gt;gee · stac · asf · jaxa · …"]
-    lnd["earthlens-land&lt;br/&gt;dem · ghsl · soilgrids · …"]
-    haz["earthlens-hazards&lt;br/&gt;gdacs · fdsn · osm · …"]
-    meta --&gt; core &amp; atm &amp; ocn &amp; img &amp; lnd &amp; haz
-    atm &amp; ocn &amp; img &amp; lnd &amp; haz -.-&gt;|depends on| core</code></pre> 
-    
-</div>
-<p>The public surface is <strong><code>earthlens.core</code></strong>, not the top level:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span><span class="p">,</span> <span class="n">download</span><span class="p">,</span> <span class="n">find</span><span class="p">,</span> <span class="n">search</span><span class="p">,</span> <span class="n">sources</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">aggregate_netcdf</span><span class="p">,</span> <span class="n">__version__</span>
-</code></pre></div>
-<p><code>from earthlens import EarthLens</code> does <strong>not</strong> work — it required the <code>__init__.py</code> that the namespace layout
-removes. Backend modules keep their dotted paths (<code>earthlens.chc</code>, <code>earthlens.gee</code>, …), which is how you reach a
-provider's <code>Catalog</code>.</p>
-<h2 id="the-data-source-contract"><a class="toclink" href="#the-data-source-contract">The data-source contract</a><a class="headerlink" href="#the-data-source-contract" title="Permanent link">#</a></h2>
-<p><code>AbstractDataSource</code> is the core abstraction. Only <strong>two</strong> members are abstract — <code>download()</code> and
-<code>_check_input_dates()</code>; everything else is a hook with a working default, which is why a new backend is usually a
-small class.</p>
-<p>The lifecycle hooks are <strong>private by design</strong>. Users call <code>download()</code>; the base class drives the rest.</p>
+<h2 id="class-diagram"><a class="toclink" href="#class-diagram">Class Diagram</a><a class="headerlink" href="#class-diagram" title="Permanent link">#</a></h2>
+<p>The core abstraction is <code>AbstractDataSource</code>. Concrete classes <code>CHIRPS</code>, <code>S3</code>, <code>ECMWF</code>, and the <code>GEE</code> subpackage implement it. <code>AbstractCatalog</code> plays the same role for the variable/dataset metadata catalogs.</p>
 <div class="panzoom-box" data-key="ctrl" id="panzoom0" oncontextmenu="return false;">
     <div class="panzoom-info-box panzoom-info-box-top panzoom-hidden">
 Hold "Ctrl" to enable pan &amp; zoom
@@ -19827,83 +19304,136 @@ Hold "Ctrl" to enable pan &amp; zoom
     <pre class="mermaid"><code>classDiagram
     class AbstractDataSource {
         &lt;&lt;abstract&gt;&gt;
-        +OUTPUT_KIND: str
-        +REQUIRES_TIME_WINDOW: bool
-        +SUPPORTS_POLYGON_AOI: bool
-        +space: SpatialExtent
-        +time: TemporalExtent
+        +space: Dict
+        +time: Dict
         +client
         +root_dir: Path
-        +authenticate() AbstractDataSource
+        +temporal_resolution: str
+        +variables: list
+        +check_input_dates(start, end, res, fmt)*
+        +initialize()*
+        +create_grid(lat_lim, lon_lim)*
         +download()*
-        +iter_download()
-        #_check_input_dates()*
-        #_initialize()
-        #_create_grid()
-        #_api()
-    }
-
-    class SpatialExtent {
-        &lt;&lt;frozen pydantic&gt;&gt;
-        +north, south, east, west: float
-        +from_pairs(lat_lim, lon_lim)$
-        +estimate_pixel_dims(scale_m)
-    }
-
-    class TemporalExtent {
-        &lt;&lt;frozen pydantic&gt;&gt;
-        +start, end
-        +resolution: str
+        +download_dataset()
+        +api()*
     }
 
     class AbstractCatalog {
         &lt;&lt;abstract&gt;&gt;
-        +load(path)$
-        +get_variable(name)
+        +catalog: Dict
+        +get_catalog()
+        +get_variable(var_name)
     }
 
-    AbstractDataSource --&gt; SpatialExtent : _create_grid() returns
-    AbstractDataSource --&gt; TemporalExtent : _check_input_dates() returns
-    AbstractDataSource --&gt; AbstractCatalog : reads</code></pre> 
+    class CHIRPS {
+        +start_date
+        +end_date
+        +lat_limits
+        +lon_limits
+        +check_input_dates(...)
+        +initialize()
+        +create_grid(lat_lim, lon_lim)
+        +download(progress_bar, cores)
+        +API(date, args)
+        +callAPI(pathFTP, path, filename)
+        +post_download(...)
+    }
+
+    class S3 {
+        +bucket: str
+        +check_input_dates(...)
+        +initialize(bucket)
+        +create_grid(lat_lim, lon_lim)
+        +download(progress_bar)
+        +downloadDataset(var, progress_bar)
+        +API(s3_file_path, local_dir, bucket)
+        +parse_response_metadata(response)$
+    }
+
+    class ECMWF {
+        +check_input_dates(...)
+        +initialize()
+        +create_grid(lat_lim, lon_lim)
+        +download(...)
+        +download_dataset(...)
+        +api(var_info)
+        +post_download(...)
+    }
+
+    class EarthLens {
+        +DataSources: Dict
+        +datasource: AbstractDataSource
+        +download(progress_bar, *args, **kwargs)
+    }
+
+    AbstractDataSource &lt;|-- CHIRPS
+    AbstractDataSource &lt;|-- S3
+    AbstractDataSource &lt;|-- ECMWF
+    EarthLens o--&gt; AbstractDataSource : delegates to
+    AbstractCatalog &lt;|-- CHIRPS_Catalog
+    AbstractCatalog &lt;|-- S3_Catalog
+    AbstractCatalog &lt;|-- ECMWF_Catalog
+    class CHIRPS_Catalog["Catalog (CHIRPS)"]
+    class S3_Catalog["Catalog (S3)"] {
+        +initialize(bucket)$
+        +get_catalog()
+        +get_variable(var_name)
+        +get_available_years(bucket)
+        +get_available_data(...)
+    }
+    class ECMWF_Catalog["Catalog (ECMWF)"] {
+        +get_catalog()
+        +get_variable(dataset_name, variable_name)
+        +get_dataset(name)
+        +describe(name)
+    }</code></pre> 
     
 </div>
-<p><code>_create_grid()</code> and <code>_check_input_dates()</code> return frozen pydantic value objects, which the base class captures
-into <code>self.space</code> and <code>self.time</code> — they are not plain dicts.</p>
-<h3 id="output_kind"><a class="toclink" href="#output_kind"><code>OUTPUT_KIND</code></a><a class="headerlink" href="#output_kind" title="Permanent link">#</a></h3>
-<p>Each backend declares what it produces, and that one attribute drives the facade's behaviour:</p>
-<table>
-<thead>
-<tr>
-<th><code>OUTPUT_KIND</code></th>
-<th><code>download()</code> returns</th>
-<th><code>aggregate=</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>raster</code></td>
-<td><code>list[Path]</code> — GeoTIFF / NetCDF / COG</td>
-<td>accepted</td>
-</tr>
-<tr>
-<td><code>vector</code></td>
-<td><code>FeatureCollection</code> / <code>GeoDataFrame</code></td>
-<td>rejected</td>
-</tr>
-<tr>
-<td><code>tabular</code></td>
-<td><code>DataFrame</code></td>
-<td>rejected</td>
-</tr>
-<tr>
-<td><code>mixed</code></td>
-<td>varies per request</td>
-<td>rejected</td>
-</tr>
-</tbody>
-</table>
-<p><code>download()</code> never returns <code>None</code>.</p>
-<h2 id="download-sequence"><a class="toclink" href="#download-sequence">Download sequence</a><a class="headerlink" href="#download-sequence" title="Permanent link">#</a></h2>
+<h2 id="gee-subpackage"><a class="toclink" href="#gee-subpackage">GEE Subpackage</a><a class="headerlink" href="#gee-subpackage" title="Permanent link">#</a></h2>
+<p>The Google Earth Engine backend lives in its own subpackage and has a different shape: rather than implementing <code>AbstractDataSource</code>, it wraps the <code>earthengine-api</code> client directly through a small class hierarchy.</p>
+<div class="panzoom-box" data-key="ctrl" id="panzoom0" oncontextmenu="return false;">
+    <div class="panzoom-info-box panzoom-info-box-top panzoom-hidden">
+Hold "Ctrl" to enable pan &amp; zoom
+</div>
+    <nav class="panzoom-nav panzoom-top-nav">
+    <button class="panzoom-info panzoom-button">
+    <svg class="panzoom-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3l58.3 0c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24l0-13.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1l-58.3 0c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"></path>
+    </svg>
+</button><button class="panzoom-reset panzoom-button">
+    <svg class="panzoom-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"></path>
+    </svg>
+</button><button class="panzoom-max panzoom-button">
+    <svg class="panzoom-icon" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z"></path>
+    </svg>
+</button><button class="panzoom-min panzoom-button panzoom-hidden">
+    <svg class="panzoom-icon" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+        <path d="M160 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96zM32 320c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM352 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 320c-17.7 0-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0z"></path>
+    </svg>
+</button>
+    </nav>
+    <pre class="mermaid"><code>classDiagram
+    class GEE {
+        +service_account: str
+        +service_key_path: str
+        +initialize(service_account, service_key)$
+        +encodeServiceAccount(key_dir)$
+        +decodeServiceAccount(key_bytes)$
+    }
+
+    class Dataset {
+        +getDate(...)
+        +addBoundary(gdf)
+        +filterByRegion(gdf)
+    }
+
+    GEE &lt;|-- Dataset</code></pre> 
+    
+</div>
+<h2 id="download-sequence"><a class="toclink" href="#download-sequence">Download Sequence</a><a class="headerlink" href="#download-sequence" title="Permanent link">#</a></h2>
+<p>The user calls <code>EarthLens.download()</code>, which delegates to the selected backend. Each backend follows the same high-level sequence: authenticate / open a session, iterate over dates × variables, fetch, and post-process.</p>
 <div class="panzoom-box" data-key="ctrl" id="panzoom0" oncontextmenu="return false;">
     <div class="panzoom-info-box panzoom-info-box-top panzoom-hidden">
 Hold "Ctrl" to enable pan &amp; zoom
@@ -19931,37 +19461,26 @@ Hold "Ctrl" to enable pan &amp; zoom
     autonumber
     actor User
     participant Facade as EarthLens
-    participant Registry as _LazyRegistry
-    participant DS as Backend
-    participant Server as Provider
+    participant DS as AbstractDataSource
+    participant Server as Remote server&lt;br/&gt;(FTP / S3 / CDS)
     participant Pyramids as pyramids-gis
 
     User-&gt;&gt;Facade: EarthLens(data_source, start, end, ...)
-    Facade-&gt;&gt;Registry: resolve key
-    Registry--&gt;&gt;Facade: backend class (imported on demand)
-    Facade-&gt;&gt;DS: instantiate
-    DS-&gt;&gt;DS: _check_input_dates() → TemporalExtent
-    DS-&gt;&gt;DS: _create_grid() → SpatialExtent
-    opt provider needs credentials
-        User-&gt;&gt;Facade: authenticate(...)
-        Facade-&gt;&gt;DS: authenticate()
-    end
+    Facade-&gt;&gt;DS: instantiate backend
+    DS-&gt;&gt;DS: initialize() / check_input_dates() / create_grid()
     User-&gt;&gt;Facade: download()
     Facade-&gt;&gt;DS: download()
-    Note over DS: base class creates root_dir,&lt;br/&gt;and unwinds it if the call raises
-    loop each date × variable
-        DS-&gt;&gt;Server: _api()
-        Server--&gt;&gt;DS: raw granule
-        DS-&gt;&gt;Pyramids: clip / convert / write
-        Pyramids--&gt;&gt;DS: GeoTIFF / NetCDF
+    loop for each date × variable
+        DS-&gt;&gt;Server: api() / callAPI()
+        Server--&gt;&gt;DS: NetCDF / raw file
+        DS-&gt;&gt;Pyramids: post_download() → clip + convert
+        Pyramids--&gt;&gt;DS: GeoTIFF
     end
-    DS--&gt;&gt;Facade: paths or in-memory table
-    Facade--&gt;&gt;User: result (per OUTPUT_KIND)</code></pre> 
+    DS--&gt;&gt;User: files saved under path/</code></pre> 
     
 </div>
-<h2 id="catalog-pattern"><a class="toclink" href="#catalog-pattern">Catalog pattern</a><a class="headerlink" href="#catalog-pattern" title="Permanent link">#</a></h2>
-<p>Nearly every backend has a companion <code>Catalog</code> — a pydantic model loading YAML shipped as package data, parsed
-through the shared duplicate-key-rejecting loader <code>earthlens.base.yaml_loader.load_yaml_strict</code>.</p>
+<h2 id="catalog-pattern"><a class="toclink" href="#catalog-pattern">Catalog Pattern</a><a class="headerlink" href="#catalog-pattern" title="Permanent link">#</a></h2>
+<p>Every data source has a companion <code>Catalog</code> class that loads variable metadata from a YAML file (for CHIRPS and ECMWF) or introspects the remote bucket (for S3).</p>
 <div class="panzoom-box" data-key="ctrl" id="panzoom0" oncontextmenu="return false;">
     <div class="panzoom-info-box panzoom-info-box-top panzoom-hidden">
 Hold "Ctrl" to enable pan &amp; zoom
@@ -19985,73 +19504,33 @@ Hold "Ctrl" to enable pan &amp; zoom
     </svg>
 </button>
     </nav>
-    <pre class="mermaid"><code>flowchart LR
-    subgraph shared["earthlens.base"]
-        AC[AbstractCatalog]
-        YL[load_yaml_strict]
+    <pre class="mermaid"><code>flowchart TB
+    subgraph CHIRPS
+        direction TB
+        C1[Catalog]
+        C2[(chirps entries&lt;br/&gt;in code)]
+        C1 --&gt; C2
     end
-    subgraph sharded["Sharded — large / multi-family"]
-        S1["catalog/&amp;lt;family&amp;gt;.yaml&lt;br/&gt;+ _index.yaml"]
+    subgraph ECMWF
+        direction TB
+        E1[Catalog]
+        E2[(ecmwf/catalog/)]
+        E1 --&gt; E2
     end
-    subgraph single["Single file — small enumeration"]
-        S2["&amp;lt;pkg&amp;gt;_data_catalog.yaml"]
+    subgraph S3
+        direction TB
+        S1[Catalog]
+        S2[(era5-pds&lt;br/&gt;S3 bucket listing)]
+        S1 --&gt; S2
     end
-    AC --&gt; YL
-    YL --&gt; S1 &amp; S2</code></pre> 
+    subgraph GEE
+        direction TB
+        G1[Catalog]
+        G2[(gee/catalog.yaml)]
+        G1 --&gt; G2
+    end</code></pre> 
     
 </div>
-<p>Which shape a backend uses is decided by the rule in <a href="#catalog-storage">Catalog storage</a> below, not ad hoc. A few
-catalogs are introspected live from the provider instead of shipped (S3 lists its bucket).</p>
-<h2 id="shared-base-services"><a class="toclink" href="#shared-base-services">Shared base services</a><a class="headerlink" href="#shared-base-services" title="Permanent link">#</a></h2>
-<p><code>earthlens.base</code> holds the contracts and the cross-backend plumbing, so a provider backend stays small:</p>
-<table>
-<thead>
-<tr>
-<th>Module</th>
-<th>Role</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>abstractdatasource.py</code></td>
-<td><code>AbstractDataSource</code>, <code>AbstractCatalog</code>, <code>SpatialExtent</code>, <code>TemporalExtent</code></td>
-</tr>
-<tr>
-<td><code>http.py</code></td>
-<td><code>HttpClient</code> — pooled, retrying HTTP with URL redaction</td>
-</tr>
-<tr>
-<td><code>region.py</code></td>
-<td>Region affinity — pick the provider endpoint / mirror nearest the AOI</td>
-</tr>
-<tr>
-<td><code>spatial.py</code></td>
-<td>AOI normalisation and bbox helpers</td>
-</tr>
-<tr>
-<td><code>auth.py</code></td>
-<td><code>AbstractAuth</code>, <code>AuthenticationError</code></td>
-</tr>
-<tr>
-<td><code>s3.py</code></td>
-<td><code>S3Auth</code> / <code>S3Credentials</code> for the unsigned and signed bucket backends</td>
-</tr>
-<tr>
-<td><code>catalog_source.py</code></td>
-<td>Catalog parse cache keyed on <code>(path, mtime_ns)</code></td>
-</tr>
-<tr>
-<td><code>yaml_loader.py</code></td>
-<td><code>load_yaml_strict</code> — duplicate-key-rejecting YAML</td>
-</tr>
-<tr>
-<td><code>providers.py</code></td>
-<td><code>Provider</code> registry loaded from per-backend <code>providers.yaml</code></td>
-</tr>
-</tbody>
-</table>
-<p>Generic GIS work — reprojection, resampling, format conversion, visualisation — is <strong>not</strong> here. It belongs to
-<a href="https://github.com/serapeum-org/pyramids">pyramids</a>, the GIS backend earthlens consumes.</p>
 <h2 id="subpackage-layout-style"><a class="toclink" href="#subpackage-layout-style">Subpackage layout &amp; style</a><a class="headerlink" href="#subpackage-layout-style" title="Permanent link">#</a></h2>
 <p>Every provider backend under <code>src/earthlens/&lt;pkg&gt;/</code> follows one layout so the
 backends read the same way; a new backend should match it.</p>
@@ -20167,7 +19646,7 @@ hdx, overture, tropycal) have no auth module.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../discovery/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Discovering datasets">
+          <a href="../../getting-started/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Getting started">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -20177,7 +19656,7 @@ hdx, overture, tropycal) have no auth module.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Discovering datasets
+                Getting started
               </div>
             </div>
           </a>
