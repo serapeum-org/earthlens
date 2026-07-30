@@ -714,8 +714,9 @@ class TestConcurrencyContractIsDocumented:
 
         from earthlens.base.http import HttpClient
 
+        client = HttpClient()
         with pytest.raises((TypeError, AttributeError)):
-            pickle.dumps(HttpClient())
+            pickle.dumps(client)
 
     def test_a_fresh_backend_pickles(self, tmp_path):
         """Before any client materialises, a backend crosses a process boundary."""

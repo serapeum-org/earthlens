@@ -528,6 +528,43 @@ def _head_rows(chunk: Any, count: int) -> Any:
 _MISSING = object()
 
 
+def _missing_ancestors(directory: Path) -> list[Path]:
+    """Return `directory` and each missing parent, leaf first.
+
+    Args:
+        directory: The output directory about to be created.
+
+    Returns:
+        list[Path]: The paths that do not exist yet, nearest first, so a
+            failure can remove exactly what the call went on to create.
+    """
+    missing: list[Path] = []
+    probe = directory
+    while not probe.exists() and probe != probe.parent:
+        missing.append(probe)
+        probe = probe.parent
+    return missing
+
+
+def _unwind_created(created: list[Path]) -> None:
+    """Remove directories this call created, stopping at the first non-empty one.
+
+    A request the backend rejects (an unsupported `aggregate=`, a bad dataset
+    key) must not leave an output directory behind. Only the directories the
+    call created are removed, and only while each is still empty, so a
+    pre-existing tree and anything a partially-successful download wrote are
+    both left alone.
+
+    Args:
+        created: The paths from :func:`_missing_ancestors`, leaf first.
+    """
+    for directory in created:
+        try:
+            directory.rmdir()
+        except OSError:
+            break
+
+
 @functools.cache
 def _parameters(function: Any) -> frozenset[str]:
     """Return the parameter names `function` accepts.
@@ -894,28 +931,14 @@ class AbstractDataSource(ABC):
             # refused above.
             if "aggregate" in kw and "aggregate" not in _parameters(original):
                 kw.pop("aggregate")
-            # Record which directories are missing *before* creating them, so
-            # the failure path can unwind exactly what this call added.
-            created = []
-            probe = self.root_dir
-            while not probe.exists() and probe != probe.parent:
-                created.append(probe)
-                probe = probe.parent
+            # Recorded *before* creating them, so the failure path can unwind
+            # exactly what this call added.
+            created = _missing_ancestors(self.root_dir)
             self._ensure_root_dir()
             try:
                 return original(self, *args, **kw)
             except BaseException:
-                # A request the backend rejects (an unsupported `aggregate=`,
-                # a bad dataset key) must not leave an output directory
-                # behind. Unwind leaf-first, and only the directories this
-                # call created and only while each is still empty — so a
-                # pre-existing tree, and anything a partially-successful
-                # download wrote, are both untouched.
-                for directory in created:
-                    try:
-                        directory.rmdir()
-                    except OSError:
-                        break
+                _unwind_created(created)
                 raise
 
         download._ensures_root_dir = True  # type: ignore[attr-defined]
@@ -2021,26 +2044,65 @@ class AbstractDataSource(ABC):
             # raises while the generator is suspended, so a caller's own error
             # would be logged as this item's failure and swallowed by an
             # `ignore` policy.
-            placeholder = _MISSING
             try:
                 value = fn(item)
             except Exception as exc:  # noqa: BLE001 - policy decides the fate
                 if errors is None or errors == "raise":
                     raise
-                described = name(item)
-                if on_failure is not None:
-                    placeholder = on_failure(item, exc)
-                if errors == "warn":
-                    logger.warning(
-                        f"{type(self).__name__}: {label} {described} failed: "
-                        f"{type(exc).__name__}: {exc}"
-                    )
-                failures.append((described, exc))
-                if placeholder is _MISSING:
-                    continue
-                yield placeholder
+                placeholder = self._record_failure(
+                    item,
+                    exc,
+                    errors=errors,
+                    label=label,
+                    name=name,
+                    on_failure=on_failure,
+                    failures=failures,
+                )
+                if placeholder is not _MISSING:
+                    yield placeholder
                 continue
             yield value
+
+    def _record_failure(
+        self,
+        item: Any,
+        exc: BaseException,
+        *,
+        errors: str,
+        label: str,
+        name: Callable[[Any], str],
+        on_failure: Callable[[Any, BaseException], Any] | None,
+        failures: list[tuple[str, BaseException]],
+    ) -> Any:
+        """Log and record one item's failure under a non-raising policy.
+
+        Split out of :meth:`_iter_items` so the generator stays a plain
+        try/except around the item call.
+
+        Args:
+            item: The item whose `fn` call raised.
+            exc: What it raised.
+            errors: The already-validated policy (`"warn"` or `"ignore"`).
+            label: Noun for the log line (e.g. `"granule"`).
+            name: Renders `item` for the log.
+            on_failure: Optional `(item, exception) -> placeholder`.
+            failures: Accumulator the caller owns; appended to here.
+
+        Returns:
+            Any: The placeholder to yield in the failed item's place, or the
+                `_MISSING` sentinel when there is none. A hook returning
+                `None` is a real placeholder, which is why a sentinel and not
+                `None` marks its absence.
+        """
+        described = name(item)
+        placeholder = _MISSING if on_failure is None else on_failure(item, exc)
+        if errors == "warn":
+            logger.warning(
+                f"{type(self).__name__}: {label} {described} failed: "
+                f"{type(exc).__name__}: {exc}"
+            )
+        failures.append((described, exc))
+        return placeholder
 
     def _fetch_limited(
         self, products: Sequence[RemoteProduct], limit: int | None = None

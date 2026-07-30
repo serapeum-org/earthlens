@@ -385,8 +385,9 @@ class TestIterItemsPolicy:
         # An `Exception` subclass on purpose: a `KeyboardInterrupt` here would
         # pass either way, since `except Exception` never catches it, and the
         # test would prove nothing.
+        from_the_caller = RuntimeError("raised by the caller")
         with pytest.raises(RuntimeError, match="raised by the caller"):
-            generator.throw(RuntimeError("raised by the caller"))
+            generator.throw(from_the_caller)
 
         assert failures == [], "the consumer's error was logged as an item failure"
 

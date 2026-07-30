@@ -439,7 +439,10 @@ class TestRateLimitActuallyPaces:
         client._throttle()
         client._throttle()
 
-        assert slept and slept[0] == pytest.approx(OSM.MIN_REQUEST_INTERVAL), (
-            f"expected one {OSM.MIN_REQUEST_INTERVAL}s pause between "
-            f"back-to-back requests, got {slept}"
+        assert slept, (
+            f"expected a pause between back-to-back requests, got none: {slept}"
+        )
+        assert slept[0] == pytest.approx(OSM.MIN_REQUEST_INTERVAL), (
+            f"expected a {OSM.MIN_REQUEST_INTERVAL}s pause between back-to-back "
+            f"requests, got {slept}"
         )
