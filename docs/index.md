@@ -53,7 +53,7 @@ See [Supported providers](reference/providers.md) for the full matrix, and the
 per-provider pages under **Data Sources** for catalogs, authentication, and usage.
 
 <p align="center">
-  <img src="_images/branding/earthlens-brand-kit/animation/earthlens-logo-animated.svg" width="260"
+  <img src="_images/branding/earthlens-brand-kit/animation/earthlens-logo-orbit.gif" width="280"
        alt="A satellite orbiting Earth, its data resolving down through a pyramid of raster overview tiles onto the globe">
 </p>
 
