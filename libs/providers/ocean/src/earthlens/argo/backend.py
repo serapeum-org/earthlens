@@ -292,7 +292,6 @@ class ARGO(AbstractDataSource):
                 the cap is never fetched. `None` (the default) fetches
                 everything, which for a wide request is bounded only by memory.
 
-
         Returns:
             pd.DataFrame: The long-format profile table.
         """

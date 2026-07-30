@@ -276,16 +276,16 @@ class PVGIS(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        limit: int | None = None,
+            limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch every sampled point, write the table, and return it.
 
         Args:
-            progress_bar: Show a per-point `tqdm` bar while fetching.            limit: Cap on the total rows returned, across every requested
+            progress_bar: Show a per-point `tqdm` bar while fetching.
+            limit: Cap on the total rows returned, across every requested
                 point. Applied as each point's frame arrives, so a point past
                 the cap is never requested. `None` (the default) fetches
                 everything.
-
 
         Returns:
             pd.DataFrame: The concatenated long-format frame — one block of

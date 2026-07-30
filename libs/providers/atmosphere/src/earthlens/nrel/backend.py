@@ -334,16 +334,16 @@ class NREL(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        limit: int | None = None,
+            limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch every `(point, year)` call, write the table, and return it.
 
         Args:
-            progress_bar: Show a per-call `tqdm` bar while fetching.            limit: Cap on the total rows returned, across every requested
+            progress_bar: Show a per-call `tqdm` bar while fetching.
+            limit: Cap on the total rows returned, across every requested
                 call. Applied as each call's frame arrives, so a call past
                 the cap is never requested. `None` (the default) fetches
                 everything.
-
 
         Returns:
             pd.DataFrame: The concatenated long-format frame — one block of

@@ -45,9 +45,6 @@ from earthlens.base.abstractdatasource import (
 )
 from earthlens.base.http import HttpClient
 from earthlens.base.spatial import crop_to_aoi, resolve_aoi
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 from earthlens.worldpop._helpers import (
     cohort_of,
     continent_for_bbox,
@@ -66,6 +63,9 @@ from earthlens.worldpop.rest import (
     record_archive_files,
     rest_records,
 )
+
+if TYPE_CHECKING:
+    from earthlens.aggregate import AggregationConfig
 
 #: Sub-directory under the output path where raw per-country GeoTIFFs land.
 _RAW_DIRNAME: str = ".worldpop_raw"

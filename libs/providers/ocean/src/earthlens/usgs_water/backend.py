@@ -359,7 +359,6 @@ class USGSWater(AbstractDataSource):
                 *per request* server-side; passing neither, either, or both is
                 valid.
 
-
         Returns:
             pd.DataFrame: The long-format observation table for the
                 selected `service`.

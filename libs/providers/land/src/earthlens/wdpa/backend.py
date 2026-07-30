@@ -273,7 +273,6 @@ class WDPA(AbstractDataSource):
                 selector past the cap is never queried. `None` (the default)
                 fetches everything.
 
-
         Returns:
             FeatureCollection: The protected-area polygons, CRS
                 `EPSG:4326`. Written to a file under `path` when set.

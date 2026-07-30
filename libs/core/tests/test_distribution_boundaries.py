@@ -1027,3 +1027,53 @@ class TestSourceTextIsNotDoubleEncoded:
             f"double-encoded characters found; these render as 'â€\"' in error "
             f"messages and docs: {offenders}"
         )
+
+
+class TestArgsEntriesAreOnTheirOwnLine:
+    """Two `Args:` entries must never share a physical line.
+
+    A scripted docstring edit that inserts `limit:` after `progress_bar:`
+    without a newline produces
+    `progress_bar: Show a bar.            limit: Cap on the rows...`.
+    Python does not care, the tests do not care, and ruff does not read
+    docstring structure — but Google-style parsers key on one entry per line,
+    so the second parameter silently vanishes from the rendered documentation.
+    That happened to nrel and pvgis in this branch.
+    """
+
+    def test_no_two_arg_entries_share_a_line(self):
+        """Each `name: description` entry starts its own line."""
+        import re
+
+        root = Path(__file__).resolve().parents[3]
+        offenders: list[str] = []
+        pattern = re.compile(r"\S {2,}[a-z_]+:\s")
+        for glob in (
+            "libs/providers/*/src/earthlens/**/*.py",
+            "libs/core/src/earthlens/**/*.py",
+        ):
+            for path in sorted(root.glob(glob)):
+                if "build" in path.parts:
+                    continue
+                for index, line in enumerate(
+                    path.read_text(encoding="utf-8").splitlines(), 1
+                ):
+                    stripped = line.strip()
+                    # Only docstring prose indented as an Args entry, not code
+                    # (a dict literal or a type annotation legitimately has
+                    # `name:` after other text).
+                    # Doctest lines carry their own `name: value` syntax —
+                    # class-body annotations and inline YAML — which is not an
+                    # Args entry at all.
+                    if not stripped or stripped.startswith(
+                        ("#", '"', "'", ">>>", "...")
+                    ):
+                        continue
+                    if any(ch in line for ch in "{}=()[]"):
+                        continue
+                    if pattern.search(line):
+                        offenders.append(f"{path.name}:{index}")
+        assert offenders == [], (
+            f"two Args entries share one line, so the second is dropped from "
+            f"the rendered docs: {offenders}"
+        )
