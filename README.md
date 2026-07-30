@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="docs/_images/branding/earthlens-brand-kit/docs/readme-banner.png" width="820"
+       alt="earthlens — 48 Earth-observation providers · one facade · modular install">
+</p>
+
 [![Tests](https://github.com/serapeum-org/earthlens/actions/workflows/tests.yml/badge.svg)](https://github.com/serapeum-org/earthlens/actions/workflows/tests.yml)
 [![Wheel](https://github.com/serapeum-org/earthlens/actions/workflows/wheel-test.yml/badge.svg)](https://github.com/serapeum-org/earthlens/actions/workflows/wheel-test.yml)
 [![Docs](https://github.com/serapeum-org/earthlens/actions/workflows/github-pages-mkdocs.yml/badge.svg)](https://serapeum-org.github.io/earthlens/)
@@ -457,6 +462,7 @@ Start here:
 | [Troubleshooting](https://serapeum-org.github.io/earthlens/troubleshooting/) | When a download fails, and what to change. |
 | [Migration guide](https://serapeum-org.github.io/earthlens/migration/) | Breaking changes by release. |
 | [Architecture](https://serapeum-org.github.io/earthlens/overview/architecture/) | How the facade, registry, and backends fit together. |
+| [Brand & media kit](https://serapeum-org.github.io/earthlens/brand/) | Logos, icons, favicons, social cards, and animations. |
 
 
 Contributing

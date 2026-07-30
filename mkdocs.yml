@@ -1,5 +1,5 @@
 site_name: earthlens
-site_description: Remote sensing package
+site_description: One Python facade for 48 Earth-observation data providers
 site_url: https://serapeum-org.github.io/earthlens/
 repo_url: https://github.com/serapeum-org/earthlens
 repo_name: serapeum-org/earthlens
@@ -7,6 +7,10 @@ repo_name: serapeum-org/earthlens
 theme:
   name: material
   language: en
+  # The transparent globe mark reads on both the light and dark palettes, so one
+  # asset serves both. See the Brand & media kit page for the full set.
+  logo: _images/branding/earthlens-brand-kit/icon/earthlens-icon.svg
+  favicon: _images/branding/earthlens-brand-kit/favicon/favicon-32.png
   features:
     - navigation.instant
     - navigation.tracking
@@ -62,6 +66,13 @@ exclude_docs: |
   examples/*/ohsome_log/
   examples/*/insar_stack*/
   examples/*/soilgrids_*/
+  # Branding: publish the curated kit (and its downloadable zip), not the
+  # loose exploration variants and duplicates beside it. The single-level
+  # globs deliberately do not reach into earthlens-brand-kit/.
+  _images/branding/*.svg
+  _images/branding/*.gif
+  _images/branding/*.zip
+  _images/branding/PHILOSOPHY-hologram.md
 
 plugins:
   - search
@@ -688,6 +699,7 @@ nav:
     - Region affinity (base): reference/base/region-affinity.md
     - Biodiversity helpers: reference/biodiversity/api.md
   - About:
+    - Brand & media kit: brand.md
     - Change Log: change-log.md
     - License: LICENSE.md
 

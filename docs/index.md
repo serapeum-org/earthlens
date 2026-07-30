@@ -1,3 +1,5 @@
+![earthlens — one Python facade for 48 Earth-observation data providers](_images/branding/earthlens-brand-kit/docs/docs-hero.png)
+
 # earthlens
 
 [![Docs](https://img.shields.io/badge/docs-mkdocs-blue)](https://serapeum-org.github.io/earthlens/)
