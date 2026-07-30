@@ -208,9 +208,11 @@ class USGSWater(AbstractDataSource):
                 — `"daily"`, `"monthly"`, or `"annual"`. Ignored by the
                 modern endpoint, whose `get_stats_date_range` returns its
                 own intervals over the `start`/`end` window.
-            limit: Optional cap on the rows pulled per request (passed
-                through to the modern endpoint's `limit=`). `None`
-                means the SDK default.
+            limit: Optional cap on the rows pulled **per request**, passed
+                through to the modern endpoint's own `limit=`. `None`
+                means the SDK default. Distinct from `download(limit=)`,
+                which caps the *total* rows returned across every item;
+                the two compose, and neither overwrites the other.
 
         Raises:
             ValueError: When `service`, `api`, or `output_format` is
@@ -250,7 +252,7 @@ class USGSWater(AbstractDataSource):
         self._api_flavour = api
         self._output_format: OutputFormat = output_format
         self._stat_type = stat_type
-        self._limit = limit
+        self._request_limit = limit
         self._auth: UsgsWaterAuth | None = None
         self._catalog = Catalog()
         self._used_legacy_fallback = False
@@ -349,10 +351,13 @@ class USGSWater(AbstractDataSource):
                 backends. USGS Water issues one bulk `dataretrieval`
                 call per service rather than a per-item loop, so there
                 is no progress bar to show — this is a no-op.
-            limit: Cap on the total rows returned, across every requested
+            limit: Cap on the **total** rows returned, across every requested
                 item. Applied as the per-item results arrive, so an item past
                 the cap is never fetched. `None` (the default) fetches
                 everything, which for a wide request is bounded only by memory.
+                Independent of the constructor's `limit=`, which caps rows
+                *per request* server-side; passing neither, either, or both is
+                valid.
 
 
         Returns:
@@ -492,7 +497,7 @@ class USGSWater(AbstractDataSource):
             bbox=self._bbox_list(),
             start=self.time.start_date.strftime("%Y-%m-%d"),
             end=self.time.end_date.strftime("%Y-%m-%d"),
-            limit=self._limit,
+            limit=self._request_limit,
             stat_type=self._stat_type,
         )
         result = function(**kwargs)

@@ -779,11 +779,16 @@ class TestLimitIsBoundedNotTrimmed:
 
         The strongest bound available: the service never sends the rows past
         the cap, so there is nothing to trim client-side and no helper is
-        needed. fdsn does this — `limit=self._limit` goes into the FDSN
-        `get_events` call. Detected structurally (a `limit=self._limit`
-        keyword on a call that is not one of the bounding helpers) so a
+        needed. fdsn does this — `limit=self._request_limit` goes into the FDSN
+        `get_events` call. Detected structurally (a `limit=` keyword bound to a
+        cap attribute, on a call that is not one of the bounding helpers) so a
         backend cannot claim it with a comment.
+
+        `_request_limit` is the provider-side name; `_limit` is the base's
+        client-side total. Both count here, because either can legitimately be
+        the value a backend forwards to its own query.
         """
+        cap_attributes = {"self._limit", "self._request_limit"}
         for node in ast.walk(ast.parse(source)):
             if not isinstance(node, ast.Call):
                 continue
@@ -798,7 +803,7 @@ class TestLimitIsBoundedNotTrimmed:
             for keyword in node.keywords:
                 if (
                     keyword.arg == "limit"
-                    and ast.unparse(keyword.value) == "self._limit"
+                    and ast.unparse(keyword.value) in cap_attributes
                 ):
                     return True
         return False
@@ -874,3 +879,71 @@ class TestLimitIsBoundedNotTrimmed:
         assert not self._pushes_limit_to_the_service(
             "self._take_limited(frames, limit=self._limit)"
         )
+
+
+class TestProviderCapsDoNotShadowTheBaseAttribute:
+    """`self._limit` is the base's client-side total; providers must not reuse it.
+
+    usgs_water is why this exists. It stored its constructor's *server-side*
+    per-request cap in `self._limit` long before the base claimed that name, so
+    adding `download(limit=)` made a plain `download()` overwrite it with
+    `None` — turning a bounded request into an unbounded one, silently, in the
+    one backend family the bounded-result work was supposed to protect. A
+    provider-side cap belongs in its own attribute (`_request_limit`).
+    """
+
+    #: Attribute the base class owns for the client-side total cap.
+    BASE_ATTR = "self._limit"
+
+    def _assignments_to_base_attr(self, source: str) -> list[str]:
+        """Return the right-hand sides assigned to `self._limit` in `source`."""
+        found: list[str] = []
+        for node in ast.walk(ast.parse(source)):
+            if not isinstance(node, ast.Assign):
+                continue
+            for target in node.targets:
+                if ast.unparse(target) == self.BASE_ATTR:
+                    found.append(ast.unparse(node.value))
+        return found
+
+    def test_only_a_validated_cap_is_stored_in_the_base_attribute(self):
+        """Every write to `self._limit` must be a `check_limit(...)` result.
+
+        A raw `self._limit = limit` is the shape of a provider borrowing the
+        name for its own meaning — and it also skips validation.
+        """
+        offenders: list[str] = []
+        root = Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            for value in self._assignments_to_base_attr(
+                path.read_text(encoding="utf-8")
+            ):
+                if "check_limit(" not in value:
+                    offenders.append(f"{path.parent.name}: self._limit = {value}")
+        assert offenders == [], (
+            f"these assign something other than a validated cap to the "
+            f"base-owned self._limit; a provider-side cap needs its own "
+            f"attribute: {offenders}"
+        )
+
+    def test_a_provider_side_cap_still_reaches_its_query(self):
+        """The renamed attribute is wired, not merely stored.
+
+        Guards the rename itself: moving fdsn/usgs_water to `_request_limit`
+        would be a regression if the query kept reading the old name.
+        """
+        checks = {
+            "libs/providers/hazards/src/earthlens/fdsn/backend.py": (
+                "limit=self._request_limit,"
+            ),
+            "libs/providers/ocean/src/earthlens/usgs_water/backend.py": (
+                "limit=self._request_limit,"
+            ),
+        }
+        root = Path(__file__).resolve().parents[3]
+        for relative, expected in checks.items():
+            source = (root / relative).read_text(encoding="utf-8")
+            assert expected in source, (
+                f"{relative} no longer passes its provider-side cap to the "
+                f"query; the server-side bound is gone"
+            )

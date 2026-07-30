@@ -379,3 +379,52 @@ def _sites_modern_frame():
             "site_type": ["Stream"],
         }
     )
+
+
+class TestTheTwoCapsAreIndependent:
+    """The constructor's per-request cap and `download(limit=)` must not collide.
+
+    `USGSWater` took a `limit=` (a server-side per-request cap, forwarded to the
+    modern endpoint) before the base class claimed `self._limit` for the
+    client-side *total* cap. While both lived in that one attribute, calling
+    `download()` with no arguments overwrote the server-side cap with `None` —
+    turning a deliberately bounded request into an unbounded one.
+    """
+
+    def test_a_plain_download_keeps_the_server_side_cap(self, fake_usgs, usgs_kwargs):
+        """`download()` with no cap must not erase the constructor's `limit=`."""
+        backend = USGSWater(
+            **usgs_kwargs(service="daily", sites="01646500", limit=1000)
+        )
+        backend.download(progress_bar=False)
+
+        sent = fake_usgs.kwargs_for("get_daily")
+        assert sent["limit"] == 1000, (
+            f"the server-side per-request cap reached the endpoint as "
+            f"{sent['limit']!r}; a plain download() erased it"
+        )
+
+    def test_a_download_cap_does_not_become_the_request_cap(
+        self, fake_usgs, usgs_kwargs
+    ):
+        """The client-side total must not be forwarded as the per-request cap."""
+        backend = USGSWater(**usgs_kwargs(service="daily", sites="01646500"))
+        backend.download(progress_bar=False, limit=5)
+
+        # An absent `limit` and an explicit `None` both mean "no server-side
+        # cap"; the helper omits the key entirely when it is None.
+        sent = fake_usgs.kwargs_for("get_daily")
+        assert sent.get("limit") is None, (
+            f"download(limit=5) leaked into the per-request server-side cap as "
+            f"{sent.get('limit')!r}; the two caps mean different things"
+        )
+
+    def test_both_caps_apply_together(self, fake_usgs, usgs_kwargs):
+        """Passing both is valid: one bounds each request, the other the total."""
+        backend = USGSWater(
+            **usgs_kwargs(service="daily", sites="01646500", limit=1000)
+        )
+        backend.download(progress_bar=False, limit=5)
+
+        assert fake_usgs.kwargs_for("get_daily")["limit"] == 1000
+        assert backend._limit == 5

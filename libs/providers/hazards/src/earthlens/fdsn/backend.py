@@ -168,10 +168,13 @@ class FDSN(AbstractDataSource):
         self._magnitude_type = magnitude_type
         self._event_type = event_type
         self._orderby = orderby
-        # Validated here so a zero/negative cap is refused before it reaches
-        # the FDSN query, where it would be a server-side argument whose
-        # meaning varies by provider rather than an obvious client-side bug.
-        self._limit = self.check_limit(limit)
+        # Not `self._limit`: the base class owns that name for the
+        # client-side total cap, and a provider storing its own meaning there
+        # is how usgs_water silently lost its server-side limit. Validated
+        # here so a zero/negative cap is refused before it reaches the FDSN
+        # query, where it would be a server-side argument whose meaning varies
+        # by provider rather than an obvious client-side bug.
+        self._request_limit = self.check_limit(limit)
         self._earthscope_token_arg = earthscope_token
         self._earthscope_token: str | None = None
         if file_format not in _DRIVERS:
@@ -402,7 +405,7 @@ class FDSN(AbstractDataSource):
                 magnitudetype=self._magnitude_type,
                 eventtype=self._event_type,
                 orderby=self._orderby,
-                limit=self._limit,
+                limit=self._request_limit,
             )
         except FDSNNoDataException:
             logger.info(
