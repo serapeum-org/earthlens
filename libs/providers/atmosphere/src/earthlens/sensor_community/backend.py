@@ -336,6 +336,7 @@ class SensorCommunity(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Discover + fetch readings, write them to `path`, return the frame.
 
@@ -348,12 +349,19 @@ class SensorCommunity(AbstractDataSource):
         Args:
             progress_bar: Show the per-sensor `tqdm` bar. Defaults to
                 `True`.
+            limit: Cap on the total readings fetched, across every discovered
+                sensor. Applied as each sensor's frame arrives, so a sensor
+                past the cap never has its daily archive files downloaded.
+                `None` (the default) fetches everything. The cap is on rows
+                *fetched*, before the window filter, so the returned frame can
+                be shorter than the cap.
 
         Returns:
             pd.DataFrame: The long-format readings (schema columns,
                 `datetime_utc` tz-aware UTC). Empty (schema-only) when
                 nothing matched.
         """
+        self._limit = self.check_limit(limit)
         warnings.warn(_LICENSE_TEXT, LicenseWarning, stacklevel=2)
 
         frames = self._search_fetch_each(

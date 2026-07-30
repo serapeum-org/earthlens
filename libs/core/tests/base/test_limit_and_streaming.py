@@ -296,3 +296,166 @@ class TestFetchLimitedStopsWork:
         """A cap nothing reaches behaves like no cap."""
         backend = _build(_Backend, tmp_path)
         assert sum(len(f) for f in backend._fetch_limited(backend._search(), 100)) == 9
+
+
+class TestSearchFetchEachIsBounded:
+    """`_search_fetch_each` honours `_limit` on both of its paths.
+
+    It is the shared composition behind openaq, sensor_community, firms and
+    soilgrids, so a cap that stopped only on the plain path would leave the
+    error-policy path fetching everything — the same decorative cap, hidden one
+    level down.
+    """
+
+    def test_products_past_the_cap_are_not_fetched(self, tmp_path):
+        """The plain path stops as soon as the cap is met."""
+        backend = _build(_Backend, tmp_path)
+        backend._limit = 4
+        frames = backend._search_fetch_each()
+
+        assert backend.fetched == ["p0", "p1"], (
+            f"fetched {backend.fetched}; the third product was pulled after the "
+            f"cap was already met"
+        )
+        assert sum(len(frame) for frame in frames) == 4
+
+    def test_no_limit_fetches_every_product(self, tmp_path):
+        """Without a cap the composition is unchanged."""
+        backend = _build(_Backend, tmp_path)
+        backend._limit = None
+        frames = backend._search_fetch_each()
+
+        assert backend.fetched == ["p0", "p1", "p2"]
+        assert sum(len(frame) for frame in frames) == 9
+
+    def test_the_cap_stops_the_work_under_an_error_policy_too(self, tmp_path):
+        """A failing product consumes an item without contributing rows.
+
+        Which is exactly why the cap cannot be pre-applied to the product list:
+        with `p0` failing, reaching 4 rows takes `p1` and `p2`, so all three are
+        touched — and a fourth, had there been one, would not be.
+        """
+        backend = _build(_Backend, tmp_path)
+        backend.sizes = (3, 3, 3, 3)
+        original = backend._fetch_one
+
+        def flaky(product):
+            if product.id == "p0":
+                backend.fetched.append(product.id)
+                raise RuntimeError("boom")
+            return original(product)
+
+        backend._fetch_one = flaky
+        backend._limit = 4
+        frames = backend._search_fetch_each(errors="ignore")
+
+        assert backend.fetched == ["p0", "p1", "p2"], (
+            f"fetched {backend.fetched}; the failure should not have ended the "
+            f"batch, and p3 should never have been reached"
+        )
+        assert sum(len(frame) for frame in frames) == 4
+
+
+class TestIterItemsPolicy:
+    """The lazy policy loop `_run_items` and `_search_fetch_each` share."""
+
+    def test_a_consumer_exception_is_not_recorded_as_an_item_failure(self, tmp_path):
+        """The handler must not stand in the path of the caller's own errors.
+
+        With the `yield` inside the `try`, an exception raised by the consumer
+        while the generator is suspended propagates *into* the generator at the
+        yield point — so an `ignore` policy would swallow the caller's error and
+        log it as this item's failure. Calling `fn` outside the `yield` is what
+        keeps the two apart.
+        """
+        backend = _build(_Backend, tmp_path)
+        failures: list[tuple[str, BaseException]] = []
+        items = [RemoteProduct(id="p0"), RemoteProduct(id="p1")]
+
+        generator = backend._iter_items(
+            items,
+            backend._fetch_one,
+            errors="ignore",
+            label="product",
+            describe=str,
+            on_failure=None,
+            failures=failures,
+        )
+        next(generator)
+        # An `Exception` subclass on purpose: a `KeyboardInterrupt` here would
+        # pass either way, since `except Exception` never catches it, and the
+        # test would prove nothing.
+        with pytest.raises(RuntimeError, match="raised by the caller"):
+            generator.throw(RuntimeError("raised by the caller"))
+
+        assert failures == [], "the consumer's error was logged as an item failure"
+
+    def test_a_placeholder_of_none_is_still_yielded(self, tmp_path):
+        """`on_failure` returning `None` is a real placeholder, not "no result".
+
+        The loop distinguishes them with a sentinel; a plain `is None` test here
+        would silently drop the row the hook asked to substitute.
+        """
+        backend = _build(_Backend, tmp_path)
+        failures: list[tuple[str, BaseException]] = []
+
+        def always_fails(item):
+            raise RuntimeError("boom")
+
+        results = list(
+            backend._iter_items(
+                [RemoteProduct(id="p0")],
+                always_fails,
+                errors="ignore",
+                label="product",
+                describe=str,
+                on_failure=lambda item, exc: None,
+                failures=failures,
+            )
+        )
+
+        assert results == [None]
+        assert len(failures) == 1
+
+    def test_no_placeholder_yields_nothing_for_the_failed_item(self, tmp_path):
+        """Without an `on_failure` hook a failure contributes no result."""
+        backend = _build(_Backend, tmp_path)
+        failures: list[tuple[str, BaseException]] = []
+
+        def always_fails(item):
+            raise RuntimeError("boom")
+
+        results = list(
+            backend._iter_items(
+                [RemoteProduct(id="p0")],
+                always_fails,
+                errors="ignore",
+                label="product",
+                describe=str,
+                on_failure=None,
+                failures=failures,
+            )
+        )
+
+        assert results == []
+        assert len(failures) == 1
+
+    def test_the_raise_policy_still_propagates(self, tmp_path):
+        """`errors=None` / `"raise"` keeps the fail-fast behaviour."""
+        backend = _build(_Backend, tmp_path)
+        failures: list[tuple[str, BaseException]] = []
+
+        def always_fails(item):
+            raise RuntimeError("boom")
+
+        generator = backend._iter_items(
+            [RemoteProduct(id="p0")],
+            always_fails,
+            errors=None,
+            label="product",
+            describe=str,
+            on_failure=None,
+            failures=failures,
+        )
+        with pytest.raises(RuntimeError, match="boom"):
+            list(generator)

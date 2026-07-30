@@ -763,7 +763,16 @@ class TestLimitIsBoundedNotTrimmed:
     """
 
     #: The helpers that consume fragments lazily and stop at the cap.
-    BOUNDING_HELPERS = ("_take_limited", "_fetch_limited", "iter_download")
+    #: `_search_fetch_each` qualifies because the base composition itself runs
+    #: through `_take_limited` on both its paths (pinned by
+    #: `TestSearchFetchEachIsBounded`), so a backend built on it inherits the
+    #: bound without naming a helper of its own.
+    BOUNDING_HELPERS = (
+        "_take_limited",
+        "_fetch_limited",
+        "iter_download",
+        "_search_fetch_each",
+    )
 
     def _pushes_limit_to_the_service(self, source: str) -> bool:
         """Whether the cap is handed to the provider's own query.

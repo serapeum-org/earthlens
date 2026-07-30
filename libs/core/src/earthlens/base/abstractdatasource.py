@@ -522,6 +522,12 @@ def _head_rows(chunk: Any, count: int) -> Any:
     return chunk[:count]
 
 
+#: "Nothing was produced" marker for the per-item loops. A plain `None` cannot
+#: serve: an `on_failure` hook is free to return `None` as a real placeholder,
+#: and that has to stay distinguishable from having no placeholder at all.
+_MISSING = object()
+
+
 def _describe_remote_product(product: Any) -> str:
     """Render a product for the :meth:`AbstractDataSource._run_items` log lines.
 
@@ -1832,30 +1838,93 @@ class AbstractDataSource(ABC):
             BaseException: The first item's exception when `errors="raise"`.
         """
         policy = self.check_errors_policy(errors)
-        name = describe or str
-        results: list[Any] = []
         failures: list[tuple[str, BaseException]] = []
-        for item in items:
-            try:
-                results.append(fn(item))
-            except Exception as exc:  # noqa: BLE001 - policy decides the fate
-                if policy == "raise":
-                    raise
-                described = name(item)
-                if on_failure is not None:
-                    results.append(on_failure(item, exc))
-                if policy == "warn":
-                    logger.warning(
-                        f"{type(self).__name__}: {label} {described} failed: "
-                        f"{type(exc).__name__}: {exc}"
-                    )
-                failures.append((described, exc))
+        results = list(
+            self._iter_items(
+                items,
+                fn,
+                errors=policy,
+                label=label,
+                describe=describe,
+                on_failure=on_failure,
+                failures=failures,
+            )
+        )
         if failures and policy == "warn":
             logger.warning(
                 f"{type(self).__name__}: {len(failures)} of {len(items)} "
                 f"{label}(s) failed; {len(results)} succeeded."
             )
         return results, failures
+
+    def _iter_items(
+        self,
+        items: Iterable[Any],
+        fn: Callable[[Any], Any],
+        *,
+        errors: str | None,
+        label: str,
+        describe: Callable[[Any], str] | None,
+        on_failure: Callable[[Any, BaseException], Any] | None,
+        failures: list[tuple[str, BaseException]],
+    ) -> Iterator[Any]:
+        """Apply `fn` to each item under the failure policy, yielding as it goes.
+
+        The lazy form of :meth:`_run_items`, and the single implementation of
+        the policy: `_run_items` is `list()` of this plus a summary line. Being
+        a generator is what lets a bounded caller stop early — under a policy a
+        cap cannot be turned into a slice of `items`, because failures consume
+        items without producing rows, so the decision to stop can only be made
+        after each result arrives.
+
+        Args:
+            items: The items to process; consumed lazily.
+            fn: Called once per item; its return value is yielded.
+            errors: An already-validated policy (`"raise"` / `"warn"` /
+                `"ignore"`), or `None` for `"raise"`.
+            label: Noun for the log lines (e.g. `"granule"`, `"variable"`).
+            describe: Renders an item for the log; defaults to `str`.
+            on_failure: Optional `(item, exception) -> placeholder`, yielded in
+                place of the failed item's result.
+            failures: Accumulator the caller owns; each failure is appended as
+                `(description, exception)` so a caller that stops early still
+                sees what failed before it stopped.
+
+        Yields:
+            Any: Each successful `fn(item)` result, plus any `on_failure`
+                placeholders, in item order.
+
+        Raises:
+            BaseException: The first item's exception when the policy is
+                `"raise"`.
+        """
+        name = describe or str
+        for item in items:
+            # `fn` is called outside the `yield` on purpose: yielding inside the
+            # `try` would put the handler in the path of whatever the *consumer*
+            # raises while the generator is suspended, so a caller's own error
+            # would be logged as this item's failure and swallowed by an
+            # `ignore` policy.
+            placeholder = _MISSING
+            try:
+                value = fn(item)
+            except Exception as exc:  # noqa: BLE001 - policy decides the fate
+                if errors is None or errors == "raise":
+                    raise
+                described = name(item)
+                if on_failure is not None:
+                    placeholder = on_failure(item, exc)
+                if errors == "warn":
+                    logger.warning(
+                        f"{type(self).__name__}: {label} {described} failed: "
+                        f"{type(exc).__name__}: {exc}"
+                    )
+                failures.append((described, exc))
+                if placeholder is _MISSING:
+                    continue
+                yield placeholder
+                continue
+            yield value
 
     def _fetch_limited(
         self, products: Sequence[RemoteProduct], limit: int | None = None
@@ -1947,15 +2016,29 @@ class AbstractDataSource(ABC):
             desc=desc or type(self).__name__,
             unit=unit,
         )
-        if errors is None:
-            return [self._fetch_one(product) for product in iterator]
-        results, _failures = self._run_items(
-            list(iterator),
-            self._fetch_one,
-            errors=errors,
-            label=label,
-            describe=_describe_remote_product,
+        # Lazy in both branches so `self._limit` stops the fetching rather than
+        # trimming the assembled list. Under a policy the cap cannot be turned
+        # into a slice of `products` up front: a failed product consumes an item
+        # without contributing rows, so only the results can be counted.
+        policy = self.check_errors_policy(errors) if errors is not None else None
+        failures: list[tuple[str, BaseException]] = []
+        results = self._take_limited(
+            self._iter_items(
+                iterator,
+                self._fetch_one,
+                errors=policy,
+                label=label,
+                describe=_describe_remote_product,
+                on_failure=None,
+                failures=failures,
+            ),
+            limit=self._limit,
         )
+        if failures and policy == "warn":
+            logger.warning(
+                f"{type(self).__name__}: {len(failures)} of {len(products)} "
+                f"{label}(s) failed; {len(results)} succeeded."
+            )
         return results
 
 
