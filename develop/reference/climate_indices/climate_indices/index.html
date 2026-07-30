@@ -64,7 +64,7 @@
     
     
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20878,7 +20878,14 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <span class="normal"><a href="#__codelineno-0-427">427</a></span>
 <span class="normal"><a href="#__codelineno-0-428">428</a></span>
 <span class="normal"><a href="#__codelineno-0-429">429</a></span>
-<span class="normal"><a href="#__codelineno-0-430">430</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="k">class</span><span class="w"> </span><span class="nc">ClimateIndices</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span>
+<span class="normal"><a href="#__codelineno-0-431">431</a></span>
+<span class="normal"><a href="#__codelineno-0-432">432</a></span>
+<span class="normal"><a href="#__codelineno-0-433">433</a></span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span>
+<span class="normal"><a href="#__codelineno-0-435">435</a></span>
+<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="k">class</span><span class="w"> </span><span class="nc">ClimateIndices</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Climate / teleconnection index backend (long-format tabular output).</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    Fetches one monthly index series per id in `variables` from its</span>
@@ -21063,7 +21070,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            list[pd.DataFrame]: One canonical long-schema frame per</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                product (empty when the window held no data), same order.</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_limited</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">)</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one index, parse it, stamp it, and filter to the window.</span>
@@ -21149,87 +21156,94 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every requested index, write the table, and return it.</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">                backends; the per-index loop is short, so this is a</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                no-op.</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            pd.DataFrame: The long-format table (`date`, `index`,</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">                `value`, `source`) for every requested index over the</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                window; an empty (schema-only) frame when nothing matched.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every requested index, write the table, and return it.</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                backends; the per-index loop is short, so this is a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                no-op.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            limit: Cap on the total rows returned, across every requested</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">                item. Applied as the per-item results arrive, so an item past</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">                the cap is never fetched. `None` (the default) fetches</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                everything, which for a wide request is bounded only by memory.</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            ValueError: If an index id is unknown, or a fetch fails</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">                (`G8`).</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)]</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>            <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>            <span class="k">if</span> <span class="n">frames</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>            <span class="k">else</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">empty_canonical</span><span class="p">()</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="p">)</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citations</span><span class="p">()</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>                <span class="sa">f</span><span class="s2">&quot;ClimateIndices: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) across &quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> index/indices written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="p">)</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>                <span class="s2">&quot;ClimateIndices: no rows matched the requested window; wrote &quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>                <span class="sa">f</span><span class="s2">&quot;an empty (schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="p">)</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="k">return</span> <span class="n">df</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the long-format table to `root_dir` and return the path.</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        The filename spells out the requested ids</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        (`climate_indices_oni_nao.csv`) up to :data:`_MAX_STEM_IDS`; beyond</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        that it is summarised as `climate_indices_&lt;n&gt;_indices.csv` to keep</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        the name short.</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            df: The canonical long-format frame.</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">            Path: The written CSV / Parquet file path.</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            ImportError: If `output_format=&quot;parquet&quot;` but `pyarrow` is</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">                not installed.</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">_MAX_STEM_IDS</span><span class="p">:</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>            <span class="n">stem</span> <span class="o">=</span> <span class="s2">&quot;climate_indices_&quot;</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>            <span class="n">stem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;climate_indices_</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span><span class="si">}</span><span class="s2">_indices&quot;</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>                <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover - depends on env</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>                    <span class="s2">&quot;Writing Parquet requires &#39;pyarrow&#39;. Install it (pip &quot;</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>                    <span class="s2">&quot;install pyarrow) or use output_format=&#39;csv&#39;.&quot;</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="k">return</span> <span class="n">out_path</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log each requested source&#39;s citation once (info, not a warning).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">for</span> <span class="n">index_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="n">citation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">index_id</span><span class="p">]</span><span class="o">.</span><span class="n">citation</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>            <span class="k">if</span> <span class="n">citation</span> <span class="ow">and</span> <span class="n">citation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">citation</span><span class="p">)</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ClimateIndices source citation: </span><span class="si">{</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            pd.DataFrame: The long-format table (`date`, `index`,</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">                `value`, `source`) for every requested index over the</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                window; an empty (schema-only) frame when nothing matched.</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            ValueError: If an index id is unknown, or a fetch fails</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">                (`G8`).</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)]</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="k">if</span> <span class="n">frames</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="k">else</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">empty_canonical</span><span class="p">()</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="p">)</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citations</span><span class="p">()</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>                <span class="sa">f</span><span class="s2">&quot;ClimateIndices: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) across &quot;</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> index/indices written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="s2">&quot;ClimateIndices: no rows matched the requested window; wrote &quot;</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="sa">f</span><span class="s2">&quot;an empty (schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="p">)</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="k">return</span> <span class="n">df</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the long-format table to `root_dir` and return the path.</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">        The filename spells out the requested ids</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        (`climate_indices_oni_nao.csv`) up to :data:`_MAX_STEM_IDS`; beyond</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        that it is summarised as `climate_indices_&lt;n&gt;_indices.csv` to keep</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        the name short.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            df: The canonical long-format frame.</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">            Path: The written CSV / Parquet file path.</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            ImportError: If `output_format=&quot;parquet&quot;` but `pyarrow` is</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">                not installed.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">_MAX_STEM_IDS</span><span class="p">:</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>            <span class="n">stem</span> <span class="o">=</span> <span class="s2">&quot;climate_indices_&quot;</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>            <span class="n">stem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;climate_indices_</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span><span class="si">}</span><span class="s2">_indices&quot;</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>                <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover - depends on env</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>                    <span class="s2">&quot;Writing Parquet requires &#39;pyarrow&#39;. Install it (pip &quot;</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>                    <span class="s2">&quot;install pyarrow) or use output_format=&#39;csv&#39;.&quot;</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log each requested source&#39;s citation once (info, not a warning).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="k">for</span> <span class="n">index_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">:</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="n">citation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">index_id</span><span class="p">]</span><span class="o">.</span><span class="n">citation</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="k">if</span> <span class="n">citation</span> <span class="ow">and</span> <span class="n">citation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">citation</span><span class="p">)</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ClimateIndices source citation: </span><span class="si">{</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -21610,7 +21624,7 @@ not a recognised value.</p>
 
 
 <h4 id="earthlens.climate_indices.ClimateIndices.download" class="doc doc-heading"><a href="#earthlens.climate_indices.ClimateIndices.download" class="toclink">
-            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.climate_indices.ClimateIndices.download" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -21647,6 +21661,25 @@ no-op.</p>
             </td>
             <td>
                   <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>limit</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Cap on the total rows returned, across every requested
+item. Applied as the per-item results arrive, so an item past
+the cap is never fetched. <code>None</code> (the default) fetches
+everything, which for a wide request is bounded only by memory.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -21742,45 +21775,59 @@ window; an empty (schema-only) frame when nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-382">382</a></span>
 <span class="normal"><a href="#__codelineno-0-383">383</a></span>
 <span class="normal"><a href="#__codelineno-0-384">384</a></span>
-<span class="normal"><a href="#__codelineno-0-385">385</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span>
+<span class="normal"><a href="#__codelineno-0-389">389</a></span>
+<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every requested index, write the table, and return it.</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            backends; the per-index loop is short, so this is a</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            no-op.</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        pd.DataFrame: The long-format table (`date`, `index`,</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            `value`, `source`) for every requested index over the</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            window; an empty (schema-only) frame when nothing matched.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every requested index, write the table, and return it.</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            backends; the per-index loop is short, so this is a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            no-op.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        limit: Cap on the total rows returned, across every requested</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            item. Applied as the per-item results arrive, so an item past</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            the cap is never fetched. `None` (the default) fetches</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            everything, which for a wide request is bounded only by memory.</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        ValueError: If an index id is unknown, or a fetch fails</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            (`G8`).</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)]</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="k">if</span> <span class="n">frames</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="k">else</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">empty_canonical</span><span class="p">()</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>    <span class="p">)</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citations</span><span class="p">()</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="sa">f</span><span class="s2">&quot;ClimateIndices: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) across &quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> index/indices written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="p">)</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="s2">&quot;ClimateIndices: no rows matched the requested window; wrote &quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="sa">f</span><span class="s2">&quot;an empty (schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="p">)</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="k">return</span> <span class="n">df</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        pd.DataFrame: The long-format table (`date`, `index`,</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            `value`, `source`) for every requested index over the</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            window; an empty (schema-only) frame when nothing matched.</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        ValueError: If an index id is unknown, or a fetch fails</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            (`G8`).</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)]</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="k">if</span> <span class="n">frames</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="k">else</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">empty_canonical</span><span class="p">()</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="p">)</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citations</span><span class="p">()</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="sa">f</span><span class="s2">&quot;ClimateIndices: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) across &quot;</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> index/indices written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="s2">&quot;ClimateIndices: no rows matched the requested window; wrote &quot;</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="sa">f</span><span class="s2">&quot;an empty (schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="p">)</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -22875,7 +22922,14 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <span class="normal"><a href="#__codelineno-0-427">427</a></span>
 <span class="normal"><a href="#__codelineno-0-428">428</a></span>
 <span class="normal"><a href="#__codelineno-0-429">429</a></span>
-<span class="normal"><a href="#__codelineno-0-430">430</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="k">class</span><span class="w"> </span><span class="nc">ClimateIndices</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span>
+<span class="normal"><a href="#__codelineno-0-431">431</a></span>
+<span class="normal"><a href="#__codelineno-0-432">432</a></span>
+<span class="normal"><a href="#__codelineno-0-433">433</a></span>
+<span class="normal"><a href="#__codelineno-0-434">434</a></span>
+<span class="normal"><a href="#__codelineno-0-435">435</a></span>
+<span class="normal"><a href="#__codelineno-0-436">436</a></span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="k">class</span><span class="w"> </span><span class="nc">ClimateIndices</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Climate / teleconnection index backend (long-format tabular output).</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">    Fetches one monthly index series per id in `variables` from its</span>
@@ -23060,7 +23114,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            list[pd.DataFrame]: One canonical long-schema frame per</span>
 <a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">                product (empty when the window held no data), same order.</span>
 <a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fetch_one</span><span class="p">(</span><span class="n">product</span><span class="p">)</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">]</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_limited</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">)</span>
 <a id="__codelineno-0-265" name="__codelineno-0-265"></a>
 <a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product</span><span class="p">:</span> <span class="n">RemoteProduct</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-267" name="__codelineno-0-267"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch one index, parse it, stamp it, and filter to the window.</span>
@@ -23146,87 +23200,94 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every requested index, write the table, and return it.</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">                backends; the per-index loop is short, so this is a</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                no-op.</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            pd.DataFrame: The long-format table (`date`, `index`,</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">                `value`, `source`) for every requested index over the</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                window; an empty (schema-only) frame when nothing matched.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch every requested index, write the table, and return it.</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">                backends; the per-index loop is short, so this is a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">                no-op.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">            limit: Cap on the total rows returned, across every requested</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">                item. Applied as the per-item results arrive, so an item past</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">                the cap is never fetched. `None` (the default) fetches</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">                everything, which for a wide request is bounded only by memory.</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            ValueError: If an index id is unknown, or a fetch fails</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">                (`G8`).</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)]</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>            <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>            <span class="k">if</span> <span class="n">frames</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>            <span class="k">else</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">empty_canonical</span><span class="p">()</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="p">)</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citations</span><span class="p">()</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>                <span class="sa">f</span><span class="s2">&quot;ClimateIndices: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) across &quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> index/indices written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="p">)</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>                <span class="s2">&quot;ClimateIndices: no rows matched the requested window; wrote &quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>                <span class="sa">f</span><span class="s2">&quot;an empty (schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="p">)</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="k">return</span> <span class="n">df</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the long-format table to `root_dir` and return the path.</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">        The filename spells out the requested ids</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">        (`climate_indices_oni_nao.csv`) up to :data:`_MAX_STEM_IDS`; beyond</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        that it is summarised as `climate_indices_&lt;n&gt;_indices.csv` to keep</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">        the name short.</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">            df: The canonical long-format frame.</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">            Path: The written CSV / Parquet file path.</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">            ImportError: If `output_format=&quot;parquet&quot;` but `pyarrow` is</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">                not installed.</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">_MAX_STEM_IDS</span><span class="p">:</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>            <span class="n">stem</span> <span class="o">=</span> <span class="s2">&quot;climate_indices_&quot;</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>            <span class="n">stem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;climate_indices_</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span><span class="si">}</span><span class="s2">_indices&quot;</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>                <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover - depends on env</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>                    <span class="s2">&quot;Writing Parquet requires &#39;pyarrow&#39;. Install it (pip &quot;</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>                    <span class="s2">&quot;install pyarrow) or use output_format=&#39;csv&#39;.&quot;</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="k">return</span> <span class="n">out_path</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log each requested source&#39;s citation once (info, not a warning).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">for</span> <span class="n">index_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="n">citation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">index_id</span><span class="p">]</span><span class="o">.</span><span class="n">citation</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>            <span class="k">if</span> <span class="n">citation</span> <span class="ow">and</span> <span class="n">citation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">citation</span><span class="p">)</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ClimateIndices source citation: </span><span class="si">{</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            pd.DataFrame: The long-format table (`date`, `index`,</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">                `value`, `source`) for every requested index over the</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                window; an empty (schema-only) frame when nothing matched.</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            ValueError: If an index id is unknown, or a fetch fails</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">                (`G8`).</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)]</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="k">if</span> <span class="n">frames</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="k">else</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">empty_canonical</span><span class="p">()</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="p">)</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_citations</span><span class="p">()</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>                <span class="sa">f</span><span class="s2">&quot;ClimateIndices: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) across &quot;</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> index/indices written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="s2">&quot;ClimateIndices: no rows matched the requested window; wrote &quot;</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="sa">f</span><span class="s2">&quot;an empty (schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="p">)</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="k">return</span> <span class="n">df</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the long-format table to `root_dir` and return the path.</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a><span class="sd">        The filename spells out the requested ids</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="sd">        (`climate_indices_oni_nao.csv`) up to :data:`_MAX_STEM_IDS`; beyond</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="sd">        that it is summarised as `climate_indices_&lt;n&gt;_indices.csv` to keep</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="sd">        the name short.</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">            df: The canonical long-format frame.</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">            Path: The written CSV / Parquet file path.</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            ImportError: If `output_format=&quot;parquet&quot;` but `pyarrow` is</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">                not installed.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">_MAX_STEM_IDS</span><span class="p">:</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>            <span class="n">stem</span> <span class="o">=</span> <span class="s2">&quot;climate_indices_&quot;</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>            <span class="n">stem</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;climate_indices_</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span><span class="si">}</span><span class="s2">_indices&quot;</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>                <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover - depends on env</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>                    <span class="s2">&quot;Writing Parquet requires &#39;pyarrow&#39;. Install it (pip &quot;</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>                    <span class="s2">&quot;install pyarrow) or use output_format=&#39;csv&#39;.&quot;</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="k">return</span> <span class="n">out_path</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_log_citations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Log each requested source&#39;s citation once (info, not a warning).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>        <span class="k">for</span> <span class="n">index_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">:</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="n">citation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">index_id</span><span class="p">]</span><span class="o">.</span><span class="n">citation</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="k">if</span> <span class="n">citation</span> <span class="ow">and</span> <span class="n">citation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">citation</span><span class="p">)</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ClimateIndices source citation: </span><span class="si">{</span><span class="n">citation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -23607,7 +23668,7 @@ not a recognised value.</p>
 
 
 <h4 id="earthlens.climate_indices.backend.ClimateIndices.download" class="doc doc-heading"><a href="#earthlens.climate_indices.backend.ClimateIndices.download" class="toclink">
-            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.climate_indices.backend.ClimateIndices.download" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -23644,6 +23705,25 @@ no-op.</p>
             </td>
             <td>
                   <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>limit</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Cap on the total rows returned, across every requested
+item. Applied as the per-item results arrive, so an item past
+the cap is never fetched. <code>None</code> (the default) fetches
+everything, which for a wide request is bounded only by memory.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -23739,45 +23819,59 @@ window; an empty (schema-only) frame when nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-382">382</a></span>
 <span class="normal"><a href="#__codelineno-0-383">383</a></span>
 <span class="normal"><a href="#__codelineno-0-384">384</a></span>
-<span class="normal"><a href="#__codelineno-0-385">385</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span>
+<span class="normal"><a href="#__codelineno-0-389">389</a></span>
+<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
 <a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="bp">self</span><span class="p">,</span>
 <a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every requested index, write the table, and return it.</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">            backends; the per-index loop is short, so this is a</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            no-op.</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        pd.DataFrame: The long-format table (`date`, `index`,</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            `value`, `source`) for every requested index over the</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            window; an empty (schema-only) frame when nothing matched.</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch every requested index, write the table, and return it.</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">            backends; the per-index loop is short, so this is a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">            no-op.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        limit: Cap on the total rows returned, across every requested</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">            item. Applied as the per-item results arrive, so an item past</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            the cap is never fetched. `None` (the default) fetches</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            everything, which for a wide request is bounded only by memory.</span>
 <a id="__codelineno-0-362" name="__codelineno-0-362"></a>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        ValueError: If an index id is unknown, or a fetch fails</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            (`G8`).</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)]</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="k">if</span> <span class="n">frames</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="k">else</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">empty_canonical</span><span class="p">()</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>    <span class="p">)</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citations</span><span class="p">()</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="sa">f</span><span class="s2">&quot;ClimateIndices: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) across &quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> index/indices written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="p">)</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="s2">&quot;ClimateIndices: no rows matched the requested window; wrote &quot;</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="sa">f</span><span class="s2">&quot;an empty (schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="p">)</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>    <span class="k">return</span> <span class="n">df</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        pd.DataFrame: The long-format table (`date`, `index`,</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            `value`, `source`) for every requested index over the</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            window; an empty (schema-only) frame when nothing matched.</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        ValueError: If an index id is unknown, or a fetch fails</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            (`G8`).</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)]</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="n">df</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="k">if</span> <span class="n">frames</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="k">else</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">empty_canonical</span><span class="p">()</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="p">)</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_log_citations</span><span class="p">()</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="sa">f</span><span class="s2">&quot;ClimateIndices: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) across &quot;</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> index/indices written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="p">)</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="s2">&quot;ClimateIndices: no rows matched the requested window; wrote &quot;</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>            <span class="sa">f</span><span class="s2">&quot;an empty (schema-only) table to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="p">)</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
