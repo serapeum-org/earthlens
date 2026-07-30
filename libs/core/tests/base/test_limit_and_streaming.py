@@ -261,3 +261,38 @@ class TestFacadeIterDownload:
         assert backend.root_dir.is_dir(), (
             f"{backend.root_dir} should have been created before the first fetch"
         )
+
+
+class TestFetchLimitedStopsWork:
+    """ARC-3: `_fetch_limited` caps the work, not just the returned rows.
+
+    The shape it replaces — `[self._fetch_one(p) for p in products]` — fetches
+    every product and lets any cap trim the result afterwards. That bounds what
+    you get back and not what you paid for, which is the opposite of the point
+    for a backend whose per-product fetch is a network call.
+    """
+
+    def test_products_past_the_cap_are_never_fetched(self, tmp_path):
+        """The generator stops, so later products are not requested at all."""
+        backend = _build(_Backend, tmp_path)
+
+        kept = backend._fetch_limited(backend._search(), limit=4)
+
+        assert [len(fragment) for fragment in kept] == [3, 1]
+        assert backend.fetched == ["p0", "p1"], (
+            f"p2 must never be fetched under limit=4; got {backend.fetched}"
+        )
+
+    def test_no_limit_fetches_everything(self, tmp_path):
+        """`limit=None` keeps the unbounded behaviour it replaced."""
+        backend = _build(_Backend, tmp_path)
+
+        kept = backend._fetch_limited(backend._search(), limit=None)
+
+        assert [len(fragment) for fragment in kept] == [3, 3, 3]
+        assert backend.fetched == ["p0", "p1", "p2"]
+
+    def test_cap_larger_than_the_result_is_not_an_error(self, tmp_path):
+        """A cap nothing reaches behaves like no cap."""
+        backend = _build(_Backend, tmp_path)
+        assert sum(len(f) for f in backend._fetch_limited(backend._search(), 100)) == 9

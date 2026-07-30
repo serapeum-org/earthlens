@@ -1857,6 +1857,29 @@ class AbstractDataSource(ABC):
             )
         return results, failures
 
+    def _fetch_limited(
+        self, products: Sequence[RemoteProduct], limit: int | None = None
+    ) -> list[Any]:
+        """Fetch each product, stopping once `limit` rows have been collected.
+
+        The bounded form of the `[self._fetch_one(p) for p in products]` that
+        several backends write as their `_fetch`. The comprehension fetches
+        everything and any cap applied afterwards only truncates the result; this
+        consumes lazily, so a product past the cap is never requested.
+
+        Args:
+            products: The products from :meth:`_search`.
+            limit: Total rows to collect, or `None` for all of them. Usually
+                :attr:`_limit`, recorded by the backend's `download(limit=...)`.
+
+        Returns:
+            list[Any]: One fragment per fetched product, the last trimmed when it
+                straddled the cap.
+        """
+        return self._take_limited(
+            (self._fetch_one(product) for product in products), limit=limit
+        )
+
     def _fetch_one(self, product: RemoteProduct) -> Any:
         """Fetch a single product — the per-product hook for `_search_fetch_each`.
 

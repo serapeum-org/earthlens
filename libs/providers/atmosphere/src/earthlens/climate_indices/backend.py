@@ -261,7 +261,7 @@ class ClimateIndices(AbstractDataSource):
             list[pd.DataFrame]: One canonical long-schema frame per
                 product (empty when the window held no data), same order.
         """
-        return [self._fetch_one(product) for product in products]
+        return self._fetch_limited(products, self._limit)
 
     def _fetch_one(self, product: RemoteProduct) -> pd.DataFrame:
         """Fetch one index, parse it, stamp it, and filter to the window.
@@ -347,6 +347,7 @@ class ClimateIndices(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch every requested index, write the table, and return it.
 
@@ -354,6 +355,11 @@ class ClimateIndices(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends; the per-index loop is short, so this is a
                 no-op.
+            limit: Cap on the total rows returned, across every requested
+                item. Applied as the per-item results arrive, so an item past
+                the cap is never fetched. `None` (the default) fetches
+                everything, which for a wide request is bounded only by memory.
+
 
         Returns:
             pd.DataFrame: The long-format table (`date`, `index`,
@@ -364,6 +370,7 @@ class ClimateIndices(AbstractDataSource):
             ValueError: If an index id is unknown, or a fetch fails
                 (`G8`).
         """
+        self._limit = self.check_limit(limit)
         frames = [frame for frame in self._api() if len(frame)]
         df = (
             pd.concat(frames, ignore_index=True)

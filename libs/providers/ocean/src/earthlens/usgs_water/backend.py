@@ -340,6 +340,7 @@ class USGSWater(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch the selected service, write the table, and return it.
 
@@ -348,6 +349,11 @@ class USGSWater(AbstractDataSource):
                 backends. USGS Water issues one bulk `dataretrieval`
                 call per service rather than a per-item loop, so there
                 is no progress bar to show — this is a no-op.
+            limit: Cap on the total rows returned, across every requested
+                item. Applied as the per-item results arrive, so an item past
+                the cap is never fetched. `None` (the default) fetches
+                everything, which for a wide request is bounded only by memory.
+
 
         Returns:
             pd.DataFrame: The long-format observation table for the
@@ -358,6 +364,7 @@ class USGSWater(AbstractDataSource):
                 `sites=` (`peaks` / `ratings` / `statistics`) but none
                 was supplied.
         """
+        self._limit = self.check_limit(limit)
         # Each frame is already normalised to its service's schema (even
         # when empty), so concat all of them — preserving the right
         # columns for non-values services — rather than dropping empties.
@@ -422,7 +429,7 @@ class USGSWater(AbstractDataSource):
             list[pd.DataFrame]: One canonical long-schema frame per
                 product, same order.
         """
-        return [self._fetch_one(product) for product in products]
+        return self._fetch_limited(products, self._limit)
 
     def _fetch_one(self, product: RemoteProduct) -> pd.DataFrame:
         """Fetch one product's service frame and normalise it.

@@ -279,6 +279,7 @@ class ARGO(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch the profiles, write the table, and return it.
 
@@ -286,10 +287,16 @@ class ARGO(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends. Argo issues one bulk `argopy` call, so there is
                 no per-item progress bar — this is a no-op.
+            limit: Cap on the total rows returned, across every requested
+                item. Applied as the per-item results arrive, so an item past
+                the cap is never fetched. `None` (the default) fetches
+                everything, which for a wide request is bounded only by memory.
+
 
         Returns:
             pd.DataFrame: The long-format profile table.
         """
+        self._limit = self.check_limit(limit)
         frames = self._api()
         df = (
             pd.concat(frames, ignore_index=True)
@@ -344,7 +351,7 @@ class ARGO(AbstractDataSource):
         Returns:
             list[pd.DataFrame]: One frame per product, same order.
         """
-        return [self._fetch_one(product) for product in products]
+        return self._fetch_limited(products, self._limit)
 
     def _fetch_one(self, product: RemoteProduct) -> pd.DataFrame:
         """Fetch one product's profiles as a long-format frame.
