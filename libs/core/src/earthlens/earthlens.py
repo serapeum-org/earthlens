@@ -1494,16 +1494,20 @@ class EarthLens:
             progress_bar: Whether the backend should print a per-date
                 progress bar during the loop. Defaults to `True`.
             aggregate: Optional :class:`earthlens.aggregate.AggregationConfig`.
-                Forwarded to backends whose `OUTPUT_KIND` is
-                `"raster"` or `"mixed"` — the two shapes for which
-                a gridded reduction is well-defined. Backends
-                declaring `"vector"` or `"tabular"` reject a
-                non-`None` `aggregate` with `NotImplementedError`
-                before the backend's `download` is called (the
-                aggregator has no meaningful semantics on
-                `GeoDataFrame` / `DataFrame` rows). A backend
-                without an explicit `OUTPUT_KIND` attribute is
-                treated as `"raster"` for back-compatibility.
+                Two conditions must both hold for it to be forwarded:
+                the backend's `OUTPUT_KIND` is `"raster"` or
+                `"mixed"` — the shapes for which a gridded reduction
+                is well-defined — **and** the backend declares
+                `SUPPORTS_AGGREGATE`. A `"vector"` / `"tabular"`
+                backend is refused because the aggregator has no
+                meaningful semantics on `GeoDataFrame` / `DataFrame`
+                rows; a raster backend that has not wired the reducer
+                yet is refused for that reason instead. Either way the
+                refusal is a `NotImplementedError` raised before the
+                backend's `download` runs, carrying the backend's own
+                `AGGREGATE_REFUSAL_REASON`. A backend without an
+                explicit `OUTPUT_KIND` is treated as `"raster"` for
+                back-compatibility.
             *args: Forwarded positionally to `backend.download`.
             **kwargs: Forwarded as keywords to `backend.download`.
 
@@ -1679,13 +1683,15 @@ class EarthLens:
         The shared fetch path behind :meth:`download` (which first redirects an
         omitted `path` to the persistent directory) and :meth:`load` (which
         keeps the throwaway temp directory). Rejects a non-`None` `aggregate`
-        for a non-raster backend before the backend is called.
+        before the backend is called — for a non-raster backend, and equally
+        for a raster one that does not declare `SUPPORTS_AGGREGATE`.
 
         Args:
             *args: Forwarded positionally to `backend.download`.
             progress_bar: Whether the backend prints its progress bar.
-            aggregate: Optional aggregation config; only valid for `"raster"` /
-                `"mixed"` backends.
+            aggregate: Optional aggregation config; valid only for a
+                `"raster"` / `"mixed"` backend that also declares
+                `SUPPORTS_AGGREGATE`.
             **kwargs: Forwarded as keywords to `backend.download`.
 
         Returns:

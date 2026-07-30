@@ -289,11 +289,14 @@ class OBIS(AbstractDataSource):
         Args:
             progress_bar: Accepted for signature parity; OBIS search has no
                 progress bar, so this is a no-op.
-            limit: Cap on the total occurrence rows returned, across every
+            limit: Cap on the total occurrence rows **fetched**, across every
                 requested selector. Applied as the per-selector frames arrive,
-                so a selector past the cap is never searched. `None` (the
-                default) fetches everything, which for a broad taxon over a
-                wide bbox is bounded only by memory.
+                so a selector past the cap is never searched. The cap is
+                counted before the rows are mapped to features, so a request
+                whose records carry no usable coordinates can return fewer
+                features than the cap. `None` (the default) fetches everything,
+                which for a broad taxon over a wide bbox is bounded only by
+                memory.
 
         Returns:
             FeatureCollection: The occurrence points, CRS `EPSG:4326`.
