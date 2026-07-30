@@ -1077,3 +1077,55 @@ class TestArgsEntriesAreOnTheirOwnLine:
             f"two Args entries share one line, so the second is dropped from "
             f"the rendered docs: {offenders}"
         )
+
+
+class TestCatalogLoadingUsesOneMechanism:
+    """A catalog must not define `_autoload` that its own post-init skips.
+
+    ARC-4 moved 32 catalogs onto the shared `_autoload` hook and deliberately
+    left the rest loading inline in their own `model_post_init`. Both are fine.
+    What is not fine is a class doing both halves inconsistently: defining
+    `_autoload` while overriding `model_post_init` without chaining to the base
+    means the hook is never called, and the catalog silently loads by whichever
+    path happens to be wired — with the dead one sitting there looking correct.
+    """
+
+    def _catalog_classes(self):
+        """Yield `(label, ClassDef)` for every `AbstractCatalog` subclass."""
+        root = Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/catalog.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.ClassDef):
+                    continue
+                if any("AbstractCatalog" in ast.unparse(b) for b in node.bases):
+                    yield f"{path.parent.name}.{node.name}", node
+
+    def test_catalog_classes_were_found(self):
+        """Guard the guard: the scan must reach the shipped catalogs."""
+        found = [label for label, _ in self._catalog_classes()]
+        assert len(found) > 30, f"only found {len(found)}: {found}"
+
+    def test_no_catalog_defines_an_autoload_it_never_calls(self):
+        """Defining `_autoload` and skipping `super()` leaves it dead."""
+        offenders: list[str] = []
+        for label, node in self._catalog_classes():
+            body = ast.unparse(node)
+            defines_autoload = any(
+                isinstance(member, ast.FunctionDef) and member.name == "_autoload"
+                for member in node.body
+            )
+            overrides = [
+                member
+                for member in node.body
+                if isinstance(member, ast.FunctionDef)
+                and member.name == "model_post_init"
+            ]
+            if not defines_autoload or not overrides:
+                continue
+            if "super().model_post_init" not in body:
+                offenders.append(label)
+        assert offenders == [], (
+            f"these define _autoload but override model_post_init without "
+            f"calling super(), so the hook never runs: {offenders}"
+        )

@@ -514,3 +514,37 @@ class TestTakeLimitedClosesWhatItAbandons:
             [pd.DataFrame({"n": [1, 2]}), pd.DataFrame({"n": [3, 4]})], limit=3
         )
         assert sum(len(frame) for frame in collected) == 3
+
+
+class TestCapOnANonRowFragmentExplainsItself:
+    """A cap on a file-writing backend fails with a message that names the cause.
+
+    `_search_fetch_each` is shared by tabular backends (whose `_fetch_one`
+    yields frames) and by soilgrids, whose `_fetch_one` yields a single `Path`.
+    Routing the composition through `_take_limited` made the cap reach `len()`
+    — fine for a frame, a bare `TypeError: object of type 'WindowsPath' has no
+    len()` for a path, naming neither the backend nor the cap.
+    """
+
+    def test_a_path_fragment_names_the_backend_and_the_cap(self, tmp_path):
+        """The raised message points at the real problem."""
+        backend = _build(_Backend, tmp_path)
+        backend._fetch_one = lambda product: tmp_path / f"{product.id}.tif"
+        backend._limit = 2
+
+        with pytest.raises(TypeError, match="cannot apply a row cap"):
+            backend._search_fetch_each()
+
+    def test_row_bearing_fragments_are_unaffected(self, tmp_path):
+        """The normal path still measures with `len`."""
+        backend = _build(_Backend, tmp_path)
+        backend._limit = 4
+        frames = backend._search_fetch_each()
+        assert sum(len(frame) for frame in frames) == 4
+
+    def test_no_cap_leaves_path_fragments_alone(self, tmp_path):
+        """Without a cap nothing is measured, so a file backend is untouched."""
+        backend = _build(_Backend, tmp_path)
+        backend._fetch_one = lambda product: tmp_path / f"{product.id}.tif"
+        backend._limit = None
+        assert len(backend._search_fetch_each()) == 3

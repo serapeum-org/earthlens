@@ -1869,6 +1869,39 @@ class AbstractDataSource(ABC):
             )
         return results, failures
 
+    def _fragment_rows(self, fragment: Any) -> int:
+        """Row count of one fetched fragment, for the shared composition's cap.
+
+        `len` is right for the row-bearing fragments (`DataFrame`,
+        `FeatureCollection`) the tabular and vector backends yield. A raster
+        backend's `_fetch_one` yields a single `Path`, which has no length —
+        soilgrids is the one built on this composition. That combination only
+        arises if such a backend gains a `limit=`, and the bare `len()` failure
+        is a `TypeError: object of type 'WindowsPath' has no len()` naming
+        neither the backend nor the cap.
+
+        Args:
+            fragment: One `_fetch_one` result.
+
+        Returns:
+            int: The fragment's row count.
+
+        Raises:
+            TypeError: When the fragment has no length, naming the backend and
+                what to do about it.
+        """
+        try:
+            return len(fragment)
+        except TypeError as exc:
+            raise TypeError(
+                f"{type(self).__name__} cannot apply a row cap: its fetch "
+                f"returns {type(fragment).__name__}, which has no length "
+                f"(OUTPUT_KIND={self.OUTPUT_KIND!r}). A `limit=` counts rows, "
+                f"so it does not describe a backend that writes files — narrow "
+                f"the request instead, or pass `size=` if a per-item cap is "
+                f"what you mean."
+            ) from exc
+
     def _iter_items(
         self,
         items: Iterable[Any],
@@ -2045,6 +2078,7 @@ class AbstractDataSource(ABC):
                 failures=failures,
             ),
             limit=self._limit,
+            size=self._fragment_rows,
         )
         if failures and policy == "warn":
             logger.warning(
