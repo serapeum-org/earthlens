@@ -260,22 +260,19 @@ class Catalog(AbstractCatalog):
     datasets: dict[str, Dataset] = Field(default_factory=dict)
     regions: dict[str, str] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no queries were supplied.
+    @classmethod
+    def _autoload(cls) -> dict[str, Any]:
+        """Read the bundled catalog from disk.
 
-        `Catalog()` with no args reads `CATALOG_PATH`; passing
-        `datasets=...` skips the disk read (used in tests).
-
-        Raises:
-            ValueError: Propagated from `load` when the YAML is missing,
-                empty, or has a malformed query row.
+        Returns:
+            dict[str, Any]: The `datasets`, `regions` read from
+                the bundled catalog.
         """
-        if not self.datasets:
-            loaded = Catalog.load()
-            self.datasets = loaded.datasets
-            if not self.regions:
-                self.regions = loaded.regions
-        super().model_post_init(__context)
+        loaded = Catalog.load()
+        return {
+            "datasets": loaded.datasets,
+            "regions": loaded.regions,
+        }
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

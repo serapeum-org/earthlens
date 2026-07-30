@@ -72,7 +72,6 @@ from earthlens.osm.catalog import Catalog, Dataset
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
 
-    from earthlens.aggregate import AggregationConfig
 
 #: Canonical public Overpass endpoint. Overridable via `endpoint=`.
 OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter"
@@ -161,6 +160,16 @@ class OSM(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    #: Overpass' usage policy asks for a single request at a time and a
+    #: pause between them; ohsome rate-limits per user. One second is the
+    #: commonly cited floor for both, and it is a floor, not a target —
+    #: raise it for a large sweep. Before this, `min_interval` existed on
+    #: HttpClient and no call site ever set it, so nothing in earthlens
+    #: paced itself against any provider.
+    MIN_REQUEST_INTERVAL: float = 1.0
+
+    AGGREGATE_REFUSAL_REASON = "OSM features are vector, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     #: An Overpass current-state query has no window; ohsome supplies its own, so a
     #: missing `start` / `end` is legal here.
@@ -282,6 +291,11 @@ class OSM(AbstractDataSource):
         self._region = region
         self._engine: Engine = engine
         self._cache_dir = Path(cache_dir) if cache_dir else DEFAULT_PBF_CACHE_DIR
+        # Built on first use and reused, so `MIN_REQUEST_INTERVAL` actually
+        # paces successive queries: the interval is enforced from a timestamp
+        # the client carries, which a per-query client would always reset.
+        self._overpass_http: HttpClient | None = None
+        self._pbf_http: HttpClient | None = None
         self._catalog = Catalog()
         super().__init__(
             start=cast("str", start),
@@ -425,18 +439,80 @@ class OSM(AbstractDataSource):
             list[FeatureCollection]: One collection per product, in product
                 order.
         """
-        collections: list[FeatureCollection] = []
-        for product in products:
-            dataset: Dataset = product.metadata["dataset"]
-            if dataset.protocol == "overpass":
-                collection = self._fetch_overpass(product.id, dataset)
-            elif dataset.protocol == "ohsome":
-                collection = self._fetch_ohsome(product.id, dataset)
-            else:
-                collection = self._fetch_pbf(product.id, dataset)
-            logger.info(f"{product.id}: fetched {len(collection)} feature(s)")
-            collections.append(collection)
-        return collections
+        # Lazy so a `limit=` stops the work: each query is a live Overpass /
+        # ohsome request or a PBF extract, so a query past the cap is never
+        # issued rather than issued and then trimmed away.
+        return self._take_limited(
+            (self._fetch_product(product) for product in products),
+            limit=self._limit,
+        )
+
+    def _fetch_product(self, product: RemoteProduct) -> FeatureCollection:
+        """Run one planned query, routing on its dataset's protocol.
+
+        Args:
+            product: One product from `_search`; its `dataset` metadata
+                decides the transport.
+
+        Returns:
+            FeatureCollection: The query's features (empty when nothing
+                matched).
+        """
+        dataset: Dataset = product.metadata["dataset"]
+        if dataset.protocol == "overpass":
+            collection = self._fetch_overpass(product.id, dataset)
+        elif dataset.protocol == "ohsome":
+            collection = self._fetch_ohsome(product.id, dataset)
+        else:
+            collection = self._fetch_pbf(product.id, dataset)
+        logger.info(f"{product.id}: fetched {len(collection)} feature(s)")
+        return collection
+
+    def _overpass_client(self) -> HttpClient:
+        """Return this instance's Overpass client, built once.
+
+        One client per backend, not one per query: `min_interval` paces
+        requests through the `_last_request` timestamp the client carries, so a
+        fresh client per query starts with no history and never sleeps —
+        `MIN_REQUEST_INTERVAL` would be declared, passed, and completely
+        inert against the public endpoint it exists to protect.
+
+        Returns:
+            HttpClient: The memoised Overpass client.
+        """
+        if self._overpass_http is None:
+            self._overpass_http = HttpClient(
+                session=cast("requests.Session | None", _RequestsHttp()),
+                user_agent=self._user_agent,
+                min_interval=self.MIN_REQUEST_INTERVAL,
+                timeout=self._timeout,
+                max_retries=0,
+                status_forcelist=(),
+                raise_for_status=True,
+            )
+        return self._overpass_http
+
+    def _pbf_client(self) -> HttpClient:
+        """Return this instance's PBF-download client, built once.
+
+        Memoised for the same reason as :meth:`_overpass_client`: the pacing
+        state lives on the client.
+
+        Returns:
+            HttpClient: The memoised PBF client.
+        """
+        if self._pbf_http is None:
+            self._pbf_http = HttpClient(
+                user_agent=self._user_agent,
+                timeout=self._timeout,
+                min_interval=self.MIN_REQUEST_INTERVAL,
+                retry_on_exceptions=(
+                    requests.ConnectionError,
+                    requests.Timeout,
+                    OSError,
+                ),
+            )
+        return self._pbf_http
 
     def _fetch_overpass(self, query_id: str, dataset: Dataset) -> FeatureCollection:
         """Fetch one Overpass query: POST the QL (with UA), parse, build geometry.
@@ -482,15 +558,7 @@ class OSM(AbstractDataSource):
             "{timeout}", str(int(self._timeout))
         )
         logger.info(f"Querying Overpass for {query_id!r} over bbox ({bbox_str})")
-        http = HttpClient(
-            session=cast("requests.Session | None", _RequestsHttp()),
-            user_agent=self._user_agent,
-            timeout=self._timeout,
-            max_retries=0,
-            status_forcelist=(),
-            raise_for_status=True,
-        )
-        response = http.post(self._endpoint, data={"data": ql})
+        response = self._overpass_client().post(self._endpoint, data={"data": ql})
         result = overpy.Overpass().parse_json(response.text)
         return to_fc(overpy_to_gdf(result))
 
@@ -576,16 +644,7 @@ class OSM(AbstractDataSource):
         # a definitive 4xx (e.g. a wrong region path -> 404) still fails fast
         # rather than retrying five times; retryable 429/5xx statuses are already
         # handled by the client's default `status_forcelist`.
-        http = HttpClient(
-            user_agent=self._user_agent,
-            timeout=self._timeout,
-            retry_on_exceptions=(
-                requests.ConnectionError,
-                requests.Timeout,
-                OSError,
-            ),
-        )
-        path = download_extract(region_path, self._cache_dir, http=http)
+        path = download_extract(region_path, self._cache_dir, http=self._pbf_client())
         return read_pbf(
             path,
             pyrosm_method=cast("str", dataset.pyrosm_method),
@@ -637,7 +696,7 @@ class OSM(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> FeatureCollection:
         """Run the requested OSM queries and return the combined features.
 
@@ -650,26 +709,16 @@ class OSM(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends; OSM issues one query per named id, so this is a
                 no-op.
-            aggregate: Must be `None`. OSM features are vector, not gridded,
-                so there is no meaningful aggregation. The facade already
-                rejects a non-`None` `aggregate=` for a `vector` backend;
-                this is the belt-and-suspenders guard for direct callers.
+            limit: Cap on the total features returned, across every named
+                query. Applied as each query's result arrives, so a query past
+                the cap is never issued — which also means the rate limit is
+                not spent on it. `None` (the default) runs every query.
 
         Returns:
             FeatureCollection: The matched features, CRS `EPSG:4326`. Empty
                 (schema-only) when nothing matched.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "OSM.download(aggregate=...) is not supported: OSM features are "
-                "vector, not gridded rasters, so there is no meaningful gridded "
-                "reduction. Call download() without aggregate= and post-process "
-                "the returned FeatureCollection (a GeoDataFrame) directly."
-            )
-
+        self._limit = self.check_limit(limit)
         collection = self._combine(self._api())
         # OSM is ODbL — warn on every result, even an empty one (the query
         # itself succeeded and the obligation rides with any data downloaded).

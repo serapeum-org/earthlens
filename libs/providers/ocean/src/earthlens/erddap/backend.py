@@ -159,6 +159,13 @@ class ERDDAP(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Wires the temporal reducer (ARC-1).
+    SUPPORTS_AGGREGATE = True
+
+    AGGREGATE_REFUSAL_REASON = (
+        "a tabledap response is tabular; only griddap grids have an axis to reduce"
+    )
+
     def __init__(
         self,
         start: str,
@@ -291,6 +298,16 @@ class ERDDAP(AbstractDataSource):
         returns an in-memory frame (the write happens in :meth:`download`
         via :meth:`_write_table`), a griddap fetch returns the written
         NetCDF path.
+
+        Deliberately takes no `limit=`, unlike the other tabular backends.
+        `_search` resolves to a single dataset, so there is no per-product loop
+        a cap could stop: griddap streams one file, and tabledap is one request
+        whose rows have all been transferred by the time a frame exists. A
+        client-side cap here would trim the result without saving any work —
+        the decorative form `TestLimitIsBoundedNotTrimmed` exists to catch. The
+        real bound is ERDDAP's own server-side `orderByLimit`, which belongs in
+        `build_constraints` and needs verifying against a live server before it
+        is claimed; narrowing the date window is the bound available today.
 
         Args:
             products: The single-element list from :meth:`_search`.
@@ -470,14 +487,6 @@ class ERDDAP(AbstractDataSource):
                 coverage (from :meth:`_fetch_grid`).
         """
         if self.OUTPUT_KIND == "tabular":
-            if aggregate is not None:
-                raise NotImplementedError(
-                    "ERDDAP.download(aggregate=...) is not supported for a "
-                    "tabledap dataset: its output is a per-row table, not a "
-                    "gridded raster, so there is no meaningful gridded "
-                    "reduction. Use a griddap dataset (or the CMEMS backend) "
-                    "for gridded fields you want to aggregate."
-                )
             frames = self._api()
             df = (
                 pd.concat(frames, ignore_index=True)

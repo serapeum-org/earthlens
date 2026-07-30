@@ -30,7 +30,7 @@ for a single explicit point a `ValueError` naming the coordinate is raised.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import Any, Literal, cast
 
 import pandas as pd
 import requests
@@ -46,9 +46,6 @@ from earthlens.base import (
 from earthlens.nrel import _helpers
 from earthlens.nrel.auth import NrelAuth, NrelCredentials
 from earthlens.nrel.catalog import Catalog, Product
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -94,6 +91,8 @@ class NREL(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "NREL output is a per-coordinate hourly time series (tabular), not a gridded raster, so there is no meaningful gridded reduction. NREL already returns the resolved hourly / TMY series"
 
     def __init__(
         self,
@@ -332,17 +331,16 @@ class NREL(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch every `(point, year)` call, write the table, and return it.
 
         Args:
             progress_bar: Show a per-call `tqdm` bar while fetching.
-            aggregate: Must be `None`. NREL output is tabular (the resolved
-                hourly / TMY series), so there is no gridded reduction; the
-                facade already rejects a non-`None` `aggregate=` for a
-                `tabular` backend, and this is the belt-and-suspenders guard for
-                direct callers.
+            limit: Cap on the total rows returned, across every requested
+                call. Applied as each call's frame arrives, so a call past
+                the cap is never requested. `None` (the default) fetches
+                everything.
 
         Returns:
             pd.DataFrame: The concatenated long-format frame — one block of
@@ -350,17 +348,10 @@ class NREL(AbstractDataSource):
                 `lat`/`lon`/`year`/`product`.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
             ValueError: If a single explicit point is out of NREL coverage, or
                 the fan-out exceeds `max_requests`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "NREL.download(aggregate=...) is not supported: NREL output is "
-                "a per-coordinate hourly time series (tabular), not a gridded "
-                "raster, so there is no meaningful gridded reduction. NREL "
-                "already returns the resolved hourly / TMY series."
-            )
+        self._limit = self.check_limit(limit)
         assert self._product is not None  # set by _initialize
         self._show_progress = progress_bar
         frames = [frame for frame in self._api() if frame is not None]
@@ -412,22 +403,34 @@ class NREL(AbstractDataSource):
         Returns:
             list[pd.DataFrame | None]: One frame per in-coverage call (same
                 order); `None` where a multi-point bbox skipped a call.
+                Truncated when `limit=` was passed to `download`.
         """
         from tqdm import tqdm
 
         last_call = [0.0]
         single = len({(p.metadata["lat"], p.metadata["lon"]) for p in products}) == 1
-        iterator = tqdm(
-            products,
-            disable=not self._show_progress,
-            desc="NREL",
-            unit="call",
-        )
-        with requests.Session() as session:
-            return [
-                self._fetch_call(product, session, last_call, single=single)
-                for product in iterator
-            ]
+        # `with`, so a cap that stops the sweep early still closes the bar:
+        # tqdm keeps redrawing and holds the terminal until it is closed.
+        with (
+            tqdm(
+                products,
+                disable=not self._show_progress,
+                desc="NREL",
+                unit="call",
+            ) as iterator,
+            requests.Session() as session,
+        ):
+            # Lazy so a `limit=` stops the work: a call past the cap is never
+            # requested. Skipped (`None`) calls count as zero rows, so the cap
+            # bounds returned rows rather than attempted calls.
+            return self._take_limited(
+                (
+                    self._fetch_call(product, session, last_call, single=single)
+                    for product in iterator
+                ),
+                limit=self._limit,
+                size=lambda frame: 0 if frame is None else len(frame),
+            )
 
     def _fetch_call(
         self,

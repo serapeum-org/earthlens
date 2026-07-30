@@ -14,13 +14,39 @@ from __future__ import annotations
 from typing import get_args
 from unittest.mock import MagicMock
 
+import pandas as pd
 import pytest
 
-from earthlens.base import AbstractDataSource, OutputKind
+from earthlens.base import AbstractDataSource, OutputKind, TemporalExtent
 from earthlens.chc import CHIRPS
 from earthlens.earthlens import EarthLens
 from earthlens.ecmwf import ECMWF
 from earthlens.s3 import S3
+
+
+class _GuardBackend(AbstractDataSource):
+    """Minimal real backend whose `OUTPUT_KIND` a test can set per instance.
+
+    A real subclass, not a mock: the `aggregate=` guard lives in the `download`
+    wrapper that `__init_subclass__` installs, so a mock would not be guarded at
+    all.
+    """
+
+    REQUIRES_TIME_WINDOW = False
+    SUPPORTS_AGGREGATE = True
+
+    def _check_input_dates(self, start, end, temporal_resolution, fmt):
+        return TemporalExtent(
+            start_date=None,
+            end_date=None,
+            resolution="all",
+            dates=pd.DatetimeIndex([]),
+        )
+
+    def download(self, progress_bar: bool = True, aggregate=None, **kwargs):
+        """Record the call so a test can assert what reached the backend."""
+        self.calls.append({"progress_bar": progress_bar, "aggregate": aggregate})
+        return []
 
 
 @pytest.mark.unit
@@ -69,12 +95,29 @@ class TestAbstractDataSourceOutputKindDefault:
 
 @pytest.mark.unit
 class TestEarthLensAggregateGuard:
-    """Facade `download(aggregate=...)` gates by `datasource.OUTPUT_KIND`."""
+    """`download(aggregate=...)` is gated by the backend, reached via the facade.
+
+    The gate used to live in the facade and test against a `MagicMock`
+    datasource. It now lives in the `download` wrapper every
+    `AbstractDataSource` subclass gets, which is why these use a real subclass:
+    the wrapper also guards a direct `backend.download(aggregate=...)`, which a
+    facade-only check never did, and the facade is contracted to hold a real
+    backend anyway.
+    """
 
     @pytest.fixture
     def fake_backend(self):
-        """A MagicMock that stands in for a constructed backend instance."""
-        return MagicMock(name="fake_backend")
+        """A real `AbstractDataSource` subclass standing in for a backend."""
+        backend = _GuardBackend(
+            start=None,
+            end=None,
+            variables=["x"],
+            lat_lim=[4.0, 5.0],
+            lon_lim=[-75.0, -74.0],
+            path="",
+        )
+        backend.calls = []
+        return backend
 
     @pytest.fixture
     def facade(self, fake_backend):
@@ -89,35 +132,46 @@ class TestEarthLensAggregateGuard:
         fake_backend.OUTPUT_KIND = kind
         cfg = object()
         facade.download(progress_bar=False, aggregate=cfg)
-        _, kwargs = fake_backend.download.call_args
-        assert kwargs.get("aggregate") is cfg, (
-            f"aggregate not forwarded for OUTPUT_KIND={kind!r}: kwargs={kwargs!r}"
+        assert fake_backend.calls[-1]["aggregate"] is cfg, (
+            f"aggregate not forwarded for OUTPUT_KIND={kind!r}: {fake_backend.calls!r}"
         )
 
     @pytest.mark.parametrize("kind", ["vector", "tabular"])
     def test_aggregate_rejected_for_disallowed_kinds(self, facade, fake_backend, kind):
-        """`aggregate=cfg` raises `NotImplementedError` for vector / tabular."""
+        """A non-gridded instance refuses `aggregate=`, even when the class supports it."""
         fake_backend.OUTPUT_KIND = kind
         cfg = object()
         with pytest.raises(NotImplementedError, match="aggregate= is not supported"):
             facade.download(progress_bar=False, aggregate=cfg)
-        fake_backend.download.assert_not_called()
+        assert fake_backend.calls == [], "the backend body must not run"
+
+    def test_rejected_on_a_direct_call_too(self, fake_backend):
+        """The guard is the backend's, so bypassing the facade does not bypass it."""
+        fake_backend.OUTPUT_KIND = "tabular"
+        with pytest.raises(NotImplementedError, match="aggregate= is not supported"):
+            fake_backend.download(aggregate=object())
+        assert fake_backend.calls == []
+
+    def test_class_that_does_not_support_it_refuses_even_for_raster(self, fake_backend):
+        """`SUPPORTS_AGGREGATE = False` refuses regardless of a gridded kind."""
+        fake_backend.OUTPUT_KIND = "raster"
+        fake_backend.SUPPORTS_AGGREGATE = False
+        with pytest.raises(NotImplementedError, match="aggregate= is not supported"):
+            fake_backend.download(aggregate=object())
 
     def test_aggregate_none_bypasses_guard_for_any_kind(self, facade, fake_backend):
         """`aggregate=None` (default) never trips the guard, even for vector backends."""
         fake_backend.OUTPUT_KIND = "vector"
         facade.download(progress_bar=False)
-        _, kwargs = fake_backend.download.call_args
-        assert "aggregate" not in kwargs, (
-            f"aggregate should be omitted when None: kwargs={kwargs!r}"
-        )
+        assert fake_backend.calls[-1]["aggregate"] is None
 
-    def test_missing_output_kind_attr_defaults_to_raster(self, facade, fake_backend):
-        """A backend with no `OUTPUT_KIND` attribute is treated as raster (back-compat)."""
-        # `delattr` removes the auto-mock attr so getattr falls back to default
-        if hasattr(fake_backend, "OUTPUT_KIND"):
-            delattr(fake_backend, "OUTPUT_KIND")
-        # Force MagicMock to not auto-generate it on access — use a real obj
+    def test_missing_output_kind_attr_defaults_to_raster(self, facade):
+        """A datasource with no `OUTPUT_KIND` is treated as raster (back-compat).
+
+        Such an object is not an `AbstractDataSource`, so it has no `download`
+        wrapper and therefore no guard — the facade forwards and the object
+        decides for itself.
+        """
         sentinel = type("LegacyBackend", (), {})()
         sentinel.download = MagicMock()
         facade.datasource = sentinel
@@ -132,9 +186,36 @@ class TestEarthLensAggregateGuard:
     def test_error_message_names_backend_class_and_kind(self, facade, fake_backend):
         """The `NotImplementedError` message includes the backend class name and kind."""
         fake_backend.OUTPUT_KIND = "tabular"
-        fake_backend.__class__.__name__ = "FakeTabularBackend"
         with pytest.raises(NotImplementedError) as exc_info:
             facade.download(progress_bar=False, aggregate=object())
         msg = str(exc_info.value)
         assert "tabular" in msg, f"kind missing from message: {msg!r}"
         assert "OUTPUT_KIND=" in msg, f"OUTPUT_KIND label missing: {msg!r}"
+
+
+class TestPositionalAggregateReachesTheGate:
+    """A positionally-passed `aggregate` is refused like the keyword form.
+
+    `aggregate` is the second positional parameter on the backends that declare
+    it, so a gate reading only `**kwargs` let `download(False, config)` through.
+    This file tests the `OUTPUT_KIND` gate and had no positional case, which is
+    why it did not catch that.
+    """
+
+    def test_positional_and_keyword_forms_agree(self, tmp_path):
+        """Both call shapes raise the same refusal."""
+        backend = _GuardBackend(
+            start=None,
+            end=None,
+            variables=["x"],
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path=str(tmp_path),
+        )
+        backend.calls = []
+        backend.OUTPUT_KIND = "vector"
+        with pytest.raises(NotImplementedError) as positional:
+            backend.download(False, object())
+        with pytest.raises(NotImplementedError) as keyword:
+            backend.download(aggregate=object())
+        assert str(positional.value) == str(keyword.value)

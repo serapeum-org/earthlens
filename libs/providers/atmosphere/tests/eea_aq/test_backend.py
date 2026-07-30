@@ -177,7 +177,8 @@ class TestApi:
             lon_lim=[-40.0, -39.0],
         )
         df = backend.download(progress_bar=False)
-        assert df.empty and "country" in df.columns
+        assert df.empty
+        assert "country" in df.columns
         assert fake_client.calls == []
 
     def test_unsupported_country_dropped(self, tmp_path, fake_client):
@@ -192,7 +193,8 @@ class TestApi:
         """When no requested country is served, an empty frame comes back."""
         fake_client.countries = frozenset({"FR"})
         df = _backend(fake_client, tmp_path, country="MT").download(progress_bar=False)
-        assert df.empty and fake_client.calls == []
+        assert df.empty
+        assert fake_client.calls == []
 
     def test_no_parquet_returns_empty(self, tmp_path):
         """A dataset that yields no Parquet returns a schema-only frame."""
@@ -260,3 +262,57 @@ def test_missing_airbase_raises(tmp_path, monkeypatch):
     monkeypatch.setattr(builtins, "__import__", _no_airbase)
     with pytest.raises(ImportError, match="eea_aq"):
         backend._airbase_client()
+
+
+@pytest.mark.eea
+class TestLimitStopsTheWork:
+    """A `limit=` must stop the era downloads, not trim the concatenated frame.
+
+    This backend is the one where the distinction is most expensive: `airbase`
+    has no date filter, so each era is a bulk download of every Parquet the
+    service holds for the (era, country, pollutant) triple — hundreds of MB is
+    normal. Trimming rows afterwards would leave every byte of that transferred.
+    """
+
+    def test_the_second_era_is_never_requested_once_the_cap_is_met(
+        self, tmp_path, fake_client
+    ):
+        """A 2023 window spans Verified + Unverified; a met cap stops after one."""
+        backend = _backend(fake_client, tmp_path)
+        assert len(fake_client.calls) == 0
+
+        backend._limit = 1
+        backend._api()
+
+        eras = [call[0] for call in fake_client.calls]
+        assert eras == ["Verified"], (
+            f"requested {eras}; the Unverified era was bulk-downloaded even "
+            f"though the cap was already met by the Verified one"
+        )
+
+    def test_without_a_cap_both_eras_are_requested(self, tmp_path, fake_client):
+        """The unbounded sweep is unchanged."""
+        backend = _backend(fake_client, tmp_path)
+        backend._limit = None
+        backend._api()
+
+        assert [call[0] for call in fake_client.calls] == ["Verified", "Unverified"]
+
+    def test_a_zero_limit_is_refused_before_any_download(self, tmp_path, fake_client):
+        """`limit=0` is caught before the first era is requested."""
+        backend = _backend(fake_client, tmp_path)
+        with pytest.raises(ValueError):
+            backend.download(progress_bar=False, limit=0)
+        assert fake_client.calls == []
+
+
+@pytest.mark.eea
+class TestPublicDownloadHonoursTheCap:
+    """`download(limit=)` must reach the era loop, not just validate."""
+
+    def test_the_keyword_stops_the_second_era(self, tmp_path, fake_client):
+        """A cap passed to `download` leaves the Unverified era unrequested."""
+        backend = _backend(fake_client, tmp_path)
+        backend.download(progress_bar=False, limit=1)
+
+        assert [call[0] for call in fake_client.calls] == ["Verified"]

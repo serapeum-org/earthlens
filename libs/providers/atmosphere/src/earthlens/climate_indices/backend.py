@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import pandas as pd
 import requests
@@ -42,9 +42,6 @@ from earthlens.base import (
 from earthlens.base.http import HttpClient
 from earthlens.climate_indices import _helpers
 from earthlens.climate_indices.catalog import Catalog
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -96,6 +93,8 @@ class ClimateIndices(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "climate indices are tabular monthly scalars, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned DataFrame directly"
 
     def __init__(
         self,
@@ -259,7 +258,7 @@ class ClimateIndices(AbstractDataSource):
             list[pd.DataFrame]: One canonical long-schema frame per
                 product (empty when the window held no data), same order.
         """
-        return [self._fetch_one(product) for product in products]
+        return self._fetch_limited(products, self._limit)
 
     def _fetch_one(self, product: RemoteProduct) -> pd.DataFrame:
         """Fetch one index, parse it, stamp it, and filter to the window.
@@ -345,7 +344,7 @@ class ClimateIndices(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch every requested index, write the table, and return it.
 
@@ -353,11 +352,10 @@ class ClimateIndices(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends; the per-index loop is short, so this is a
                 no-op.
-            aggregate: Must be `None`. Climate-index output is tabular
-                monthly scalars, so there is no gridded reduction; the
-                facade already rejects a non-`None` `aggregate=` for a
-                `tabular` backend, and this is the belt-and-suspenders
-                guard for direct callers.
+            limit: Cap on the total rows returned, across every requested
+                item. Applied as the per-item results arrive, so an item past
+                the cap is never fetched. `None` (the default) fetches
+                everything, which for a wide request is bounded only by memory.
 
         Returns:
             pd.DataFrame: The long-format table (`date`, `index`,
@@ -365,18 +363,10 @@ class ClimateIndices(AbstractDataSource):
                 window; an empty (schema-only) frame when nothing matched.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None` (`G1`).
             ValueError: If an index id is unknown, or a fetch fails
                 (`G8`).
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "ClimateIndices.download(aggregate=...) is not supported: "
-                "climate indices are tabular monthly scalars, not gridded "
-                "rasters, so there is no meaningful gridded reduction. Call "
-                "download() without aggregate= and post-process the returned "
-                "DataFrame directly."
-            )
+        self._limit = self.check_limit(limit)
         frames = [frame for frame in self._api() if len(frame)]
         df = (
             pd.concat(frames, ignore_index=True)

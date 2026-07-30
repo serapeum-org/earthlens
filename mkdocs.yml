@@ -653,6 +653,7 @@ nav:
   - API Reference:
     - EarthLens Facade: reference/earthlens.md
     - AbstractDataSource: reference/abstract-datasource.md
+    - Bounded results (base): reference/base/bounded-results.md
     - HTTP client (base): reference/base/http-client.md
     - Region affinity (base): reference/base/region-affinity.md
   - About:

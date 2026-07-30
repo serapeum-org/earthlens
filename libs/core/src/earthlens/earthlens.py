@@ -21,7 +21,7 @@ import inspect
 import shutil
 import tempfile
 import warnings
-from collections.abc import Iterator, Mapping
+from collections.abc import Callable, Iterator, Mapping
 from datetime import date, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
@@ -1494,16 +1494,20 @@ class EarthLens:
             progress_bar: Whether the backend should print a per-date
                 progress bar during the loop. Defaults to `True`.
             aggregate: Optional :class:`earthlens.aggregate.AggregationConfig`.
-                Forwarded to backends whose `OUTPUT_KIND` is
-                `"raster"` or `"mixed"` — the two shapes for which
-                a gridded reduction is well-defined. Backends
-                declaring `"vector"` or `"tabular"` reject a
-                non-`None` `aggregate` with `NotImplementedError`
-                before the backend's `download` is called (the
-                aggregator has no meaningful semantics on
-                `GeoDataFrame` / `DataFrame` rows). A backend
-                without an explicit `OUTPUT_KIND` attribute is
-                treated as `"raster"` for back-compatibility.
+                Two conditions must both hold for it to be forwarded:
+                the backend's `OUTPUT_KIND` is `"raster"` or
+                `"mixed"` — the shapes for which a gridded reduction
+                is well-defined — **and** the backend declares
+                `SUPPORTS_AGGREGATE`. A `"vector"` / `"tabular"`
+                backend is refused because the aggregator has no
+                meaningful semantics on `GeoDataFrame` / `DataFrame`
+                rows; a raster backend that has not wired the reducer
+                yet is refused for that reason instead. Either way the
+                refusal is a `NotImplementedError` raised before the
+                backend's `download` runs, carrying the backend's own
+                `AGGREGATE_REFUSAL_REASON`. A backend without an
+                explicit `OUTPUT_KIND` is treated as `"raster"` for
+                back-compatibility.
             *args: Forwarded positionally to `backend.download`.
             **kwargs: Forwarded as keywords to `backend.download`.
 
@@ -1529,12 +1533,13 @@ class EarthLens:
                 :class:`earthlens.ecmwf.AuthenticationError`.
             KeyError: When any backend receives an unknown variable
                 code that the catalog cannot resolve.
-            NotImplementedError: When `aggregate=` is not `None` and
-                the bound backend's `OUTPUT_KIND` is `"vector"` or
-                `"tabular"`. The aggregator only handles gridded
-                raster outputs; vector / tabular backends emit
-                `GeoDataFrame` / `DataFrame` rows that have no
-                meaningful gridded reduction.
+            NotImplementedError: When `aggregate=` is not `None` and the
+                bound backend does not support it — either because its
+                `OUTPUT_KIND` is `"vector"` / `"tabular"` (those emit
+                `GeoDataFrame` / `DataFrame` rows, which have no meaningful
+                gridded reduction) or because it is a raster backend that has
+                not wired the reducer and so does not declare
+                `SUPPORTS_AGGREGATE`.
 
         Examples:
             - End-to-end CHIRPS download. Marked `# doctest: +SKIP`
@@ -1679,40 +1684,46 @@ class EarthLens:
         The shared fetch path behind :meth:`download` (which first redirects an
         omitted `path` to the persistent directory) and :meth:`load` (which
         keeps the throwaway temp directory). Rejects a non-`None` `aggregate`
-        for a non-raster backend before the backend is called.
+        before the backend is called — for a non-raster backend, and equally
+        for a raster one that does not declare `SUPPORTS_AGGREGATE`.
 
         Args:
             *args: Forwarded positionally to `backend.download`.
             progress_bar: Whether the backend prints its progress bar.
-            aggregate: Optional aggregation config; only valid for `"raster"` /
-                `"mixed"` backends.
+            aggregate: Optional aggregation config; valid only for a
+                `"raster"` / `"mixed"` backend that also declares
+                `SUPPORTS_AGGREGATE`.
             **kwargs: Forwarded as keywords to `backend.download`.
 
         Returns:
             Whatever the bound backend's `download` returns.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None` and the backend's
-                `OUTPUT_KIND` is `"vector"` or `"tabular"`.
+            NotImplementedError: If `aggregate` is not `None` and the backend
+                either is not `raster`/`mixed` or does not declare
+                `SUPPORTS_AGGREGATE`.
         """
         if aggregate is not None:
-            output_kind = getattr(self.datasource, "OUTPUT_KIND", "raster")
-            if output_kind not in {"raster", "mixed"}:
-                raise NotImplementedError(
-                    f"aggregate= is not supported for "
-                    f"{type(self.datasource).__name__} backends "
-                    f"(OUTPUT_KIND={output_kind!r}). The aggregator only "
-                    f"handles gridded raster outputs; vector / tabular "
-                    f"backends emit GeoDataFrames or DataFrames that do "
-                    f"not have a meaningful gridded reduction."
-                )
+            # Forward it and let the backend's `download` wrapper decide. The
+            # wrapper checks `SUPPORTS_AGGREGATE`, which is the honest question:
+            # `OUTPUT_KIND` used to stand in for it here and could not answer it,
+            # because plenty of `"raster"` backends emit grids with no time axis
+            # to reduce. Keeping the check in one place also means a direct
+            # `backend.download(aggregate=...)` is refused identically.
             kwargs["aggregate"] = aggregate
 
-        # The base `download(self)` is a minimal placeholder; every concrete
-        # backend override accepts `progress_bar` (and its own extra kwargs).
-        return self.datasource.download(  # type: ignore[call-arg]
-            *args, progress_bar=progress_bar, **kwargs
-        )
+        # The abstract `download` now declares `(self, progress_bar)` and each
+        # backend adds its own optional arguments (ARC-2), which is exactly what
+        # cannot be typed at this call site: the facade is handed a backend
+        # chosen at runtime by string key, so the extra keywords it forwards are
+        # only checkable against the concrete class. The narrow ignore below is
+        # the price of that dispatch; a wrong keyword still fails loudly at the
+        # backend, and `options_for` validates the request up front.
+        # Cast rather than a stack of ignores: at this point the signature
+        # genuinely is not statically known, and saying so is more honest than
+        # suppressing three separate errors about it.
+        download = cast("Callable[..., Any]", self.datasource.download)
+        return download(*args, progress_bar=progress_bar, **kwargs)
 
     def load(self, *args: object, **kwargs: Any) -> Any:
         """Download and return the data in memory instead of only on disk.

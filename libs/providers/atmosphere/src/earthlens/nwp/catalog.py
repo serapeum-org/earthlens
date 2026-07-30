@@ -286,16 +286,15 @@ class Catalog(AbstractCatalog):
 
     datasets: dict[str, NWPModel] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no datasets were supplied.
+    @classmethod
+    def _autoload(cls) -> dict[str, Any]:
+        """Read the bundled catalog from disk.
 
-        `Catalog()` with no args reads the bundled YAML through the
-        `(path, mtime)`-keyed cache; passing `datasets=...` skips the
-        disk read (used by tests that inject a faked catalog).
+        Returns:
+            dict[str, Any]: The `datasets` read from
+                the bundled catalog.
         """
-        if not self.datasets:
-            self.datasets = _load_catalog_data(CATALOG_PATH)
-        super().model_post_init(__context)
+        return {"datasets": _load_catalog_data(CATALOG_PATH)}
 
     def get_catalog(self) -> dict[str, NWPModel]:
         """Return the structural per-model map (satisfies the base contract)."""

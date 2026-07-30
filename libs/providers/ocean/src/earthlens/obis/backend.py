@@ -21,6 +21,7 @@ set, writes it (GeoParquet by default). Like GBIF the facade rejects an
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -38,7 +39,6 @@ from earthlens.obis.catalog import Catalog
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
 
-    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["geoparquet", "gpkg", "geojson"]
 
@@ -98,6 +98,8 @@ class OBIS(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "occurrences are vector point features, not gridded rasters. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     def __init__(
         self,
@@ -223,6 +225,22 @@ class OBIS(AbstractDataSource):
             "size": self._size,
         }
 
+    def _iter_selector_frames(self) -> Iterator[pd.DataFrame]:
+        """Yield one occurrence frame per requested selector, lazily.
+
+        Lazy so a `limit=` can stop the search: a selector past the cap is never
+        sent to OBIS, which is the difference between capping the result and
+        capping the work.
+
+        Yields:
+            pandas.DataFrame: The raw occurrence rows for one selector.
+        """
+        from pyobis import occurrences
+
+        for selector in self.vars:
+            name = self._catalog.resolve_scientific_name(selector)
+            yield occurrences.search(**self._plan_search(name)).execute()
+
     def _fetch_all(self) -> FeatureCollection:
         """Search every requested species and map the rows to a FeatureCollection.
 
@@ -236,19 +254,18 @@ class OBIS(AbstractDataSource):
             FeatureCollection: The occurrence points, CRS `EPSG:4326`;
                 empty (schema-only) when nothing matched.
         """
-        from pyobis import occurrences
-
-        frames: list[pd.DataFrame] = []
+        frames = self._take_limited(self._iter_selector_frames(), limit=self._limit)
+        if not frames:
+            combined = pd.DataFrame()
+        elif len(frames) > 1:
+            combined = pd.concat(frames, ignore_index=True)
+        else:
+            combined = frames[0]
+        # Licences are read off the rows actually kept, not every row fetched, so
+        # a capped request does not warn about a dataset it did not return.
         licenses: set[str] = set()
-        for selector in self.vars:
-            name = self._catalog.resolve_scientific_name(selector)
-            frame = occurrences.search(**self._plan_search(name)).execute()
-            frames.append(frame)
-            if "license" in frame.columns:
-                licenses.update(frame["license"].dropna())
-        combined = (
-            pd.concat(frames, ignore_index=True) if len(frames) > 1 else frames[0]
-        )
+        if "license" in combined.columns:
+            licenses.update(combined["license"].dropna())
         collection = occurrences_to_fc(
             combined,
             lat_field="decimalLatitude",
@@ -266,16 +283,21 @@ class OBIS(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> FeatureCollection:
         """Run the occurrence search and return the points FeatureCollection.
 
         Args:
             progress_bar: Accepted for signature parity; OBIS search has no
                 progress bar, so this is a no-op.
-            aggregate: Must be `None`. Occurrences are vector, not gridded;
-                the facade already rejects a non-`None` `aggregate=` for a
-                `vector` backend.
+            limit: Cap on the total occurrence rows **fetched**, across every
+                requested selector. Applied as the per-selector frames arrive,
+                so a selector past the cap is never searched. The cap is
+                counted before the rows are mapped to features, so a request
+                whose records carry no usable coordinates can return fewer
+                features than the cap. `None` (the default) fetches everything,
+                which for a broad taxon over a wide bbox is bounded only by
+                memory.
 
         Returns:
             FeatureCollection: The occurrence points, CRS `EPSG:4326`.
@@ -283,15 +305,10 @@ class OBIS(AbstractDataSource):
                 under `path` when `path` is set.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
+            TypeError: If `limit` is neither `None` nor an `int`.
+            ValueError: If `limit` is less than 1.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "OBIS.download(aggregate=...) is not supported: occurrences "
-                "are vector point features, not gridded rasters. Call "
-                "download() without aggregate= and post-process the returned "
-                "FeatureCollection (a GeoDataFrame) directly."
-            )
+        self._limit = self.check_limit(limit)
         collection = self._fetch_all()
         if self._user_path and len(collection):
             written = self._write(collection)

@@ -37,7 +37,7 @@ from __future__ import annotations
 
 import importlib
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import pandas as pd
 from loguru import logger
@@ -52,9 +52,6 @@ from earthlens.base import (
 from earthlens.usgs_water import _helpers
 from earthlens.usgs_water.auth import UsgsWaterAuth, UsgsWaterCredentials
 from earthlens.usgs_water.catalog import Catalog
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 ApiFlavour = Literal["auto", "waterdata", "legacy"]
 OutputFormat = Literal["csv", "parquet"]
@@ -151,6 +148,8 @@ class USGSWater(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "tabular"
 
+    AGGREGATE_REFUSAL_REASON = "USGS water observations are tabular per-site rows, not gridded rasters, so there is no meaningful gridded reduction. Use service='statistics' for a server-side temporal rollup (daily/monthly/annual) instead"
+
     def __init__(
         self,
         start: str,
@@ -206,9 +205,11 @@ class USGSWater(AbstractDataSource):
                 — `"daily"`, `"monthly"`, or `"annual"`. Ignored by the
                 modern endpoint, whose `get_stats_date_range` returns its
                 own intervals over the `start`/`end` window.
-            limit: Optional cap on the rows pulled per request (passed
-                through to the modern endpoint's `limit=`). `None`
-                means the SDK default.
+            limit: Optional cap on the rows pulled **per request**, passed
+                through to the modern endpoint's own `limit=`. `None`
+                means the SDK default. Distinct from `download(limit=)`,
+                which caps the *total* rows returned across every item;
+                the two compose, and neither overwrites the other.
 
         Raises:
             ValueError: When `service`, `api`, or `output_format` is
@@ -248,7 +249,10 @@ class USGSWater(AbstractDataSource):
         self._api_flavour = api
         self._output_format: OutputFormat = output_format
         self._stat_type = stat_type
-        self._limit = limit
+        # Validated like fdsn's: this goes onto the wire as the modern
+        # endpoint's own `limit=`, where 0 / -5 / True is a caller bug the
+        # service would answer confusingly rather than reject.
+        self._request_limit = self.check_limit(limit)
         self._auth: UsgsWaterAuth | None = None
         self._catalog = Catalog()
         self._used_legacy_fallback = False
@@ -338,7 +342,7 @@ class USGSWater(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch the selected service, write the table, and return it.
 
@@ -347,33 +351,25 @@ class USGSWater(AbstractDataSource):
                 backends. USGS Water issues one bulk `dataretrieval`
                 call per service rather than a per-item loop, so there
                 is no progress bar to show — this is a no-op.
-            aggregate: Must be `None`. USGS Water output is tabular, so
-                there is no gridded reduction; the facade already
-                rejects a non-`None` `aggregate=` for a `tabular`
-                backend, and this is the belt-and-suspenders guard for
-                direct callers. Use `service="statistics"` for a
-                server-side temporal rollup instead.
+            limit: Cap on the **total** rows returned. **Trims, it does not
+                reduce the fetch**: `_search` plans one bulk `dataretrieval`
+                call per service, so there is no later item for the cap to
+                skip. The constructor's `limit=` is the one that reduces
+                transfer — it is a per-request cap the modern endpoint applies
+                server-side — and the two are independent; passing neither,
+                either, or both is valid. `None` (the default) returns
+                everything.
 
         Returns:
             pd.DataFrame: The long-format observation table for the
                 selected `service`.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None` (tabular
-                output has no gridded reduction; use
-                `service="statistics"` instead).
             ValueError: If the selected `service` requires an explicit
                 `sites=` (`peaks` / `ratings` / `statistics`) but none
                 was supplied.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "USGSWater.download(aggregate=...) is not supported: USGS "
-                "water observations are tabular per-site rows, not gridded "
-                "rasters, so there is no meaningful gridded reduction. Use "
-                "service='statistics' for a server-side temporal rollup "
-                "(daily/monthly/annual) instead."
-            )
+        self._limit = self.check_limit(limit)
         # Each frame is already normalised to its service's schema (even
         # when empty), so concat all of them — preserving the right
         # columns for non-values services — rather than dropping empties.
@@ -438,7 +434,7 @@ class USGSWater(AbstractDataSource):
             list[pd.DataFrame]: One canonical long-schema frame per
                 product, same order.
         """
-        return [self._fetch_one(product) for product in products]
+        return self._fetch_limited(products, self._limit)
 
     def _fetch_one(self, product: RemoteProduct) -> pd.DataFrame:
         """Fetch one product's service frame and normalise it.
@@ -501,7 +497,7 @@ class USGSWater(AbstractDataSource):
             bbox=self._bbox_list(),
             start=self.time.start_date.strftime("%Y-%m-%d"),
             end=self.time.end_date.strftime("%Y-%m-%d"),
-            limit=self._limit,
+            limit=self._request_limit,
             stat_type=self._stat_type,
         )
         result = function(**kwargs)

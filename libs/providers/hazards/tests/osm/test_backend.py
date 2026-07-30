@@ -179,7 +179,8 @@ class TestOhsomeRoute:
         fc = OSM(
             **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
         ).download()
-        assert "index" not in fc.columns and len(fc) == 1
+        assert "index" not in fc.columns
+        assert len(fc) == 1
 
 
 class TestDownloadContract:
@@ -331,4 +332,119 @@ def test_no_xarray_in_subpackage():
     root = Path(pkg.__file__).parent
     for path in root.glob("*.py"):
         text = path.read_text(encoding="utf-8")
-        assert "import xarray" not in text and "xr." not in text, path.name
+        assert "import xarray" not in text, path.name
+        assert "xr." not in text, path.name
+
+
+class TestLimitStopsTheWork:
+    """A `limit=` must stop issuing queries, not trim the merged collection.
+
+    Every query is a live Overpass / ohsome request against a rate-limited
+    public endpoint, so a cap that only sliced the combined result would still
+    spend the quota on every named query.
+    """
+
+    def _fake_products(self, backend, monkeypatch, fetched):
+        """Point the backend at two queries whose fetch is recorded."""
+        import geopandas as gpd
+        from pyramids.feature.collection import FeatureCollection
+        from shapely.geometry import Point
+
+        def fake_fetch_product(product):
+            fetched.append(product.id)
+            frame = gpd.GeoDataFrame(
+                {"name": ["a", "b", "c"]},
+                geometry=[Point(8.68, 49.41)] * 3,
+                crs="EPSG:4326",
+            )
+            return FeatureCollection(frame)
+
+        monkeypatch.setattr(backend, "_fetch_product", fake_fetch_product)
+
+    def test_queries_past_the_cap_are_never_issued(self, osm_kwargs, monkeypatch):
+        """The second query is not run once the first fills the cap."""
+        backend = OSM(
+            **{
+                **osm_kwargs(),
+                "variables": ["overpass:hospitals", "overpass:schools"],
+            }
+        )
+        fetched: list[str] = []
+        self._fake_products(backend, monkeypatch, fetched)
+
+        backend._limit = 2
+        collections = backend._fetch(backend._search())
+
+        assert fetched == ["overpass:hospitals"], (
+            f"issued {fetched}; the second query was run even though the cap "
+            f"was already met"
+        )
+        assert sum(len(fc) for fc in collections) == 2
+
+    def test_no_limit_issues_every_query(self, osm_kwargs, monkeypatch):
+        """Without a cap every named query still runs."""
+        backend = OSM(
+            **{
+                **osm_kwargs(),
+                "variables": ["overpass:hospitals", "overpass:schools"],
+            }
+        )
+        fetched: list[str] = []
+        self._fake_products(backend, monkeypatch, fetched)
+
+        backend._limit = None
+        backend._fetch(backend._search())
+
+        assert fetched == ["overpass:hospitals", "overpass:schools"]
+
+    def test_a_zero_limit_is_refused_before_any_query(self, osm_kwargs, monkeypatch):
+        """`limit=0` is caught before the first request goes out."""
+        backend = OSM(**osm_kwargs())
+        monkeypatch.setattr(
+            backend,
+            "_fetch_product",
+            lambda product: pytest.fail("a rejected cap must not reach the network"),
+        )
+        with pytest.raises(ValueError):
+            backend.download(progress_bar=False, limit=0)
+
+
+class TestRateLimitActuallyPaces:
+    """`MIN_REQUEST_INTERVAL` must pace successive queries, not just be declared.
+
+    The interval is enforced from a `_last_request` timestamp held on the
+    `HttpClient`. Building a client per query gave every request a fresh client
+    with no history, so the declared 1.0 s floor produced zero sleeps against
+    the shared public Overpass endpoint it exists to protect — declared,
+    passed, and completely inert.
+    """
+
+    def test_the_client_is_reused_across_queries(self, osm_kwargs):
+        """The same client instance serves every Overpass query."""
+        backend = OSM(**osm_kwargs())
+        assert backend._overpass_client() is backend._overpass_client()
+
+    def test_successive_requests_are_spaced_by_the_interval(self, osm_kwargs):
+        """With an injected clock, the second request sleeps the full interval."""
+        backend = OSM(**osm_kwargs())
+        client = backend._overpass_client()
+        assert client.min_interval == OSM.MIN_REQUEST_INTERVAL
+
+        now = [1000.0]
+        slept: list[float] = []
+        client._clock = lambda: now[0]
+        client._sleep = lambda seconds: (
+            slept.append(seconds),
+            now.__setitem__(0, now[0] + seconds),
+        )
+
+        client._throttle()
+        client._throttle()
+
+        assert slept, (
+            f"expected a pause between back-to-back requests, got none: {slept}"
+        )
+        assert slept[0] == pytest.approx(OSM.MIN_REQUEST_INTERVAL), (
+            f"expected a {OSM.MIN_REQUEST_INTERVAL}s pause between back-to-back "
+            f"requests, got {slept}"
+        )

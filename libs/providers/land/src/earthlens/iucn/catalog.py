@@ -153,26 +153,19 @@ class Catalog(AbstractCatalog):
 
     datasets: dict[str, Country] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no rows were supplied.
+    @classmethod
+    def _autoload(cls) -> dict[str, Any]:
+        """Read the bundled catalog from disk.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH` (cached);
-        passing `datasets=...` skips the disk read (used in tests).
-
-        Args:
-            __context: Opaque context handed in by the pydantic v2 model
-                lifecycle; forwarded to the base class unchanged.
-
-        Raises:
-            ValueError: Propagated from :func:`_load_catalog_data` when the
-                YAML is missing, empty, or has a malformed row.
+        Returns:
+            dict[str, Any]: The `datasets`, `available_datasets` read from
+                the bundled catalog.
         """
-        if not self.datasets:
-            rows, available = _load_catalog_data(CATALOG_PATH)
-            self.datasets = dict(rows)
-            if not self.available_datasets:
-                self.available_datasets = list(available)
-        super().model_post_init(__context)
+        rows, available = _load_catalog_data(CATALOG_PATH)
+        return {
+            "datasets": dict(rows),
+            "available_datasets": list(available),
+        }
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

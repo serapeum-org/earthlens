@@ -69,6 +69,11 @@ class Earthdata(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Wires the temporal reducer (ARC-1).
+    SUPPORTS_AGGREGATE = True
+
+    AGGREGATE_REFUSAL_REASON = "this collection resolves to a non-gridded output, so there is no grid to reduce"
+
     def __init__(
         self,
         start: str,

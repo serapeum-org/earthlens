@@ -56,7 +56,6 @@ from earthlens.sensor_community.catalog import Catalog
 if TYPE_CHECKING:
     import requests
 
-    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["csv", "parquet"]
 
@@ -92,6 +91,8 @@ class SensorCommunity(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "readings are tabular per-row station data, not gridded rasters, so there is no meaningful gridded reduction"
 
     def __init__(
         self,
@@ -335,7 +336,7 @@ class SensorCommunity(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Discover + fetch readings, write them to `path`, return the frame.
 
@@ -348,25 +349,19 @@ class SensorCommunity(AbstractDataSource):
         Args:
             progress_bar: Show the per-sensor `tqdm` bar. Defaults to
                 `True`.
-            aggregate: Must be `None`. Sensor.Community output is tabular,
-                so there is no meaningful gridded reduction; the facade
-                already rejects a non-`None` `aggregate=` for a `tabular`
-                backend, and this is the belt-and-suspenders guard.
+            limit: Cap on the total readings fetched, across every discovered
+                sensor. Applied as each sensor's frame arrives, so a sensor
+                past the cap never has its daily archive files downloaded.
+                `None` (the default) fetches everything. The cap is on rows
+                *fetched*, before the window filter, so the returned frame can
+                be shorter than the cap.
 
         Returns:
             pd.DataFrame: The long-format readings (schema columns,
                 `datetime_utc` tz-aware UTC). Empty (schema-only) when
                 nothing matched.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "SensorCommunity.download(aggregate=...) is not supported: "
-                "readings are tabular per-row station data, not gridded "
-                "rasters, so there is no meaningful gridded reduction."
-            )
+        self._limit = self.check_limit(limit)
         warnings.warn(_LICENSE_TEXT, LicenseWarning, stacklevel=2)
 
         frames = self._search_fetch_each(

@@ -44,6 +44,7 @@ from earthlens.s3.catalog import Catalog, Dataset
 from earthlens.s3.layouts import plan_products
 
 if TYPE_CHECKING:
+    from earthlens.aggregate import AggregationConfig
     from earthlens.ecmwf import Variable
 
 __all__ = ["S3"]
@@ -99,6 +100,9 @@ class S3(AbstractDataSource):
     """
 
     OUTPUT_KIND = "mixed"
+
+    #: Wires the temporal reducer (ARC-1).
+    SUPPORTS_AGGREGATE = True
 
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
@@ -505,7 +509,7 @@ class S3(AbstractDataSource):
     # -- public API ----------------------------------------------------
 
     def download(
-        self, progress_bar: bool = True, aggregate: Any | None = None
+        self, progress_bar: bool = True, aggregate: AggregationConfig | None = None
     ) -> list[Path]:
         """Download every planned product, cropped to the AOI.
 

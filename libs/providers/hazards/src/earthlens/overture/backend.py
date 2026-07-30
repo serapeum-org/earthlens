@@ -51,7 +51,6 @@ from earthlens.overture.catalog import Catalog, Theme
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
 
-    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["geoparquet", "gpkg", "geojson"]
 
@@ -104,6 +103,8 @@ class Overture(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "overture features are vector, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     #: Each Overture release is a snapshot with no time axis, so a missing `start` /
     #: `end` is legal here.
@@ -499,33 +500,17 @@ class Overture(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> list[Path]:
         """Fetch the requested Overture themes and return the written paths.
 
         Args:
             progress_bar: Accepted for signature parity with the other
                 backends.
-            aggregate: Must be `None`. Overture is vector, not gridded, so
-                there is no meaningful aggregation. The facade already
-                rejects a non-`None` `aggregate=` for a `vector` backend;
-                this is the belt-and-suspenders guard for direct callers.
 
         Returns:
             list[Path]: The vector file(s) written under `path`, one per
                 requested feature type.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "Overture.download(aggregate=...) is not supported: Overture "
-                "features are vector, not gridded rasters, so there is no "
-                "meaningful gridded reduction. Call download() without "
-                "aggregate= and post-process the returned FeatureCollection "
-                "(a GeoDataFrame) directly."
-            )
         return cast("list[Path]", self._api())
 
 

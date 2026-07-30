@@ -189,20 +189,15 @@ class Catalog(AbstractCatalog):
         """
         return self.datasets
 
-    def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no pollutants were supplied.
+    @classmethod
+    def _autoload(cls) -> dict[str, Any]:
+        """Read the bundled catalog from disk.
 
-        `Catalog()` with no args reads `CATALOG_PATH`; passing
-        `pollutants=...` (or `datasets=...`) skips the disk read (used in
-        tests).
-
-        Raises:
-            ValueError: Propagated from `load` when the YAML is missing,
-                empty, or has a malformed pollutant row.
+        Returns:
+            dict[str, Any]: The `datasets` read from
+                the bundled catalog.
         """
-        if not self.datasets:
-            self.datasets = Catalog.load().datasets
-        super().model_post_init(__context)
+        return {"datasets": Catalog.load().datasets}
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

@@ -530,3 +530,183 @@ def _shifted(state, storm_id):
 def _boom_builder(*args, **kwargs):
     """A recon sub-product builder stand-in that raises (decode failure)."""
     raise RuntimeError("recon decode failed")
+
+
+class TestLimitStopsTheWork:
+    """A `limit=` must stop loading basins/storms, not trim the result at the end.
+
+    Every tropycal product is expensive per item — a basin load parses a whole
+    best-track file, and a SHIPS or realtime item is a separate fetch — so a cap
+    that only slices the concatenated output would leave the cost unchanged.
+    These tests count the per-item calls, which is the part a post-hoc slice
+    cannot fake.
+    """
+
+    def test_basins_past_the_cap_are_never_loaded(self, tmp_path, monkeypatch):
+        """The second basin is not loaded once the first fills the cap."""
+        backend = _backend(tmp_path, variables=["north_atlantic", "east_pacific"])
+        queried: list[str] = []
+
+        def fake_query_one(product):
+            queried.append(product.id)
+            frame = pd.DataFrame({"storm_id": ["a", "b", "c"]})
+            return gpd.GeoDataFrame(
+                frame, geometry=gpd.points_from_xy([-90, -91, -92], [25, 26, 27])
+            )
+
+        monkeypatch.setattr(backend, "_query_one", fake_query_one)
+        products = backend._search()
+        assert len(products) == 2, "fixture expects one product per basin"
+
+        backend._limit = 2
+        frames = backend._fetch(products)
+
+        assert queried == ["north_atlantic"], (
+            "the second basin was loaded even though the first already filled "
+            "the cap; the cap is trimming, not stopping the work"
+        )
+        assert sum(len(frame) for frame in frames) == 2
+
+    def test_no_limit_loads_every_basin(self, tmp_path, monkeypatch):
+        """Without a cap the sweep is unchanged."""
+        backend = _backend(tmp_path, variables=["north_atlantic", "east_pacific"])
+        queried: list[str] = []
+
+        def fake_query_one(product):
+            queried.append(product.id)
+            frame = pd.DataFrame({"storm_id": ["a"]})
+            return gpd.GeoDataFrame(frame, geometry=gpd.points_from_xy([-90], [25]))
+
+        monkeypatch.setattr(backend, "_query_one", fake_query_one)
+        backend._limit = None
+        backend._fetch(backend._search())
+
+        assert queried == ["north_atlantic", "east_pacific"]
+
+    def test_a_zero_limit_is_refused_before_any_load(self, tmp_path, monkeypatch):
+        """`limit=0` is a caller bug, caught before the first basin is touched."""
+        backend = _backend(tmp_path)
+        monkeypatch.setattr(
+            backend,
+            "_query_one",
+            lambda product: pytest.fail("a rejected cap must not reach the load"),
+        )
+        with pytest.raises(ValueError):
+            backend.download(progress_bar=False, limit=0)
+
+
+def _make_realtime_frame(storm_id):
+    """Build a two-fix realtime frame for `storm_id`."""
+    return pd.DataFrame(
+        {
+            "storm_id": [storm_id, storm_id],
+            "time": pd.to_datetime(["2024-06-01T00:00", "2024-06-01T06:00"]),
+            "lat": [25.0, 25.5],
+            "lon": [-90.0, -90.5],
+            "vmax": [50, 55],
+            "mslp": [990, 985],
+            "type": ["TS", "TS"],
+        }
+    )
+
+
+class TestWrittenFilesMatchTheReturnedResult:
+    """What lands on disk must equal what `download` returns under a cap.
+
+    The write used to happen inside the per-item generator, before
+    `_take_limited` trimmed the fragment the cap lands inside. That put the
+    untrimmed storm on disk while returning the trimmed one, so a caller
+    reading the file back got more rows than the call reported — a silent
+    disagreement between two views of the same request.
+    """
+
+    def test_realtime_writes_only_what_it_returns(self, tmp_path, monkeypatch):
+        """The trimmed fragment is what gets written, not the fetched one."""
+        backend = _backend(tmp_path, product="realtime", variables=[])
+
+        class _FakeRealtime:
+            def list_active_storms(self):
+                return ["AL012024", "AL022024"]
+
+        monkeypatch.setattr(backend, "_get_realtime", lambda: _FakeRealtime())
+        monkeypatch.setattr(
+            backend,
+            "_realtime_storm_frame",
+            lambda realtime, storm_id: _make_realtime_frame(storm_id),
+        )
+        written: list[tuple[str, int]] = []
+        monkeypatch.setattr(
+            backend,
+            "_write",
+            lambda unit, collection: (
+                written.append((unit, len(collection))) or tmp_path / f"{unit}.gpkg"
+            ),
+        )
+
+        # 3, not 2: the frames are two fixes each, so a cap of 2 lands exactly
+        # on the first fragment's boundary and never exercises the trim — the
+        # pre-fix code, which wrote the untrimmed fragment, passes that. A cap
+        # of 3 forces the second fragment to be trimmed to one row, so writing
+        # before the trim would put 4 rows on disk against 3 returned.
+        backend._limit = 3
+        result = backend._download_realtime()
+
+        assert len(result) == 3
+        assert sum(count for _unit, count in written) == 3, (
+            f"wrote {written} but returned {len(result)} feature(s); the file "
+            f"and the return value disagree"
+        )
+
+    def test_ships_writes_only_what_it_returns(self, tmp_path, monkeypatch):
+        """The SHIPS path trims before writing too."""
+        backend = _backend(
+            tmp_path,
+            product="ships",
+            variables=["AL012024", "AL022024"],
+            ships_time="2024-06-01 00:00",
+        )
+        monkeypatch.setattr(
+            backend, "_get_track_dataset", lambda basin, source: object()
+        )
+        monkeypatch.setattr(backend, "_get_storm", lambda dataset, sid: object())
+        monkeypatch.setattr(
+            backend,
+            "_ships_frame",
+            lambda storm, init: pd.DataFrame({"fhr": [0, 6, 12]}),
+        )
+        written: list[tuple[str, int]] = []
+        monkeypatch.setattr(
+            backend,
+            "_write_table",
+            lambda storm_id, init, frame: (
+                written.append((storm_id, len(frame))) or tmp_path / f"{storm_id}.csv"
+            ),
+        )
+
+        backend._limit = 4
+        result = backend._download_ships()
+
+        assert len(result) == 4
+        assert sum(rows for _sid, rows in written) == 4, (
+            f"wrote {written} but returned {len(result)} row(s); the file and "
+            f"the return value disagree"
+        )
+
+
+class TestPublicDownloadHonoursTheCap:
+    """`download(limit=)` must reach the basin loop, not merely validate.
+
+    The other cap tests set `backend._limit` directly, which leaves the wiring
+    between the keyword and the attribute untested — a `download` missing its
+    `self._limit = self.check_limit(limit)` line would pass all of them and
+    still ignore the caller's cap.
+    """
+
+    def test_the_keyword_bounds_the_result(self, tmp_path, fake_tropycal):
+        """A cap passed to `download` bounds the returned features."""
+        result = _backend(tmp_path).download(limit=2)
+        assert len(result) == 2
+
+    def test_without_the_keyword_everything_is_returned(self, tmp_path, fake_tropycal):
+        """The default is unchanged."""
+        assert len(_backend(tmp_path).download()) == 3

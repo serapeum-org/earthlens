@@ -196,19 +196,15 @@ class Catalog(AbstractCatalog):
     #: :meth:`get_dataset`'s did-you-mean hint work unchanged.
     datasets: dict[str, Index] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no rows were supplied.
+    @classmethod
+    def _autoload(cls) -> dict[str, Any]:
+        """Read the bundled catalog from disk.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH`; passing
-        `datasets=...` skips the disk read.
-
-        Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is
-                missing, empty, or has a malformed row.
+        Returns:
+            dict[str, Any]: The `datasets` read from
+                the bundled catalog.
         """
-        if not self.datasets:
-            self.datasets = Catalog.load().datasets
-        super().model_post_init(__context)
+        return {"datasets": Catalog.load().datasets}
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

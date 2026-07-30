@@ -326,3 +326,99 @@ class TestFetchAndDownload:
         """A non-None aggregate raises NotImplementedError mentioning vector."""
         with pytest.raises(NotImplementedError, match="vector"):
             _backend(tmp_path).download(aggregate=object())
+
+
+@pytest.mark.wdpa
+class TestLimitStopsTheWork:
+    """A `limit=` must stop querying selectors, not trim the merged frame.
+
+    Each selector is a paged REST sweep over a country's protected areas, so a
+    cap that only sliced the concatenated result would still pay for every
+    country. Counting the per-selector calls is what distinguishes the two.
+    """
+
+    def test_selectors_past_the_cap_are_never_queried(self, tmp_path, monkeypatch):
+        """The second country is not fetched once the first fills the cap."""
+        backend = _backend(tmp_path, variables=["KEN", "TZA"])
+        queried: list[str] = []
+        square = Polygon([(0, 0), (0, 1), (1, 1), (1, 0)])
+
+        def fake_fetch_selector(token, selector):
+            queried.append(selector)
+            return GeoDataFrame(
+                {"name": ["a", "b", "c"]},
+                geometry=[square, square, square],
+                crs="EPSG:4326",
+            )
+
+        monkeypatch.setattr(backend, "_fetch_selector", fake_fetch_selector)
+        backend._limit = 2
+        merged = backend._fetch_all()
+
+        assert queried == ["KEN"], (
+            "the second selector was queried even though the first already "
+            "filled the cap; the cap is trimming, not stopping the work"
+        )
+        assert len(merged) == 2
+
+    def test_no_limit_queries_every_selector(self, tmp_path, monkeypatch):
+        """Without a cap every requested country is still swept."""
+        backend = _backend(tmp_path, variables=["KEN", "TZA"])
+        queried: list[str] = []
+        square = Polygon([(0, 0), (0, 1), (1, 1), (1, 0)])
+
+        def fake_fetch_selector(token, selector):
+            queried.append(selector)
+            return GeoDataFrame({"name": ["a"]}, geometry=[square], crs="EPSG:4326")
+
+        monkeypatch.setattr(backend, "_fetch_selector", fake_fetch_selector)
+        backend._limit = None
+        merged = backend._fetch_all()
+
+        assert queried == ["KEN", "TZA"]
+        assert len(merged) == 2
+
+    def test_a_cap_that_matches_nothing_returns_an_empty_frame(
+        self, tmp_path, monkeypatch
+    ):
+        """Every selector empty yields the schema-correct empty frame, not a crash."""
+        backend = _backend(tmp_path, variables=["KEN"])
+        monkeypatch.setattr(
+            backend,
+            "_fetch_selector",
+            lambda token, selector: GeoDataFrame(
+                {"name": []}, geometry=[], crs="EPSG:4326"
+            ),
+        )
+        backend._limit = 5
+        merged = backend._fetch_all()
+        assert len(merged) == 0
+
+
+@pytest.mark.wdpa
+class TestPublicDownloadHonoursTheCap:
+    """`download(limit=)` must reach the selector sweep, not just validate."""
+
+    def test_the_keyword_bounds_the_result(self, tmp_path, monkeypatch):
+        """A cap passed to `download` stops the second country being queried."""
+        backend = _backend(tmp_path, variables=["KEN", "TZA"])
+        queried: list[str] = []
+        square = Polygon([(0, 0), (0, 1), (1, 1), (1, 0)])
+
+        def fake_fetch_selector(token, selector):
+            queried.append(selector)
+            return GeoDataFrame(
+                {"name": ["a", "b", "c"]},
+                geometry=[square] * 3,
+                crs="EPSG:4326",
+            )
+
+        monkeypatch.setattr(backend, "_fetch_selector", fake_fetch_selector)
+        monkeypatch.setattr(backend, "_initialize", lambda: None)
+        backend._auth = type("_Auth", (), {"token": "t"})()
+
+        with pytest.warns(LicenseWarning):
+            result = backend.download(progress_bar=False, limit=2)
+
+        assert len(result) == 2
+        assert queried == ["KEN"]

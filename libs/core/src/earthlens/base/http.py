@@ -315,9 +315,9 @@ def reset_thread_local_sessions() -> None:
     """Drop this thread's cached sessions.
 
     The cache outlives any one request, so a caller that has swapped the
-    transport underneath it — the suite does, per test — needs a way to make
-    the next :func:`thread_local_session` call rebuild rather than hand back a
-    session built against the previous one.
+    transport underneath it needs a way to make the next
+    :func:`thread_local_session` call rebuild, rather than hand back a session
+    built against the previous one.
     """
     _THREAD_SESSIONS.cache = {}
 
