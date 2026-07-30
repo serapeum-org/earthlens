@@ -10,1351 +10,1351 @@ datasets:
     - l1-swi-tir
     protocol: gportal
     short_name: '10001002'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D L1A-SWI & TIR"
+    description: "GCOM-C/SGLI — L1A-SWI & TIR"
   sgli-l1-swi-tir-1005:
     aliases:
     - l1-swi-tir-1005
     protocol: gportal
     short_name: '10001005'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D L1B-SWI & TIR"
+    description: "GCOM-C/SGLI — L1B-SWI & TIR"
   sgli-l1-visible-near-infrared-pol:
     aliases:
     - l1-visible-near-infrared-pol
     protocol: gportal
     short_name: '10001001'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D L1A-Visible & Near Infrared, POL"
+    description: "GCOM-C/SGLI — L1A-Visible & Near Infrared, POL"
   sgli-l1-visible-near-infrared-pol-1004:
     aliases:
     - l1-visible-near-infrared-pol-1004
     protocol: gportal
     short_name: '10001004'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D L1B-Visible & Near Infrared, POL"
+    description: "GCOM-C/SGLI — L1B-Visible & Near Infrared, POL"
   sgli-l1-visible-near-infrared-vnr:
     aliases:
     - l1-visible-near-infrared-vnr
     protocol: gportal
     short_name: '10001000'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D L1A-Visible & Near Infrared, VNR"
+    description: "GCOM-C/SGLI — L1A-Visible & Near Infrared, VNR"
   sgli-l1-visible-near-infrared-vnr-1003:
     aliases:
     - l1-visible-near-infrared-vnr-1003
     protocol: gportal
     short_name: '10001003'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D L1B-Visible & Near Infrared, VNR"
+    description: "GCOM-C/SGLI — L1B-Visible & Near Infrared, VNR"
   sgli-l2-arnp:
     aliases:
     - l2-arnp
     protocol: gportal
     short_name: '10002079'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L2-ARNP"
+    description: "GCOM-C/SGLI — Atmosphere/L2-ARNP"
   sgli-l2-arnp-ver-2:
     aliases:
     - l2-arnp-ver-2
     protocol: gportal
     short_name: '10002060'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L2-ARNP Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L2-ARNP Ver.2"
   sgli-l2-arnp-ver-2-2059:
     aliases:
     - l2-arnp-ver-2-2059
     protocol: gportal
     short_name: '10002059'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L2-ARNP Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L2-ARNP Ver.2"
   sgli-l2-arpl-ver-2:
     aliases:
     - l2-arpl-ver-2
     protocol: gportal
     short_name: '10002062'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L2-ARPL Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L2-ARPL Ver.2"
   sgli-l2-arpl-ver-2-2061:
     aliases:
     - l2-arpl-ver-2-2061
     protocol: gportal
     short_name: '10002061'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L2-ARPL Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L2-ARPL Ver.2"
   sgli-l2-atmosphere-global-l2-global-ar:
     aliases:
     - l2-atmosphere-global-l2-global-ar
     protocol: gportal
     short_name: '10002080'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-ARNP"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-ARNP"
   sgli-l2-atmosphere-global-l2-global-ar-2071:
     aliases:
     - l2-atmosphere-global-l2-global-ar-2071
     protocol: gportal
     short_name: '10002071'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-ARNP Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-ARNP Ver.2"
   sgli-l2-atmosphere-global-l2-global-ar-2072:
     aliases:
     - l2-atmosphere-global-l2-global-ar-2072
     protocol: gportal
     short_name: '10002072'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-ARNP Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-ARNP Ver.2"
   sgli-l2-atmosphere-global-l2-global-ar-2073:
     aliases:
     - l2-atmosphere-global-l2-global-ar-2073
     protocol: gportal
     short_name: '10002073'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-ARPL Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-ARPL Ver.2"
   sgli-l2-atmosphere-global-l2-global-ar-2074:
     aliases:
     - l2-atmosphere-global-l2-global-ar-2074
     protocol: gportal
     short_name: '10002074'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-ARPL Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-ARPL Ver.2"
   sgli-l2-atmosphere-global-l2-global-cl:
     aliases:
     - l2-atmosphere-global-l2-global-cl
     protocol: gportal
     short_name: '10002068'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-CLFG"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-CLFG"
   sgli-l2-atmosphere-global-l2-global-cl-2067:
     aliases:
     - l2-atmosphere-global-l2-global-cl-2067
     protocol: gportal
     short_name: '10002067'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-CLFG"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-CLFG"
   sgli-l2-atmosphere-global-l2-global-cl-2069:
     aliases:
     - l2-atmosphere-global-l2-global-cl-2069
     protocol: gportal
     short_name: '10002069'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-CLPR"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-CLPR"
   sgli-l2-atmosphere-global-l2-global-cl-2070:
     aliases:
     - l2-atmosphere-global-l2-global-cl-2070
     protocol: gportal
     short_name: '10002070'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-CLPR"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-CLPR"
   sgli-l2-atmosphere-global-l2-global-lc:
     aliases:
     - l2-atmosphere-global-l2-global-lc
     protocol: gportal
     short_name: '10002063'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-LCLR"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-LCLR"
   sgli-l2-atmosphere-global-l2-global-lt:
     aliases:
     - l2-atmosphere-global-l2-global-lt
     protocol: gportal
     short_name: '10002066'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-LTOA"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-LTOA"
   sgli-l2-atmosphere-global-l2-global-lt-2064:
     aliases:
     - l2-atmosphere-global-l2-global-lt-2064
     protocol: gportal
     short_name: '10002064'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-LTOA"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-LTOA"
   sgli-l2-atmosphere-global-l2-global-lt-2065:
     aliases:
     - l2-atmosphere-global-l2-global-lt-2065
     protocol: gportal
     short_name: '10002065'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere global/L2 global-LTOA"
+    description: "GCOM-C/SGLI — Atmosphere global/L2 global-LTOA"
   sgli-l2-clfg:
     aliases:
     - l2-clfg
     protocol: gportal
     short_name: '10002056'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L2-CLFG"
+    description: "GCOM-C/SGLI — Atmosphere/L2-CLFG"
   sgli-l2-clfg-2055:
     aliases:
     - l2-clfg-2055
     protocol: gportal
     short_name: '10002055'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L2-CLFG"
+    description: "GCOM-C/SGLI — Atmosphere/L2-CLFG"
   sgli-l2-clpr:
     aliases:
     - l2-clpr
     protocol: gportal
     short_name: '10002058'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L2-CLPR"
+    description: "GCOM-C/SGLI — Atmosphere/L2-CLPR"
   sgli-l2-clpr-2057:
     aliases:
     - l2-clpr-2057
     protocol: gportal
     short_name: '10002057'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L2-CLPR"
+    description: "GCOM-C/SGLI — Atmosphere/L2-CLPR"
   sgli-l2-cryosphere-statistics-l2-stati:
     aliases:
     - l2-cryosphere-statistics-l2-stati
     protocol: gportal
     short_name: '10002009'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere statistics/L2 statistics-SICE"
+    description: "GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SICE"
   sgli-l2-cryosphere-statistics-l2-stati-2008:
     aliases:
     - l2-cryosphere-statistics-l2-stati-2008
     protocol: gportal
     short_name: '10002008'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere statistics/L2 statistics-SICE"
+    description: "GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SICE"
   sgli-l2-cryosphere-statistics-l2-stati-2010:
     aliases:
     - l2-cryosphere-statistics-l2-stati-2010
     protocol: gportal
     short_name: '10002010'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere statistics/L2 statistics-SIST"
+    description: "GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SIST"
   sgli-l2-cryosphere-statistics-l2-stati-2011:
     aliases:
     - l2-cryosphere-statistics-l2-stati-2011
     protocol: gportal
     short_name: '10002011'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere statistics/L2 statistics-SGSL"
+    description: "GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SGSL"
   sgli-l2-cryosphere-statistics-l2-stati-2077:
     aliases:
     - l2-cryosphere-statistics-l2-stati-2077
     protocol: gportal
     short_name: '10002077'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere statistics/L2 statistics-SALB"
+    description: "GCOM-C/SGLI — Cryosphere statistics/L2 statistics-SALB"
   sgli-l2-land-area-l2-agb:
     aliases:
     - l2-land-area-l2-agb
     protocol: gportal
     short_name: '10002018'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L2-AGB"
+    description: "GCOM-C/SGLI — Land area/L2-AGB"
   sgli-l2-land-area-l2-lai:
     aliases:
     - l2-land-area-l2-lai
     protocol: gportal
     short_name: '10002017'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L2-LAI"
+    description: "GCOM-C/SGLI — Land area/L2-LAI"
   sgli-l2-land-area-l2-lst:
     aliases:
     - l2-land-area-l2-lst
     protocol: gportal
     short_name: '10002019'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L2-LST"
+    description: "GCOM-C/SGLI — Land area/L2-LST"
   sgli-l2-land-area-l2-ltoa:
     aliases:
     - l2-land-area-l2-ltoa
     protocol: gportal
     short_name: '10002014'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L2-LTOA"
+    description: "GCOM-C/SGLI — Land area/L2-LTOA"
   sgli-l2-land-area-l2-ltoa-2012:
     aliases:
     - l2-land-area-l2-ltoa-2012
     protocol: gportal
     short_name: '10002012'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L2-LTOA"
+    description: "GCOM-C/SGLI — Land area/L2-LTOA"
   sgli-l2-land-area-l2-ltoa-2013:
     aliases:
     - l2-land-area-l2-ltoa-2013
     protocol: gportal
     short_name: '10002013'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L2-LTOA"
+    description: "GCOM-C/SGLI — Land area/L2-LTOA"
   sgli-l2-land-area-l2-rsrf:
     aliases:
     - l2-land-area-l2-rsrf
     protocol: gportal
     short_name: '10002015'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L2-RSRF"
+    description: "GCOM-C/SGLI — Land area/L2-RSRF"
   sgli-l2-land-area-l2-vgi:
     aliases:
     - l2-land-area-l2-vgi
     protocol: gportal
     short_name: '10002016'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L2-VGI"
+    description: "GCOM-C/SGLI — Land area/L2-VGI"
   sgli-l2-land-area-statistics-l2-statis:
     aliases:
     - l2-land-area-statistics-l2-statis
     protocol: gportal
     short_name: '10002022'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-LTOA"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-LTOA"
   sgli-l2-land-area-statistics-l2-statis-2020:
     aliases:
     - l2-land-area-statistics-l2-statis-2020
     protocol: gportal
     short_name: '10002020'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-LTOA"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-LTOA"
   sgli-l2-land-area-statistics-l2-statis-2021:
     aliases:
     - l2-land-area-statistics-l2-statis-2021
     protocol: gportal
     short_name: '10002021'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-LTOA"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-LTOA"
   sgli-l2-land-area-statistics-l2-statis-2023:
     aliases:
     - l2-land-area-statistics-l2-statis-2023
     protocol: gportal
     short_name: '10002023'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2024:
     aliases:
     - l2-land-area-statistics-l2-statis-2024
     protocol: gportal
     short_name: '10002024'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2025:
     aliases:
     - l2-land-area-statistics-l2-statis-2025
     protocol: gportal
     short_name: '10002025'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2026:
     aliases:
     - l2-land-area-statistics-l2-statis-2026
     protocol: gportal
     short_name: '10002026'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2027:
     aliases:
     - l2-land-area-statistics-l2-statis-2027
     protocol: gportal
     short_name: '10002027'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2028:
     aliases:
     - l2-land-area-statistics-l2-statis-2028
     protocol: gportal
     short_name: '10002028'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2029:
     aliases:
     - l2-land-area-statistics-l2-statis-2029
     protocol: gportal
     short_name: '10002029'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2030:
     aliases:
     - l2-land-area-statistics-l2-statis-2030
     protocol: gportal
     short_name: '10002030'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2031:
     aliases:
     - l2-land-area-statistics-l2-statis-2031
     protocol: gportal
     short_name: '10002031'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2032:
     aliases:
     - l2-land-area-statistics-l2-statis-2032
     protocol: gportal
     short_name: '10002032'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2033:
     aliases:
     - l2-land-area-statistics-l2-statis-2033
     protocol: gportal
     short_name: '10002033'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2034:
     aliases:
     - l2-land-area-statistics-l2-statis-2034
     protocol: gportal
     short_name: '10002034'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2035:
     aliases:
     - l2-land-area-statistics-l2-statis-2035
     protocol: gportal
     short_name: '10002035'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2036:
     aliases:
     - l2-land-area-statistics-l2-statis-2036
     protocol: gportal
     short_name: '10002036'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2037:
     aliases:
     - l2-land-area-statistics-l2-statis-2037
     protocol: gportal
     short_name: '10002037'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2038:
     aliases:
     - l2-land-area-statistics-l2-statis-2038
     protocol: gportal
     short_name: '10002038'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2039:
     aliases:
     - l2-land-area-statistics-l2-statis-2039
     protocol: gportal
     short_name: '10002039'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2040:
     aliases:
     - l2-land-area-statistics-l2-statis-2040
     protocol: gportal
     short_name: '10002040'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2041:
     aliases:
     - l2-land-area-statistics-l2-statis-2041
     protocol: gportal
     short_name: '10002041'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2042:
     aliases:
     - l2-land-area-statistics-l2-statis-2042
     protocol: gportal
     short_name: '10002042'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2043:
     aliases:
     - l2-land-area-statistics-l2-statis-2043
     protocol: gportal
     short_name: '10002043'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2044:
     aliases:
     - l2-land-area-statistics-l2-statis-2044
     protocol: gportal
     short_name: '10002044'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2045:
     aliases:
     - l2-land-area-statistics-l2-statis-2045
     protocol: gportal
     short_name: '10002045'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2046:
     aliases:
     - l2-land-area-statistics-l2-statis-2046
     protocol: gportal
     short_name: '10002046'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-land-area-statistics-l2-statis-2047:
     aliases:
     - l2-land-area-statistics-l2-statis-2047
     protocol: gportal
     short_name: '10002047'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-NDVI"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-NDVI"
   sgli-l2-land-area-statistics-l2-statis-2048:
     aliases:
     - l2-land-area-statistics-l2-statis-2048
     protocol: gportal
     short_name: '10002048'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-EVI"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-EVI"
   sgli-l2-land-area-statistics-l2-statis-2049:
     aliases:
     - l2-land-area-statistics-l2-statis-2049
     protocol: gportal
     short_name: '10002049'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-SDI"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-SDI"
   sgli-l2-land-area-statistics-l2-statis-2050:
     aliases:
     - l2-land-area-statistics-l2-statis-2050
     protocol: gportal
     short_name: '10002050'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-FPAR"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-FPAR"
   sgli-l2-land-area-statistics-l2-statis-2051:
     aliases:
     - l2-land-area-statistics-l2-statis-2051
     protocol: gportal
     short_name: '10002051'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-LAI"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-LAI"
   sgli-l2-land-area-statistics-l2-statis-2052:
     aliases:
     - l2-land-area-statistics-l2-statis-2052
     protocol: gportal
     short_name: '10002052'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-VRI"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-VRI"
   sgli-l2-land-area-statistics-l2-statis-2053:
     aliases:
     - l2-land-area-statistics-l2-statis-2053
     protocol: gportal
     short_name: '10002053'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-AGB"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-AGB"
   sgli-l2-land-area-statistics-l2-statis-2054:
     aliases:
     - l2-land-area-statistics-l2-statis-2054
     protocol: gportal
     short_name: '10002054'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-LST"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-LST"
   sgli-l2-land-area-statistics-l2-statis-2078:
     aliases:
     - l2-land-area-statistics-l2-statis-2078
     protocol: gportal
     short_name: '10002078'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area statistics/L2 statistics-RSRF"
+    description: "GCOM-C/SGLI — Land area statistics/L2 statistics-RSRF"
   sgli-l2-oceanic-sphere-l2-iwpr:
     aliases:
     - l2-oceanic-sphere-l2-iwpr
     protocol: gportal
     short_name: '10002001'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L2-IWPR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L2-IWPR"
   sgli-l2-oceanic-sphere-l2-nwlr:
     aliases:
     - l2-oceanic-sphere-l2-nwlr
     protocol: gportal
     short_name: '10002000'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L2-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L2-NWLR"
   sgli-l2-oceanic-sphere-l2-sst:
     aliases:
     - l2-oceanic-sphere-l2-sst
     protocol: gportal
     short_name: '10002002'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L2-SST"
+    description: "GCOM-C/SGLI — Oceanic sphere/L2-SST"
   sgli-l2-okid:
     aliases:
     - l2-okid
     protocol: gportal
     short_name: '10002003'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L2-OKID"
+    description: "GCOM-C/SGLI — Cryosphere/L2-OKID"
   sgli-l2-sice:
     aliases:
     - l2-sice
     protocol: gportal
     short_name: '10002005'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L2-SICE"
+    description: "GCOM-C/SGLI — Cryosphere/L2-SICE"
   sgli-l2-sice-2004:
     aliases:
     - l2-sice-2004
     protocol: gportal
     short_name: '10002004'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L2-SICE"
+    description: "GCOM-C/SGLI — Cryosphere/L2-SICE"
   sgli-l2-sipr:
     aliases:
     - l2-sipr
     protocol: gportal
     short_name: '10002076'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L2-SIPR"
+    description: "GCOM-C/SGLI — Cryosphere/L2-SIPR"
   sgli-l2-sipr-2075:
     aliases:
     - l2-sipr-2075
     protocol: gportal
     short_name: '10002075'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L2-SIPR"
+    description: "GCOM-C/SGLI — Cryosphere/L2-SIPR"
   sgli-l2-sipr-ver-2:
     aliases:
     - l2-sipr-ver-2
     protocol: gportal
     short_name: '10002007'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L2-SIPR ver.2"
+    description: "GCOM-C/SGLI — Cryosphere/L2-SIPR ver.2"
   sgli-l2-sipr-ver-2-2006:
     aliases:
     - l2-sipr-ver-2-2006
     protocol: gportal
     short_name: '10002006'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L2-SIPR ver.2"
+    description: "GCOM-C/SGLI — Cryosphere/L2-SIPR ver.2"
   sgli-l3-aael-ver-2:
     aliases:
     - l3-aael-ver-2
     protocol: gportal
     short_name: '10003165'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AAEL Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AAEL Ver.2"
   sgli-l3-aael-ver-2-3164:
     aliases:
     - l3-aael-ver-2-3164
     protocol: gportal
     short_name: '10003164'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AAEL Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AAEL Ver.2"
   sgli-l3-aaeo-ver-2:
     aliases:
     - l3-aaeo-ver-2
     protocol: gportal
     short_name: '10003163'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AAEO Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AAEO Ver.2"
   sgli-l3-aaeo-ver-2-3162:
     aliases:
     - l3-aaeo-ver-2-3162
     protocol: gportal
     short_name: '10003162'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AAEO Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AAEO Ver.2"
   sgli-l3-aaep-ver-2:
     aliases:
     - l3-aaep-ver-2
     protocol: gportal
     short_name: '10003169'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AAEP Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AAEP Ver.2"
   sgli-l3-aaep-ver-2-3168:
     aliases:
     - l3-aaep-ver-2-3168
     protocol: gportal
     short_name: '10003168'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AAEP Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AAEP Ver.2"
   sgli-l3-aotl-ver-2:
     aliases:
     - l3-aotl-ver-2
     protocol: gportal
     short_name: '10003161'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AOTL Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AOTL Ver.2"
   sgli-l3-aotl-ver-2-3160:
     aliases:
     - l3-aotl-ver-2-3160
     protocol: gportal
     short_name: '10003160'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AOTL Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AOTL Ver.2"
   sgli-l3-aoto-ver-2:
     aliases:
     - l3-aoto-ver-2
     protocol: gportal
     short_name: '10003159'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AOTO Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AOTO Ver.2"
   sgli-l3-aoto-ver-2-3158:
     aliases:
     - l3-aoto-ver-2-3158
     protocol: gportal
     short_name: '10003158'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AOTO Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AOTO Ver.2"
   sgli-l3-aotp-ver-2:
     aliases:
     - l3-aotp-ver-2
     protocol: gportal
     short_name: '10003167'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AOTP Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AOTP Ver.2"
   sgli-l3-aotp-ver-2-3166:
     aliases:
     - l3-aotp-ver-2-3166
     protocol: gportal
     short_name: '10003166'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AOTP Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AOTP Ver.2"
   sgli-l3-arae:
     aliases:
     - l3-arae
     protocol: gportal
     short_name: '10003175'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-ARAE"
+    description: "GCOM-C/SGLI — Atmosphere/L3-ARAE"
   sgli-l3-arae-3174:
     aliases:
     - l3-arae-3174
     protocol: gportal
     short_name: '10003174'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-ARAE"
+    description: "GCOM-C/SGLI — Atmosphere/L3-ARAE"
   sgli-l3-arot:
     aliases:
     - l3-arot
     protocol: gportal
     short_name: '10003173'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AROT"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AROT"
   sgli-l3-arot-3172:
     aliases:
     - l3-arot-3172
     protocol: gportal
     short_name: '10003172'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-AROT"
+    description: "GCOM-C/SGLI — Atmosphere/L3-AROT"
   sgli-l3-assa:
     aliases:
     - l3-assa
     protocol: gportal
     short_name: '10003177'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-ASSA"
+    description: "GCOM-C/SGLI — Atmosphere/L3-ASSA"
   sgli-l3-assa-3176:
     aliases:
     - l3-assa-3176
     protocol: gportal
     short_name: '10003176'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-ASSA"
+    description: "GCOM-C/SGLI — Atmosphere/L3-ASSA"
   sgli-l3-assa-ver-2:
     aliases:
     - l3-assa-ver-2
     protocol: gportal
     short_name: '10003171'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-ASSA Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-ASSA Ver.2"
   sgli-l3-assa-ver-2-3170:
     aliases:
     - l3-assa-ver-2-3170
     protocol: gportal
     short_name: '10003170'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-ASSA Ver.2"
+    description: "GCOM-C/SGLI — Atmosphere/L3-ASSA Ver.2"
   sgli-l3-cerw:
     aliases:
     - l3-cerw
     protocol: gportal
     short_name: '10003155'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CERW"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CERW"
   sgli-l3-cerw-3154:
     aliases:
     - l3-cerw-3154
     protocol: gportal
     short_name: '10003154'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CERW"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CERW"
   sgli-l3-clfr:
     aliases:
     - l3-clfr
     protocol: gportal
     short_name: '10003147'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3122:
     aliases:
     - l3-clfr-3122
     protocol: gportal
     short_name: '10003122'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3123:
     aliases:
     - l3-clfr-3123
     protocol: gportal
     short_name: '10003123'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3124:
     aliases:
     - l3-clfr-3124
     protocol: gportal
     short_name: '10003124'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3125:
     aliases:
     - l3-clfr-3125
     protocol: gportal
     short_name: '10003125'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3126:
     aliases:
     - l3-clfr-3126
     protocol: gportal
     short_name: '10003126'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3127:
     aliases:
     - l3-clfr-3127
     protocol: gportal
     short_name: '10003127'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3128:
     aliases:
     - l3-clfr-3128
     protocol: gportal
     short_name: '10003128'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3129:
     aliases:
     - l3-clfr-3129
     protocol: gportal
     short_name: '10003129'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3130:
     aliases:
     - l3-clfr-3130
     protocol: gportal
     short_name: '10003130'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3131:
     aliases:
     - l3-clfr-3131
     protocol: gportal
     short_name: '10003131'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3132:
     aliases:
     - l3-clfr-3132
     protocol: gportal
     short_name: '10003132'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3133:
     aliases:
     - l3-clfr-3133
     protocol: gportal
     short_name: '10003133'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3134:
     aliases:
     - l3-clfr-3134
     protocol: gportal
     short_name: '10003134'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3135:
     aliases:
     - l3-clfr-3135
     protocol: gportal
     short_name: '10003135'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3136:
     aliases:
     - l3-clfr-3136
     protocol: gportal
     short_name: '10003136'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3137:
     aliases:
     - l3-clfr-3137
     protocol: gportal
     short_name: '10003137'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3138:
     aliases:
     - l3-clfr-3138
     protocol: gportal
     short_name: '10003138'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3139:
     aliases:
     - l3-clfr-3139
     protocol: gportal
     short_name: '10003139'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3140:
     aliases:
     - l3-clfr-3140
     protocol: gportal
     short_name: '10003140'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3141:
     aliases:
     - l3-clfr-3141
     protocol: gportal
     short_name: '10003141'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3142:
     aliases:
     - l3-clfr-3142
     protocol: gportal
     short_name: '10003142'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3143:
     aliases:
     - l3-clfr-3143
     protocol: gportal
     short_name: '10003143'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3144:
     aliases:
     - l3-clfr-3144
     protocol: gportal
     short_name: '10003144'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3145:
     aliases:
     - l3-clfr-3145
     protocol: gportal
     short_name: '10003145'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clfr-3146:
     aliases:
     - l3-clfr-3146
     protocol: gportal
     short_name: '10003146'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLFR"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLFR"
   sgli-l3-clth:
     aliases:
     - l3-clth
     protocol: gportal
     short_name: '10003151'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLTH"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLTH"
   sgli-l3-clth-3150:
     aliases:
     - l3-clth-3150
     protocol: gportal
     short_name: '10003150'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLTH"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLTH"
   sgli-l3-cltt:
     aliases:
     - l3-cltt
     protocol: gportal
     short_name: '10003149'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLTT"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLTT"
   sgli-l3-cltt-3148:
     aliases:
     - l3-cltt-3148
     protocol: gportal
     short_name: '10003148'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-CLTT"
+    description: "GCOM-C/SGLI — Atmosphere/L3-CLTT"
   sgli-l3-coti:
     aliases:
     - l3-coti
     protocol: gportal
     short_name: '10003157'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-COTI"
+    description: "GCOM-C/SGLI — Atmosphere/L3-COTI"
   sgli-l3-coti-3156:
     aliases:
     - l3-coti-3156
     protocol: gportal
     short_name: '10003156'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-COTI"
+    description: "GCOM-C/SGLI — Atmosphere/L3-COTI"
   sgli-l3-cotw:
     aliases:
     - l3-cotw
     protocol: gportal
     short_name: '10003153'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-COTW"
+    description: "GCOM-C/SGLI — Atmosphere/L3-COTW"
   sgli-l3-cotw-3152:
     aliases:
     - l3-cotw-3152
     protocol: gportal
     short_name: '10003152'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Atmosphere/L3-COTW"
+    description: "GCOM-C/SGLI — Atmosphere/L3-COTW"
   sgli-l3-land-area-l3-agb:
     aliases:
     - l3-land-area-l3-agb
     protocol: gportal
     short_name: '10003117'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-AGB"
+    description: "GCOM-C/SGLI — Land area/L3-AGB"
   sgli-l3-land-area-l3-agb-3116:
     aliases:
     - l3-land-area-l3-agb-3116
     protocol: gportal
     short_name: '10003116'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-AGB"
+    description: "GCOM-C/SGLI — Land area/L3-AGB"
   sgli-l3-land-area-l3-evi:
     aliases:
     - l3-land-area-l3-evi
     protocol: gportal
     short_name: '10003109'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-EVI"
+    description: "GCOM-C/SGLI — Land area/L3-EVI"
   sgli-l3-land-area-l3-evi-3108:
     aliases:
     - l3-land-area-l3-evi-3108
     protocol: gportal
     short_name: '10003108'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-EVI"
+    description: "GCOM-C/SGLI — Land area/L3-EVI"
   sgli-l3-land-area-l3-fpar:
     aliases:
     - l3-land-area-l3-fpar
     protocol: gportal
     short_name: '10003113'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-FPAR"
+    description: "GCOM-C/SGLI — Land area/L3-FPAR"
   sgli-l3-land-area-l3-fpar-3112:
     aliases:
     - l3-land-area-l3-fpar-3112
     protocol: gportal
     short_name: '10003112'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-FPAR"
+    description: "GCOM-C/SGLI — Land area/L3-FPAR"
   sgli-l3-land-area-l3-lai:
     aliases:
     - l3-land-area-l3-lai
     protocol: gportal
     short_name: '10003115'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-LAI"
+    description: "GCOM-C/SGLI — Land area/L3-LAI"
   sgli-l3-land-area-l3-lai-3114:
     aliases:
     - l3-land-area-l3-lai-3114
     protocol: gportal
     short_name: '10003114'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-LAI"
+    description: "GCOM-C/SGLI — Land area/L3-LAI"
   sgli-l3-land-area-l3-lst:
     aliases:
     - l3-land-area-l3-lst
     protocol: gportal
     short_name: '10003121'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-LST"
+    description: "GCOM-C/SGLI — Land area/L3-LST"
   sgli-l3-land-area-l3-lst-3120:
     aliases:
     - l3-land-area-l3-lst-3120
     protocol: gportal
     short_name: '10003120'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-LST"
+    description: "GCOM-C/SGLI — Land area/L3-LST"
   sgli-l3-land-area-l3-ndvi:
     aliases:
     - l3-land-area-l3-ndvi
     protocol: gportal
     short_name: '10003107'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-NDVI"
+    description: "GCOM-C/SGLI — Land area/L3-NDVI"
   sgli-l3-land-area-l3-ndvi-3106:
     aliases:
     - l3-land-area-l3-ndvi-3106
     protocol: gportal
     short_name: '10003106'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-NDVI"
+    description: "GCOM-C/SGLI — Land area/L3-NDVI"
   sgli-l3-land-area-l3-rsrf:
     aliases:
     - l3-land-area-l3-rsrf
     protocol: gportal
     short_name: '10003105'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3040:
     aliases:
     - l3-land-area-l3-rsrf-3040
     protocol: gportal
     short_name: '10003040'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3041:
     aliases:
     - l3-land-area-l3-rsrf-3041
     protocol: gportal
     short_name: '10003041'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3042:
     aliases:
     - l3-land-area-l3-rsrf-3042
     protocol: gportal
     short_name: '10003042'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3043:
     aliases:
     - l3-land-area-l3-rsrf-3043
     protocol: gportal
     short_name: '10003043'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3044:
     aliases:
     - l3-land-area-l3-rsrf-3044
     protocol: gportal
     short_name: '10003044'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3045:
     aliases:
     - l3-land-area-l3-rsrf-3045
     protocol: gportal
     short_name: '10003045'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3046:
     aliases:
     - l3-land-area-l3-rsrf-3046
     protocol: gportal
     short_name: '10003046'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3047:
     aliases:
     - l3-land-area-l3-rsrf-3047
     protocol: gportal
     short_name: '10003047'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3048:
     aliases:
     - l3-land-area-l3-rsrf-3048
     protocol: gportal
     short_name: '10003048'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3049:
     aliases:
     - l3-land-area-l3-rsrf-3049
     protocol: gportal
     short_name: '10003049'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3050:
     aliases:
     - l3-land-area-l3-rsrf-3050
     protocol: gportal
     short_name: '10003050'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3051:
     aliases:
     - l3-land-area-l3-rsrf-3051
     protocol: gportal
     short_name: '10003051'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3052:
     aliases:
     - l3-land-area-l3-rsrf-3052
     protocol: gportal
     short_name: '10003052'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3053:
     aliases:
     - l3-land-area-l3-rsrf-3053
     protocol: gportal
     short_name: '10003053'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3054:
     aliases:
     - l3-land-area-l3-rsrf-3054
     protocol: gportal
     short_name: '10003054'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3055:
     aliases:
     - l3-land-area-l3-rsrf-3055
     protocol: gportal
     short_name: '10003055'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3056:
     aliases:
     - l3-land-area-l3-rsrf-3056
     protocol: gportal
     short_name: '10003056'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3057:
     aliases:
     - l3-land-area-l3-rsrf-3057
     protocol: gportal
     short_name: '10003057'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3058:
     aliases:
     - l3-land-area-l3-rsrf-3058
     protocol: gportal
     short_name: '10003058'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3059:
     aliases:
     - l3-land-area-l3-rsrf-3059
     protocol: gportal
     short_name: '10003059'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3060:
     aliases:
     - l3-land-area-l3-rsrf-3060
     protocol: gportal
     short_name: '10003060'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3061:
     aliases:
     - l3-land-area-l3-rsrf-3061
     protocol: gportal
     short_name: '10003061'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3062:
     aliases:
     - l3-land-area-l3-rsrf-3062
     protocol: gportal
     short_name: '10003062'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3063:
     aliases:
     - l3-land-area-l3-rsrf-3063
     protocol: gportal
     short_name: '10003063'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3064:
     aliases:
     - l3-land-area-l3-rsrf-3064
     protocol: gportal
     short_name: '10003064'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3065:
     aliases:
     - l3-land-area-l3-rsrf-3065
     protocol: gportal
     short_name: '10003065'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3066:
     aliases:
     - l3-land-area-l3-rsrf-3066
     protocol: gportal
     short_name: '10003066'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3067:
     aliases:
     - l3-land-area-l3-rsrf-3067
     protocol: gportal
     short_name: '10003067'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3068:
     aliases:
     - l3-land-area-l3-rsrf-3068
     protocol: gportal
     short_name: '10003068'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3069:
     aliases:
     - l3-land-area-l3-rsrf-3069
     protocol: gportal
     short_name: '10003069'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3070:
     aliases:
     - l3-land-area-l3-rsrf-3070
     protocol: gportal
     short_name: '10003070'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3071:
     aliases:
     - l3-land-area-l3-rsrf-3071
     protocol: gportal
     short_name: '10003071'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3072:
     aliases:
     - l3-land-area-l3-rsrf-3072
     protocol: gportal
     short_name: '10003072'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3073:
     aliases:
     - l3-land-area-l3-rsrf-3073
     protocol: gportal
     short_name: '10003073'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3074:
     aliases:
     - l3-land-area-l3-rsrf-3074
     protocol: gportal
     short_name: '10003074'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3075:
     aliases:
     - l3-land-area-l3-rsrf-3075
     protocol: gportal
     short_name: '10003075'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3076:
     aliases:
     - l3-land-area-l3-rsrf-3076
     protocol: gportal
     short_name: '10003076'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3077:
     aliases:
     - l3-land-area-l3-rsrf-3077
     protocol: gportal
     short_name: '10003077'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3078:
     aliases:
     - l3-land-area-l3-rsrf-3078
     protocol: gportal
     short_name: '10003078'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3079:
     aliases:
     - l3-land-area-l3-rsrf-3079
     protocol: gportal
     short_name: '10003079'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3080:
     aliases:
     - l3-land-area-l3-rsrf-3080
     protocol: gportal
     short_name: '10003080'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3081:
     aliases:
     - l3-land-area-l3-rsrf-3081
     protocol: gportal
     short_name: '10003081'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3082:
     aliases:
     - l3-land-area-l3-rsrf-3082
     protocol: gportal
     short_name: '10003082'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3083:
     aliases:
     - l3-land-area-l3-rsrf-3083
     protocol: gportal
     short_name: '10003083'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3084:
     aliases:
     - l3-land-area-l3-rsrf-3084
     protocol: gportal
     short_name: '10003084'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3085:
     aliases:
     - l3-land-area-l3-rsrf-3085
     protocol: gportal
     short_name: '10003085'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3086:
     aliases:
     - l3-land-area-l3-rsrf-3086
     protocol: gportal
     short_name: '10003086'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3087:
     aliases:
     - l3-land-area-l3-rsrf-3087
     protocol: gportal
     short_name: '10003087'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3088:
     aliases:
     - l3-land-area-l3-rsrf-3088
     protocol: gportal
     short_name: '10003088'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3089:
     aliases:
     - l3-land-area-l3-rsrf-3089
     protocol: gportal
     short_name: '10003089'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3090:
     aliases:
     - l3-land-area-l3-rsrf-3090
     protocol: gportal
     short_name: '10003090'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3091:
     aliases:
     - l3-land-area-l3-rsrf-3091
     protocol: gportal
     short_name: '10003091'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3092:
     aliases:
     - l3-land-area-l3-rsrf-3092
     protocol: gportal
     short_name: '10003092'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3093:
     aliases:
     - l3-land-area-l3-rsrf-3093
     protocol: gportal
     short_name: '10003093'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3094:
     aliases:
     - l3-land-area-l3-rsrf-3094
     protocol: gportal
     short_name: '10003094'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3095:
     aliases:
     - l3-land-area-l3-rsrf-3095
     protocol: gportal
     short_name: '10003095'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3096:
     aliases:
     - l3-land-area-l3-rsrf-3096
     protocol: gportal
     short_name: '10003096'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3097:
     aliases:
     - l3-land-area-l3-rsrf-3097
     protocol: gportal
     short_name: '10003097'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3098:
     aliases:
     - l3-land-area-l3-rsrf-3098
     protocol: gportal
     short_name: '10003098'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3099:
     aliases:
     - l3-land-area-l3-rsrf-3099
     protocol: gportal
     short_name: '10003099'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3100:
     aliases:
     - l3-land-area-l3-rsrf-3100
     protocol: gportal
     short_name: '10003100'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3101:
     aliases:
     - l3-land-area-l3-rsrf-3101
     protocol: gportal
     short_name: '10003101'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3102:
     aliases:
     - l3-land-area-l3-rsrf-3102
     protocol: gportal
     short_name: '10003102'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3103:
     aliases:
     - l3-land-area-l3-rsrf-3103
     protocol: gportal
     short_name: '10003103'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-rsrf-3104:
     aliases:
     - l3-land-area-l3-rsrf-3104
     protocol: gportal
     short_name: '10003104'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-RSRF"
+    description: "GCOM-C/SGLI — Land area/L3-RSRF"
   sgli-l3-land-area-l3-sdi:
     aliases:
     - l3-land-area-l3-sdi
     protocol: gportal
     short_name: '10003111'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-SDI"
+    description: "GCOM-C/SGLI — Land area/L3-SDI"
   sgli-l3-land-area-l3-sdi-3110:
     aliases:
     - l3-land-area-l3-sdi-3110
     protocol: gportal
     short_name: '10003110'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-SDI"
+    description: "GCOM-C/SGLI — Land area/L3-SDI"
   sgli-l3-land-area-l3-vri:
     aliases:
     - l3-land-area-l3-vri
     protocol: gportal
     short_name: '10003119'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-VRI"
+    description: "GCOM-C/SGLI — Land area/L3-VRI"
   sgli-l3-land-area-l3-vri-3118:
     aliases:
     - l3-land-area-l3-vri-3118
     protocol: gportal
     short_name: '10003118'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Land area/L3-VRI"
+    description: "GCOM-C/SGLI — Land area/L3-VRI"
   sgli-l3-nwlr:
     aliases:
     - sgli-l380
@@ -1363,238 +1363,238 @@ datasets:
     - l3-nwlr
     protocol: gportal
     short_name: '10003001'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-acp:
     aliases:
     - l3-oceanic-sphere-l3-acp
     protocol: gportal
     short_name: '10003017'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-ACP"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-ACP"
   sgli-l3-oceanic-sphere-l3-acp-3014:
     aliases:
     - l3-oceanic-sphere-l3-acp-3014
     protocol: gportal
     short_name: '10003014'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-ACP"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-ACP"
   sgli-l3-oceanic-sphere-l3-acp-3015:
     aliases:
     - l3-oceanic-sphere-l3-acp-3015
     protocol: gportal
     short_name: '10003015'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-ACP"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-ACP"
   sgli-l3-oceanic-sphere-l3-acp-3016:
     aliases:
     - l3-oceanic-sphere-l3-acp-3016
     protocol: gportal
     short_name: '10003016'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-ACP"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-ACP"
   sgli-l3-oceanic-sphere-l3-cdom:
     aliases:
     - l3-oceanic-sphere-l3-cdom
     protocol: gportal
     short_name: '10003025'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-CDOM"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-CDOM"
   sgli-l3-oceanic-sphere-l3-cdom-3024:
     aliases:
     - l3-oceanic-sphere-l3-cdom-3024
     protocol: gportal
     short_name: '10003024'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-CDOM"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-CDOM"
   sgli-l3-oceanic-sphere-l3-chla:
     aliases:
     - l3-oceanic-sphere-l3-chla
     protocol: gportal
     short_name: '10003021'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-CHLA"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-CHLA"
   sgli-l3-oceanic-sphere-l3-chla-3020:
     aliases:
     - l3-oceanic-sphere-l3-chla-3020
     protocol: gportal
     short_name: '10003020'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-CHLA"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-CHLA"
   sgli-l3-oceanic-sphere-l3-nwlr:
     aliases:
     - l3-oceanic-sphere-l3-nwlr
     protocol: gportal
     short_name: '10003013'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3000:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3000
     protocol: gportal
     short_name: '10003000'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3002:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3002
     protocol: gportal
     short_name: '10003002'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3003:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3003
     protocol: gportal
     short_name: '10003003'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3004:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3004
     protocol: gportal
     short_name: '10003004'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3005:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3005
     protocol: gportal
     short_name: '10003005'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3006:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3006
     protocol: gportal
     short_name: '10003006'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3007:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3007
     protocol: gportal
     short_name: '10003007'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3008:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3008
     protocol: gportal
     short_name: '10003008'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3009:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3009
     protocol: gportal
     short_name: '10003009'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3010:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3010
     protocol: gportal
     short_name: '10003010'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3011:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3011
     protocol: gportal
     short_name: '10003011'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-nwlr-3012:
     aliases:
     - l3-oceanic-sphere-l3-nwlr-3012
     protocol: gportal
     short_name: '10003012'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-NWLR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-NWLR"
   sgli-l3-oceanic-sphere-l3-par:
     aliases:
     - l3-oceanic-sphere-l3-par
     protocol: gportal
     short_name: '10003019'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-PAR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-PAR"
   sgli-l3-oceanic-sphere-l3-par-3018:
     aliases:
     - l3-oceanic-sphere-l3-par-3018
     protocol: gportal
     short_name: '10003018'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-PAR"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-PAR"
   sgli-l3-oceanic-sphere-l3-sst:
     aliases:
     - l3-oceanic-sphere-l3-sst
     protocol: gportal
     short_name: '10003027'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-SST"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-SST"
   sgli-l3-oceanic-sphere-l3-sst-3026:
     aliases:
     - l3-oceanic-sphere-l3-sst-3026
     protocol: gportal
     short_name: '10003026'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-SST"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-SST"
   sgli-l3-oceanic-sphere-l3-tsm:
     aliases:
     - l3-oceanic-sphere-l3-tsm
     protocol: gportal
     short_name: '10003023'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-TSM"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-TSM"
   sgli-l3-oceanic-sphere-l3-tsm-3022:
     aliases:
     - l3-oceanic-sphere-l3-tsm-3022
     protocol: gportal
     short_name: '10003022'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Oceanic sphere/L3-TSM"
+    description: "GCOM-C/SGLI — Oceanic sphere/L3-TSM"
   sgli-l3-sgsl:
     aliases:
     - l3-sgsl
     protocol: gportal
     short_name: '10003039'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SGSL"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SGSL"
   sgli-l3-sgsl-3036:
     aliases:
     - l3-sgsl-3036
     protocol: gportal
     short_name: '10003036'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SGSL"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SGSL"
   sgli-l3-sgsl-3037:
     aliases:
     - l3-sgsl-3037
     protocol: gportal
     short_name: '10003037'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SGSL"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SGSL"
   sgli-l3-sgsl-3038:
     aliases:
     - l3-sgsl-3038
     protocol: gportal
     short_name: '10003038'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SGSL"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SGSL"
   sgli-l3-sice:
     aliases:
     - l3-sice
     protocol: gportal
     short_name: '10003031'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SICE"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SICE"
   sgli-l3-sice-3028:
     aliases:
     - l3-sice-3028
     protocol: gportal
     short_name: '10003028'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SICE"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SICE"
   sgli-l3-sice-3029:
     aliases:
     - l3-sice-3029
     protocol: gportal
     short_name: '10003029'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SICE"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SICE"
   sgli-l3-sice-3030:
     aliases:
     - l3-sice-3030
     protocol: gportal
     short_name: '10003030'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SICE"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SICE"
   sgli-l3-sist:
     aliases:
     - l3-sist
     protocol: gportal
     short_name: '10003035'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SIST"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SIST"
   sgli-l3-sist-3032:
     aliases:
     - l3-sist-3032
     protocol: gportal
     short_name: '10003032'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SIST"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SIST"
   sgli-l3-sist-3033:
     aliases:
     - l3-sist-3033
     protocol: gportal
     short_name: '10003033'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SIST"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SIST"
   sgli-l3-sist-3034:
     aliases:
     - l3-sist-3034
     protocol: gportal
     short_name: '10003034'
-    description: "GCOM-C/SGLI \xE2\u20AC\u201D Cryosphere/L3-SIST"
+    description: "GCOM-C/SGLI — Cryosphere/L3-SIST"
