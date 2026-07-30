@@ -593,3 +593,96 @@ class TestLimitStopsTheWork:
         )
         with pytest.raises(ValueError):
             backend.download(progress_bar=False, limit=0)
+
+
+def _make_realtime_frame(storm_id):
+    """Build a two-fix realtime frame for `storm_id`."""
+    return pd.DataFrame(
+        {
+            "storm_id": [storm_id, storm_id],
+            "time": pd.to_datetime(["2024-06-01T00:00", "2024-06-01T06:00"]),
+            "lat": [25.0, 25.5],
+            "lon": [-90.0, -90.5],
+            "vmax": [50, 55],
+            "mslp": [990, 985],
+            "type": ["TS", "TS"],
+        }
+    )
+
+
+class TestWrittenFilesMatchTheReturnedResult:
+    """What lands on disk must equal what `download` returns under a cap.
+
+    The write used to happen inside the per-item generator, before
+    `_take_limited` trimmed the fragment the cap lands inside. That put the
+    untrimmed storm on disk while returning the trimmed one, so a caller
+    reading the file back got more rows than the call reported — a silent
+    disagreement between two views of the same request.
+    """
+
+    def test_realtime_writes_only_what_it_returns(self, tmp_path, monkeypatch):
+        """The trimmed fragment is what gets written, not the fetched one."""
+        backend = _backend(tmp_path, product="realtime", variables=[])
+
+        class _FakeRealtime:
+            def list_active_storms(self):
+                return ["AL012024", "AL022024"]
+
+        monkeypatch.setattr(backend, "_get_realtime", lambda: _FakeRealtime())
+        monkeypatch.setattr(
+            backend,
+            "_realtime_storm_frame",
+            lambda realtime, storm_id: _make_realtime_frame(storm_id),
+        )
+        written: list[tuple[str, int]] = []
+        monkeypatch.setattr(
+            backend,
+            "_write",
+            lambda unit, collection: (
+                written.append((unit, len(collection))) or tmp_path / f"{unit}.gpkg"
+            ),
+        )
+
+        backend._limit = 2
+        result = backend._download_realtime()
+
+        assert len(result) == 2
+        assert sum(count for _unit, count in written) == 2, (
+            f"wrote {written} but returned {len(result)} feature(s); the file "
+            f"and the return value disagree"
+        )
+
+    def test_ships_writes_only_what_it_returns(self, tmp_path, monkeypatch):
+        """The SHIPS path trims before writing too."""
+        backend = _backend(
+            tmp_path,
+            product="ships",
+            variables=["AL012024", "AL022024"],
+            ships_time="2024-06-01 00:00",
+        )
+        monkeypatch.setattr(
+            backend, "_get_track_dataset", lambda basin, source: object()
+        )
+        monkeypatch.setattr(backend, "_get_storm", lambda dataset, sid: object())
+        monkeypatch.setattr(
+            backend,
+            "_ships_frame",
+            lambda storm, init: pd.DataFrame({"fhr": [0, 6, 12]}),
+        )
+        written: list[tuple[str, int]] = []
+        monkeypatch.setattr(
+            backend,
+            "_write_table",
+            lambda storm_id, init, frame: (
+                written.append((storm_id, len(frame))) or tmp_path / f"{storm_id}.csv"
+            ),
+        )
+
+        backend._limit = 4
+        result = backend._download_ships()
+
+        assert len(result) == 4
+        assert sum(rows for _sid, rows in written) == 4, (
+            f"wrote {written} but returned {len(result)} row(s); the file and "
+            f"the return value disagree"
+        )

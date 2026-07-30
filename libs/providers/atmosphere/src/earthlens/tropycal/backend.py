@@ -688,13 +688,21 @@ class TropicalCyclone(AbstractDataSource):
             return events.empty_fc(self._geometry)
 
         bbox = (self.space.south, self.space.north, self.space.west, self.space.east)
-        written: list[Path] = []
         # Lazy so a `limit=` stops the work: a storm past the cap is never
-        # pulled or written, rather than fetched and then trimmed away.
+        # pulled. Writing happens *after* the cap is applied, matching the
+        # best-track path — writing inside the generator would put the
+        # untrimmed fragment on disk while returning the trimmed one, so for
+        # the storm the cap lands inside the file and the return value would
+        # disagree.
         collections = self._take_limited(
-            (self._realtime_one(realtime, storm_id, bbox, written) for storm_id in ids),
+            (self._realtime_one(realtime, storm_id, bbox) for storm_id in ids),
             limit=self._limit,
         )
+        written = [
+            self._write(storm_id, collection)
+            for storm_id, collection in zip(ids, collections)
+            if len(collection)
+        ]
 
         combined = events.concat_fcs(collections, self._geometry)
         logger.info(
@@ -735,32 +743,29 @@ class TropicalCyclone(AbstractDataSource):
         realtime: Any,
         storm_id: str,
         bbox: tuple[float, float, float, float],
-        written: list[Path],
     ) -> FeatureCollection:
-        """Pull one active storm's current track and write it when non-empty.
+        """Pull one active storm's current track.
+
+        Fetch only — the caller writes what survives the cap, so the file on
+        disk always matches the returned features.
 
         Args:
             realtime: The `tropycal.realtime.Realtime` object to read from.
             storm_id: The active storm's identifier.
             bbox: The request's `(south, north, west, east)` filter.
-            written: Output-path accumulator; appended to when this storm
-                produced features.
 
         Returns:
             FeatureCollection: The storm's current-track features (empty when
                 it fell outside the bbox).
         """
         frame = self._realtime_storm_frame(realtime, storm_id)
-        fc = events.frame_to_fc(
+        return events.frame_to_fc(
             [frame] if frame is not None else [],
             geometry=self._geometry,
             window=_OPEN_WINDOW,
             bbox=bbox,
             source="realtime",
         )
-        if len(fc):
-            written.append(self._write(storm_id, fc))
-        return fc
 
     def _download_ships(self) -> pd.DataFrame:
         """Fetch SHIPS guidance for each storm and return one tabular frame.
@@ -778,20 +783,28 @@ class TropicalCyclone(AbstractDataSource):
         """
         init = pd.to_datetime(self._ships_time).to_pydatetime()
         products = self._search()
-        written: list[Path] = []
         # Lazy so a `limit=` stops the work: a storm past the cap never has its
-        # guidance pulled or written. Storms with no guidance are dropped
-        # before the cap counts them, so `limit` bounds returned rows only.
+        # guidance pulled. Storms with no guidance are dropped before the cap
+        # counts them, so `limit` bounds returned rows only.
         frames = self._take_limited(
             (
                 frame
                 for frame in (
-                    self._ships_one(product, init, written) for product in products
+                    self._ships_one(product, init) for product in products
                 )
                 if frame is not None
             ),
             limit=self._limit,
         )
+        # Written after the cap, so a storm the cap lands inside has the same
+        # rows on disk as in the returned frame. Each frame carries its own
+        # `storm_id` (stamped in `_ships_one`), so the surviving frames can be
+        # written without re-pairing them with `products` — which the
+        # `None`-dropping filter above has already unaligned.
+        written = [
+            self._write_table(str(frame["storm_id"].iloc[0]), init, frame)
+            for frame in frames
+        ]
         if not frames:
             logger.warning(
                 "Tropycal ships: no SHIPS guidance matched the request, nothing written"
@@ -805,15 +818,16 @@ class TropicalCyclone(AbstractDataSource):
         return combined
 
     def _ships_one(
-        self, product: RemoteProduct, init: dt.datetime, written: list[Path]
+        self, product: RemoteProduct, init: dt.datetime
     ) -> pd.DataFrame | None:
-        """Pull one storm's SHIPS table for `init` and write it when non-empty.
+        """Pull one storm's SHIPS table for `init`.
+
+        Fetch only — the caller writes what survives the cap, so the file on
+        disk always matches the returned rows.
 
         Args:
             product: One product from `_search`; `product.id` is the storm id.
             init: The forecast initialisation time to request.
-            written: Output-path accumulator; appended to when this storm had
-                guidance for the cycle.
 
         Returns:
             pd.DataFrame | None: The storm's guidance rows, stamped with
@@ -830,7 +844,6 @@ class TropicalCyclone(AbstractDataSource):
         df = df.copy()
         df.insert(0, "forecast_init", pd.Timestamp(init))
         df.insert(0, "storm_id", product.id)
-        written.append(self._write_table(product.id, init, df))
         return df
 
     @staticmethod
