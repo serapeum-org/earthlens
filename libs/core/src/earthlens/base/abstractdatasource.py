@@ -1774,7 +1774,12 @@ class AbstractDataSource(ABC):
                 continue
             length = len(fragment)
             if length >= remaining:
-                yield _head_rows(fragment, remaining)
+                # Skip the slice when the fragment fills the cap exactly, as
+                # `_take_limited` does: `_head_rows` would copy every row to
+                # produce the fragment it was handed.
+                yield (
+                    fragment if length == remaining else _head_rows(fragment, remaining)
+                )
                 return
             yield fragment
             remaining -= length
