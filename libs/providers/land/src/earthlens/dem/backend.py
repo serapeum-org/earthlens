@@ -82,6 +82,8 @@ class DEM(AbstractDataSource):
 
     OUTPUT_KIND = "raster"
 
+    AGGREGATE_REFUSAL_REASON = "a DEM tile is time-invariant. Mosaic / crop the downloaded tiles with pyramids downstream (`pyramids.Dataset.read_file` + `.crop`, `pyramids.dataset.merge.merge_rasters` for a multi-tile mosaic)"
+
     #: Elevation is time-invariant, so a missing `start` / `end` is legal here.
     REQUIRES_TIME_WINDOW = False
 
@@ -288,7 +290,6 @@ class DEM(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: Any | None = None,
         *,
         force: bool = False,
     ) -> list[Path]:
@@ -299,28 +300,12 @@ class DEM(AbstractDataSource):
                 `True`.
             force: Re-fetch even when a complete output already exists,
                 bypassing the skip-if-exists check. Defaults to `False`.
-            aggregate: Must be `None`. DEM is a raw-COG whole-tile
-                backend (`G4` — no server-side subset, `G5` — no
-                decode), so a time-window reduce has nothing to reduce.
-                Cropping / mosaicking the tiles is pyramids' job, not
-                the backend's.
 
         Returns:
             list[Path]: The local paths of the downloaded COG tiles, in
                 bbox row-major order. Empty when every candidate tile is
                 absent from the bucket.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "DEM.download(aggregate=...) is not supported — a DEM tile is "
-                "time-invariant. Mosaic / crop the downloaded tiles with "
-                "pyramids downstream (`pyramids.Dataset.read_file` + "
-                "`.crop`, `pyramids.dataset.merge.merge_rasters` for a "
-                "multi-tile mosaic)."
-            )
         self._show_progress = progress_bar
         self._force = force
         return self._api_via_search_fetch()

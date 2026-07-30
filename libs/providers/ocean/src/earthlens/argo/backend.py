@@ -32,7 +32,7 @@ backend logs the standard Argo data-acknowledgement statement
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import pandas as pd
 from loguru import logger
@@ -52,9 +52,6 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
 )
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -138,6 +135,8 @@ class ARGO(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "argo float profiles are irregular tabular point data, not a gridded field, so there is no meaningful gridded reduction. Use the CMEMS backend for gridded ocean fields instead"
 
     def __init__(
         self,
@@ -277,7 +276,7 @@ class ARGO(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch the profiles, write the table, and return it.
 
@@ -285,27 +284,17 @@ class ARGO(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends. Argo issues one bulk `argopy` call, so there is
                 no per-item progress bar — this is a no-op.
-            aggregate: Must be `None`. Argo output is tabular point data,
-                so there is no gridded reduction; the facade already
-                rejects a non-`None` `aggregate=` for a `tabular`
-                backend, and this is the belt-and-suspenders guard for
-                direct callers.
+            limit: Cap on the total rows returned. **Trims, it does not
+                reduce the fetch**: argopy answers a whole selection in one
+                call, so `_search` plans a single product and there is no
+                later item for the cap to skip. Use it to bound what you get
+                back, and narrow `start` / `end` / the bbox to bound what is
+                transferred. `None` (the default) returns everything.
 
         Returns:
             pd.DataFrame: The long-format profile table.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None` (tabular
-                output has no gridded reduction; use CMEMS for gridded
-                ocean fields).
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "ARGO.download(aggregate=...) is not supported: Argo float "
-                "profiles are irregular tabular point data, not a gridded "
-                "field, so there is no meaningful gridded reduction. Use the "
-                "CMEMS backend for gridded ocean fields instead."
-            )
+        self._limit = self.check_limit(limit)
         frames = self._api()
         df = (
             pd.concat(frames, ignore_index=True)
@@ -360,7 +349,7 @@ class ARGO(AbstractDataSource):
         Returns:
             list[pd.DataFrame]: One frame per product, same order.
         """
-        return [self._fetch_one(product) for product in products]
+        return self._fetch_limited(products, self._limit)
 
     def _fetch_one(self, product: RemoteProduct) -> pd.DataFrame:
         """Fetch one product's profiles as a long-format frame.

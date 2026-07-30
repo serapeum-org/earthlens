@@ -57,6 +57,20 @@ dependencies = [
 # imports it, so a provider distribution never depends on a sibling for it.
 [project.optional-dependencies]
 s3 = ["boto3 >=1.43.0", "botocore >=1.34.0"]
+# `earthlens.testing` ships the pytest fixtures each member's tests/conftest.py
+# imports (and that downstream code testing its own backend can reuse). It is
+# the one module in core that imports pytest, so the dependency is declared here
+# rather than relied on transitively; nothing in the runtime package imports it.
+#
+# RELEASE NOTE: this module and this extra are new in the working tree while
+# `version` is still 0.12.0, and every provider pins `earthlens-core ==0.12.0`.
+# Nothing shipped breaks — provider wheels package only `src/earthlens/<backend>*`,
+# so the conftests that import it never leave the repo, where core and the
+# providers are always in lockstep. But a downstream caller taking core at its
+# word and importing `earthlens.testing` from a published 0.12.0 would not find
+# it. Bump core (and the provider pins) before the next release rather than
+# shipping a new public module under an old version number.
+test = ["pytest >=8"]
 
 [project.scripts]
 earthlens = "earthlens.cli:main"

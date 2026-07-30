@@ -401,7 +401,7 @@ def test_crs_from_geojson_handles_variants():
 
 
 def test_usdm_aggregate_rejected(tmp_path):
-    """`aggregate=` is a NotImplementedError on the vector USDM route."""
+    """`aggregate=` is refused on the vector USDM route, by the shared gate."""
     backend = Drought(
         start="2026-06-23",
         end="2026-06-23",
@@ -410,7 +410,7 @@ def test_usdm_aggregate_rejected(tmp_path):
         dataset="usdm",
         path=str(tmp_path),
     )
-    with pytest.raises(NotImplementedError, match="vector"):
+    with pytest.raises(NotImplementedError, match="no gridded reduction"):
         backend.download(aggregate=object())
 
 
@@ -507,7 +507,8 @@ def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
         path=str(tmp_path),
     )
     backend.download(progress_bar=False)
-    assert seen and all("map=DO_WCS" in u for u in seen)
+    assert seen, "no GetCoverage URL was captured"
+    assert all("map=DO_WCS" in u for u in seen), seen
     assert all("GDO_WCS" not in u for u in seen)
 
 
@@ -659,7 +660,7 @@ def test_edo_fetch_surfaces_copernicus_error(monkeypatch, tmp_path):
 
 
 def test_raster_aggregate_rejected_until_reducer_lands(tmp_path):
-    """The raster `aggregate=` path raises a clear NotImplementedError."""
+    """The raster `aggregate=` path is refused too, with the reducer named."""
     backend = Drought(
         start="2026-06-01",
         end="2026-06-01",
@@ -668,7 +669,7 @@ def test_raster_aggregate_rejected_until_reducer_lands(tmp_path):
         dataset="speibase-12",
         path=str(tmp_path),
     )
-    with pytest.raises(NotImplementedError, match="not wired"):
+    with pytest.raises(NotImplementedError, match="not wired yet"):
         backend.download(aggregate=object())
 
 
@@ -1107,3 +1108,112 @@ def test_unknown_transport_on_row_raises(monkeypatch, tmp_path):
     monkeypatch.setattr(backend, "_dataset", rogue)
     with pytest.raises(ValueError, match="unknown drought transport"):
         backend._fetch(backend._search())
+
+
+class TestLimitStopsTheWork:
+    """A `limit=` caps the USDM polygons, and is refused where it cannot apply."""
+
+    def _usdm(self, weeks: int = 3) -> Drought:
+        """Build a USDM backend spanning `weeks` weekly periods."""
+        end = dt.date(2026, 6, 1) + dt.timedelta(days=7 * (weeks - 1))
+        return Drought(
+            start="2026-06-01",
+            end=end.strftime("%Y-%m-%d"),
+            lat_lim=[30.0, 40.0],
+            lon_lim=[-95.0, -85.0],
+            dataset="usdm",
+        )
+
+    def _fake_period(self, backend, monkeypatch, fetched, rows: int = 3):
+        """Record each period fetched and serve `rows` in-bbox polygons for it."""
+        import geopandas as gpd
+        from shapely.geometry import Polygon
+
+        square = Polygon([(-94, 31), (-94, 32), (-93, 32), (-93, 31)])
+
+        def fake_fetch(product, bbox):
+            fetched.append(product.metadata["period"])
+            return gpd.GeoDataFrame(
+                {"dm": list(range(rows))},
+                geometry=[square] * rows,
+                crs="EPSG:4326",
+            )
+
+        monkeypatch.setattr(backend, "_fetch_usdm_period", fake_fetch)
+
+    def test_weeks_past_the_cap_are_never_downloaded(self, monkeypatch):
+        """The later weeks' GeoJSON is not requested once the cap is met."""
+        backend = self._usdm(weeks=3)
+        fetched: list[dt.date] = []
+        self._fake_period(backend, monkeypatch, fetched)
+
+        backend._limit = 4
+        result = backend._fetch(backend._search())
+
+        assert len(fetched) == 2, (
+            f"downloaded {len(fetched)} weeks for a cap met by 2; the cap is "
+            f"trimming, not stopping the work"
+        )
+        assert len(result) == 4
+
+    def test_no_limit_downloads_every_week(self, monkeypatch):
+        """Without a cap the whole window is swept."""
+        backend = self._usdm(weeks=3)
+        fetched: list[dt.date] = []
+        self._fake_period(backend, monkeypatch, fetched)
+
+        backend._limit = None
+        result = backend._fetch(backend._search())
+
+        assert len(fetched) == 3
+        assert len(result) == 9
+
+    def test_the_cap_counts_only_rows_inside_the_bbox(self, monkeypatch):
+        """USDM publishes nationally, so the clip must precede the cap.
+
+        With the cap applied to the raw national frame, `limit=3` filled up on
+        polygons outside the request bbox and the final clip removed all of
+        them — returning nothing while the weeks that did intersect were never
+        fetched. Every polygon in the other fixtures sits inside the bbox, so
+        only a frame mixing the two can see this.
+        """
+        import geopandas as gpd
+        from shapely.geometry import Polygon
+
+        backend = self._usdm(weeks=3)
+        inside = Polygon([(-94, 31), (-94, 32), (-93, 32), (-93, 31)])
+        outside = Polygon([(10, 50), (10, 51), (11, 51), (11, 50)])
+
+        def fake_fetch(product, bbox):
+            frame = gpd.GeoDataFrame(
+                {"dm": [0, 1, 2, 3]},
+                geometry=[outside, outside, outside, inside],
+                crs="EPSG:4326",
+            )
+            return frame.cx[bbox[0] : bbox[2], bbox[1] : bbox[3]]
+
+        monkeypatch.setattr(backend, "_fetch_usdm_period", fake_fetch)
+        backend._limit = 3
+        result = backend._fetch(backend._search())
+
+        assert len(result) == 3, (
+            f"got {len(result)} row(s) for limit=3; the cap counted polygons "
+            f"outside the request bbox that the clip then discarded"
+        )
+
+    def test_a_cap_on_a_raster_transport_is_refused(self, tmp_path):
+        """Raster transports write files, so a row cap is rejected, not ignored.
+
+        Silently accepting it would be the worst outcome: the caller believes
+        the request is bounded while every period is downloaded in full.
+        """
+        spei = Drought(
+            start="2026-06-01",
+            end="2026-06-01",
+            lat_lim=[30.0, 40.0],
+            lon_lim=[-95.0, -85.0],
+            dataset="speibase-12",
+            path=str(tmp_path),
+        )
+        with pytest.raises(ValueError, match="USDM .vector. transport only"):
+            spei.download(progress_bar=False, limit=5)

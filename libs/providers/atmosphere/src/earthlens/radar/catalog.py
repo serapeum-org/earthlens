@@ -122,11 +122,14 @@ class Catalog(AbstractCatalog):
 
     datasets: dict[str, Station] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled `radar_data_catalog.yaml` when no rows were supplied."""
-        if not self.datasets:
-            self.datasets = _load_stations(CATALOG_PATH)
-        super().model_post_init(__context)
+    @classmethod
+    def _autoload(cls) -> dict[str, Any]:
+        """Read the bundled station registry.
+
+        Returns:
+            dict[str, Any]: The `stations:` map keyed by site id.
+        """
+        return {"datasets": _load_stations(CATALOG_PATH)}
 
     def get_catalog(self) -> dict[str, Station]:
         """Return the structural per-site map (satisfies the base contract)."""

@@ -241,20 +241,16 @@ class Catalog(AbstractCatalog):
 
     datasets: dict[str, Sensor] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no sensors were supplied.
+    @classmethod
+    def _autoload(cls) -> dict[str, Any]:
+        """Read the bundled catalog from disk.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH`; passing
-        `datasets=...` skips the disk read (used in tests).
-
-        Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is
-                missing, empty, or has a malformed sensor row.
+        Returns:
+            dict[str, Any]: The `datasets` read from
+                the bundled catalog.
         """
-        if not self.datasets:
-            loaded = Catalog.load()
-            self.datasets = loaded.datasets
-        super().model_post_init(__context)
+        loaded = Catalog.load()
+        return {"datasets": loaded.datasets}
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

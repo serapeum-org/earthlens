@@ -522,6 +522,89 @@ def _head_rows(chunk: Any, count: int) -> Any:
     return chunk[:count]
 
 
+#: "Nothing was produced" marker for the per-item loops. A plain `None` cannot
+#: serve: an `on_failure` hook is free to return `None` as a real placeholder,
+#: and that has to stay distinguishable from having no placeholder at all.
+_MISSING = object()
+
+
+def _missing_ancestors(directory: Path) -> list[Path]:
+    """Return `directory` and each missing parent, leaf first.
+
+    Args:
+        directory: The output directory about to be created.
+
+    Returns:
+        list[Path]: The paths that do not exist yet, nearest first, so a
+            failure can remove exactly what the call went on to create.
+    """
+    missing: list[Path] = []
+    probe = directory
+    while not probe.exists() and probe != probe.parent:
+        missing.append(probe)
+        probe = probe.parent
+    return missing
+
+
+def _unwind_created(created: list[Path]) -> None:
+    """Remove directories this call created, stopping at the first non-empty one.
+
+    A request the backend rejects (an unsupported `aggregate=`, a bad dataset
+    key) must not leave an output directory behind. Only the directories the
+    call created are removed, and only while each is still empty, so a
+    pre-existing tree and anything a partially-successful download wrote are
+    both left alone.
+
+    Args:
+        created: The paths from :func:`_missing_ancestors`, leaf first.
+    """
+    for directory in created:
+        try:
+            directory.rmdir()
+        except OSError:
+            break
+
+
+@functools.cache
+def _parameters(function: Any) -> frozenset[str]:
+    """Return the parameter names `function` accepts.
+
+    Cached: this runs on every `download` call, and a function's signature does
+    not change once it is defined.
+
+    Args:
+        function: The unwrapped `download` to inspect.
+
+    Returns:
+        frozenset[str]: Its parameter names.
+    """
+    return frozenset(inspect.signature(function).parameters)
+
+
+def _passed_aggregate(function: Any, args: tuple[Any, ...], kw: dict[str, Any]) -> bool:
+    """Whether this call supplied a non-`None` `aggregate`, positionally or not.
+
+    Args:
+        function: The unwrapped `download` whose signature names the parameters.
+        args: Positional arguments the caller passed, `self` excluded.
+        kw: Keyword arguments the caller passed.
+
+    Returns:
+        bool: `True` when an `aggregate` argument arrived with a value.
+    """
+    if kw.get("aggregate") is not None:
+        return True
+    if not args:
+        return False
+    try:
+        bound = inspect.signature(function).bind_partial(None, *args, **kw)
+    except TypeError:
+        # A call that does not match the signature will raise on its own once
+        # the wrapper forwards it; refusing here would report the wrong error.
+        return False
+    return bound.arguments.get("aggregate") is not None
+
+
 def _describe_remote_product(product: Any) -> str:
     """Render a product for the :meth:`AbstractDataSource._run_items` log lines.
 
@@ -585,6 +668,42 @@ class AbstractDataSource(ABC):
             the polygon's bounding box — a plausible-looking raster over
             roughly the right area, which is the hardest kind of wrong
             output to notice.
+        SUPPORTS_AGGREGATE: Whether this backend implements the `aggregate=`
+            temporal reduction. `False` (the default) means the parameter is
+            refused centrally, so the backend neither declares it nor writes
+            its own refusal — `OUTPUT_KIND` alone cannot decide this, because
+            plenty of `"raster"` backends (goes, dem, jaxa, radar, …) emit
+            grids the reducer has no time axis for. Only the backends that
+            actually wire the aggregator set it to `True`.
+
+    Note:
+        **Threads.** A backend instance is not safe to share across threads.
+        It caches per-request state (`self.space` / `self.time`, an
+        `HttpClient`, a lazily-built SDK client), none of it guarded. Give each
+        thread its own instance. Where earthlens itself fans out — ghsl's tile
+        downloads run through `joblib.Parallel(prefer="threads")` — the shared
+        helpers take a session from
+        :func:`earthlens.base.http.thread_local_session`, one per thread,
+        because `requests.Session` is not guaranteed thread-safe either.
+
+        A consequence worth knowing: `min_interval` throttling is per
+        `HttpClient`, so N threads holding N clients each wait
+        `min_interval` *independently* — the effective request rate is N times
+        what a single-threaded run would produce.
+
+    Note:
+        **Processes.** A freshly constructed backend usually pickles, because
+        the SDK clients are lazy. Once one materialises — after
+        :meth:`authenticate` or the first download — it generally does not, and
+        a backend that caches an :class:`~earthlens.base.http.HttpClient` on
+        `self._http` (erddap, bathymetry, gee) never does: the client holds a
+        `threading.Lock` for the throttle, and locks do not pickle. (A bare
+        `requests.Session`, perhaps surprisingly, does.)
+
+        So distribute at the **request** level, not the object level: send the
+        request parameters to the worker and construct the backend there. That
+        is also the only shape that works with a rate limit, since a throttle
+        cannot span processes.
     """
 
     OUTPUT_KIND: OutputKind = "raster"
@@ -592,6 +711,31 @@ class AbstractDataSource(ABC):
     REQUIRES_TIME_WINDOW: bool = True
 
     SUPPORTS_POLYGON_AOI: bool = False
+
+    SUPPORTS_AGGREGATE: bool = False
+
+    #: Optional sentence explaining why this backend refuses `aggregate=`,
+    #: appended to the central message by
+    #: :meth:`_refuse_unsupported_aggregate`. Worth setting: the specific reason
+    #: ("a single static prediction with no temporal axis") is more use to a
+    #: caller than the generic one.
+    AGGREGATE_REFUSAL_REASON: str = ""
+
+    #: Minimum seconds between consecutive requests to this provider — a
+    #: client-side politeness limit, passed to
+    #: :class:`~earthlens.base.http.HttpClient`'s `min_interval`. `0.0` (the
+    #: default) means the provider publishes no etiquette we are bound by.
+    #:
+    #: Declared on the backend rather than read from the `providers.yaml`
+    #: registry, which cannot answer it: only ecmwf, earthdata and gee ship one,
+    #: and all three authenticate through an SDK, while the backends that
+    #: actually get rate-limited (osm's Overpass / ohsome) have no provider
+    #: record at all.
+    #:
+    #: The throttle is per :class:`HttpClient`, so a backend fanning out over N
+    #: threads with a client each waits `min_interval` N times in parallel — see
+    #: the concurrency note on this class.
+    MIN_REQUEST_INTERVAL: float = 0.0
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         """Give every backend its `download` wrapper and constructor sugar.
@@ -619,19 +763,67 @@ class AbstractDataSource(ABC):
         so signature introspection (e.g. `EarthLens.options_for`) and the
         facade's kwarg validation still see the backend's real parameters.
 
-        Note:
-            No backend currently subclasses another backend. If one ever
-            does, its `__init__` must not forward the ergonomic kwargs
-            (`aoi` / `buffer` / `cadence` / `dataset`) up to
-            `super().__init__()`: the parent's wrapper would resolve them a
-            second time (e.g. re-running `resolve_aoi`). Forward only the
-            already-resolved native parameters (`lat_lim` / `lon_lim` /
-            `temporal_resolution` / `variables`) instead.
+        Raises:
+            TypeError: When a backend subclasses another backend without
+                passing `ergonomics_resolved=True`. Both classes get an
+                `__init__` wrapper, so if the child forwards an ergonomic kwarg
+                up to `super().__init__()` the parent's wrapper resolves it a
+                second time — `resolve_aoi` runs twice and the second call sees
+                an already-reduced bbox. All 48 backends inherit
+                `AbstractDataSource` directly, so this has never fired; it is
+                checked rather than left as a comment because the failure is
+                silent, and a plausible-looking bbox over roughly the right area
+                is the hardest kind of wrong output to notice.
+
+                A subclass that genuinely wants this declares
+                `class Child(Parent, ergonomics_resolved=True)`, which says "my
+                `__init__` forwards only the already-resolved native parameters
+                (`lat_lim` / `lon_lim` / `temporal_resolution` / `variables`)"
+                and skips the second wrap.
         """
+        resolved = kwargs.pop("ergonomics_resolved", False)
         super().__init_subclass__(**kwargs)
-        # Independent of the constructor sugar below: a backend that inherits
-        # `__init__` unchanged still needs its `download` to create `root_dir`.
+        backend_bases = [
+            base
+            for base in cls.__bases__
+            if base is not AbstractDataSource
+            and isinstance(base, type)
+            and issubclass(base, AbstractDataSource)
+        ]
+        # Only a child that declares its *own* `__init__` is at risk: that is
+        # what earns a second wrapper. A child without one inherits the parent's
+        # already-wrapped constructor and cannot double-resolve anything, which
+        # is why the test helpers and any mixin-style subclass stay legal.
+        if backend_bases and not resolved and "__init__" in cls.__dict__:
+            names = ", ".join(base.__name__ for base in backend_bases)
+            raise TypeError(
+                f"{cls.__name__} declares its own __init__ and subclasses the "
+                f"backend(s) {names}, so both classes carry an __init__ wrapper "
+                f"and an ergonomic kwarg forwarded to super().__init__() would "
+                f"be resolved twice. Forward only the resolved native "
+                f"parameters (lat_lim, lon_lim, temporal_resolution, variables) "
+                f"and declare `class {cls.__name__}({names}, "
+                f"ergonomics_resolved=True)`."
+            )
+        if resolved and not backend_bases:
+            # The promise is about a *parent's* wrapper, and there is no backend
+            # parent here. Honouring it would silently drop the ergonomic
+            # kwargs (aoi / buffer / cadence / dataset) from a backend that has
+            # no second wrapper to avoid — the opposite of what the flag means.
+            raise TypeError(
+                f"{cls.__name__} passes ergonomics_resolved=True but inherits "
+                f"AbstractDataSource directly, so there is no parent wrapper to "
+                f"avoid. The flag would only disable this class's own ergonomic "
+                f"kwargs (aoi=, buffer=, cadence=, dataset=). Drop it."
+            )
+        # Every subclass needs this, independent of the constructor sugar
+        # below: a backend that inherits `__init__` unchanged still needs its
+        # `download` to create `root_dir`.
         cls._wrap_download()
+        if resolved:
+            # The child promises it forwards only resolved parameters, so it
+            # keeps the parent's `__init__` wrapper and gains no second one.
+            return
         orig = cls.__dict__.get("__init__")
         if orig is None or getattr(orig, "_ergonomic", False):
             return
@@ -710,28 +902,43 @@ class AbstractDataSource(ABC):
 
         @functools.wraps(original)
         def download(self, *args, **kw):
-            # Record which directories are missing *before* creating them, so
-            # the failure path can unwind exactly what this call added.
-            created = []
-            probe = self.root_dir
-            while not probe.exists() and probe != probe.parent:
-                created.append(probe)
-                probe = probe.parent
+            # One place refuses `aggregate=`. Previously 40 backends each
+            # declared the parameter and wrote their own `NotImplementedError`,
+            # so the policy was stated 40 times and the argument sat in the
+            # signature of backends it meant nothing to.
+            #
+            # Both conditions have to permit it, and they answer different
+            # questions. `SUPPORTS_AGGREGATE` is per class — does this backend
+            # wire the reducer at all. `OUTPUT_KIND` is per *instance* for a few
+            # backends (earthdata, eumetsat, tropycal, cmems) whose shape is
+            # only known once the dataset resolves: cmems supports aggregation
+            # for its gridded datasets and must still refuse it for a vector
+            # one.
+            #
+            # Bound against the real signature rather than read out of `kw`:
+            # `aggregate` is the second positional parameter on the backends
+            # that declare it, so `download(False, cfg)` would slip past a
+            # keyword-only lookup and be silently ignored — the refusal these
+            # backends used to raise themselves.
+            if _passed_aggregate(original, args, kw):
+                self._refuse_unsupported_aggregate()
+            # `aggregate=None` means "not asking for one", and it worked on the
+            # ~40 backends that each declared the parameter before the refusal
+            # was centralised. Removing it from their signatures turned that
+            # call into a `TypeError`, which is a break for any caller that
+            # forwards the argument unconditionally. Absorb it here for the
+            # backends that no longer name it; the non-`None` case was already
+            # refused above.
+            if "aggregate" in kw and "aggregate" not in _parameters(original):
+                kw.pop("aggregate")
+            # Recorded *before* creating them, so the failure path can unwind
+            # exactly what this call added.
+            created = _missing_ancestors(self.root_dir)
             self._ensure_root_dir()
             try:
                 return original(self, *args, **kw)
             except BaseException:
-                # A request the backend rejects (an unsupported `aggregate=`,
-                # a bad dataset key) must not leave an output directory
-                # behind. Unwind leaf-first, and only the directories this
-                # call created and only while each is still empty — so a
-                # pre-existing tree, and anything a partially-successful
-                # download wrote, are both untouched.
-                for directory in created:
-                    try:
-                        directory.rmdir()
-                    except OSError:
-                        break
+                _unwind_created(created)
                 raise
 
         download._ensures_root_dir = True  # type: ignore[attr-defined]
@@ -759,13 +966,10 @@ class AbstractDataSource(ABC):
           :class:`S3`) keep their own assignment; the parent only sets
           the attribute when :meth:`_initialize` returns a non-`None`
           value.
-        * `self.space` — the dict returned by :meth:`_create_grid`,
-          containing `lat_lim` and `lon_lim`. Subclasses that
-          override :meth:`_create_grid` to set attributes directly (e.g.
-          :class:`CHIRPS`) and return `None` are unaffected.
-        * `self.time` — the dict returned by :meth:`_check_input_dates`,
-          containing `start_date`, `end_date`, `time_freq` and
-          `dates`. Same opt-in semantics as `self.space`.
+        * `self.space` — the :class:`SpatialExtent` returned by
+          :meth:`_create_grid`.
+        * `self.time` — the :class:`TemporalExtent` returned by
+          :meth:`_check_input_dates`.
         * `self.root_dir` — the absolute :class:`pathlib.Path` of the
           output directory. `self.path` is kept as a legacy alias so
           older backends (CHIRPS, S3) continue to work. The directory is
@@ -802,27 +1006,51 @@ class AbstractDataSource(ABC):
         self.temporal_resolution = temporal_resolution
         self.vars = variables
 
-        space = self._create_grid(lat_lim, lon_lim)
-        if isinstance(space, SpatialExtent):
-            self.space = space
-        elif isinstance(space, dict):
-            self.space = SpatialExtent.from_pairs(
-                lat_lim=space["lat_lim"], lon_lim=space["lon_lim"]
-            )
-
-        time = self._check_input_dates(start, end, temporal_resolution, fmt)
-        if isinstance(time, TemporalExtent):
-            self.time = time
-        elif isinstance(time, dict):
-            self.time = TemporalExtent(
-                start_date=time["start_date"],
-                end_date=time["end_date"],
-                resolution=cast(str, time.get("resolution", time.get("time_freq"))),
-                dates=time["dates"],
-            )
+        # Both hooks return their validated model. They used to be allowed to
+        # return a plain dict or `None` instead, and this branched on
+        # `isinstance` to cope — three valid answers to one question, which a
+        # backend author could not infer without reading this. Every one of the
+        # 53 overrides in the tree returns the model, so the other two branches
+        # were dead; a hook returning something else now fails here rather than
+        # silently leaving `space` / `time` unset.
+        self.space = self._create_grid(lat_lim, lon_lim)
+        self.time = self._check_input_dates(start, end, temporal_resolution, fmt)
 
         self.root_dir = Path(path).absolute()
         self.path = self.root_dir
+
+    def _refuse_unsupported_aggregate(self) -> None:
+        """Raise unless this instance can honour a non-`None` `aggregate=`.
+
+        The single implementation of a policy 40 backends used to each write for
+        themselves. Two independent questions have to pass:
+
+        * :attr:`SUPPORTS_AGGREGATE` — does the class wire the reducer at all;
+        * :attr:`OUTPUT_KIND` — is *this instance's* output gridded. A handful of
+          backends resolve their kind per request, so a backend that aggregates
+          its raster datasets must still refuse for a vector one.
+
+        A backend may set :attr:`AGGREGATE_REFUSAL_REASON` to a sentence saying
+        why, which is appended to the message. That is worth doing: "SoilGrids is
+        a single static prediction with no temporal axis" tells a caller
+        something the generic sentence cannot.
+
+        Raises:
+            NotImplementedError: When either check fails.
+        """
+        output_kind = getattr(self, "OUTPUT_KIND", "raster")
+        griddable = output_kind in {"raster", "mixed"}
+        if self.SUPPORTS_AGGREGATE and griddable:
+            return
+        reason = getattr(self, "AGGREGATE_REFUSAL_REASON", "") or (
+            "the temporal reducer needs a gridded output with a time axis to "
+            "reduce over, and this request has none"
+        )
+        raise NotImplementedError(
+            f"aggregate= is not supported by {type(self).__name__} "
+            f"(OUTPUT_KIND={output_kind!r}): {reason}. Reduce the downloaded "
+            f"output yourself, or use a backend that supports it."
+        )
 
     def _is_complete(
         self,
@@ -1017,7 +1245,7 @@ class AbstractDataSource(ABC):
     @abstractmethod
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
-    ):
+    ) -> TemporalExtent:
         """Check validity of input dates. Called by `__init__`.
 
         Still abstract, because the *shape* of a backend's time axis is a real
@@ -1191,9 +1419,7 @@ class AbstractDataSource(ABC):
         """
         return None
 
-    def _create_grid(
-        self, lat_lim: list[float], lon_lim: list[float]
-    ) -> SpatialExtent | dict | None:
+    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
         """Turn the requested lat/lon bounds into this backend's spatial extent.
 
         Called once by :meth:`__init__`; the result is captured onto
@@ -1217,17 +1443,37 @@ class AbstractDataSource(ABC):
         return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
 
     @abstractmethod
-    def download(self):
+    def download(self, progress_bar: bool = True) -> Any:
         """Download every requested variable and return the produced artifacts.
 
-        The return shape tracks :attr:`OUTPUT_KIND`: `"raster"` /
-        `"mixed"` file-writing backends return the list of written
-        paths (`list[Path]`); `"vector"` backends return an in-memory
-        `FeatureCollection` (radar returns a `GeoDataFrame`);
-        `"tabular"` backends return a `pandas.DataFrame`. Every backend
-        now returns its produced artifacts (the legacy CHIRPS / ECMWF
-        backends return their written `list[Path]` and also leave the
-        files on disk under `self.root_dir`).
+        Declares exactly the parameter every backend shares. A subclass may add
+        further **optional** arguments — that stays substitutable, so mypy checks
+        the overrides rather than waving them through. Deliberately *not*
+        `**kwargs`: putting that here would oblige all 48 overrides to accept
+        arbitrary keywords, which is the opposite of a contract.
+
+        Capability-gated arguments appear only where they are honoured
+        (`aggregate=` on the backends declaring :attr:`SUPPORTS_AGGREGATE`,
+        `errors=` where the batch is a loop over independent items, `force=`
+        where a re-run can skip completed artefacts), alongside genuinely
+        backend-specific ones (`cores=` on chc, `tailor=` on eumetsat). Read the
+        backend's own signature for those.
+
+        Args:
+            progress_bar: Whether to show this backend's progress bar. The one
+                universal parameter, which is why it is declared here: this
+                method used to be `download(self)` while all 48 overrides took
+                two to five arguments, so nothing — not mypy, not a test — could
+                catch a signature drifting.
+
+        Returns:
+            Any: The produced artifacts, shaped by :attr:`OUTPUT_KIND` —
+                `"raster"` / `"mixed"` file-writing backends return the written
+                paths (`list[Path]`); `"vector"` backends return an in-memory
+                `FeatureCollection` (radar returns a `GeoDataFrame`);
+                `"tabular"` backends return a `pandas.DataFrame`. Every backend
+                returns its artifacts; the file-writing ones also leave them on
+                disk under :attr:`root_dir`.
 
         Partial-failure policy across a multi-item batch defaults to
         **skip-and-continue** — a failed `(dataset, variable)` / chunk /
@@ -1246,9 +1492,6 @@ class AbstractDataSource(ABC):
         rather than assuming; :meth:`_search_fetch_each` also takes
         `errors=` for backends composed from it.
         """
-        # loop over dates if the downloaded rasters/netcdf are for a specific date out of the required
-        # list of dates
-        pass
 
     def _api(self, *args: Any, **kwargs: Any) -> Any:
         """Send / receive the request(s) this download needs.
@@ -1414,6 +1657,12 @@ class AbstractDataSource(ABC):
     #: it by assigning the :meth:`check_errors_policy` result.
     _errors: str = "warn"
 
+    #: The total-row cap a backend's `download(limit=...)` recorded, read by
+    #: whichever method assembles the result (often `_fetch_all`, not `download`
+    #: itself). `None` means no cap. Declared here so an adopting backend does
+    #: not have to initialise it in `__init__`.
+    _limit: int | None = None
+
     #: Slot for a backend's lazily-built `HttpClient`. Declared here so the
     #: backends that hold one (rather than rebuilding it per item, which would
     #: discard the pooled connection) can check `if self._http is None` without
@@ -1531,18 +1780,30 @@ class AbstractDataSource(ABC):
         take = head or _head_rows
         collected: list[Any] = []
         remaining = limit
-        for chunk in chunks:
-            length = measure(chunk)
-            # `>=`, not `>`: a chunk that exactly fills the cap must also end the
-            # loop here. Deciding on the *next* iteration would pull one more
-            # fragment first — the very work the cap exists to avoid.
-            if length >= remaining:
-                collected.append(
-                    take(chunk, remaining) if length > remaining else chunk
-                )
-                return collected
-            collected.append(chunk)
-            remaining -= length
+        iterator = iter(chunks)
+        try:
+            for chunk in iterator:
+                length = measure(chunk)
+                # `>=`, not `>`: a chunk that exactly fills the cap must also end
+                # the loop here. Deciding on the *next* iteration would pull one
+                # more fragment first — the very work the cap exists to avoid.
+                if length >= remaining:
+                    collected.append(
+                        take(chunk, remaining) if length > remaining else chunk
+                    )
+                    return collected
+                collected.append(chunk)
+                remaining -= length
+        finally:
+            # Stopping early abandons the generator mid-`for`, which leaves any
+            # `with` block it is suspended inside — a temp directory holding a
+            # bulk download, an open session — unwound only whenever the object
+            # is collected. Closing it here makes that deterministic, which is
+            # the difference between a temp dir removed now and one removed at
+            # interpreter exit.
+            close = getattr(iterator, "close", None)
+            if close is not None:
+                close()
         return collected
 
     def iter_download(self, *, limit: int | None = None) -> Iterator[Any]:
@@ -1591,7 +1852,12 @@ class AbstractDataSource(ABC):
                 continue
             length = len(fragment)
             if length >= remaining:
-                yield _head_rows(fragment, remaining)
+                # Skip the slice when the fragment fills the cap exactly, as
+                # `_take_limited` does: `_head_rows` would copy every row to
+                # produce the fragment it was handed.
+                yield (
+                    fragment if length == remaining else _head_rows(fragment, remaining)
+                )
                 return
             yield fragment
             remaining -= length
@@ -1678,30 +1944,188 @@ class AbstractDataSource(ABC):
             BaseException: The first item's exception when `errors="raise"`.
         """
         policy = self.check_errors_policy(errors)
-        name = describe or str
-        results: list[Any] = []
         failures: list[tuple[str, BaseException]] = []
-        for item in items:
-            try:
-                results.append(fn(item))
-            except Exception as exc:  # noqa: BLE001 - policy decides the fate
-                if policy == "raise":
-                    raise
-                described = name(item)
-                if on_failure is not None:
-                    results.append(on_failure(item, exc))
-                if policy == "warn":
-                    logger.warning(
-                        f"{type(self).__name__}: {label} {described} failed: "
-                        f"{type(exc).__name__}: {exc}"
-                    )
-                failures.append((described, exc))
+        results = list(
+            self._iter_items(
+                items,
+                fn,
+                errors=policy,
+                label=label,
+                describe=describe,
+                on_failure=on_failure,
+                failures=failures,
+            )
+        )
         if failures and policy == "warn":
             logger.warning(
                 f"{type(self).__name__}: {len(failures)} of {len(items)} "
                 f"{label}(s) failed; {len(results)} succeeded."
             )
         return results, failures
+
+    def _fragment_rows(self, fragment: Any) -> int:
+        """Row count of one fetched fragment, for the shared composition's cap.
+
+        `len` is right for the row-bearing fragments (`DataFrame`,
+        `FeatureCollection`) the tabular and vector backends yield. A raster
+        backend's `_fetch_one` yields a single `Path`, which has no length —
+        soilgrids is the one built on this composition. That combination only
+        arises if such a backend gains a `limit=`, and the bare `len()` failure
+        is a `TypeError: object of type 'WindowsPath' has no len()` naming
+        neither the backend nor the cap.
+
+        Args:
+            fragment: One `_fetch_one` result.
+
+        Returns:
+            int: The fragment's row count.
+
+        Raises:
+            TypeError: When the fragment has no length, naming the backend and
+                what to do about it.
+        """
+        try:
+            return len(fragment)
+        except TypeError as exc:
+            raise TypeError(
+                f"{type(self).__name__} cannot apply a row cap: its fetch "
+                f"returns {type(fragment).__name__}, which has no length "
+                f"(OUTPUT_KIND={self.OUTPUT_KIND!r}). A `limit=` counts rows, "
+                f"so it does not describe a backend that writes files — narrow "
+                f"the request instead, or pass `size=` if a per-item cap is "
+                f"what you mean."
+            ) from exc
+
+    def _iter_items(
+        self,
+        items: Iterable[Any],
+        fn: Callable[[Any], Any],
+        *,
+        errors: str | None,
+        label: str,
+        describe: Callable[[Any], str] | None,
+        on_failure: Callable[[Any, BaseException], Any] | None,
+        failures: list[tuple[str, BaseException]],
+    ) -> Iterator[Any]:
+        """Apply `fn` to each item under the failure policy, yielding as it goes.
+
+        The lazy form of :meth:`_run_items`, and the single implementation of
+        the policy: `_run_items` is `list()` of this plus a summary line. Being
+        a generator is what lets a bounded caller stop early — under a policy a
+        cap cannot be turned into a slice of `items`, because failures consume
+        items without producing rows, so the decision to stop can only be made
+        after each result arrives.
+
+        Args:
+            items: The items to process; consumed lazily.
+            fn: Called once per item; its return value is yielded.
+            errors: An already-validated policy (`"raise"` / `"warn"` /
+                `"ignore"`), or `None` for `"raise"`.
+            label: Noun for the log lines (e.g. `"granule"`, `"variable"`).
+            describe: Renders an item for the log; defaults to `str`.
+            on_failure: Optional `(item, exception) -> placeholder`, yielded in
+                place of the failed item's result.
+            failures: Accumulator the caller owns; each failure is appended as
+                `(description, exception)` so a caller that stops early still
+                sees what failed before it stopped.
+
+        Yields:
+            Any: Each successful `fn(item)` result, plus any `on_failure`
+                placeholders, in item order.
+
+        Raises:
+            BaseException: The first item's exception when the policy is
+                `"raise"`.
+        """
+        name = describe or str
+        for item in items:
+            # `fn` is called outside the `yield` on purpose: yielding inside the
+            # `try` would put the handler in the path of whatever the *consumer*
+            # raises while the generator is suspended, so a caller's own error
+            # would be logged as this item's failure and swallowed by an
+            # `ignore` policy.
+            try:
+                value = fn(item)
+            except Exception as exc:  # noqa: BLE001 - policy decides the fate
+                if errors is None or errors == "raise":
+                    raise
+                placeholder = self._record_failure(
+                    item,
+                    exc,
+                    errors=errors,
+                    label=label,
+                    name=name,
+                    on_failure=on_failure,
+                    failures=failures,
+                )
+                if placeholder is not _MISSING:
+                    yield placeholder
+                continue
+            yield value
+
+    def _record_failure(
+        self,
+        item: Any,
+        exc: BaseException,
+        *,
+        errors: str,
+        label: str,
+        name: Callable[[Any], str],
+        on_failure: Callable[[Any, BaseException], Any] | None,
+        failures: list[tuple[str, BaseException]],
+    ) -> Any:
+        """Log and record one item's failure under a non-raising policy.
+
+        Split out of :meth:`_iter_items` so the generator stays a plain
+        try/except around the item call.
+
+        Args:
+            item: The item whose `fn` call raised.
+            exc: What it raised.
+            errors: The already-validated policy (`"warn"` or `"ignore"`).
+            label: Noun for the log line (e.g. `"granule"`).
+            name: Renders `item` for the log.
+            on_failure: Optional `(item, exception) -> placeholder`.
+            failures: Accumulator the caller owns; appended to here.
+
+        Returns:
+            Any: The placeholder to yield in the failed item's place, or the
+                `_MISSING` sentinel when there is none. A hook returning
+                `None` is a real placeholder, which is why a sentinel and not
+                `None` marks its absence.
+        """
+        described = name(item)
+        placeholder = _MISSING if on_failure is None else on_failure(item, exc)
+        if errors == "warn":
+            logger.warning(
+                f"{type(self).__name__}: {label} {described} failed: "
+                f"{type(exc).__name__}: {exc}"
+            )
+        failures.append((described, exc))
+        return placeholder
+
+    def _fetch_limited(
+        self, products: Sequence[RemoteProduct], limit: int | None = None
+    ) -> list[Any]:
+        """Fetch each product, stopping once `limit` rows have been collected.
+
+        The bounded form of the `[self._fetch_one(p) for p in products]` that
+        several backends write as their `_fetch`. The comprehension fetches
+        everything and any cap applied afterwards only truncates the result; this
+        consumes lazily, so a product past the cap is never requested.
+
+        Args:
+            products: The products from :meth:`_search`.
+            limit: Total rows to collect, or `None` for all of them. Usually
+                :attr:`_limit`, recorded by the backend's `download(limit=...)`.
+
+        Returns:
+            list[Any]: One fragment per fetched product, the last trimmed when it
+                straddled the cap.
+        """
+        return self._take_limited(
+            (self._fetch_one(product) for product in products), limit=limit
+        )
 
     def _fetch_one(self, product: RemoteProduct) -> Any:
         """Fetch a single product — the per-product hook for `_search_fetch_each`.
@@ -1770,15 +2194,46 @@ class AbstractDataSource(ABC):
             desc=desc or type(self).__name__,
             unit=unit,
         )
-        if errors is None:
-            return [self._fetch_one(product) for product in iterator]
-        results, _failures = self._run_items(
-            list(iterator),
-            self._fetch_one,
-            errors=errors,
-            label=label,
-            describe=_describe_remote_product,
-        )
+        # Closed explicitly: a cap that stops mid-sweep leaves the bar
+        # unfinished, and tqdm only restores the terminal (and stops redrawing)
+        # when it is closed. `_take_limited` closes the *generator* it abandons,
+        # which is `_iter_items` — the bar underneath it is a separate object.
+        # Lazy in both branches so `self._limit` stops the fetching rather than
+        # trimming the assembled list. Under a policy the cap cannot be turned
+        # into a slice of `products` up front: a failed product consumes an item
+        # without contributing rows, so only the results can be counted.
+        policy = self.check_errors_policy(errors) if errors is not None else None
+        failures: list[tuple[str, BaseException]] = []
+        # `finally`, so the bar is closed on the failure path too: a
+        # `_fetch_one` that raises under the `raise` policy propagates straight
+        # out of here, and an unclosed tqdm keeps redrawing over whatever the
+        # caller prints next.
+        try:
+            results = self._take_limited(
+                self._iter_items(
+                    iterator,
+                    self._fetch_one,
+                    errors=policy,
+                    label=label,
+                    describe=_describe_remote_product,
+                    on_failure=None,
+                    failures=failures,
+                ),
+                limit=self._limit,
+                size=self._fragment_rows,
+            )
+        finally:
+            iterator.close()
+        if failures and policy == "warn":
+            # Counted against the products actually attempted, not the whole
+            # planned list: a cap can end the sweep early, and "3 of 400 failed"
+            # reads as a 0.75% failure rate when in truth 3 of the 5 products
+            # that ran failed.
+            attempted = len(failures) + len(results)
+            logger.warning(
+                f"{type(self).__name__}: {len(failures)} of {attempted} "
+                f"{label}(s) attempted failed; {len(results)} succeeded."
+            )
         return results
 
 
@@ -1860,14 +2315,45 @@ class AbstractCatalog(BaseModel):
         """
         return MappingProxyType(self.get_catalog())
 
-    def model_post_init(self, __context: Any) -> None:
-        """Hook run after pydantic validation.
+    @classmethod
+    def _autoload(cls) -> Mapping[str, Any]:
+        """Return the payload to fill an empty catalog from disk.
 
-        Kept as an overridable no-op so subclasses can call
-        `super().model_post_init(__context)` first and keep their own
-        post-init wiring in one place. :attr:`catalog` is a property now, so
-        nothing has to be populated here.
+        The one part of post-init that genuinely differs per backend: *how* the
+        rows are read. Everything around it — only read when no rows were
+        supplied, never clobber what the caller passed — is the same everywhere
+        and lives in :meth:`model_post_init`.
+
+        Returns:
+            Mapping[str, Any]: Field name to value, e.g.
+                `{"datasets": ..., "available_datasets": ...}`. The default is
+                empty, meaning this catalog does not auto-load.
         """
+        return {}
+
+    def model_post_init(self, __context: Any) -> None:
+        """Fill an empty catalog from disk, then run the subclass's wiring.
+
+        `Catalog()` with no arguments reads from disk; passing `datasets=...`
+        skips the read, which is what lets a test build a catalog from literals.
+        A field the caller already supplied is never overwritten, so a partial
+        construction (`datasets=` but no `available_datasets=`) still gets the
+        rest filled in.
+
+        This used to be written out in all 48 provider catalogs. The bodies
+        differed only in the loader call, and the surrounding rule had drifted —
+        some defaulted `available_datasets`, some did not — which is the kind of
+        difference nobody notices until two catalogs disagree.
+
+        Args:
+            __context: Opaque context handed in by the pydantic v2 lifecycle.
+                Unused — this hook only fills empty fields — but named
+                positionally because pydantic calls it that way.
+        """
+        if not self.datasets:
+            for field, value in self._autoload().items():
+                if not getattr(self, field, None):
+                    setattr(self, field, value)
 
     def get_catalog(self) -> Any:
         """Read the catalog of the datasource from disk or retrieve it from server.

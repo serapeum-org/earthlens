@@ -51,7 +51,6 @@ from earthlens.tropycal.catalog import Catalog
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
 
-    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["gpkg", "geojson"]
 Geometry = Literal["point", "track"]
@@ -98,8 +97,9 @@ class TropicalCyclone(AbstractDataSource):
     and the basins' results are unioned into the single FeatureCollection
     `download()` returns.
 
-    Best-track only — tropycal's realtime / operational / forecast
-    products are out of scope. No credentials are needed.
+    Four products, selected with `product=`: `besttrack` (the default),
+    `recon` aircraft observations, `ships` forecast guidance, and
+    `realtime` active storms. No credentials are needed.
 
     Attributes:
         OUTPUT_KIND: `"vector"` — the result is a table of track
@@ -108,6 +108,8 @@ class TropicalCyclone(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "tropycal products are vector features or tabular guidance, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned GeoDataFrame / DataFrame directly"
 
     def __init__(
         self,
@@ -354,8 +356,14 @@ class TropicalCyclone(AbstractDataSource):
 
         Returns:
             list[FeatureCollection]: One collection per basin, same order.
+                Truncated when `limit=` was passed to `download`.
         """
-        return [self._query_one(product) for product in products]
+        # Lazy so a `limit=` stops the work: a basin past the cap never has its
+        # TrackDataset loaded, rather than being loaded and then trimmed away.
+        return self._take_limited(
+            (self._query_one(product) for product in products),
+            limit=self._limit,
+        )
 
     def _query_one(self, product: RemoteProduct) -> FeatureCollection:
         """Load one basin's TrackDataset and map its storms to features.
@@ -597,7 +605,7 @@ class TropicalCyclone(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> FeatureCollection | pd.DataFrame:
         """Load every requested basin and return the unioned tracks.
 
@@ -611,11 +619,13 @@ class TropicalCyclone(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends; tropycal has no progress bar, so this is a
                 no-op.
-            aggregate: Must be `None`. Tracks are vector, not gridded, so
-                there is no meaningful aggregation. The facade already
-                rejects a non-`None` `aggregate=` for a `vector` backend;
-                this is the belt-and-suspenders guard for direct backend
-                callers.
+            limit: Cap on the total features (or SHIPS rows) returned, across
+                every requested basin / storm. Applied as each one is loaded,
+                so a basin or storm **past** the cap is never pulled. Within a
+                single item it can only trim: a basin's `TrackDataset` is
+                parsed whole before any of its storms can be filtered, so a
+                one-basin request (the default) pays the full load whatever the
+                cap. `None` (the default) loads everything.
 
         Returns:
             FeatureCollection: The row-wise union of every requested
@@ -623,18 +633,9 @@ class TropicalCyclone(AbstractDataSource):
                 (schema-only) when nothing matched.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
             ImportError: If the `[tropycal]` extra is not installed.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "TropicalCyclone.download(aggregate=...) is not supported: "
-                "tropycal products are vector features or tabular guidance, "
-                "not gridded rasters, so there is no meaningful gridded "
-                "reduction. Call download() without aggregate= and "
-                "post-process the returned GeoDataFrame / DataFrame directly."
-            )
-
+        self._limit = self.check_limit(limit)
         if self._product == "ships":
             return self._download_ships()
         if self._product == "realtime":
@@ -691,20 +692,21 @@ class TropicalCyclone(AbstractDataSource):
             return events.empty_fc(self._geometry)
 
         bbox = (self.space.south, self.space.north, self.space.west, self.space.east)
-        written: list[Path] = []
-        collections: list[FeatureCollection] = []
-        for storm_id in ids:
-            frame = self._realtime_storm_frame(realtime, storm_id)
-            fc = events.frame_to_fc(
-                [frame] if frame is not None else [],
-                geometry=self._geometry,
-                window=_OPEN_WINDOW,
-                bbox=bbox,
-                source="realtime",
-            )
-            collections.append(fc)
-            if len(fc):
-                written.append(self._write(storm_id, fc))
+        # Lazy so a `limit=` stops the work: a storm past the cap is never
+        # pulled. Writing happens *after* the cap is applied, matching the
+        # best-track path — writing inside the generator would put the
+        # untrimmed fragment on disk while returning the trimmed one, so for
+        # the storm the cap lands inside the file and the return value would
+        # disagree.
+        collections = self._take_limited(
+            (self._realtime_one(realtime, storm_id, bbox) for storm_id in ids),
+            limit=self._limit,
+        )
+        written = [
+            self._write(storm_id, collection)
+            for storm_id, collection in zip(ids, collections)
+            if len(collection)
+        ]
 
         combined = events.concat_fcs(collections, self._geometry)
         logger.info(
@@ -740,6 +742,35 @@ class TropicalCyclone(AbstractDataSource):
             )
             return None
 
+    def _realtime_one(
+        self,
+        realtime: Any,
+        storm_id: str,
+        bbox: tuple[float, float, float, float],
+    ) -> FeatureCollection:
+        """Pull one active storm's current track.
+
+        Fetch only — the caller writes what survives the cap, so the file on
+        disk always matches the returned features.
+
+        Args:
+            realtime: The `tropycal.realtime.Realtime` object to read from.
+            storm_id: The active storm's identifier.
+            bbox: The request's `(south, north, west, east)` filter.
+
+        Returns:
+            FeatureCollection: The storm's current-track features (empty when
+                it fell outside the bbox).
+        """
+        frame = self._realtime_storm_frame(realtime, storm_id)
+        return events.frame_to_fc(
+            [frame] if frame is not None else [],
+            geometry=self._geometry,
+            window=_OPEN_WINDOW,
+            bbox=bbox,
+            source="realtime",
+        )
+
     def _download_ships(self) -> pd.DataFrame:
         """Fetch SHIPS guidance for each storm and return one tabular frame.
 
@@ -756,20 +787,26 @@ class TropicalCyclone(AbstractDataSource):
         """
         init = pd.to_datetime(self._ships_time).to_pydatetime()
         products = self._search()
-        frames: list[pd.DataFrame] = []
-        written: list[Path] = []
-        for product in products:
-            track_dataset = self._get_track_dataset(
-                product.metadata["basin"], product.metadata["source"]
-            )
-            storm = self._get_storm(track_dataset, product.id)
-            df = self._ships_frame(storm, init) if storm is not None else None
-            if df is not None and len(df):
-                df = df.copy()
-                df.insert(0, "forecast_init", pd.Timestamp(init))
-                df.insert(0, "storm_id", product.id)
-                frames.append(df)
-                written.append(self._write_table(product.id, init, df))
+        # Lazy so a `limit=` stops the work: a storm past the cap never has its
+        # guidance pulled. Storms with no guidance are dropped before the cap
+        # counts them, so `limit` bounds returned rows only.
+        frames = self._take_limited(
+            (
+                frame
+                for frame in (self._ships_one(product, init) for product in products)
+                if frame is not None
+            ),
+            limit=self._limit,
+        )
+        # Written after the cap, so a storm the cap lands inside has the same
+        # rows on disk as in the returned frame. Each frame carries its own
+        # `storm_id` (stamped in `_ships_one`), so the surviving frames can be
+        # written without re-pairing them with `products` — which the
+        # `None`-dropping filter above has already unaligned.
+        written = [
+            self._write_table(str(frame["storm_id"].iloc[0]), init, frame)
+            for frame in frames
+        ]
         if not frames:
             logger.warning(
                 "Tropycal ships: no SHIPS guidance matched the request, nothing written"
@@ -781,6 +818,35 @@ class TropicalCyclone(AbstractDataSource):
             f"file(s) written to {self.root_dir}"
         )
         return combined
+
+    def _ships_one(
+        self, product: RemoteProduct, init: dt.datetime
+    ) -> pd.DataFrame | None:
+        """Pull one storm's SHIPS table for `init`.
+
+        Fetch only — the caller writes what survives the cap, so the file on
+        disk always matches the returned rows.
+
+        Args:
+            product: One product from `_search`; `product.id` is the storm id.
+            init: The forecast initialisation time to request.
+
+        Returns:
+            pd.DataFrame | None: The storm's guidance rows, stamped with
+                `storm_id` / `forecast_init`, or `None` when the storm has no
+                guidance for this cycle.
+        """
+        track_dataset = self._get_track_dataset(
+            product.metadata["basin"], product.metadata["source"]
+        )
+        storm = self._get_storm(track_dataset, product.id)
+        df = self._ships_frame(storm, init) if storm is not None else None
+        if df is None or not len(df):
+            return None
+        df = df.copy()
+        df.insert(0, "forecast_init", pd.Timestamp(init))
+        df.insert(0, "storm_id", product.id)
+        return df
 
     @staticmethod
     def _ships_frame(storm: Any, init: dt.datetime) -> pd.DataFrame | None:

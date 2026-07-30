@@ -55,8 +55,6 @@ from earthlens.worldpop._helpers import (
     normalise_iso3,
 )
 
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 from earthlens.worldpop.auth import WorldPopAuth
 from earthlens.worldpop.catalog import GENERATIONS, Catalog
 from earthlens.worldpop.rest import (
@@ -66,6 +64,9 @@ from earthlens.worldpop.rest import (
     record_archive_files,
     rest_records,
 )
+
+if TYPE_CHECKING:
+    from earthlens.aggregate import AggregationConfig
 
 #: Sub-directory under the output path where raw per-country GeoTIFFs land.
 _RAW_DIRNAME: str = ".worldpop_raw"
@@ -101,6 +102,9 @@ class WorldPop(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "mixed"
+
+    #: Wires the temporal reducer (ARC-1).
+    SUPPORTS_AGGREGATE = True
 
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True

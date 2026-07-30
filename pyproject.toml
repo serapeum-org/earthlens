@@ -270,6 +270,16 @@ exclude = [
     "docs/",
     "scripts/",
     "planning/",
+    # `uv build` / setuptools leave a full stale copy of each distribution under
+    # `libs/*/build/lib/earthlens/`. They are gitignored, so `git status` stays
+    # clean and they can sit there for weeks. CI is unaffected (it runs
+    # `uv run mypy` with no path, so the `files` list above applies), but a
+    # developer typing `mypy libs` picks the copies up: one such run checked 568
+    # files instead of 284 and reported an error from a stale module. Excluding
+    # them makes the command produce the same answer either way. ruff already
+    # excludes `build` by default.
+    "build/",
+    "dist/",
 ]
 
 [tool.coverage.run]

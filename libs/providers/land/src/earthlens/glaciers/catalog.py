@@ -353,22 +353,20 @@ class Catalog(AbstractCatalog):
     #: GTN-G first-order region id -> :class:`Region` (RGI download metadata).
     regions: dict[str, Region] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no rows were supplied.
+    @classmethod
+    def _autoload(cls) -> dict[str, Any]:
+        """Read the bundled catalog from disk.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH`; passing
-        `datasets=...` skips the disk read.
-
-        Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is missing,
-                empty, or has a malformed row.
+        Returns:
+            dict[str, Any]: The `datasets`, `regions`, `available_datasets` read from
+                the bundled catalog.
         """
-        if not self.datasets:
-            loaded = Catalog.load()
-            self.datasets = loaded.datasets
-            self.regions = loaded.regions
-            self.available_datasets = loaded.available_datasets
-        super().model_post_init(__context)
+        loaded = Catalog.load()
+        return {
+            "datasets": loaded.datasets,
+            "regions": loaded.regions,
+            "available_datasets": loaded.available_datasets,
+        }
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

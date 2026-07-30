@@ -68,8 +68,10 @@ class TestConstruction:
     def test_default_bbox_is_whole_earth(self):
         """Omitting lat_lim / lon_lim defaults to the whole-Earth sentinel extent."""
         backend = _make_backend()
-        assert backend.space.south == -90.0 and backend.space.north == 90.0
-        assert backend.space.west == -180.0 and backend.space.east == 180.0
+        assert backend.space.south == -90.0
+        assert backend.space.north == 90.0
+        assert backend.space.west == -180.0
+        assert backend.space.east == 180.0
 
     def test_empty_variables_rejected(self):
         """An empty variables list raises at construction."""
@@ -151,7 +153,8 @@ class TestResolveUrl:
         """Natural Earth uses the dataset's default scale when none is given."""
         backend = _make_backend(variables=["natural_earth:countries"])
         url = backend._resolve_url(backend._catalog.get("natural_earth:countries"))
-        assert "110m" in url and url.endswith("ne_110m_admin_0_countries.zip")
+        assert "110m" in url
+        assert url.endswith("ne_110m_admin_0_countries.zip")
 
     def test_natural_earth_route_scale_override(self):
         """An explicit scale= overrides the dataset default in the URL."""
@@ -169,7 +172,8 @@ class TestResolveUrl:
         """An explicit year= overrides the dataset default in the URL."""
         backend = _make_backend(variables=["tiger:county"], year=2022)
         url = backend._resolve_url(backend._catalog.get("tiger:county"))
-        assert "GENZ2022" in url and "cb_2022_us_county_500k.zip" in url
+        assert "GENZ2022" in url
+        assert "cb_2022_us_county_500k.zip" in url
 
     def test_tiger_tract_uses_state_scope(self):
         """A per-state tract writes the zero-padded FIPS as the URL scope."""
@@ -200,7 +204,8 @@ class TestSearchFetch:
         """_fetch routes each product through read_vector and returns its FCs."""
         backend = _make_backend(variables=["cgaz:adm0"])
         results = backend._fetch(backend._search())
-        assert len(results) == 1 and len(results[0]) == 2
+        assert len(results) == 1
+        assert len(results[0]) == 2
         assert fake_read[0].endswith("geoBoundariesCGAZ_ADM0.gpkg")
 
     def test_api_composes_search_fetch(self, fake_read):
@@ -292,3 +297,65 @@ def test_no_bare_gpd_read_file_in_source():
         text = path.read_text(encoding="utf-8")
         assert "gpd.read_file(" not in text
         assert "geopandas.read_file(" not in text
+
+
+class TestLimitStopsTheWork:
+    """A `limit=` must stop reading datasets, not trim the combined collection.
+
+    Each dataset is a whole boundary layer read over `/vsicurl/` — often tens of
+    MB — so a cap that only sliced the concatenated features would download
+    every layer regardless. Counting the reads is what tells the two apart.
+    """
+
+    def test_datasets_past_the_cap_are_never_read(self, fake_read, monkeypatch):
+        """The second layer is not fetched once the first fills the cap."""
+        backend = _make_backend(variables=["cgaz:adm0", "cgaz:adm1"])
+        backend._limit = 2
+        collections = backend._fetch(backend._search())
+
+        assert len(fake_read) == 1, (
+            f"read {len(fake_read)} layer(s) for a cap the first already "
+            f"filled; the cap is trimming, not stopping the work"
+        )
+        assert sum(len(fc) for fc in collections) == 2
+
+    def test_no_limit_reads_every_dataset(self, fake_read):
+        """Without a cap every requested layer is still read."""
+        backend = _make_backend(variables=["cgaz:adm0", "cgaz:adm1"])
+        backend._limit = None
+        backend._fetch(backend._search())
+
+        assert len(fake_read) == 2
+
+    def test_a_zero_limit_is_refused_before_any_read(self, fake_read):
+        """`limit=0` is a caller bug, caught before the first layer is touched."""
+        backend = _make_backend(variables=["cgaz:adm0"])
+        with pytest.raises(ValueError):
+            backend.download(progress_bar=False, limit=0)
+        assert fake_read == []
+
+
+class TestPublicDownloadHonoursTheCap:
+    """`download(limit=)` — the public path — must reach the fetch.
+
+    The other cap tests set `backend._limit` directly, which exercises the
+    bounding but not the wiring between the keyword and the attribute. A
+    backend whose `download` forgot `self._limit = self.check_limit(limit)`
+    would pass every one of those and still ignore the caller's cap.
+    """
+
+    def test_the_keyword_bounds_the_result(self, fake_read):
+        """A cap passed to `download` bounds both the reads and the return."""
+        backend = _make_backend(variables=["cgaz:adm0", "cgaz:adm1"])
+        collection = backend.download(progress_bar=False, limit=2)
+
+        assert len(collection) == 2
+        assert len(fake_read) == 1
+
+    def test_without_the_keyword_everything_is_read(self, fake_read):
+        """The default is unchanged."""
+        backend = _make_backend(variables=["cgaz:adm0", "cgaz:adm1"])
+        collection = backend.download(progress_bar=False)
+
+        assert len(collection) == 4
+        assert len(fake_read) == 2

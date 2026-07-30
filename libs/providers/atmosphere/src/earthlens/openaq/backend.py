@@ -32,7 +32,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import Any, Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -48,9 +48,6 @@ from earthlens.base import (
 from earthlens.openaq.auth import AuthenticationError, OpenaqAuth, OpenaqCredentials
 from earthlens.openaq.catalog import Catalog
 from earthlens.openaq.client import OpenaqClient
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["csv", "parquet"]
 
@@ -109,6 +106,8 @@ class OpenAQ(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "pollutant measurements are tabular per-row station observations, not gridded rasters, so there is no meaningful gridded reduction. Use the server-side temporal_resolution rollup (hourly/daily/monthly/yearly) instead"
 
     def __init__(
         self,
@@ -433,7 +432,7 @@ class OpenAQ(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch measurements, write them to `path`, and return the frame.
 
@@ -448,30 +447,21 @@ class OpenAQ(AbstractDataSource):
         Args:
             progress_bar: Show a per-sensor progress bar. Defaults to
                 `True`.
-            aggregate: Must be `None`. OpenAQ output is tabular, so
-                there is no meaningful gridded reduction; the facade
-                already rejects a non-`None` `aggregate=` for a
-                `tabular` backend, and this is the belt-and-suspenders
-                guard for direct backend callers. Use the server-side
-                `temporal_resolution` rollup instead.
+            limit: Cap on the total measurement rows, overriding the
+                constructor's `limit=` for this call. Same meaning as that
+                one — a total across sensors, applied as each sensor's frame
+                arrives — and accepted here so the cap can be passed through
+                `EarthLens(...).download(limit=...)` like every other bounded
+                backend. `None` (the default) keeps whatever the constructor
+                set.
 
         Returns:
             pd.DataFrame: The long-format union of every sensor's
                 measurements (schema columns, `datetime_utc` tz-aware
                 UTC). Empty (schema-only) when nothing matched.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "OpenAQ.download(aggregate=...) is not supported: pollutant "
-                "measurements are tabular per-row station observations, not "
-                "gridded rasters, so there is no meaningful gridded "
-                "reduction. Use the server-side temporal_resolution rollup "
-                "(hourly/daily/monthly/yearly) instead."
-            )
-
+        if limit is not None:
+            self._limit = self.check_limit(limit)
         frames = self._take_limited(
             self._iter_non_empty_frames(progress_bar),
             limit=self._limit,
@@ -546,15 +536,18 @@ class OpenAQ(AbstractDataSource):
         products = self._search()
         if not products:
             return
-        for product in tqdm(
+        # `with`, so abandoning this generator at a cap unwinds the bar
+        # instead of leaving it redrawing and holding the terminal.
+        with tqdm(
             products,
             disable=not progress_bar,
             desc="OpenAQ sensors",
             unit="sensor",
-        ):
-            frame = self._fetch_one(product)
-            if not frame.empty:
-                yield frame
+        ) as iterator:
+            for product in iterator:
+                frame = self._fetch_one(product)
+                if not frame.empty:
+                    yield frame
 
 
 def _empty_frame() -> pd.DataFrame:

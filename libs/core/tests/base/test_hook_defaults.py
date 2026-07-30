@@ -341,7 +341,8 @@ class TestRunItems:
         results, failures = self._backend(tmp_path)._run_items(
             [1], lambda n: n, errors="skip"
         )
-        assert results == [1] and failures == []
+        assert results == [1]
+        assert failures == []
 
     def test_unknown_policy_rejected(self, tmp_path):
         """A policy outside the accepted set raises with the accepted names."""
@@ -586,7 +587,8 @@ class TestNoOverrideSilencers:
         """Guard the guard: the glob must find the real backend modules."""
         found = [path.parent.name for path, _ in self._backend_sources()]
         assert len(found) > 30, f"only scanned {len(found)} backends: {found[:5]}"
-        assert "nwp" in found and "soilgrids" in found, f"unexpected set: {found[:8]}"
+        assert "nwp" in found, f"nwp missing from the scan: {found[:8]}"
+        assert "soilgrids" in found, f"soilgrids missing from the scan: {found[:8]}"
 
     def test_fetch_one_takes_only_a_product(self):
         """Every `_fetch_one` override keeps the base's single-argument shape."""
@@ -606,3 +608,375 @@ class TestNoOverrideSilencers:
             "`_fetch_one` must take exactly `(self, product)`; extra per-batch "
             f"context belongs on `self` or in `RemoteProduct.metadata`: {offenders}"
         )
+
+
+class TestBackendInheritanceIsGuarded:
+    """ARC-6: the no-backend-subclasses-a-backend rule is enforced, not assumed.
+
+    Both a parent and a child backend get an `__init__` wrapper, so an ergonomic
+    kwarg forwarded to `super().__init__()` would be resolved twice — `resolve_aoi`
+    running on an already-reduced bbox. That produces a plausible-looking box over
+    roughly the right area, which is why it is worth failing at class-definition
+    time rather than trusting a docstring note.
+    """
+
+    def test_subclassing_with_its_own_init_is_refused(self):
+        """A child declaring its own `__init__` earns a second wrapper, so it raises."""
+        with pytest.raises(TypeError, match="resolved twice"):
+
+            class _Child(_Minimal):
+                def __init__(self, **kwargs):
+                    super().__init__(**kwargs)
+
+    def test_the_error_names_the_opt_out(self):
+        """The message tells the author how to declare the safe case."""
+        with pytest.raises(TypeError, match="ergonomics_resolved=True"):
+
+            class _Child(_Minimal):
+                def __init__(self, **kwargs):
+                    super().__init__(**kwargs)
+
+    def test_subclassing_without_an_init_is_allowed(self):
+        """A child that inherits the constructor cannot double-resolve, so it is legal.
+
+        This is the shape the test helpers in this module use, and it was the
+        first thing the guard wrongly rejected.
+        """
+
+        class _Child(_Minimal):
+            pass
+
+        assert issubclass(_Child, _Minimal)
+
+    def test_opting_in_is_allowed_and_skips_the_second_wrap(self):
+        """`ergonomics_resolved=True` permits the subclass and wraps only download."""
+
+        class _Child(_Minimal, ergonomics_resolved=True):
+            def __init__(self, **kwargs):
+                super().__init__(**kwargs)
+
+            def download(self, progress_bar: bool = True, **kwargs):
+                return ["child"]
+
+        # The download wrapper is still applied (root_dir creation), which is the
+        # piece a subclass must not lose.
+        assert getattr(_Child.download, "_ensures_root_dir", False)
+
+    def test_every_shipped_backend_inherits_the_abc_directly(self):
+        """No shipped backend relies on the opt-out, so the simple case holds."""
+        import ast as ast_module
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[3] / "providers"
+        offenders = []
+        defined: dict[str, str] = {}
+        trees = {}
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            tree = ast_module.parse(path.read_text(encoding="utf-8"))
+            trees[path] = tree
+            for node in tree.body:
+                if isinstance(node, ast_module.ClassDef) and any(
+                    "AbstractDataSource" in ast_module.unparse(b) for b in node.bases
+                ):
+                    defined[node.name] = path.parent.name
+        for path, tree in trees.items():
+            for node in tree.body:
+                if not isinstance(node, ast_module.ClassDef):
+                    continue
+                for base in node.bases:
+                    name = ast_module.unparse(base).split(".")[-1]
+                    if name in defined:
+                        offenders.append(f"{node.name} <- {name} ({path.parent.name})")
+        assert offenders == [], (
+            f"a backend subclasses another backend: {offenders}. Read the "
+            f"__init_subclass__ docstring before adding `ergonomics_resolved=True`."
+        )
+
+
+class TestConcurrencyContractIsDocumented:
+    """ARC-11: pin the pickling facts the class docstring states.
+
+    Documentation about what does and does not survive a process boundary drifts
+    silently, and the answer here is non-obvious: a bare `requests.Session`
+    pickles, an `HttpClient` does not, so a backend flips from picklable to
+    unpicklable the first time it caches a client.
+    """
+
+    def test_a_bare_session_pickles(self):
+        """The surprising half: `requests.Session` itself is picklable."""
+        import pickle
+
+        import requests
+
+        assert pickle.loads(pickle.dumps(requests.Session())) is not None
+
+    def test_an_http_client_does_not_pickle(self):
+        """`HttpClient` holds the throttle lock, and locks do not pickle."""
+        import pickle
+
+        from earthlens.base.http import HttpClient
+
+        client = HttpClient()
+        with pytest.raises((TypeError, AttributeError)):
+            pickle.dumps(client)
+
+    def test_a_fresh_backend_pickles(self, tmp_path):
+        """Before any client materialises, a backend crosses a process boundary."""
+        import pickle
+
+        backend = _build(_Minimal, tmp_path)
+        assert pickle.loads(pickle.dumps(backend)) is not None
+
+    def test_a_backend_holding_a_client_does_not(self, tmp_path):
+        """Caching an `HttpClient` is what makes it unpicklable — the `_http` slot."""
+        import pickle
+
+        from earthlens.base.http import HttpClient
+
+        backend = _build(_Minimal, tmp_path)
+        backend._http = HttpClient()
+        with pytest.raises((TypeError, AttributeError)):
+            pickle.dumps(backend)
+
+
+class TestHooksReturnOneShape:
+    """ARC-7: `_create_grid` / `_check_input_dates` return their model, only."""
+
+    def _hook_returns(self, hook: str):
+        """Yield `(backend_name, {return kinds})` for each override of `hook`."""
+        import ast as ast_module
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[3] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            tree = ast_module.parse(path.read_text(encoding="utf-8"))
+            for node in ast_module.walk(tree):
+                if not (isinstance(node, ast_module.FunctionDef) and node.name == hook):
+                    continue
+                kinds = set()
+                returns = [
+                    n for n in ast_module.walk(node) if isinstance(n, ast_module.Return)
+                ]
+                for ret in returns:
+                    if ret.value is None or (
+                        isinstance(ret.value, ast_module.Constant)
+                        and ret.value.value is None
+                    ):
+                        kinds.add("None")
+                    elif isinstance(ret.value, ast_module.Dict):
+                        kinds.add("dict")
+                    else:
+                        kinds.add("model")
+                if not returns:
+                    kinds.add("None")
+                yield path.parent.name, kinds
+
+    def test_overrides_were_found(self):
+        """Guard the guard: the walk must find the `_check_input_dates` overrides."""
+        found = list(self._hook_returns("_check_input_dates"))
+        assert len(found) > 40, f"only found {len(found)}"
+
+    @pytest.mark.parametrize("hook", ["_create_grid", "_check_input_dates"])
+    def test_no_override_returns_a_dict_or_none(self, hook):
+        """`__init__` assigns the result directly, so a dict or `None` breaks it.
+
+        These hooks used to accept three return shapes and `__init__` branched on
+        `isinstance` to cope. Every override returned the model, so the other two
+        branches were dead and are gone — which means a dict or `None` now leaves
+        `space` / `time` wrong instead of being quietly converted.
+        """
+        offenders = [
+            f"{name}: {sorted(kinds)}"
+            for name, kinds in self._hook_returns(hook)
+            if kinds - {"model"}
+        ]
+        assert offenders == [], (
+            f"{hook} must return its extent model; these do not: {offenders}"
+        )
+
+
+class TestErgonomicsResolvedNeedsABackendBase:
+    """`ergonomics_resolved=True` is only meaningful under a backend parent.
+
+    The flag says "my `__init__` forwards only resolved parameters, so do not
+    wrap it a second time". On a class inheriting `AbstractDataSource` directly
+    there is no first wrapper, so honouring it would quietly strip that
+    backend's own ergonomic kwargs (`aoi=`, `buffer=`, `cadence=`, `dataset=`)
+    — the opposite of the flag's purpose, and invisible until a user passed one.
+    """
+
+    def test_declaring_it_without_a_backend_base_is_refused(self):
+        """A direct subclass passing the flag is an authoring mistake."""
+        with pytest.raises(TypeError, match="no parent wrapper to avoid"):
+
+            class Direct(AbstractDataSource, ergonomics_resolved=True):
+                def __init__(self, **kwargs):
+                    super().__init__(**kwargs)
+
+    def test_it_is_still_accepted_under_a_backend_parent(self):
+        """The legitimate use — a backend subclassing a backend — still works."""
+
+        class Parent(AbstractDataSource):
+            REQUIRES_TIME_WINDOW = False
+
+            def _check_input_dates(self, start, end, temporal_resolution, fmt):
+                return TemporalExtent(
+                    start_date=None,
+                    end_date=None,
+                    resolution="all",
+                    dates=pd.DatetimeIndex([]),
+                )
+
+            def download(self, progress_bar: bool = True):
+                return []
+
+        class Child(Parent, ergonomics_resolved=True):
+            def __init__(self, **kwargs):
+                super().__init__(**kwargs)
+
+        assert issubclass(Child, Parent)
+
+
+class TestPositionalAggregateIsRefused:
+    """The central gate must see `aggregate` however it was passed.
+
+    `aggregate` is the second positional parameter on the backends that declare
+    it, so reading it out of `**kwargs` alone let `download(False, config)`
+    through. That mattered most for the backends whose own refusal was deleted
+    once the gate became central: they would silently ignore the argument
+    instead of raising.
+    """
+
+    def _backend(self, tmp_path):
+        """Build a raster backend that declares `aggregate` positionally."""
+
+        class _Positional(AbstractDataSource):
+            REQUIRES_TIME_WINDOW = False
+            OUTPUT_KIND = "raster"
+            AGGREGATE_REFUSAL_REASON = "not wired here"
+
+            def _check_input_dates(self, start, end, temporal_resolution, fmt):
+                return TemporalExtent(
+                    start_date=None,
+                    end_date=None,
+                    resolution="all",
+                    dates=pd.DatetimeIndex([]),
+                )
+
+            def download(self, progress_bar: bool = True, aggregate=None):
+                return ["ran"]
+
+        return _Positional(
+            start=None,
+            end=None,
+            variables=["x"],
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path=str(tmp_path),
+        )
+
+    def test_a_positional_aggregate_is_refused(self, tmp_path):
+        """`download(False, config)` raises, exactly as the keyword form does."""
+        backend = self._backend(tmp_path)
+        with pytest.raises(NotImplementedError, match="not wired here"):
+            backend.download(False, object())
+
+    def test_the_keyword_form_still_raises(self, tmp_path):
+        """The original path is unchanged."""
+        backend = self._backend(tmp_path)
+        with pytest.raises(NotImplementedError, match="not wired here"):
+            backend.download(aggregate=object())
+
+    def test_a_positional_progress_bar_alone_is_fine(self, tmp_path):
+        """Passing only `progress_bar` positionally must not trip the gate."""
+        backend = self._backend(tmp_path)
+        assert backend.download(False) == ["ran"]
+
+    def test_an_explicit_none_aggregate_is_fine(self, tmp_path):
+        """`aggregate=None` means "not asking for one"."""
+        backend = self._backend(tmp_path)
+        assert backend.download(True, None) == ["ran"]
+
+
+class TestAggregateNoneStaysAccepted:
+    """`download(aggregate=None)` must keep working on every backend.
+
+    Before the refusal was centralised, ~40 backends each declared
+    `aggregate=None` in their own `download` signature. Removing the parameter
+    from those signatures made a perfectly valid call — "I am not asking for an
+    aggregation" — raise `TypeError: got an unexpected keyword argument`, which
+    breaks any caller that forwards the argument unconditionally. The wrapper
+    absorbs the `None` case for backends that no longer name it.
+    """
+
+    def _backend(self, tmp_path):
+        """Build a backend whose `download` does not declare `aggregate`."""
+
+        class _NoAggregateParam(AbstractDataSource):
+            REQUIRES_TIME_WINDOW = False
+            OUTPUT_KIND = "vector"
+            AGGREGATE_REFUSAL_REASON = "vector features have no gridded reduction"
+
+            def _check_input_dates(self, start, end, temporal_resolution, fmt):
+                return TemporalExtent(
+                    start_date=None,
+                    end_date=None,
+                    resolution="all",
+                    dates=pd.DatetimeIndex([]),
+                )
+
+            def download(self, progress_bar: bool = True):
+                return ["ran"]
+
+        return _NoAggregateParam(
+            start=None,
+            end=None,
+            variables=["x"],
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path=str(tmp_path),
+        )
+
+    def test_an_explicit_none_is_absorbed(self, tmp_path):
+        """The call runs instead of raising `TypeError`."""
+        backend = self._backend(tmp_path)
+        assert backend.download(aggregate=None) == ["ran"]
+
+    def test_a_real_config_is_still_refused(self, tmp_path):
+        """Absorbing `None` must not weaken the refusal."""
+        backend = self._backend(tmp_path)
+        with pytest.raises(NotImplementedError, match="no gridded reduction"):
+            backend.download(aggregate=object())
+
+    def test_a_backend_that_declares_it_still_receives_it(self, tmp_path):
+        """A real implementer must still get the argument it declared."""
+        seen = {}
+
+        class _Implementer(AbstractDataSource):
+            REQUIRES_TIME_WINDOW = False
+            OUTPUT_KIND = "raster"
+            SUPPORTS_AGGREGATE = True
+
+            def _check_input_dates(self, start, end, temporal_resolution, fmt):
+                return TemporalExtent(
+                    start_date=None,
+                    end_date=None,
+                    resolution="all",
+                    dates=pd.DatetimeIndex([]),
+                )
+
+            def download(self, progress_bar: bool = True, aggregate=None):
+                seen["aggregate"] = aggregate
+                return ["ran"]
+
+        backend = _Implementer(
+            start=None,
+            end=None,
+            variables=["x"],
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path=str(tmp_path),
+        )
+        config = object()
+        backend.download(aggregate=config)
+        assert seen["aggregate"] is config

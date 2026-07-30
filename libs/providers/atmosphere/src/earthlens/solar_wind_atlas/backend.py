@@ -24,7 +24,7 @@ facade-forwarded `aggregate=` is rejected. All raster I/O goes through
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 from loguru import logger
 
@@ -40,9 +40,6 @@ from earthlens.solar_wind_atlas._helpers import (
     window_crop,
 )
 from earthlens.solar_wind_atlas.catalog import Catalog, Layer
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 #: Approximate one-time download size, per Global Solar Atlas variable, surfaced
 #: in the `download_zip` heads-up warning (the 1 km single-file product).
@@ -81,6 +78,8 @@ class SolarWindAtlas(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    AGGREGATE_REFUSAL_REASON = "the Solar/Wind Atlas layers are static long-term-average climatology with no temporal axis, so there is nothing to reduce. Call download() without aggregate="
 
     #: The resource-atlas layers are long-term climatologies, so a missing `start` /
     #: `end` is legal here.
@@ -242,30 +241,15 @@ class SolarWindAtlas(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> list[Path]:
         """Fetch every requested layer's bbox subset as a written GeoTIFF.
 
         Args:
             progress_bar: Accepted for signature parity; one fetch per layer.
-            aggregate: Must be `None`. The layers are static climatology with no
-                temporal axis, so a non-`None` value raises `NotImplementedError`
-                (the facade already gates this; this is the belt-and-suspenders
-                guard for direct callers).
 
         Returns:
             list[Path]: The written GeoTIFF path(s), one per requested layer.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "SolarWindAtlas.download(aggregate=...) is not supported: the "
-                "Solar/Wind Atlas layers are static long-term-average "
-                "climatology with no temporal axis, so there is nothing to "
-                "reduce. Call download() without aggregate=."
-            )
         self._warn_large_downloads()
         paths = cast("list[Path]", self._api())
         self._log_attribution()

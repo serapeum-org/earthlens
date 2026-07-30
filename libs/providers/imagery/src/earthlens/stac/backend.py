@@ -57,6 +57,9 @@ class STAC(LazyClientMixin, AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Wires the temporal reducer (ARC-1).
+    SUPPORTS_AGGREGATE = True
+
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
 

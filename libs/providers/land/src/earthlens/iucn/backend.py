@@ -21,7 +21,7 @@ shipped as package data — the token stays user-supplied.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import pandas as pd
 from loguru import logger
@@ -36,9 +36,6 @@ from earthlens.biodiversity import IUCN_LICENSE, warn_license
 from earthlens.iucn import _rest
 from earthlens.iucn.auth import IucnAuth, IucnCredentials
 from earthlens.iucn.catalog import Catalog
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["csv", "parquet"]
 
@@ -82,6 +79,12 @@ class IUCN(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = (
+        "Red List assessments are tabular records, not gridded rasters. Call "
+        "download() without aggregate= and post-process the returned DataFrame "
+        "directly"
+    )
 
     def __init__(
         self,
@@ -255,31 +258,17 @@ class IUCN(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> pd.DataFrame:
         """Fetch the assessment records and return them as a DataFrame.
 
         Args:
             progress_bar: Accepted for signature parity; the REST shim has
                 no progress bar, so this is a no-op.
-            aggregate: Must be `None`. Assessments are tabular, not gridded;
-                the facade already rejects a non-`None` `aggregate=` for a
-                `tabular` backend.
 
         Returns:
             pd.DataFrame: The assessment rows. Written to a CSV/Parquet file
                 under `path` when `path` is set and rows are present.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "IUCN.download(aggregate=...) is not supported: Red List "
-                "assessments are tabular records, not gridded rasters. Call "
-                "download() without aggregate= and post-process the returned "
-                "DataFrame directly."
-            )
         frame = self._fetch_all()
         if self._user_path and len(frame):
             written = self._write(frame)

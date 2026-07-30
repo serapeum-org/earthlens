@@ -46,7 +46,7 @@ import functools
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeVar, cast
+from typing import TypeVar, cast
 
 from loguru import logger
 
@@ -58,9 +58,6 @@ from earthlens.base import (
 )
 from earthlens.hdx._helpers import match_resource
 from earthlens.hdx.catalog import Catalog
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 #: Resolved `(hdx_id, [resource_filter, ...])` download target. An empty
 #: filter list means "every resource of the dataset".
@@ -114,6 +111,8 @@ class HDX(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "mixed"
+
+    AGGREGATE_REFUSAL_REASON = "HDX returns resource files as-is in their native (mixed) formats, so there is no meaningful gridded reduction to apply. Call download() without aggregate= and post-process the files"
 
     def __init__(
         self,
@@ -447,7 +446,6 @@ class HDX(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
         read: bool = False,
     ) -> list[Path] | list:
         """Resolve the requested datasets and download their resources.
@@ -462,11 +460,6 @@ class HDX(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends; the HDX SDK exposes no per-resource download
                 progress hook, so this is a no-op.
-            aggregate: Must be `None`. An HDX resource is returned
-                as-is in its native format (`G4`); there is no gridded
-                reduction to apply, so a non-`None` value is rejected
-                even though the facade forwards `aggregate=` for a
-                `"mixed"` backend (`G1`).
             read: When `True`, read each downloaded resource into its
                 pyramids type — a `Dataset` (raster), a
                 `FeatureCollection` (vector), or a `DataFrame` (tabular)
@@ -482,19 +475,7 @@ class HDX(AbstractDataSource):
             list: One read pyramids object per resource (a
                 `Dataset` / `FeatureCollection` / `DataFrame`), in the
                 same order — when `read=True`.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None`, or if
-                `read=True` but the installed pyramids has no
-                `read_resource` (upgrade to `pyramids-gis >= 0.29.0`).
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "HDX.download(aggregate=...) is not supported: HDX returns "
-                "resource files as-is in their native (mixed) formats, so "
-                "there is no meaningful gridded reduction to apply. Call "
-                "download() without aggregate= and post-process the files."
-            )
         if not read:
             return self._api_via_search_fetch()
 

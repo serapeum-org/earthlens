@@ -27,7 +27,7 @@ for downstream InSAR tools rather than processing them.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast
 
 from earthlens.asf._helpers import apply_baseline_windows, wkt_from_extent
 from earthlens.asf.auth import ASFAuth, ASFCredentials
@@ -38,9 +38,6 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
 )
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 
 class ASF(AbstractDataSource):
@@ -95,6 +92,8 @@ class ASF(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    AGGREGATE_REFUSAL_REASON = "ASF returns SAR products for downstream InSAR/RTC tooling; aggregate= is not supported. Post-process the downloaded SLC/RTC stack with a dedicated InSAR tool"
 
     def __init__(
         self,
@@ -479,25 +478,17 @@ class ASF(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> list[Path]:
         """Run the search/stack + download and return the written paths.
 
         Args:
             progress_bar: Accepted for facade-compatibility; not
                 used (the SDK manages its own per-file progress).
-            aggregate: Must be `None`. ASF returns SAR products for
-                downstream InSAR / RTC tooling, not gridded
-                summaries — passing an :class:`AggregationConfig`
-                raises `NotImplementedError`.
 
         Returns:
             list[Path]: The on-disk paths of every downloaded
                 product, including the products that were already
                 present and skipped.
-
-        Raises:
-            NotImplementedError: When `aggregate` is not `None`.
 
         Examples:
             - Construct in search mode and reject an `aggregate=`
@@ -520,10 +511,4 @@ class ASF(AbstractDataSource):
 
                 ```
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "ASF returns SAR products for downstream InSAR/RTC tooling; "
-                "aggregate= is not supported. Post-process the downloaded "
-                "SLC/RTC stack with a dedicated InSAR tool."
-            )
         return cast("list[Path]", self._api())

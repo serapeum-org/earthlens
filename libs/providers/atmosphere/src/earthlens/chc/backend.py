@@ -254,6 +254,11 @@ class CHIRPS(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    AGGREGATE_REFUSAL_REASON = (
+        "it writes per-date GeoTIFFs and has no aggregator wiring, unlike the "
+        "NetCDF-emitting ECMWF backend"
+    )
+
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True
     api_url: str = "data.chc.ucsb.edu"
@@ -443,7 +448,6 @@ class CHIRPS(AbstractDataSource):
         self,
         progress_bar: bool = True,
         cores: int | None = None,
-        aggregate: object | None = None,
         errors: str = "warn",
         **_kwargs: object,
     ) -> list[Path]:
@@ -454,11 +458,6 @@ class CHIRPS(AbstractDataSource):
                 bar. Defaults to `True`.
             cores: Number of joblib workers for parallel per-date
                 retrieval. `None` (or `0`) runs sequentially.
-            aggregate: Not supported by CHIRPS — a non-`None` value
-                raises `NotImplementedError` rather than being
-                silently ignored. CHIRPS writes per-date GeoTIFFs and
-                has no aggregator wiring (unlike the NetCDF-emitting
-                ECMWF backend).
             errors: Partial-failure policy across the
                 `(dataset, variable)` pairs — `"warn"` (default) logs each
                 failure and continues, `"raise"` propagates the first one,
@@ -473,7 +472,6 @@ class CHIRPS(AbstractDataSource):
             and omitted from the list rather than aborting the batch.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
             ValueError: If `errors` is not a recognised policy.
 
         Examples:
@@ -503,13 +501,6 @@ class CHIRPS(AbstractDataSource):
 
                 ```
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "aggregate= is not supported for the CHIRPS backend. It "
-                "writes per-date GeoTIFFs and has no aggregator wiring "
-                "(unlike the NetCDF-emitting ECMWF backend); reduce the "
-                "downloaded rasters yourself."
-            )
         assert isinstance(self.vars, dict)  # CHC normalises variables to a mapping
         pairs = [
             (ds_key, var_name)

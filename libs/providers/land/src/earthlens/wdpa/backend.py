@@ -21,7 +21,7 @@ permission, redistribution is restricted), so every fetch raises a
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import pandas as pd
 from loguru import logger
@@ -37,9 +37,6 @@ from earthlens.biodiversity import WDPA_LICENSE, warn_license
 from earthlens.wdpa import _rest
 from earthlens.wdpa.auth import WdpaAuth, WdpaCredentials
 from earthlens.wdpa.catalog import Catalog
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["geoparquet", "gpkg", "geojson"]
 
@@ -84,6 +81,8 @@ class WDPA(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "vector"
+
+    AGGREGATE_REFUSAL_REASON = "protected areas are vector polygons, not gridded rasters. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     def __init__(
         self,
@@ -214,9 +213,17 @@ class WDPA(AbstractDataSource):
         """
         assert self._auth is not None  # set by _initialize before _fetch_all runs
         token = self._auth.token
-        frames = [self._fetch_selector(token, selector) for selector in self.vars]
+        # Lazy so a `limit=` stops the work: a selector past the cap is never
+        # queried, rather than queried and then trimmed away.
+        frames = self._take_limited(
+            (self._fetch_selector(token, selector) for selector in self.vars),
+            limit=self._limit,
+        )
         non_empty = [frame for frame in frames if len(frame)]
         if not non_empty:
+            # `variables` is validated non-empty at construction and
+            # `_take_limited` always keeps the first fragment, so there is at
+            # least one frame here to carry the empty result's schema.
             return frames[0]
         import geopandas as gpd
 
@@ -251,31 +258,23 @@ class WDPA(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> FeatureCollection:
         """Fetch the protected-area polygons and return the FeatureCollection.
 
         Args:
             progress_bar: Accepted for signature parity; the REST client
                 has no progress bar, so this is a no-op.
-            aggregate: Must be `None`. Protected areas are vector, not
-                gridded; the facade already rejects a non-`None`
-                `aggregate=` for a `vector` backend.
+            limit: Cap on the total polygons returned, across every requested
+                selector. Applied as each selector's frame arrives, so a
+                selector past the cap is never queried. `None` (the default)
+                fetches everything.
 
         Returns:
             FeatureCollection: The protected-area polygons, CRS
                 `EPSG:4326`. Written to a file under `path` when set.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "WDPA.download(aggregate=...) is not supported: protected "
-                "areas are vector polygons, not gridded rasters. Call "
-                "download() without aggregate= and post-process the returned "
-                "FeatureCollection (a GeoDataFrame) directly."
-            )
+        self._limit = self.check_limit(limit)
         collection = FeatureCollection(self._fetch_all())
         if len(collection):
             warn_license(

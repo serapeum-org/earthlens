@@ -257,21 +257,19 @@ class Catalog(AbstractCatalog):
     #: ISO3 -> ThinkHazard ADM0 division code lookup (== FAO GAUL 2015 ADM0).
     admin_codes: dict[str, int] = Field(default_factory=dict)
 
-    def model_post_init(self, __context: Any) -> None:
-        """Auto-load the bundled catalog when no rows were supplied.
+    @classmethod
+    def _autoload(cls) -> dict[str, Any]:
+        """Read the bundled catalog from disk.
 
-        `Catalog()` with no args reads :data:`CATALOG_PATH`; passing
-        `datasets=...` skips the disk read.
-
-        Raises:
-            ValueError: Propagated from :meth:`load` when the YAML is missing,
-                empty, or has a malformed row.
+        Returns:
+            dict[str, Any]: The `datasets`, `admin_codes` read from
+                the bundled catalog.
         """
-        if not self.datasets:
-            loaded = Catalog.load()
-            self.datasets = loaded.datasets
-            self.admin_codes = loaded.admin_codes
-        super().model_post_init(__context)
+        loaded = Catalog.load()
+        return {
+            "datasets": loaded.datasets,
+            "admin_codes": loaded.admin_codes,
+        }
 
     @classmethod
     def load(cls, catalog_path: Path | None = None) -> Catalog:

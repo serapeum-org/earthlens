@@ -101,6 +101,18 @@ class Drought(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    # No `SUPPORTS_AGGREGATE = True`: neither transport reduces today, so the
+    # central gate refuses `aggregate=` before the body runs. The reason covers
+    # both, because `OUTPUT_KIND` is resolved per instance from the catalog row.
+    AGGREGATE_REFUSAL_REASON = (
+        "no drought transport reduces across dates today. The USDM "
+        "(vector) route returns drought-class polygons, which have no gridded "
+        "reduction; the SPEIbase / EDO / GDO (raster) routes emit per-period "
+        "GeoTIFFs whose stack reducer is not wired yet — pass those through "
+        "earthlens.aggregate.aggregate_netcdf (or pyramids' "
+        "DatasetCollection.groupby) directly"
+    )
+
     def __init__(
         self,
         start: str | dt.date | dt.datetime,
@@ -339,15 +351,21 @@ class Drought(AbstractDataSource):
         import geopandas as gpd
         from pyramids.feature.collection import FeatureCollection
 
-        frames: list[gpd.GeoDataFrame] = []
-        for product in products:
-            period: dt.date = product.metadata["period"]
-            assert product.href is not None  # USDM products always carry a URL template
-            url = self._render_usdm_url(product.href, period)
-            payload = _http_get_json(url)
-            frame = self._geojson_to_gdf(payload, period)
-            if len(frame):
-                frames.append(frame)
+        # Lazy so a `limit=` stops the work: each period is a separate GeoJSON
+        # download, so a week past the cap is never requested. Empty periods
+        # are dropped before the cap counts them, so the cap bounds returned
+        # polygons rather than weeks attempted.
+        bbox = bbox_from_extent(self.space)
+        frames = self._take_limited(
+            (
+                frame
+                for frame in (
+                    self._fetch_usdm_period(product, bbox) for product in products
+                )
+                if len(frame)
+            ),
+            limit=self._limit,
+        )
         if not frames:
             return self._empty_vector()
         merged = pd.concat(frames, ignore_index=True)
@@ -367,7 +385,8 @@ class Drought(AbstractDataSource):
             )
         if gdf.crs.to_epsg() != 4326:
             gdf = gdf.to_crs("EPSG:4326")
-        bbox = bbox_from_extent(self.space)
+        # Already clipped per period (before the cap counted the rows), so
+        # this is a no-op for the bbox and only guards the empty case.
         within = gdf.cx[bbox[0] : bbox[2], bbox[1] : bbox[3]]
         if not len(within):
             return self._empty_vector()
@@ -428,6 +447,49 @@ class Drought(AbstractDataSource):
         gdf = gpd.GeoDataFrame.from_features(features, crs=source_crs)
         gdf["release_date"] = period.isoformat()
         return gdf
+
+    def _fetch_usdm_period(
+        self, product: RemoteProduct, bbox: tuple[float, float, float, float]
+    ) -> Any:
+        """Download one USDM week's GeoJSON and clip it to the request bbox.
+
+        The clip happens here, not after the concat, because a `limit=` counts
+        these frames as they arrive. USDM publishes one **national** polygon
+        set per week, so counting before the clip would let a cap fill up on
+        rows outside the requested area and return nothing — with the weeks
+        that did intersect it never fetched.
+
+        Args:
+            product: One period product from `_search`; its `href` is the URL
+                template and its `period` metadata the week to render.
+            bbox: The request's `(west, south, east, north)` filter.
+
+        Returns:
+            gpd.GeoDataFrame: That week's drought polygons intersecting the
+                bbox, stamped with the period (empty when nothing matched).
+        """
+        period: dt.date = product.metadata["period"]
+        assert product.href is not None  # USDM products always carry a URL template
+        url = self._render_usdm_url(product.href, period)
+        payload = _http_get_json(url)
+        frame = self._geojson_to_gdf(payload, period)
+        if not len(frame):
+            return frame
+        if frame.crs is None:
+            # _geojson_to_gdf always stamps the source CRS (RFC 7946 default
+            # 4326 when the payload omits it), so reaching here means an
+            # upstream contract was broken. Raise loudly rather than silently
+            # re-labelling unknown coordinates.
+            raise RuntimeError(
+                "USDM frame reached _fetch_usdm_period with no CRS; "
+                "_geojson_to_gdf is expected to stamp one."
+            )
+        # Reproject before clipping: `bbox` is in EPSG:4326, so clipping a
+        # payload delivered in another CRS with those numbers discards
+        # everything.
+        if frame.crs.to_epsg() != 4326:
+            frame = frame.to_crs("EPSG:4326")
+        return frame.cx[bbox[0] : bbox[2], bbox[1] : bbox[3]]
 
     def _fetch_speibase(self, products: list[RemoteProduct]) -> list[Path]:
         """Fetch the SPEIbase NetCDF once per scale, write one TIFF per period.
@@ -755,6 +817,7 @@ class Drought(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> list[Path] | FeatureCollection:
         """Fetch the requested drought indicator and return its artefacts.
 
@@ -763,12 +826,18 @@ class Drought(AbstractDataSource):
                 drought transports run one fetch per period in serial
                 today, so a `tqdm` bar would mostly idle; the argument is
                 a no-op until a transport gains a per-byte progress hook.
-            aggregate: A temporal reducer over the requested date range.
-                Accepted for `OUTPUT_KIND == "raster"` (EDO/GDO/SPEIbase)
-                and forwarded to the standard `earthlens.aggregate`
-                pyramids reducer. **Rejected** for `OUTPUT_KIND ==
-                "vector"` (USDM) — drought-class polygons have no
-                gridded reduction.
+            aggregate: Refused on every transport today, by the shared gate
+                rather than here. The USDM (vector) route returns polygons,
+                which have no gridded reduction; the raster routes emit
+                per-period GeoTIFFs whose stack reducer is not wired yet.
+            limit: Cap on the total drought polygons returned, across every
+                requested week. Applied as each week's GeoJSON arrives — after
+                the bbox clip, so it counts rows the caller will actually
+                receive — meaning a week past the cap is never downloaded.
+                `None` (the default) fetches everything. **Vector (USDM)
+                only** — the raster transports return written files, which a
+                row cap cannot describe, so passing one there is refused
+                rather than silently ignored.
 
         Returns:
             FeatureCollection | list[Path]: For the vector USDM transport,
@@ -777,30 +846,25 @@ class Drought(AbstractDataSource):
                 in period order.
 
         Raises:
-            NotImplementedError: When `aggregate is not None` on the
-                vector USDM transport (drought-class polygons have no
-                gridded reduction), or on any raster transport (the
-                cross-period stack reducer is not wired yet).
+            NotImplementedError: When `aggregate is not None`. Raised by the
+                shared gate before this body runs — the USDM (vector) route
+                has no gridded reduction, and the raster routes' cross-period
+                stack reducer is not wired yet.
+            ValueError: When `limit` is not `None` on a raster transport,
+                where there are no rows to cap; or when it is zero or
+                negative.
         """
-        if self.OUTPUT_KIND == "vector" and aggregate is not None:
-            raise NotImplementedError(
-                "Drought.download(aggregate=...) is not supported for the "
-                "USDM (vector) transport: drought-class polygons have no "
-                "gridded reduction. Call download() without aggregate= and "
-                "post-process the returned FeatureCollection directly."
+        self._limit = self.check_limit(limit)
+        if self._limit is not None and self.OUTPUT_KIND != "vector":
+            raise ValueError(
+                f"Drought.download(limit=...) applies to the USDM (vector) "
+                f"transport only; dataset {self._dataset.id!r} writes raster "
+                f"files, which a row cap cannot describe. Drop limit= and "
+                f"narrow the date range instead."
             )
         # Force `progress_bar` into the local scope so a future per-period
         # tqdm hook does not break the public signature when wired up.
         _ = progress_bar
-        if self.OUTPUT_KIND == "raster" and aggregate is not None:
-            raise NotImplementedError(
-                "Drought.download(aggregate=...) for raster transports is "
-                "not wired in this build. The SPEIbase / EDO / GDO outputs "
-                "are per-period GeoTIFFs; pass them through "
-                "`earthlens.aggregate.aggregate_netcdf` (or pyramids' "
-                "`DatasetCollection.groupby`) directly until the drought "
-                "stack reducer ships."
-            )
         result = self._api()
         logger.info(attribution_for(self._dataset.transport))
         return result

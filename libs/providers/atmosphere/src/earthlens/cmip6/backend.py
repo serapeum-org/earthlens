@@ -28,7 +28,6 @@ NetCDFs can be aggregated separately.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from loguru import logger
 from tqdm import tqdm
@@ -42,9 +41,6 @@ from earthlens.base import (
 from earthlens.cmip6 import accessor
 from earthlens.cmip6.catalog import Catalog
 from earthlens.cmip6.resolver import ResolvedStore, StoreResolver
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 
 class CMIP6(AbstractDataSource):
@@ -60,6 +56,8 @@ class CMIP6(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    AGGREGATE_REFUSAL_REASON = "the backend writes gridded NetCDF subsets; reduce them separately with earthlens.aggregate.aggregate_netcdf"
 
     def __init__(
         self,
@@ -313,7 +311,6 @@ class CMIP6(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> list[Path]:
         """Fetch the requested CMIP6 subset(s) and return the written paths.
 
@@ -323,9 +320,6 @@ class CMIP6(AbstractDataSource):
 
         Args:
             progress_bar: Show a per-store progress bar. Defaults to `True`.
-            aggregate: Must be `None`. Aggregation is not wired for CMIP6; the
-                written NetCDFs can be aggregated separately with
-                :func:`earthlens.aggregate.aggregate_netcdf`.
 
         Returns:
             list[Path]: The written NetCDF paths, one per resolved store (never
@@ -333,14 +327,7 @@ class CMIP6(AbstractDataSource):
                 returning an empty list).
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None`.
             ValueError: If the facet tuple matches no store.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "CMIP6.download(aggregate=...) is not supported — the backend "
-                "writes gridded NetCDF subsets; aggregate them separately with "
-                "earthlens.aggregate.aggregate_netcdf."
-            )
         self._show_progress = progress_bar
         return self._api_via_search_fetch()

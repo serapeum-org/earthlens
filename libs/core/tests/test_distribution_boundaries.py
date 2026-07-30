@@ -26,6 +26,12 @@ _CORE_ROOTS = {
     "_backends",
     "grids",
     "core",
+    # `biodiversity` and `cli` ship from core too. Leaving them out did not
+    # merely under-cover the rule — it exempted them, so osm and overture
+    # imported `earthlens.biodiversity._helpers` (a private module) for as long
+    # as this guard has existed, and it reported a clean boundary.
+    "biodiversity",
+    "cli",
 }
 
 #: Private core modules a provider must not reach into; the public re-export is
@@ -182,6 +188,11 @@ def _quiet_close_lookalikes(path: Path) -> list[str]:
             for sub in ast.walk(node)
             if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Attribute)
         }
+        # `contextlib.suppress(...)` is itself an attribute call, so it landed
+        # in this set and the `== {"close"}` test rejected the very form the
+        # docstring says is caught. It is the swallow, not a second method the
+        # function calls, so it is discounted here.
+        methods.discard("suppress")
         # `close` called, and nothing else — a lone `close` inside a
         # swallow-everything handler is the helper, whatever it is named.
         if methods == {"close"}:
@@ -460,4 +471,769 @@ class TestCatalogLoaderAdoption:
         assert sorted(offenders) == [], (
             "these catalogs re-implement the mtime cache key instead of using "
             f"earthlens.base.catalog_source.load_catalog: {sorted(offenders)}"
+        )
+
+
+class TestAggregateCapabilityIsCentral:
+    """ARC-1: no backend re-implements the `aggregate=` refusal."""
+
+    def _backend_sources(self):
+        """Yield `(path, source)` for every provider `backend.py`."""
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            yield path, path.read_text(encoding="utf-8")
+
+    def test_backends_were_scanned(self):
+        """Guard the guard: the glob must actually find the backends."""
+        found = [p.parent.name for p, _ in self._backend_sources()]
+        assert len(found) > 40, f"only scanned {len(found)}: {found[:5]}"
+
+    def test_no_backend_hand_rolls_the_refusal(self):
+        """The policy lives once, in `_refuse_unsupported_aggregate`.
+
+        40 backends used to each declare `aggregate=` and raise their own
+        `NotImplementedError`, so the rule was written 40 times and the argument
+        sat in the signature of backends it meant nothing to. A backend that
+        cannot aggregate now declares nothing; one that can sets
+        `SUPPORTS_AGGREGATE` and may add `AGGREGATE_REFUSAL_REASON`.
+        """
+        import re
+
+        # A *refusal*, not any use of the condition: an implementer legitimately
+        # writes `if aggregate is not None:` to branch into the reducer. What
+        # must not come back is that branch raising NotImplementedError.
+        refusal = re.compile(
+            r"if aggregate is not None:\s*\n\s+raise NotImplementedError", re.M
+        )
+        offenders = [
+            path.parent.name
+            for path, source in self._backend_sources()
+            if refusal.search(source)
+        ]
+        assert offenders == [], (
+            "these backends re-implement the aggregate= refusal instead of "
+            f"declaring SUPPORTS_AGGREGATE: {offenders}"
+        )
+
+    def test_only_real_implementers_declare_support(self):
+        """A backend claiming `SUPPORTS_AGGREGATE` must actually use the argument.
+
+        The reverse of the check above: declaring the capability without wiring
+        the reducer would silently accept `aggregate=` and ignore it, which is
+        worse than refusing it.
+        """
+        import ast as ast_module
+
+        liars = []
+        for path, source in self._backend_sources():
+            # Read the declaration from the AST, not the text: this very test
+            # file's own explanatory comments contain the literal
+            # `SUPPORTS_AGGREGATE = True`, and so does drought's comment saying
+            # it deliberately does *not* declare it.
+            declares = False
+            for node in ast_module.walk(ast_module.parse(source)):
+                # `SUPPORTS_AGGREGATE: bool = True` is an `AnnAssign`, which an
+                # `Assign`-only scan would skip — the declaration would be live
+                # and this guard blind to it.
+                if isinstance(node, ast_module.Assign):
+                    names = [getattr(t, "id", "") for t in node.targets]
+                    value = node.value
+                elif isinstance(node, ast_module.AnnAssign):
+                    names = [getattr(node.target, "id", "")]
+                    value = node.value
+                else:
+                    continue
+                if (
+                    "SUPPORTS_AGGREGATE" in names
+                    and getattr(value, "value", None) is True
+                ):
+                    declares = True
+                    break
+            if not declares:
+                continue
+            # Read the AST, not the text. A substring search is fooled by a
+            # backend that only *names* the aggregator in its error message —
+            # cmip6 did exactly that ("reduce them separately with
+            # ...aggregate_netcdf"), and a text scan classified it as an
+            # implementer.
+            uses_it = False
+            for node in ast_module.walk(ast_module.parse(source)):
+                if isinstance(node, ast_module.Name) and node.id == "aggregate":
+                    uses_it = True
+                    break
+                if isinstance(node, ast_module.Attribute) and node.attr.startswith(
+                    "_aggregate"
+                ):
+                    uses_it = True
+                    break
+            # Merely *naming* `aggregate` is not using it. drought declared
+            # support while its only references were
+            # `if aggregate is not None: raise NotImplementedError` — the name
+            # appears, so a name-scan passed it, and the central gate then
+            # waved the call through on a declaration that was false. Consuming
+            # it means passing it to a call or storing it (openeo and worldpop
+            # assign it to an instance attribute rather than forwarding it
+            # directly, and both are genuine implementers).
+            #
+            # Note this cannot be "declares and also raises NotImplementedError
+            # about aggregate": s3 legitimately reduces NetCDF and refuses only
+            # its COG datasets, and that partial support is not a lie.
+            consumes_it = False
+            for node in ast_module.walk(ast_module.parse(source)):
+                if isinstance(node, ast_module.Call):
+                    passed = list(node.args) + [kw.value for kw in node.keywords]
+                    if any(
+                        isinstance(arg, ast_module.Name) and arg.id == "aggregate"
+                        for arg in passed
+                    ):
+                        consumes_it = True
+                        break
+                if isinstance(node, (ast_module.Assign, ast_module.AnnAssign)):
+                    value = node.value
+                    if isinstance(value, ast_module.Name) and value.id == "aggregate":
+                        consumes_it = True
+                        break
+            if not (uses_it and consumes_it):
+                liars.append(path.parent.name)
+        assert liars == [], (
+            f"these declare SUPPORTS_AGGREGATE but never use aggregate: {liars}"
+        )
+
+
+class TestDownloadSignatureContract:
+    """ARC-2: `download` has one shape every backend satisfies."""
+
+    def _download_defs(self):
+        """Yield `(backend_name, ast.FunctionDef)` for each `download` override."""
+        import ast as ast_module
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            tree = ast_module.parse(path.read_text(encoding="utf-8"))
+            for node in ast_module.walk(tree):
+                if isinstance(node, ast_module.FunctionDef) and node.name == "download":
+                    yield path.parent.name, node
+
+    def test_download_overrides_were_found(self):
+        """Guard the guard: the walk must actually find the overrides."""
+        names = [name for name, _ in self._download_defs()]
+        assert len(names) > 40, f"only found {len(names)}: {names[:5]}"
+
+    def test_every_download_takes_progress_bar_first(self):
+        """`progress_bar` is the one universal argument, so it comes first.
+
+        The base used to declare `download(self)` while every override took two
+        to five arguments. Nothing could catch drift, and the argument order
+        varied. Pinning the first parameter keeps a positional
+        `download(False)` meaning the same thing on all 48.
+        """
+        offenders = []
+        for name, node in self._download_defs():
+            args = [a.arg for a in node.args.args]
+            if args[:2] != ["self", "progress_bar"]:
+                offenders.append(f"{name}: {args}")
+        assert offenders == [], (
+            f"download must start with (self, progress_bar, ...): {offenders}"
+        )
+
+    def test_capability_arguments_are_annotated(self):
+        """A shared argument carries the same annotation everywhere it appears.
+
+        `aggregate=` was spelled four ways across the tree
+        (`AggregationConfig | None`, `Any`, `Any | None`, and unannotated), which
+        is how a shared contract stops being checkable.
+        """
+        import ast as ast_module
+
+        expected = {
+            "aggregate": "AggregationConfig | None",
+            "progress_bar": "bool",
+            "errors": "str",
+            "force": "bool",
+        }
+        offenders = []
+        for name, node in self._download_defs():
+            for arg in node.args.args + node.args.kwonlyargs:
+                want = expected.get(arg.arg)
+                if want is None:
+                    continue
+                got = ast_module.unparse(arg.annotation) if arg.annotation else "(none)"
+                if got != want:
+                    offenders.append(f"{name}.{arg.arg}: {got} (want {want})")
+        assert offenders == [], f"annotation drift: {offenders}"
+
+
+class TestCatalogAutoloadIsShared:
+    """ARC-4: the load-if-empty rule lives once, in `AbstractCatalog`."""
+
+    def _catalog_sources(self):
+        """Yield `(backend_name, source)` for every provider `catalog.py`."""
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/catalog.py")):
+            yield path.parent.name, path.read_text(encoding="utf-8")
+
+    def test_catalogs_were_scanned(self):
+        """Guard the guard: the glob must find the catalogs."""
+        names = [name for name, _ in self._catalog_sources()]
+        assert len(names) > 40, f"only scanned {len(names)}: {names[:5]}"
+
+    def test_most_catalogs_use_the_shared_autoload(self):
+        """The simple shape declares `_autoload`, not its own `model_post_init`.
+
+        A catalog with real post-init work (an alias index, a per-instance
+        `OUTPUT_KIND`, a second cache) still overrides `model_post_init` — the
+        point is that the *shared* rule is not restated alongside it. This pins
+        the ratio so the duplication cannot creep back one catalog at a time.
+        """
+        autoload, bespoke = [], []
+        for name, source in self._catalog_sources():
+            if "def _autoload" in source:
+                autoload.append(name)
+            elif "def model_post_init" in source:
+                bespoke.append(name)
+        # 32 today. Pinned just under, so losing a handful is a failure
+        # rather than a floor that a halved population still clears.
+        assert len(autoload) >= 30, (
+            f"only {len(autoload)} catalogs use the shared autoload; "
+            f"still hand-rolling post-init: {bespoke}"
+        )
+
+    def test_no_catalog_reimplements_the_load_if_empty_guard(self):
+        """A converted catalog must not also carry the `if not self.datasets` test."""
+        offenders = [
+            name
+            for name, source in self._catalog_sources()
+            if "def _autoload" in source and "if not self.datasets" in source
+        ]
+        assert offenders == [], (
+            f"these declare _autoload and still guard on an empty catalog "
+            f"themselves, so the rule is applied twice: {offenders}"
+        )
+
+
+class TestRateLimitDeclarationIsWired:
+    """ARC-10: a declared `MIN_REQUEST_INTERVAL` must reach an `HttpClient`."""
+
+    def _backend_sources(self):
+        """Yield `(backend_name, source)` for every provider `backend.py`."""
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            yield path.parent.name, path.read_text(encoding="utf-8")
+
+    def test_backends_were_scanned(self):
+        """Guard the guard: the glob must find the backends."""
+        names = [name for name, _ in self._backend_sources()]
+        assert len(names) > 40, f"only scanned {len(names)}"
+
+    def test_a_declared_interval_is_passed_to_a_client(self):
+        """Declaring a limit without passing it would be decorative.
+
+        `min_interval` sat on `HttpClient` unused by every call site, which is how
+        a feature, its lock and its tests end up carried for nothing. A backend
+        that now declares a limit has to hand it to the client that makes the
+        requests.
+        """
+        offenders = [
+            name
+            for name, source in self._backend_sources()
+            if "MIN_REQUEST_INTERVAL: float = " in source
+            and "min_interval=self.MIN_REQUEST_INTERVAL" not in source
+        ]
+        assert offenders == [], (
+            f"these declare MIN_REQUEST_INTERVAL but never pass it to an "
+            f"HttpClient, so nothing paces their requests: {offenders}"
+        )
+
+    def test_at_least_one_backend_paces_itself(self):
+        """The mechanism is live, not merely available."""
+        wired = [
+            name
+            for name, source in self._backend_sources()
+            if "min_interval=self.MIN_REQUEST_INTERVAL" in source
+        ]
+        assert wired, (
+            "no backend passes a rate limit to its client; min_interval is dead "
+            "code again"
+        )
+
+
+class TestDocstringSectionsHaveBodies:
+    """No Google-style section header is left without content.
+
+    A sweep that deletes the last entry from a `Raises:` block leaves the header
+    behind, which renders as an empty section in the docs. That happened here:
+    removing the `aggregate=` refusals orphaned 22 `Raises:` headers, and nothing
+    objected — ruff and mypy do not read docstring structure.
+    """
+
+    def _source_files(self):
+        """Yield every provider and core source file, skipping build artefacts."""
+        import pathlib
+
+        root = pathlib.Path(__file__).resolve().parents[3]
+        for pattern in (
+            "libs/providers/*/src/earthlens/**/*.py",
+            "libs/core/src/earthlens/**/*.py",
+        ):
+            for path in sorted(root.glob(pattern)):
+                if "build" not in path.parts:
+                    yield path
+
+    def test_files_were_scanned(self):
+        """Guard the guard: the globs must find the sources."""
+        assert len(list(self._source_files())) > 200
+
+    def test_no_orphaned_section_headers(self):
+        """Every `Args:` / `Returns:` / `Raises:` / `Yields:` has an indented body."""
+        import re
+
+        orphans = []
+        for path in self._source_files():
+            lines = path.read_text(encoding="utf-8").splitlines()
+            for index, line in enumerate(lines):
+                match = re.match(r"^(\s+)(Raises|Args|Returns|Yields):\s*$", line)
+                if not match:
+                    continue
+                indent = len(match.group(1))
+                nxt = lines[index + 1] if index + 1 < len(lines) else ""
+                body_indent = len(nxt) - len(nxt.lstrip()) if nxt.strip() else -1
+                if (
+                    not nxt.strip()
+                    or nxt.strip().startswith('"""')
+                    or body_indent <= indent
+                ):
+                    orphans.append(f"{path.name}:{index + 1} {match.group(2)}:")
+        assert orphans == [], f"empty docstring sections: {orphans}"
+
+
+class TestLimitIsBoundedNotTrimmed:
+    """ARC-3: a backend that accepts `limit=` must let it stop the work.
+
+    The failure this guards against is a `limit=` that reads as a cap but is
+    really a slice: the backend fetches every product, concatenates, and returns
+    the first `n` rows. That bounds the *return value* while the memory and the
+    request count stay unbounded, which is the opposite of what a caller passing
+    a cap is asking for. A conforming backend validates the cap through
+    `check_limit` and routes its assembly through one of the bounding helpers,
+    all of which consume their input lazily.
+    """
+
+    #: The helpers that consume fragments lazily and stop at the cap.
+    #: `_search_fetch_each` qualifies because the base composition itself runs
+    #: through `_take_limited` on both its paths (pinned by
+    #: `TestSearchFetchEachIsBounded`), so a backend built on it inherits the
+    #: bound without naming a helper of its own.
+    BOUNDING_HELPERS = (
+        "_take_limited",
+        "_fetch_limited",
+        "iter_download",
+        "_search_fetch_each",
+    )
+
+    def _pushes_limit_to_the_service(self, source: str) -> bool:
+        """Whether the cap is handed to the provider's own query.
+
+        The strongest bound available: the service never sends the rows past
+        the cap, so there is nothing to trim client-side and no helper is
+        needed. fdsn does this — `limit=self._request_limit` goes into the FDSN
+        `get_events` call. Detected structurally (a `limit=` keyword bound to a
+        cap attribute, on a call that is not one of the bounding helpers) so a
+        backend cannot claim it with a comment.
+
+        `_request_limit` is the provider-side name; `_limit` is the base's
+        client-side total. Both count here, because either can legitimately be
+        the value a backend forwards to its own query.
+        """
+        cap_attributes = {"self._limit", "self._request_limit"}
+        for node in ast.walk(ast.parse(source)):
+            if not isinstance(node, ast.Call):
+                continue
+            func = node.func
+            name = (
+                func.attr
+                if isinstance(func, ast.Attribute)
+                else getattr(func, "id", "")
+            )
+            if name in self.BOUNDING_HELPERS:
+                continue
+            for keyword in node.keywords:
+                if (
+                    keyword.arg == "limit"
+                    and ast.unparse(keyword.value) in cap_attributes
+                ):
+                    return True
+        return False
+
+    def _backends_accepting_limit(self):
+        """Yield `(name, source)` for each backend that takes a `limit`.
+
+        Both entry points count: a cap can arrive as a `download(limit=)`
+        keyword (the facade forwards `**kwargs` to it) or as a constructor
+        argument held for the whole session, as openaq does. A backend that
+        takes one anywhere owes the caller the same guarantee.
+        """
+        root = Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            source = path.read_text(encoding="utf-8")
+            tree = ast.parse(source)
+            for node in ast.walk(tree):
+                if not (
+                    isinstance(node, ast.FunctionDef)
+                    and node.name in {"download", "__init__"}
+                ):
+                    continue
+                args = [a.arg for a in node.args.args + node.args.kwonlyargs]
+                if "limit" in args:
+                    yield path.parent.name, source
+                    break
+
+    def test_some_backends_accept_a_limit(self):
+        """Guard the guard: the scan must actually find the converted backends."""
+        found = [name for name, _ in self._backends_accepting_limit()]
+        # 15 backends take a cap today; a floor of 8 was set before most
+        # were converted and would now pass with half of them regressed.
+        assert len(found) >= 14, f"only found {found}"
+
+    def test_an_accepted_limit_is_validated(self):
+        """An unchecked cap lets `limit=0` or `limit=-1` through to the fetch."""
+        offenders = [
+            name
+            for name, source in self._backends_accepting_limit()
+            if "check_limit(" not in source
+        ]
+        assert offenders == [], (
+            f"these accept limit= without validating it through check_limit, so "
+            f"a zero or negative cap reaches the fetch loop: {offenders}"
+        )
+
+    def test_an_accepted_limit_actually_bounds_the_work(self):
+        """Without a lazy helper or a server-side push, a cap is a post-hoc slice."""
+        offenders = [
+            name
+            for name, source in self._backends_accepting_limit()
+            if not any(helper in source for helper in self.BOUNDING_HELPERS)
+            and not self._pushes_limit_to_the_service(source)
+        ]
+        assert offenders == [], (
+            f"these accept limit= but neither route through "
+            f"{self.BOUNDING_HELPERS} nor push the cap into the provider query, "
+            f"so every product is still fetched and the cap only trims the "
+            f"returned value: {offenders}"
+        )
+
+    def test_the_server_side_form_is_recognised_and_not_a_free_pass(self):
+        """Guard the guard: the escape hatch must be structural, not textual.
+
+        A backend that merely mentions `limit` in a comment, or passes its own
+        page size, must not read as bounded — otherwise the exemption that lets
+        fdsn through would excuse every unbounded backend too.
+        """
+        assert self._pushes_limit_to_the_service(
+            "client.get_events(starttime=t, limit=self._limit)"
+        )
+        assert not self._pushes_limit_to_the_service(
+            "# we pass limit=self._limit somewhere\nclient.get(limit=self._page_limit)"
+        )
+        assert not self._pushes_limit_to_the_service(
+            "self._take_limited(frames, limit=self._limit)"
+        )
+
+
+class TestProviderCapsDoNotShadowTheBaseAttribute:
+    """`self._limit` is the base's client-side total; providers must not reuse it.
+
+    usgs_water is why this exists. It stored its constructor's *server-side*
+    per-request cap in `self._limit` long before the base claimed that name, so
+    adding `download(limit=)` made a plain `download()` overwrite it with
+    `None` — turning a bounded request into an unbounded one, silently, in the
+    one backend family the bounded-result work was supposed to protect. A
+    provider-side cap belongs in its own attribute (`_request_limit`).
+    """
+
+    #: Attribute the base class owns for the client-side total cap.
+    BASE_ATTR = "self._limit"
+
+    def _assignments_to_base_attr(self, source: str) -> list[str]:
+        """Return the right-hand sides assigned to `self._limit` in `source`."""
+        found: list[str] = []
+        for node in ast.walk(ast.parse(source)):
+            # `AnnAssign` too: `self._limit: int | None = limit` is the same
+            # shadowing written with an annotation, and an `Assign`-only walk
+            # lets it back in unflagged.
+            if isinstance(node, ast.Assign):
+                targets, value = node.targets, node.value
+            elif isinstance(node, ast.AnnAssign) and node.value is not None:
+                targets, value = [node.target], node.value
+            else:
+                continue
+            for target in targets:
+                if ast.unparse(target) == self.BASE_ATTR:
+                    found.append(ast.unparse(value))
+        return found
+
+    def test_only_a_validated_cap_is_stored_in_the_base_attribute(self):
+        """Every write to `self._limit` must be a `check_limit(...)` result.
+
+        A raw `self._limit = limit` is the shape of a provider borrowing the
+        name for its own meaning — and it also skips validation.
+        """
+        offenders: list[str] = []
+        root = Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            for value in self._assignments_to_base_attr(
+                path.read_text(encoding="utf-8")
+            ):
+                if "check_limit(" not in value:
+                    offenders.append(f"{path.parent.name}: self._limit = {value}")
+        assert offenders == [], (
+            f"these assign something other than a validated cap to the "
+            f"base-owned self._limit; a provider-side cap needs its own "
+            f"attribute: {offenders}"
+        )
+
+    def test_a_provider_side_cap_still_reaches_its_query(self):
+        """The renamed attribute is wired, not merely stored.
+
+        Guards the rename itself: moving fdsn/usgs_water to `_request_limit`
+        would be a regression if the query kept reading the old name.
+        """
+        checks = {
+            "libs/providers/hazards/src/earthlens/fdsn/backend.py": (
+                "limit=self._request_limit,"
+            ),
+            "libs/providers/ocean/src/earthlens/usgs_water/backend.py": (
+                "limit=self._request_limit,"
+            ),
+        }
+        root = Path(__file__).resolve().parents[3]
+        for relative, expected in checks.items():
+            source = (root / relative).read_text(encoding="utf-8")
+            assert expected in source, (
+                f"{relative} no longer passes its provider-side cap to the "
+                f"query; the server-side bound is gone"
+            )
+
+
+class TestSourceTextIsNotDoubleEncoded:
+    """No source file carries mojibake from a UTF-8/cp1252 round-trip.
+
+    Six backends shipped `â€"` where an em-dash belonged — the byte sequence a
+    UTF-8 em-dash becomes when it is decoded as cp1252 and re-encoded. It hid
+    well: ruff, mypy and the whole suite are indifferent to string *contents*,
+    and a Windows terminal renders the mangled bytes back as `—`, so reading
+    the file in a console makes it look correct. These strings are user-facing
+    (they are the `aggregate=` refusal messages), so the corruption reaches
+    error output and the rendered docs.
+    """
+
+    #: `â€"` / `â€"` / `â€¦` — the cp1252 re-encodings of U+2014, U+201D, U+2026.
+    MOJIBAKE = "\u00e2\u20ac"
+
+    def test_no_source_file_contains_mojibake(self):
+        """A `â€`-prefixed sequence is never intentional in this codebase."""
+        root = Path(__file__).resolve().parents[3]
+        offenders: list[str] = []
+        for pattern in (
+            "libs/providers/*/src/earthlens/**/*.py",
+            "libs/core/src/earthlens/**/*.py",
+        ):
+            for path in sorted(root.glob(pattern)):
+                if "build" in path.parts:
+                    continue
+                text = path.read_text(encoding="utf-8")
+                if self.MOJIBAKE in text:
+                    line = next(
+                        index
+                        for index, content in enumerate(text.splitlines(), 1)
+                        if self.MOJIBAKE in content
+                    )
+                    offenders.append(f"{path.name}:{line}")
+        assert offenders == [], (
+            f"double-encoded characters found; these render as 'â€\"' in error "
+            f"messages and docs: {offenders}"
+        )
+
+
+class TestArgsEntriesAreOnTheirOwnLine:
+    """Two `Args:` entries must never share a physical line.
+
+    A scripted docstring edit that inserts `limit:` after `progress_bar:`
+    without a newline produces
+    `progress_bar: Show a bar.            limit: Cap on the rows...`.
+    Python does not care, the tests do not care, and ruff does not read
+    docstring structure — but Google-style parsers key on one entry per line,
+    so the second parameter silently vanishes from the rendered documentation.
+    That happened to nrel and pvgis in this branch.
+    """
+
+    def test_no_two_arg_entries_share_a_line(self):
+        """Each `name: description` entry starts its own line."""
+        import re
+
+        root = Path(__file__).resolve().parents[3]
+        offenders: list[str] = []
+        pattern = re.compile(r"\S {2,}[a-z_]+:\s")
+        for glob in (
+            "libs/providers/*/src/earthlens/**/*.py",
+            "libs/core/src/earthlens/**/*.py",
+        ):
+            for path in sorted(root.glob(glob)):
+                if "build" in path.parts:
+                    continue
+                # Scoped to lines *inside* an `Args:` block. The first version
+                # skipped any line containing `{}=()[]` instead, which is most
+                # real Args prose (`lat_lim: [lat_min, lat_max] in degrees`) —
+                # it would have missed the nrel/pvgis defect it was written for.
+                in_args = False
+                args_indent = 0
+                for index, line in enumerate(
+                    path.read_text(encoding="utf-8").splitlines(), 1
+                ):
+                    stripped = line.strip()
+                    if not stripped:
+                        continue
+                    indent = len(line) - len(line.lstrip())
+                    if stripped in ("Args:", "Arguments:"):
+                        in_args, args_indent = True, indent
+                        continue
+                    if in_args and indent <= args_indent:
+                        in_args = False
+                    if not in_args:
+                        continue
+                    # Doctest lines carry their own `name: value` syntax —
+                    # class-body annotations and inline YAML — which is not an
+                    # Args entry at all.
+                    if stripped.startswith(("#", ">>>", "...")):
+                        continue
+                    if pattern.search(line):
+                        offenders.append(f"{path.name}:{index}")
+        assert offenders == [], (
+            f"two Args entries share one line, so the second is dropped from "
+            f"the rendered docs: {offenders}"
+        )
+
+
+class TestCatalogLoadingUsesOneMechanism:
+    """A catalog must not define `_autoload` that its own post-init skips.
+
+    ARC-4 moved 32 catalogs onto the shared `_autoload` hook and deliberately
+    left the rest loading inline in their own `model_post_init`. Both are fine.
+    What is not fine is a class doing both halves inconsistently: defining
+    `_autoload` while overriding `model_post_init` without chaining to the base
+    means the hook is never called, and the catalog silently loads by whichever
+    path happens to be wired — with the dead one sitting there looking correct.
+    """
+
+    def _catalog_classes(self):
+        """Yield `(label, ClassDef)` for every `AbstractCatalog` subclass."""
+        root = Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/catalog.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.ClassDef):
+                    continue
+                if any("AbstractCatalog" in ast.unparse(b) for b in node.bases):
+                    yield f"{path.parent.name}.{node.name}", node
+
+    def test_catalog_classes_were_found(self):
+        """Guard the guard: the scan must reach the shipped catalogs."""
+        found = [label for label, _ in self._catalog_classes()]
+        # ~48 backends ship a catalog; a floor of 40 fails if the scan
+        # silently stops finding most of them.
+        assert len(found) >= 40, f"only found {len(found)}: {found}"
+
+    def test_no_catalog_defines_an_autoload_it_never_calls(self):
+        """Defining `_autoload` and skipping `super()` leaves it dead."""
+        offenders: list[str] = []
+        for label, node in self._catalog_classes():
+            body = ast.unparse(node)
+            defines_autoload = any(
+                isinstance(member, ast.FunctionDef) and member.name == "_autoload"
+                for member in node.body
+            )
+            overrides = [
+                member
+                for member in node.body
+                if isinstance(member, ast.FunctionDef)
+                and member.name == "model_post_init"
+            ]
+            if not defines_autoload or not overrides:
+                continue
+            if "super().model_post_init" not in body:
+                offenders.append(label)
+        assert offenders == [], (
+            f"these define _autoload but override model_post_init without "
+            f"calling super(), so the hook never runs: {offenders}"
+        )
+
+
+class TestLimitIsReachableThroughTheFacade:
+    """A backend that takes a `limit` must accept it on `download`.
+
+    The facade forwards `**kwargs` to `backend.download`, so a backend whose
+    cap lives only on `__init__` answers `EarthLens(...).download(limit=100)`
+    with `TypeError: got an unexpected keyword argument`. openaq and fdsn were
+    in that shape while thirteen other backends took the keyword happily —
+    the same argument name working or failing depending on which backend was
+    bound is the kind of inconsistency a user cannot predict.
+    """
+
+    def test_every_backend_with_a_cap_takes_it_on_download(self):
+        """No backend accepts `limit` only at construction."""
+        root = Path(__file__).resolve().parents[2] / "providers"
+        offenders: list[str] = []
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            takes = {"__init__": False, "download": False}
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef) and node.name in takes:
+                    names = [a.arg for a in node.args.args + node.args.kwonlyargs]
+                    takes[node.name] = takes[node.name] or "limit" in names
+            if takes["__init__"] and not takes["download"]:
+                offenders.append(path.parent.name)
+        assert offenders == [], (
+            f"these take a limit= at construction but not on download, so "
+            f"EarthLens(...).download(limit=...) raises TypeError for them: "
+            f"{offenders}"
+        )
+
+
+class TestBoundedResultsDocMatchesTheCode:
+    """The `limit=` reference page must list every backend that takes one.
+
+    Documentation that enumerates backends goes stale the moment one is added,
+    and a table that silently omits a backend is worse than no table — a reader
+    concludes the cap is unavailable there. This pins the list to the code that
+    it describes.
+    """
+
+    def test_every_capped_backend_appears_in_the_table(self):
+        """A backend with `download(limit=)` is named on the page."""
+        root = Path(__file__).resolve().parents[3]
+        page = root / "docs" / "reference" / "base" / "bounded-results.md"
+        assert page.exists(), f"the bounded-results reference page is missing: {page}"
+        text = page.read_text(encoding="utf-8")
+
+        missing: list[str] = []
+        provider_root = root / "libs" / "providers"
+        for path in sorted(provider_root.rglob("src/earthlens/*/backend.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if not (isinstance(node, ast.FunctionDef) and node.name == "download"):
+                    continue
+                names = [a.arg for a in node.args.args + node.args.kwonlyargs]
+                if "limit" in names and path.parent.name not in text:
+                    missing.append(path.parent.name)
+                break
+        assert missing == [], (
+            f"these backends accept limit= but are not named on "
+            f"docs/reference/base/bounded-results.md, so a reader would think "
+            f"the cap is unavailable for them: {missing}"
         )

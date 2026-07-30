@@ -46,7 +46,6 @@ from earthlens.base import (
 if TYPE_CHECKING:
     import requests
 
-    from earthlens.aggregate import AggregationConfig
 
 FileFormat = Literal["csv", "parquet"]
 
@@ -108,6 +107,8 @@ class AirNow(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
+
+    AGGREGATE_REFUSAL_REASON = "monitor observations are tabular per-row station data, not gridded rasters, so there is no meaningful gridded reduction"
 
     def __init__(
         self,
@@ -358,7 +359,6 @@ class AirNow(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> pd.DataFrame:
         """Fetch observations, write them to `path`, and return the frame.
 
@@ -370,27 +370,12 @@ class AirNow(AbstractDataSource):
         Args:
             progress_bar: Accepted for API parity with the other backends;
                 AirNow is a single request, so there is no per-item bar.
-            aggregate: Must be `None`. AirNow output is tabular, so there
-                is no meaningful gridded reduction; the facade already
-                rejects a non-`None` `aggregate=` for a `tabular` backend,
-                and this is the belt-and-suspenders guard for direct
-                backend callers.
 
         Returns:
             pd.DataFrame: The long-format observations (schema columns,
                 `datetime_utc` tz-aware UTC). Empty (schema-only) when
                 nothing matched.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None`.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "AirNow.download(aggregate=...) is not supported: monitor "
-                "observations are tabular per-row station data, not gridded "
-                "rasters, so there is no meaningful gridded reduction."
-            )
-
         df = self._api()
 
         out_path = self._output_path()

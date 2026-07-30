@@ -146,3 +146,78 @@ class TestAbstractAuth:
         auth.close()
         with auth:
             pass
+
+
+class TestProviderErrorHierarchy:
+    """ARC-5: the per-provider `AuthenticationError` subclasses are deliberate.
+
+    Each provider re-exports a zero-body subclass of the base error. That looked
+    like duplication, but it is the documented design: the base is what you catch
+    to handle *any* backend's auth failure, and the provider name is what you
+    catch to single one out — and it keeps existing
+    `except earthlens.gee.AuthenticationError` consumers working.
+
+    Pinned here because that intent lives only in docstrings, so a future tidy-up
+    could collapse the hierarchy without anything objecting.
+    """
+
+    def _provider_error_classes(self):
+        """Import each provider's `AuthenticationError`, skipping absent SDKs."""
+        import importlib
+
+        found = {}
+        for module in (
+            "earthlens.airnow.auth",
+            "earthlens.firms.auth",
+            "earthlens.gee.auth",
+            "earthlens.iucn.auth",
+            "earthlens.nrel.auth",
+            "earthlens.openaq.auth",
+            "earthlens.wdpa.auth",
+        ):
+            try:
+                found[module] = importlib.import_module(module).AuthenticationError
+            except (ImportError, AttributeError):  # optional SDK not installed
+                continue
+        return found
+
+    def test_provider_errors_were_found(self):
+        """Guard the guard: at least a few provider modules must be importable."""
+        found = self._provider_error_classes()
+        # 7 provider error modules import today; a floor of 3 would still
+        # pass with four of them gone.
+        assert len(found) >= 6, f"only imported {sorted(found)}"
+
+    def test_one_base_clause_catches_every_provider(self):
+        """The broad catch works: each provider error is a base subclass."""
+        from earthlens.base import AuthenticationError
+
+        offenders = [
+            module
+            for module, cls in self._provider_error_classes().items()
+            if not issubclass(cls, AuthenticationError)
+        ]
+        assert offenders == [], (
+            f"these no longer subclass the base error, so one `except "
+            f"AuthenticationError` clause would miss them: {offenders}"
+        )
+
+    def test_each_provider_error_is_distinct(self):
+        """The narrow catch works: no two providers share one error class.
+
+        If these were collapsed into re-exports of the base, catching one
+        provider's failure would silently catch every provider's.
+        """
+        from earthlens.base import AuthenticationError
+
+        classes = self._provider_error_classes()
+        aliased = [
+            module for module, cls in classes.items() if cls is AuthenticationError
+        ]
+        assert aliased == [], (
+            f"these are the base class itself, so a narrow `except` cannot "
+            f"single out one provider: {aliased}"
+        )
+        assert len(set(classes.values())) == len(classes), (
+            f"two providers share an error class: {sorted(classes)}"
+        )

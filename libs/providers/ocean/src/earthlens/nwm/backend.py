@@ -44,7 +44,7 @@ from __future__ import annotations
 import datetime as dt
 import shutil
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, TypeGuard
+from typing import Any, TypeGuard
 
 from loguru import logger
 from tqdm import tqdm
@@ -59,9 +59,6 @@ from earthlens.base import (
     safe_filename,
 )
 from earthlens.nwm.catalog import Catalog, NWMConfig, NWMProduct
-
-if TYPE_CHECKING:
-    from earthlens.aggregate import AggregationConfig
 
 #: The unsigned AWS bucket holding NWM operational output.
 BUCKET = "noaa-nwm-pds"
@@ -189,6 +186,8 @@ class NWM(AbstractDataSource):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    AGGREGATE_REFUSAL_REASON = "chrtout is feature-id indexed (not griddable) and a gridded reduce needs a separate gridded reader"
 
     def __init__(
         self,
@@ -827,7 +826,6 @@ class NWM(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-        aggregate: AggregationConfig | None = None,
     ) -> list[Path]:
         """Fetch the requested NWM data and return the written paths.
 
@@ -844,28 +842,13 @@ class NWM(AbstractDataSource):
         Args:
             progress_bar: Show a per-item progress bar. Defaults to
                 `True`.
-            aggregate: Must be `None`. NWM `chrtout` is feature-id
-                indexed (not griddable) and a gridded reduce needs a
-                separate reader, so aggregation is unsupported. The
-                facade already rejects a non-`None` `aggregate=` for a
-                non-raster backend; this guards direct callers.
 
         Returns:
             list[Path]: The written paths — whole-CONUS NetCDFs for a
                 plain operational request, or Parquet tables for a
                 subset / retrospective read. Empty when nothing in the
                 window was available.
-
-        Raises:
-            NotImplementedError: If `aggregate` is not `None`, or for a
-                subset / retrospective request against a gridded product.
         """
-        if aggregate is not None:
-            raise NotImplementedError(
-                "NWM.download(aggregate=...) is not supported — chrtout is "
-                "feature-id indexed (not griddable) and a gridded reduce needs a "
-                "separate gridded reader."
-            )
         self._show_progress = progress_bar
         return self._api_via_search_fetch()
 
