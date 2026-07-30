@@ -63,6 +63,26 @@
 
     
     
+  
+  <link rel="icon" sizes="any"
+        href="../_images/branding/earthlens-brand-kit/favicon/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16"
+        href="../_images/branding/earthlens-brand-kit/favicon/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="48x48"
+        href="../_images/branding/earthlens-brand-kit/favicon/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="192x192"
+        href="../_images/branding/earthlens-brand-kit/favicon/favicon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512"
+        href="../_images/branding/earthlens-brand-kit/favicon/favicon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180"
+        href="../_images/branding/earthlens-brand-kit/favicon/apple-touch-icon.png">
+  <meta name="theme-color" content="#0B2036">
+  <meta property="og:image"
+        content="../_images/branding/earthlens-brand-kit/social/github-social-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image"
+        content="../_images/branding/earthlens-brand-kit/social/announcement-card.png">
+
   <meta name="panzoom-theme" content="material">
 <meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
@@ -19368,6 +19388,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#source-assets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source assets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#colors" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -19587,6 +19618,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#source-assets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source assets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#colors" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -19672,9 +19714,14 @@ ships in the repository under <code>docs/_images/branding/earthlens-brand-kit/</
 <a href="https://github.com/serapeum-org/pyramids">pyramids</a> lineage — onto a living, rotating globe. The name is the
 story: <strong>earth + lens</strong>.</p>
 <p align="center">
-  <img src="../_images/branding/earthlens-brand-kit/animation/earthlens-logo-animated.svg" width="300"
+  <img src="../_images/branding/earthlens-brand-kit/animation/earthlens-logo-animated.svg" width="260"
        alt="Animated earthlens logo: a satellite orbiting a rotating globe above the pyramids raster stack">
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="../_images/branding/earthlens-brand-kit/logo/earthlens-logo.svg" width="260"
+       alt="Static earthlens logo: satellite, pyramids raster stack, and globe">
 </p>
+
+<p align="center"><em>Animated (left) and static (right) — the same mark, both vector.</em></p>
 
 <p>The animated logo is a <strong>self-contained SVG</strong> — the motion is CSS <code>@keyframes</code> inside the file, with no
 JavaScript — so it animates inside a plain <code>&lt;img&gt;</code> and weighs 14.5 KB. Prefer it over the GIFs wherever a vector
@@ -19752,18 +19799,33 @@ will do.</p>
   &nbsp;&nbsp;
   <img src="../_images/branding/earthlens-brand-kit/logo/earthlens-logo-on-navy.png" width="150"
        alt="earthlens logo pre-composited on navy">
+  &nbsp;&nbsp;
+  <img src="../_images/branding/earthlens-brand-kit/logo/earthlens-logo.png" width="150"
+       alt="earthlens logo, 918x1600 transparent raster">
 </p>
+
+<p align="center"><em>
+  Stacked lockup (theme-aware) · on-white plate · on-navy plate · transparent raster
+</em></p>
 
 <h2 id="icon"><a class="toclink" href="#icon">Icon</a><a class="headerlink" href="#icon" title="Permanent link">#</a></h2>
 <p>The square globe, with and without a rounded app-badge plate. The transparent icon is what the docs site uses as
 its header mark, because it reads on both palettes.</p>
 <p align="center">
-  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-icon.svg" width="140"
-       alt="earthlens globe icon, transparent">
+  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-icon.svg" width="130"
+       alt="earthlens globe icon, transparent, vector">
+  &nbsp;&nbsp;
+  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-icon.png" width="130"
+       alt="earthlens globe icon, 1024 px raster">
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-badge.svg" width="140"
-       alt="earthlens rounded app badge">
+  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-badge.svg" width="130"
+       alt="earthlens rounded app badge, vector">
+  &nbsp;&nbsp;
+  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-badge.png" width="130"
+       alt="earthlens rounded app badge, 1024 px raster">
 </p>
+
+<p align="center"><em>Icon and badge, each as vector then 1024 px raster.</em></p>
 
 <table>
 <thead>
@@ -19898,6 +19960,14 @@ social platforms and older README renderers — and prefer the vector everywhere
 <p align="center">
   <img src="../_images/branding/earthlens-brand-kit/animation/earthlens-logo-orbit.gif" width="240"
        alt="Orbit animation: a satellite circling the earthlens globe">
+</p>
+
+<h2 id="source-assets"><a class="toclink" href="#source-assets">Source assets</a><a class="headerlink" href="#source-assets" title="Permanent link">#</a></h2>
+<p><code>world-texture.png</code> (32 KB) is the equirectangular land/ocean texture the globe is built from. It is a build
+input for regenerating the mark, not a logo — do not use it as one.</p>
+<p align="center">
+  <img src="../_images/branding/earthlens-brand-kit/world-texture.png" width="260"
+       alt="Equirectangular world texture used to build the globe in the mark">
 </p>
 
 <h2 id="colors"><a class="toclink" href="#colors">Colors</a><a class="headerlink" href="#colors" title="Permanent link">#</a></h2>
