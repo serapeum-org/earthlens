@@ -191,3 +191,31 @@ class TestEarthLensAggregateGuard:
         msg = str(exc_info.value)
         assert "tabular" in msg, f"kind missing from message: {msg!r}"
         assert "OUTPUT_KIND=" in msg, f"OUTPUT_KIND label missing: {msg!r}"
+
+
+class TestPositionalAggregateReachesTheGate:
+    """A positionally-passed `aggregate` is refused like the keyword form.
+
+    `aggregate` is the second positional parameter on the backends that declare
+    it, so a gate reading only `**kwargs` let `download(False, config)` through.
+    This file tests the `OUTPUT_KIND` gate and had no positional case, which is
+    why it did not catch that.
+    """
+
+    def test_positional_and_keyword_forms_agree(self, tmp_path):
+        """Both call shapes raise the same refusal."""
+        backend = _GuardBackend(
+            start=None,
+            end=None,
+            variables=["x"],
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path=str(tmp_path),
+        )
+        backend.calls = []
+        backend.OUTPUT_KIND = "vector"
+        with pytest.raises(NotImplementedError) as positional:
+            backend.download(False, object())
+        with pytest.raises(NotImplementedError) as keyword:
+            backend.download(aggregate=object())
+        assert str(positional.value) == str(keyword.value)

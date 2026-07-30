@@ -529,6 +529,22 @@ _MISSING = object()
 
 
 
+@functools.cache
+def _parameters(function: Any) -> frozenset[str]:
+    """Return the parameter names `function` accepts.
+
+    Cached: this runs on every `download` call, and a function's signature does
+    not change once it is defined.
+
+    Args:
+        function: The unwrapped `download` to inspect.
+
+    Returns:
+        frozenset[str]: Its parameter names.
+    """
+    return frozenset(inspect.signature(function).parameters)
+
+
 def _passed_aggregate(function: Any, args: tuple[Any, ...], kw: dict[str, Any]) -> bool:
     """Whether this call supplied a non-`None` `aggregate`, positionally or not.
 
@@ -870,6 +886,15 @@ class AbstractDataSource(ABC):
             # backends used to raise themselves.
             if _passed_aggregate(original, args, kw):
                 self._refuse_unsupported_aggregate()
+            # `aggregate=None` means "not asking for one", and it worked on the
+            # ~40 backends that each declared the parameter before the refusal
+            # was centralised. Removing it from their signatures turned that
+            # call into a `TypeError`, which is a break for any caller that
+            # forwards the argument unconditionally. Absorb it here for the
+            # backends that no longer name it; the non-`None` case was already
+            # refused above.
+            if "aggregate" in kw and "aggregate" not in _parameters(original):
+                kw.pop("aggregate")
             # Record which directories are missing *before* creating them, so
             # the failure path can unwind exactly what this call added.
             created = []

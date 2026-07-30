@@ -893,3 +893,87 @@ class TestPositionalAggregateIsRefused:
         """`aggregate=None` means "not asking for one"."""
         backend = self._backend(tmp_path)
         assert backend.download(True, None) == ["ran"]
+
+
+class TestAggregateNoneStaysAccepted:
+    """`download(aggregate=None)` must keep working on every backend.
+
+    Before the refusal was centralised, ~40 backends each declared
+    `aggregate=None` in their own `download` signature. Removing the parameter
+    from those signatures made a perfectly valid call — "I am not asking for an
+    aggregation" — raise `TypeError: got an unexpected keyword argument`, which
+    breaks any caller that forwards the argument unconditionally. The wrapper
+    absorbs the `None` case for backends that no longer name it.
+    """
+
+    def _backend(self, tmp_path):
+        """Build a backend whose `download` does not declare `aggregate`."""
+
+        class _NoAggregateParam(AbstractDataSource):
+            REQUIRES_TIME_WINDOW = False
+            OUTPUT_KIND = "vector"
+            AGGREGATE_REFUSAL_REASON = "vector features have no gridded reduction"
+
+            def _check_input_dates(self, start, end, temporal_resolution, fmt):
+                return TemporalExtent(
+                    start_date=None,
+                    end_date=None,
+                    resolution="all",
+                    dates=pd.DatetimeIndex([]),
+                )
+
+            def download(self, progress_bar: bool = True):
+                return ["ran"]
+
+        return _NoAggregateParam(
+            start=None,
+            end=None,
+            variables=["x"],
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path=str(tmp_path),
+        )
+
+    def test_an_explicit_none_is_absorbed(self, tmp_path):
+        """The call runs instead of raising `TypeError`."""
+        backend = self._backend(tmp_path)
+        assert backend.download(aggregate=None) == ["ran"]
+
+    def test_a_real_config_is_still_refused(self, tmp_path):
+        """Absorbing `None` must not weaken the refusal."""
+        backend = self._backend(tmp_path)
+        with pytest.raises(NotImplementedError, match="no gridded reduction"):
+            backend.download(aggregate=object())
+
+    def test_a_backend_that_declares_it_still_receives_it(self, tmp_path):
+        """A real implementer must still get the argument it declared."""
+        seen = {}
+
+        class _Implementer(AbstractDataSource):
+            REQUIRES_TIME_WINDOW = False
+            OUTPUT_KIND = "raster"
+            SUPPORTS_AGGREGATE = True
+
+            def _check_input_dates(self, start, end, temporal_resolution, fmt):
+                return TemporalExtent(
+                    start_date=None,
+                    end_date=None,
+                    resolution="all",
+                    dates=pd.DatetimeIndex([]),
+                )
+
+            def download(self, progress_bar: bool = True, aggregate=None):
+                seen["aggregate"] = aggregate
+                return ["ran"]
+
+        backend = _Implementer(
+            start=None,
+            end=None,
+            variables=["x"],
+            lat_lim=[0.0, 1.0],
+            lon_lim=[0.0, 1.0],
+            path=str(tmp_path),
+        )
+        config = object()
+        backend.download(aggregate=config)
+        assert seen["aggregate"] is config

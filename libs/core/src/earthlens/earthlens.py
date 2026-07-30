@@ -1533,12 +1533,13 @@ class EarthLens:
                 :class:`earthlens.ecmwf.AuthenticationError`.
             KeyError: When any backend receives an unknown variable
                 code that the catalog cannot resolve.
-            NotImplementedError: When `aggregate=` is not `None` and
-                the bound backend's `OUTPUT_KIND` is `"vector"` or
-                `"tabular"`. The aggregator only handles gridded
-                raster outputs; vector / tabular backends emit
-                `GeoDataFrame` / `DataFrame` rows that have no
-                meaningful gridded reduction.
+            NotImplementedError: When `aggregate=` is not `None` and the
+                bound backend does not support it — either because its
+                `OUTPUT_KIND` is `"vector"` / `"tabular"` (those emit
+                `GeoDataFrame` / `DataFrame` rows, which have no meaningful
+                gridded reduction) or because it is a raster backend that has
+                not wired the reducer and so does not declare
+                `SUPPORTS_AGGREGATE`.
 
         Examples:
             - End-to-end CHIRPS download. Marked `# doctest: +SKIP`
@@ -1698,8 +1699,9 @@ class EarthLens:
             Whatever the bound backend's `download` returns.
 
         Raises:
-            NotImplementedError: If `aggregate` is not `None` and the backend's
-                `OUTPUT_KIND` is `"vector"` or `"tabular"`.
+            NotImplementedError: If `aggregate` is not `None` and the backend
+                either is not `raster`/`mixed` or does not declare
+                `SUPPORTS_AGGREGATE`.
         """
         if aggregate is not None:
             # Forward it and let the backend's `download` wrapper decide. The
