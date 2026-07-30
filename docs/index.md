@@ -60,7 +60,7 @@ per-provider pages under **Data Sources** for catalogs, authentication, and usag
 <p align="center"><em>
   A satellite captures Earth-observation data, which resolves down through a pyramid of raster overview
   tiles — the <a href="https://github.com/serapeum-org/pyramids">pyramids</a> lineage — onto a living globe.<br>
-  The name is the story: <strong>earth + lens</strong>. See the <a href="brand.md">brand &amp; media kit</a>.
+  The name is the story: <strong>earth + lens</strong>.
 </em></p>
 
 ## Quick Start

@@ -467,7 +467,6 @@ Start here:
 | [Troubleshooting](https://serapeum-org.github.io/earthlens/troubleshooting/) | When a download fails, and what to change. |
 | [Migration guide](https://serapeum-org.github.io/earthlens/migration/) | Breaking changes by release. |
 | [Architecture](https://serapeum-org.github.io/earthlens/overview/architecture/) | How the facade, registry, and backends fit together. |
-| [Brand & media kit](https://serapeum-org.github.io/earthlens/brand/) | Logos, icons, favicons, social cards, and animations. |
 
 
 Contributing

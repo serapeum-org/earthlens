@@ -9,7 +9,8 @@ theme:
   custom_dir: overrides
   language: en
   # The transparent globe mark reads on both the light and dark palettes, so one
-  # asset serves both. See the Brand & media kit page for the full set.
+  # asset serves both. The full kit lives under
+  # docs/_images/branding/earthlens-brand-kit/ with its own BRAND-GUIDE.md.
   logo: _images/branding/earthlens-brand-kit/icon/earthlens-icon.svg
   favicon: _images/branding/earthlens-brand-kit/favicon/favicon-32.png
   features:
@@ -700,7 +701,6 @@ nav:
     - Region affinity (base): reference/base/region-affinity.md
     - Biodiversity helpers: reference/biodiversity/api.md
   - About:
-    - Brand & media kit: brand.md
     - Change Log: change-log.md
     - License: LICENSE.md
 
