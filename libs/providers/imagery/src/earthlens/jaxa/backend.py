@@ -83,7 +83,7 @@ class JAXA(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
-    AGGREGATE_REFUSAL_REASON = "JAXA does not yet support the aggregate= argument. All three branches emit per-date artefacts today (jaxa-earth: per-date COGs; gportal: per-product SFTP downloads; ptree: per-slot HSD segments) â€” reducing them across dates is a planned follow-on (planning G6)"
+    AGGREGATE_REFUSAL_REASON = "JAXA does not yet support the aggregate= argument. All three branches emit per-date artefacts today (jaxa-earth: per-date COGs; gportal: per-product SFTP downloads; ptree: per-slot HSD segments) — reducing them across dates is a planned follow-on (planning G6)"
 
     def __init__(
         self,

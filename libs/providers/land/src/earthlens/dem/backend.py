@@ -82,7 +82,7 @@ class DEM(AbstractDataSource):
 
     OUTPUT_KIND = "raster"
 
-    AGGREGATE_REFUSAL_REASON = "â€” a DEM tile is time-invariant. Mosaic / crop the downloaded tiles with pyramids downstream (`pyramids.Dataset.read_file` + `.crop`, `pyramids.dataset.merge.merge_rasters` for a multi-tile mosaic)"
+    AGGREGATE_REFUSAL_REASON = "a DEM tile is time-invariant. Mosaic / crop the downloaded tiles with pyramids downstream (`pyramids.Dataset.read_file` + `.crop`, `pyramids.dataset.merge.merge_rasters` for a multi-tile mosaic)"
 
     #: Elevation is time-invariant, so a missing `start` / `end` is legal here.
     REQUIRES_TIME_WINDOW = False

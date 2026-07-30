@@ -130,7 +130,7 @@ class Radar(AbstractDataSource):
     OUTPUT_KIND: OutputKind = "vector"
 
     AGGREGATE_REFUSAL_REASON = (
-        "â€” raw Level-II volumes are not griddable by the pyramids reducer"
+        "raw Level-II volumes are not griddable by the pyramids reducer"
     )
 
     def __init__(

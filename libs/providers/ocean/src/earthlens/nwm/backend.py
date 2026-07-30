@@ -190,7 +190,7 @@ class NWM(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
-    AGGREGATE_REFUSAL_REASON = "â€” chrtout is feature-id indexed (not griddable) and a gridded reduce needs a separate gridded reader"
+    AGGREGATE_REFUSAL_REASON = "chrtout is feature-id indexed (not griddable) and a gridded reduce needs a separate gridded reader"
 
     def __init__(
         self,

@@ -242,7 +242,7 @@ class GOES(AbstractDataSource):
 
     OUTPUT_KIND = "raster"
 
-    AGGREGATE_REFUSAL_REASON = "â€” the granules are raw, undecoded geostationary NetCDF; read and reduce them downstream with pyramids / satpy"
+    AGGREGATE_REFUSAL_REASON = "the granules are raw, undecoded geostationary NetCDF; read and reduce them downstream with pyramids / satpy"
 
     def __init__(
         self,

@@ -987,3 +987,43 @@ class TestProviderCapsDoNotShadowTheBaseAttribute:
                 f"{relative} no longer passes its provider-side cap to the "
                 f"query; the server-side bound is gone"
             )
+
+
+class TestSourceTextIsNotDoubleEncoded:
+    """No source file carries mojibake from a UTF-8/cp1252 round-trip.
+
+    Six backends shipped `â€"` where an em-dash belonged — the byte sequence a
+    UTF-8 em-dash becomes when it is decoded as cp1252 and re-encoded. It hid
+    well: ruff, mypy and the whole suite are indifferent to string *contents*,
+    and a Windows terminal renders the mangled bytes back as `—`, so reading
+    the file in a console makes it look correct. These strings are user-facing
+    (they are the `aggregate=` refusal messages), so the corruption reaches
+    error output and the rendered docs.
+    """
+
+    #: `â€"` / `â€"` / `â€¦` — the cp1252 re-encodings of U+2014, U+201D, U+2026.
+    MOJIBAKE = "\u00e2\u20ac"
+
+    def test_no_source_file_contains_mojibake(self):
+        """A `â€`-prefixed sequence is never intentional in this codebase."""
+        root = Path(__file__).resolve().parents[3]
+        offenders: list[str] = []
+        for pattern in (
+            "libs/providers/*/src/earthlens/**/*.py",
+            "libs/core/src/earthlens/**/*.py",
+        ):
+            for path in sorted(root.glob(pattern)):
+                if "build" in path.parts:
+                    continue
+                text = path.read_text(encoding="utf-8")
+                if self.MOJIBAKE in text:
+                    line = next(
+                        index
+                        for index, content in enumerate(text.splitlines(), 1)
+                        if self.MOJIBAKE in content
+                    )
+                    offenders.append(f"{path.name}:{line}")
+        assert offenders == [], (
+            f"double-encoded characters found; these render as 'â€\"' in error "
+            f"messages and docs: {offenders}"
+        )

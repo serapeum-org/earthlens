@@ -265,10 +265,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
     OUTPUT_KIND: OutputKind = "raster"
 
     AGGREGATE_REFUSAL_REASON = (
-        "aggregate= is not yet supported by the GEE backend (planned)"
+        "aggregate= is not yet supported by the GEE backend (planned — see the "
+        "GEE plan task M3)"
     )
-
-    AGGREGATE_REFUSAL_REASON = "aggregate= is not yet supported by the GEE backend (planned â€” see the GEE plan task M3)"
 
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True

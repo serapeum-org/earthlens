@@ -81,10 +81,10 @@ class IUCN(AbstractDataSource):
     OUTPUT_KIND: OutputKind = "tabular"
 
     AGGREGATE_REFUSAL_REASON = (
-        "Red List assessments are tabular records, not gridded rasters"
+        "Red List assessments are tabular records, not gridded rasters. Call "
+        "download() without aggregate= and post-process the returned DataFrame "
+        "directly"
     )
-
-    AGGREGATE_REFUSAL_REASON = "red List assessments are tabular records, not gridded rasters. Call download() without aggregate= and post-process the returned DataFrame directly"
 
     def __init__(
         self,
