@@ -25,7 +25,6 @@ import shutil
 import tempfile
 from collections import Counter
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from loguru import logger
 
@@ -45,9 +44,6 @@ from earthlens.soilgrids._helpers import (
     expand_request,
 )
 from earthlens.soilgrids.catalog import Catalog, Property
-
-if TYPE_CHECKING:
-    pass
 
 
 class SoilGrids(AbstractDataSource):

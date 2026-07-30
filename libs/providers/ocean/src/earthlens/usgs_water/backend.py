@@ -37,7 +37,7 @@ from __future__ import annotations
 
 import importlib
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import pandas as pd
 from loguru import logger
@@ -52,9 +52,6 @@ from earthlens.base import (
 from earthlens.usgs_water import _helpers
 from earthlens.usgs_water.auth import UsgsWaterAuth, UsgsWaterCredentials
 from earthlens.usgs_water.catalog import Catalog
-
-if TYPE_CHECKING:
-    pass
 
 ApiFlavour = Literal["auto", "waterdata", "legacy"]
 OutputFormat = Literal["csv", "parquet"]

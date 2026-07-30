@@ -38,7 +38,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import pandas as pd
 from loguru import logger
@@ -58,9 +58,6 @@ from earthlens.goes._helpers import (
     unsigned_s3_client,
 )
 from earthlens.goes.catalog import Catalog, GOESDomain, GOESProduct
-
-if TYPE_CHECKING:
-    pass
 
 #: `_search` lists one S3 prefix per hour of the window; beyond this many
 #: hours (30 days) it logs a warning so a wide window is not a silent

@@ -45,7 +45,6 @@ from __future__ import annotations
 import shutil
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from loguru import logger
 from pydantic import SecretStr
@@ -61,9 +60,6 @@ from earthlens.eumetsat._helpers import eumdac_bbox, safe_product_filename
 from earthlens.eumetsat.auth import EumetsatAuth, EumetsatCredentials
 from earthlens.eumetsat.catalog import Catalog, DataStoreGroup, EumetsatDataset
 from earthlens.eumetsat.tailor import TailorConfig
-
-if TYPE_CHECKING:
-    pass
 
 #: Total wall-clock budget for polling one Data Tailor customisation to a
 #: terminal state before giving up (`G8`). A stuck job must not hang forever.

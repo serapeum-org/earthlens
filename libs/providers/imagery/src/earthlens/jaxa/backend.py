@@ -33,12 +33,8 @@ shape stabilises across the catalog (see `G6` in the planning doc).
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from pydantic import SecretStr
-
-if TYPE_CHECKING:
-    pass
 
 from earthlens.base import OutputKind, date_windows, resolve_cadence, to_datetime
 from earthlens.base.abstractdatasource import (

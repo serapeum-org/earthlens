@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import difflib
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 import requests
 from loguru import logger
@@ -41,9 +41,6 @@ from earthlens.bathymetry._helpers import (
     griddap_subset_url,
 )
 from earthlens.bathymetry.catalog import Catalog, Dataset
-
-if TYPE_CHECKING:
-    pass
 
 #: Leading magic bytes of the NetCDF container formats ERDDAP serves —
 #: classic NetCDF-3 (`CDF\x01/02/05`) and NetCDF-4/HDF5 (`\x89HDF`). A griddap

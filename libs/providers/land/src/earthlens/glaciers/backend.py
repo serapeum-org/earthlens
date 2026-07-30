@@ -31,7 +31,7 @@ pure pandas.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, cast
+from typing import Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -45,9 +45,6 @@ from earthlens.base import (
 )
 from earthlens.glaciers import _helpers
 from earthlens.glaciers.catalog import Catalog, Dataset
-
-if TYPE_CHECKING:
-    pass
 
 OutputFormat = Literal["csv", "parquet"]
 

@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import pandas as pd
 import requests
@@ -42,9 +42,6 @@ from earthlens.base import (
 from earthlens.base.http import HttpClient
 from earthlens.climate_indices import _helpers
 from earthlens.climate_indices.catalog import Catalog
-
-if TYPE_CHECKING:
-    pass
 
 OutputFormat = Literal["csv", "parquet"]
 

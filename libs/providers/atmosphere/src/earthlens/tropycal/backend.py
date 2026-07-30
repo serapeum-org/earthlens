@@ -789,9 +789,7 @@ class TropicalCyclone(AbstractDataSource):
         frames = self._take_limited(
             (
                 frame
-                for frame in (
-                    self._ships_one(product, init) for product in products
-                )
+                for frame in (self._ships_one(product, init) for product in products)
                 if frame is not None
             ),
             limit=self._limit,

@@ -27,7 +27,7 @@ CGAZ is seamless and needs none.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, cast
+from typing import Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -50,9 +50,6 @@ from earthlens.base import (
     TemporalExtent,
     to_datetime,
 )
-
-if TYPE_CHECKING:
-    pass
 
 FileFormat = Literal["gpkg", "geojson"]
 

@@ -32,7 +32,7 @@ backend logs the standard Argo data-acknowledgement statement
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import pandas as pd
 from loguru import logger
@@ -52,9 +52,6 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
 )
-
-if TYPE_CHECKING:
-    pass
 
 OutputFormat = Literal["csv", "parquet"]
 

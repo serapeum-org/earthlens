@@ -27,7 +27,7 @@ the parse uses no gridded-array dependency.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, cast
+from typing import Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -44,9 +44,6 @@ from earthlens.base import (
 from earthlens.risk_indicators import _helpers
 from earthlens.risk_indicators.auth import GfwAuth, GfwCredentials
 from earthlens.risk_indicators.catalog import Catalog, Dataset
-
-if TYPE_CHECKING:
-    pass
 
 OutputFormat = Literal["csv", "parquet"]
 

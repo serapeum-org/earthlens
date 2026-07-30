@@ -32,7 +32,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import Any, Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -48,9 +48,6 @@ from earthlens.base import (
 from earthlens.openaq.auth import AuthenticationError, OpenaqAuth, OpenaqCredentials
 from earthlens.openaq.catalog import Catalog
 from earthlens.openaq.client import OpenaqClient
-
-if TYPE_CHECKING:
-    pass
 
 FileFormat = Literal["csv", "parquet"]
 

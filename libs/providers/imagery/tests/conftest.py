@@ -1,7 +1,8 @@
 """Shared fixtures for the imagery distribution's tests.
 
-Holds the HTTP transport seam every member root needs; see
-`_unpooled_http_transport`.
+Re-exports the HTTP transport seam every member root needs from
+`earthlens.testing`, which is where it now lives so that a member's tests can
+find it when that member is run on its own.
 """
 
 from __future__ import annotations

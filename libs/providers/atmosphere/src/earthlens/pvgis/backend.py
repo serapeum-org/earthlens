@@ -30,7 +30,7 @@ point a `ValueError` naming the coordinate is raised.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import Any, Literal, cast
 
 import pandas as pd
 import requests
@@ -44,9 +44,6 @@ from earthlens.base import (
 )
 from earthlens.pvgis import _helpers
 from earthlens.pvgis.catalog import Catalog, Product
-
-if TYPE_CHECKING:
-    pass
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -276,7 +273,7 @@ class PVGIS(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-            limit: int | None = None,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch every sampled point, write the table, and return it.
 

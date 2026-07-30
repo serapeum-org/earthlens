@@ -28,7 +28,6 @@ NetCDFs can be aggregated separately.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from loguru import logger
 from tqdm import tqdm
@@ -42,9 +41,6 @@ from earthlens.base import (
 from earthlens.cmip6 import accessor
 from earthlens.cmip6.catalog import Catalog
 from earthlens.cmip6.resolver import ResolvedStore, StoreResolver
-
-if TYPE_CHECKING:
-    pass
 
 
 class CMIP6(AbstractDataSource):

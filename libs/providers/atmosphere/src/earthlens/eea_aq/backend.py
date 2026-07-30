@@ -44,7 +44,7 @@ from __future__ import annotations
 import tempfile
 from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import Any, Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -63,9 +63,6 @@ from earthlens.eea_aq._helpers import (
     shape_frame,
 )
 from earthlens.eea_aq.catalog import Catalog
-
-if TYPE_CHECKING:
-    pass
 
 FileFormat = Literal["csv", "parquet"]
 

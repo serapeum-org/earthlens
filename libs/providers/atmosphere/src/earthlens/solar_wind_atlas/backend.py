@@ -24,7 +24,7 @@ facade-forwarded `aggregate=` is rejected. All raster I/O goes through
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 from loguru import logger
 
@@ -40,9 +40,6 @@ from earthlens.solar_wind_atlas._helpers import (
     window_crop,
 )
 from earthlens.solar_wind_atlas.catalog import Catalog, Layer
-
-if TYPE_CHECKING:
-    pass
 
 #: Approximate one-time download size, per Global Solar Atlas variable, surfaced
 #: in the `download_zip` heads-up warning (the 1 km single-file product).

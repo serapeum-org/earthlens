@@ -44,7 +44,7 @@ from __future__ import annotations
 import datetime as dt
 import shutil
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, TypeGuard
+from typing import Any, TypeGuard
 
 from loguru import logger
 from tqdm import tqdm
@@ -59,9 +59,6 @@ from earthlens.base import (
     safe_filename,
 )
 from earthlens.nwm.catalog import Catalog, NWMConfig, NWMProduct
-
-if TYPE_CHECKING:
-    pass
 
 #: The unsigned AWS bucket holding NWM operational output.
 BUCKET = "noaa-nwm-pds"

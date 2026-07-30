@@ -27,7 +27,7 @@ for downstream InSAR tools rather than processing them.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast
 
 from earthlens.asf._helpers import apply_baseline_windows, wkt_from_extent
 from earthlens.asf.auth import ASFAuth, ASFCredentials
@@ -38,9 +38,6 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
 )
-
-if TYPE_CHECKING:
-    pass
 
 
 class ASF(AbstractDataSource):

@@ -30,7 +30,7 @@ from __future__ import annotations
 import datetime as dt
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast
 
 from tqdm import tqdm
 
@@ -41,9 +41,6 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.radar.catalog import Catalog, Station
-
-if TYPE_CHECKING:
-    pass
 
 #: The unsigned AWS bucket holding the real-time Level-II chunk feed.
 BUCKET = "unidata-nexrad-level2-chunks"

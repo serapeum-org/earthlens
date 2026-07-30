@@ -21,7 +21,7 @@ permission, redistribution is restricted), so every fetch raises a
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 
 import pandas as pd
 from loguru import logger
@@ -37,9 +37,6 @@ from earthlens.biodiversity import WDPA_LICENSE, warn_license
 from earthlens.wdpa import _rest
 from earthlens.wdpa.auth import WdpaAuth, WdpaCredentials
 from earthlens.wdpa.catalog import Catalog
-
-if TYPE_CHECKING:
-    pass
 
 FileFormat = Literal["geoparquet", "gpkg", "geojson"]
 

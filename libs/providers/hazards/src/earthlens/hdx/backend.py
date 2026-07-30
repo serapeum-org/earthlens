@@ -46,7 +46,7 @@ import functools
 import time
 from collections.abc import Callable
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeVar, cast
+from typing import TypeVar, cast
 
 from loguru import logger
 
@@ -58,9 +58,6 @@ from earthlens.base import (
 )
 from earthlens.hdx._helpers import match_resource
 from earthlens.hdx.catalog import Catalog
-
-if TYPE_CHECKING:
-    pass
 
 #: Resolved `(hdx_id, [resource_filter, ...])` download target. An empty
 #: filter list means "every resource of the dataset".
