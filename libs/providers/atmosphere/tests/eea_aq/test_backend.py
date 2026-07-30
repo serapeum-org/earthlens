@@ -302,3 +302,15 @@ class TestLimitStopsTheWork:
         with pytest.raises(ValueError):
             backend.download(progress_bar=False, limit=0)
         assert fake_client.calls == []
+
+
+@pytest.mark.eea
+class TestPublicDownloadHonoursTheCap:
+    """`download(limit=)` must reach the era loop, not just validate."""
+
+    def test_the_keyword_stops_the_second_era(self, tmp_path, fake_client):
+        """A cap passed to `download` leaves the Unverified era unrequested."""
+        backend = _backend(fake_client, tmp_path)
+        backend.download(progress_bar=False, limit=1)
+
+        assert [call[0] for call in fake_client.calls] == ["Verified"]

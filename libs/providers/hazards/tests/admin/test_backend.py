@@ -328,3 +328,29 @@ class TestLimitStopsTheWork:
         with pytest.raises(ValueError):
             backend.download(progress_bar=False, limit=0)
         assert fake_read == []
+
+
+class TestPublicDownloadHonoursTheCap:
+    """`download(limit=)` — the public path — must reach the fetch.
+
+    The other cap tests set `backend._limit` directly, which exercises the
+    bounding but not the wiring between the keyword and the attribute. A
+    backend whose `download` forgot `self._limit = self.check_limit(limit)`
+    would pass every one of those and still ignore the caller's cap.
+    """
+
+    def test_the_keyword_bounds_the_result(self, fake_read):
+        """A cap passed to `download` bounds both the reads and the return."""
+        backend = _make_backend(variables=["cgaz:adm0", "cgaz:adm1"])
+        collection = backend.download(progress_bar=False, limit=2)
+
+        assert len(collection) == 2
+        assert len(fake_read) == 1
+
+    def test_without_the_keyword_everything_is_read(self, fake_read):
+        """The default is unchanged."""
+        backend = _make_backend(variables=["cgaz:adm0", "cgaz:adm1"])
+        collection = backend.download(progress_bar=False)
+
+        assert len(collection) == 4
+        assert len(fake_read) == 2

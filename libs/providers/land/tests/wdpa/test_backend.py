@@ -393,3 +393,32 @@ class TestLimitStopsTheWork:
         backend._limit = 5
         merged = backend._fetch_all()
         assert len(merged) == 0
+
+
+@pytest.mark.wdpa
+class TestPublicDownloadHonoursTheCap:
+    """`download(limit=)` must reach the selector sweep, not just validate."""
+
+    def test_the_keyword_bounds_the_result(self, tmp_path, monkeypatch):
+        """A cap passed to `download` stops the second country being queried."""
+        backend = _backend(tmp_path, variables=["KEN", "TZA"])
+        queried: list[str] = []
+        square = Polygon([(0, 0), (0, 1), (1, 1), (1, 0)])
+
+        def fake_fetch_selector(token, selector):
+            queried.append(selector)
+            return GeoDataFrame(
+                {"name": ["a", "b", "c"]},
+                geometry=[square] * 3,
+                crs="EPSG:4326",
+            )
+
+        monkeypatch.setattr(backend, "_fetch_selector", fake_fetch_selector)
+        monkeypatch.setattr(backend, "_initialize", lambda: None)
+        backend._auth = type("_Auth", (), {"token": "t"})()
+
+        with pytest.warns(LicenseWarning):
+            result = backend.download(progress_bar=False, limit=2)
+
+        assert len(result) == 2
+        assert queried == ["KEN"]
