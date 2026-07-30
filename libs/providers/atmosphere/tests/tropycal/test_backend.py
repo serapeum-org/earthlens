@@ -643,11 +643,16 @@ class TestWrittenFilesMatchTheReturnedResult:
             ),
         )
 
-        backend._limit = 2
+        # 3, not 2: the frames are two fixes each, so a cap of 2 lands exactly
+        # on the first fragment's boundary and never exercises the trim — the
+        # pre-fix code, which wrote the untrimmed fragment, passes that. A cap
+        # of 3 forces the second fragment to be trimmed to one row, so writing
+        # before the trim would put 4 rows on disk against 3 returned.
+        backend._limit = 3
         result = backend._download_realtime()
 
-        assert len(result) == 2
-        assert sum(count for _unit, count in written) == 2, (
+        assert len(result) == 3
+        assert sum(count for _unit, count in written) == 3, (
             f"wrote {written} but returned {len(result)} feature(s); the file "
             f"and the return value disagree"
         )
@@ -686,3 +691,22 @@ class TestWrittenFilesMatchTheReturnedResult:
             f"wrote {written} but returned {len(result)} row(s); the file and "
             f"the return value disagree"
         )
+
+
+class TestPublicDownloadHonoursTheCap:
+    """`download(limit=)` must reach the basin loop, not merely validate.
+
+    The other cap tests set `backend._limit` directly, which leaves the wiring
+    between the keyword and the attribute untested — a `download` missing its
+    `self._limit = self.check_limit(limit)` line would pass all of them and
+    still ignore the caller's cap.
+    """
+
+    def test_the_keyword_bounds_the_result(self, tmp_path, fake_tropycal):
+        """A cap passed to `download` bounds the returned features."""
+        result = _backend(tmp_path).download(limit=2)
+        assert len(result) == 2
+
+    def test_without_the_keyword_everything_is_returned(self, tmp_path, fake_tropycal):
+        """The default is unchanged."""
+        assert len(_backend(tmp_path).download()) == 3

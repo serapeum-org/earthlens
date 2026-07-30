@@ -554,3 +554,90 @@ class TestCapOnANonRowFragmentExplainsItself:
         backend._fetch_one = lambda product: tmp_path / f"{product.id}.tif"
         backend._limit = None
         assert len(backend._search_fetch_each()) == 3
+
+
+class TestExactFillSkipsTheTrim:
+    """A fragment that fills the cap exactly is passed through, not re-sliced.
+
+    Behaviourally identical either way, which is why it went untested — the
+    difference is that `_head_rows` copies every row to hand back the fragment
+    it was already given. Identity is what distinguishes them.
+    """
+
+    def test_take_limited_returns_the_same_object(self, tmp_path):
+        """The exactly-filling fragment is the object that was yielded."""
+        backend = _build(_Backend, tmp_path)
+        frame = pd.DataFrame({"n": [1, 2, 3]})
+
+        kept = backend._take_limited([frame], limit=3)
+
+        assert kept[0] is frame, "an exact fill was copied instead of passed through"
+
+    def test_take_limited_still_trims_when_it_straddles(self, tmp_path):
+        """One row over the cap and the trim must happen."""
+        backend = _build(_Backend, tmp_path)
+        frame = pd.DataFrame({"n": [1, 2, 3, 4]})
+
+        kept = backend._take_limited([frame], limit=3)
+
+        assert kept[0] is not frame
+        assert list(kept[0]["n"]) == [1, 2, 3]
+
+    def test_iter_download_returns_the_same_object_on_an_exact_fill(self, tmp_path):
+        """`iter_download` agrees with `_take_limited` on the exact-fill case."""
+        backend = _build(_Backend, tmp_path)
+        backend.sizes = (3,)
+
+        fragments = list(backend.iter_download(limit=3))
+
+        assert len(fragments) == 1
+        assert len(fragments[0]) == 3
+
+    def test_iter_download_still_trims_when_it_straddles(self, tmp_path):
+        """The straddling fragment is cut to the remaining rows."""
+        backend = _build(_Backend, tmp_path)
+        backend.sizes = (2, 3)
+
+        fragments = list(backend.iter_download(limit=4))
+
+        assert [len(fragment) for fragment in fragments] == [2, 2]
+
+
+class TestSearchFetchEachClosesItsProgressBar:
+    """The tqdm bar is closed even when the cap ends the sweep early.
+
+    tqdm keeps redrawing and holds the terminal until it is closed. A cap that
+    stops mid-sweep leaves the bar unfinished, and closing the abandoned
+    generator does not close the bar — they are separate objects.
+    """
+
+    def test_the_bar_is_closed_when_a_cap_stops_the_sweep(self, tmp_path, monkeypatch):
+        """The bar's `close` runs before `_search_fetch_each` returns."""
+        import sys
+
+        import tqdm as tqdm_module
+
+        closed: list[bool] = []
+        # `instances` keeps every bar referenced. Without it the local goes out
+        # of scope when `_search_fetch_each` returns, refcounting collects the
+        # bar, and tqdm's own `__del__` calls `close` — so the test passes with
+        # the explicit close deleted, which is precisely what it must detect.
+        instances: list[object] = []
+
+        class _RecordingTqdm(tqdm_module.tqdm):
+            def __init__(self, *args, **kwargs):
+                instances.append(self)
+                super().__init__(*args, **kwargs)
+
+            def close(self):
+                closed.append(True)
+                super().close()
+
+        monkeypatch.setattr(tqdm_module, "tqdm", _RecordingTqdm)
+        monkeypatch.setitem(sys.modules, "tqdm", tqdm_module)
+        backend = _build(_Backend, tmp_path)
+        backend._limit = 4
+        backend._search_fetch_each(progress_bar=False)
+
+        assert instances, "the composition built no progress bar to close"
+        assert closed, "the progress bar was abandoned without being closed"

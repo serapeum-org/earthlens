@@ -620,8 +620,11 @@ class TropicalCyclone(AbstractDataSource):
                 no-op.
             limit: Cap on the total features (or SHIPS rows) returned, across
                 every requested basin / storm. Applied as each one is loaded,
-                so a basin or storm past the cap is never pulled. `None` (the
-                default) loads everything.
+                so a basin or storm **past** the cap is never pulled. Within a
+                single item it can only trim: a basin's `TrackDataset` is
+                parsed whole before any of its storms can be filtered, so a
+                one-basin request (the default) pays the full load whatever the
+                cap. `None` (the default) loads everything.
 
         Returns:
             FeatureCollection: The row-wise union of every requested

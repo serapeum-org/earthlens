@@ -284,10 +284,12 @@ class ARGO(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends. Argo issues one bulk `argopy` call, so there is
                 no per-item progress bar — this is a no-op.
-            limit: Cap on the total rows returned, across every requested
-                item. Applied as the per-item results arrive, so an item past
-                the cap is never fetched. `None` (the default) fetches
-                everything, which for a wide request is bounded only by memory.
+            limit: Cap on the total rows returned. **Trims, it does not
+                reduce the fetch**: argopy answers a whole selection in one
+                call, so `_search` plans a single product and there is no
+                later item for the cap to skip. Use it to bound what you get
+                back, and narrow `start` / `end` / the bbox to bound what is
+                transferred. `None` (the default) returns everything.
 
         Returns:
             pd.DataFrame: The long-format profile table.

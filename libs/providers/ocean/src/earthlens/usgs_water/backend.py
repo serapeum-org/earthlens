@@ -351,13 +351,14 @@ class USGSWater(AbstractDataSource):
                 backends. USGS Water issues one bulk `dataretrieval`
                 call per service rather than a per-item loop, so there
                 is no progress bar to show — this is a no-op.
-            limit: Cap on the **total** rows returned, across every requested
-                item. Applied as the per-item results arrive, so an item past
-                the cap is never fetched. `None` (the default) fetches
-                everything, which for a wide request is bounded only by memory.
-                Independent of the constructor's `limit=`, which caps rows
-                *per request* server-side; passing neither, either, or both is
-                valid.
+            limit: Cap on the **total** rows returned. **Trims, it does not
+                reduce the fetch**: `_search` plans one bulk `dataretrieval`
+                call per service, so there is no later item for the cap to
+                skip. The constructor's `limit=` is the one that reduces
+                transfer — it is a per-request cap the modern endpoint applies
+                server-side — and the two are independent; passing neither,
+                either, or both is valid. `None` (the default) returns
+                everything.
 
         Returns:
             pd.DataFrame: The long-format observation table for the
