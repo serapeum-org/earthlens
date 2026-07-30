@@ -43,7 +43,7 @@ Why earthlens?
 ------------
 
 <p align="center">
-  <img src="docs/_images/branding/earthlens-brand-kit/animation/earthlens-logo-orbit.gif" width="420"
+  <img src="docs/_images/branding/earthlens-brand-kit/animation/earthlens-logo-orbit.gif" width="600"
        alt="A satellite orbiting the earthlens globe">
 </p>
 
