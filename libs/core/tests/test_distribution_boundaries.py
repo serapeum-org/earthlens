@@ -521,15 +521,25 @@ class TestAggregateCapabilityIsCentral:
             # file's own explanatory comments contain the literal
             # `SUPPORTS_AGGREGATE = True`, and so does drought's comment saying
             # it deliberately does *not* declare it.
-            declares = any(
-                isinstance(node, ast_module.Assign)
-                and any(
-                    getattr(target, "id", "") == "SUPPORTS_AGGREGATE"
-                    for target in node.targets
-                )
-                and getattr(node.value, "value", None) is True
-                for node in ast_module.walk(ast_module.parse(source))
-            )
+            declares = False
+            for node in ast_module.walk(ast_module.parse(source)):
+                # `SUPPORTS_AGGREGATE: bool = True` is an `AnnAssign`, which an
+                # `Assign`-only scan would skip — the declaration would be live
+                # and this guard blind to it.
+                if isinstance(node, ast_module.Assign):
+                    names = [getattr(t, "id", "") for t in node.targets]
+                    value = node.value
+                elif isinstance(node, ast_module.AnnAssign):
+                    names = [getattr(node.target, "id", "")]
+                    value = node.value
+                else:
+                    continue
+                if (
+                    "SUPPORTS_AGGREGATE" in names
+                    and getattr(value, "value", None) is True
+                ):
+                    declares = True
+                    break
             if not declares:
                 continue
             # Read the AST, not the text. A substring search is fooled by a
@@ -939,11 +949,18 @@ class TestProviderCapsDoNotShadowTheBaseAttribute:
         """Return the right-hand sides assigned to `self._limit` in `source`."""
         found: list[str] = []
         for node in ast.walk(ast.parse(source)):
-            if not isinstance(node, ast.Assign):
+            # `AnnAssign` too: `self._limit: int | None = limit` is the same
+            # shadowing written with an annotation, and an `Assign`-only walk
+            # lets it back in unflagged.
+            if isinstance(node, ast.Assign):
+                targets, value = node.targets, node.value
+            elif isinstance(node, ast.AnnAssign) and node.value is not None:
+                targets, value = [node.target], node.value
+            else:
                 continue
-            for target in node.targets:
+            for target in targets:
                 if ast.unparse(target) == self.BASE_ATTR:
-                    found.append(ast.unparse(node.value))
+                    found.append(ast.unparse(value))
         return found
 
     def test_only_a_validated_cap_is_stored_in_the_base_attribute(self):
@@ -1055,21 +1072,30 @@ class TestArgsEntriesAreOnTheirOwnLine:
             for path in sorted(root.glob(glob)):
                 if "build" in path.parts:
                     continue
+                # Scoped to lines *inside* an `Args:` block. The first version
+                # skipped any line containing `{}=()[]` instead, which is most
+                # real Args prose (`lat_lim: [lat_min, lat_max] in degrees`) —
+                # it would have missed the nrel/pvgis defect it was written for.
+                in_args = False
+                args_indent = 0
                 for index, line in enumerate(
                     path.read_text(encoding="utf-8").splitlines(), 1
                 ):
                     stripped = line.strip()
-                    # Only docstring prose indented as an Args entry, not code
-                    # (a dict literal or a type annotation legitimately has
-                    # `name:` after other text).
+                    if not stripped:
+                        continue
+                    indent = len(line) - len(line.lstrip())
+                    if stripped in ("Args:", "Arguments:"):
+                        in_args, args_indent = True, indent
+                        continue
+                    if in_args and indent <= args_indent:
+                        in_args = False
+                    if not in_args:
+                        continue
                     # Doctest lines carry their own `name: value` syntax —
                     # class-body annotations and inline YAML — which is not an
                     # Args entry at all.
-                    if not stripped or stripped.startswith(
-                        ("#", '"', "'", ">>>", "...")
-                    ):
-                        continue
-                    if any(ch in line for ch in "{}=()[]"):
+                    if stripped.startswith(("#", ">>>", "...")):
                         continue
                     if pattern.search(line):
                         offenders.append(f"{path.name}:{index}")

@@ -482,12 +482,18 @@ class TestTakeLimitedClosesWhatItAbandons:
             finally:
                 released.append("cleaned up")
 
-        collected = backend._take_limited(frames(), limit=4)
+        # The reference is held deliberately. Passing `frames()` inline lets
+        # CPython's refcounting collect the abandoned generator the moment
+        # `_take_limited` returns, which runs the `finally` for reasons that
+        # have nothing to do with the explicit close — the test then passes
+        # with the close deleted, proving nothing.
+        stream = frames()
+        collected = backend._take_limited(stream, limit=4)
 
         assert sum(len(frame) for frame in collected) == 4
         assert released == ["cleaned up"], (
-            "the generator was abandoned without being closed, so whatever it "
-            "held open stays open until it is collected"
+            "the still-referenced generator was abandoned without being "
+            "closed, so whatever it held open stays open"
         )
 
     def test_full_consumption_still_cleans_up_once(self, tmp_path):
