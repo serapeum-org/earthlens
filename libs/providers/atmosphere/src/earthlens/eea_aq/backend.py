@@ -358,7 +358,7 @@ class EEA_AQ(AbstractDataSource):
         client: Any,
         countries: list[str],
         polls: list[str],
-        code_to_name: dict[str, str],
+        code_to_name: dict[int, str],
     ) -> Iterator[pd.DataFrame]:
         """Yield one shaped frame per Parquet file, era by era.
 
@@ -373,7 +373,7 @@ class EEA_AQ(AbstractDataSource):
             client: The airbase client to request through.
             countries: Reporting-country codes the service serves.
             polls: Pollutant codes to request.
-            code_to_name: Pollutant code to catalog name, restricted to the
+            code_to_name: Pollutant code (numeric) to catalog name, restricted to the
                 requested pollutants.
 
         Yields:
