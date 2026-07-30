@@ -97,8 +97,9 @@ class TropicalCyclone(AbstractDataSource):
     and the basins' results are unioned into the single FeatureCollection
     `download()` returns.
 
-    Best-track only — tropycal's realtime / operational / forecast
-    products are out of scope. No credentials are needed.
+    Four products, selected with `product=`: `besttrack` (the default),
+    `recon` aircraft observations, `ships` forecast guidance, and
+    `realtime` active storms. No credentials are needed.
 
     Attributes:
         OUTPUT_KIND: `"vector"` — the result is a table of track

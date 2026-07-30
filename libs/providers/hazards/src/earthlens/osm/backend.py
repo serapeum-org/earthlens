@@ -644,9 +644,7 @@ class OSM(AbstractDataSource):
         # a definitive 4xx (e.g. a wrong region path -> 404) still fails fast
         # rather than retrying five times; retryable 429/5xx statuses are already
         # handled by the client's default `status_forcelist`.
-        path = download_extract(
-            region_path, self._cache_dir, http=self._pbf_client()
-        )
+        path = download_extract(region_path, self._cache_dir, http=self._pbf_client())
         return read_pbf(
             path,
             pyrosm_method=cast("str", dataset.pyrosm_method),

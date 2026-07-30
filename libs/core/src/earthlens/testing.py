@@ -60,4 +60,7 @@ def real_pooled_session(monkeypatch: pytest.MonkeyPatch) -> None:
     from earthlens.base import http
 
     monkeypatch.setattr(http, "new_session", requests.Session)
+    # Same reason as the unpooled fixture: the per-thread cache outlives a
+    # test, so without this the pooled session under test would be whichever
+    # one the previous test's transport built.
     http.reset_thread_local_sessions()

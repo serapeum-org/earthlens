@@ -62,13 +62,29 @@ fires when the snapped Tuesday's composite has not yet been released
 (its release Thursday is still in the future) — historical queries
 always land on the requested Tuesday.
 
-Asking for `aggregate=` on USDM is rejected — drought-class polygons
-have no gridded reduction:
+Asking for `aggregate=` is rejected on every drought transport — the USDM
+polygons have no gridded reduction, and the raster routes' cross-period stack
+reducer is not wired yet. The refusal comes from the shared gate, so the
+message names the backend and its output kind:
 
 ```python
 >>> facade.download(aggregate=object())  # doctest: +SKIP
-NotImplementedError: Drought.download(aggregate=...) is not supported for the USDM (vector) transport: drought-class polygons have no gridded reduction. ...
+NotImplementedError: aggregate= is not supported by Drought (OUTPUT_KIND='vector'): no drought transport reduces across dates today. ...
 ```
+
+### Capping the result
+
+`limit=` bounds the polygons a USDM request returns. It is applied as each
+week's GeoJSON arrives — after the bbox clip, so it counts rows you will
+actually receive — which means a week past the cap is never downloaded:
+
+```python
+>>> facade.download(limit=500)  # doctest: +SKIP
+```
+
+It applies to the vector (USDM) transport only. The raster transports write
+files, which a row cap cannot describe, so passing `limit=` to one of those
+raises `ValueError` rather than being quietly ignored.
 
 ## SPEIbase — global monthly raster
 

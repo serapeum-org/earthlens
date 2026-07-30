@@ -409,13 +409,17 @@ class NREL(AbstractDataSource):
 
         last_call = [0.0]
         single = len({(p.metadata["lat"], p.metadata["lon"]) for p in products}) == 1
-        iterator = tqdm(
-            products,
-            disable=not self._show_progress,
-            desc="NREL",
-            unit="call",
-        )
-        with requests.Session() as session:
+        # `with`, so a cap that stops the sweep early still closes the bar:
+        # tqdm keeps redrawing and holds the terminal until it is closed.
+        with (
+            tqdm(
+                products,
+                disable=not self._show_progress,
+                desc="NREL",
+                unit="call",
+            ) as iterator,
+            requests.Session() as session,
+        ):
             # Lazy so a `limit=` stops the work: a call past the cap is never
             # requested. Skipped (`None`) calls count as zero rows, so the cap
             # bounds returned rows rather than attempted calls.

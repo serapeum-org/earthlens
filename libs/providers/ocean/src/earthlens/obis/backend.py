@@ -21,6 +21,7 @@ set, writes it (GeoParquet by default). Like GBIF the facade rejects an
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -224,7 +225,7 @@ class OBIS(AbstractDataSource):
             "size": self._size,
         }
 
-    def _iter_selector_frames(self):
+    def _iter_selector_frames(self) -> Iterator[pd.DataFrame]:
         """Yield one occurrence frame per requested selector, lazily.
 
         Lazy so a `limit=` can stop the search: a selector past the cap is never

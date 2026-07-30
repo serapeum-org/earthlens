@@ -188,6 +188,11 @@ def _quiet_close_lookalikes(path: Path) -> list[str]:
             for sub in ast.walk(node)
             if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Attribute)
         }
+        # `contextlib.suppress(...)` is itself an attribute call, so it landed
+        # in this set and the `== {"close"}` test rejected the very form the
+        # docstring says is caught. It is the swallow, not a second method the
+        # function calls, so it is discounted here.
+        methods.discard("suppress")
         # `close` called, and nothing else — a lone `close` inside a
         # swallow-everything handler is the helper, whatever it is named.
         if methods == {"close"}:
@@ -691,6 +696,8 @@ class TestCatalogAutoloadIsShared:
                 autoload.append(name)
             elif "def model_post_init" in source:
                 bespoke.append(name)
+        # 32 today. Pinned just under, so losing a handful is a failure
+        # rather than a floor that a halved population still clears.
         assert len(autoload) >= 30, (
             f"only {len(autoload)} catalogs use the shared autoload; "
             f"still hand-rolling post-init: {bespoke}"
@@ -890,7 +897,9 @@ class TestLimitIsBoundedNotTrimmed:
     def test_some_backends_accept_a_limit(self):
         """Guard the guard: the scan must actually find the converted backends."""
         found = [name for name, _ in self._backends_accepting_limit()]
-        assert len(found) >= 8, f"only found {found}"
+        # 15 backends take a cap today; a floor of 8 was set before most
+        # were converted and would now pass with half of them regressed.
+        assert len(found) >= 14, f"only found {found}"
 
     def test_an_accepted_limit_is_validated(self):
         """An unchecked cap lets `limit=0` or `limit=-1` through to the fetch."""
@@ -1136,7 +1145,9 @@ class TestCatalogLoadingUsesOneMechanism:
     def test_catalog_classes_were_found(self):
         """Guard the guard: the scan must reach the shipped catalogs."""
         found = [label for label, _ in self._catalog_classes()]
-        assert len(found) > 30, f"only found {len(found)}: {found}"
+        # ~48 backends ship a catalog; a floor of 40 fails if the scan
+        # silently stops finding most of them.
+        assert len(found) >= 40, f"only found {len(found)}: {found}"
 
     def test_no_catalog_defines_an_autoload_it_never_calls(self):
         """Defining `_autoload` and skipping `super()` leaves it dead."""
@@ -1191,4 +1202,38 @@ class TestLimitIsReachableThroughTheFacade:
             f"these take a limit= at construction but not on download, so "
             f"EarthLens(...).download(limit=...) raises TypeError for them: "
             f"{offenders}"
+        )
+
+
+class TestBoundedResultsDocMatchesTheCode:
+    """The `limit=` reference page must list every backend that takes one.
+
+    Documentation that enumerates backends goes stale the moment one is added,
+    and a table that silently omits a backend is worse than no table — a reader
+    concludes the cap is unavailable there. This pins the list to the code that
+    it describes.
+    """
+
+    def test_every_capped_backend_appears_in_the_table(self):
+        """A backend with `download(limit=)` is named on the page."""
+        root = Path(__file__).resolve().parents[3]
+        page = root / "docs" / "reference" / "base" / "bounded-results.md"
+        assert page.exists(), f"the bounded-results reference page is missing: {page}"
+        text = page.read_text(encoding="utf-8")
+
+        missing: list[str] = []
+        provider_root = root / "libs" / "providers"
+        for path in sorted(provider_root.rglob("src/earthlens/*/backend.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if not (isinstance(node, ast.FunctionDef) and node.name == "download"):
+                    continue
+                names = [a.arg for a in node.args.args + node.args.kwonlyargs]
+                if "limit" in names and path.parent.name not in text:
+                    missing.append(path.parent.name)
+                break
+        assert missing == [], (
+            f"these backends accept limit= but are not named on "
+            f"docs/reference/base/bounded-results.md, so a reader would think "
+            f"the cap is unavailable for them: {missing}"
         )

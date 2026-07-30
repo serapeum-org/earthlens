@@ -307,7 +307,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
     def _check_input_dates(
         self, start: str, end: str, temporal_resolution: str, fmt: str
-    ):
+    ) -> TemporalExtent:
         """Parse the date range and produce the iteration index.
 
         Returned dict is captured by
@@ -516,7 +516,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 resolutions.append(ERA5_GRID_DEGREES)
         return min(resolutions) if resolutions else ERA5_GRID_DEGREES
 
-    def _create_grid(self, lat_lim: list, lon_lim: list):
+    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
         """Snap a lat/lon bounding box to the request's native grid edges.
 
         Floors the south/west limits and ceils the north/east limits to the

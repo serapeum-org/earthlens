@@ -105,7 +105,7 @@ class Drought(AbstractDataSource):
     # central gate refuses `aggregate=` before the body runs. The reason covers
     # both, because `OUTPUT_KIND` is resolved per instance from the catalog row.
     AGGREGATE_REFUSAL_REASON = (
-        "neither drought transport reduces across dates today. The USDM "
+        "no drought transport reduces across dates today. The USDM "
         "(vector) route returns drought-class polygons, which have no gridded "
         "reduction; the SPEIbase / EDO / GDO (raster) routes emit per-period "
         "GeoTIFFs whose stack reducer is not wired yet — pass those through "
@@ -826,17 +826,18 @@ class Drought(AbstractDataSource):
                 drought transports run one fetch per period in serial
                 today, so a `tqdm` bar would mostly idle; the argument is
                 a no-op until a transport gains a per-byte progress hook.
-            limit: Cap on the total drought polygons returned, across every
-                requested week. Applied as each week's GeoJSON arrives, so a
-                week past the cap is never downloaded. `None` (the default)
-                fetches everything. **Vector (USDM) only** — the raster
-                transports return written files, which a row cap cannot
-                describe, so passing one there is refused rather than
-                silently ignored.
             aggregate: Refused on every transport today, by the shared gate
                 rather than here. The USDM (vector) route returns polygons,
                 which have no gridded reduction; the raster routes emit
                 per-period GeoTIFFs whose stack reducer is not wired yet.
+            limit: Cap on the total drought polygons returned, across every
+                requested week. Applied as each week's GeoJSON arrives — after
+                the bbox clip, so it counts rows the caller will actually
+                receive — meaning a week past the cap is never downloaded.
+                `None` (the default) fetches everything. **Vector (USDM)
+                only** — the raster transports return written files, which a
+                row cap cannot describe, so passing one there is refused
+                rather than silently ignored.
 
         Returns:
             FeatureCollection | list[Path]: For the vector USDM transport,

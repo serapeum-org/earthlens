@@ -536,15 +536,18 @@ class OpenAQ(AbstractDataSource):
         products = self._search()
         if not products:
             return
-        for product in tqdm(
+        # `with`, so abandoning this generator at a cap unwinds the bar
+        # instead of leaving it redrawing and holding the terminal.
+        with tqdm(
             products,
             disable=not progress_bar,
             desc="OpenAQ sensors",
             unit="sensor",
-        ):
-            frame = self._fetch_one(product)
-            if not frame.empty:
-                yield frame
+        ) as iterator:
+            for product in iterator:
+                frame = self._fetch_one(product)
+                if not frame.empty:
+                    yield frame
 
 
 def _empty_frame() -> pd.DataFrame:

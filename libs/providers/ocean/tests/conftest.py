@@ -7,8 +7,6 @@ find it when that member is run on its own.
 
 from __future__ import annotations
 
-import pytest
-
 # The HTTP transport seam lives in the installed package so every member
 # root can reach it; see earthlens.testing for why it cannot live here.
 from earthlens.testing import (  # noqa: F401 - fixtures used by name

@@ -353,13 +353,17 @@ class PVGIS(AbstractDataSource):
 
         last_call = [0.0]
         single = len(products) == 1
-        iterator = tqdm(
-            products,
-            disable=not self._show_progress,
-            desc="PVGIS",
-            unit="point",
-        )
-        with requests.Session() as session:
+        # `with`, so a cap that stops the sweep early still closes the bar:
+        # tqdm keeps redrawing and holds the terminal until it is closed.
+        with (
+            tqdm(
+                products,
+                disable=not self._show_progress,
+                desc="PVGIS",
+                unit="point",
+            ) as iterator,
+            requests.Session() as session,
+        ):
             # Lazy so a `limit=` stops the work: a point past the cap is never
             # requested. Skipped (`None`) points count as zero rows, so the cap
             # bounds returned rows rather than attempted points.

@@ -528,7 +528,6 @@ def _head_rows(chunk: Any, count: int) -> Any:
 _MISSING = object()
 
 
-
 @functools.cache
 def _parameters(function: Any) -> frozenset[str]:
     """Return the parameter names `function` accepts.
@@ -780,14 +779,14 @@ class AbstractDataSource(ABC):
                 f"avoid. The flag would only disable this class's own ergonomic "
                 f"kwargs (aoi=, buffer=, cadence=, dataset=). Drop it."
             )
+        # Every subclass needs this, independent of the constructor sugar
+        # below: a backend that inherits `__init__` unchanged still needs its
+        # `download` to create `root_dir`.
+        cls._wrap_download()
         if resolved:
             # The child promises it forwards only resolved parameters, so it
-            # keeps the parent's wrapper and gains no second one.
-            cls._wrap_download()
+            # keeps the parent's `__init__` wrapper and gains no second one.
             return
-        # Independent of the constructor sugar below: a backend that inherits
-        # `__init__` unchanged still needs its `download` to create `root_dir`.
-        cls._wrap_download()
         orig = cls.__dict__.get("__init__")
         if orig is None or getattr(orig, "_ergonomic", False):
             return
@@ -2143,24 +2142,35 @@ class AbstractDataSource(ABC):
         # without contributing rows, so only the results can be counted.
         policy = self.check_errors_policy(errors) if errors is not None else None
         failures: list[tuple[str, BaseException]] = []
-        results = self._take_limited(
-            self._iter_items(
-                iterator,
-                self._fetch_one,
-                errors=policy,
-                label=label,
-                describe=_describe_remote_product,
-                on_failure=None,
-                failures=failures,
-            ),
-            limit=self._limit,
-            size=self._fragment_rows,
-        )
-        iterator.close()
+        # `finally`, so the bar is closed on the failure path too: a
+        # `_fetch_one` that raises under the `raise` policy propagates straight
+        # out of here, and an unclosed tqdm keeps redrawing over whatever the
+        # caller prints next.
+        try:
+            results = self._take_limited(
+                self._iter_items(
+                    iterator,
+                    self._fetch_one,
+                    errors=policy,
+                    label=label,
+                    describe=_describe_remote_product,
+                    on_failure=None,
+                    failures=failures,
+                ),
+                limit=self._limit,
+                size=self._fragment_rows,
+            )
+        finally:
+            iterator.close()
         if failures and policy == "warn":
+            # Counted against the products actually attempted, not the whole
+            # planned list: a cap can end the sweep early, and "3 of 400 failed"
+            # reads as a 0.75% failure rate when in truth 3 of the 5 products
+            # that ran failed.
+            attempted = len(failures) + len(results)
             logger.warning(
-                f"{type(self).__name__}: {len(failures)} of {len(products)} "
-                f"{label}(s) failed; {len(results)} succeeded."
+                f"{type(self).__name__}: {len(failures)} of {attempted} "
+                f"{label}(s) attempted failed; {len(results)} succeeded."
             )
         return results
 
@@ -2274,8 +2284,9 @@ class AbstractCatalog(BaseModel):
         difference nobody notices until two catalogs disagree.
 
         Args:
-            __context: Opaque context from the pydantic v2 lifecycle, forwarded
-                to the base unchanged.
+            __context: Opaque context handed in by the pydantic v2 lifecycle.
+                Unused — this hook only fills empty fields — but named
+                positionally because pydantic calls it that way.
         """
         if not self.datasets:
             for field, value in self._autoload().items():

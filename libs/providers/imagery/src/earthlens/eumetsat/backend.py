@@ -109,7 +109,11 @@ class EUMETSAT(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
-    AGGREGATE_REFUSAL_REASON = "EUMETSAT aggregate= is the temporal reducer (G1); it is not implemented for this backend. Download products (optionally with tailor= for server-side subset/reproject) and reduce NetCDF products client-side with pyramids"
+    AGGREGATE_REFUSAL_REASON = (
+        "the temporal reducer is not wired for this backend. Download the "
+        "products (optionally with tailor= for a server-side subset / "
+        "reproject) and reduce the NetCDF ones client-side with pyramids"
+    )
 
     def __init__(
         self,

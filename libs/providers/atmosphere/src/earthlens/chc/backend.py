@@ -254,7 +254,10 @@ class CHIRPS(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "raster"
 
-    AGGREGATE_REFUSAL_REASON = "aggregate= is not supported for the CHIRPS backend. It writes per-date GeoTIFFs and has no aggregator wiring (unlike the NetCDF-emitting ECMWF backend); reduce the downloaded rasters yourself"
+    AGGREGATE_REFUSAL_REASON = (
+        "it writes per-date GeoTIFFs and has no aggregator wiring, unlike the "
+        "NetCDF-emitting ECMWF backend"
+    )
 
     #: Clips to the exact polygon when `aoi=` carries one, not just its bbox.
     SUPPORTS_POLYGON_AOI = True

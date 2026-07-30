@@ -184,7 +184,9 @@ class TestProviderErrorHierarchy:
     def test_provider_errors_were_found(self):
         """Guard the guard: at least a few provider modules must be importable."""
         found = self._provider_error_classes()
-        assert len(found) >= 3, f"only imported {sorted(found)}"
+        # 7 provider error modules import today; a floor of 3 would still
+        # pass with four of them gone.
+        assert len(found) >= 6, f"only imported {sorted(found)}"
 
     def test_one_base_clause_catches_every_provider(self):
         """The broad catch works: each provider error is a base subclass."""
