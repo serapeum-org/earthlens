@@ -2288,6 +2288,9 @@ s3 = [
     { name = "boto3" },
     { name = "botocore" },
 ]
+test = [
+    { name = "pytest" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -2307,9 +2310,10 @@ requires-dist = [
     { name = "rich", specifier = ">=13" },
     { name = "shapely", specifier = ">=2.0.0" },
     { name = "tqdm", specifier = ">=4.66.0" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=8" },
     { name = "typer", specifier = ">=0.12" },
 ]
-provides-extras = ["s3"]
+provides-extras = ["s3", "test"]
 
 [[package]]
 name = "earthlens-hazards"
