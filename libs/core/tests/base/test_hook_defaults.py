@@ -790,3 +790,45 @@ class TestHooksReturnOneShape:
         assert offenders == [], (
             f"{hook} must return its extent model; these do not: {offenders}"
         )
+
+
+class TestErgonomicsResolvedNeedsABackendBase:
+    """`ergonomics_resolved=True` is only meaningful under a backend parent.
+
+    The flag says "my `__init__` forwards only resolved parameters, so do not
+    wrap it a second time". On a class inheriting `AbstractDataSource` directly
+    there is no first wrapper, so honouring it would quietly strip that
+    backend's own ergonomic kwargs (`aoi=`, `buffer=`, `cadence=`, `dataset=`)
+    — the opposite of the flag's purpose, and invisible until a user passed one.
+    """
+
+    def test_declaring_it_without_a_backend_base_is_refused(self):
+        """A direct subclass passing the flag is an authoring mistake."""
+        with pytest.raises(TypeError, match="no parent wrapper to avoid"):
+
+            class Direct(AbstractDataSource, ergonomics_resolved=True):
+                def __init__(self, **kwargs):
+                    super().__init__(**kwargs)
+
+    def test_it_is_still_accepted_under_a_backend_parent(self):
+        """The legitimate use — a backend subclassing a backend — still works."""
+
+        class Parent(AbstractDataSource):
+            REQUIRES_TIME_WINDOW = False
+
+            def _check_input_dates(self, start, end, temporal_resolution, fmt):
+                return TemporalExtent(
+                    start_date=None,
+                    end_date=None,
+                    resolution="all",
+                    dates=pd.DatetimeIndex([]),
+                )
+
+            def download(self, progress_bar: bool = True):
+                return []
+
+        class Child(Parent, ergonomics_resolved=True):
+            def __init__(self, **kwargs):
+                super().__init__(**kwargs)
+
+        assert issubclass(Child, Parent)

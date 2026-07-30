@@ -728,6 +728,17 @@ class AbstractDataSource(ABC):
                 f"and declare `class {cls.__name__}({names}, "
                 f"ergonomics_resolved=True)`."
             )
+        if resolved and not backend_bases:
+            # The promise is about a *parent's* wrapper, and there is no backend
+            # parent here. Honouring it would silently drop the ergonomic
+            # kwargs (aoi / buffer / cadence / dataset) from a backend that has
+            # no second wrapper to avoid — the opposite of what the flag means.
+            raise TypeError(
+                f"{cls.__name__} passes ergonomics_resolved=True but inherits "
+                f"AbstractDataSource directly, so there is no parent wrapper to "
+                f"avoid. The flag would only disable this class's own ergonomic "
+                f"kwargs (aoi=, buffer=, cadence=, dataset=). Drop it."
+            )
         if resolved:
             # The child promises it forwards only resolved parameters, so it
             # keeps the parent's wrapper and gains no second one.
@@ -2061,6 +2072,10 @@ class AbstractDataSource(ABC):
             desc=desc or type(self).__name__,
             unit=unit,
         )
+        # Closed explicitly: a cap that stops mid-sweep leaves the bar
+        # unfinished, and tqdm only restores the terminal (and stops redrawing)
+        # when it is closed. `_take_limited` closes the *generator* it abandons,
+        # which is `_iter_items` — the bar underneath it is a separate object.
         # Lazy in both branches so `self._limit` stops the fetching rather than
         # trimming the assembled list. Under a policy the cap cannot be turned
         # into a slice of `products` up front: a failed product consumes an item
@@ -2080,6 +2095,7 @@ class AbstractDataSource(ABC):
             limit=self._limit,
             size=self._fragment_rows,
         )
+        iterator.close()
         if failures and policy == "warn":
             logger.warning(
                 f"{type(self).__name__}: {len(failures)} of {len(products)} "
