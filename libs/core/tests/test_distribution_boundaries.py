@@ -26,6 +26,12 @@ _CORE_ROOTS = {
     "_backends",
     "grids",
     "core",
+    # `biodiversity` and `cli` ship from core too. Leaving them out did not
+    # merely under-cover the rule — it exempted them, so osm and overture
+    # imported `earthlens.biodiversity._helpers` (a private module) for as long
+    # as this guard has existed, and it reported a clean boundary.
+    "biodiversity",
+    "cli",
 }
 
 #: Private core modules a provider must not reach into; the public re-export is

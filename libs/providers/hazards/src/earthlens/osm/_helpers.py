@@ -36,7 +36,7 @@ from shapely.geometry import LineString, Point, Polygon, box
 # lives in the biodiversity cluster's helper module (overture re-exports the same
 # class object) and is re-exported here so the backend imports it from its own
 # subpackage.
-from earthlens.biodiversity._helpers import LicenseWarning  # noqa: F401
+from earthlens.biodiversity import LicenseWarning  # noqa: F401
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent

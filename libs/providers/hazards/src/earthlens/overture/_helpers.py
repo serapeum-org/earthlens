@@ -38,7 +38,7 @@ import pandas as pd
 # `LicenseWarning` is shared across backends, so it lives in the biodiversity
 # cluster's helper module; Overture re-exports it here (same class object) so
 # `warn_if_odbl` and `overture.__init__` keep working unchanged.
-from earthlens.biodiversity._helpers import LicenseWarning
+from earthlens.biodiversity import LicenseWarning
 
 #: Share-alike license OSM-derived rows carry; the value the warning keys off.
 ODBL = "ODbL-1.0"
