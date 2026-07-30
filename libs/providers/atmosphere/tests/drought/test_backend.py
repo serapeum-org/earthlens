@@ -1107,3 +1107,79 @@ def test_unknown_transport_on_row_raises(monkeypatch, tmp_path):
     monkeypatch.setattr(backend, "_dataset", rogue)
     with pytest.raises(ValueError, match="unknown drought transport"):
         backend._fetch(backend._search())
+
+
+class TestLimitStopsTheWork:
+    """A `limit=` caps the USDM polygons, and is refused where it cannot apply."""
+
+    def _usdm(self, weeks: int = 3) -> Drought:
+        """Build a USDM backend spanning `weeks` weekly periods."""
+        end = dt.date(2026, 6, 1) + dt.timedelta(days=7 * (weeks - 1))
+        return Drought(
+            start="2026-06-01",
+            end=end.strftime("%Y-%m-%d"),
+            lat_lim=[30.0, 40.0],
+            lon_lim=[-95.0, -85.0],
+            dataset="usdm",
+        )
+
+    def _fake_period(self, backend, monkeypatch, fetched, rows: int = 3):
+        """Record each period fetched and serve `rows` polygons for it."""
+        import geopandas as gpd
+        from shapely.geometry import Polygon
+
+        square = Polygon([(-94, 31), (-94, 32), (-93, 32), (-93, 31)])
+
+        def fake_fetch(product):
+            fetched.append(product.metadata["period"])
+            return gpd.GeoDataFrame(
+                {"dm": list(range(rows))},
+                geometry=[square] * rows,
+                crs="EPSG:4326",
+            )
+
+        monkeypatch.setattr(backend, "_fetch_usdm_period", fake_fetch)
+
+    def test_weeks_past_the_cap_are_never_downloaded(self, monkeypatch):
+        """The later weeks' GeoJSON is not requested once the cap is met."""
+        backend = self._usdm(weeks=3)
+        fetched: list[dt.date] = []
+        self._fake_period(backend, monkeypatch, fetched)
+
+        backend._limit = 4
+        result = backend._fetch(backend._search())
+
+        assert len(fetched) == 2, (
+            f"downloaded {len(fetched)} weeks for a cap met by 2; the cap is "
+            f"trimming, not stopping the work"
+        )
+        assert len(result) == 4
+
+    def test_no_limit_downloads_every_week(self, monkeypatch):
+        """Without a cap the whole window is swept."""
+        backend = self._usdm(weeks=3)
+        fetched: list[dt.date] = []
+        self._fake_period(backend, monkeypatch, fetched)
+
+        backend._limit = None
+        result = backend._fetch(backend._search())
+
+        assert len(fetched) == 3
+        assert len(result) == 9
+
+    def test_a_cap_on_a_raster_transport_is_refused(self, tmp_path):
+        """Raster transports write files, so a row cap is rejected, not ignored.
+
+        Silently accepting it would be the worst outcome: the caller believes
+        the request is bounded while every period is downloaded in full.
+        """
+        spei = Drought(
+            start="2026-06-01",
+            end="2026-06-01",
+            lat_lim=[30.0, 40.0],
+            lon_lim=[-95.0, -85.0],
+            dataset="speibase-12",
+            path=str(tmp_path),
+        )
+        with pytest.raises(ValueError, match="USDM .vector. transport only"):
+            spei.download(progress_bar=False, limit=5)

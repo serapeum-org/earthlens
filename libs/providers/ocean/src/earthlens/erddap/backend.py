@@ -299,6 +299,16 @@ class ERDDAP(AbstractDataSource):
         via :meth:`_write_table`), a griddap fetch returns the written
         NetCDF path.
 
+        Deliberately takes no `limit=`, unlike the other tabular backends.
+        `_search` resolves to a single dataset, so there is no per-product loop
+        a cap could stop: griddap streams one file, and tabledap is one request
+        whose rows have all been transferred by the time a frame exists. A
+        client-side cap here would trim the result without saving any work —
+        the decorative form `TestLimitIsBoundedNotTrimmed` exists to catch. The
+        real bound is ERDDAP's own server-side `orderByLimit`, which belongs in
+        `build_constraints` and needs verifying against a live server before it
+        is claimed; narrowing the date window is the bound available today.
+
         Args:
             products: The single-element list from :meth:`_search`.
 

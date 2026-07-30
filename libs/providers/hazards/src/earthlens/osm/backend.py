@@ -434,18 +434,34 @@ class OSM(AbstractDataSource):
             list[FeatureCollection]: One collection per product, in product
                 order.
         """
-        collections: list[FeatureCollection] = []
-        for product in products:
-            dataset: Dataset = product.metadata["dataset"]
-            if dataset.protocol == "overpass":
-                collection = self._fetch_overpass(product.id, dataset)
-            elif dataset.protocol == "ohsome":
-                collection = self._fetch_ohsome(product.id, dataset)
-            else:
-                collection = self._fetch_pbf(product.id, dataset)
-            logger.info(f"{product.id}: fetched {len(collection)} feature(s)")
-            collections.append(collection)
-        return collections
+        # Lazy so a `limit=` stops the work: each query is a live Overpass /
+        # ohsome request or a PBF extract, so a query past the cap is never
+        # issued rather than issued and then trimmed away.
+        return self._take_limited(
+            (self._fetch_product(product) for product in products),
+            limit=self._limit,
+        )
+
+    def _fetch_product(self, product: RemoteProduct) -> FeatureCollection:
+        """Run one planned query, routing on its dataset's protocol.
+
+        Args:
+            product: One product from `_search`; its `dataset` metadata
+                decides the transport.
+
+        Returns:
+            FeatureCollection: The query's features (empty when nothing
+                matched).
+        """
+        dataset: Dataset = product.metadata["dataset"]
+        if dataset.protocol == "overpass":
+            collection = self._fetch_overpass(product.id, dataset)
+        elif dataset.protocol == "ohsome":
+            collection = self._fetch_ohsome(product.id, dataset)
+        else:
+            collection = self._fetch_pbf(product.id, dataset)
+        logger.info(f"{product.id}: fetched {len(collection)} feature(s)")
+        return collection
 
     def _fetch_overpass(self, query_id: str, dataset: Dataset) -> FeatureCollection:
         """Fetch one Overpass query: POST the QL (with UA), parse, build geometry.
@@ -648,6 +664,7 @@ class OSM(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> FeatureCollection:
         """Run the requested OSM queries and return the combined features.
 
@@ -660,11 +677,16 @@ class OSM(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends; OSM issues one query per named id, so this is a
                 no-op.
+            limit: Cap on the total features returned, across every named
+                query. Applied as each query's result arrives, so a query past
+                the cap is never issued — which also means the rate limit is
+                not spent on it. `None` (the default) runs every query.
 
         Returns:
             FeatureCollection: The matched features, CRS `EPSG:4326`. Empty
                 (schema-only) when nothing matched.
         """
+        self._limit = self.check_limit(limit)
         collection = self._combine(self._api())
         # OSM is ODbL — warn on every result, even an empty one (the query
         # itself succeeded and the obligation rides with any data downloaded).

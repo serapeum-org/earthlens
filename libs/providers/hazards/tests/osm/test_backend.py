@@ -332,3 +332,76 @@ def test_no_xarray_in_subpackage():
     for path in root.glob("*.py"):
         text = path.read_text(encoding="utf-8")
         assert "import xarray" not in text and "xr." not in text, path.name
+
+
+class TestLimitStopsTheWork:
+    """A `limit=` must stop issuing queries, not trim the merged collection.
+
+    Every query is a live Overpass / ohsome request against a rate-limited
+    public endpoint, so a cap that only sliced the combined result would still
+    spend the quota on every named query.
+    """
+
+    def _fake_products(self, backend, monkeypatch, fetched):
+        """Point the backend at two queries whose fetch is recorded."""
+        import geopandas as gpd
+        from pyramids.feature.collection import FeatureCollection
+        from shapely.geometry import Point
+
+        def fake_fetch_product(product):
+            fetched.append(product.id)
+            frame = gpd.GeoDataFrame(
+                {"name": ["a", "b", "c"]},
+                geometry=[Point(8.68, 49.41)] * 3,
+                crs="EPSG:4326",
+            )
+            return FeatureCollection(frame)
+
+        monkeypatch.setattr(backend, "_fetch_product", fake_fetch_product)
+
+    def test_queries_past_the_cap_are_never_issued(self, osm_kwargs, monkeypatch):
+        """The second query is not run once the first fills the cap."""
+        backend = OSM(
+            **{
+                **osm_kwargs(),
+                "variables": ["overpass:hospitals", "overpass:schools"],
+            }
+        )
+        fetched: list[str] = []
+        self._fake_products(backend, monkeypatch, fetched)
+
+        backend._limit = 2
+        collections = backend._fetch(backend._search())
+
+        assert fetched == ["overpass:hospitals"], (
+            f"issued {fetched}; the second query was run even though the cap "
+            f"was already met"
+        )
+        assert sum(len(fc) for fc in collections) == 2
+
+    def test_no_limit_issues_every_query(self, osm_kwargs, monkeypatch):
+        """Without a cap every named query still runs."""
+        backend = OSM(
+            **{
+                **osm_kwargs(),
+                "variables": ["overpass:hospitals", "overpass:schools"],
+            }
+        )
+        fetched: list[str] = []
+        self._fake_products(backend, monkeypatch, fetched)
+
+        backend._limit = None
+        backend._fetch(backend._search())
+
+        assert fetched == ["overpass:hospitals", "overpass:schools"]
+
+    def test_a_zero_limit_is_refused_before_any_query(self, osm_kwargs, monkeypatch):
+        """`limit=0` is caught before the first request goes out."""
+        backend = OSM(**osm_kwargs())
+        monkeypatch.setattr(
+            backend,
+            "_fetch_product",
+            lambda product: pytest.fail("a rejected cap must not reach the network"),
+        )
+        with pytest.raises(ValueError):
+            backend.download(progress_bar=False, limit=0)

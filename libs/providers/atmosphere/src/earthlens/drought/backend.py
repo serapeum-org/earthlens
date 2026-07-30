@@ -342,15 +342,18 @@ class Drought(AbstractDataSource):
         import geopandas as gpd
         from pyramids.feature.collection import FeatureCollection
 
-        frames: list[gpd.GeoDataFrame] = []
-        for product in products:
-            period: dt.date = product.metadata["period"]
-            assert product.href is not None  # USDM products always carry a URL template
-            url = self._render_usdm_url(product.href, period)
-            payload = _http_get_json(url)
-            frame = self._geojson_to_gdf(payload, period)
-            if len(frame):
-                frames.append(frame)
+        # Lazy so a `limit=` stops the work: each period is a separate GeoJSON
+        # download, so a week past the cap is never requested. Empty periods
+        # are dropped before the cap counts them, so the cap bounds returned
+        # polygons rather than weeks attempted.
+        frames = self._take_limited(
+            (
+                frame
+                for frame in (self._fetch_usdm_period(product) for product in products)
+                if len(frame)
+            ),
+            limit=self._limit,
+        )
         if not frames:
             return self._empty_vector()
         merged = pd.concat(frames, ignore_index=True)
@@ -431,6 +434,23 @@ class Drought(AbstractDataSource):
         gdf = gpd.GeoDataFrame.from_features(features, crs=source_crs)
         gdf["release_date"] = period.isoformat()
         return gdf
+
+    def _fetch_usdm_period(self, product: RemoteProduct) -> Any:
+        """Download and parse one USDM week's GeoJSON.
+
+        Args:
+            product: One period product from `_search`; its `href` is the URL
+                template and its `period` metadata the week to render.
+
+        Returns:
+            gpd.GeoDataFrame: That week's drought polygons, stamped with the
+                period (empty when the week published nothing).
+        """
+        period: dt.date = product.metadata["period"]
+        assert product.href is not None  # USDM products always carry a URL template
+        url = self._render_usdm_url(product.href, period)
+        payload = _http_get_json(url)
+        return self._geojson_to_gdf(payload, period)
 
     def _fetch_speibase(self, products: list[RemoteProduct]) -> list[Path]:
         """Fetch the SPEIbase NetCDF once per scale, write one TIFF per period.
@@ -758,6 +778,7 @@ class Drought(AbstractDataSource):
         self,
         progress_bar: bool = True,
         aggregate: AggregationConfig | None = None,
+        limit: int | None = None,
     ) -> list[Path] | FeatureCollection:
         """Fetch the requested drought indicator and return its artefacts.
 
@@ -766,6 +787,13 @@ class Drought(AbstractDataSource):
                 drought transports run one fetch per period in serial
                 today, so a `tqdm` bar would mostly idle; the argument is
                 a no-op until a transport gains a per-byte progress hook.
+            limit: Cap on the total drought polygons returned, across every
+                requested week. Applied as each week's GeoJSON arrives, so a
+                week past the cap is never downloaded. `None` (the default)
+                fetches everything. **Vector (USDM) only** — the raster
+                transports return written files, which a row cap cannot
+                describe, so passing one there is refused rather than
+                silently ignored.
             aggregate: A temporal reducer over the requested date range.
                 Accepted for `OUTPUT_KIND == "raster"` (EDO/GDO/SPEIbase)
                 and forwarded to the standard `earthlens.aggregate`
@@ -784,7 +812,18 @@ class Drought(AbstractDataSource):
                 vector USDM transport (drought-class polygons have no
                 gridded reduction), or on any raster transport (the
                 cross-period stack reducer is not wired yet).
+            ValueError: When `limit` is not `None` on a raster transport,
+                where there are no rows to cap; or when it is zero or
+                negative.
         """
+        self._limit = self.check_limit(limit)
+        if self._limit is not None and self.OUTPUT_KIND != "vector":
+            raise ValueError(
+                f"Drought.download(limit=...) applies to the USDM (vector) "
+                f"transport only; dataset {self._dataset.id!r} writes raster "
+                f"files, which a row cap cannot describe. Drop limit= and "
+                f"narrow the date range instead."
+            )
         if self.OUTPUT_KIND == "vector" and aggregate is not None:
             raise NotImplementedError(
                 "Drought.download(aggregate=...) is not supported for the "
