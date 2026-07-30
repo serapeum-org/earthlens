@@ -17,11 +17,31 @@
          <lastmod>2026-07-30</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/contributing/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/discovery/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/getting-started/</loc>
          <lastmod>2026-07-30</lastmod>
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/installation/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/migration/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/troubleshooting/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/BRAND-GUIDE/</loc>
          <lastmod>2026-07-30</lastmod>
     </url>
     <url>
@@ -793,7 +813,15 @@
          <lastmod>2026-07-30</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/europe_temperature_2026/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/hurricanes_goes_subdaily/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/netherlands_drought_2026/</loc>
          <lastmod>2026-07-30</lastmod>
     </url>
     <url>
@@ -957,7 +985,15 @@
          <lastmod>2026-07-30</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/aggregation-api/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/cli/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/core-functions/</loc>
          <lastmod>2026-07-30</lastmod>
     </url>
     <url>
@@ -1037,7 +1073,23 @@
          <lastmod>2026-07-30</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/base/auth-api/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/base/bounded-results/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/base/catalog-api/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/base/contracts/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/base/extents/</loc>
          <lastmod>2026-07-30</lastmod>
     </url>
     <url>
@@ -1065,7 +1117,15 @@
          <lastmod>2026-07-30</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/biodiversity/api/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/biodiversity/introduction/</loc>
+         <lastmod>2026-07-30</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/biodiversity/usage/</loc>
          <lastmod>2026-07-30</lastmod>
     </url>
     <url>
