@@ -405,3 +405,41 @@ class TestLimitStopsTheWork:
         )
         with pytest.raises(ValueError):
             backend.download(progress_bar=False, limit=0)
+
+
+class TestRateLimitActuallyPaces:
+    """`MIN_REQUEST_INTERVAL` must pace successive queries, not just be declared.
+
+    The interval is enforced from a `_last_request` timestamp held on the
+    `HttpClient`. Building a client per query gave every request a fresh client
+    with no history, so the declared 1.0 s floor produced zero sleeps against
+    the shared public Overpass endpoint it exists to protect — declared,
+    passed, and completely inert.
+    """
+
+    def test_the_client_is_reused_across_queries(self, osm_kwargs):
+        """The same client instance serves every Overpass query."""
+        backend = OSM(**osm_kwargs())
+        assert backend._overpass_client() is backend._overpass_client()
+
+    def test_successive_requests_are_spaced_by_the_interval(self, osm_kwargs):
+        """With an injected clock, the second request sleeps the full interval."""
+        backend = OSM(**osm_kwargs())
+        client = backend._overpass_client()
+        assert client.min_interval == OSM.MIN_REQUEST_INTERVAL
+
+        now = [1000.0]
+        slept: list[float] = []
+        client._clock = lambda: now[0]
+        client._sleep = lambda seconds: (
+            slept.append(seconds),
+            now.__setitem__(0, now[0] + seconds),
+        )
+
+        client._throttle()
+        client._throttle()
+
+        assert slept and slept[0] == pytest.approx(OSM.MIN_REQUEST_INTERVAL), (
+            f"expected one {OSM.MIN_REQUEST_INTERVAL}s pause between "
+            f"back-to-back requests, got {slept}"
+        )

@@ -291,6 +291,11 @@ class OSM(AbstractDataSource):
         self._region = region
         self._engine: Engine = engine
         self._cache_dir = Path(cache_dir) if cache_dir else DEFAULT_PBF_CACHE_DIR
+        # Built on first use and reused, so `MIN_REQUEST_INTERVAL` actually
+        # paces successive queries: the interval is enforced from a timestamp
+        # the client carries, which a per-query client would always reset.
+        self._overpass_http: HttpClient | None = None
+        self._pbf_http: HttpClient | None = None
         self._catalog = Catalog()
         super().__init__(
             start=cast("str", start),
@@ -463,6 +468,52 @@ class OSM(AbstractDataSource):
         logger.info(f"{product.id}: fetched {len(collection)} feature(s)")
         return collection
 
+    def _overpass_client(self) -> HttpClient:
+        """Return this instance's Overpass client, built once.
+
+        One client per backend, not one per query: `min_interval` paces
+        requests through the `_last_request` timestamp the client carries, so a
+        fresh client per query starts with no history and never sleeps —
+        `MIN_REQUEST_INTERVAL` would be declared, passed, and completely
+        inert against the public endpoint it exists to protect.
+
+        Returns:
+            HttpClient: The memoised Overpass client.
+        """
+        if self._overpass_http is None:
+            self._overpass_http = HttpClient(
+                session=cast("requests.Session | None", _RequestsHttp()),
+                user_agent=self._user_agent,
+                min_interval=self.MIN_REQUEST_INTERVAL,
+                timeout=self._timeout,
+                max_retries=0,
+                status_forcelist=(),
+                raise_for_status=True,
+            )
+        return self._overpass_http
+
+    def _pbf_client(self) -> HttpClient:
+        """Return this instance's PBF-download client, built once.
+
+        Memoised for the same reason as :meth:`_overpass_client`: the pacing
+        state lives on the client.
+
+        Returns:
+            HttpClient: The memoised PBF client.
+        """
+        if self._pbf_http is None:
+            self._pbf_http = HttpClient(
+                user_agent=self._user_agent,
+                timeout=self._timeout,
+                min_interval=self.MIN_REQUEST_INTERVAL,
+                retry_on_exceptions=(
+                    requests.ConnectionError,
+                    requests.Timeout,
+                    OSError,
+                ),
+            )
+        return self._pbf_http
+
     def _fetch_overpass(self, query_id: str, dataset: Dataset) -> FeatureCollection:
         """Fetch one Overpass query: POST the QL (with UA), parse, build geometry.
 
@@ -507,16 +558,7 @@ class OSM(AbstractDataSource):
             "{timeout}", str(int(self._timeout))
         )
         logger.info(f"Querying Overpass for {query_id!r} over bbox ({bbox_str})")
-        http = HttpClient(
-            session=cast("requests.Session | None", _RequestsHttp()),
-            user_agent=self._user_agent,
-            min_interval=self.MIN_REQUEST_INTERVAL,
-            timeout=self._timeout,
-            max_retries=0,
-            status_forcelist=(),
-            raise_for_status=True,
-        )
-        response = http.post(self._endpoint, data={"data": ql})
+        response = self._overpass_client().post(self._endpoint, data={"data": ql})
         result = overpy.Overpass().parse_json(response.text)
         return to_fc(overpy_to_gdf(result))
 
@@ -602,17 +644,9 @@ class OSM(AbstractDataSource):
         # a definitive 4xx (e.g. a wrong region path -> 404) still fails fast
         # rather than retrying five times; retryable 429/5xx statuses are already
         # handled by the client's default `status_forcelist`.
-        http = HttpClient(
-            user_agent=self._user_agent,
-            timeout=self._timeout,
-            min_interval=self.MIN_REQUEST_INTERVAL,
-            retry_on_exceptions=(
-                requests.ConnectionError,
-                requests.Timeout,
-                OSError,
-            ),
+        path = download_extract(
+            region_path, self._cache_dir, http=self._pbf_client()
         )
-        path = download_extract(region_path, self._cache_dir, http=http)
         return read_pbf(
             path,
             pyrosm_method=cast("str", dataset.pyrosm_method),
