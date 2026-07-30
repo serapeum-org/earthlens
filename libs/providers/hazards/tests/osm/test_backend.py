@@ -179,7 +179,8 @@ class TestOhsomeRoute:
         fc = OSM(
             **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
         ).download()
-        assert "index" not in fc.columns and len(fc) == 1
+        assert "index" not in fc.columns
+        assert len(fc) == 1
 
 
 class TestDownloadContract:
@@ -331,7 +332,8 @@ def test_no_xarray_in_subpackage():
     root = Path(pkg.__file__).parent
     for path in root.glob("*.py"):
         text = path.read_text(encoding="utf-8")
-        assert "import xarray" not in text and "xr." not in text, path.name
+        assert "import xarray" not in text, path.name
+        assert "xr." not in text, path.name
 
 
 class TestLimitStopsTheWork:

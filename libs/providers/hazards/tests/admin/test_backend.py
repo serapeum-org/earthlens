@@ -68,8 +68,10 @@ class TestConstruction:
     def test_default_bbox_is_whole_earth(self):
         """Omitting lat_lim / lon_lim defaults to the whole-Earth sentinel extent."""
         backend = _make_backend()
-        assert backend.space.south == -90.0 and backend.space.north == 90.0
-        assert backend.space.west == -180.0 and backend.space.east == 180.0
+        assert backend.space.south == -90.0
+        assert backend.space.north == 90.0
+        assert backend.space.west == -180.0
+        assert backend.space.east == 180.0
 
     def test_empty_variables_rejected(self):
         """An empty variables list raises at construction."""
@@ -151,7 +153,8 @@ class TestResolveUrl:
         """Natural Earth uses the dataset's default scale when none is given."""
         backend = _make_backend(variables=["natural_earth:countries"])
         url = backend._resolve_url(backend._catalog.get("natural_earth:countries"))
-        assert "110m" in url and url.endswith("ne_110m_admin_0_countries.zip")
+        assert "110m" in url
+        assert url.endswith("ne_110m_admin_0_countries.zip")
 
     def test_natural_earth_route_scale_override(self):
         """An explicit scale= overrides the dataset default in the URL."""
@@ -169,7 +172,8 @@ class TestResolveUrl:
         """An explicit year= overrides the dataset default in the URL."""
         backend = _make_backend(variables=["tiger:county"], year=2022)
         url = backend._resolve_url(backend._catalog.get("tiger:county"))
-        assert "GENZ2022" in url and "cb_2022_us_county_500k.zip" in url
+        assert "GENZ2022" in url
+        assert "cb_2022_us_county_500k.zip" in url
 
     def test_tiger_tract_uses_state_scope(self):
         """A per-state tract writes the zero-padded FIPS as the URL scope."""
@@ -200,7 +204,8 @@ class TestSearchFetch:
         """_fetch routes each product through read_vector and returns its FCs."""
         backend = _make_backend(variables=["cgaz:adm0"])
         results = backend._fetch(backend._search())
-        assert len(results) == 1 and len(results[0]) == 2
+        assert len(results) == 1
+        assert len(results[0]) == 2
         assert fake_read[0].endswith("geoBoundariesCGAZ_ADM0.gpkg")
 
     def test_api_composes_search_fetch(self, fake_read):

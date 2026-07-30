@@ -177,7 +177,8 @@ class TestApi:
             lon_lim=[-40.0, -39.0],
         )
         df = backend.download(progress_bar=False)
-        assert df.empty and "country" in df.columns
+        assert df.empty
+        assert "country" in df.columns
         assert fake_client.calls == []
 
     def test_unsupported_country_dropped(self, tmp_path, fake_client):
@@ -192,7 +193,8 @@ class TestApi:
         """When no requested country is served, an empty frame comes back."""
         fake_client.countries = frozenset({"FR"})
         df = _backend(fake_client, tmp_path, country="MT").download(progress_bar=False)
-        assert df.empty and fake_client.calls == []
+        assert df.empty
+        assert fake_client.calls == []
 
     def test_no_parquet_returns_empty(self, tmp_path):
         """A dataset that yields no Parquet returns a schema-only frame."""

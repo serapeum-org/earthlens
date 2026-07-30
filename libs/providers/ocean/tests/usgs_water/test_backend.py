@@ -231,7 +231,8 @@ def test_statistics_modern_calls_get_stats_date_range(fake_usgs, usgs_kwargs):
     assert "percentile" in df.columns
     # the caller's window is forwarded as start_date / end_date
     kw = fake_usgs.kwargs_for("get_stats_date_range")
-    assert kw["start_date"] == "2023-01-01" and kw["end_date"] == "2023-01-05"
+    assert kw["start_date"] == "2023-01-01"
+    assert kw["end_date"] == "2023-01-05"
 
 
 def test_statistics_legacy_forwards_stat_type(fake_usgs, usgs_kwargs):

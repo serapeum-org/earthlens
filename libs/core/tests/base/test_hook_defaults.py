@@ -341,7 +341,8 @@ class TestRunItems:
         results, failures = self._backend(tmp_path)._run_items(
             [1], lambda n: n, errors="skip"
         )
-        assert results == [1] and failures == []
+        assert results == [1]
+        assert failures == []
 
     def test_unknown_policy_rejected(self, tmp_path):
         """A policy outside the accepted set raises with the accepted names."""
@@ -586,7 +587,8 @@ class TestNoOverrideSilencers:
         """Guard the guard: the glob must find the real backend modules."""
         found = [path.parent.name for path, _ in self._backend_sources()]
         assert len(found) > 30, f"only scanned {len(found)} backends: {found[:5]}"
-        assert "nwp" in found and "soilgrids" in found, f"unexpected set: {found[:8]}"
+        assert "nwp" in found, f"nwp missing from the scan: {found[:8]}"
+        assert "soilgrids" in found, f"soilgrids missing from the scan: {found[:8]}"
 
     def test_fetch_one_takes_only_a_product(self):
         """Every `_fetch_one` override keeps the base's single-argument shape."""

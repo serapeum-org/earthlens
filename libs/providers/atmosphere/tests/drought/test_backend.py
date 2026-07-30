@@ -507,7 +507,8 @@ def test_gdo_fetch_uses_the_single_do_wcs_map(monkeypatch, tmp_path):
         path=str(tmp_path),
     )
     backend.download(progress_bar=False)
-    assert seen and all("map=DO_WCS" in u for u in seen)
+    assert seen, "no GetCoverage URL was captured"
+    assert all("map=DO_WCS" in u for u in seen), seen
     assert all("GDO_WCS" not in u for u in seen)
 
 
