@@ -216,9 +216,17 @@ class WDPA(AbstractDataSource):
         """
         assert self._auth is not None  # set by _initialize before _fetch_all runs
         token = self._auth.token
-        frames = [self._fetch_selector(token, selector) for selector in self.vars]
+        # Lazy so a `limit=` stops the work: a selector past the cap is never
+        # queried, rather than queried and then trimmed away.
+        frames = self._take_limited(
+            (self._fetch_selector(token, selector) for selector in self.vars),
+            limit=self._limit,
+        )
         non_empty = [frame for frame in frames if len(frame)]
         if not non_empty:
+            # `variables` is validated non-empty at construction and
+            # `_take_limited` always keeps the first fragment, so there is at
+            # least one frame here to carry the empty result's schema.
             return frames[0]
         import geopandas as gpd
 
@@ -253,17 +261,24 @@ class WDPA(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> FeatureCollection:
         """Fetch the protected-area polygons and return the FeatureCollection.
 
         Args:
             progress_bar: Accepted for signature parity; the REST client
                 has no progress bar, so this is a no-op.
+            limit: Cap on the total polygons returned, across every requested
+                selector. Applied as each selector's frame arrives, so a
+                selector past the cap is never queried. `None` (the default)
+                fetches everything.
+
 
         Returns:
             FeatureCollection: The protected-area polygons, CRS
                 `EPSG:4326`. Written to a file under `path` when set.
         """
+        self._limit = self.check_limit(limit)
         collection = FeatureCollection(self._fetch_all())
         if len(collection):
             warn_license(

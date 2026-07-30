@@ -530,3 +530,66 @@ def _shifted(state, storm_id):
 def _boom_builder(*args, **kwargs):
     """A recon sub-product builder stand-in that raises (decode failure)."""
     raise RuntimeError("recon decode failed")
+
+
+class TestLimitStopsTheWork:
+    """A `limit=` must stop loading basins/storms, not trim the result at the end.
+
+    Every tropycal product is expensive per item — a basin load parses a whole
+    best-track file, and a SHIPS or realtime item is a separate fetch — so a cap
+    that only slices the concatenated output would leave the cost unchanged.
+    These tests count the per-item calls, which is the part a post-hoc slice
+    cannot fake.
+    """
+
+    def test_basins_past_the_cap_are_never_loaded(self, tmp_path, monkeypatch):
+        """The second basin is not loaded once the first fills the cap."""
+        backend = _backend(tmp_path, variables=["north_atlantic", "east_pacific"])
+        queried: list[str] = []
+
+        def fake_query_one(product):
+            queried.append(product.id)
+            frame = pd.DataFrame({"storm_id": ["a", "b", "c"]})
+            return gpd.GeoDataFrame(
+                frame, geometry=gpd.points_from_xy([-90, -91, -92], [25, 26, 27])
+            )
+
+        monkeypatch.setattr(backend, "_query_one", fake_query_one)
+        products = backend._search()
+        assert len(products) == 2, "fixture expects one product per basin"
+
+        backend._limit = 2
+        frames = backend._fetch(products)
+
+        assert queried == ["north_atlantic"], (
+            "the second basin was loaded even though the first already filled "
+            "the cap; the cap is trimming, not stopping the work"
+        )
+        assert sum(len(frame) for frame in frames) == 2
+
+    def test_no_limit_loads_every_basin(self, tmp_path, monkeypatch):
+        """Without a cap the sweep is unchanged."""
+        backend = _backend(tmp_path, variables=["north_atlantic", "east_pacific"])
+        queried: list[str] = []
+
+        def fake_query_one(product):
+            queried.append(product.id)
+            frame = pd.DataFrame({"storm_id": ["a"]})
+            return gpd.GeoDataFrame(frame, geometry=gpd.points_from_xy([-90], [25]))
+
+        monkeypatch.setattr(backend, "_query_one", fake_query_one)
+        backend._limit = None
+        backend._fetch(backend._search())
+
+        assert queried == ["north_atlantic", "east_pacific"]
+
+    def test_a_zero_limit_is_refused_before_any_load(self, tmp_path, monkeypatch):
+        """`limit=0` is a caller bug, caught before the first basin is touched."""
+        backend = _backend(tmp_path)
+        monkeypatch.setattr(
+            backend,
+            "_query_one",
+            lambda product: pytest.fail("a rejected cap must not reach the load"),
+        )
+        with pytest.raises(ValueError):
+            backend.download(progress_bar=False, limit=0)

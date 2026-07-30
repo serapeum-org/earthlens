@@ -334,11 +334,16 @@ class NREL(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch every `(point, year)` call, write the table, and return it.
 
         Args:
-            progress_bar: Show a per-call `tqdm` bar while fetching.
+            progress_bar: Show a per-call `tqdm` bar while fetching.            limit: Cap on the total rows returned, across every requested
+                call. Applied as each call's frame arrives, so a call past
+                the cap is never requested. `None` (the default) fetches
+                everything.
+
 
         Returns:
             pd.DataFrame: The concatenated long-format frame — one block of
@@ -349,6 +354,7 @@ class NREL(AbstractDataSource):
             ValueError: If a single explicit point is out of NREL coverage, or
                 the fan-out exceeds `max_requests`.
         """
+        self._limit = self.check_limit(limit)
         assert self._product is not None  # set by _initialize
         self._show_progress = progress_bar
         frames = [frame for frame in self._api() if frame is not None]
@@ -400,6 +406,7 @@ class NREL(AbstractDataSource):
         Returns:
             list[pd.DataFrame | None]: One frame per in-coverage call (same
                 order); `None` where a multi-point bbox skipped a call.
+                Truncated when `limit=` was passed to `download`.
         """
         from tqdm import tqdm
 
@@ -412,10 +419,17 @@ class NREL(AbstractDataSource):
             unit="call",
         )
         with requests.Session() as session:
-            return [
-                self._fetch_call(product, session, last_call, single=single)
-                for product in iterator
-            ]
+            # Lazy so a `limit=` stops the work: a call past the cap is never
+            # requested. Skipped (`None`) calls count as zero rows, so the cap
+            # bounds returned rows rather than attempted calls.
+            return self._take_limited(
+                (
+                    self._fetch_call(product, session, last_call, single=single)
+                    for product in iterator
+                ),
+                limit=self._limit,
+                size=lambda frame: 0 if frame is None else len(frame),
+            )
 
     def _fetch_call(
         self,

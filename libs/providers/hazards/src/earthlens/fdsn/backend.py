@@ -149,7 +149,12 @@ class FDSN(AbstractDataSource):
                 `"earthquake"`, `"volcanic eruption"`), or `None`.
             orderby: Result ordering — `"time"`, `"time-asc"`,
                 `"magnitude"`, or `"magnitude-asc"`.
-            limit: Maximum number of events per network, or `None`.
+            limit: Maximum number of events **per network**, or `None` for no
+                cap. Unlike the total-row `limit=` the tabular backends take,
+                this is pushed into the FDSN query itself, so a capped request
+                never transfers the events past the cap; with several networks
+                the totals add up rather than being one overall ceiling.
+                Rejected if zero or negative.
             earthscope_token: Optional EarthScope access token; falls
                 back to `EARTHSCOPE_TOKEN` / `~/.earthscope_token`.
                 Used only for a provider that requires a token.
@@ -163,7 +168,10 @@ class FDSN(AbstractDataSource):
         self._magnitude_type = magnitude_type
         self._event_type = event_type
         self._orderby = orderby
-        self._limit = limit
+        # Validated here so a zero/negative cap is refused before it reaches
+        # the FDSN query, where it would be a server-side argument whose
+        # meaning varies by provider rather than an obvious client-side bug.
+        self._limit = self.check_limit(limit)
         self._earthscope_token_arg = earthscope_token
         self._earthscope_token: str | None = None
         if file_format not in _DRIVERS:

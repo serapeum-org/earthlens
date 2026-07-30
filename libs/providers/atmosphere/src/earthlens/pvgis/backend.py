@@ -276,11 +276,16 @@ class PVGIS(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch every sampled point, write the table, and return it.
 
         Args:
-            progress_bar: Show a per-point `tqdm` bar while fetching.
+            progress_bar: Show a per-point `tqdm` bar while fetching.            limit: Cap on the total rows returned, across every requested
+                point. Applied as each point's frame arrives, so a point past
+                the cap is never requested. `None` (the default) fetches
+                everything.
+
 
         Returns:
             pd.DataFrame: The concatenated long-format frame — one block of
@@ -291,6 +296,7 @@ class PVGIS(AbstractDataSource):
             ValueError: If a single explicit point is out of PVGIS coverage,
                 or the grid exceeds `max_points`.
         """
+        self._limit = self.check_limit(limit)
         assert self._product is not None  # set by _initialize
         self._show_progress = progress_bar
         frames = [frame for frame in self._api() if frame is not None]
@@ -344,6 +350,7 @@ class PVGIS(AbstractDataSource):
         Returns:
             list[pd.DataFrame | None]: One frame per in-coverage point (same
                 order); `None` where a multi-point bbox skipped a point.
+                Truncated when `limit=` was passed to `download`.
         """
         from tqdm import tqdm
 
@@ -356,10 +363,17 @@ class PVGIS(AbstractDataSource):
             unit="point",
         )
         with requests.Session() as session:
-            return [
-                self._fetch_point(product, session, last_call, single=single)
-                for product in iterator
-            ]
+            # Lazy so a `limit=` stops the work: a point past the cap is never
+            # requested. Skipped (`None`) points count as zero rows, so the cap
+            # bounds returned rows rather than attempted points.
+            return self._take_limited(
+                (
+                    self._fetch_point(product, session, last_call, single=single)
+                    for product in iterator
+                ),
+                limit=self._limit,
+                size=lambda frame: 0 if frame is None else len(frame),
+            )
 
     def _fetch_point(
         self,

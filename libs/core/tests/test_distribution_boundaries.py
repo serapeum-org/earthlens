@@ -748,3 +748,120 @@ class TestDocstringSectionsHaveBodies:
                 ):
                     orphans.append(f"{path.name}:{index + 1} {match.group(2)}:")
         assert orphans == [], f"empty docstring sections: {orphans}"
+
+
+class TestLimitIsBoundedNotTrimmed:
+    """ARC-3: a backend that accepts `limit=` must let it stop the work.
+
+    The failure this guards against is a `limit=` that reads as a cap but is
+    really a slice: the backend fetches every product, concatenates, and returns
+    the first `n` rows. That bounds the *return value* while the memory and the
+    request count stay unbounded, which is the opposite of what a caller passing
+    a cap is asking for. A conforming backend validates the cap through
+    `check_limit` and routes its assembly through one of the bounding helpers,
+    all of which consume their input lazily.
+    """
+
+    #: The helpers that consume fragments lazily and stop at the cap.
+    BOUNDING_HELPERS = ("_take_limited", "_fetch_limited", "iter_download")
+
+    def _pushes_limit_to_the_service(self, source: str) -> bool:
+        """Whether the cap is handed to the provider's own query.
+
+        The strongest bound available: the service never sends the rows past
+        the cap, so there is nothing to trim client-side and no helper is
+        needed. fdsn does this — `limit=self._limit` goes into the FDSN
+        `get_events` call. Detected structurally (a `limit=self._limit`
+        keyword on a call that is not one of the bounding helpers) so a
+        backend cannot claim it with a comment.
+        """
+        for node in ast.walk(ast.parse(source)):
+            if not isinstance(node, ast.Call):
+                continue
+            func = node.func
+            name = (
+                func.attr
+                if isinstance(func, ast.Attribute)
+                else getattr(func, "id", "")
+            )
+            if name in self.BOUNDING_HELPERS:
+                continue
+            for keyword in node.keywords:
+                if (
+                    keyword.arg == "limit"
+                    and ast.unparse(keyword.value) == "self._limit"
+                ):
+                    return True
+        return False
+
+    def _backends_accepting_limit(self):
+        """Yield `(name, source)` for each backend that takes a `limit`.
+
+        Both entry points count: a cap can arrive as a `download(limit=)`
+        keyword (the facade forwards `**kwargs` to it) or as a constructor
+        argument held for the whole session, as openaq does. A backend that
+        takes one anywhere owes the caller the same guarantee.
+        """
+        root = Path(__file__).resolve().parents[2] / "providers"
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            source = path.read_text(encoding="utf-8")
+            tree = ast.parse(source)
+            for node in ast.walk(tree):
+                if not (
+                    isinstance(node, ast.FunctionDef)
+                    and node.name in {"download", "__init__"}
+                ):
+                    continue
+                args = [a.arg for a in node.args.args + node.args.kwonlyargs]
+                if "limit" in args:
+                    yield path.parent.name, source
+                    break
+
+    def test_some_backends_accept_a_limit(self):
+        """Guard the guard: the scan must actually find the converted backends."""
+        found = [name for name, _ in self._backends_accepting_limit()]
+        assert len(found) >= 8, f"only found {found}"
+
+    def test_an_accepted_limit_is_validated(self):
+        """An unchecked cap lets `limit=0` or `limit=-1` through to the fetch."""
+        offenders = [
+            name
+            for name, source in self._backends_accepting_limit()
+            if "check_limit(" not in source
+        ]
+        assert offenders == [], (
+            f"these accept limit= without validating it through check_limit, so "
+            f"a zero or negative cap reaches the fetch loop: {offenders}"
+        )
+
+    def test_an_accepted_limit_actually_bounds_the_work(self):
+        """Without a lazy helper or a server-side push, a cap is a post-hoc slice."""
+        offenders = [
+            name
+            for name, source in self._backends_accepting_limit()
+            if not any(helper in source for helper in self.BOUNDING_HELPERS)
+            and not self._pushes_limit_to_the_service(source)
+        ]
+        assert offenders == [], (
+            f"these accept limit= but neither route through "
+            f"{self.BOUNDING_HELPERS} nor push the cap into the provider query, "
+            f"so every product is still fetched and the cap only trims the "
+            f"returned value: {offenders}"
+        )
+
+    def test_the_server_side_form_is_recognised_and_not_a_free_pass(self):
+        """Guard the guard: the escape hatch must be structural, not textual.
+
+        A backend that merely mentions `limit` in a comment, or passes its own
+        page size, must not read as bounded — otherwise the exemption that lets
+        fdsn through would excuse every unbounded backend too.
+        """
+        assert self._pushes_limit_to_the_service(
+            "client.get_events(starttime=t, limit=self._limit)"
+        )
+        assert not self._pushes_limit_to_the_service(
+            "# we pass limit=self._limit somewhere\nclient.get(limit=self._page_limit)"
+        )
+        assert not self._pushes_limit_to_the_service(
+            "self._take_limited(frames, limit=self._limit)"
+        )

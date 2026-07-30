@@ -292,3 +292,39 @@ def test_no_bare_gpd_read_file_in_source():
         text = path.read_text(encoding="utf-8")
         assert "gpd.read_file(" not in text
         assert "geopandas.read_file(" not in text
+
+
+class TestLimitStopsTheWork:
+    """A `limit=` must stop reading datasets, not trim the combined collection.
+
+    Each dataset is a whole boundary layer read over `/vsicurl/` — often tens of
+    MB — so a cap that only sliced the concatenated features would download
+    every layer regardless. Counting the reads is what tells the two apart.
+    """
+
+    def test_datasets_past_the_cap_are_never_read(self, fake_read, monkeypatch):
+        """The second layer is not fetched once the first fills the cap."""
+        backend = _make_backend(variables=["cgaz:adm0", "cgaz:adm1"])
+        backend._limit = 2
+        collections = backend._fetch(backend._search())
+
+        assert len(fake_read) == 1, (
+            f"read {len(fake_read)} layer(s) for a cap the first already "
+            f"filled; the cap is trimming, not stopping the work"
+        )
+        assert sum(len(fc) for fc in collections) == 2
+
+    def test_no_limit_reads_every_dataset(self, fake_read):
+        """Without a cap every requested layer is still read."""
+        backend = _make_backend(variables=["cgaz:adm0", "cgaz:adm1"])
+        backend._limit = None
+        backend._fetch(backend._search())
+
+        assert len(fake_read) == 2
+
+    def test_a_zero_limit_is_refused_before_any_read(self, fake_read):
+        """`limit=0` is a caller bug, caught before the first layer is touched."""
+        backend = _make_backend(variables=["cgaz:adm0"])
+        with pytest.raises(ValueError):
+            backend.download(progress_bar=False, limit=0)
+        assert fake_read == []

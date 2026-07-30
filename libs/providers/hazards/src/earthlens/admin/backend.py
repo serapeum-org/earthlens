@@ -312,19 +312,36 @@ class AdminBoundaries(AbstractDataSource):
         Returns:
             list[FeatureCollection]: One collection per product, in order.
         """
-        collections: list[FeatureCollection] = []
         logged_licenses: set[str] = set()
-        for product in products:
-            dataset: Dataset = product.metadata["dataset"]
-            url = self._resolve_url(dataset)
-            logger.info(f"Fetching {dataset.id} from {dataset.provider} ({url})")
-            if dataset.provider not in logged_licenses:
-                logger.info(f"{dataset.provider} license: {dataset.license_note}")
-                logged_licenses.add(dataset.provider)
-            collection = read_vector(url)
-            logger.info(f"{dataset.id}: read {len(collection)} feature(s)")
-            collections.append(collection)
-        return collections
+        # Lazy so a `limit=` stops the work: a product past the cap is never
+        # resolved or read, rather than downloaded and then trimmed away.
+        return self._take_limited(
+            (self._read_product(product, logged_licenses) for product in products),
+            limit=self._limit,
+        )
+
+    def _read_product(
+        self, product: RemoteProduct, logged_licenses: set[str]
+    ) -> FeatureCollection:
+        """Resolve one product's URL and read its boundary layer.
+
+        Args:
+            product: One product from `_search`.
+            logged_licenses: Providers already logged this call; mutated so
+                each provider's license note is emitted once per download.
+
+        Returns:
+            FeatureCollection: The dataset's features, normalised to EPSG:4326.
+        """
+        dataset: Dataset = product.metadata["dataset"]
+        url = self._resolve_url(dataset)
+        logger.info(f"Fetching {dataset.id} from {dataset.provider} ({url})")
+        if dataset.provider not in logged_licenses:
+            logger.info(f"{dataset.provider} license: {dataset.license_note}")
+            logged_licenses.add(dataset.provider)
+        collection = read_vector(url)
+        logger.info(f"{dataset.id}: read {len(collection)} feature(s)")
+        return collection
 
     def _resolve_url(self, dataset: Dataset) -> str:
         """Build the `read_vector` source path for one dataset (routes by provider).
@@ -366,6 +383,7 @@ class AdminBoundaries(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> FeatureCollection:
         """Fetch the requested administrative boundaries and return the polygons.
 
@@ -377,11 +395,15 @@ class AdminBoundaries(AbstractDataSource):
         Args:
             progress_bar: Accepted for signature parity with the other
                 backends.
+            limit: Cap on the total features returned, across every requested
+                dataset. Applied as each dataset is read, so a dataset past the
+                cap is never fetched. `None` (the default) reads everything.
 
         Returns:
             FeatureCollection: The boundary polygons, CRS EPSG:4326. Empty
                 (schema-only) when nothing was fetched.
         """
+        self._limit = self.check_limit(limit)
         collections = self._api()
         collection = self._combine(collections)
         if len(collection) and self._should_write:
