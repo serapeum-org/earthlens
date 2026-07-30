@@ -42,6 +42,11 @@ open-source ecosystem and is built on top of
 Why earthlens?
 ------------
 
+<p align="center">
+  <img src="docs/_images/branding/earthlens-brand-kit/animation/earthlens-logo-orbit.gif" width="240"
+       alt="A satellite orbiting the earthlens globe">
+</p>
+
 Every provider speaks its own dialect: CHIRPS is anonymous FTP with date-coded
 filenames, ERA5-on-S3 is unsigned object storage with a per-month layout, the
 ECMWF CDS expects a JSON request body validated against a constraints graph,

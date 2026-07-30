@@ -6,6 +6,7 @@ repo_name: serapeum-org/earthlens
 
 theme:
   name: material
+  custom_dir: overrides
   language: en
   # The transparent globe mark reads on both the light and dark palettes, so one
   # asset serves both. See the Brand & media kit page for the full set.

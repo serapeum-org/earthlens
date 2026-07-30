@@ -12,9 +12,14 @@ A satellite captures Earth-observation data, which resolves down through a pyram
 story: **earth + lens**.
 
 <p align="center">
-  <img src="../_images/branding/earthlens-brand-kit/animation/earthlens-logo-animated.svg" width="300"
+  <img src="../_images/branding/earthlens-brand-kit/animation/earthlens-logo-animated.svg" width="260"
        alt="Animated earthlens logo: a satellite orbiting a rotating globe above the pyramids raster stack">
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="../_images/branding/earthlens-brand-kit/logo/earthlens-logo.svg" width="260"
+       alt="Static earthlens logo: satellite, pyramids raster stack, and globe">
 </p>
+
+<p align="center"><em>Animated (left) and static (right) — the same mark, both vector.</em></p>
 
 The animated logo is a **self-contained SVG** — the motion is CSS `@keyframes` inside the file, with no
 JavaScript — so it animates inside a plain `<img>` and weighs 14.5 KB. Prefer it over the GIFs wherever a vector
@@ -57,7 +62,14 @@ The stacked lockup and the pre-composited logo plates, for when you cannot contr
   &nbsp;&nbsp;
   <img src="../_images/branding/earthlens-brand-kit/logo/earthlens-logo-on-navy.png" width="150"
        alt="earthlens logo pre-composited on navy">
+  &nbsp;&nbsp;
+  <img src="../_images/branding/earthlens-brand-kit/logo/earthlens-logo.png" width="150"
+       alt="earthlens logo, 918x1600 transparent raster">
 </p>
+
+<p align="center"><em>
+  Stacked lockup (theme-aware) · on-white plate · on-navy plate · transparent raster
+</em></p>
 
 ## Icon
 
@@ -65,12 +77,20 @@ The square globe, with and without a rounded app-badge plate. The transparent ic
 its header mark, because it reads on both palettes.
 
 <p align="center">
-  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-icon.svg" width="140"
-       alt="earthlens globe icon, transparent">
+  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-icon.svg" width="130"
+       alt="earthlens globe icon, transparent, vector">
+  &nbsp;&nbsp;
+  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-icon.png" width="130"
+       alt="earthlens globe icon, 1024 px raster">
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-badge.svg" width="140"
-       alt="earthlens rounded app badge">
+  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-badge.svg" width="130"
+       alt="earthlens rounded app badge, vector">
+  &nbsp;&nbsp;
+  <img src="../_images/branding/earthlens-brand-kit/icon/earthlens-badge.png" width="130"
+       alt="earthlens rounded app badge, 1024 px raster">
 </p>
+
+<p align="center"><em>Icon and badge, each as vector then 1024 px raster.</em></p>
 
 | Asset | Size | Use |
 |---|---|---|
@@ -154,6 +174,16 @@ social platforms and older README renderers — and prefer the vector everywhere
 <p align="center">
   <img src="../_images/branding/earthlens-brand-kit/animation/earthlens-logo-orbit.gif" width="240"
        alt="Orbit animation: a satellite circling the earthlens globe">
+</p>
+
+## Source assets
+
+`world-texture.png` (32 KB) is the equirectangular land/ocean texture the globe is built from. It is a build
+input for regenerating the mark, not a logo — do not use it as one.
+
+<p align="center">
+  <img src="../_images/branding/earthlens-brand-kit/world-texture.png" width="260"
+       alt="Equirectangular world texture used to build the globe in the mark">
 </p>
 
 ## Colors

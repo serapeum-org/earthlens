@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{#
+  mkdocs-material's `theme.favicon` emits a single <link rel="icon">. The brand
+  kit ships a full set, so declare the rest here: the .ico for browsers that ask
+  for it by convention, the Apple touch icon for iOS home screens, and the 192 /
+  512 px PNGs that a PWA install prompt looks for.
+#}
+{% block extrahead %}
+  {{ super() }}
+  <link rel="icon" sizes="any"
+        href="{{ '_images/branding/earthlens-brand-kit/favicon/favicon.ico' | url }}">
+  <link rel="icon" type="image/png" sizes="16x16"
+        href="{{ '_images/branding/earthlens-brand-kit/favicon/favicon-16.png' | url }}">
+  <link rel="icon" type="image/png" sizes="48x48"
+        href="{{ '_images/branding/earthlens-brand-kit/favicon/favicon-48.png' | url }}">
+  <link rel="icon" type="image/png" sizes="192x192"
+        href="{{ '_images/branding/earthlens-brand-kit/favicon/favicon-192.png' | url }}">
+  <link rel="icon" type="image/png" sizes="512x512"
+        href="{{ '_images/branding/earthlens-brand-kit/favicon/favicon-512.png' | url }}">
+  <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ '_images/branding/earthlens-brand-kit/favicon/apple-touch-icon.png' | url }}">
+  <meta name="theme-color" content="#0B2036">
+  <meta property="og:image"
+        content="{{ '_images/branding/earthlens-brand-kit/social/github-social-preview.png' | url }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image"
+        content="{{ '_images/branding/earthlens-brand-kit/social/announcement-card.png' | url }}">
+{% endblock %}

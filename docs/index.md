@@ -52,6 +52,17 @@ graph LR
 See [Supported providers](reference/providers.md) for the full matrix, and the
 per-provider pages under **Data Sources** for catalogs, authentication, and usage.
 
+<p align="center">
+  <img src="_images/branding/earthlens-brand-kit/animation/earthlens-logo-animated.svg" width="260"
+       alt="A satellite orbiting Earth, its data resolving down through a pyramid of raster overview tiles onto the globe">
+</p>
+
+<p align="center"><em>
+  A satellite captures Earth-observation data, which resolves down through a pyramid of raster overview
+  tiles — the <a href="https://github.com/serapeum-org/pyramids">pyramids</a> lineage — onto a living globe.<br>
+  The name is the story: <strong>earth + lens</strong>. See the <a href="brand.md">brand &amp; media kit</a>.
+</em></p>
+
 ## Quick Start
 
 ```python
