@@ -419,6 +419,7 @@ class FDSN(AbstractDataSource):
         self,
         progress_bar: bool = True,
         errors: str = "warn",
+        limit: int | None = None,
     ) -> FeatureCollection:
         """Query every requested network and return the unioned events.
 
@@ -436,6 +437,13 @@ class FDSN(AbstractDataSource):
             progress_bar: Accepted for signature parity with the other
                 backends; obspy's `get_events` has no progress bar, so
                 this is currently a no-op.
+            limit: Maximum events **per network**, overriding the constructor's
+                `limit=` for this call. Same meaning as that one — pushed into
+                the FDSN query itself, so a per-network server-side cap rather
+                than a total across networks — and accepted here so it can be
+                passed through `EarthLens(...).download(limit=...)` like the
+                other bounded backends. `None` (the default) keeps whatever the
+                constructor set.
 
         Returns:
             FeatureCollection: The row-wise union of every requested
@@ -447,6 +455,8 @@ class FDSN(AbstractDataSource):
                 (propagated from :meth:`_fetch`). A partial failure does
                 not raise — the healthy networks' events are returned.
         """
+        if limit is not None:
+            self._request_limit = self.check_limit(limit)
         self._errors = self.check_errors_policy(errors)
         products = self._search()
         collections = self._fetch(products) if products else []

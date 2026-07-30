@@ -1161,3 +1161,34 @@ class TestCatalogLoadingUsesOneMechanism:
             f"these define _autoload but override model_post_init without "
             f"calling super(), so the hook never runs: {offenders}"
         )
+
+
+class TestLimitIsReachableThroughTheFacade:
+    """A backend that takes a `limit` must accept it on `download`.
+
+    The facade forwards `**kwargs` to `backend.download`, so a backend whose
+    cap lives only on `__init__` answers `EarthLens(...).download(limit=100)`
+    with `TypeError: got an unexpected keyword argument`. openaq and fdsn were
+    in that shape while thirteen other backends took the keyword happily —
+    the same argument name working or failing depending on which backend was
+    bound is the kind of inconsistency a user cannot predict.
+    """
+
+    def test_every_backend_with_a_cap_takes_it_on_download(self):
+        """No backend accepts `limit` only at construction."""
+        root = Path(__file__).resolve().parents[2] / "providers"
+        offenders: list[str] = []
+        for path in sorted(root.rglob("src/earthlens/*/backend.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            takes = {"__init__": False, "download": False}
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef) and node.name in takes:
+                    names = [a.arg for a in node.args.args + node.args.kwonlyargs]
+                    takes[node.name] = takes[node.name] or "limit" in names
+            if takes["__init__"] and not takes["download"]:
+                offenders.append(path.parent.name)
+        assert offenders == [], (
+            f"these take a limit= at construction but not on download, so "
+            f"EarthLens(...).download(limit=...) raises TypeError for them: "
+            f"{offenders}"
+        )

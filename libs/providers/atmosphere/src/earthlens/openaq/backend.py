@@ -432,6 +432,7 @@ class OpenAQ(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
+        limit: int | None = None,
     ) -> pd.DataFrame:
         """Fetch measurements, write them to `path`, and return the frame.
 
@@ -446,12 +447,21 @@ class OpenAQ(AbstractDataSource):
         Args:
             progress_bar: Show a per-sensor progress bar. Defaults to
                 `True`.
+            limit: Cap on the total measurement rows, overriding the
+                constructor's `limit=` for this call. Same meaning as that
+                one — a total across sensors, applied as each sensor's frame
+                arrives — and accepted here so the cap can be passed through
+                `EarthLens(...).download(limit=...)` like every other bounded
+                backend. `None` (the default) keeps whatever the constructor
+                set.
 
         Returns:
             pd.DataFrame: The long-format union of every sensor's
                 measurements (schema columns, `datetime_utc` tz-aware
                 UTC). Empty (schema-only) when nothing matched.
         """
+        if limit is not None:
+            self._limit = self.check_limit(limit)
         frames = self._take_limited(
             self._iter_non_empty_frames(progress_bar),
             limit=self._limit,
