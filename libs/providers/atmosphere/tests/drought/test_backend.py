@@ -1124,13 +1124,13 @@ class TestLimitStopsTheWork:
         )
 
     def _fake_period(self, backend, monkeypatch, fetched, rows: int = 3):
-        """Record each period fetched and serve `rows` polygons for it."""
+        """Record each period fetched and serve `rows` in-bbox polygons for it."""
         import geopandas as gpd
         from shapely.geometry import Polygon
 
         square = Polygon([(-94, 31), (-94, 32), (-93, 32), (-93, 31)])
 
-        def fake_fetch(product):
+        def fake_fetch(product, bbox):
             fetched.append(product.metadata["period"])
             return gpd.GeoDataFrame(
                 {"dm": list(range(rows))},
@@ -1166,6 +1166,39 @@ class TestLimitStopsTheWork:
 
         assert len(fetched) == 3
         assert len(result) == 9
+
+    def test_the_cap_counts_only_rows_inside_the_bbox(self, monkeypatch):
+        """USDM publishes nationally, so the clip must precede the cap.
+
+        With the cap applied to the raw national frame, `limit=3` filled up on
+        polygons outside the request bbox and the final clip removed all of
+        them — returning nothing while the weeks that did intersect were never
+        fetched. Every polygon in the other fixtures sits inside the bbox, so
+        only a frame mixing the two can see this.
+        """
+        import geopandas as gpd
+        from shapely.geometry import Polygon
+
+        backend = self._usdm(weeks=3)
+        inside = Polygon([(-94, 31), (-94, 32), (-93, 32), (-93, 31)])
+        outside = Polygon([(10, 50), (10, 51), (11, 51), (11, 50)])
+
+        def fake_fetch(product, bbox):
+            frame = gpd.GeoDataFrame(
+                {"dm": [0, 1, 2, 3]},
+                geometry=[outside, outside, outside, inside],
+                crs="EPSG:4326",
+            )
+            return frame.cx[bbox[0] : bbox[2], bbox[1] : bbox[3]]
+
+        monkeypatch.setattr(backend, "_fetch_usdm_period", fake_fetch)
+        backend._limit = 3
+        result = backend._fetch(backend._search())
+
+        assert len(result) == 3, (
+            f"got {len(result)} row(s) for limit=3; the cap counted polygons "
+            f"outside the request bbox that the clip then discarded"
+        )
 
     def test_a_cap_on_a_raster_transport_is_refused(self, tmp_path):
         """Raster transports write files, so a row cap is rejected, not ignored.

@@ -355,10 +355,13 @@ class Drought(AbstractDataSource):
         # download, so a week past the cap is never requested. Empty periods
         # are dropped before the cap counts them, so the cap bounds returned
         # polygons rather than weeks attempted.
+        bbox = bbox_from_extent(self.space)
         frames = self._take_limited(
             (
                 frame
-                for frame in (self._fetch_usdm_period(product) for product in products)
+                for frame in (
+                    self._fetch_usdm_period(product, bbox) for product in products
+                )
                 if len(frame)
             ),
             limit=self._limit,
@@ -382,7 +385,8 @@ class Drought(AbstractDataSource):
             )
         if gdf.crs.to_epsg() != 4326:
             gdf = gdf.to_crs("EPSG:4326")
-        bbox = bbox_from_extent(self.space)
+        # Already clipped per period (before the cap counted the rows), so
+        # this is a no-op for the bbox and only guards the empty case.
         within = gdf.cx[bbox[0] : bbox[2], bbox[1] : bbox[3]]
         if not len(within):
             return self._empty_vector()
@@ -444,22 +448,48 @@ class Drought(AbstractDataSource):
         gdf["release_date"] = period.isoformat()
         return gdf
 
-    def _fetch_usdm_period(self, product: RemoteProduct) -> Any:
-        """Download and parse one USDM week's GeoJSON.
+    def _fetch_usdm_period(
+        self, product: RemoteProduct, bbox: tuple[float, float, float, float]
+    ) -> Any:
+        """Download one USDM week's GeoJSON and clip it to the request bbox.
+
+        The clip happens here, not after the concat, because a `limit=` counts
+        these frames as they arrive. USDM publishes one **national** polygon
+        set per week, so counting before the clip would let a cap fill up on
+        rows outside the requested area and return nothing — with the weeks
+        that did intersect it never fetched.
 
         Args:
             product: One period product from `_search`; its `href` is the URL
                 template and its `period` metadata the week to render.
+            bbox: The request's `(west, south, east, north)` filter.
 
         Returns:
-            gpd.GeoDataFrame: That week's drought polygons, stamped with the
-                period (empty when the week published nothing).
+            gpd.GeoDataFrame: That week's drought polygons intersecting the
+                bbox, stamped with the period (empty when nothing matched).
         """
         period: dt.date = product.metadata["period"]
         assert product.href is not None  # USDM products always carry a URL template
         url = self._render_usdm_url(product.href, period)
         payload = _http_get_json(url)
-        return self._geojson_to_gdf(payload, period)
+        frame = self._geojson_to_gdf(payload, period)
+        if not len(frame):
+            return frame
+        if frame.crs is None:
+            # _geojson_to_gdf always stamps the source CRS (RFC 7946 default
+            # 4326 when the payload omits it), so reaching here means an
+            # upstream contract was broken. Raise loudly rather than silently
+            # re-labelling unknown coordinates.
+            raise RuntimeError(
+                "USDM frame reached _fetch_usdm_period with no CRS; "
+                "_geojson_to_gdf is expected to stamp one."
+            )
+        # Reproject before clipping: `bbox` is in EPSG:4326, so clipping a
+        # payload delivered in another CRS with those numbers discards
+        # everything.
+        if frame.crs.to_epsg() != 4326:
+            frame = frame.to_crs("EPSG:4326")
+        return frame.cx[bbox[0] : bbox[2], bbox[1] : bbox[3]]
 
     def _fetch_speibase(self, products: list[RemoteProduct]) -> list[Path]:
         """Fetch the SPEIbase NetCDF once per scale, write one TIFF per period.
