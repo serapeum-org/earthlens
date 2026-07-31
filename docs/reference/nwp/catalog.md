@@ -15,10 +15,13 @@ bundled in the `pyramids-gis` wheel, so nothing has to be installed alongside
 it.
 
 The **decode** libraries Herbie needs (`cfgrib`, `eccodes`) come in as ordinary
-PyPI dependencies of `herbie-data`, and the ecCodes binary they bind to arrives
-with them: on Windows through `ecmwflibs`, which the `nwp` extra installs for
-that platform, and elsewhere in the `eccodes` wheel itself. earthlens imports
-neither `cfgrib` nor `eccodes` directly.
+PyPI dependencies of `herbie-data`. On Windows the ecCodes binary they bind to
+arrives with `ecmwflibs`, which the `nwp` extra installs for that platform —
+verified on a clean pip environment, where `import herbie` and
+`codes_get_api_version()` both succeed with nothing from conda-forge. On Linux
+and macOS the `eccodes` wheel is expected to carry its own binary; that path was
+not tested here, so if `import herbie` reports a missing ecCodes library, see the
+note below. earthlens imports neither `cfgrib` nor `eccodes` directly.
 
 !!! note "If `import herbie` cannot find ecCodes"
     Older `eccodes` wheels did not bundle the binary, and a mixed conda/pip

@@ -10,8 +10,10 @@ from earthlens.base import SpatialExtent, TemporalExtent
 
 These are values, not dicts — they are immutable, and `SpatialExtent` is comparable and hashable.
 
-`TemporalExtent` is neither, because its `dates` field holds a `DatetimeIndex`: `==` raises `ValueError`
-("truth value of an array ... is ambiguous") and `hash()` raises `TypeError`. Compare its scalar fields
+`TemporalExtent` is neither, because its `dates` field holds a `DatetimeIndex`. `hash()` always raises
+`TypeError`. `==` is worse than simply failing: it returns `True` when both extents share the *same*
+`dates` object, and raises `ValueError` ("truth value of an array ... is ambiguous") when they hold
+equal-but-distinct ones — so it appears to work until it doesn't. Compare the scalar fields
 (`start_date`, `end_date`, `resolution`) rather than the object.
 
 ## `SpatialExtent`

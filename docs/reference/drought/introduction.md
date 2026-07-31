@@ -68,8 +68,8 @@ The Copernicus EMS drought endpoint is **not a conformant OGC WCS server** —
 it is a REST shim. Only its `GetCoverage` operation is reliable; the
 standard `GetCapabilities` / `DescribeCoverage` discovery operations answer
 `502` / `400` (they require a non-standard `SELECTED_TIMESCALE` parameter),
-so pyramids' `Dataset.from_wcs` (whose WCS reader needs that discovery
-handshake) cannot read it.
+so pyramids' `Dataset.from_wcs` (whose underlying WCS driver needs that
+discovery handshake) cannot read it.
 
 Instead the backend builds the documented `GetCoverage` URL by hand with
 core `requests` and two Copernicus-custom parameters:

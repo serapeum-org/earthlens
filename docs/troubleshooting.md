@@ -23,7 +23,8 @@ use `earthlens.core`.
 ### A backend raises `ImportError` about an extra
 
 ```
-... SDK is not installed. Install with `pip install earthlens[cmems]`.
+ImportError: backend 'cmems' is unavailable — its runtime dependency is not
+installed. Install with `pip install earthlens[cmems]`.
 ```
 
 Each backend's SDK is optional and imported lazily. Install the extra named in the message, or `earthlens[all]`
@@ -34,6 +35,8 @@ for everything. The [provider matrix](reference/providers.md) lists the extra fo
 ```
 Extras `openeo` and `argo` are incompatible with the declared conflicts
 ```
+
+(That one is uv's message, not earthlens'.)
 
 `argopy` needs `xarray>=2025.7` and `openeo` needs `xarray<2025.1.2` — mutually unsatisfiable. Use the curated
 extra instead:

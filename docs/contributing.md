@@ -141,5 +141,9 @@ nothing could regenerate what was stripped.
 The practical consequence is that the docs build does **not** execute notebooks, so a stripped notebook
 publishes as code with no results. That is the current trade-off: the repository stays small, and the example
 pages show the call rather than its output. If you are adding a notebook whose result is the point, put it under
-`showcases/` so its outputs survive, and keep them small — prefer a linked asset over a multi-megabyte embedded
-one.
+`showcases/` so its outputs survive.
+
+Keep those outputs small. An embedded base64 image or video is counted in full on every clone, so prefer a
+linked asset, and reach for an embedded one only when the page is meaningless without it. The two 2026
+showcase notebooks sit at roughly 1.5–1.8 MB each and are the practical ceiling — treat them as the limit,
+not the example to follow.
