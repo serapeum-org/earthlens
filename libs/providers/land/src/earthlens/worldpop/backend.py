@@ -54,7 +54,6 @@ from earthlens.worldpop._helpers import (
     load_iso3_bbox,
     normalise_iso3,
 )
-
 from earthlens.worldpop.auth import WorldPopAuth
 from earthlens.worldpop.catalog import GENERATIONS, Catalog
 from earthlens.worldpop.rest import (
