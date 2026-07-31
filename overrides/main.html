@@ -21,9 +21,31 @@
   <link rel="apple-touch-icon" sizes="180x180"
         href="{{ '_images/branding/earthlens-brand-kit/favicon/apple-touch-icon.png' | url }}">
   <meta name="theme-color" content="#0B2036">
-  <meta property="og:image"
-        content="{{ '_images/branding/earthlens-brand-kit/social/github-social-preview.png' | url }}">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image"
-        content="{{ '_images/branding/earthlens-brand-kit/social/announcement-card.png' | url }}">
+
+  {#
+    Open Graph and Twitter require ABSOLUTE urls — a scraper has no page context
+    to resolve a relative one against, so `| url` alone yields a card that never
+    renders. Build them from site_url, and skip the tags entirely rather than
+    emit a broken relative one if it is unset.
+  #}
+  {% if config.site_url %}
+    {# `page` is None on the 404 template, so every lookup has to tolerate it. #}
+    {% set base = config.site_url | trim('/') %}
+    {% set og_title = page.title if page and page.title else config.site_name %}
+    {% set og_desc = page.meta.description if page and page.meta and page.meta.description
+                     else config.site_description %}
+    {% set og_url = page.canonical_url if page and page.canonical_url else config.site_url %}
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ config.site_name }}">
+    <meta property="og:title" content="{{ og_title }}">
+    <meta property="og:description" content="{{ og_desc }}">
+    <meta property="og:url" content="{{ og_url }}">
+    <meta property="og:image"
+          content="{{ base }}/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ og_title }}">
+    <meta name="twitter:description" content="{{ og_desc }}">
+    <meta name="twitter:image"
+          content="{{ base }}/_images/branding/earthlens-brand-kit/social/announcement-card.png">
+  {% endif %}
 {% endblock %}

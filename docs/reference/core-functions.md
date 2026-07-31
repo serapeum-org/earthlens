@@ -14,16 +14,16 @@ For a task-oriented walkthrough of `find` / `search` / `sources`, see [Discoveri
 The one-shot equivalent of constructing an `EarthLens` and calling `.download()`. Takes the same arguments as the
 facade constructor and returns the backend's result directly.
 
-::: earthlens.earthlens.download
+::: earthlens.core.download
 
 ## `sources`
 
-::: earthlens.earthlens.sources
+::: earthlens.core.sources
 
 ## `find`
 
-::: earthlens.earthlens.find
+::: earthlens.core.find
 
 ## `search`
 
-::: earthlens.earthlens.search
+::: earthlens.core.search
