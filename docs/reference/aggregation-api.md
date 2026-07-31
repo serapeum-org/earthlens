@@ -7,8 +7,11 @@ guide with worked examples, see [Temporal aggregation](../aggregation.md).
 from earthlens.core import AggregationConfig, aggregate_netcdf
 ```
 
-The aggregator is accepted for backends whose `OUTPUT_KIND` is `raster`, and rejected for `vector` / `tabular` /
-`mixed` ones — see [Base contracts](base/contracts.md).
+`aggregate=` is forwarded only when **both** conditions hold: the backend's `OUTPUT_KIND` is `raster` or `mixed`
+— the shapes a gridded reduction is defined for — **and** the backend declares `SUPPORTS_AGGREGATE`. A `vector` /
+`tabular` backend is refused because the aggregator has no meaning on `GeoDataFrame` / `DataFrame` rows; a raster
+backend that has not wired the reducer is refused for that reason instead. Either way the refusal is a
+`NotImplementedError` raised before the backend's `download` runs. See [Base contracts](base/contracts.md).
 
 ## `AggregationConfig`
 

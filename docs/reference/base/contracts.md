@@ -34,7 +34,8 @@ Three `TemporalExtent` factories cover the common window shapes, replacing 27 ha
 
 | Attribute | Default | Meaning |
 |---|---|---|
-| `OUTPUT_KIND` | `"raster"` | What `download()` returns, and whether `aggregate=` is accepted. |
+| `OUTPUT_KIND` | `"raster"` | What `download()` returns. Also the first half of the `aggregate=` gate. |
+| `SUPPORTS_AGGREGATE` | `False` | The second half: `aggregate=` is forwarded only when this is `True` **and** `OUTPUT_KIND` is `raster` or `mixed`. |
 | `REQUIRES_TIME_WINDOW` | `True` | Whether `start` / `end` are mandatory. |
 | `SUPPORTS_POLYGON_AOI` | `False` | Whether a polygon `aoi=` is honoured, or reduced to its bounding box. |
 | `ERROR_POLICIES` | `{"raise", "warn", "skip", "ignore"}` | The accepted `errors=` values. |

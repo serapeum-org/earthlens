@@ -119,14 +119,18 @@ into `self.space` and `self.time` — they are not plain dicts.
 
 ### `OUTPUT_KIND`
 
-Each backend declares what it produces, and that one attribute drives the facade's behaviour:
+Each backend declares what it produces, and that attribute drives the facade's behaviour:
 
 | `OUTPUT_KIND` | `download()` returns | `aggregate=` |
 |---|---|---|
-| `raster` | `list[Path]` — GeoTIFF / NetCDF / COG | accepted |
+| `raster` | `list[Path]` — GeoTIFF / NetCDF / COG | if `SUPPORTS_AGGREGATE` |
+| `mixed` | varies per request | if `SUPPORTS_AGGREGATE` |
 | `vector` | `FeatureCollection` / `GeoDataFrame` | rejected |
 | `tabular` | `DataFrame` | rejected |
-| `mixed` | varies per request | rejected |
+
+`aggregate=` needs **both** an `OUTPUT_KIND` of `raster` or `mixed` and a `SUPPORTS_AGGREGATE` declaration —
+`OUTPUT_KIND` alone does not decide it. A raster backend that has not wired the reducer is refused just as a
+`vector` one is, with a `NotImplementedError` raised before `download` runs.
 
 `download()` never returns `None`.
 

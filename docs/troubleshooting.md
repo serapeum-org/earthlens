@@ -82,7 +82,9 @@ giving you daily data under a label that claimed otherwise — see the [migratio
 vector / tabular backends emit GeoDataFrame / DataFrame rows that have no meaningful gridded reduction.
 ```
 
-`aggregate=` is accepted only for `raster` backends. For `vector` / `tabular` results, reduce the returned
+`aggregate=` is forwarded only when the backend's `OUTPUT_KIND` is `raster` or `mixed` **and** it declares
+`SUPPORTS_AGGREGATE`. A raster backend that has not wired the reducer is refused too. For `vector` / `tabular`
+results, reduce the returned
 `GeoDataFrame` / `DataFrame` with pandas instead.
 
 ### A polygon AOI came back as a rectangle
