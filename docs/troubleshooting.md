@@ -230,8 +230,12 @@ uv run --group docs --extra all mkdocs build --strict
 
 ### A notebook renders with no output
 
-The docs build does **not** execute notebooks — it renders stored outputs. Commit notebooks with their outputs
-saved, or the page publishes as code with no results.
+Expected for most example pages. The docs build does **not** execute notebooks — it renders whatever outputs are
+stored — and the `nbstripout` pre-commit hook clears outputs from everything under `docs/examples/` except
+`showcases/`. So a page showing code with no results is the designed state, not a broken build.
+
+Run the notebook yourself to see its output. If you are authoring one whose rendered result is the point, put it
+under `docs/examples/showcases/`, which is excluded from the hook.
 
 ## Still stuck
 

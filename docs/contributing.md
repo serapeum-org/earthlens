@@ -133,5 +133,13 @@ Notebook examples live under `docs/examples/<pkg>/`. Because a notebook's kernel
 as the working directory, paths inside a notebook must be relative to the notebook itself — a notebook at
 `docs/examples/<pkg>/nb.ipynb` reaches `examples/data/` via `../../../examples/data`.
 
-Commit notebooks **with their outputs stored**. The docs build does not execute them, so a notebook without saved
-outputs publishes as code with no results.
+**Notebook outputs are stripped on commit.** The `nbstripout` pre-commit hook clears outputs and execution
+counts from every notebook under `docs/examples/`, with one exception: `docs/examples/showcases/`, whose
+notebooks exist to show a rendered animation or plot and need credentials the docs build does not have, so
+nothing could regenerate what was stripped.
+
+The practical consequence is that the docs build does **not** execute notebooks, so a stripped notebook
+publishes as code with no results. That is the current trade-off: the repository stays small, and the example
+pages show the call rather than its output. If you are adding a notebook whose result is the point, put it under
+`showcases/` so its outputs survive, and keep them small — prefer a linked asset over a multi-megabyte embedded
+one.
