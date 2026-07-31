@@ -5,7 +5,7 @@ omitted — see the [change log](change-log.md) for the full history.
 
 ## 0.11.0 → 0.12.0
 
-Four breaking changes. The `OpenAQ` one is the dangerous one: **your code keeps running and quietly means
+Five breaking changes. The `OpenAQ` one is the dangerous one: **your code keeps running and quietly means
 something different**. The rest fail loudly.
 
 ### `OpenAQ(limit=...)` changed meaning

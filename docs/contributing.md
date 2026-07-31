@@ -39,12 +39,15 @@ Refresh the lockfile with `uv lock`; `uv lock --check` verifies it is current (t
 uv run pytest -m "not e2e" --cov=libs --cov-report=xml
 
 # one file, one test
-uv run pytest tests/test_earthlens.py -v
-uv run pytest tests/test_earthlens.py::test_name -v
+uv run pytest libs/core/tests/test_earthlens.py -v
+uv run pytest libs/core/tests/test_earthlens.py::test_name -v
 ```
 
+Tests are **co-located with each distribution**, not in a repo-root `tests/`. `testpaths` lists the six roots:
+`libs/core/tests` plus `libs/providers/<theme>/tests` for each of the five themes.
+
 End-to-end tests carry the `e2e` marker, perform live network downloads, and are skipped unless you select them
-with `-m e2e`. Live-test scratch data goes to `tests/data/delete/`.
+with `-m e2e`.
 
 Test categories are selected by **pytest markers only** — never by environment variables. Every backend has its
 own marker (`chc`, `gee`, `cmems`, …) alongside the cross-cutting ones (`slow`, `fast`, `unit`, `integration`,
