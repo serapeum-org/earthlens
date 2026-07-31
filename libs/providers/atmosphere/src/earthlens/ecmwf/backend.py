@@ -239,15 +239,18 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
     def __init__(
         self,
-        start: str,
-        end: str,
-        variables: dict[str, list[str]],
-        lat_lim: list[float],
-        lon_lim: list[float],
+        start: str | None = None,
+        end: str | None = None,
+        variables: dict[str, list[str]] | None = None,
+        lat_lim: list[float] | None = None,
+        lon_lim: list[float] | None = None,
         temporal_resolution: str = "daily",
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
         skip_constraints: bool = False,
+        dataset: str | None = None,
+        request: dict[str, Any] | None = None,
+        endpoint: str | None = None,
     ):
         """Initialize an ECMWF backend instance.
 
@@ -294,6 +297,42 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # poison endpoint routing.
         self._clients: dict[str, Any] = {}
         self._injected_client: Any = None
+        # Raw-request passthrough (the coverage lever): when `request=` is
+        # given, skip the typed catalog / date / grid machinery and forward
+        # the raw request to the resolved store's client (see `download`).
+        self._passthrough: dict[str, Any] | None = None
+        if request is not None:
+            if not dataset:
+                raise ValueError(
+                    "ECMWF raw passthrough needs `dataset=<id>` alongside "
+                    "`request=<dict>`."
+                )
+            self._passthrough = {
+                "dataset": str(dataset),
+                "request": dict(request),
+                "endpoint": endpoint,
+            }
+            self.root_dir = Path(path).absolute()
+            self.root_dir.mkdir(parents=True, exist_ok=True)
+            self.path = self.root_dir
+            return
+
+        missing = [
+            name
+            for name, value in (
+                ("start", start),
+                ("end", end),
+                ("variables", variables),
+                ("lat_lim", lat_lim),
+                ("lon_lim", lon_lim),
+            )
+            if value is None
+        ]
+        if missing:
+            raise ValueError(
+                f"ECMWF requires {missing} — or pass `dataset=`+`request=` "
+                "for a raw-request passthrough."
+            )
         super().__init__(
             start=start,
             end=end,
@@ -690,6 +729,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             :class:`Catalog`: Resolves `(dataset, code)` pairs to
                 per-variable metadata.
         """
+        if getattr(self, "_passthrough", None) is not None:
+            return self._download_passthrough(aggregate=aggregate)
         self._errors = self.check_errors_policy(errors)
         catalog = Catalog()
         effective_aggregate: AggregationConfig | None = None
@@ -762,6 +803,122 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             return [nc_path]
         agg = aggregate_netcdf(nc_path, var_info, aggregate)
         return [path for _, _, path in agg if path is not None]
+
+    def _resolve_endpoint(self, dataset: str) -> str:
+        """Resolve which store hosts `dataset` for a passthrough retrieve.
+
+        A curated row's `endpoint` wins; otherwise the per-store availability
+        index (`Catalog.store_for`) decides; falling back to `"cds"`.
+
+        Args:
+            dataset: The Copernicus dataset id being retrieved.
+
+        Returns:
+            str: The store slug (`"cds"` / `"ads"` / `"ewds"`).
+        """
+        catalog = Catalog()
+        row = catalog.datasets.get(dataset)
+        if row is not None:
+            return row.endpoint
+        return catalog.store_for(dataset) or "cds"
+
+    def _passthrough_target(self, dataset: str, request: dict[str, Any]) -> str:
+        """Pick an output filename for a raw retrieve from the request format.
+
+        Args:
+            dataset: The dataset id (becomes the filename stem).
+            request: The raw request dict (its format hint picks the suffix).
+
+        Returns:
+            str: `<dataset><suffix>` — `.nc` / `.zip` / `.grib` / `.bin`.
+        """
+        fmt = str(request.get("data_format") or request.get("format") or "").lower()
+        download_fmt = str(request.get("download_format") or "").lower()
+        if download_fmt == "zip" or fmt == "netcdf_zip":
+            suffix = ".zip"
+        elif fmt == "netcdf":
+            suffix = ".nc"
+        elif fmt in ("grib", "grib2"):
+            suffix = ".grib"
+        else:
+            suffix = ".bin"
+        return f"{dataset}{suffix}"
+
+    def _download_passthrough(
+        self, aggregate: AggregationConfig | None = None
+    ) -> list[Path]:
+        """Retrieve a raw `dataset` + `request` from the resolved store.
+
+        The coverage lever (`G3`): forwards a raw request to the endpoint
+        router with no curated row, typed variable resolution, grid snap, or
+        constraint pre-validation. NetCDF (incl. single-member `netcdf_zip`)
+        is unwrapped in place; other formats (GRIB, multi-member zips, CSV) are
+        written raw with a clear log for the caller / the C3 format handler.
+
+        Args:
+            aggregate: Rejected — aggregation needs a curated `Variable`.
+
+        Returns:
+            list[Path]: The single written file.
+
+        Raises:
+            NotImplementedError: If `aggregate` is set.
+            PermissionError: If the store rejects the dataset for an unaccepted
+                licence (mapped to name the dataset page).
+        """
+        if aggregate is not None:
+            raise NotImplementedError(
+                "aggregate= is not supported for a raw-request passthrough; "
+                "use a curated dataset row."
+            )
+        spec = self._passthrough
+        assert spec is not None
+        dataset = spec["dataset"]
+        request = spec["request"]
+        endpoint = spec["endpoint"] or self._resolve_endpoint(dataset)
+        target = self.root_dir / self._passthrough_target(dataset, request)
+        client = self._client_for(endpoint)
+        logger.info(
+            f"Passthrough retrieve {dataset!r} via {endpoint.upper()}; "
+            "this may take several minutes"
+        )
+        try:
+            client.retrieve(dataset, request, str(target))
+        except (
+            Exception
+        ) as exc:  # noqa: BLE001 - classify licence errors, re-raise the rest
+            if _looks_like_licence_not_accepted(exc):
+                base = endpoint_url(endpoint).rsplit("/api", 1)[0]
+                raise PermissionError(
+                    f"{endpoint.upper()} rejected {dataset!r}: licence not "
+                    f"accepted. Open {base}/datasets/{dataset} and tick the "
+                    "licence at the bottom of the 'Download' tab."
+                ) from exc
+            raise
+        self._passthrough_postprocess(target)
+        return [target]
+
+    def _passthrough_postprocess(self, target: Path) -> None:
+        """Normalise a raw-retrieve output: unwrap single-member NetCDF zips.
+
+        A single-member `netcdf_zip` is unwrapped to a plain `.nc` in place;
+        multi-member archives and GRIB are left raw (the C3 format handler /
+        pyramids read them) with a clear log. Never raises on the archive
+        shape — passthrough must not fail after a successful retrieve.
+
+        Args:
+            target: The file the retrieve wrote.
+        """
+        if zipfile.is_zipfile(target):
+            try:
+                _unwrap_zipped_netcdf(target)
+            except RuntimeError:
+                logger.warning(
+                    f"{target.name}: multi-member archive written raw "
+                    "(zip-of-NetCDF unpacking lands in C3)."
+                )
+        else:
+            logger.info(f"{target.name}: written ({target.stat().st_size} bytes).")
 
     def _download_dataset(
         self,

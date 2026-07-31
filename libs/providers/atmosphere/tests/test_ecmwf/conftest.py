@@ -26,7 +26,9 @@ import pytest
 from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.ecmwf import ECMWF, Variable
 
-_LIVE_CDS_TEST_CLASSES = frozenset({"TestApiE2E", "TestFacadeE2E", "TestGlofasE2E"})
+_LIVE_CDS_TEST_CLASSES = frozenset(
+    {"TestApiE2E", "TestFacadeE2E", "TestGlofasE2E", "TestPassthroughE2E"}
+)
 
 
 def pytest_collection_modifyitems(items):

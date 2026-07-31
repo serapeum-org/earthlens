@@ -115,7 +115,9 @@ def _yaml_files_for(path: Path) -> list[Path]:
     return yaml_files_for(path, provider='CDS', shard_noun='per-family')
 
 
-def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
+def _load_catalog_data(
+    path: Path,
+) -> tuple[list[str], dict[str, Dataset], dict[str, str]]:
     """Parse, validate, and cache the CDS catalog at `path`.
 
     Returns a `(available_datasets, datasets)` tuple of the same shape
@@ -141,6 +143,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
         return cached
 
     available: list[str] = []
+    by_store: dict[str, str] = {}
     datasets_yaml: dict[str, Any] = {}
     seen_in: dict[str, str] = {}
     for yaml_path in files:
@@ -148,9 +151,12 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
         block = data.get("available_datasets") or []
         if isinstance(block, dict):
             # Per-store mapping (`{cds: [...], ads: [...], ewds: [...]}`) →
-            # union every store's ids into the flat availability list.
-            for ids in block.values():
-                available += list(ids or [])
+            # union every store's ids into the flat availability list and
+            # record which store hosts each id (for endpoint auto-resolution).
+            for store, ids in block.items():
+                for ident in ids or []:
+                    available.append(ident)
+                    by_store[str(ident)] = str(store)
         else:
             available += list(block)
         for ds_key, ds_body in (data.get("datasets") or {}).items():
@@ -181,7 +187,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
             "See the schema header in `_index.yaml`."
         )
 
-    _CATALOG_CACHE[key] = (available, structural)
+    _CATALOG_CACHE[key] = (available, structural, by_store)
     return _CATALOG_CACHE[key]
 
 
@@ -652,8 +658,23 @@ class Catalog(AbstractCatalog):
     _catalog_kind: str = "CDS catalog"
 
     available_datasets: list[str] = Field(default_factory=list)
+    available_by_store: dict[str, str] = Field(default_factory=dict)
     datasets: dict[str, Dataset] = Field(default_factory=dict)
     providers: dict[str, Provider] = Field(default_factory=dict)
+
+    def store_for(self, dataset_id: str) -> str | None:
+        """Return the Copernicus store (`cds` / `ads` / `ewds`) hosting a dataset.
+
+        Reads the per-store availability index. Used to auto-resolve the
+        `endpoint` for a raw-request passthrough when the caller omits it.
+
+        Args:
+            dataset_id: A Copernicus dataset id (e.g. `"cams-global-reanalysis-eac4"`).
+
+        Returns:
+            str | None: The store slug, or `None` if the id is not in the index.
+        """
+        return self.available_by_store.get(dataset_id)
 
     @classmethod
     def _autoload(cls) -> dict[str, Any]:
@@ -666,6 +687,7 @@ class Catalog(AbstractCatalog):
         loaded = Catalog.load()
         return {
             "available_datasets": loaded.available_datasets,
+            "available_by_store": loaded.available_by_store,
             "datasets": loaded.datasets,
             "providers": loaded.providers,
         }
@@ -702,7 +724,9 @@ class Catalog(AbstractCatalog):
         providers_path = (
             providers_path if providers_path is not None else PROVIDERS_PATH
         )
-        available_datasets, datasets = _load_catalog_data(catalog_path)
+        available_datasets, datasets, available_by_store = _load_catalog_data(
+            catalog_path
+        )
         providers = load_providers(providers_path)
         unknown = sorted(
             {
@@ -719,6 +743,7 @@ class Catalog(AbstractCatalog):
             )
         return cls(
             available_datasets=list(available_datasets),
+            available_by_store=dict(available_by_store),
             datasets=dict(datasets),
             providers=dict(providers),
         )
