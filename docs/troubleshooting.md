@@ -8,7 +8,7 @@ quoted as earthlens raises them.
 ### `from earthlens import EarthLens` fails
 
 ```
-ImportError: cannot import name 'EarthLens' from 'earthlens'
+ImportError: cannot import name 'EarthLens' from 'earthlens' (unknown location)
 ```
 
 `earthlens` is a namespace package with no top-level `__init__.py`. Import from `earthlens.core`:
@@ -78,9 +78,14 @@ giving you daily data under a label that claimed otherwise — see the [migratio
 ### `NotImplementedError` on `aggregate=`
 
 ```
-... (OUTPUT_KIND='vector'). The aggregator only handles gridded raster outputs;
-vector / tabular backends emit GeoDataFrame / DataFrame rows that have no meaningful gridded reduction.
+NotImplementedError: aggregate= is not supported by GDACS (OUTPUT_KIND='vector'):
+disaster alerts are vector features, not gridded rasters, so there is no meaningful
+gridded reduction. Call download() without aggregate= and post-process the returned
+FeatureCollection.
 ```
+
+The wording after the colon is the backend's own `AGGREGATE_REFUSAL_REASON`, so it names why *that* provider
+refuses rather than repeating a generic sentence.
 
 `aggregate=` is forwarded only when the backend's `OUTPUT_KIND` is `raster` or `mixed` **and** it declares
 `SUPPORTS_AGGREGATE`. A raster backend that has not wired the reducer is refused too. For `vector` / `tabular`
