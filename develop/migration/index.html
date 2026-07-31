@@ -77,11 +77,27 @@
   <link rel="apple-touch-icon" sizes="180x180"
         href="../_images/branding/earthlens-brand-kit/favicon/apple-touch-icon.png">
   <meta name="theme-color" content="#0B2036">
-  <meta property="og:image"
-        content="../_images/branding/earthlens-brand-kit/social/github-social-preview.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image"
-        content="../_images/branding/earthlens-brand-kit/social/announcement-card.png">
+
+  
+  
+    
+    
+    
+    
+    
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="earthlens">
+    <meta property="og:title" content="Migration guide">
+    <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
+    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/migration/">
+    <meta property="og:image"
+          content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Migration guide">
+    <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
+    <meta name="twitter:image"
+          content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
+  
 
   <meta name="panzoom-theme" content="material">
 <meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
@@ -19645,7 +19661,7 @@
 <p>Breaking changes by release, with the concrete edit each one needs. Releases without breaking changes are
 omitted — see the <a href="../change-log/">change log</a> for the full history.</p>
 <h2 id="0110-0120"><a class="toclink" href="#0110-0120">0.11.0 → 0.12.0</a><a class="headerlink" href="#0110-0120" title="Permanent link">#</a></h2>
-<p>Four breaking changes. The <code>OpenAQ</code> one is the dangerous one: <strong>your code keeps running and quietly means
+<p>Five breaking changes. The <code>OpenAQ</code> one is the dangerous one: <strong>your code keeps running and quietly means
 something different</strong>. The rest fail loudly.</p>
 <h3 id="openaqlimit-changed-meaning"><a class="toclink" href="#openaqlimit-changed-meaning"><code>OpenAQ(limit=...)</code> changed meaning</a><a class="headerlink" href="#openaqlimit-changed-meaning" title="Permanent link">#</a></h3>
 <p><code>limit=</code> used to be the <em>page size</em> for the paginated OpenAQ endpoints. It is now a <strong>total row cap</strong>, and the page

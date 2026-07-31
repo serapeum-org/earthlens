@@ -77,11 +77,27 @@
   <link rel="apple-touch-icon" sizes="180x180"
         href="../_images/branding/earthlens-brand-kit/favicon/apple-touch-icon.png">
   <meta name="theme-color" content="#0B2036">
-  <meta property="og:image"
-        content="../_images/branding/earthlens-brand-kit/social/github-social-preview.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image"
-        content="../_images/branding/earthlens-brand-kit/social/announcement-card.png">
+
+  
+  
+    
+    
+    
+    
+    
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="earthlens">
+    <meta property="og:title" content="Contributing">
+    <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
+    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/contributing/">
+    <meta property="og:image"
+          content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Contributing">
+    <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
+    <meta name="twitter:image"
+          content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
+  
 
   <meta name="panzoom-theme" content="material">
 <meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
@@ -19635,11 +19651,13 @@ curated <code>all</code> extra includes <code>openeo</code> and omits <code>argo
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not e2e&quot;</span><span class="w"> </span>--cov<span class="o">=</span>libs<span class="w"> </span>--cov-report<span class="o">=</span>xml
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># one file, one test</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/test_earthlens.py<span class="w"> </span>-v
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/test_earthlens.py::test_name<span class="w"> </span>-v
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>libs/core/tests/test_earthlens.py<span class="w"> </span>-v
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>libs/core/tests/test_earthlens.py::test_name<span class="w"> </span>-v
 </code></pre></div>
+<p>Tests are <strong>co-located with each distribution</strong>, not in a repo-root <code>tests/</code>. <code>testpaths</code> lists the six roots:
+<code>libs/core/tests</code> plus <code>libs/providers/&lt;theme&gt;/tests</code> for each of the five themes.</p>
 <p>End-to-end tests carry the <code>e2e</code> marker, perform live network downloads, and are skipped unless you select them
-with <code>-m e2e</code>. Live-test scratch data goes to <code>tests/data/delete/</code>.</p>
+with <code>-m e2e</code>.</p>
 <p>Test categories are selected by <strong>pytest markers only</strong> — never by environment variables. Every backend has its
 own marker (<code>chc</code>, <code>gee</code>, <code>cmems</code>, …) alongside the cross-cutting ones (<code>slow</code>, <code>fast</code>, <code>unit</code>, <code>integration</code>,
 <code>e2e</code>). Run <code>uv run pytest --markers</code> for the full list. Credentials a live test needs may come from the

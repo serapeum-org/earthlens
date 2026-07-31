@@ -77,11 +77,27 @@
   <link rel="apple-touch-icon" sizes="180x180"
         href="../../../_images/branding/earthlens-brand-kit/favicon/apple-touch-icon.png">
   <meta name="theme-color" content="#0B2036">
-  <meta property="og:image"
-        content="../../../_images/branding/earthlens-brand-kit/social/github-social-preview.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image"
-        content="../../../_images/branding/earthlens-brand-kit/social/announcement-card.png">
+
+  
+  
+    
+    
+    
+    
+    
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="earthlens">
+    <meta property="og:title" content="Catalog & utilities">
+    <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
+    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/reference/base/catalog-api/">
+    <meta property="og:image"
+          content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Catalog & utilities">
+    <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
+    <meta name="twitter:image"
+          content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
+  
 
   <meta name="panzoom-theme" content="material">
 <meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
@@ -19181,7 +19197,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.base.catalog_source.load_catalog" class="md-nav__link">
+  <a href="#earthlens.base.load_catalog" class="md-nav__link">
     <span class="md-ellipsis">
       
         load_catalog
@@ -19225,7 +19241,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.base.providers.Provider" class="md-nav__link">
+  <a href="#earthlens.base.Provider" class="md-nav__link">
     <span class="md-ellipsis">
       
         Provider
@@ -19236,7 +19252,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.base.providers.load_providers" class="md-nav__link">
+  <a href="#earthlens.base.load_providers" class="md-nav__link">
     <span class="md-ellipsis">
       
         load_providers
@@ -19258,7 +19274,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.base.naming.safe_filename" class="md-nav__link">
+  <a href="#earthlens.base.safe_filename" class="md-nav__link">
     <span class="md-ellipsis">
       
         safe_filename
@@ -19519,7 +19535,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.base.catalog_source.load_catalog" class="md-nav__link">
+  <a href="#earthlens.base.load_catalog" class="md-nav__link">
     <span class="md-ellipsis">
       
         load_catalog
@@ -19563,7 +19579,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.base.providers.Provider" class="md-nav__link">
+  <a href="#earthlens.base.Provider" class="md-nav__link">
     <span class="md-ellipsis">
       
         Provider
@@ -19574,7 +19590,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.base.providers.load_providers" class="md-nav__link">
+  <a href="#earthlens.base.load_providers" class="md-nav__link">
     <span class="md-ellipsis">
       
         load_providers
@@ -19596,7 +19612,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.base.naming.safe_filename" class="md-nav__link">
+  <a href="#earthlens.base.safe_filename" class="md-nav__link">
     <span class="md-ellipsis">
       
         safe_filename
@@ -19650,10 +19666,10 @@ key, and the cache registry.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="earthlens.base.catalog_source.load_catalog" class="doc doc-heading"><a href="#earthlens.base.catalog_source.load_catalog" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">catalog_source</span><span class="o">.</span><span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">parse</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">provider</span><span class="p">,</span> <span class="n">shard_noun</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
+<h2 id="earthlens.base.load_catalog" class="doc doc-heading"><a href="#earthlens.base.load_catalog" class="toclink">
+            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">load_catalog</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">parse</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">provider</span><span class="p">,</span> <span class="n">shard_noun</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
 
-</a><a href="#earthlens.base.catalog_source.load_catalog" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.base.load_catalog" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">
@@ -20231,11 +20247,11 @@ earthlens.gee.catalog.Catalog: Uses this to load the GEE catalog.</p>
 
 
 
-<h2 id="earthlens.base.providers.Provider" class="doc doc-heading"><a href="#earthlens.base.providers.Provider" class="toclink">
-            <code>earthlens.base.providers.Provider</code>
+<h2 id="earthlens.base.Provider" class="doc doc-heading"><a href="#earthlens.base.Provider" class="toclink">
+            <code>earthlens.base.Provider</code>
 
 
-</a><a href="#earthlens.base.providers.Provider" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.base.Provider" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">
@@ -20262,7 +20278,7 @@ registered.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.base.providers.Provider.slug">slug</span></code></td>
+            <td><code><span title="earthlens.base.Provider.slug">slug</span></code></td>
             <td>
                   <code><span title="str">str</span></code>
             </td>
@@ -20275,7 +20291,7 @@ YAML mapping key.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.base.providers.Provider.display_name">display_name</span></code></td>
+            <td><code><span title="earthlens.base.Provider.display_name">display_name</span></code></td>
             <td>
                   <code><span title="str">str</span></code>
             </td>
@@ -20286,7 +20302,7 @@ YAML mapping key.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.base.providers.Provider.parent">parent</span></code></td>
+            <td><code><span title="earthlens.base.Provider.parent">parent</span></code></td>
             <td>
                   <code><span title="str">str</span> | None</code>
             </td>
@@ -20382,10 +20398,10 @@ the <code>"nasa"</code> umbrella.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="earthlens.base.providers.load_providers" class="doc doc-heading"><a href="#earthlens.base.providers.load_providers" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">load_providers</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code>
+<h2 id="earthlens.base.load_providers" class="doc doc-heading"><a href="#earthlens.base.load_providers" class="toclink">
+            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">load_providers</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code>
 
-</a><a href="#earthlens.base.providers.load_providers" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.base.load_providers" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">
@@ -20437,7 +20453,7 @@ parent?}</code>).</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.providers.Provider&lt;/code&gt;" href="#earthlens.base.providers.Provider">Provider</a>]</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.Provider&lt;/code&gt; (&lt;code&gt;earthlens.base.providers.Provider&lt;/code&gt;)" href="#earthlens.base.Provider">Provider</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -20575,10 +20591,10 @@ pydantic validation on any entry.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="earthlens.base.naming.safe_filename" class="doc doc-heading"><a href="#earthlens.base.naming.safe_filename" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">naming</span><span class="o">.</span><span class="n">safe_filename</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
+<h2 id="earthlens.base.safe_filename" class="doc doc-heading"><a href="#earthlens.base.safe_filename" class="toclink">
+            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">safe_filename</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
 
-</a><a href="#earthlens.base.naming.safe_filename" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.base.safe_filename" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">

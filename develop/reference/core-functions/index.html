@@ -77,11 +77,27 @@
   <link rel="apple-touch-icon" sizes="180x180"
         href="../../_images/branding/earthlens-brand-kit/favicon/apple-touch-icon.png">
   <meta name="theme-color" content="#0B2036">
-  <meta property="og:image"
-        content="../../_images/branding/earthlens-brand-kit/social/github-social-preview.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image"
-        content="../../_images/branding/earthlens-brand-kit/social/announcement-card.png">
+
+  
+  
+    
+    
+    
+    
+    
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="earthlens">
+    <meta property="og:title" content="Core functions">
+    <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
+    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/reference/core-functions/">
+    <meta property="og:image"
+          content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Core functions">
+    <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
+    <meta name="twitter:image"
+          content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
+  
 
   <meta name="panzoom-theme" content="material">
 <meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
@@ -18985,7 +19001,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.earthlens.download" class="md-nav__link">
+  <a href="#earthlens.core.download" class="md-nav__link">
     <span class="md-ellipsis">
       
         download
@@ -19007,7 +19023,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.earthlens.sources" class="md-nav__link">
+  <a href="#earthlens.core.sources" class="md-nav__link">
     <span class="md-ellipsis">
       
         sources
@@ -19029,7 +19045,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.earthlens.find" class="md-nav__link">
+  <a href="#earthlens.core.find" class="md-nav__link">
     <span class="md-ellipsis">
       
         find
@@ -19051,7 +19067,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.earthlens.search" class="md-nav__link">
+  <a href="#earthlens.core.search" class="md-nav__link">
     <span class="md-ellipsis">
       
         search
@@ -19508,7 +19524,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.earthlens.download" class="md-nav__link">
+  <a href="#earthlens.core.download" class="md-nav__link">
     <span class="md-ellipsis">
       
         download
@@ -19530,7 +19546,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.earthlens.sources" class="md-nav__link">
+  <a href="#earthlens.core.sources" class="md-nav__link">
     <span class="md-ellipsis">
       
         sources
@@ -19552,7 +19568,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.earthlens.find" class="md-nav__link">
+  <a href="#earthlens.core.find" class="md-nav__link">
     <span class="md-ellipsis">
       
         find
@@ -19574,7 +19590,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.earthlens.search" class="md-nav__link">
+  <a href="#earthlens.core.search" class="md-nav__link">
     <span class="md-ellipsis">
       
         search
@@ -19631,10 +19647,10 @@ facade constructor and returns the backend's result directly.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="earthlens.earthlens.download" class="doc doc-heading"><a href="#earthlens.earthlens.download" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">earthlens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">&#39;chc&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">)</span></code>
+<h2 id="earthlens.core.download" class="doc doc-heading"><a href="#earthlens.core.download" class="toclink">
+            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">&#39;chc&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">load</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">)</span></code>
 
-</a><a href="#earthlens.earthlens.download" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.core.download" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">
@@ -20222,10 +20238,10 @@ Defaults to <code>False</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="earthlens.earthlens.sources" class="doc doc-heading"><a href="#earthlens.earthlens.sources" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">earthlens</span><span class="o">.</span><span class="n">sources</span><span class="p">()</span></code>
+<h2 id="earthlens.core.sources" class="doc doc-heading"><a href="#earthlens.core.sources" class="toclink">
+            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">sources</span><span class="p">()</span></code>
 
-</a><a href="#earthlens.earthlens.sources" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.core.sources" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">
@@ -20366,10 +20382,10 @@ their canonical backend key here, so the list is one entry per backend.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="earthlens.earthlens.find" class="doc doc-heading"><a href="#earthlens.earthlens.find" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">earthlens</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></code>
+<h2 id="earthlens.core.find" class="doc doc-heading"><a href="#earthlens.core.find" class="toclink">
+            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></code>
 
-</a><a href="#earthlens.earthlens.find" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.core.find" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">
@@ -20541,10 +20557,10 @@ failing the whole call — so the result covers the installed backends.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="earthlens.earthlens.search" class="doc doc-heading"><a href="#earthlens.earthlens.search" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">earthlens</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">&#39;chc&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">)</span></code>
+<h2 id="earthlens.core.search" class="doc doc-heading"><a href="#earthlens.core.search" class="toclink">
+            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s1">&#39;chc&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aoi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">backend_kwargs</span><span class="p">)</span></code>
 
-</a><a href="#earthlens.earthlens.search" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.core.search" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">

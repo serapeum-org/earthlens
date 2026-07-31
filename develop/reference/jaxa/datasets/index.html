@@ -77,11 +77,27 @@
   <link rel="apple-touch-icon" sizes="180x180"
         href="../../../_images/branding/earthlens-brand-kit/favicon/apple-touch-icon.png">
   <meta name="theme-color" content="#0B2036">
-  <meta property="og:image"
-        content="../../../_images/branding/earthlens-brand-kit/social/github-social-preview.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image"
-        content="../../../_images/branding/earthlens-brand-kit/social/announcement-card.png">
+
+  
+  
+    
+    
+    
+    
+    
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="earthlens">
+    <meta property="og:title" content="Available datasets">
+    <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
+    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/reference/jaxa/datasets/">
+    <meta property="og:image"
+          content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Available datasets">
+    <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
+    <meta name="twitter:image"
+          content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
+  
 
   <meta name="panzoom-theme" content="material">
 <meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
@@ -19544,7 +19560,8 @@
 
 
 <h1 id="jaxa-available-datasets"><a class="toclink" href="#jaxa-available-datasets">JAXA — available datasets</a><a class="headerlink" href="#jaxa-available-datasets" title="Permanent link">#</a></h1>
-<p>The bundled catalog ships <strong>917 rows</strong>: 118 <code>jaxa-earth</code> STAC collections plus 799 <code>gportal</code> mission products. Every row has a short, friendly canonical key; the long auto-derived slug and a few high-traffic English names also resolve via <code>cat.get(...)</code>.</p>
+<p>The bundled catalog ships <strong>918 rows</strong>: 118 <code>jaxa-earth</code> STAC collections, 799 <code>gportal</code> mission products, and
+one <code>ptree</code> Himawari entry. Every row has a short, friendly canonical key; the long auto-derived slug and a few high-traffic English names also resolve via <code>cat.get(...)</code>.</p>
 <p>The naming scheme for jaxa-earth is <code>&lt;mission&gt;-&lt;product&gt;[-&lt;d|n&gt;][-&lt;cadence&gt;][-norm]</code> where <code>d</code>/<code>n</code> mark daytime / nighttime variants, the cadence comes from the source (<code>daily</code>, <code>halfmonth</code>, <code>monthly</code>, <code>8day</code>, <code>hourly</code>, <code>yearly</code>), and <code>-norm</code> flags a climatological <em>normal</em>.</p>
 <p>Resolve either form:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jaxa</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
