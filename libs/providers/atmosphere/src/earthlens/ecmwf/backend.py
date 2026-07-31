@@ -248,7 +248,6 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
         skip_constraints: bool = False,
-        dataset: str | None = None,
         request: dict[str, Any] | None = None,
         endpoint: str | None = None,
     ):
@@ -299,13 +298,22 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         self._injected_client: Any = None
         # Raw-request passthrough (the coverage lever): when `request=` is
         # given, skip the typed catalog / date / grid machinery and forward
-        # the raw request to the resolved store's client (see `download`).
+        # the raw request to the resolved store's client (see `download`). The
+        # dataset id arrives as the single key of `variables` — the facade
+        # composes `dataset=<id>` into `variables={<id>: []}`, so a passthrough
+        # is `EarthLens('ecmwf', dataset=<id>, request=<dict>)`.
         self._passthrough: dict[str, Any] | None = None
         if request is not None:
+            dataset = (
+                next(iter(variables))
+                if isinstance(variables, dict) and len(variables) == 1
+                else None
+            )
             if not dataset:
                 raise ValueError(
-                    "ECMWF raw passthrough needs `dataset=<id>` alongside "
-                    "`request=<dict>`."
+                    "ECMWF raw passthrough needs the dataset id alongside "
+                    "`request=<dict>` — pass `dataset=<id>` (facade) or "
+                    "`variables={<id>: []}`."
                 )
             self._passthrough = {
                 "dataset": str(dataset),
@@ -862,14 +870,14 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             list[Path]: The single written file.
 
         Raises:
-            NotImplementedError: If `aggregate` is set.
+            ValueError: If `aggregate` is set (it needs a curated `Variable`).
             PermissionError: If the store rejects the dataset for an unaccepted
                 licence (mapped to name the dataset page).
         """
         if aggregate is not None:
-            raise NotImplementedError(
-                "aggregate= is not supported for a raw-request passthrough; "
-                "use a curated dataset row."
+            raise ValueError(
+                "aggregate= needs a curated dataset row; it is not available "
+                "for a raw-request passthrough."
             )
         spec = self._passthrough
         assert spec is not None

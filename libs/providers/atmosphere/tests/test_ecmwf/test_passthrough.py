@@ -45,9 +45,9 @@ class _LicenceRejectingClient:
 
 
 def _passthrough(tmp_path, dataset=_EAC4, request=None, endpoint=None):
-    """Build a passthrough ECMWF instance (no typed args)."""
+    """Build a passthrough ECMWF instance (the dataset id keys `variables`)."""
     return ECMWF(
-        dataset=dataset,
+        variables={dataset: []},
         request=request if request is not None else dict(_EAC4_REQUEST),
         endpoint=endpoint,
         path=str(tmp_path),
@@ -64,8 +64,8 @@ class TestPassthroughConstruction:
         assert backend._passthrough["dataset"] == _EAC4
 
     def test_request_without_dataset_is_rejected(self, tmp_path):
-        """`request=` with no `dataset=` raises a clear error."""
-        with pytest.raises(ValueError, match="dataset"):
+        """`request=` with no dataset id raises a clear error."""
+        with pytest.raises(ValueError, match="dataset id"):
             ECMWF(request={"variable": ["x"]}, path=str(tmp_path))
 
     def test_typed_mode_still_requires_standard_args(self, tmp_path):
@@ -142,7 +142,7 @@ class TestPassthroughRetrieve:
 
         backend = _passthrough(tmp_path)
         backend._client_for = lambda endpoint: _RecordingClient()
-        with pytest.raises(NotImplementedError, match="passthrough"):
+        with pytest.raises(ValueError, match="aggregate"):
             backend.download(aggregate=AggregationConfig(freq="1D"))
 
     def test_licence_error_maps_to_permission_error(self, tmp_path):
