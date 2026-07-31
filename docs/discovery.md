@@ -64,17 +64,20 @@ catalog page before relying on a hit.
 The dry-run half of the search→fetch split. It takes the **same arguments as a download** and returns one
 `RemoteProduct` per item the download *would* fetch — without fetching anything.
 
+Not every backend implements it. 38 of the 48 do; the rest — CHC among them — raise `NotImplementedError` and
+expect you to call `download()` directly. The message names the backend when that happens.
+
 ```python
 from earthlens.core import search
 
 products = search(
-    data_source="chc",
-    temporal_resolution="daily",
-    start="2009-01-01",
-    end="2009-01-10",
-    variables=["precipitation"],
-    lat_lim=[4.19, 4.64],
-    lon_lim=[-75.65, -74.73],
+    data_source="amazon-s3",              # unsigned public bucket, no credentials
+    temporal_resolution="monthly",
+    start="2020-01-01",
+    end="2020-02-01",
+    variables=["air_temperature_at_2_metres"],
+    lat_lim=[30.0, 35.0],
+    lon_lim=[28.0, 35.0],
 )
 
 len(products)          # how many granules this request resolves to
@@ -92,7 +95,7 @@ The same thing is available as a method when you already hold a facade:
 ```python
 from earthlens.core import EarthLens
 
-lens = EarthLens(data_source="chc", ...)
+lens = EarthLens(data_source="amazon-s3", ...)
 products = lens.search()      # dry run
 paths = lens.download()       # then fetch
 ```
@@ -103,8 +106,8 @@ A typical path from "I need rainfall over Colombia" to a download:
 
 1. **`find("precipitation")`** — narrow 48 providers to a handful.
 2. Read the candidates' [provider pages](reference/providers.md) — coverage, resolution, licence, auth.
-3. **`search(...)`** — confirm the request resolves to the granules you expect.
-4. **`download()`** — fetch.
+3. **`search(...)`** — confirm the request resolves to the granules you expect, on the backends that support it.
+4. **`download()`** — fetch. On a backend without `search()`, go straight here.
 
 ## See also
 
