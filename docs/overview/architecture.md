@@ -29,7 +29,7 @@ backend and the optional SDK for a provider you never touch is never imported.
 ```python
 from earthlens.core import sources
 
-sources()          # every registered key, aliases included
+sources()          # the 48 canonical keys — aliases resolve but are not listed
 ```
 
 ## Distribution & namespace layout
@@ -75,15 +75,18 @@ classDiagram
     class AbstractDataSource {
         <<abstract>>
         +OUTPUT_KIND: str
+        +SUPPORTS_AGGREGATE: bool
         +REQUIRES_TIME_WINDOW: bool
         +SUPPORTS_POLYGON_AOI: bool
+        +ERROR_POLICIES: frozenset
         +space: SpatialExtent
         +time: TemporalExtent
-        +client
         +root_dir: Path
         +authenticate() AbstractDataSource
         +download()*
-        +iter_download()
+        +iter_download(limit)
+        +check_limit(limit)$
+        +check_errors_policy(errors)$
         #_check_input_dates()*
         #_initialize()
         #_create_grid()
@@ -99,14 +102,18 @@ classDiagram
 
     class TemporalExtent {
         <<frozen pydantic>>
-        +start, end
+        +start_date, end_date
         +resolution: str
+        +dates
     }
 
     class AbstractCatalog {
         <<abstract>>
-        +load(path)$
-        +get_variable(name)
+        +catalog
+        +get_catalog()
+        +get_dataset(key)
+        +get_variable(dataset_key, variable_name)
+        +resolve(key)
     }
 
     AbstractDataSource --> SpatialExtent : _create_grid() returns
@@ -191,7 +198,8 @@ flowchart LR
 ```
 
 Which shape a backend uses is decided by the rule in [Catalog storage](#catalog-storage) below, not ad hoc. A few
-catalogs are introspected live from the provider instead of shipped (S3 lists its bucket).
+catalogs additionally probe the provider at request time to resolve what a shipped row expands to, but the
+curated rows themselves are always shipped — S3's live in `s3_data_catalog.yaml` like every other backend's.
 
 ## Shared base services
 
