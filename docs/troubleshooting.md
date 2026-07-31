@@ -97,14 +97,31 @@ to its bounding box and say so. Check `SUPPORTS_POLYGON_AOI`, and clip the resul
 
 ### `AuthenticationError`
 
-Credentials are missing, wrong, or expired. Credentials are **not** constructor arguments — they go to
-`authenticate()` or environment variables:
+Credentials are missing, wrong, or expired. **Where they go is backend-specific** — there is no single rule:
 
 ```python
-lens = EarthLens(data_source="cmems", ...).authenticate(
+# CMEMS takes them as constructor keywords, forwarded to the backend
+lens = EarthLens(
+    data_source="cmems", ...,
     service_username="…", service_password="…",
 )
+
+# GEE and FIRMS take theirs in authenticate()
+lens = EarthLens(data_source="gee", ...).authenticate(
+    service_account="my-sa@my-project.iam.gserviceaccount.com",
+    service_key="/path/to/key.json",
+)
 ```
+
+`authenticate(**credentials)` forwards its keywords verbatim to the backend's own `authenticate`, so passing one
+the backend does not accept raises `TypeError` rather than `AuthenticationError`:
+
+```
+TypeError: AbstractDataSource.authenticate() got an unexpected keyword argument 'service_username'
+```
+
+If you see that, the credential belongs in the constructor instead. Most backends also read an environment
+variable when the keyword is omitted.
 
 Per-provider setup is on each backend's page; see also [Authentication examples](examples/authentication.md) and
 the [auth API](reference/base/auth-api.md).

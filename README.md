@@ -442,8 +442,10 @@ Roughly half the backends need no credentials at all. Common ones:
 | CMEMS, Earthdata, ASF, EUMETSAT, Sentinel Hub, openEO | A provider login. |
 | OpenAQ, AirNow, FIRMS, WDPA, IUCN, NREL, GFW | A free API key or token. |
 
-Credentials are **not** constructor arguments — pass them to `authenticate(...)`
-or set the documented environment variables. The full per-provider matrix is in
+Where credentials go is **backend-specific**: some take them as constructor keywords (CMEMS's
+`service_username=` / `service_password=`), others in `authenticate(...)` (GEE's `service_account=`, FIRMS's
+`api_key=`), and most fall back to an environment variable. Each backend's page says which. The full
+per-provider matrix is in
 [Supported providers](https://serapeum-org.github.io/earthlens/reference/providers/).
 
 

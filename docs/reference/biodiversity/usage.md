@@ -39,9 +39,12 @@ None of the four is gridded, so the facade rejects `aggregate=` for all of them 
 
 GBIF and OBIS search anonymously. WDPA and IUCN need a token:
 
+Both take the token as a **constructor** keyword — their `authenticate()` accepts none, so passing it there
+raises `TypeError`:
+
 ```python
-lens = EarthLens(data_source="wdpa", ...).authenticate(token="…")   # or WDPA_TOKEN
-lens = EarthLens(data_source="iucn", ...).authenticate(token="…")   # or IUCN_TOKEN
+lens = EarthLens(data_source="wdpa", ..., token="…")   # or set WDPA_TOKEN
+lens = EarthLens(data_source="iucn", ..., token="…")   # or set IUCN_TOKEN
 ```
 
 Red List data is never shipped as package data — the token stays user-supplied.

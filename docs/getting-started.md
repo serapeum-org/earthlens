@@ -78,8 +78,10 @@ backend), e.g. `pyramids.dataset.Dataset.read_file(...)`.
 
 Any extra keyword not named by the facade is forwarded verbatim to the backend
 constructor — e.g. ECMWF's `skip_constraints=`, or GEE's `scale=` /
-`export_via=` / `reducer=`. (Credentials are not constructor keywords — they go
-to `authenticate(...)`; see each backend's reference page.)
+`export_via=` / `reducer=`. Credentials travel the same way for most backends
+(CMEMS's `service_username=`, WDPA's `token=`), while a few take theirs in
+`authenticate(...)` instead (GEE's `service_account=`, FIRMS's `api_key=`) —
+see each backend's reference page.
 
 ## Next steps
 
