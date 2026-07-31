@@ -32,10 +32,18 @@ jobs:
   # docstring would publish silently — this fails the run instead.
   build-strict:
     runs-on: ubuntu-latest
+    # Only reads the tree; the write scopes the workflow grants are for the
+    # deploy jobs, not for this one.
+    permissions:
+      contents: read
     steps:
+    # Check out the same ref deploy-release publishes. On a workflow_run
+    # trigger the default ref is not the release branch, so without this the
+    # gate would validate one commit while the deploy shipped another.
     - uses: actions/checkout@v5
       with:
         fetch-depth: 0
+        ref: ${{ github.event.workflow_run.head_branch || github.ref }}
 
     - uses: astral-sh/setup-uv@v5
       with:
