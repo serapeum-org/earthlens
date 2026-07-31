@@ -12,16 +12,16 @@ credentials, see [Authentication examples](../../examples/authentication.md).
 
 ## `AbstractAuth`
 
-::: earthlens.base.auth.AbstractAuth
+::: earthlens.base.AbstractAuth
 
 ## `AuthenticationError`
 
-::: earthlens.base.auth.AuthenticationError
+::: earthlens.base.AuthenticationError
 
 ## S3 credentials
 
 Shared by the backends that read public or requester-pays AWS buckets (ERA5, Copernicus DEM, GOES, NWM, NEXRAD).
 
-::: earthlens.base.s3.S3Auth
+::: earthlens.base.S3Auth
 
-::: earthlens.base.s3.S3Credentials
+::: earthlens.base.S3Credentials

@@ -8,7 +8,7 @@ registry, and the small filesystem helpers. See [Base contracts](contracts.md) f
 All 48 catalog loaders route through `load_catalog`, which owns the catalog glob, the `(path, mtime_ns)` cache
 key, and the cache registry.
 
-::: earthlens.base.catalog_source.load_catalog
+::: earthlens.base.load_catalog
 
 ## Strict YAML
 
@@ -21,10 +21,10 @@ raises `ValueError` rather than silently keeping the last value.
 
 Backends that populate the base `providers` field load it from a per-backend `providers.yaml`.
 
-::: earthlens.base.providers.Provider
+::: earthlens.base.Provider
 
-::: earthlens.base.providers.load_providers
+::: earthlens.base.load_providers
 
 ## Filesystem helpers
 
-::: earthlens.base.naming.safe_filename
+::: earthlens.base.safe_filename

@@ -16,11 +16,11 @@ These are values, not dicts — they are immutable, and `SpatialExtent` is compa
 
 ## `SpatialExtent`
 
-::: earthlens.base.abstractdatasource.SpatialExtent
+::: earthlens.base.SpatialExtent
 
 ## `TemporalExtent`
 
-::: earthlens.base.abstractdatasource.TemporalExtent
+::: earthlens.base.TemporalExtent
 
 ## `PolygonAoiWarning`
 
@@ -28,4 +28,4 @@ Raised as a warning when a polygon `aoi=` is reduced to its bounding box because
 a polygon. Backends advertise the capability through `SUPPORTS_POLYGON_AOI` — see
 [Base contracts](contracts.md).
 
-::: earthlens.base.abstractdatasource.PolygonAoiWarning
+::: earthlens.base.PolygonAoiWarning
