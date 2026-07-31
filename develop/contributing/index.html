@@ -8599,6 +8599,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/biodiversity/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared helpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -19333,34 +19361,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reference/biodiversity/api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Biodiversity helpers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -19640,9 +19640,9 @@ in the repository root.</p>
 <p class="admonition-title">Use <code>--extra all</code>, not <code>--all-extras</code></p>
 <p><code>--all-extras</code> activates <em>every</em> extra, including both <code>argo</code> and <code>openeo</code>, which are mutually exclusive:
 <code>argopy</code> needs <code>xarray&gt;=2025.7</code> while <code>openeo</code> needs <code>xarray&lt;2025.1.2</code>. uv rejects the combination. The
-curated <code>all</code> extra includes <code>openeo</code> and omits <code>argo</code> / <code>osm</code> / <code>osm-pbf</code>, so it resolves.</p>
+curated <code>all</code> extra includes <code>openeo</code> and <code>osm</code>, and omits only <code>argo</code> and <code>osm-pbf</code>, so it resolves.</p>
 <p>To work on the argo or osm side instead, prune the other:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--all-extras<span class="w"> </span>--no-extra<span class="w"> </span>openeo<span class="w"> </span>--no-extra<span class="w"> </span>osm<span class="w"> </span>--no-extra<span class="w"> </span>osm-pbf
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--all-extras<span class="w"> </span>--no-extra<span class="w"> </span>openeo<span class="w"> </span>--no-extra<span class="w"> </span>osm-pbf
 </code></pre></div>
 </div>
 <p>Refresh the lockfile with <code>uv lock</code>; <code>uv lock --check</code> verifies it is current (the CI <code>--locked</code> gate).</p>
@@ -19715,7 +19715,7 @@ and import it instead.</p>
 <li><strong>PEP 8 casing</strong> — <code>snake_case</code> for functions/variables/modules, <code>PascalCase</code> for classes, <code>UPPER_SNAKE_CASE</code>
   for module constants.</li>
 <li><strong>Google-style docstrings</strong>, rendered by mkdocstrings as Markdown. Use <em>single</em> backticks for inline code —
-  double backticks are an reStructuredText holdover and are not idiomatic here.</li>
+  double backticks are a reStructuredText holdover and are not idiomatic here.</li>
 </ul>
 <h2 id="documentation"><a class="toclink" href="#documentation">Documentation</a><a class="headerlink" href="#documentation" title="Permanent link">#</a></h2>
 <p>The site is mkdocs-material with mkdocstrings; <code>mkdocs.yml</code> holds the nav.</p>

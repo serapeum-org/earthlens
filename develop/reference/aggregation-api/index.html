@@ -8464,6 +8464,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../biodiversity/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared helpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -19029,7 +19057,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.aggregate.AggregationConfig" class="md-nav__link">
+  <a href="#earthlens.core.AggregationConfig" class="md-nav__link">
     <span class="md-ellipsis">
       
         AggregationConfig
@@ -19051,7 +19079,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.aggregate.aggregate_netcdf" class="md-nav__link">
+  <a href="#earthlens.core.aggregate_netcdf" class="md-nav__link">
     <span class="md-ellipsis">
       
         aggregate_netcdf
@@ -19073,7 +19101,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.aggregate.iter_aggregate_netcdf" class="md-nav__link">
+  <a href="#earthlens.core.iter_aggregate_netcdf" class="md-nav__link">
     <span class="md-ellipsis">
       
         iter_aggregate_netcdf
@@ -19095,7 +19123,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.aggregate.AggregatedWindow" class="md-nav__link">
+  <a href="#earthlens.core.AggregatedWindow" class="md-nav__link">
     <span class="md-ellipsis">
       
         AggregatedWindow
@@ -19371,34 +19399,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../biodiversity/api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Biodiversity helpers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -19557,7 +19557,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.aggregate.AggregationConfig" class="md-nav__link">
+  <a href="#earthlens.core.AggregationConfig" class="md-nav__link">
     <span class="md-ellipsis">
       
         AggregationConfig
@@ -19579,7 +19579,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.aggregate.aggregate_netcdf" class="md-nav__link">
+  <a href="#earthlens.core.aggregate_netcdf" class="md-nav__link">
     <span class="md-ellipsis">
       
         aggregate_netcdf
@@ -19601,7 +19601,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.aggregate.iter_aggregate_netcdf" class="md-nav__link">
+  <a href="#earthlens.core.iter_aggregate_netcdf" class="md-nav__link">
     <span class="md-ellipsis">
       
         iter_aggregate_netcdf
@@ -19623,7 +19623,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#earthlens.aggregate.AggregatedWindow" class="md-nav__link">
+  <a href="#earthlens.core.AggregatedWindow" class="md-nav__link">
     <span class="md-ellipsis">
       
         AggregatedWindow
@@ -19716,11 +19716,11 @@ backend that has not wired the reducer is refused for that reason instead. Eithe
 
 
 
-<h2 id="earthlens.aggregate.AggregationConfig" class="doc doc-heading"><a href="#earthlens.aggregate.AggregationConfig" class="toclink">
-            <code>earthlens.aggregate.AggregationConfig</code>
+<h2 id="earthlens.core.AggregationConfig" class="doc doc-heading"><a href="#earthlens.core.AggregationConfig" class="toclink">
+            <code>earthlens.core.AggregationConfig</code>
 
 
-</a><a href="#earthlens.aggregate.AggregationConfig" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.core.AggregationConfig" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">
@@ -19747,7 +19747,7 @@ silently using the default.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.aggregate.AggregationConfig.freq">freq</span></code></td>
+            <td><code><span title="earthlens.core.AggregationConfig.freq">freq</span></code></td>
             <td>
                   <code><span title="str">str</span></code>
             </td>
@@ -19762,7 +19762,7 @@ silently using the default.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.aggregate.AggregationConfig.op">op</span></code></td>
+            <td><code><span title="earthlens.core.AggregationConfig.op">op</span></code></td>
             <td>
                   <code><span title="earthlens.aggregate.OperationLiteral">OperationLiteral</span></code>
             </td>
@@ -19775,7 +19775,7 @@ other values are forwarded as-is to the dispatcher.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.aggregate.AggregationConfig.out_dir">out_dir</span></code></td>
+            <td><code><span title="earthlens.core.AggregationConfig.out_dir">out_dir</span></code></td>
             <td>
                   <code><span title="pathlib.Path">Path</span> | None</code>
             </td>
@@ -19788,7 +19788,7 @@ step entirely and returns arrays in memory only.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.aggregate.AggregationConfig.cell_size">cell_size</span></code></td>
+            <td><code><span title="earthlens.core.AggregationConfig.cell_size">cell_size</span></code></td>
             <td>
                   <code><span title="float">float</span></code>
             </td>
@@ -19802,7 +19802,7 @@ the NetCDF — this is informational only.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.aggregate.AggregationConfig.level">level</span></code></td>
+            <td><code><span title="earthlens.core.AggregationConfig.level">level</span></code></td>
             <td>
                   <code><span title="int">int</span> | <span title="float">float</span> | None</code>
             </td>
@@ -19816,7 +19816,7 @@ this level via :meth:<code>pyramids.netcdf.NetCDF.sel</code>. <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.aggregate.AggregationConfig.skipna">skipna</span></code></td>
+            <td><code><span title="earthlens.core.AggregationConfig.skipna">skipna</span></code></td>
             <td>
                   <code><span title="bool">bool</span></code>
             </td>
@@ -19829,7 +19829,7 @@ window to the output.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.aggregate.AggregationConfig.min_count">min_count</span></code></td>
+            <td><code><span title="earthlens.core.AggregationConfig.min_count">min_count</span></code></td>
             <td>
                   <code><span title="int">int</span> | None</code>
             </td>
@@ -20106,10 +20106,10 @@ NaN. <code>None</code> (default) means no minimum.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="earthlens.aggregate.aggregate_netcdf" class="doc doc-heading"><a href="#earthlens.aggregate.aggregate_netcdf" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">aggregate</span><span class="o">.</span><span class="n">aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></code>
+<h2 id="earthlens.core.aggregate_netcdf" class="doc doc-heading"><a href="#earthlens.core.aggregate_netcdf" class="toclink">
+            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></code>
 
-</a><a href="#earthlens.aggregate.aggregate_netcdf" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.core.aggregate_netcdf" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">
@@ -20174,7 +20174,7 @@ to pick the variable from the NetCDF
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.aggregate.AggregationConfig&lt;/code&gt;" href="#earthlens.aggregate.AggregationConfig">AggregationConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.core.AggregationConfig&lt;/code&gt; (&lt;code&gt;earthlens.aggregate.AggregationConfig&lt;/code&gt;)" href="#earthlens.core.AggregationConfig">AggregationConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -20427,10 +20427,10 @@ on a long time series.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="earthlens.aggregate.iter_aggregate_netcdf" class="doc doc-heading"><a href="#earthlens.aggregate.iter_aggregate_netcdf" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">aggregate</span><span class="o">.</span><span class="n">iter_aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></code>
+<h2 id="earthlens.core.iter_aggregate_netcdf" class="doc doc-heading"><a href="#earthlens.core.iter_aggregate_netcdf" class="toclink">
+            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">iter_aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></code>
 
-</a><a href="#earthlens.aggregate.iter_aggregate_netcdf" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.core.iter_aggregate_netcdf" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">
@@ -20507,7 +20507,7 @@ seed the output filename (<code>var_info.cds_variable</code>), and resolve
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.aggregate.AggregationConfig&lt;/code&gt;" href="#earthlens.aggregate.AggregationConfig">AggregationConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.core.AggregationConfig&lt;/code&gt; (&lt;code&gt;earthlens.aggregate.AggregationConfig&lt;/code&gt;)" href="#earthlens.core.AggregationConfig">AggregationConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -20534,12 +20534,12 @@ reduction, output location, and whether to retain arrays.</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>AggregatedWindow</code></td>            <td>
-                  <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.aggregate.AggregatedWindow&lt;/code&gt;
+                  <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.core.AggregatedWindow&lt;/code&gt;
 
 
   &lt;span class=&quot;doc doc-labels&quot;&gt;
       &lt;small class=&quot;doc doc-label doc-label-dataclass&quot;&gt;&lt;code&gt;dataclass&lt;/code&gt;&lt;/small&gt;
-  &lt;/span&gt;" href="#earthlens.aggregate.AggregatedWindow">AggregatedWindow</a></code>
+  &lt;/span&gt; (&lt;code&gt;earthlens.aggregate.AggregatedWindow&lt;/code&gt;)" href="#earthlens.core.AggregatedWindow">AggregatedWindow</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -20822,15 +20822,15 @@ pressure-level dimension, or vice versa; see
 
 
 
-<h2 id="earthlens.aggregate.AggregatedWindow" class="doc doc-heading"><a href="#earthlens.aggregate.AggregatedWindow" class="toclink">
-            <code>earthlens.aggregate.AggregatedWindow</code>
+<h2 id="earthlens.core.AggregatedWindow" class="doc doc-heading"><a href="#earthlens.core.AggregatedWindow" class="toclink">
+            <code>earthlens.core.AggregatedWindow</code>
 
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
   </span>
 
-</a><a href="#earthlens.aggregate.AggregatedWindow" class="headerlink" title="Permanent link">#</a></h2>
+</a><a href="#earthlens.core.AggregatedWindow" class="headerlink" title="Permanent link">#</a></h2>
 
 
     <div class="doc doc-contents first">
@@ -20860,7 +20860,7 @@ unhashable. Compare the fields you actually care about instead.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.aggregate.AggregatedWindow.label">label</span></code></td>
+            <td><code><span title="earthlens.core.AggregatedWindow.label">label</span></code></td>
             <td>
                   <code><span title="pandas.Timestamp">Timestamp</span></code>
             </td>
@@ -20871,7 +20871,7 @@ unhashable. Compare the fields you actually care about instead.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.aggregate.AggregatedWindow.array">array</span></code></td>
+            <td><code><span title="earthlens.core.AggregatedWindow.array">array</span></code></td>
             <td>
                   <code><span title="numpy.ndarray">ndarray</span> | None</code>
             </td>
@@ -20883,7 +20883,7 @@ retain it.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="earthlens.aggregate.AggregatedWindow.path">path</span></code></td>
+            <td><code><span title="earthlens.core.AggregatedWindow.path">path</span></code></td>
             <td>
                   <code><span title="pathlib.Path">Path</span> | None</code>
             </td>

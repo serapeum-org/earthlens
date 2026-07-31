@@ -8849,6 +8849,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/biodiversity/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared helpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -19583,34 +19611,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../reference/biodiversity/api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Biodiversity helpers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -20145,9 +20145,9 @@ for everything. The <a href="../reference/providers/">provider matrix</a> lists 
 </code></pre></div>
 <p><code>argopy</code> needs <code>xarray&gt;=2025.7</code> and <code>openeo</code> needs <code>xarray&lt;2025.1.2</code> — mutually unsatisfiable. Use the curated
 extra instead:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev<span class="w">      </span><span class="c1"># includes openeo; omits argo / osm / osm-pbf</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev<span class="w">      </span><span class="c1"># includes openeo and osm; omits argo / osm-pbf</span>
 </code></pre></div>
-<p>To work on the argo side, prune the other: <code>uv sync --all-extras --no-extra openeo --no-extra osm --no-extra osm-pbf</code>.</p>
+<p>To work on the argo side, prune the other: <code>uv sync --all-extras --no-extra openeo --no-extra osm-pbf</code>.</p>
 <h2 id="request-construction"><a class="toclink" href="#request-construction">Request construction</a><a class="headerlink" href="#request-construction" title="Permanent link">#</a></h2>
 <h3 id="x-is-not-a-supported-data-source"><a class="toclink" href="#x-is-not-a-supported-data-source"><code>'x' is not a supported data source</code></a><a class="headerlink" href="#x-is-not-a-supported-data-source" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ValueError: &#39;not-a-provider&#39; is not a supported data source. Known: [&#39;admin&#39;, &#39;admin-boundaries&#39;, ...]
@@ -20260,9 +20260,10 @@ harder.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">lens</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">iter_download</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
 <a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="o">...</span>
 </code></pre></div>
-<p>Only backends implementing the <code>_search</code> / <code>_fetch_one</code> split can stream — <code>openaq</code>, <code>firms</code>, <code>usgs-water</code>,
-<code>argo</code>, <code>glaciers</code>, <code>climate-indices</code>, <code>sensor-community</code> and <code>gfw</code>. On one whose fetch is a single whole-batch
-request, such as <code>gdacs</code>, this raises <code>NotImplementedError</code>; narrow the request instead.</p>
+<p>Only backends implementing the <code>_search</code> / <code>_fetch_one</code> split can stream — twelve do: <code>openaq</code>, <code>firms</code>,
+<code>usgs-water</code>, <code>argo</code>, <code>glaciers</code>, <code>climate-indices</code>, <code>sensor-community</code>, <code>gfw</code>, <code>cop-dem</code>, <code>soilgrids</code>, <code>nwm</code>
+and <code>nwp</code>. On one whose fetch is a single whole-batch request, such as <code>gdacs</code>, this raises
+<code>NotImplementedError</code>; narrow the request instead.</p>
 <p>See <a href="../reference/base/contracts/">Base contracts</a>.</p>
 <h2 id="output"><a class="toclink" href="#output">Output</a><a class="headerlink" href="#output" title="Permanent link">#</a></h2>
 <h3 id="where-did-my-files-go"><a class="toclink" href="#where-did-my-files-go">Where did my files go?</a><a class="headerlink" href="#where-did-my-files-go" title="Permanent link">#</a></h3>

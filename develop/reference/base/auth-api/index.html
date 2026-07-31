@@ -8464,6 +8464,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../biodiversity/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared helpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -19449,34 +19477,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../biodiversity/api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Biodiversity helpers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -20748,7 +20748,8 @@ misconfigured project IAM). Callers should catch
     </div>
 
 </div><h2 id="s3-credentials"><a class="toclink" href="#s3-credentials">S3 credentials</a><a class="headerlink" href="#s3-credentials" title="Permanent link">#</a></h2>
-<p>Shared by the backends that read public or requester-pays AWS buckets (ERA5, Copernicus DEM, GOES, NWM, NEXRAD).</p>
+<p>Used by the two backends that resolve AWS credentials through this helper — <code>amazon-s3</code> (ERA5 and the other
+public buckets) and <code>dem</code> (Copernicus DEM). The other bucket-backed backends open their clients directly.</p>
 
 
 <div class="doc doc-object doc-class">

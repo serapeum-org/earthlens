@@ -8527,6 +8527,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../biodiversity/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared helpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -19261,34 +19289,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../biodiversity/api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Biodiversity helpers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -19513,7 +19513,7 @@ plain HTTP and pull in no additional SDK.</p>
 <tr>
 <td>AWS Open Data (ERA5 / Sentinel-2 / Copernicus DEM / ESA WorldCover)</td>
 <td><code>amazon-s3</code></td>
-<td>raster</td>
+<td>mixed</td>
 <td>unsigned AWS (public buckets)</td>
 <td><code>s3</code></td>
 <td><a href="../s3/introduction/">Amazon S3</a></td>
@@ -19713,7 +19713,7 @@ plain HTTP and pull in no additional SDK.</p>
 <tr>
 <td>Alaska Satellite Facility (SAR search + InSAR baselines)</td>
 <td><code>asf</code>, <code>alaska-satellite-facility</code>, <code>insar</code></td>
-<td>vector</td>
+<td>raster</td>
 <td>NASA Earthdata Login (reuses <code>earthdata</code>)</td>
 <td><code>asf</code></td>
 <td><a href="../asf/introduction/">ASF</a></td>
@@ -19890,9 +19890,10 @@ plain HTTP and pull in no additional SDK.</p>
 </table>
 <p><code>Output</code> is the backend's <code>OUTPUT_KIND</code> — <code>raster</code> writes GeoTIFF/COG/NetCDF, <code>vector</code> writes geometry tables
 (GeoJSON / GeoPackage), <code>tabular</code> writes plain tables (CSV / Parquet), and <code>mixed</code> (HDX, Sentinel Hub, WorldPop)
-covers backends whose products vary by request. It also governs <code>aggregate=</code>: the temporal aggregator is
-accepted for <code>raster</code> backends and rejected for <code>vector</code> / <code>tabular</code> ones; the <code>mixed</code> backends reject it
-because their products are returned as-is.</p>
+covers backends whose products vary by request. It is also the first half of the <code>aggregate=</code> gate: the temporal
+aggregator is forwarded only when <code>OUTPUT_KIND</code> is <code>raster</code> <strong>or</strong> <code>mixed</code> <strong>and</strong> the backend declares
+<code>SUPPORTS_AGGREGATE</code>. <code>vector</code> / <code>tabular</code> backends always refuse, and a raster backend that has not wired the
+reducer refuses too.</p>
 
 
 

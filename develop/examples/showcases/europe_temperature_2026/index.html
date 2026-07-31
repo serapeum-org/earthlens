@@ -8464,6 +8464,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/biodiversity/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared helpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -19324,34 +19352,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/biodiversity/api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Biodiversity helpers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -20331,7 +20331,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1 id="an-ecmwf-style-temperature-animation-over-europe-june-july-2026">An ECMWF-style temperature animation over Europe — June → July 2026<a class="anchor-link" href="#an-ecmwf-style-temperature-animation-over-europe-june-july-2026">¶</a></h1><p>This showcase reproduces the look ECMWF posts on social media — the glowing blue-to-magenta
-2 m-temperature maps on a dark canvas with country borders and a moving date stamp — for the whole of
+2 m-temperature maps on a dark canvas with country borders — for the whole of
 <strong>1 June → 15 July 2026</strong>, one frame per day, straight from <code>earthlens</code>.</p>
 <p>The colour is not hand-rolled: cleopatra ships <strong><code>style="2t"</code></strong>, the genuine <strong>ECMWF Magics</strong> palette
 for 2 m temperature (the GRIB shortName <code>2t</code>, vendored from ECMWF's own <code>palettes.json</code>). <code>pyramids</code>
@@ -20355,7 +20355,7 @@ published day as of this writing is <strong>15 July 2026</strong> (about nine da
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p><code>pyramids</code> supplies <code>Dataset</code> / <code>DatasetCollection</code>; cleopatra supplies the ECMWF <code>"2t"</code> preset, the
-<code>FrameLabel</code> date stamp, and <code>apply_blank_canvas</code> for the dark look; <code>earthlens</code> supplies the unified
+dark-basemap inset, and <code>apply_blank_canvas</code> for the dark look; <code>earthlens</code> supplies the unified
 <code>EarthLens</code> entry point.</p>
 </div>
 </div>
@@ -20599,7 +20599,8 @@ else:
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="2-convert-kelvin-to-c">2 · Convert kelvin to °C<a class="anchor-link" href="#2-convert-kelvin-to-c">¶</a></h2><p>ERA5-Land 2 m temperature is in kelvin with 0 as the sea/fill value; mask non-positive fills and
+<h2 id="2-convert-kelvin-to-c">2 · Convert kelvin to °C<a class="anchor-link" href="#2-convert-kelvin-to-c">¶</a></h2><p>ERA5-Land 2 m temperature is in kelvin with 0 as the sea/fill value; mask everything below 200 K —
+well under any real surface temperature, so it catches the 0 fill without touching valid data — and
 subtract 273.15. Each converted day is written into <code>t2m_celsius/</code> and the day is recorded as a frame
 label.</p>
 </div>
@@ -20685,7 +20686,7 @@ len(celsius_paths), labels[0], "-&gt;", labels[-1]</div>
 <ul>
 <li><code>cube.plot(style="2t")</code> — the genuine ECMWF Magics 2 m-temperature palette.</li>
 <li><code>apply_blank_canvas(..., facecolor="black")</code> — the dark-animation canvas.</li>
-<li><code>animate(..., frame_label=FrameLabel(...))</code> — the moving date stamp, in white.</li>
+<li><code>save_animation(..., fps=5, crf=23)</code> — writes the frames out as an mp4.</li>
 <li><code>add_reference_map(style="ecmwf-dark", ...)</code> — the dark basemap with country borders underneath.</li>
 </ul>
 <p>The <code>"2t"</code> palette is flat-saturated at both ends by design, with the gradient packed into the middle,
@@ -20855,7 +20856,7 @@ for the white-background variant.</li>
 <li><strong>Longer / smoother.</strong> Extend <code>END</code> as newer ERA5-Land days publish, or raise <code>fps</code> for a faster
 playback. Lower <code>scale</code> for a sharper (heavier) movie.</li>
 <li><strong>Same recipe elsewhere.</strong> Change <code>EUROPE</code> to any box and re-run — the whole animation is one
-<code>cube.plot(style=...).animate(...).add_reference_map(...)</code> chain.</li>
+<code>cube.plot(style=...)</code> → <code>apply_blank_canvas</code> → <code>add_reference_map</code> → <code>save_animation</code> sequence.</li>
 </ul>
 </div>
 </div>

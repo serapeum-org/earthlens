@@ -8464,6 +8464,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../biodiversity/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared helpers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -19161,6 +19189,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -19325,34 +19364,6 @@
     
   
     Region affinity (base)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../biodiversity/api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Biodiversity helpers
   
 
     
@@ -19600,6 +19611,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -19738,9 +19760,10 @@ explicit and <strong>exact</strong> — it stops the work rather than truncating
 </code></pre></div>
 <p><code>check_limit(limit)</code> validates the value; <code>iter_download(limit=...)</code> yields at most that many items.</p>
 <p>Streaming is <strong>not</strong> universal. The default <code>iter_download</code> composes the <code>_search</code> / <code>_fetch_one</code> split, so only
-a backend that implements both gets it — eight of the vector / tabular backends do (<code>openaq</code>, <code>firms</code>,
-<code>usgs-water</code>, <code>argo</code>, <code>glaciers</code>, <code>climate-indices</code>, <code>sensor-community</code>, <code>gfw</code>). A backend whose fetch is one
-whole-batch server request, such as <code>gdacs</code>, raises rather than pretending to stream.</p>
+a backend implementing both gets it — twelve do, across every output kind: <code>openaq</code>, <code>firms</code>, <code>usgs-water</code>,
+<code>argo</code>, <code>glaciers</code>, <code>climate-indices</code>, <code>sensor-community</code>, <code>gfw</code>, plus the raster <code>cop-dem</code>, <code>soilgrids</code>,
+<code>nwm</code> and <code>nwp</code>. A backend whose fetch is one whole-batch server request, such as <code>gdacs</code>, raises rather than
+pretending to stream.</p>
 <h2 id="error-policy"><a class="toclink" href="#error-policy">Error policy</a><a class="headerlink" href="#error-policy" title="Permanent link">#</a></h2>
 <p>Backends that process a batch honour <code>errors=</code>:</p>
 <table>
@@ -19803,8 +19826,9 @@ caller mutating a catalog cannot corrupt the process-wide cache.</p>
 <p>Pass a <code>pathlib.Path</code>. A missing path raises <code>ValueError</code> (it raised <code>FileNotFoundError</code> before 0.12.0 — see the
 <a href="../../../migration/">migration guide</a>).</p>
 <h2 id="accepted-date-forms"><a class="toclink" href="#accepted-date-forms">Accepted date forms</a><a class="headerlink" href="#accepted-date-forms" title="Permanent link">#</a></h2>
-<p><code>start</code> / <code>end</code> accept all four documented forms — <code>str</code>, <code>datetime</code>, <code>date</code>, and ISO-datetime strings. Before</p>
-<h1 id="804-this-worked-on-only-8-of-48-backends-despite-the-facade-documenting-all-four"><a class="toclink" href="#804-this-worked-on-only-8-of-48-backends-despite-the-facade-documenting-all-four">804 this worked on only 8 of 48 backends despite the facade documenting all four.</a><a class="headerlink" href="#804-this-worked-on-only-8-of-48-backends-despite-the-facade-documenting-all-four" title="Permanent link">#</a></h1>
+<p><code>start</code> / <code>end</code> accept every documented form — a <code>datetime</code>, a <code>date</code>, or a <code>str</code> in either the plain <code>fmt</code>
+shape or full ISO-8601. Before #804 this worked on only 8 of 48 backends despite the facade documenting them
+all.</p>
 <h2 id="see-also"><a class="toclink" href="#see-also">See also</a><a class="headerlink" href="#see-also" title="Permanent link">#</a></h2>
 <ul>
 <li><a href="../http-client/">HTTP client</a> — the pooled, retrying <code>HttpClient</code>.</li>

@@ -87,13 +87,13 @@
     
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="earthlens">
-    <meta property="og:title" content="Showcase — the Netherlands' 2026 water shortage, from orbit and from the ground">
+    <meta property="og:title" content="Showcase — the Netherlands&#39; 2026 water shortage, from orbit and from the ground">
     <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
     <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/examples/showcases/netherlands_drought_2026/">
     <meta property="og:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Showcase — the Netherlands' 2026 water shortage, from orbit and from the ground">
+    <meta name="twitter:title" content="Showcase — the Netherlands&#39; 2026 water shortage, from orbit and from the ground">
     <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
     <meta name="twitter:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
@@ -8451,6 +8451,34 @@
     
   
     Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/biodiversity/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shared helpers
   
 
     
@@ -19474,34 +19502,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../reference/biodiversity/api/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Biodiversity helpers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -21012,7 +21012,7 @@ cdi_vmin, cdi_vmax</div>
     <span class="n">vmin</span><span class="o">=</span><span class="n">cdi_vmin</span><span class="p">,</span>
     <span class="n">vmax</span><span class="o">=</span><span class="n">cdi_vmax</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
-    <span class="n">title</span><span class="o">=</span><span class="s2">"Netherlands - Copernicus EDO Combined Drought Indicator, Apr-Jul 2026"</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">"Netherlands - Copernicus EDO Combined Drought Indicator, Apr-Jun 2026"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">gif</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
 <span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">gif</span><span class="p">)))</span>
@@ -21024,7 +21024,7 @@ dc_cdi.plot(
     vmin=cdi_vmin,
     vmax=cdi_vmax,
     figsize=(5, 5),
-    title="Netherlands - Copernicus EDO Combined Drought Indicator, Apr-Jul 2026",
+    title="Netherlands - Copernicus EDO Combined Drought Indicator, Apr-Jun 2026",
 ).save_animation(str(gif), fps=1.5)
 plt.close("all")
 display(Image(filename=str(gif)))</div>
@@ -21336,8 +21336,11 @@ Name: precip_mm, dtype: float64</pre>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="cumulative-precipitation-four-years-side-by-side">Cumulative precipitation, four years side by side<a class="anchor-link" href="#cumulative-precipitation-four-years-side-by-side">¶</a></h3><p>If 2026 is genuinely the driest, its cumulative-precipitation curve should sit visibly below the
-other three years by the end of the window.</p>
+<h3 id="cumulative-precipitation-four-years-side-by-side">Cumulative precipitation, four years side by side<a class="anchor-link" href="#cumulative-precipitation-four-years-side-by-side">¶</a></h3><p>Compared at the same day-of-season, 2026 and 2025 land almost on top of each other — 138.0 mm and
+136.3 mm — while 2023 reaches 153.5 mm and 2024 reaches 262.6 mm. So the honest reading is not
+"2026 is the driest year" but "2026 is the second of two consecutive springs at roughly half of
+2024", with 2025 marginally lower still. That is what makes the 2026 declaration notable: the
+shortage arrived on top of an already-depleted 2025, not after a wet year.</p>
 </div>
 </div>
 </div>
@@ -21370,8 +21373,11 @@ other three years by the end of the window.</p>
 <span class="n">totals</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">year</span><span class="p">,</span> <span class="n">grp</span> <span class="ow">in</span> <span class="n">era5_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"year"</span><span class="p">):</span>
     <span class="n">grp</span> <span class="o">=</span> <span class="n">grp</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"season_day"</span><span class="p">)</span>
+    <span class="c1"># Truncate before the cumulative sum so the curve and the total describe the</span>
+    <span class="c1"># same window as the title.</span>
+    <span class="n">grp</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="n">grp</span><span class="p">[</span><span class="s2">"season_day"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">common_last</span><span class="p">]</span>
     <span class="n">cum</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s2">"precip_mm"</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
-    <span class="n">totals</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cum</span><span class="p">[</span><span class="n">grp</span><span class="p">[</span><span class="s2">"season_day"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">common_last</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">totals</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cum</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">style</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#c1440e"</span><span class="p">)</span> <span class="k">if</span> <span class="n">year</span> <span class="o">==</span> <span class="mi">2026</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grp</span><span class="p">[</span><span class="s2">"season_day"</span><span class="p">],</span> <span class="n">cum</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="o">**</span><span class="n">style</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"days since 1 April"</span><span class="p">)</span>
@@ -21396,8 +21402,11 @@ common_last = int(era5_df.groupby("year")["season_day"].max().min())
 totals = {}
 for year, grp in era5_df.groupby("year"):
     grp = grp.sort_values("season_day")
+    # Truncate before the cumulative sum so the curve and the total describe the
+    # same window as the title.
+    grp = grp[grp["season_day"] &lt;= common_last]
     cum = grp["precip_mm"].cumsum()
-    totals[year] = float(cum[grp["season_day"] &lt;= common_last].iloc[-1])
+    totals[year] = float(cum.iloc[-1])
     style = dict(lw=3, color="#c1440e") if year == 2026 else dict(lw=1.5, alpha=0.6)
     ax.plot(grp["season_day"], cum, label=str(year), **style)
 ax.set_xlabel("days since 1 April")
@@ -21481,7 +21490,7 @@ left two of five composites visibly cloud-contaminated in an earlier pass of thi
         <span class="n">scene</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
             <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
             <span class="n">cadence</span><span class="o">=</span><span class="s2">"raw"</span><span class="p">,</span>
-            <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>  <span class="c1"># scratch only; the OS reclaims it, nothing here is kept</span>
             <span class="n">dataset</span><span class="o">=</span><span class="n">S2</span><span class="p">,</span>
             <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">,</span> <span class="s2">"B8"</span><span class="p">],</span>
             <span class="n">aoi</span><span class="o">=</span><span class="n">LOBITH_AOI</span><span class="p">,</span>
@@ -21536,7 +21545,7 @@ for start, end in WINDOWS:
         scene = EarthLens(
             data_source="gee",
             cadence="raw",
-            path=tempfile.mkdtemp(),
+            path=tempfile.mkdtemp(),  # scratch only; the OS reclaims it, nothing here is kept
             dataset=S2,
             variables=["B4", "B3", "B2", "B8"],
             aoi=LOBITH_AOI,
@@ -21861,7 +21870,7 @@ else:
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="animated-true-colour-and-animated-ndwi">Animated true colour and animated NDWI<a class="anchor-link" href="#animated-true-colour-and-animated-ndwi">¶</a></h3><p>The same pattern as the <a href="gerd_reservoir_filling.ipynb">GERD reservoir-filling showcase</a>: step through
+<h3 id="animated-true-colour-and-animated-ndwi">Animated true colour and animated NDWI<a class="anchor-link" href="#animated-true-colour-and-animated-ndwi">¶</a></h3><p>The same pattern as the <a href="../showcase/gerd_reservoir_filling.ipynb">GERD reservoir-filling showcase</a>: step through
 the composites and watch for any visible change in the channel's width or the exposure of its
 sandbanks.</p>
 </div>
@@ -22101,8 +22110,8 @@ else:
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="reading-the-result-honestly">Reading the result honestly<a class="anchor-link" href="#reading-the-result-honestly">¶</a></h3><p>Only two windows survived the cloud filter, and between them the wetted area <em>grew</em> slightly rather
-than shrank. That is a real result, not a bug, and it rejects the "the channel visibly narrows"
+<h3 id="reading-the-result-honestly">Reading the result honestly<a class="anchor-link" href="#reading-the-result-honestly">¶</a></h3><p>Only two windows survived the cloud filter, and between them the wetted area <em>grew</em> rather than
+shrank — the direction is the point, and the plot above carries the magnitude. That is a real result, not a bug, and it rejects the "the channel visibly narrows"
 hypothesis for this reach — worth saying plainly rather than forcing the opposite conclusion.</p>
 <p>Two things explain it. First, timing: the 771 m³/s record is specifically a <strong>July</strong> anomaly — Alpine
 snowmelt still buffers Rhine discharge in spring, so an April-vs-July comparison isn't guaranteed to
@@ -22132,7 +22141,8 @@ honestly negative result:</p>
 <li><strong><code>drought</code> → Copernicus EDO Combined Drought Indicator</strong> — an animated map of the drought severity
 spreading over the Netherlands from April to June 2026 (the most recent published dekad).</li>
 <li><strong><code>gee</code> → ERA5-Land</strong> — a four-year (2023–2026) comparison turning "lowest in years" into an actual
-cumulative-precipitation number (2026's 138 mm against 162–282 mm in the three prior years), not
+cumulative-precipitation number (2026's 138 mm and 2025's 136 mm against 154 mm and 263 mm in
+2023 and 2024, all compared at the same day-of-season), not
 just a quote.</li>
 <li><strong><code>gee</code> → Sentinel-2 true colour + NDWI</strong> — a before/after panel, an animated water-extent GIF, and
 a wetted-area chart over the Rhine at Lobith, which <em>rejects</em> the assumption that this particular
