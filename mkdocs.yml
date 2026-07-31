@@ -80,6 +80,19 @@ exclude_docs: |
   _images/branding/*.md
   # The kit's own guide would otherwise build as a page with no nav entry.
   _images/branding/earthlens-brand-kit/BRAND-GUIDE.md
+  # The kit ships 30 assets but the site references 13 — the header mark, the
+  # favicon set, the hero, the orbit animation and the social cards. Nothing
+  # links to the rest, so publishing them added 5.75 MB the site cannot reach.
+  # They stay tracked: the kit is meant to be taken from the repository.
+  _images/branding/earthlens-brand-kit/logo/
+  _images/branding/earthlens-brand-kit/icon/earthlens-icon.png
+  _images/branding/earthlens-brand-kit/icon/earthlens-badge.*
+  _images/branding/earthlens-brand-kit/animation/earthlens-globe-spinning.gif
+  _images/branding/earthlens-brand-kit/animation/earthlens-logo-animated.svg
+  _images/branding/earthlens-brand-kit/animation/earthlens-logo-orbit.webp
+  _images/branding/earthlens-brand-kit/favicon/favicon-64.png
+  _images/branding/earthlens-brand-kit/favicon/favicon-180.png
+  _images/branding/earthlens-brand-kit/world-texture.png
 
 plugins:
   - search
