@@ -84,7 +84,7 @@
         content="../_images/branding/earthlens-brand-kit/social/announcement-card.png">
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20112,7 +20112,7 @@
 quoted as earthlens raises them.</p>
 <h2 id="import-and-installation"><a class="toclink" href="#import-and-installation">Import and installation</a><a class="headerlink" href="#import-and-installation" title="Permanent link">#</a></h2>
 <h3 id="from-earthlens-import-earthlens-fails"><a class="toclink" href="#from-earthlens-import-earthlens-fails"><code>from earthlens import EarthLens</code> fails</a><a class="headerlink" href="#from-earthlens-import-earthlens-fails" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ImportError: cannot import name &#39;EarthLens&#39; from &#39;earthlens&#39;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ImportError: cannot import name &#39;EarthLens&#39; from &#39;earthlens&#39; (unknown location)
 </code></pre></div>
 <p><code>earthlens</code> is a namespace package with no top-level <code>__init__.py</code>. Import from <code>earthlens.core</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -20151,9 +20151,13 @@ explicit <code>dataset=</code>. A bare list only works for backends with a singl
 <p>Before 0.12.0 this silently downloaded <strong>daily</strong> data. If this started failing after an upgrade, the old run was
 giving you daily data under a label that claimed otherwise — see the <a href="../migration/">migration guide</a>.</p>
 <h3 id="notimplementederror-on-aggregate"><a class="toclink" href="#notimplementederror-on-aggregate"><code>NotImplementedError</code> on <code>aggregate=</code></a><a class="headerlink" href="#notimplementederror-on-aggregate" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>... (OUTPUT_KIND=&#39;vector&#39;). The aggregator only handles gridded raster outputs;
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>vector / tabular backends emit GeoDataFrame / DataFrame rows that have no meaningful gridded reduction.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>NotImplementedError: aggregate= is not supported by GDACS (OUTPUT_KIND=&#39;vector&#39;):
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>disaster alerts are vector features, not gridded rasters, so there is no meaningful
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>gridded reduction. Call download() without aggregate= and post-process the returned
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>FeatureCollection.
 </code></pre></div>
+<p>The wording after the colon is the backend's own <code>AGGREGATE_REFUSAL_REASON</code>, so it names why <em>that</em> provider
+refuses rather than repeating a generic sentence.</p>
 <p><code>aggregate=</code> is forwarded only when the backend's <code>OUTPUT_KIND</code> is <code>raster</code> or <code>mixed</code> <strong>and</strong> it declares
 <code>SUPPORTS_AGGREGATE</code>. A raster backend that has not wired the reducer is refused too. For <code>vector</code> / <code>tabular</code>
 results, reduce the returned
@@ -20164,12 +20168,25 @@ to its bounding box and say so. Check <code>SUPPORTS_POLYGON_AOI</code>, and cli
 <a href="https://github.com/serapeum-org/pyramids">pyramids</a> if you need the exact shape.</p>
 <h2 id="authentication"><a class="toclink" href="#authentication">Authentication</a><a class="headerlink" href="#authentication" title="Permanent link">#</a></h2>
 <h3 id="authenticationerror"><a class="toclink" href="#authenticationerror"><code>AuthenticationError</code></a><a class="headerlink" href="#authenticationerror" title="Permanent link">#</a></h3>
-<p>Credentials are missing, wrong, or expired. Credentials are <strong>not</strong> constructor arguments — they go to
-<code>authenticate()</code> or environment variables:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;cmems&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">service_username</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span> <span class="n">service_password</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="p">)</span>
+<p>Credentials are missing, wrong, or expired. <strong>Where they go is backend-specific</strong> — there is no single rule:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># CMEMS takes them as constructor keywords, forwarded to the backend</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;cmems&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">service_username</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span> <span class="n">service_password</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">)</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1"># GEE and FIRMS take theirs in authenticate()</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gee&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>    <span class="n">service_account</span><span class="o">=</span><span class="s2">&quot;my-sa@my-project.iam.gserviceaccount.com&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="n">service_key</span><span class="o">=</span><span class="s2">&quot;/path/to/key.json&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="p">)</span>
 </code></pre></div>
+<p><code>authenticate(**credentials)</code> forwards its keywords verbatim to the backend's own <code>authenticate</code>, so passing one
+the backend does not accept raises <code>TypeError</code> rather than <code>AuthenticationError</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>TypeError: AbstractDataSource.authenticate() got an unexpected keyword argument &#39;service_username&#39;
+</code></pre></div>
+<p>If you see that, the credential belongs in the constructor instead. Most backends also read an environment
+variable when the keyword is omitted.</p>
 <p>Per-provider setup is on each backend's page; see also <a href="../examples/authentication/">Authentication examples</a> and
 the <a href="../reference/base/auth-api/">auth API</a>.</p>
 <h3 id="ecmwf-cds-fails-to-authenticate"><a class="toclink" href="#ecmwf-cds-fails-to-authenticate">ECMWF / CDS fails to authenticate</a><a class="headerlink" href="#ecmwf-cds-fails-to-authenticate" title="Permanent link">#</a></h3>
@@ -20217,20 +20234,24 @@ and otherwise backing off exponentially:</p>
 harder.</p>
 <h3 id="a-batch-dies-on-one-bad-item"><a class="toclink" href="#a-batch-dies-on-one-bad-item">A batch dies on one bad item</a><a class="headerlink" href="#a-batch-dies-on-one-bad-item" title="Permanent link">#</a></h3>
 <p>Backends that process a batch honour <code>errors=</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">)</span>     <span class="c1"># log and continue</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;skip&quot;</span><span class="p">)</span>     <span class="c1"># drop silently and continue</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>    <span class="c1"># default — abort on first failure</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;warn&quot;</span><span class="p">)</span>     <span class="c1"># default — log the failure and continue</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>   <span class="c1"># drop it and continue, without logging</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>    <span class="c1"># abort on the first failure</span>
 </code></pre></div>
+<p><code>"skip"</code> is accepted as an alias of <code>"ignore"</code>.</p>
 <h3 id="a-vector-or-tabular-request-exhausts-memory"><a class="toclink" href="#a-vector-or-tabular-request-exhausts-memory">A vector or tabular request exhausts memory</a><a class="headerlink" href="#a-vector-or-tabular-request-exhausts-memory" title="Permanent link">#</a></h3>
 <p>Cap it. <code>limit=</code> is an exact cap that stops the work rather than truncating at the end:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">lens</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">iter_download</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="o">...</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">lens</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">iter_download</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="o">...</span>
 </code></pre></div>
+<p>Only backends implementing the <code>_search</code> / <code>_fetch_one</code> split can stream — <code>openaq</code>, <code>firms</code>, <code>usgs-water</code>,
+<code>argo</code>, <code>glaciers</code>, <code>climate-indices</code>, <code>sensor-community</code> and <code>gfw</code>. On one whose fetch is a single whole-batch
+request, such as <code>gdacs</code>, this raises <code>NotImplementedError</code>; narrow the request instead.</p>
 <p>See <a href="../reference/base/contracts/">Base contracts</a>.</p>
 <h2 id="output"><a class="toclink" href="#output">Output</a><a class="headerlink" href="#output" title="Permanent link">#</a></h2>
 <h3 id="where-did-my-files-go"><a class="toclink" href="#where-did-my-files-go">Where did my files go?</a><a class="headerlink" href="#where-did-my-files-go" title="Permanent link">#</a></h3>
 <p>If you omit <code>path=</code>, earthlens logs where it wrote:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>No `path` given; download() writes &#39;chc&#39; output under earthlens-data\chc/ (load() uses a temp dir).
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>No `path` given; download() writes &#39;chc&#39; output under earthlens-data\chc/ (load() uses a temp dir).
 </code></pre></div>
 <p>Pass <code>path=</code> to control it.</p>
 <h3 id="download-returned-an-object-not-file-paths"><a class="toclink" href="#download-returned-an-object-not-file-paths"><code>download()</code> returned an object, not file paths</a><a class="headerlink" href="#download-returned-an-object-not-file-paths" title="Permanent link">#</a></h3>
@@ -20249,7 +20270,7 @@ pre-existing tree and any partially written data are left alone.</p>
 <p>Warnings are errors. The usual causes are a nav entry pointing at a missing file, a dangling <code>#anchor</code>, or a
 griffe docstring complaint (a missing <code>-&gt;</code> annotation, or continuation lines indented off the 4-space grid). Build
 locally before pushing:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>uv<span class="w"> </span>run<span class="w"> </span>--group<span class="w"> </span>docs<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>uv<span class="w"> </span>run<span class="w"> </span>--group<span class="w"> </span>docs<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
 </code></pre></div>
 <h3 id="a-notebook-renders-with-no-output"><a class="toclink" href="#a-notebook-renders-with-no-output">A notebook renders with no output</a><a class="headerlink" href="#a-notebook-renders-with-no-output" title="Permanent link">#</a></h3>
 <p>The docs build does <strong>not</strong> execute notebooks — it renders stored outputs. Commit notebooks with their outputs
@@ -20257,7 +20278,7 @@ saved, or the page publishes as code with no results.</p>
 <h2 id="still-stuck"><a class="toclink" href="#still-stuck">Still stuck</a><a class="headerlink" href="#still-stuck" title="Permanent link">#</a></h2>
 <p>Open an issue at <a href="https://github.com/serapeum-org/earthlens/issues">github.com/serapeum-org/earthlens/issues</a> with
 the provider key, the full traceback, and your earthlens version:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">__version__</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="n">__version__</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">__version__</span><span class="p">;</span> <span class="nb">print</span><span class="p">(</span><span class="n">__version__</span><span class="p">)</span>
 </code></pre></div>
 
 

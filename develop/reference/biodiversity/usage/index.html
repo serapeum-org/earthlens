@@ -84,7 +84,7 @@
         content="../../../_images/branding/earthlens-brand-kit/social/announcement-card.png">
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19681,8 +19681,10 @@ and <a href="../../iucn/usage/">IUCN</a>.</p>
 <p>None of the four is gridded, so the facade rejects <code>aggregate=</code> for all of them with <code>NotImplementedError</code>.</p>
 <h2 id="authentication"><a class="toclink" href="#authentication">Authentication</a><a class="headerlink" href="#authentication" title="Permanent link">#</a></h2>
 <p>GBIF and OBIS search anonymously. WDPA and IUCN need a token:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;wdpa&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">)</span>   <span class="c1"># or WDPA_TOKEN</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;iucn&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">)</span>   <span class="c1"># or IUCN_TOKEN</span>
+<p>Both take the token as a <strong>constructor</strong> keyword — their <code>authenticate()</code> accepts none, so passing it there
+raises <code>TypeError</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;wdpa&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">)</span>   <span class="c1"># or set WDPA_TOKEN</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;iucn&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">)</span>   <span class="c1"># or set IUCN_TOKEN</span>
 </code></pre></div>
 <p>Red List data is never shipped as package data — the token stays user-supplied.</p>
 <h2 id="handling-license-warnings"><a class="toclink" href="#handling-license-warnings">Handling license warnings</a><a class="headerlink" href="#handling-license-warnings" title="Permanent link">#</a></h2>

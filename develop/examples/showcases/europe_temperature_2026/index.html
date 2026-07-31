@@ -84,7 +84,7 @@
         content="../../../_images/branding/earthlens-brand-kit/social/announcement-card.png">
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20381,14 +20381,6 @@ published day as of this writing is <strong>15 July 2026</strong> (about nine da
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
-<span class="n">ANIMATE</span> <span class="o">=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
-    <span class="n">labels</span><span class="p">,</span>
-    <span class="n">interval</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>
-    <span class="n">style</span><span class="o">=</span><span class="s2">"2t"</span><span class="p">,</span>
-    <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">north</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"white"</span><span class="p">),</span>
-    <span class="n">cbar_label_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-<span class="p">)</span>
-
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
 </pre></div>
@@ -20409,14 +20401,6 @@ from pyramids.dataset import Dataset
 from pyramids.dataset.collection import DatasetCollection
 
 from earthlens.core import EarthLens
-
-ANIMATE = glyph.animate(
-    labels,
-    interval=180,
-    style="2t",
-    frame_label=FrameLabel(location=[west, north + 2], color="white"),
-    cbar_label_size=16,
-)
 
 warnings.filterwarnings("ignore")
 logger.remove()</div>

@@ -84,7 +84,7 @@
         content="../../_images/branding/earthlens-brand-kit/social/announcement-card.png">
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19776,7 +19776,7 @@ Hold "Ctrl" to enable pan &amp; zoom
 backend and the optional SDK for a provider you never touch is never imported.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">sources</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">sources</span><span class="p">()</span>          <span class="c1"># every registered key, aliases included</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">sources</span><span class="p">()</span>          <span class="c1"># the 48 canonical keys — aliases resolve but are not listed</span>
 </code></pre></div>
 <h2 id="distribution-namespace-layout"><a class="toclink" href="#distribution-namespace-layout">Distribution &amp; namespace layout</a><a class="headerlink" href="#distribution-namespace-layout" title="Permanent link">#</a></h2>
 <p><code>earthlens</code> is a <strong>PEP 420 namespace package</strong> — there is no <code>earthlens/__init__.py</code>. Seven distributions each
@@ -19856,15 +19856,18 @@ Hold "Ctrl" to enable pan &amp; zoom
     class AbstractDataSource {
         &lt;&lt;abstract&gt;&gt;
         +OUTPUT_KIND: str
+        +SUPPORTS_AGGREGATE: bool
         +REQUIRES_TIME_WINDOW: bool
         +SUPPORTS_POLYGON_AOI: bool
+        +ERROR_POLICIES: frozenset
         +space: SpatialExtent
         +time: TemporalExtent
-        +client
         +root_dir: Path
         +authenticate() AbstractDataSource
         +download()*
-        +iter_download()
+        +iter_download(limit)
+        +check_limit(limit)$
+        +check_errors_policy(errors)$
         #_check_input_dates()*
         #_initialize()
         #_create_grid()
@@ -19880,14 +19883,18 @@ Hold "Ctrl" to enable pan &amp; zoom
 
     class TemporalExtent {
         &lt;&lt;frozen pydantic&gt;&gt;
-        +start, end
+        +start_date, end_date
         +resolution: str
+        +dates
     }
 
     class AbstractCatalog {
         &lt;&lt;abstract&gt;&gt;
-        +load(path)$
-        +get_variable(name)
+        +catalog
+        +get_catalog()
+        +get_dataset(key)
+        +get_variable(dataset_key, variable_name)
+        +resolve(key)
     }
 
     AbstractDataSource --&gt; SpatialExtent : _create_grid() returns
@@ -20032,7 +20039,8 @@ Hold "Ctrl" to enable pan &amp; zoom
     
 </div>
 <p>Which shape a backend uses is decided by the rule in <a href="#catalog-storage">Catalog storage</a> below, not ad hoc. A few
-catalogs are introspected live from the provider instead of shipped (S3 lists its bucket).</p>
+catalogs additionally probe the provider at request time to resolve what a shipped row expands to, but the
+curated rows themselves are always shipped — S3's live in <code>s3_data_catalog.yaml</code> like every other backend's.</p>
 <h2 id="shared-base-services"><a class="toclink" href="#shared-base-services">Shared base services</a><a class="headerlink" href="#shared-base-services" title="Permanent link">#</a></h2>
 <p><code>earthlens.base</code> holds the contracts and the cross-backend plumbing, so a provider backend stays small:</p>
 <table>

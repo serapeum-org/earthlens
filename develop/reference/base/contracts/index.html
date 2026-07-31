@@ -84,7 +84,7 @@
         content="../../../_images/branding/earthlens-brand-kit/social/announcement-card.png">
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -19714,13 +19714,17 @@ for.</p>
 <h2 id="bounded-results"><a class="toclink" href="#bounded-results">Bounded results</a><a class="headerlink" href="#bounded-results" title="Permanent link">#</a></h2>
 <p>A vector or tabular request used to be bounded only by available RAM. The bounded-result contract makes the cap
 explicit and <strong>exact</strong> — it stops the work rather than truncating at the end:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gdacs&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span><span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;openaq&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># stream, stopping after 500 records</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">lens</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">iter_download</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">...</span>
 </code></pre></div>
 <p><code>check_limit(limit)</code> validates the value; <code>iter_download(limit=...)</code> yields at most that many items.</p>
+<p>Streaming is <strong>not</strong> universal. The default <code>iter_download</code> composes the <code>_search</code> / <code>_fetch_one</code> split, so only
+a backend that implements both gets it — eight of the vector / tabular backends do (<code>openaq</code>, <code>firms</code>,
+<code>usgs-water</code>, <code>argo</code>, <code>glaciers</code>, <code>climate-indices</code>, <code>sensor-community</code>, <code>gfw</code>). A backend whose fetch is one
+whole-batch server request, such as <code>gdacs</code>, raises rather than pretending to stream.</p>
 <h2 id="error-policy"><a class="toclink" href="#error-policy">Error policy</a><a class="headerlink" href="#error-policy" title="Permanent link">#</a></h2>
 <p>Backends that process a batch honour <code>errors=</code>:</p>
 <table>
@@ -19732,24 +19736,25 @@ explicit and <strong>exact</strong> — it stops the work rather than truncating
 </thead>
 <tbody>
 <tr>
-<td><code>"raise"</code></td>
-<td>Abort on the first failure (default).</td>
-</tr>
-<tr>
 <td><code>"warn"</code></td>
-<td>Log the failure and continue.</td>
+<td>Log the failure and continue. <strong>The default on every backend that takes <code>errors=</code>.</strong></td>
 </tr>
 <tr>
-<td><code>"skip"</code></td>
-<td>Drop the failed item silently and continue.</td>
+<td><code>"raise"</code></td>
+<td>Abort on the first failure.</td>
 </tr>
 <tr>
 <td><code>"ignore"</code></td>
-<td>As <code>skip</code>, without recording it.</td>
+<td>Drop the failed item and continue, without logging.</td>
+</tr>
+<tr>
+<td><code>"skip"</code></td>
+<td>Accepted as an alias of <code>"ignore"</code>.</td>
 </tr>
 </tbody>
 </table>
-<p><code>check_errors_policy(errors)</code> validates the value against <code>ERROR_POLICIES</code>.</p>
+<p><code>ERROR_POLICIES</code> lists four accepted spellings but there are three behaviours: <code>check_errors_policy</code> normalises
+<code>"skip"</code> to <code>"ignore"</code>, so both take the same path.</p>
 <h2 id="streaming-and-connection-pooling"><a class="toclink" href="#streaming-and-connection-pooling">Streaming and connection pooling</a><a class="headerlink" href="#streaming-and-connection-pooling" title="Permanent link">#</a></h2>
 <ul>
 <li><strong>Downloads are streamed and atomic.</strong> Six whole-body <code>.content</code> writes were replaced with streamed writes to a
