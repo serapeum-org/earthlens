@@ -37,30 +37,30 @@ jobs:
     permissions:
       contents: read
     steps:
-    # On workflow_run the default ref is not the ref deploy-release publishes,
-    # so pin to that run's head_sha — a commit, not a branch name that may
-    # already have moved. Every other trigger keeps checkout's own default,
-    # which for a pull_request is the merge commit rather than the fork's head.
+    # No explicit ref: checkout's own default is what we want on every trigger,
+    # and it is the merge commit on a pull_request rather than the fork's head.
+    # Naming a ref from the event payload would put fork-controlled code into
+    # this job.
     - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5
       with:
         fetch-depth: 0
-        ref: ${{ github.event.workflow_run.head_sha || '' }}
         persist-credentials: false
 
-    - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
-      with:
-        version: "0.11.29"
-
-    # Pin the interpreter so the gate resolves the same environment on every
-    # trigger; without it the runner's default Python decides the resolution.
-    - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+    # The same setup the deploy jobs get. mkdocs-deploy calls this action
+    # internally with these inputs, so reusing it here keeps the gate and the
+    # deploy on one environment; installing the toolchain by hand would let the
+    # two drift and defeat the point of gating.
+    - uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
       with:
         python-version: "3.12"
+        install-groups: "groups: docs"
+        version: "0.11.29"
+        verify-lock: false
 
-    # --locked resolves from uv.lock instead of re-resolving, so the gate builds
-    # the versions the lockfile pins and fails if it has gone stale.
+    # The setup action already synced and put .venv on PATH, so build from it
+    # rather than letting uv resolve a second time.
     - name: Build docs with --strict
-      run: uv run --locked --group docs --extra all mkdocs build --strict --site-dir /tmp/site
+      run: uv run --no-sync mkdocs build --strict --site-dir /tmp/site
 
   deploy-pr:
       if: github.event_name == 'pull_request'
