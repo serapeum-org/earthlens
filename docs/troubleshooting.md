@@ -160,10 +160,12 @@ harder.
 Backends that process a batch honour `errors=`:
 
 ```python
-lens.download(errors="warn")     # log and continue
-lens.download(errors="skip")     # drop silently and continue
-lens.download(errors="raise")    # default — abort on first failure
+lens.download(errors="warn")     # default — log the failure and continue
+lens.download(errors="ignore")   # drop it and continue, without logging
+lens.download(errors="raise")    # abort on the first failure
 ```
+
+`"skip"` is accepted as an alias of `"ignore"`.
 
 ### A vector or tabular request exhausts memory
 
@@ -173,6 +175,10 @@ Cap it. `limit=` is an exact cap that stops the work rather than truncating at t
 for item in lens.datasource.iter_download(limit=500):
     ...
 ```
+
+Only backends implementing the `_search` / `_fetch_one` split can stream — `openaq`, `firms`, `usgs-water`,
+`argo`, `glaciers`, `climate-indices`, `sensor-community` and `gfw`. On one whose fetch is a single whole-batch
+request, such as `gdacs`, this raises `NotImplementedError`; narrow the request instead.
 
 See [Base contracts](reference/base/contracts.md).
 

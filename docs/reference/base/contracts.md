@@ -50,7 +50,7 @@ A vector or tabular request used to be bounded only by available RAM. The bounde
 explicit and **exact** — it stops the work rather than truncating at the end:
 
 ```python
-lens = EarthLens(data_source="gdacs", ...)
+lens = EarthLens(data_source="openaq", ...)
 
 # stream, stopping after 500 records
 for item in lens.datasource.iter_download(limit=500):
@@ -59,18 +59,24 @@ for item in lens.datasource.iter_download(limit=500):
 
 `check_limit(limit)` validates the value; `iter_download(limit=...)` yields at most that many items.
 
+Streaming is **not** universal. The default `iter_download` composes the `_search` / `_fetch_one` split, so only
+a backend that implements both gets it — eight of the vector / tabular backends do (`openaq`, `firms`,
+`usgs-water`, `argo`, `glaciers`, `climate-indices`, `sensor-community`, `gfw`). A backend whose fetch is one
+whole-batch server request, such as `gdacs`, raises rather than pretending to stream.
+
 ## Error policy
 
 Backends that process a batch honour `errors=`:
 
 | Value | Behaviour |
 |---|---|
-| `"raise"` | Abort on the first failure (default). |
-| `"warn"` | Log the failure and continue. |
-| `"skip"` | Drop the failed item silently and continue. |
-| `"ignore"` | As `skip`, without recording it. |
+| `"warn"` | Log the failure and continue. **The default on every backend that takes `errors=`.** |
+| `"raise"` | Abort on the first failure. |
+| `"ignore"` | Drop the failed item and continue, without logging. |
+| `"skip"` | Accepted as an alias of `"ignore"`. |
 
-`check_errors_policy(errors)` validates the value against `ERROR_POLICIES`.
+`ERROR_POLICIES` lists four accepted spellings but there are three behaviours: `check_errors_policy` normalises
+`"skip"` to `"ignore"`, so both take the same path.
 
 ## Streaming and connection pooling
 
