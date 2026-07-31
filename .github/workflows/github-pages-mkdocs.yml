@@ -50,17 +50,18 @@ jobs:
     # internally with these inputs, so reusing it here keeps the gate and the
     # deploy on one environment; installing the toolchain by hand would let the
     # two drift and defeat the point of gating.
-    - uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
+    - uses: serapeum-org/github-actions/actions/python-setup/uv@bc6c376c15ffbfe4d9f46fe7e39b0c2e56302ca8  # uv/v1.2.0
       with:
         python-version: "3.12"
         install-groups: "groups: docs"
         version: "0.11.29"
         verify-lock: false
 
-    # The setup action already synced and put .venv on PATH, so build from it
-    # rather than letting uv resolve a second time.
+    # The setup action puts .venv on GITHUB_PATH, so call mkdocs straight from
+    # it. Going back through `uv run` would re-enter dependency resolution for a
+    # build whose environment is already installed.
     - name: Build docs with --strict
-      run: uv run --no-sync mkdocs build --strict --site-dir /tmp/site
+      run: mkdocs build --strict --site-dir /tmp/site
 
   deploy-pr:
       if: github.event_name == 'pull_request'
