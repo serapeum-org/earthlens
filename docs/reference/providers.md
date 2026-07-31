@@ -19,7 +19,7 @@ plain HTTP and pull in no additional SDK.
 | Provider | `data_source` key(s) | Output | Auth | Extra | Docs |
 |---|---|---|---|---|---|
 | Climate Hazards Center (CHIRPS / CHIRTS / SPI / SPEI / WBGT / …) | `chc`, `chirps` | raster | anonymous FTP | — | [CHC](chc/introduction.md) |
-| AWS Open Data (ERA5 / Sentinel-2 / Copernicus DEM / ESA WorldCover) | `amazon-s3` | raster | unsigned AWS (public buckets) | `s3` | [Amazon S3](s3/introduction.md) |
+| AWS Open Data (ERA5 / Sentinel-2 / Copernicus DEM / ESA WorldCover) | `amazon-s3` | mixed | unsigned AWS (public buckets) | `s3` | [Amazon S3](s3/introduction.md) |
 | ECMWF Climate Data Store | `ecmwf` | raster | `~/.cdsapirc` token | `ecmwf` | [ECMWF](ecmwf/introduction.md) |
 | Google Earth Engine | `gee`, `google-earth-engine` | raster | service account | `gee` | [GEE](gee/introduction.md) |
 | Copernicus Marine (CMEMS) | `cmems` | raster | Copernicus Marine login | `cmems` | [CMEMS](cmems/introduction.md) |
@@ -44,7 +44,7 @@ plain HTTP and pull in no additional SDK.
 | USGS Water — NWIS / Water Data | `usgs-water`, `usgs-nwis`, `nwis` | tabular | none | `usgs-water` | [USGS Water](usgs-water/introduction.md) |
 | JRC Global Human Settlement Layer | `ghsl`, `ghs`, `human-settlement` | raster | none (open HTTPS) | — | [GHSL](ghsl/introduction.md) |
 | WorldPop population data hub | `worldpop`, `world-pop` | mixed (rasters + age/sex tables) | none (CC-BY-4.0) | `worldpop` (optional) | [WorldPop](worldpop/introduction.md) |
-| Alaska Satellite Facility (SAR search + InSAR baselines) | `asf`, `alaska-satellite-facility`, `insar` | vector | NASA Earthdata Login (reuses `earthdata`) | `asf` | [ASF](asf/introduction.md) |
+| Alaska Satellite Facility (SAR search + InSAR baselines) | `asf`, `alaska-satellite-facility`, `insar` | raster | NASA Earthdata Login (reuses `earthdata`) | `asf` | [ASF](asf/introduction.md) |
 | JAXA Earth-observation archive (jaxa-earth STAC/COG + G-Portal SFTP) | `jaxa`, `jaxa-earth`, `g-portal` | raster | none (jaxa-earth) / G-Portal SFTP credentials | `jaxa` | [JAXA](jaxa/introduction.md) |
 | GBIF species occurrences | `gbif` | vector | none (anonymous) | `gbif` | [GBIF](gbif/introduction.md) |
 | OBIS marine occurrences | `obis` | vector | none (anonymous) | `obis` | [OBIS](obis/introduction.md) |

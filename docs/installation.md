@@ -279,7 +279,7 @@ namespace package, so that import succeeds even when nothing is installed.
 ## Install using pip
 
 Install earthlens with pip, picking the backend extras you
-need (see "From PyPI" above for the available extras):
+need (see [Available extras](#available-extras) for the full list):
 
 ```bash
 pip install earthlens[ecmwf]

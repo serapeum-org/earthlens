@@ -15,22 +15,22 @@ backend that has not wired the reducer is refused for that reason instead. Eithe
 
 ## `AggregationConfig`
 
-::: earthlens.aggregate.AggregationConfig
+::: earthlens.core.AggregationConfig
 
 ## `aggregate_netcdf`
 
-::: earthlens.aggregate.aggregate_netcdf
+::: earthlens.core.aggregate_netcdf
 
 ## `iter_aggregate_netcdf`
 
 Streams one reduced window at a time instead of materialising the whole cube — this is what keeps memory bounded
 on a long time series.
 
-::: earthlens.aggregate.iter_aggregate_netcdf
+::: earthlens.core.iter_aggregate_netcdf
 
 ## `AggregatedWindow`
 
-::: earthlens.aggregate.AggregatedWindow
+::: earthlens.core.AggregatedWindow
 
 ## Reduction helpers
 

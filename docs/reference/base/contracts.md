@@ -121,8 +121,9 @@ Pass a `pathlib.Path`. A missing path raises `ValueError` (it raised `FileNotFou
 
 ## Accepted date forms
 
-`start` / `end` accept all four documented forms — `str`, `datetime`, `date`, and ISO-datetime strings. Before
-#804 this worked on only 8 of 48 backends despite the facade documenting all four.
+`start` / `end` accept every documented form — a `datetime`, a `date`, or a `str` in either the plain `fmt`
+shape or full ISO-8601. Before #804 this worked on only 8 of 48 backends despite the facade documenting them
+all.
 
 ## See also
 
