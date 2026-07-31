@@ -69,6 +69,7 @@ plain HTTP and pull in no additional SDK.
 
 `Output` is the backend's `OUTPUT_KIND` — `raster` writes GeoTIFF/COG/NetCDF, `vector` writes geometry tables
 (GeoJSON / GeoPackage), `tabular` writes plain tables (CSV / Parquet), and `mixed` (HDX, Sentinel Hub, WorldPop)
-covers backends whose products vary by request. It also governs `aggregate=`: the temporal aggregator is
-accepted for `raster` backends and rejected for `vector` / `tabular` ones; the `mixed` backends reject it
-because their products are returned as-is.
+covers backends whose products vary by request. It is also the first half of the `aggregate=` gate: the temporal
+aggregator is forwarded only when `OUTPUT_KIND` is `raster` **or** `mixed` **and** the backend declares
+`SUPPORTS_AGGREGATE`. `vector` / `tabular` backends always refuse, and a raster backend that has not wired the
+reducer refuses too.

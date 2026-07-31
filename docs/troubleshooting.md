@@ -39,10 +39,10 @@ Extras `openeo` and `argo` are incompatible with the declared conflicts
 extra instead:
 
 ```bash
-uv sync --extra all --group dev      # includes openeo; omits argo / osm / osm-pbf
+uv sync --extra all --group dev      # includes openeo and osm; omits argo / osm-pbf
 ```
 
-To work on the argo side, prune the other: `uv sync --all-extras --no-extra openeo --no-extra osm --no-extra osm-pbf`.
+To work on the argo side, prune the other: `uv sync --all-extras --no-extra openeo --no-extra osm-pbf`.
 
 ## Request construction
 
@@ -181,9 +181,10 @@ for item in lens.datasource.iter_download(limit=500):
     ...
 ```
 
-Only backends implementing the `_search` / `_fetch_one` split can stream — `openaq`, `firms`, `usgs-water`,
-`argo`, `glaciers`, `climate-indices`, `sensor-community` and `gfw`. On one whose fetch is a single whole-batch
-request, such as `gdacs`, this raises `NotImplementedError`; narrow the request instead.
+Only backends implementing the `_search` / `_fetch_one` split can stream — twelve do: `openaq`, `firms`,
+`usgs-water`, `argo`, `glaciers`, `climate-indices`, `sensor-community`, `gfw`, `cop-dem`, `soilgrids`, `nwm`
+and `nwp`. On one whose fetch is a single whole-batch request, such as `gdacs`, this raises
+`NotImplementedError`; narrow the request instead.
 
 See [Base contracts](reference/base/contracts.md).
 

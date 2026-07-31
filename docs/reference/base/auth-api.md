@@ -20,7 +20,8 @@ credentials, see [Authentication examples](../../examples/authentication.md).
 
 ## S3 credentials
 
-Shared by the backends that read public or requester-pays AWS buckets (ERA5, Copernicus DEM, GOES, NWM, NEXRAD).
+Used by the two backends that resolve AWS credentials through this helper — `amazon-s3` (ERA5 and the other
+public buckets) and `dem` (Copernicus DEM). The other bucket-backed backends open their clients directly.
 
 ::: earthlens.base.S3Auth
 

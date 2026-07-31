@@ -22,12 +22,12 @@ That installs core plus the five providers as editable, every backend SDK, and t
 
     `--all-extras` activates *every* extra, including both `argo` and `openeo`, which are mutually exclusive:
     `argopy` needs `xarray>=2025.7` while `openeo` needs `xarray<2025.1.2`. uv rejects the combination. The
-    curated `all` extra includes `openeo` and omits `argo` / `osm` / `osm-pbf`, so it resolves.
+    curated `all` extra includes `openeo` and `osm`, and omits only `argo` and `osm-pbf`, so it resolves.
 
     To work on the argo or osm side instead, prune the other:
 
     ```bash
-    uv sync --all-extras --no-extra openeo --no-extra osm --no-extra osm-pbf
+    uv sync --all-extras --no-extra openeo --no-extra osm-pbf
     ```
 
 Refresh the lockfile with `uv lock`; `uv lock --check` verifies it is current (the CI `--locked` gate).
@@ -118,7 +118,7 @@ and import it instead.
 - **PEP 8 casing** — `snake_case` for functions/variables/modules, `PascalCase` for classes, `UPPER_SNAKE_CASE`
   for module constants.
 - **Google-style docstrings**, rendered by mkdocstrings as Markdown. Use *single* backticks for inline code —
-  double backticks are an reStructuredText holdover and are not idiomatic here.
+  double backticks are a reStructuredText holdover and are not idiomatic here.
 
 ## Documentation
 

@@ -60,9 +60,10 @@ for item in lens.datasource.iter_download(limit=500):
 `check_limit(limit)` validates the value; `iter_download(limit=...)` yields at most that many items.
 
 Streaming is **not** universal. The default `iter_download` composes the `_search` / `_fetch_one` split, so only
-a backend that implements both gets it — eight of the vector / tabular backends do (`openaq`, `firms`,
-`usgs-water`, `argo`, `glaciers`, `climate-indices`, `sensor-community`, `gfw`). A backend whose fetch is one
-whole-batch server request, such as `gdacs`, raises rather than pretending to stream.
+a backend implementing both gets it — twelve do, across every output kind: `openaq`, `firms`, `usgs-water`,
+`argo`, `glaciers`, `climate-indices`, `sensor-community`, `gfw`, plus the raster `cop-dem`, `soilgrids`,
+`nwm` and `nwp`. A backend whose fetch is one whole-batch server request, such as `gdacs`, raises rather than
+pretending to stream.
 
 ## Error policy
 
