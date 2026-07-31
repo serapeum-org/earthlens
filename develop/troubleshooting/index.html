@@ -20289,8 +20289,11 @@ locally before pushing:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>uv<span class="w"> </span>run<span class="w"> </span>--group<span class="w"> </span>docs<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
 </code></pre></div>
 <h3 id="a-notebook-renders-with-no-output"><a class="toclink" href="#a-notebook-renders-with-no-output">A notebook renders with no output</a><a class="headerlink" href="#a-notebook-renders-with-no-output" title="Permanent link">#</a></h3>
-<p>The docs build does <strong>not</strong> execute notebooks — it renders stored outputs. Commit notebooks with their outputs
-saved, or the page publishes as code with no results.</p>
+<p>Expected for most example pages. The docs build does <strong>not</strong> execute notebooks — it renders whatever outputs are
+stored — and the <code>nbstripout</code> pre-commit hook clears outputs from everything under <code>docs/examples/</code> except
+<code>showcases/</code>. So a page showing code with no results is the designed state, not a broken build.</p>
+<p>Run the notebook yourself to see its output. If you are authoring one whose rendered result is the point, put it
+under <code>docs/examples/showcases/</code>, which is excluded from the hook.</p>
 <h2 id="still-stuck"><a class="toclink" href="#still-stuck">Still stuck</a><a class="headerlink" href="#still-stuck" title="Permanent link">#</a></h2>
 <p>Open an issue at <a href="https://github.com/serapeum-org/earthlens/issues">github.com/serapeum-org/earthlens/issues</a> with
 the provider key, the full traceback, and your earthlens version:</p>
