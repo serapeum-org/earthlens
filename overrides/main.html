@@ -37,14 +37,14 @@
     {% set og_url = page.canonical_url if page and page.canonical_url else config.site_url %}
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="{{ config.site_name }}">
-    <meta property="og:title" content="{{ og_title }}">
-    <meta property="og:description" content="{{ og_desc }}">
-    <meta property="og:url" content="{{ og_url }}">
+    <meta property="og:title" content="{{ og_title | e }}">
+    <meta property="og:description" content="{{ og_desc | e }}">
+    <meta property="og:url" content="{{ og_url | e }}">
     <meta property="og:image"
           content="{{ base }}/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ og_title }}">
-    <meta name="twitter:description" content="{{ og_desc }}">
+    <meta name="twitter:title" content="{{ og_title | e }}">
+    <meta name="twitter:description" content="{{ og_desc | e }}">
     <meta name="twitter:image"
           content="{{ base }}/_images/branding/earthlens-brand-kit/social/announcement-card.png">
   {% endif %}

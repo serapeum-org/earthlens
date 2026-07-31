@@ -397,6 +397,7 @@ nav:
     - Biodiversity (overview):
       - Introduction: reference/biodiversity/introduction.md
       - Usage: reference/biodiversity/usage.md
+      - Shared helpers: reference/biodiversity/api.md
     - GBIF (species occurrences):
       - Introduction: reference/gbif/introduction.md
       - Usage: reference/gbif/usage.md
@@ -718,7 +719,6 @@ nav:
     - Catalog & utilities: reference/base/catalog-api.md
     - HTTP client (base): reference/base/http-client.md
     - Region affinity (base): reference/base/region-affinity.md
-    - Biodiversity helpers: reference/biodiversity/api.md
   - About:
     - Change Log: change-log.md
     - License: LICENSE.md
