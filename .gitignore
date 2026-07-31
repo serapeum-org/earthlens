@@ -176,6 +176,30 @@ docs/examples/jaxa/ptree_out/
 docs/examples/heatwave/out/
 docs/examples/showcases/out/
 
+# The same shapes, matched by pattern so a new notebook's output directory is
+# ignored without editing this list. Kept in step with the `exclude_docs`
+# globs in mkdocs.yml, which keep these out of the built site.
+docs/examples/*/out/
+docs/examples/*/data/
+docs/examples/*/earthlens-data/
+docs/examples/*/_nb_out/
+docs/examples/*/_overture_out/
+docs/examples/*/*_out/
+docs/examples/*/*_output/
+docs/examples/*/ohsome_log/
+docs/examples/*/insar_stack*/
+docs/examples/*/soilgrids_*/
+
+# Loose branding working files beside the curated kit: the zip of the kit,
+# exploration variants, and duplicates of assets the kit already ships. The
+# kit itself (docs/_images/branding/earthlens-brand-kit/) stays tracked.
+docs/_images/branding/*.svg
+docs/_images/branding/*.gif
+docs/_images/branding/*.png
+docs/_images/branding/*.webp
+docs/_images/branding/*.zip
+docs/_images/branding/*.md
+
 # Ad-hoc agent / verification scratch dropped in the repo root (notebook
 # compile checks, result dumps). Anchored to root so src/ `_helpers.py`-style
 # files are unaffected.

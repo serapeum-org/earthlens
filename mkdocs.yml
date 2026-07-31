@@ -68,13 +68,18 @@ exclude_docs: |
   examples/*/ohsome_log/
   examples/*/insar_stack*/
   examples/*/soilgrids_*/
-  # Branding: publish the curated kit (and its downloadable zip), not the
-  # loose exploration variants and duplicates beside it. The single-level
-  # globs deliberately do not reach into earthlens-brand-kit/.
+  # Branding: publish the curated kit only. Everything loose beside it — the
+  # zip of the kit, the exploration variants, and the duplicates of files the
+  # kit already ships — stays out. These globs are single-level on purpose, so
+  # they never reach into earthlens-brand-kit/ itself.
   _images/branding/*.svg
   _images/branding/*.gif
+  _images/branding/*.png
+  _images/branding/*.webp
   _images/branding/*.zip
-  _images/branding/PHILOSOPHY-hologram.md
+  _images/branding/*.md
+  # The kit's own guide would otherwise build as a page with no nav entry.
+  _images/branding/earthlens-brand-kit/BRAND-GUIDE.md
 
 plugins:
   - search
