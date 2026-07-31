@@ -19898,7 +19898,7 @@ Hold "Ctrl" to enable pan &amp; zoom
 <p><code>_create_grid()</code> and <code>_check_input_dates()</code> return frozen pydantic value objects, which the base class captures
 into <code>self.space</code> and <code>self.time</code> — they are not plain dicts.</p>
 <h3 id="output_kind"><a class="toclink" href="#output_kind"><code>OUTPUT_KIND</code></a><a class="headerlink" href="#output_kind" title="Permanent link">#</a></h3>
-<p>Each backend declares what it produces, and that one attribute drives the facade's behaviour:</p>
+<p>Each backend declares what it produces, and that attribute drives the facade's behaviour:</p>
 <table>
 <thead>
 <tr>
@@ -19911,7 +19911,12 @@ into <code>self.space</code> and <code>self.time</code> — they are not plain d
 <tr>
 <td><code>raster</code></td>
 <td><code>list[Path]</code> — GeoTIFF / NetCDF / COG</td>
-<td>accepted</td>
+<td>if <code>SUPPORTS_AGGREGATE</code></td>
+</tr>
+<tr>
+<td><code>mixed</code></td>
+<td>varies per request</td>
+<td>if <code>SUPPORTS_AGGREGATE</code></td>
 </tr>
 <tr>
 <td><code>vector</code></td>
@@ -19923,13 +19928,11 @@ into <code>self.space</code> and <code>self.time</code> — they are not plain d
 <td><code>DataFrame</code></td>
 <td>rejected</td>
 </tr>
-<tr>
-<td><code>mixed</code></td>
-<td>varies per request</td>
-<td>rejected</td>
-</tr>
 </tbody>
 </table>
+<p><code>aggregate=</code> needs <strong>both</strong> an <code>OUTPUT_KIND</code> of <code>raster</code> or <code>mixed</code> and a <code>SUPPORTS_AGGREGATE</code> declaration —
+<code>OUTPUT_KIND</code> alone does not decide it. A raster backend that has not wired the reducer is refused just as a
+<code>vector</code> one is, with a <code>NotImplementedError</code> raised before <code>download</code> runs.</p>
 <p><code>download()</code> never returns <code>None</code>.</p>
 <h2 id="download-sequence"><a class="toclink" href="#download-sequence">Download sequence</a><a class="headerlink" href="#download-sequence" title="Permanent link">#</a></h2>
 <div class="panzoom-box" data-key="ctrl" id="panzoom0" oncontextmenu="return false;">

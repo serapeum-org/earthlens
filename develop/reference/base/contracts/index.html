@@ -19684,7 +19684,12 @@ differs.</p>
 <tr>
 <td><code>OUTPUT_KIND</code></td>
 <td><code>"raster"</code></td>
-<td>What <code>download()</code> returns, and whether <code>aggregate=</code> is accepted.</td>
+<td>What <code>download()</code> returns. Also the first half of the <code>aggregate=</code> gate.</td>
+</tr>
+<tr>
+<td><code>SUPPORTS_AGGREGATE</code></td>
+<td><code>False</code></td>
+<td>The second half: <code>aggregate=</code> is forwarded only when this is <code>True</code> <strong>and</strong> <code>OUTPUT_KIND</code> is <code>raster</code> or <code>mixed</code>.</td>
 </tr>
 <tr>
 <td><code>REQUIRES_TIME_WINDOW</code></td>

@@ -19688,8 +19688,11 @@
 guide with worked examples, see <a href="../../aggregation/">Temporal aggregation</a>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">aggregate_netcdf</span>
 </code></pre></div>
-<p>The aggregator is accepted for backends whose <code>OUTPUT_KIND</code> is <code>raster</code>, and rejected for <code>vector</code> / <code>tabular</code> /
-<code>mixed</code> ones — see <a href="../base/contracts/">Base contracts</a>.</p>
+<p><code>aggregate=</code> is forwarded only when <strong>both</strong> conditions hold: the backend's <code>OUTPUT_KIND</code> is <code>raster</code> or <code>mixed</code>
+— the shapes a gridded reduction is defined for — <strong>and</strong> the backend declares <code>SUPPORTS_AGGREGATE</code>. A <code>vector</code> /
+<code>tabular</code> backend is refused because the aggregator has no meaning on <code>GeoDataFrame</code> / <code>DataFrame</code> rows; a raster
+backend that has not wired the reducer is refused for that reason instead. Either way the refusal is a
+<code>NotImplementedError</code> raised before the backend's <code>download</code> runs. See <a href="../base/contracts/">Base contracts</a>.</p>
 <h2 id="aggregationconfig"><a class="toclink" href="#aggregationconfig"><code>AggregationConfig</code></a><a class="headerlink" href="#aggregationconfig" title="Permanent link">#</a></h2>
 
 

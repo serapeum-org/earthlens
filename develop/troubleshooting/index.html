@@ -20154,7 +20154,9 @@ giving you daily data under a label that claimed otherwise — see the <a href="
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>... (OUTPUT_KIND=&#39;vector&#39;). The aggregator only handles gridded raster outputs;
 <a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>vector / tabular backends emit GeoDataFrame / DataFrame rows that have no meaningful gridded reduction.
 </code></pre></div>
-<p><code>aggregate=</code> is accepted only for <code>raster</code> backends. For <code>vector</code> / <code>tabular</code> results, reduce the returned
+<p><code>aggregate=</code> is forwarded only when the backend's <code>OUTPUT_KIND</code> is <code>raster</code> or <code>mixed</code> <strong>and</strong> it declares
+<code>SUPPORTS_AGGREGATE</code>. A raster backend that has not wired the reducer is refused too. For <code>vector</code> / <code>tabular</code>
+results, reduce the returned
 <code>GeoDataFrame</code> / <code>DataFrame</code> with pandas instead.</p>
 <h3 id="a-polygon-aoi-came-back-as-a-rectangle"><a class="toclink" href="#a-polygon-aoi-came-back-as-a-rectangle">A polygon AOI came back as a rectangle</a><a class="headerlink" href="#a-polygon-aoi-came-back-as-a-rectangle" title="Permanent link">#</a></h3>
 <p>You will see a <code>PolygonAoiWarning</code>. Not every backend can clip server-side; those that cannot reduce the polygon
