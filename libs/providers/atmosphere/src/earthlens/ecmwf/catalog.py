@@ -120,11 +120,14 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
 
     Returns a `(available_datasets, datasets)` tuple of the same shape
     :class:`Catalog` exposes. When `path` is a directory, every `*.yaml`
-    is merged: `available_datasets:` lists are concatenated and
+    is merged: `available_datasets:` entries are concatenated and
     `datasets:` maps are unioned (a dataset key declared in two files is
-    an error). Cached on the resolved path plus every contributing
-    file's `mtime_ns` so a second `Catalog()` on an unchanged catalog
-    skips both YAML parsing and pydantic validation.
+    an error). `available_datasets:` may be either a flat list of ids or a
+    per-store mapping (`{cds: [...], ads: [...], ewds: [...]}`, written by
+    `earthlens datasets refresh ecmwf`); both are unioned into the flat
+    list. Cached on the resolved path plus every contributing file's
+    `mtime_ns` so a second `Catalog()` on an unchanged catalog skips both
+    YAML parsing and pydantic validation.
 
     Raises:
         ValueError: If the catalog is missing, has no `datasets:` block,
@@ -142,7 +145,14 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
     seen_in: dict[str, str] = {}
     for yaml_path in files:
         data = load_yaml_strict(yaml_path) or {}
-        available += list(data.get("available_datasets") or [])
+        block = data.get("available_datasets") or []
+        if isinstance(block, dict):
+            # Per-store mapping (`{cds: [...], ads: [...], ewds: [...]}`) →
+            # union every store's ids into the flat availability list.
+            for ids in block.values():
+                available += list(ids or [])
+        else:
+            available += list(block)
         for ds_key, ds_body in (data.get("datasets") or {}).items():
             if ds_key in datasets_yaml:
                 raise ValueError(
@@ -583,9 +593,10 @@ class Catalog(AbstractCatalog):
     the dataset name is part of the identity.
 
     Attributes:
-        available_datasets: Informational list of every CDS dataset
-            short name. Mirrors the `available_datasets:` block in
-            the YAML; runtime code does not consume it.
+        available_datasets: Informational list of every dataset id across
+            the three Copernicus stores (CDS + ADS + EWDS), unioned from the
+            per-store `available_datasets:` block in `_index.yaml`; runtime
+            code does not consume it.
         datasets: Structural map keyed by CDS dataset short name. Each
             value is a :class:`Dataset` carrying that dataset's
             monthly-aggregate variant and its per-variable map. The
@@ -633,7 +644,7 @@ class Catalog(AbstractCatalog):
             ```python
             >>> from earthlens.ecmwf import Catalog
             >>> len(Catalog().available_datasets)
-            134
+            169
 
             ```
     """

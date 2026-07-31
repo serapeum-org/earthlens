@@ -1126,23 +1126,42 @@ class TestComputedIndexWriters:
         assert outcome.written.endswith("available_parameters.yaml"), "sibling path"
 
 
+def _ecmwf_per_store_get_json(url, **kw):
+    """Return a distinct single collection id per Copernicus store host."""
+    if "ads.atmosphere" in url:
+        cid = "cams-global-reanalysis-eac4"
+    elif "ewds" in url:
+        cid = "cems-glofas-forecast"
+    else:
+        cid = "reanalysis-era5-land"
+    return {"collections": [{"id": cid}], "links": []}
+
+
 class TestWriteEcmwfThroughRefreshOne:
     """Tests for refresh_one(write=True) on a generic-writer provider."""
 
-    def test_writes_index_from_live_fetch(self, tmp_path, monkeypatch):
-        """ecmwf --write persists the live CDS ids into available_datasets."""
+    def test_writes_per_store_index_from_live_fetch(self, tmp_path, monkeypatch):
+        """ecmwf --write persists per-store (cds/ads/ewds) ids into available_datasets."""
         info, module, dst = _catalog_copy("ecmwf", tmp_path, monkeypatch)
-        monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
-            lambda url, **kw: {"collections": [{"id": "reanalysis-era5-land"}]},
-        )
+        monkeypatch.setattr(refresh_mod, "_get_json", _ecmwf_per_store_get_json)
         outcome = refresh_one(info, write=True)
         assert outcome.status == "ok", "write succeeded"
         assert outcome.written.endswith("_index.yaml"), "index file written"
         module.clear_catalog_cache()
         data = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
-        assert data["available_datasets"] == ["reanalysis-era5-land"], "live persisted"
+        assert data["available_datasets"] == {
+            "cds": ["reanalysis-era5-land"],
+            "ads": ["cams-global-reanalysis-eac4"],
+            "ewds": ["cems-glofas-forecast"],
+        }, "per-store ids persisted"
+        # the loader unions every store's ids into the flat availability list
+        catalog = load_catalog(info)
+        for expected in (
+            "reanalysis-era5-land",
+            "cams-global-reanalysis-eac4",
+            "cems-glofas-forecast",
+        ):
+            assert expected in catalog.available_datasets, f"{expected} unioned"
 
 
 class TestCuratedCollectionIds:
