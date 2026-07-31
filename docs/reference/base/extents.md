@@ -8,7 +8,11 @@ into `self.space` and `self.time`.
 from earthlens.base import SpatialExtent, TemporalExtent
 ```
 
-These are values, not dicts — they are immutable, comparable, and hashable.
+These are values, not dicts — they are immutable, and `SpatialExtent` is comparable and hashable.
+
+`TemporalExtent` is neither, because its `dates` field holds a `DatetimeIndex`: `==` raises `ValueError`
+("truth value of an array ... is ambiguous") and `hash()` raises `TypeError`. Compare its scalar fields
+(`start_date`, `end_date`, `resolution`) rather than the object.
 
 ## `SpatialExtent`
 

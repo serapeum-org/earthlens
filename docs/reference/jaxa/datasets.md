@@ -1,6 +1,7 @@
 # JAXA — available datasets
 
-The bundled catalog ships **917 rows**: 118 `jaxa-earth` STAC collections plus 799 `gportal` mission products. Every row has a short, friendly canonical key; the long auto-derived slug and a few high-traffic English names also resolve via `cat.get(...)`.
+The bundled catalog ships **918 rows**: 118 `jaxa-earth` STAC collections, 799 `gportal` mission products, and
+one `ptree` Himawari entry. Every row has a short, friendly canonical key; the long auto-derived slug and a few high-traffic English names also resolve via `cat.get(...)`.
 
 The naming scheme for jaxa-earth is `<mission>-<product>[-<d|n>][-<cadence>][-norm]` where `d`/`n` mark daytime / nighttime variants, the cadence comes from the source (`daily`, `halfmonth`, `monthly`, `8day`, `hourly`, `yearly`), and `-norm` flags a climatological *normal*.
 
