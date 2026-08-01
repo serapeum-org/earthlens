@@ -31,7 +31,7 @@ import tarfile
 import zipfile
 from dataclasses import dataclass, field
 from io import BytesIO
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING, Any
 
 import platformdirs
@@ -171,50 +171,41 @@ def resolve_record(
 def _safe_target(name: str, dest_dir: Path) -> Path:
     """Resolve an archive member name to a path guaranteed inside `dest_dir`.
 
-    The only way a member name becomes a path in this module. Returning the
-    checked path - rather than validating and letting the caller re-join -
-    means an unchecked join cannot exist by construction (CWE-22).
+    The only way a member name becomes a path in this module. Member names come
+    out of an archive and are therefore untrusted input: a crafted `../` entry
+    would otherwise write anywhere the process can reach (CWE-22). The check and
+    the join live in this one function so neither can drift from the other, and
+    so no unchecked join exists anywhere to be reached by mistake.
 
     Args:
-        name: The archive member name, which is attacker-controlled data.
+        name: The archive member name - untrusted data.
         dest_dir: The directory extraction is confined to.
 
     Returns:
-        Path: The destination path, verified to be within `dest_dir`.
+        Path: The destination path, verified to sit within `dest_dir`.
 
     Raises:
-        ValueError: If the member resolves outside `dest_dir`.
+        ValueError: If the member is absolute, traverses upwards, or otherwise
+            resolves outside `dest_dir`.
     """
-    _assert_safe_member(name, dest_dir)
-    return dest_dir / name
-
-
-def _assert_safe_member(name: str, dest_dir: Path) -> None:
-    """Reject a member name that would extract outside `dest_dir`.
-
-    Mirrors the guard in :mod:`earthlens.base.archive`. `tarfile`'s own
-    `filter="data"` also refuses escaping paths, but only on Python 3.11.4+, and
-    the repo floor is 3.11.0 — so the check is made explicitly rather than
-    assumed.
-
-    Args:
-        name: The archive member name.
-        dest_dir: The directory members are extracted into.
-
-    Raises:
-        ValueError: If the member resolves outside `dest_dir`.
-    """
-    # Deliberately duplicated rather than imported from `earthlens.base.archive`:
-    # that module's guard is private, and a core contract test forbids a provider
-    # reaching for a private core symbol. Promoting it is a core API change, not
-    # something to slip into a provider branch.
     base = dest_dir.resolve()
-    target = (dest_dir / name).resolve()
-    if target != base and base not in target.parents:
+    # Normalise separators, then reject the two ways a member escapes: an
+    # absolute name (`Path("/etc") / "x"` discards the left side entirely) and
+    # any upward traversal. Only then is the name joined.
+    relative = PurePosixPath(name.replace("\\", "/"))
+    parts = [part for part in relative.parts if part not in ("", "/", ".")]
+    if relative.is_absolute() or ".." in parts or not parts:
         raise ValueError(
             f"refusing to extract unsafe path {name!r} from the archive "
             f"(escapes {dest_dir})."
         )
+    target = base.joinpath(*parts)
+    if base not in target.resolve().parents:
+        raise ValueError(
+            f"refusing to extract unsafe path {name!r} from the archive "
+            f"(escapes {dest_dir})."
+        )
+    return target
 
 
 def _file_md5(path: Path) -> str:

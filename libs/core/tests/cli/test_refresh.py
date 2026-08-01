@@ -1526,3 +1526,80 @@ class TestCaravanRefresher:
         assert refresh_mod._caravan_grouped(self._catalog())["discovered"] == [
             "555 (Caravan extension Narnia)"
         ]
+
+
+class TestCaravanValidator:
+    """The offline structural validator for the Caravan catalog."""
+
+    def _row(self, **overrides):
+        """Build one Caravan extension, overridable per test."""
+        from earthlens.caravan.catalog import ArchiveFile, Extension, Source, Version
+
+        version = Version(
+            release_date="2025-01-01",
+            data_period=overrides.pop("data_period", (2000, 2020)),
+            column_set=overrides.pop("column_set", "current"),
+            files={
+                "csv": ArchiveFile(
+                    record=overrides.pop("record", 1),
+                    name="a.zip",
+                    size=overrides.pop("size", 10),
+                    md5=overrides.pop("md5", "abc"),
+                    archive_format="zip",
+                )
+            },
+        )
+        return Extension(
+            key="demo",
+            license=overrides.pop("license", "CC-BY-4.0"),
+            sources={"dk": Source(n_catchments=1)},
+            default_version=overrides.pop("default_version", "1.0"),
+            versions={"1.0": version},
+        )
+
+    def _validate(self, extension):
+        """Run the validator over a one-row catalog."""
+        from earthlens.caravan.catalog import Catalog
+        from earthlens.cli.validate import _validate_caravan
+
+        return _validate_caravan(Catalog(datasets={"demo": extension}, variables={}))
+
+    def test_a_well_formed_row_passes(self):
+        """The bundled shape must not trip its own validator."""
+        checked, issues = self._validate(self._row())
+
+        assert (checked, issues) == (1, [])
+
+    def test_an_unpinned_record_is_reported(self):
+        """Reproducibility is the catalog's whole job."""
+        _, issues = self._validate(self._row(record=0))
+
+        assert any("no pinned Zenodo record" in issue for issue in issues)
+
+    def test_a_missing_checksum_is_reported(self):
+        """Without an md5 a download cannot be verified."""
+        _, issues = self._validate(self._row(md5=""))
+
+        assert any("no md5" in issue for issue in issues)
+
+    def test_an_inverted_data_period_is_reported(self):
+        """A reversed period would silently mislead every user of the row."""
+        _, issues = self._validate(self._row(data_period=(2020, 1990)))
+
+        assert any("inverted" in issue for issue in issues)
+
+    def test_a_default_version_that_does_not_exist_is_reported(self):
+        """A bare request resolves through default_version, so it must exist."""
+        _, issues = self._validate(self._row(default_version="nope"))
+
+        assert any("default_version" in issue for issue in issues)
+
+    def test_the_bundled_catalog_validates_clean(self):
+        """The shipped catalog must pass its own checks."""
+        from earthlens.caravan import Catalog
+        from earthlens.cli.validate import _validate_caravan
+
+        checked, issues = _validate_caravan(Catalog())
+
+        assert issues == []
+        assert checked == 5

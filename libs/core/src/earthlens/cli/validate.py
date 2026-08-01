@@ -676,7 +676,67 @@ def _validate_soilgrids(catalog: Any) -> tuple[int, list[str]]:
 
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
+def _validate_caravan(catalog: Any) -> tuple[int, list[str]]:
+    """Each Caravan extension must pin a fetchable, self-consistent release.
+
+    The catalog's whole job is reproducibility: a row that pins a moving concept
+    DOI, or names an archive format the fetcher cannot read, or claims a
+    column set that does not exist, fails silently at request time rather than
+    here. These are the offline checks that catch that.
+
+    Args:
+        catalog: The loaded Caravan `Catalog`.
+
+    Returns:
+        `(checked, issues)`.
+    """
+    from earthlens.caravan.catalog import ColumnSet
+
+    valid_column_sets = set(ColumnSet.__args__)  # type: ignore[attr-defined]
+
+    def check(key: str, record: Any) -> list[str]:
+        """Flag an extension whose releases are unpinned or self-inconsistent."""
+        issues: list[str] = []
+        versions = getattr(record, "versions", None) or {}
+        if not versions:
+            return [f"{key}: no versions declared"]
+        default = getattr(record, "default_version", "")
+        if default not in versions:
+            issues.append(
+                f"{key}: default_version {default!r} is not among {sorted(versions)}"
+            )
+        if not getattr(record, "license", ""):
+            issues.append(f"{key}: no license recorded")
+        if not getattr(record, "sources", None):
+            issues.append(f"{key}: no source datasets recorded")
+        for name, release in versions.items():
+            label = f"{key}/{name}"
+            if release.column_set not in valid_column_sets:
+                issues.append(f"{label}: unknown column_set {release.column_set!r}")
+            if not release.files:
+                issues.append(f"{label}: no archive files declared")
+            for fmt, archive in release.files.items():
+                where = f"{label}[{fmt}]"
+                if not archive.record:
+                    issues.append(f"{where}: no pinned Zenodo record")
+                if not archive.md5:
+                    issues.append(f"{where}: no md5 to verify the download")
+                if archive.size <= 0:
+                    issues.append(f"{where}: size must be positive")
+                if archive.archive_format not in {"zip", "tar.gz"}:
+                    issues.append(
+                        f"{where}: unreadable archive_format {archive.archive_format!r}"
+                    )
+            period = release.data_period
+            if period is not None and period[0] > period[1]:
+                issues.append(f"{label}: data_period {period} is inverted")
+        return issues
+
+    return _lint(catalog, check)
+
+
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
+    "caravan": _validate_caravan,
     "nwp": _validate_nwp,
     "nwm": _validate_nwm,
     "goes": _validate_goes,
