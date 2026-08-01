@@ -137,6 +137,20 @@ class TestExtractMember:
         _helpers.extract_member(archive, "inner/data.csv", dest)
         assert not (dest / "inner").exists()
 
+    def test_non_empty_source_directory_is_left_alone(self, tmp_path: Path) -> None:
+        """A directory still holding something else survives the flattening."""
+        archive = tmp_path / "nested3.zip"
+        with zipfile.ZipFile(archive, "w") as bundle:
+            bundle.writestr("inner/data.csv", "a,b\n1,2\n")
+        dest = tmp_path / "out3"
+        (dest / "inner").mkdir(parents=True)
+        (dest / "inner" / "keep.txt").write_text("mine", encoding="utf-8")
+
+        got = _helpers.extract_member(archive, "inner/data.csv", dest)
+
+        assert got == dest / "data.csv"
+        assert (dest / "inner" / "keep.txt").read_text(encoding="utf-8") == "mine"
+
     def test_nested_member_is_flattened(self, tmp_path: Path) -> None:
         """A member stored under a directory still lands directly in dest."""
         archive = tmp_path / "nested.zip"

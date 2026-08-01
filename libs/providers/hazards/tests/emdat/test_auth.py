@@ -285,6 +285,16 @@ class TestConfigure:
         ).configure()
         assert os.environ["EARTHDATA_TOKEN"] == "someone-elses-token"
 
+    def test_no_explicit_credential_touches_nothing(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
+    ) -> None:
+        """With only env credentials, the exporter changes no variable."""
+        monkeypatch.setenv("EARTHDATA_TOKEN", "from-the-environment")
+        _install_fake(monkeypatch, _FakeEarthaccess(_FakeAuth()))
+        auth = EmdatAuth(EmdatCredentials(netrc_path=missing_netrc))
+        assert auth._export_explicit_credentials() == {}
+        assert os.environ["EARTHDATA_TOKEN"] == "from-the-environment"
+
     def test_unauthenticated_handle_raises(
         self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
     ) -> None:

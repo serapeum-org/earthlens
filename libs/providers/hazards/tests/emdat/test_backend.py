@@ -357,6 +357,18 @@ class TestGdisPointsRoute:
         with pytest.raises(OSError, match="unaccepted_eulas"):
             _points_backend(tmp_path).download()
 
+    def test_extracted_member_is_reused_without_the_granule(
+        self, tmp_path: Path, gdis_csv_frame, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """An unpacked member is reused even when the granule zip is gone."""
+        member = tmp_path / "pend-gdis-1960-2018-disasterlocations.csv"
+        gdis_csv_frame.to_csv(member, index=False, encoding="latin-1")
+        fake = FakeEarthaccess([FakeGranule(_GDIS_LINK)])
+        monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        result = _points_backend(tmp_path).download()
+        assert len(result) > 0
+        assert fake.searched == []
+
     def test_missing_granule_is_reported(
         self, tmp_path: Path, gdis_csv_zip: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -433,6 +445,17 @@ class TestGdisPolygonsRoute:
         result = backend._read_gdis_gpkg(gdis_gpkg)
         assert result["disasterno"].tolist() == ["1995-0002"]
 
+    def test_open_end_window(self, tmp_path: Path, gdis_gpkg: Path) -> None:
+        """A `None` upper bound keeps everything from the lower bound on."""
+        backend = EMDAT(
+            variables=["gdis:polygons"],
+            hazard="flood",
+            start="2005-01-01",
+            path=str(tmp_path),
+        )
+        result = backend._read_gdis_gpkg(gdis_gpkg)
+        assert result["disasterno"].tolist() == ["2009-0001"]
+
     def test_bbox_push_down(self, tmp_path: Path, gdis_gpkg: Path) -> None:
         """The spatial filter is applied by the driver."""
         backend = EMDAT(
@@ -489,6 +512,41 @@ class TestLargeDownloadWarning:
         polygons = EMDAT(variables=["gdis:polygons"], path=str(tmp_path))
         assert points._dataset.download_mb < LARGE_DOWNLOAD_MB
         assert polygons._dataset.download_mb > LARGE_DOWNLOAD_MB
+
+
+@pytest.mark.emdat
+class TestCitation:
+    """The source citation is logged when the row carries one."""
+
+    def test_citation_is_logged(self, tmp_path: Path) -> None:
+        """A row with a citation logs it."""
+        from loguru import logger
+
+        messages: list[str] = []
+        sink = logger.add(messages.append, level="INFO", format="{message}")
+        try:
+            EMDAT(variables=["gdis:points"], path=str(tmp_path))._log_citation()
+        finally:
+            logger.remove(sink)
+        assert any("Rosvold" in message for message in messages)
+
+    def test_missing_citation_logs_nothing(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A row without a citation stays silent."""
+        from loguru import logger
+
+        backend = EMDAT(variables=["gdis:points"], path=str(tmp_path))
+        monkeypatch.setattr(
+            backend, "_dataset", backend._dataset.model_copy(update={"citation": None})
+        )
+        messages: list[str] = []
+        sink = logger.add(messages.append, level="INFO", format="{message}")
+        try:
+            backend._log_citation()
+        finally:
+            logger.remove(sink)
+        assert messages == []
 
 
 @pytest.mark.emdat
