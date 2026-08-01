@@ -1028,9 +1028,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         if output_format == "grib":
             logger.info(f"{target.name}: GRIB written (readable via pyramids/GDAL).")
         elif output_format == "unknown":
-            logger.warning(
-                f"{target.name}: unrecognised format written raw "
-                "(CSV/point tabular handling lands in C9)."
+            logger.info(
+                f"{target.name}: non-raster format (CSV/point observations) "
+                "written raw. In-situ / point datasets stay passthrough-only — "
+                "read the file directly (e.g. with pandas)."
             )
         else:
             logger.info(

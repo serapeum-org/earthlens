@@ -178,3 +178,12 @@ class TestPostprocess:
         assert len(out) == 2, "both members extracted"
         assert not target.exists(), "archive removed after unpacking"
         assert all(p.suffix == ".nc" and p.exists() for p in out)
+
+    def test_csv_point_left_raw_for_the_caller(self, tmp_path):
+        """A CSV / point response (C9 OUT: passthrough-only) is left raw."""
+        target = tmp_path / "insitu.csv"
+        target.write_bytes(b"station,date,value\nBER,2023-01-01,1.2\n")
+        backend = _passthrough(tmp_path)
+        out = backend._passthrough_postprocess(target)
+        assert out == [target], "the raw CSV is returned for direct reading"
+        assert target.read_bytes().startswith(b"station,")
