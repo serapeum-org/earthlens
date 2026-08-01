@@ -31,7 +31,7 @@ one Personal Access Token authenticates against all three.
 Any dataset in any store is downloadable by id + a raw request, with **no curated row** — the coverage lever:
 
 ```python
-from earthlens import EarthLens
+from earthlens.core import EarthLens
 
 lens = EarthLens(
     data_source="ecmwf",
