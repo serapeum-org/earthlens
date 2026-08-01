@@ -34,7 +34,16 @@ datasets:
   emdat:events:
     provider: dataverse
     output_kind: tabular
-    long_name: EM-DAT Emergency Events Database Archive (event-level impacts)
+    long_name: >-
+      EM-DAT disaster impacts — deaths, affected and damage for flood, storm,
+      drought, earthquake, wildfire, epidemic, landslide and technological
+      events (1900 onwards)
+    description: >-
+      Event-level disaster impacts worldwide from 1900 onwards — deaths, people
+      affected, and economic damage — for natural hazards (flood, storm, drought,
+      earthquake, wildfire, epidemic, landslide, extreme temperature) and
+      technological ones (industrial and transport accidents, chemical and oil
+      spills). Tabular, one row per disaster, anonymous.
     # Dataverse native REST API. The file id changes with every archive
     # version, so the backend resolves the file by matching `file_pattern`
     # against the `:latest` version listing — never by a hard-coded id.
@@ -74,7 +83,14 @@ datasets:
   gdis:points:
     provider: earthdata
     output_kind: vector
-    long_name: GDIS geocoded disaster locations (centroids, 1960-2018)
+    long_name: >-
+      GDIS geocoded disaster locations — flood, storm, drought, earthquake,
+      landslide and volcanic activity as centroids (1960-2018)
+    description: >-
+      Where EM-DAT natural disasters happened, as point centroids on GADM
+      administrative units, 1960-2018: flood, storm, drought, earthquake,
+      landslide, extreme temperature, mass movement and volcanic activity.
+      Joins to the event impacts on the disaster number.
     short_name: CIESIN_SEDAC_PEND_GDIS
     granule: pend-gdis-1960-2018-disasterlocations-csv.zip
     member: pend-gdis-1960-2018-disasterlocations.csv
@@ -104,7 +120,14 @@ datasets:
   gdis:polygons:
     provider: earthdata
     output_kind: vector
-    long_name: GDIS geocoded disaster footprints (polygons, 1960-2018)
+    long_name: >-
+      GDIS geocoded disaster footprints — flood, storm, drought, earthquake,
+      landslide and volcanic activity as admin-unit polygons (1960-2018)
+    description: >-
+      Where EM-DAT natural disasters happened, as administrative-unit polygon
+      footprints, 1960-2018: flood, storm, drought, earthquake, landslide,
+      extreme temperature, mass movement and volcanic activity. Same coverage as
+      the centroids but with real geometry, at the cost of a 2.2 GB download.
     short_name: CIESIN_SEDAC_PEND_GDIS
     granule: pend-gdis-1960-2018-disasterlocations-gpkg.zip
     member: pend-gdis-1960-2018-disasterlocations.gpkg

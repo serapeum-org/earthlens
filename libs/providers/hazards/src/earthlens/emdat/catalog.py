@@ -133,7 +133,10 @@ class Dataset(BaseModel):
         output_kind: `"tabular"` (a `DataFrame`) or `"vector"` (a
             `FeatureCollection`). Copied onto the backend's `OUTPUT_KIND` per
             instance.
-        long_name: Human-readable description of the dataset.
+        long_name: Human-readable label for the dataset.
+        description: Longer prose describing what the dataset covers. Indexed
+            by `earthlens datasets search`, so it names the hazards a caller
+            would search for.
         dataverse_base: Base URL of the Dataverse installation
             (`provider="dataverse"` only).
         doi: The archive's persistent id (`provider="dataverse"` only).
@@ -181,6 +184,7 @@ class Dataset(BaseModel):
     provider: Provider
     output_kind: OutputKind
     long_name: str
+    description: str | None = None
 
     dataverse_base: str | None = None
     doi: str | None = None

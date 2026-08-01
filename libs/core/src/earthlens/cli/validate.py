@@ -285,6 +285,16 @@ def _validate_tropycal(catalog: Any) -> tuple[int, list[str]]:
     return checked, issues
 
 
+def _validate_emdat(catalog: Any) -> tuple[int, list[str]]:
+    """Each EM-DAT dataset needs a label, prose, a licence and a vocabulary."""
+    return _lint(
+        catalog,
+        lambda k, r: _require(
+            k, r, ("long_name", "description", "licence", "hazard_vocabulary")
+        ),
+    )
+
+
 def _validate_gdacs(catalog: Any) -> tuple[int, list[str]]:
     """Each GDACS hazard type needs a name and a description."""
     return _lint(catalog, lambda k, r: _require(k, r, ("name", "description")))
@@ -701,6 +711,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "wdpa": _validate_wdpa,
     "iucn": _validate_iucn,
     "jaxa": _validate_jaxa,
+    "emdat": _validate_emdat,
     "erddap": _validate_erddap,
     "bathymetry": _validate_bathymetry,
     "pvgis": _validate_pvgis,
