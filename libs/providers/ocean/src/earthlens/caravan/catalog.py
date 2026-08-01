@@ -298,7 +298,10 @@ class Version(BaseModel):
     """One pinned, reproducible release of an extension.
 
     Attributes:
-        doi: The version DOI (never the concept DOI, which moves).
+        doi: The version DOI (never the concept DOI, which moves). When a
+            release spans two records - `base` publishes its CSV and NetCDF
+            timeseries separately - this names one of them; the authoritative
+            per-format pointer is `files[<fmt>].record`.
         release_date: Zenodo publication date, `YYYY-MM-DD`.
         data_period: `[first_year, last_year]` the timeseries span.
         n_catchments: Catchments in this release.
@@ -349,6 +352,9 @@ class Extension(BaseModel):
         title: The record's published title.
         concept_doi: The moving concept DOI. Recorded so the refresh tool can
             discover newer versions; never used to fetch.
+        concept_doi_csv: The second concept DOI, when a row's CSV and NetCDF
+            archives live under different Zenodo concepts. Only `base` does,
+            from v1.6 onward.
         license: SPDX-ish licence id (every current row is `CC-BY-4.0`).
         attribution: The citation obligation the licence carries.
         license_file: Path to the in-archive licence text.
@@ -374,6 +380,7 @@ class Extension(BaseModel):
     key: str
     title: str = ""
     concept_doi: str = ""
+    concept_doi_csv: str = ""
     license: str = ""
     attribution: str = ""
     license_file: str = ""

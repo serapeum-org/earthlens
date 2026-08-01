@@ -610,3 +610,36 @@ class _FailingSession:
 
     def get(self, url: str, **kwargs: Any) -> Any:
         raise requests.ConnectionError("connection reset")
+
+
+class TestIndexOutlivingMembers:
+    """A cached index whose extracted members went missing."""
+
+    def test_metadata_is_restored_in_one_pass(self, tmp_path, monkeypatch):
+        """Reading them individually would cost a full decompression each."""
+        tarball = tmp_path / "a.tar.gz"
+        tarball.write_bytes(build_tar())
+        dest = tmp_path / "members"
+        _helpers.CaravanArchive.open_local_tar(
+            tarball, extract_dir=dest, fingerprint="aaa"
+        )
+        for path in dest.rglob("*.csv"):
+            path.unlink()
+
+        opens: list[str] = []
+        original = tarfile.open
+
+        def _counted(*args: Any, **kwargs: Any) -> Any:
+            opens.append("open")
+            return original(*args, **kwargs)
+
+        monkeypatch.setattr(tarfile, "open", _counted)
+        archive = _helpers.CaravanArchive.open_local_tar(
+            tarball, extract_dir=dest, fingerprint="aaa"
+        )
+        after_open = len(opens)
+        _helpers.attribute_index(archive, "dk")
+        _helpers.merge_attributes(archive, "dk")
+
+        assert after_open == 1, "the restore should take one pass"
+        assert len(opens) == after_open, "attribute reads must not re-scan"

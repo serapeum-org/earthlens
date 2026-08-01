@@ -94,6 +94,12 @@ def _label_from(url: str) -> str:
 def cache_dir() -> Path:
     """Return the directory Caravan archives and indexes are cached in.
 
+    The cache is **not** guarded against concurrent writers: two processes
+    fetching the same release at once share one staging path. Writes are staged
+    and renamed so a reader never sees a half-written file, but the download
+    itself may be done twice. Point `EARTHLENS_CACHE` at per-process
+    directories if that matters.
+
     Honours `EARTHLENS_CACHE` first (the override the cmip6 resolver already
     reads), then falls back to the per-platform user cache directory the nwp
     backend uses. A hard-coded `~/.cache` would be wrong on Windows, which is
@@ -399,7 +405,23 @@ def _tar_index(tarball: Path, extract_dir: Path, fingerprint: str) -> list[str]:
     """
     index_path = tarball.with_suffix(f"{tarball.suffix}.{fingerprint}.index.json")
     if index_path.exists():
-        return list(json.loads(index_path.read_text(encoding="utf-8")))
+        cached: list[str] = list(json.loads(index_path.read_text(encoding="utf-8")))
+        # The index can outlive the extracted members - a pruned cache, a
+        # partial copy. Restoring them in one batch keeps the guarantee the
+        # index pass makes; reading them individually would cost a full
+        # decompression each.
+        missing = [
+            name
+            for name in cached
+            if _is_metadata(name) and not (extract_dir / name).is_file()
+        ]
+        if missing:
+            logger.debug(
+                f"caravan: restoring {len(missing)} metadata member(s) of "
+                f"{tarball.name} in one pass"
+            )
+            extract_tar_members(tarball, set(missing), extract_dir)
+        return cached
     logger.warning(
         f"caravan: indexing {tarball.name} - a gzip stream has no directory, so "
         f"this decompresses the whole archive once. The listing and the small "

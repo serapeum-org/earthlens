@@ -200,7 +200,12 @@ variables:
 extensions:
   base:
     title: Caravan - a global community dataset for large-sample hydrology
+    # Since v1.6 base spans TWO Zenodo concepts, one per timeseries filetype.
+    # This is the netCDF concept; the CSV concept is 10.5281/zenodo.15530021.
+    # The authoritative pointer for a fetch is `files.<fmt>.record`, which is
+    # per-format; `doi` below names the netCDF record for the same reason.
     concept_doi: 10.5281/zenodo.6522634
+    concept_doi_csv: 10.5281/zenodo.15530021
     license: CC-BY-4.0
     attribution: >-
       Kratzert et al. (2023), Caravan - A global community dataset for
