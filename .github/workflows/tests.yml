@@ -9,6 +9,19 @@ on:
     branches: [main]
   pull_request:
 
+# Supersede a pull request's in-flight run when a new commit lands on it — the
+# older result is about to be stale, and a busy PR would otherwise queue several
+# full matrices for commits nobody will look at again.
+#
+# A push or merge to `main` is never cancelled. That run is the record for a
+# commit that is now the branch tip, so it has to finish even if another merge
+# lands while it is going; killing it would leave `main` with no test result for
+# that commit. The condition keys on the event because this workflow's only push
+# trigger is `branches: [main]`, so "not a pull request" is exactly "main".
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   # One lane per distribution (#785): each member's tests run against its own
   # `pyproject.toml` config and report coverage only for its own `src`, tagged

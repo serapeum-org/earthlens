@@ -20,6 +20,22 @@ on:
     - cron: '0 4 * * 0'
   workflow_dispatch:
 
+# Serialise, and cancel nothing that is not a pull request.
+#
+# The cancel condition is the same one `tests.yml` uses, so this workflow gains
+# the supersede-a-PR behaviour automatically if a `pull_request` trigger is ever
+# added. Today it always evaluates false: the only triggers are the weekly cron
+# and a manual dispatch, and neither may be killed — a cancelled scheduled run
+# means a week with no live-service coverage.
+#
+# The group deliberately omits the ref. What these jobs contend for is the
+# shared upstream account (one CDS / Earthdata / EE identity per repo), not the
+# branch, so a manual dispatch on a feature branch must still wait behind the
+# Sunday cron rather than hit the same quota alongside it.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   e2e-cds:
     runs-on: ubuntu-latest
