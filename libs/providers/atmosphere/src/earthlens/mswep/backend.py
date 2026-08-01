@@ -428,20 +428,62 @@ class MSWEP(AbstractDataSource):
                 )
         return products
 
+    def is_under_revision(self, stamp: dt.datetime, folder: str) -> bool:
+        """Return whether a granule is still being revised upstream.
+
+        GloH2O rewrites NRT granules for roughly ten days as better
+        inputs land — *"Users should redownload upgraded files"* — so a
+        copy already on disk inside that window is stale, not cached.
+        Only the NRT stream is revised; the historical record is stable.
+
+        Args:
+            stamp: The granule's timestamp.
+            folder: The `/`-joined folder chain it lives under.
+
+        Returns:
+            bool: `True` when the granule must be re-fetched even though
+                it exists locally.
+        """
+        window = self._catalog.nrt_revision_days
+        if not window or "/NRT/" not in f"/{folder}/":
+            return False
+        moment = stamp if isinstance(stamp, dt.datetime) else None
+        if moment is None:
+            return False
+        if moment.tzinfo is None:
+            moment = moment.replace(tzinfo=dt.UTC)
+        age = self._now() - moment
+        return age <= dt.timedelta(days=window)
+
+    @staticmethod
+    def _now() -> dt.datetime:
+        """Return the current UTC time (overridden in tests)."""
+        return dt.datetime.now(dt.UTC)
+
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Download each resolved granule into the output directory.
+
+        A granule already on disk is reused, **except** inside the NRT
+        revision window, where the local copy is known to be superseded.
 
         Args:
             products: The plan from :meth:`_search`.
 
         Returns:
-            list[Path]: The granules written, in plan order.
+            list[Path]: The granules written or already present, in plan
+                order.
         """
         root = self._ensure_root_dir()
         written: list[Path] = []
         for product in tqdm(products, desc="mswep", disable=not self._progress):
             name = str(product.metadata["name"])
             destination = root / name
+            stamp = product.metadata["timestamp"]
+            folder = str(product.metadata["folder"])
+            if destination.exists() and not self.is_under_revision(stamp, folder):
+                logger.debug(f"mswep: {name} already present; skipping download.")
+                written.append(destination)
+                continue
             download_media(self._auth.service, product.id, destination)
             written.append(destination)
         return written

@@ -24,9 +24,13 @@ the roots that are actually present.
 
 from __future__ import annotations
 
+import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
+
+from loguru import logger
 
 if TYPE_CHECKING:
     from earthlens.mswep.catalog import Catalog
@@ -225,8 +229,87 @@ def find_children_by_name(
     return found
 
 
-def download_media(service: Any, file_id: str, destination: Path) -> Path:
-    """Download one Drive file to `destination`, atomically.
+class DriveTransportError(Exception):
+    """Base for Drive transport failures the backend classifies."""
+
+
+class DownloadQuotaExceededError(DriveTransportError):
+    """Raised when Drive refuses a file for exceeding its download quota.
+
+    Drive caps downloads **per file**, counted across everyone who holds
+    the share. A folder handed to thousands of researchers hits this
+    routinely, and it is the single most-reported failure of pulling a
+    popular share with `rclone`. It is **not** a missing granule and
+    **not** a rate limit: back-off does not clear it, and it typically
+    resets only after about 24 hours.
+
+    It gets its own type so it can never fall through the
+    missing-granule path, which would return a silently partial time
+    series while logging what looks like routine NRT latency.
+    """
+
+
+class RateLimitedError(DriveTransportError):
+    """Raised when Drive throttles the caller and retries are exhausted.
+
+    Distinct from :class:`DownloadQuotaExceededError`: this one *is*
+    cleared by waiting, so it is retried with exponential back-off first
+    and only surfaces when the retry budget runs out.
+    """
+
+
+#: Drive `reason` values meaning "this file is capped", not "slow down".
+QUOTA_REASONS = frozenset({"downloadQuotaExceeded", "quotaExceeded"})
+
+#: How many times a throttled or 5xx request is retried before giving up.
+MAX_RETRIES = 5
+
+#: Base seconds for the exponential back-off between retries.
+BACKOFF_BASE = 2.0
+
+
+def classify_http_error(exc: Exception) -> Exception:
+    """Map a Drive `HttpError` onto this module's typed failures.
+
+    Args:
+        exc: The exception raised by the Drive client.
+
+    Returns:
+        Exception: A :class:`DownloadQuotaExceededError` /
+            :class:`RateLimitedError` when the status and reason say so,
+            otherwise `exc` unchanged so an unrelated failure keeps its
+            own traceback.
+    """
+    status = getattr(getattr(exc, "resp", None), "status", None)
+    if status not in (403, 429, 500, 502, 503, 504):
+        return exc
+
+    detail = str(exc)
+    if any(reason in detail for reason in QUOTA_REASONS):
+        return DownloadQuotaExceededError(
+            "Google Drive refused this granule: its per-file download quota "
+            "is exhausted. Drive counts that quota across everyone holding "
+            "the GloH2O share, so a popular file trips it regardless of your "
+            "own usage. Back-off does not help; it usually clears after "
+            "~24 hours. For a large window use `rclone sync`, which GloH2O "
+            f"asks non-commercial users to use for bulk transfers. ({exc})"
+        )
+    if status in (403, 429):
+        return RateLimitedError(f"Google Drive throttled the request: {exc}")
+    # Everything left is a 5xx the status filter above let through: transient
+    # server-side trouble, cleared by waiting exactly like throttling.
+    return RateLimitedError(f"Google Drive returned a transient {status}: {exc}")
+
+
+def download_media(
+    service: Any,
+    file_id: str,
+    destination: Path,
+    *,
+    max_retries: int = MAX_RETRIES,
+    sleep: Callable[[float], None] = time.sleep,
+) -> Path:
+    """Download one Drive file to `destination`, atomically and with retries.
 
     Streams through `MediaIoBaseDownload` so a multi-hundred-megabyte
     granule never lands in memory, and writes to a `.part` sibling that
@@ -234,29 +317,60 @@ def download_media(service: Any, file_id: str, destination: Path) -> Path:
     therefore leaves no truncated file that a later run would mistake
     for a cached granule.
 
+    Throttling and 5xx responses are retried with exponential back-off.
+    A **quota** refusal is not: it is raised immediately as
+    :class:`DownloadQuotaExceededError`, because waiting does not clear
+    it and retrying only burns the budget.
+
     Args:
         service: The Drive v3 client.
         file_id: Drive id of the file to fetch.
         destination: Final path to write.
+        max_retries: Attempts before a throttled download gives up.
+        sleep: Sleep function, injected so tests do not wait.
 
     Returns:
         Path: `destination`.
+
+    Raises:
+        DownloadQuotaExceededError: When the file's download quota is
+            exhausted.
+        RateLimitedError: When throttling outlasts the retry budget.
     """
     from googleapiclient.http import MediaIoBaseDownload
 
     destination.parent.mkdir(parents=True, exist_ok=True)
     partial = destination.with_name(destination.name + ".part")
-    request = service.files().get_media(fileId=file_id, supportsAllDrives=True)
-    try:
-        with partial.open("wb") as handle:
-            downloader = MediaIoBaseDownload(handle, request)
-            done = False
-            while not done:
-                _, done = downloader.next_chunk()
-        partial.replace(destination)
-    finally:
-        partial.unlink(missing_ok=True)
-    return destination
+
+    for attempt in range(max_retries):
+        request = service.files().get_media(fileId=file_id, supportsAllDrives=True)
+        try:
+            with partial.open("wb") as handle:
+                downloader = MediaIoBaseDownload(handle, request)
+                done = False
+                while not done:
+                    _, done = downloader.next_chunk()
+            partial.replace(destination)
+            return destination
+        except Exception as exc:  # noqa: BLE001 - re-raised after classification
+            partial.unlink(missing_ok=True)
+            classified = classify_http_error(exc)
+            if isinstance(classified, DownloadQuotaExceededError):
+                raise classified from exc
+            if not isinstance(classified, RateLimitedError):
+                raise
+            if attempt == max_retries - 1:
+                raise classified from exc
+            delay = BACKOFF_BASE**attempt
+            logger.warning(
+                f"mswep: Drive throttled {destination.name}; retrying in "
+                f"{delay:.0f}s ({attempt + 1}/{max_retries})."
+            )
+            sleep(delay)
+
+    raise RateLimitedError(  # pragma: no cover - loop always returns or raises
+        f"exhausted {max_retries} attempts downloading {destination.name}"
+    )
 
 
 class RootResolver:
