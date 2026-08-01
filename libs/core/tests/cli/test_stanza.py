@@ -128,6 +128,7 @@ class TestEcmwfRequestKind:
                 ["grid", "dataset_type", "year", "day"],
                 "fire",
             ),
+            ("cems-fire-seasonal", ["leadtime_hour", "year", "month"], "fire"),
             ("grid-only-cdr", ["grid", "year", "day"], "satellite_cdr"),
             ("reanalysis-era5-single-levels", ["year", "month", "day", "time"], "form"),
         ],

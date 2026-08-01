@@ -772,6 +772,11 @@ def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
     """
     if upstream_id.startswith("satellite-"):
         return "satellite_cdr"
+    if upstream_id.startswith("cems-fire"):
+        # Both fire-danger datasets are `cems-fire-*`; the historical form has a
+        # grid but the seasonal form keys on `leadtime_hour`, so the field
+        # heuristic alone would seed seasonal fire as `form` — key on the id.
+        return "fire"
     fields = {f.get("name") for f in form if isinstance(f, dict)}
     if "hyear" in fields:
         return "glofas_hindcast" if "hday" in fields else "seasonal_hindcast"
