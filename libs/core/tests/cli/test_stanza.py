@@ -105,6 +105,26 @@ class TestEcmwfEmitter:
         result = emit_stanza(_info("ecmwf"), "satellite-soil-moisture")
         assert result.row["request_kind"] == "satellite_cdr"
 
+    def test_seeds_every_variable_the_form_exposes(self, monkeypatch):
+        """A multi-variable form seeds one row per variable, all as placeholders."""
+        form = [
+            {"name": "year", "details": {}},
+            {"name": "month", "details": {}},
+            {"name": "day", "details": {}},
+            {"name": "time", "details": {}},
+            {
+                "name": "variable",
+                "details": {"values": ["2m_temperature", "total_precipitation"]},
+            },
+        ]
+        monkeypatch.setattr(stanza_mod, "_get_json", lambda url, **kw: form)
+        result = emit_stanza(_info("ecmwf"), "reanalysis-era5-single-levels")
+        assert result.status == "ok"
+        variables = result.row["variables"]
+        assert set(variables) == {"2m-temperature", "total-precipitation"}
+        assert variables["2m-temperature"]["cds_variable"] == "2m_temperature"
+        assert all(v["units"] == "unknown" for v in variables.values())
+
 
 class TestEcmwfRequestKind:
     """`_ecmwf_request_kind` maps a form's fields (+ dataset id) to a request kind."""

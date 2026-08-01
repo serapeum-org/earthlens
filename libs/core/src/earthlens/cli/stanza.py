@@ -800,8 +800,9 @@ def _emit_ecmwf(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
 
     Resolves the dataset's store (CDS / ADS / EWDS) from the per-store index,
     fetches its `form.json`, guesses the `request_kind` from the date/selector
-    fields, and enumerates the first variable. `nc_variable` is a placeholder
-    (the form does not carry it) — confirm it from a live retrieve.
+    fields, and enumerates every variable the `variable` widget exposes.
+    `nc_variable` / `units` are placeholders (the form does not carry them) —
+    confirm them from a live retrieve (`curate ecmwf --fill-empty`).
 
     Args:
         catalog: The loaded ECMWF `Catalog` (its per-store index resolves the
@@ -825,11 +826,12 @@ def _emit_ecmwf(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
         "endpoint": endpoint,
         "request_kind": _ecmwf_request_kind(cast("list[Any]", fields), upstream_id),
         "variables": {
-            variables[0].replace("_", "-"): {
-                "cds_variable": variables[0],
-                "nc_variable": variables[0],
+            v.replace("_", "-"): {
+                "cds_variable": v,
+                "nc_variable": v,
                 "units": "unknown",
             }
+            for v in variables
         },
     }
 
