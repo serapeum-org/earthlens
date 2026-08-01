@@ -444,6 +444,11 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 f"ECMWF requires {missing} — or pass `dataset=`+`request=` "
                 "for a raw-request passthrough."
             )
+        # The `missing` guard above already rejects a None in any of these, but
+        # mypy cannot narrow through the comprehension — assert so the typed
+        # `super().__init__` call sees the non-optional types (B101 is skipped).
+        assert start is not None and end is not None and variables is not None
+        assert lat_lim is not None and lon_lim is not None
         super().__init__(
             start=start,
             end=end,

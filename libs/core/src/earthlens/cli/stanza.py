@@ -811,13 +811,14 @@ def _emit_ecmwf(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
     token = _ecmwf_token()
     headers = {"PRIVATE-TOKEN": token} if token else None
     url = f"{_ECMWF_STORE_URLS[endpoint]}/catalogue/v1/collections/{upstream_id}/form.json"
-    form = _get_json(url, headers=headers)
-    if isinstance(form, dict):
-        form = form.get("form") or []
-    variables = _ecmwf_form_variables(cast("list[Any]", form)) or ["all"]
+    raw: Any = _get_json(url, headers=headers)
+    # CADS form.json is usually {"form": [...]} but is sometimes the bare
+    # [...] list; `raw` is Any so both shapes narrow without a mypy conflict.
+    fields = raw.get("form") or [] if isinstance(raw, dict) else raw
+    variables = _ecmwf_form_variables(cast("list[Any]", fields)) or ["all"]
     return {
         "endpoint": endpoint,
-        "request_kind": _ecmwf_request_kind(cast("list[Any]", form), upstream_id),
+        "request_kind": _ecmwf_request_kind(cast("list[Any]", fields), upstream_id),
         "variables": {
             variables[0].replace("_", "-"): {
                 "cds_variable": variables[0],
