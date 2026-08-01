@@ -39,18 +39,26 @@ Not served here: the EM-DAT country-profile summaries, which are already
 reachable through the shipped `hdx` backend as
 `EarthLens("hdx", hdx_id="emdat-country-profiles")`.
 
+Credentials are needed for the `gdis:*` sources only — GDIS moved behind an
+Earthdata Login when its old SEDAC host went away — and `emdat:events` stays
+anonymous. An EDL account must additionally accept the SEDAC data-use agreement
+once, or the download returns a `401`.
+
 Public surface (re-exported from this package):
 
 * :class:`Catalog` — pydantic-backed loader for the bundled
   `emdat_data_catalog.yaml`.
 * :class:`Dataset` — one catalog row (provider, output kind, transport detail,
   licence).
+* :class:`EmdatAuth` / :class:`EmdatCredentials` — Earthdata Login for the
+  `gdis:*` sources.
 * :func:`clear_catalog_cache` — drop the module-level parse cache.
 * :data:`CATALOG_PATH` — path to the bundled catalog YAML.
 """
 
 from __future__ import annotations
 
+from earthlens.emdat.auth import EmdatAuth, EmdatCredentials
 from earthlens.emdat.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -62,5 +70,7 @@ __all__ = [
     "CATALOG_PATH",
     "Catalog",
     "Dataset",
+    "EmdatAuth",
+    "EmdatCredentials",
     "clear_catalog_cache",
 ]
