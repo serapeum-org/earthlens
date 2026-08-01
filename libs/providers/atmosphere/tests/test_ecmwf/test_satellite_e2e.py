@@ -1,7 +1,9 @@
 """Live end-to-end test for a satellite CDR (gated).
 
 Runs only under `-m e2e`; needs a Copernicus token and the CDR's licence
-accepted. Exercises the C3 zip-of-NetCDF unpack + pyramids read.
+accepted. A one-day window returns a single-member zip, so this exercises the
+C3 `_unpack_netcdf_archive` single-member branch + a pyramids read (the
+multi-member branch is covered offline in `test_output_format.py`).
 """
 
 from __future__ import annotations

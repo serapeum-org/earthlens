@@ -10,9 +10,16 @@ import zipfile
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 import pytest
 
-from earthlens.ecmwf.backend import _detect_output_format, _unpack_netcdf_archive
+from earthlens.base import SpatialExtent, TemporalExtent
+from earthlens.ecmwf import Variable
+from earthlens.ecmwf.backend import (
+    ECMWF,
+    _detect_output_format,
+    _unpack_netcdf_archive,
+)
 
 pytestmark = [pytest.mark.unit]
 
@@ -93,6 +100,61 @@ class TestUnpackArchive:
         out = _unpack_netcdf_archive(target)
         assert all((tmp_path / "evil") in p.parents for p in out), "no escape"
         assert not (tmp_path.parent.parent / "escape.nc").exists()
+
+
+class _ZipClient:
+    """Fake cdsapi client whose retrieve writes a multi-member zip to `target`."""
+
+    def __init__(self, members: list[str]):
+        self._members = members
+
+    def retrieve(self, dataset, request, target):
+        with zipfile.ZipFile(target, "w") as archive:
+            for name in self._members:
+                archive.writestr(name, b"CDF" + name.encode())
+
+
+def _curated_backend(tmp_path: Path) -> ECMWF:
+    """A stub ECMWF wired for a curated `_api` retrieve (constraints skipped)."""
+    backend = ECMWF.__new__(ECMWF)
+    backend.root_dir = tmp_path
+    backend.skip_constraints = True
+    backend.temporal_resolution = "monthly"
+    backend.time = TemporalExtent(
+        start_date=pd.Timestamp("2020-01-01"),
+        end_date=pd.Timestamp("2021-12-01"),
+        resolution="MS",
+        dates=pd.date_range("2020-01-01", "2021-12-01", freq="MS"),
+    )
+    backend.space = SpatialExtent(
+        latitude_min=0.0,
+        latitude_max=1.0,
+        longitude_min=0.0,
+        longitude_max=1.0,
+        resolution=0.1,
+    )
+    return backend
+
+
+class TestCuratedApiMultiMemberZip:
+    """The curated `_api` path unpacks a multi-member zip instead of crashing (H1)."""
+
+    def test_multi_member_retrieve_unpacks_not_raises(self, tmp_path):
+        """A curated retrieve returning a 2-member zip unpacks; returns a member."""
+        backend = _curated_backend(tmp_path)
+        backend._client_for = lambda endpoint: _ZipClient(["2020.nc", "2021.nc"])
+        var = Variable(
+            cds_dataset="satellite-soil-moisture",
+            cds_variable="volumetric_surface_soil_moisture",
+            nc_variable="sm",
+            units="m3 m-3",
+            request_kind="satellite_cdr",
+            extras={"data_format": "zip"},
+        )
+        out = backend._api(var)
+        member_dir = tmp_path / f"{var.cds_variable}_{var.cds_dataset}"
+        assert out.parent == member_dir, "returns a member under the sibling dir"
+        assert sorted(p.name for p in member_dir.glob("*.nc")) == ["2020.nc", "2021.nc"]
 
 
 class TestPyramidsReadsUnpackedMember:

@@ -228,7 +228,8 @@ def _detect_output_format(target: Path) -> str:
         str: `"zip"`, `"netcdf"`, `"grib"`, or `"unknown"`.
     """
     try:
-        head = target.read_bytes()[:8]
+        with target.open("rb") as handle:
+            head = handle.read(8)
     except OSError:
         return "unknown"
     if head[:4] == b"PK\x03\x04":
@@ -1206,9 +1207,20 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                     "and tied to your Copernicus account."
                 ) from exc
             raise
-        _unwrap_zipped_netcdf(target)
-        self._mask_netcdf_to_geometry(target)
-        return target
+        # A zip-of-NetCDF response (satellite CDRs, CAMS netcdf_zip) is unpacked
+        # by the C3 handler — single-member in place, multi-member into a
+        # sibling dir — so a multi-timestep curated retrieve does not crash.
+        members = _unpack_netcdf_archive(target)
+        if len(members) > 1:
+            logger.warning(
+                f"{dataset}: retrieve returned {len(members)} NetCDF members "
+                f"(unpacked to {members[0].parent}); returning the first. A "
+                "multi-member curated aggregate is not yet supported — read the "
+                "member directory for the full time series."
+            )
+        primary = members[0]
+        self._mask_netcdf_to_geometry(primary)
+        return primary
 
     def _mask_netcdf_to_geometry(self, target: Path) -> None:
         """Mask a written NetCDF cube to a polygon `aoi=`, if one was given.
