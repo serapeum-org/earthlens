@@ -45,7 +45,7 @@ jobs:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
-          uv run pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp" -v
+          uv run pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not gdis" -v
 
   e2e-gee:
     runs-on: ubuntu-latest
