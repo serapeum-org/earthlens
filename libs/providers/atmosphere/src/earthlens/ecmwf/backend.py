@@ -66,6 +66,9 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # year/month/day and `product_type` (see the `cams_date` branch); nothing
     # extra to strip here.
     "cams_date": (),
+    # CEMS fire danger (EWDS): daily year/month/day + a `grid` selector, no
+    # time-of-day; drop the template's `time` slots.
+    "fire": ("time",),
 }
 
 
