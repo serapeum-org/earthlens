@@ -9,7 +9,7 @@ credentials (both NOAA PSL and KNMI Climate Explorer are open). See
 ## A single index
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 df = EarthLens(
     data_source="climate-indices",

@@ -1,6 +1,7 @@
 # JAXA — available datasets
 
-The bundled catalog ships **917 rows**: 118 `jaxa-earth` STAC collections plus 799 `gportal` mission products. Every row has a short, friendly canonical key; the long auto-derived slug and a few high-traffic English names also resolve via `cat.get(...)`.
+The bundled catalog ships **918 rows**: 118 `jaxa-earth` STAC collections, 799 `gportal` mission products, and
+one `ptree` Himawari entry. Every row has a short, friendly canonical key; the long auto-derived slug and a few high-traffic English names also resolve via `cat.get(...)`.
 
 The naming scheme for jaxa-earth is `<mission>-<product>[-<d|n>][-<cadence>][-norm]` where `d`/`n` mark daytime / nighttime variants, the cadence comes from the source (`daily`, `halfmonth`, `monthly`, `8day`, `hourly`, `yearly`), and `-norm` flags a climatological *normal*.
 
@@ -651,10 +652,10 @@ Free G-Portal account required for the SFTP download step; search is anonymous. 
 | `palsar2-hight-sensitive-dp` | — | `27004004` | ALOS-2 — NA/Hight-sensitive[6m] DP |
 | `palsar2-hight-sensitive-qp` | — | `27004005` | ALOS-2 — NA/Hight-sensitive[6m] QP |
 | `palsar2-hight-sensitive-sp` | — | `27004003` | ALOS-2 — NA/Hight-sensitive[6m] SP |
-| `palsar2-scansar-14mhz-dp` | — | `27004010` | ALOS-2 — NA/ScanSAR[350㎞](14MHz) DP |
-| `palsar2-scansar-14mhz-sp` | — | `27004009` | ALOS-2 — NA/ScanSAR[350㎞](14MHz) SP |
-| `palsar2-scansar-28mhz-dp` | — | `27004012` | ALOS-2 — NA/ScanSAR[350㎞](28MHz) DP |
-| `palsar2-scansar-28mhz-sp` | — | `27004011` | ALOS-2 — NA/ScanSAR[350㎞](28MHz) SP |
+| `palsar2-scansar-14mhz-dp` | — | `27004010` | ALOS-2 — NA/ScanSAR\[350km\](14MHz) DP |
+| `palsar2-scansar-14mhz-sp` | — | `27004009` | ALOS-2 — NA/ScanSAR\[350km\](14MHz) SP |
+| `palsar2-scansar-28mhz-dp` | — | `27004012` | ALOS-2 — NA/ScanSAR\[350km\](28MHz) DP |
+| `palsar2-scansar-28mhz-sp` | — | `27004011` | ALOS-2 — NA/ScanSAR\[350km\](28MHz) SP |
 | `palsar2-scansar-sp` | — | `27004013` | ALOS-2 — NA/ScanSAR[490km] SP |
 | `palsar2-scansardp` | — | `27004014` | ALOS-2 — NA/ScanSAR[490km]DP |
 | `palsar2-spotlight-sp` | — | `27004000` | ALOS-2 — NA/Spotlight SP |

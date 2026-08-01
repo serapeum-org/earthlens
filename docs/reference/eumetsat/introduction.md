@@ -40,7 +40,7 @@ tagged `vector`. A request that mixes output kinds is rejected up front.
 ## How it maps onto the `EarthLens` facade
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(
     data_source="eumetsat",

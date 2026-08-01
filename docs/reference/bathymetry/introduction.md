@@ -34,7 +34,7 @@ A request builds the `griddap` bbox-subset URL, downloads the resulting
 the NetCDF; the read goes through pyramids only.
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="bathymetry",

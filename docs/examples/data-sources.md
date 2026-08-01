@@ -20,7 +20,7 @@ The API takes a few parameters to determine the domain of your data:
 - If `lat_lim` and `lon_lim` are not provided, the `EarthLens` class defaults to longitude `[-180, 180]` and latitude `[-90, 90]`.
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 start = "2009-01-01"
 end = "2009-01-10"
@@ -222,7 +222,7 @@ earthlens = EarthLens(
     temporal_resolution=temporal_resolution,
     path=path,
 )
-earthlens.core.download()
+earthlens.download()
 ```
 
 !!! note "Expect to wait"
@@ -249,7 +249,7 @@ earthlens = EarthLens(
     temporal_resolution=temporal_resolution,
     path=path,
 )
-earthlens.core.download()
+earthlens.download()
 ```
 
 ### Parallel Download
@@ -267,7 +267,7 @@ earthlens = EarthLens(
     temporal_resolution=temporal_resolution,
     path=path,
 )
-earthlens.core.download(cores=4)
+earthlens.download(cores=4)
 ```
 
 ## Amazon S3
@@ -285,5 +285,5 @@ earthlens = EarthLens(
     temporal_resolution=temporal_resolution,
     path=path,
 )
-earthlens.core.download()
+earthlens.download()
 ```

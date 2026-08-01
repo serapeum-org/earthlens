@@ -10,787 +10,744 @@ datasets:
     - avnir-l1a-mu
     protocol: gportal
     short_name: '22011000'
-    description: "ADEOS \xE2\u20AC\u201D L1A MU"
+    description: "ADEOS — L1A MU"
   adeos-avnir-l1a-pan:
     aliases:
     - avnir-l1a-pan
     protocol: gportal
     short_name: '22011002'
-    description: "ADEOS \xE2\u20AC\u201D L1A PAN"
+    description: "ADEOS — L1A PAN"
   adeos-avnir-l1b2-mu:
     aliases:
     - avnir-l1b2-mu
     protocol: gportal
     short_name: '22011001'
-    description: "ADEOS \xE2\u20AC\u201D L1B2 MU"
+    description: "ADEOS — L1B2 MU"
   adeos-avnir-l1b2-pan:
     aliases:
     - avnir-l1b2-pan
     protocol: gportal
     short_name: '22011003'
-    description: "ADEOS \xE2\u20AC\u201D L1B2 PAN"
+    description: "ADEOS — L1B2 PAN"
   adeos-octs-gac-ocean-color:
     aliases:
     - octs-gac-ocean-color
     protocol: gportal
     short_name: '22003000'
-    description: "ADEOS \xE2\u20AC\u201D L3B.GACOC/GAC Ocean Color"
+    description: "ADEOS — L3B.GACOC/GAC Ocean Color"
   adeos-octs-gac-ocean-color-3007:
     aliases:
     - octs-gac-ocean-color-3007
     protocol: gportal
     short_name: '22003007'
-    description: "ADEOS \xE2\u20AC\u201D L3BM.GACOCL/GAC Ocean Color"
+    description: "ADEOS — L3BM.GACOCL/GAC Ocean Color"
   adeos-octs-gac-ocean-color-chlorophyll-a:
     aliases:
     - octs-gac-ocean-color-chlorophyll-a
     protocol: gportal
     short_name: '22003009'
-    description: "ADEOS \xE2\u20AC\u201D L3BM.GACOCC/GAC Ocean Color-Chlorophyll-a\
-      \ concentration"
+    description: "ADEOS — L3BM.GACOCC/GAC Ocean Color-Chlorophyll-a\ concentration"
   adeos-octs-gac-ocean-color-czcs-like-pigm:
     aliases:
     - octs-gac-ocean-color-czcs-like-pigm
     protocol: gportal
     short_name: '22003008'
-    description: "ADEOS \xE2\u20AC\u201D L3BM.GACOCP/GAC Ocean Color-CZCS like pigment\
-      \ concentration"
+    description: "ADEOS — L3BM.GACOCP/GAC Ocean Color-CZCS like pigment\ concentration"
   adeos-octs-gac-ocean-color1:
     aliases:
     - octs-gac-ocean-color1
     protocol: gportal
     short_name: '22002000'
-    description: "ADEOS \xE2\u20AC\u201D L2.GACOC1/GAC Ocean Color1"
+    description: "ADEOS — L2.GACOC1/GAC Ocean Color1"
   adeos-octs-gac-ocean-color2:
     aliases:
     - octs-gac-ocean-color2
     protocol: gportal
     short_name: '22002001'
-    description: "ADEOS \xE2\u20AC\u201D L2.GACOC2/GAC Ocean Color2"
+    description: "ADEOS — L2.GACOC2/GAC Ocean Color2"
   adeos-octs-gac-sea-surface-temperatur:
     aliases:
     - octs-gac-sea-surface-temperatur
     protocol: gportal
     short_name: '22002003'
-    description: "ADEOS \xE2\u20AC\u201D L2.GACSST/GAC Sea Surface Temperatur"
+    description: "ADEOS — L2.GACSST/GAC Sea Surface Temperatur"
   adeos-octs-gac-sea-surface-temperture:
     aliases:
     - octs-gac-sea-surface-temperture
     protocol: gportal
     short_name: '22003012'
-    description: "ADEOS \xE2\u20AC\u201D L3BM.GACSST/GAC Sea Surface Temperture"
+    description: "ADEOS — L3BM.GACSST/GAC Sea Surface Temperture"
   adeos-octs-gac-seasurface-temperatur:
     aliases:
     - octs-gac-seasurface-temperatur
     protocol: gportal
     short_name: '22003002'
-    description: "ADEOS \xE2\u20AC\u201D L3B.GACSST/GAC SeaSurface Temperatur"
+    description: "ADEOS — L3B.GACSST/GAC SeaSurface Temperatur"
   adeos-octs-gac-thermal-infrared:
     aliases:
     - octs-gac-thermal-infrared
     protocol: gportal
     short_name: '22001001'
-    description: "ADEOS \xE2\u20AC\u201D L1A.GACTI/GAC Thermal infrared"
+    description: "ADEOS — L1A.GACTI/GAC Thermal infrared"
   adeos-octs-gac-vegetation-index:
     aliases:
     - octs-gac-vegetation-index
     protocol: gportal
     short_name: '22002002'
-    description: "ADEOS \xE2\u20AC\u201D L2.GACVI/GAC Vegetation Index"
+    description: "ADEOS — L2.GACVI/GAC Vegetation Index"
   adeos-octs-gac-vegetation-index-3001:
     aliases:
     - octs-gac-vegetation-index-3001
     protocol: gportal
     short_name: '22003001'
-    description: "ADEOS \xE2\u20AC\u201D L3B.GACVI/GAC Vegetation Index"
+    description: "ADEOS — L3B.GACVI/GAC Vegetation Index"
   adeos-octs-gac-vegetation-index-3011:
     aliases:
     - octs-gac-vegetation-index-3011
     protocol: gportal
     short_name: '22003011'
-    description: "ADEOS \xE2\u20AC\u201D L3BM.GACVI/GAC Vegetation Index"
+    description: "ADEOS — L3BM.GACVI/GAC Vegetation Index"
   adeos-octs-gac-visible-and-near-infrared:
     aliases:
     - octs-gac-visible-and-near-infrared
     protocol: gportal
     short_name: '22001000'
-    description: "ADEOS \xE2\u20AC\u201D L1A.GACVNI/GAC Visible and near infrared"
+    description: "ADEOS — L1A.GACVNI/GAC Visible and near infrared"
   adeos-octs-k490:
     aliases:
     - octs-k490
     protocol: gportal
     short_name: '22003005'
-    description: "ADEOS \xE2\u20AC\u201D L3M.RTCOCK/RTC Ocean Color-Diffuse attenuation\
-      \ coefficient at 490nm(K490)"
+    description: "ADEOS — L3M.RTCOCK/RTC Ocean Color-Diffuse attenuation\ coefficient at 490nm(K490)"
   adeos-octs-k490-3010:
     aliases:
     - octs-k490-3010
     protocol: gportal
     short_name: '22003010'
-    description: "ADEOS \xE2\u20AC\u201D L3BM.GACOCK/GAC Ocean Color-Diffuse attenuation\
-      \ coefficient at 490nm(K490)"
+    description: "ADEOS — L3BM.GACOCK/GAC Ocean Color-Diffuse attenuation\ coefficient at 490nm(K490)"
   adeos-octs-rtc-ocean-color-chlorophyll-a:
     aliases:
     - octs-rtc-ocean-color-chlorophyll-a
     protocol: gportal
     short_name: '22003004'
-    description: "ADEOS \xE2\u20AC\u201D L3M.RTCOCC/RTC Ocean Color-Chlorophyll-a\
-      \ concentration"
+    description: "ADEOS — L3M.RTCOCC/RTC Ocean Color-Chlorophyll-a\ concentration"
   adeos-octs-rtc-ocean-color-czcs-like-pigm:
     aliases:
     - octs-rtc-ocean-color-czcs-like-pigm
     protocol: gportal
     short_name: '22003003'
-    description: "ADEOS \xE2\u20AC\u201D L3M.RTCOCP/RTC Ocean Color-CZCS like pigment\
-      \ concentration"
+    description: "ADEOS — L3M.RTCOCP/RTC Ocean Color-CZCS like pigment\ concentration"
   adeos-octs-rtc-ocean-color1:
     aliases:
     - octs-rtc-ocean-color1
     protocol: gportal
     short_name: '22002004'
-    description: "ADEOS \xE2\u20AC\u201D L2.RTCOC1/RTC Ocean Color1"
+    description: "ADEOS — L2.RTCOC1/RTC Ocean Color1"
   adeos-octs-rtc-ocean-color2:
     aliases:
     - octs-rtc-ocean-color2
     protocol: gportal
     short_name: '22002005'
-    description: "ADEOS \xE2\u20AC\u201D L2.RTCOC2/RTC Ocean Color2"
+    description: "ADEOS — L2.RTCOC2/RTC Ocean Color2"
   adeos-octs-rtc-sea-surface-temperatur:
     aliases:
     - octs-rtc-sea-surface-temperatur
     protocol: gportal
     short_name: '22002007'
-    description: "ADEOS \xE2\u20AC\u201D L2.RTCSST/RTC Sea Surface Temperatur"
+    description: "ADEOS — L2.RTCSST/RTC Sea Surface Temperatur"
   adeos-octs-rtc-sea-surface-temperture:
     aliases:
     - octs-rtc-sea-surface-temperture
     protocol: gportal
     short_name: '22003006'
-    description: "ADEOS \xE2\u20AC\u201D L3M.RTCSST/RTC Sea Surface Temperture"
+    description: "ADEOS — L3M.RTCSST/RTC Sea Surface Temperture"
   adeos-octs-rtc-thermal-infrared:
     aliases:
     - octs-rtc-thermal-infrared
     protocol: gportal
     short_name: '22001003'
-    description: "ADEOS \xE2\u20AC\u201D L1A.RTCTI/RTC Thermal infrared"
+    description: "ADEOS — L1A.RTCTI/RTC Thermal infrared"
   adeos-octs-rtc-vegetation-index:
     aliases:
     - octs-rtc-vegetation-index
     protocol: gportal
     short_name: '22002006'
-    description: "ADEOS \xE2\u20AC\u201D L2.RTCVI/RTC Vegetation Index"
+    description: "ADEOS — L2.RTCVI/RTC Vegetation Index"
   adeos-octs-rtc-visible-and-near-infrared:
     aliases:
     - octs-rtc-visible-and-near-infrared
     protocol: gportal
     short_name: '22001002'
-    description: "ADEOS \xE2\u20AC\u201D L1A.RTCVNI/RTC Visible and near infrared"
+    description: "ADEOS — L1A.RTCVNI/RTC Visible and near infrared"
   adeos2-amsr-amsr-l1a:
     aliases:
     - amsr-amsr-l1a
     protocol: gportal
     short_name: '23001000'
-    description: "ADEOS-II \xE2\u20AC\u201D L1A/AMSR L1A"
+    description: "ADEOS-II — L1A/AMSR L1A"
   adeos2-amsr-amsr-l1b:
     aliases:
     - amsr-amsr-l1b
     protocol: gportal
     short_name: '23001001'
-    description: "ADEOS-II \xE2\u20AC\u201D L1B/AMSR L1B"
+    description: "ADEOS-II — L1B/AMSR L1B"
   adeos2-amsr-amsr-l2-amount-of-precipitatio:
     aliases:
     - amsr-amsr-l2-amount-of-precipitatio
     protocol: gportal
     short_name: '23002002'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.AP/AMSR L2 Amount of Precipitation"
+    description: "ADEOS-II — L2.AP/AMSR L2 Amount of Precipitation"
   adeos2-amsr-amsr-l2-cloud-liquid-water:
     aliases:
     - amsr-amsr-l2-cloud-liquid-water
     protocol: gportal
     short_name: '23002001'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.CLW/AMSR L2 Cloud Liquid Water"
+    description: "ADEOS-II — L2.CLW/AMSR L2 Cloud Liquid Water"
   adeos2-amsr-amsr-l2-ice-concentration:
     aliases:
     - amsr-amsr-l2-ice-concentration
     protocol: gportal
     short_name: '23002005'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.IC/AMSR L2 Ice Concentration"
+    description: "ADEOS-II — L2.IC/AMSR L2 Ice Concentration"
   adeos2-amsr-amsr-l2-sea-surface-temperture:
     aliases:
     - amsr-amsr-l2-sea-surface-temperture
     protocol: gportal
     short_name: '23002004'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.SST/AMSR L2 Sea Surface Temperture"
+    description: "ADEOS-II — L2.SST/AMSR L2 Sea Surface Temperture"
   adeos2-amsr-amsr-l2-sea-surface-wind-speed:
     aliases:
     - amsr-amsr-l2-sea-surface-wind-speed
     protocol: gportal
     short_name: '23002003'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.SSW/AMSR L2 Sea Surface Wind Speed"
+    description: "ADEOS-II — L2.SSW/AMSR L2 Sea Surface Wind Speed"
   adeos2-amsr-amsr-l2-snow-water-equivalence:
     aliases:
     - amsr-amsr-l2-snow-water-equivalence
     protocol: gportal
     short_name: '23002007'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.SWE/AMSR L2 Snow Water Equivalence"
+    description: "ADEOS-II — L2.SWE/AMSR L2 Snow Water Equivalence"
   adeos2-amsr-amsr-l2-soil-moisture:
     aliases:
     - amsr-amsr-l2-soil-moisture
     protocol: gportal
     short_name: '23002006'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.SM/AMSR L2 Soil Moisture"
+    description: "ADEOS-II — L2.SM/AMSR L2 Soil Moisture"
   adeos2-amsr-amsr-l2-water-vapor:
     aliases:
     - amsr-amsr-l2-water-vapor
     protocol: gportal
     short_name: '23002000'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.WV/AMSR L2 Water Vapor"
+    description: "ADEOS-II — L2.WV/AMSR L2 Water Vapor"
   adeos2-amsr-amsr-l3-amount-of-precipitatio:
     aliases:
     - amsr-amsr-l3-amount-of-precipitatio
     protocol: gportal
     short_name: '23003002'
-    description: "ADEOS-II \xE2\u20AC\u201D L3.AP/AMSR L3 Amount of Precipitation"
+    description: "ADEOS-II — L3.AP/AMSR L3 Amount of Precipitation"
   adeos2-amsr-amsr-l3-brightness-temperature:
     aliases:
     - amsr-amsr-l3-brightness-temperature
     - adeos2-tb
     protocol: gportal
     short_name: '23003008'
-    description: "ADEOS-II \xE2\u20AC\u201D L3.BT/AMSR L3 Brightness Temperature"
+    description: "ADEOS-II — L3.BT/AMSR L3 Brightness Temperature"
   adeos2-amsr-amsr-l3-cloud-liquid-water:
     aliases:
     - amsr-amsr-l3-cloud-liquid-water
     protocol: gportal
     short_name: '23003001'
-    description: "ADEOS-II \xE2\u20AC\u201D L3.CLW/AMSR L3 Cloud Liquid Water"
+    description: "ADEOS-II — L3.CLW/AMSR L3 Cloud Liquid Water"
   adeos2-amsr-amsr-l3-ice-concentration:
     aliases:
     - amsr-amsr-l3-ice-concentration
     protocol: gportal
     short_name: '23003005'
-    description: "ADEOS-II \xE2\u20AC\u201D L3.IC/AMSR L3 Ice Concentration"
+    description: "ADEOS-II — L3.IC/AMSR L3 Ice Concentration"
   adeos2-amsr-amsr-l3-sea-surface-temperatur:
     aliases:
     - amsr-amsr-l3-sea-surface-temperatur
     protocol: gportal
     short_name: '23003004'
-    description: "ADEOS-II \xE2\u20AC\u201D L3.SST/AMSR L3 Sea Surface Temperature"
+    description: "ADEOS-II — L3.SST/AMSR L3 Sea Surface Temperature"
   adeos2-amsr-amsr-l3-sea-surface-wind-speed:
     aliases:
     - amsr-amsr-l3-sea-surface-wind-speed
     protocol: gportal
     short_name: '23003003'
-    description: "ADEOS-II \xE2\u20AC\u201D L3.SSW/AMSR L3 Sea Surface Wind Speed"
+    description: "ADEOS-II — L3.SSW/AMSR L3 Sea Surface Wind Speed"
   adeos2-amsr-amsr-l3-snow-water-equivalence:
     aliases:
     - amsr-amsr-l3-snow-water-equivalence
     protocol: gportal
     short_name: '23003007'
-    description: "ADEOS-II \xE2\u20AC\u201D L3.SWE/AMSR L3 Snow Water Equivalence"
+    description: "ADEOS-II — L3.SWE/AMSR L3 Snow Water Equivalence"
   adeos2-amsr-amsr-l3-soil-moisture:
     aliases:
     - amsr-amsr-l3-soil-moisture
     protocol: gportal
     short_name: '23003006'
-    description: "ADEOS-II \xE2\u20AC\u201D L3.SM/AMSR L3 Soil Moisture"
+    description: "ADEOS-II — L3.SM/AMSR L3 Soil Moisture"
   adeos2-amsr-amsr-l3-water-vapor:
     aliases:
     - amsr-amsr-l3-water-vapor
     protocol: gportal
     short_name: '23003000'
-    description: "ADEOS-II \xE2\u20AC\u201D L3.WV/AMSR L3 Water Vapor"
+    description: "ADEOS-II — L3.WV/AMSR L3 Water Vapor"
   adeos2-gli-1km-absorption-of-colored-dissolve:
     aliases:
     - gli-1km-absorption-of-colored-dissolve
     protocol: gportal
     short_name: '23013036'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.CDOM0/Absorption of colored dissolved\
-      \ organic matter"
+    description: "ADEOS-II — L3STAMAP.CDOM0/Absorption of colored dissolved\ organic matter"
   adeos2-gli-1km-add-data-averaged:
     aliases:
     - gli-1km-add-data-averaged
     protocol: gportal
     short_name: '23013039'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.STALL/Sea Surface Temperature(add\
-      \ data averaged)"
+    description: "ADEOS-II — L3STAMAP.STALL/Sea Surface Temperature(add\ data averaged)"
   adeos2-gli-1km-aerosol:
     aliases:
     - gli-1km-aerosol
     protocol: gportal
     short_name: '23013013'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.LA000/Aerosol"
+    description: "ADEOS-II — L3B.LA000/Aerosol"
   adeos2-gli-1km-aerosol-3033:
     aliases:
     - gli-1km-aerosol-3033
     protocol: gportal
     short_name: '23013033'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.LA000/Aerosol"
+    description: "ADEOS-II — L3STAMAP.LA000/Aerosol"
   adeos2-gli-1km-aerosol-angstrom-exponent:
     aliases:
     - gli-1km-aerosol-angstrom-exponent
     protocol: gportal
     short_name: '23012001'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.ARAEO/Aerosol Angstrom Exponent"
+    description: "ADEOS-II — L2.ARAEO/Aerosol Angstrom Exponent"
   adeos2-gli-1km-aerosol-angstrom-exponent-3000:
     aliases:
     - gli-1km-aerosol-angstrom-exponent-3000
     protocol: gportal
     short_name: '23013000'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.ARAEO/Aerosol Angstrom Exponent"
+    description: "ADEOS-II — L3B.ARAEO/Aerosol Angstrom Exponent"
   adeos2-gli-1km-aerosol-angstrom-exponent-3020:
     aliases:
     - gli-1km-aerosol-angstrom-exponent-3020
     protocol: gportal
     short_name: '23013020'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.ARAEO/Aerosol Angstrom Exponent"
+    description: "ADEOS-II — L3STAMAP.ARAEO/Aerosol Angstrom Exponent"
   adeos2-gli-1km-aerosol-optical-thickness:
     aliases:
     - gli-1km-aerosol-optical-thickness
     protocol: gportal
     short_name: '23012002'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.AROP0/Aerosol Optical Thickness"
+    description: "ADEOS-II — L2.AROP0/Aerosol Optical Thickness"
   adeos2-gli-1km-aerosol-optical-thickness-3001:
     aliases:
     - gli-1km-aerosol-optical-thickness-3001
     protocol: gportal
     short_name: '23013001'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.AROP0/Aerosol Optical Thickness"
+    description: "ADEOS-II — L3B.AROP0/Aerosol Optical Thickness"
   adeos2-gli-1km-aerosol-optical-thickness-3021:
     aliases:
     - gli-1km-aerosol-optical-thickness-3021
     protocol: gportal
     short_name: '23013021'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.AROP0/Aerosol Optical Thickness"
+    description: "ADEOS-II — L3STAMAP.AROP0/Aerosol Optical Thickness"
   adeos2-gli-1km-atmospheric-corrected-data-for:
     aliases:
     - gli-1km-atmospheric-corrected-data-for
     protocol: gportal
     short_name: '23012018'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.ACLC0/Atmospheric Corrected Data For\
-      \ Land And Cryosphere"
+    description: "ADEOS-II — L2.ACLC0/Atmospheric Corrected Data For\ Land And Cryosphere"
   adeos2-gli-1km-atmospheric-correction:
     aliases:
     - gli-1km-atmospheric-correction
     protocol: gportal
     short_name: '23012013'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.NLLR0/Atmospheric Correction"
+    description: "ADEOS-II — L2.NLLR0/Atmospheric Correction"
   adeos2-gli-1km-attenuation-coefficent-at-490m:
     aliases:
     - gli-1km-attenuation-coefficent-at-490m
     protocol: gportal
     short_name: '23013037'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.K4900/Attenuation coefficent\
-      \ at 490mm"
+    description: "ADEOS-II — L3STAMAP.K4900/Attenuation coefficent\ at 490mm"
   adeos2-gli-1km-chlorophyll-a:
     aliases:
     - gli-1km-chlorophyll-a
     - adeos2-chla
     protocol: gportal
     short_name: '23013034'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.CHLA0/Chlorophyll-a"
+    description: "ADEOS-II — L3STAMAP.CHLA0/Chlorophyll-a"
   adeos2-gli-1km-cloud-effective-particle-radiu:
     aliases:
     - gli-1km-cloud-effective-particle-radiu
     protocol: gportal
     short_name: '23012004'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.CERWR/Cloud Effective Particle Radius\
-      \ of water cloud by reflection method"
+    description: "ADEOS-II — L2.CERWR/Cloud Effective Particle Radius\ of water cloud by reflection method"
   adeos2-gli-1km-cloud-effective-particle-radiu-2005:
     aliases:
     - gli-1km-cloud-effective-particle-radiu-2005
     protocol: gportal
     short_name: '23012005'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.CERIE/Cloud Effective Particle Radius\
-      \ of ice cloud by emission method"
+    description: "ADEOS-II — L2.CERIE/Cloud Effective Particle Radius\ of ice cloud by emission method"
   adeos2-gli-1km-cloud-effective-particle-radiu-3003:
     aliases:
     - gli-1km-cloud-effective-particle-radiu-3003
     protocol: gportal
     short_name: '23013003'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.CERWR/Cloud Effective Particle Radius\
-      \ of water cloud by reflection method"
+    description: "ADEOS-II — L3B.CERWR/Cloud Effective Particle Radius\ of water cloud by reflection method"
   adeos2-gli-1km-cloud-effective-particle-radiu-3004:
     aliases:
     - gli-1km-cloud-effective-particle-radiu-3004
     protocol: gportal
     short_name: '23013004'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.CERIE/Cloud Effective Particle Radius\
-      \ of ice cloud by emission method"
+    description: "ADEOS-II — L3B.CERIE/Cloud Effective Particle Radius\ of ice cloud by emission method"
   adeos2-gli-1km-cloud-effective-particle-radiu-3023:
     aliases:
     - gli-1km-cloud-effective-particle-radiu-3023
     protocol: gportal
     short_name: '23013023'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.CERWR/Cloud Effective Particle\
-      \ Radius of water cloud by reflection method"
+    description: "ADEOS-II — L3STAMAP.CERWR/Cloud Effective Particle\ Radius of water cloud by reflection method"
   adeos2-gli-1km-cloud-effective-particle-radiu-3024:
     aliases:
     - gli-1km-cloud-effective-particle-radiu-3024
     protocol: gportal
     short_name: '23013024'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.CERIE/Cloud Effective Particle\
-      \ Radius of ice cloud by emission method"
+    description: "ADEOS-II — L3STAMAP.CERIE/Cloud Effective Particle\ Radius of ice cloud by emission method"
   adeos2-gli-1km-cloud-flag:
     aliases:
     - gli-1km-cloud-flag
     protocol: gportal
     short_name: '23012000'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.CLFLG/Cloud Flag"
+    description: "ADEOS-II — L2.CLFLG/Cloud Flag"
   adeos2-gli-1km-cloud-fraction:
     aliases:
     - gli-1km-cloud-fraction
     protocol: gportal
     short_name: '23012003'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.CLFR0/Cloud fraction"
+    description: "ADEOS-II — L2.CLFR0/Cloud fraction"
   adeos2-gli-1km-cloud-fraction-3002:
     aliases:
     - gli-1km-cloud-fraction-3002
     protocol: gportal
     short_name: '23013002'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.CLFR0/Cloud fraction"
+    description: "ADEOS-II — L3B.CLFR0/Cloud fraction"
   adeos2-gli-1km-cloud-fraction-3022:
     aliases:
     - gli-1km-cloud-fraction-3022
     protocol: gportal
     short_name: '23013022'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.CLFR0/Cloud fraction"
+    description: "ADEOS-II — L3STAMAP.CLFR0/Cloud fraction"
   adeos2-gli-1km-cloud-liquid-water-path-of-wat:
     aliases:
     - gli-1km-cloud-liquid-water-path-of-wat
     protocol: gportal
     short_name: '23012012'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.CWPWR/Cloud Liquid Water Path of water\
-      \ cloud by reflaction method"
+    description: "ADEOS-II — L2.CWPWR/Cloud Liquid Water Path of water\ cloud by reflaction method"
   adeos2-gli-1km-cloud-liquid-water-path-of-wat-3011:
     aliases:
     - gli-1km-cloud-liquid-water-path-of-wat-3011
     protocol: gportal
     short_name: '23013011'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.CWPWR/Cloud Liquid Water Path of water\
-      \ cloud by reflaction method"
+    description: "ADEOS-II — L3B.CWPWR/Cloud Liquid Water Path of water\ cloud by reflaction method"
   adeos2-gli-1km-cloud-liquid-water-path-of-wat-3031:
     aliases:
     - gli-1km-cloud-liquid-water-path-of-wat-3031
     protocol: gportal
     short_name: '23013031'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.CWPWR/Cloud Liquid Water Path\
-      \ of water cloud by reflaction method"
+    description: "ADEOS-II — L3STAMAP.CWPWR/Cloud Liquid Water Path\ of water cloud by reflaction method"
   adeos2-gli-1km-cloud-optical-thickness-of-ice:
     aliases:
     - gli-1km-cloud-optical-thickness-of-ice
     protocol: gportal
     short_name: '23012007'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.COPIR/Cloud Optical Thickness of ice\
-      \ cloud by reflection method"
+    description: "ADEOS-II — L2.COPIR/Cloud Optical Thickness of ice\ cloud by reflection method"
   adeos2-gli-1km-cloud-optical-thickness-of-ice-2008:
     aliases:
     - gli-1km-cloud-optical-thickness-of-ice-2008
     protocol: gportal
     short_name: '23012008'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.COPIE/Cloud Optical Thickness of ice\
-      \ cloud by emission method"
+    description: "ADEOS-II — L2.COPIE/Cloud Optical Thickness of ice\ cloud by emission method"
   adeos2-gli-1km-cloud-optical-thickness-of-ice-3006:
     aliases:
     - gli-1km-cloud-optical-thickness-of-ice-3006
     protocol: gportal
     short_name: '23013006'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.COPIR/Cloud Optical Thickness of ice\
-      \  cloud by reflection method"
+    description: "ADEOS-II — L3B.COPIR/Cloud Optical Thickness of ice\  cloud by reflection method"
   adeos2-gli-1km-cloud-optical-thickness-of-ice-3007:
     aliases:
     - gli-1km-cloud-optical-thickness-of-ice-3007
     protocol: gportal
     short_name: '23013007'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.COPIE/Cloud Optical Thickness of ice\
-      \ cloud by emission method"
+    description: "ADEOS-II — L3B.COPIE/Cloud Optical Thickness of ice\ cloud by emission method"
   adeos2-gli-1km-cloud-optical-thickness-of-ice-3026:
     aliases:
     - gli-1km-cloud-optical-thickness-of-ice-3026
     protocol: gportal
     short_name: '23013026'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.COPIR/Cloud Optical Thickness\
-      \ of ice  cloud by reflection method"
+    description: "ADEOS-II — L3STAMAP.COPIR/Cloud Optical Thickness\ of ice  cloud by reflection method"
   adeos2-gli-1km-cloud-optical-thickness-of-ice-3027:
     aliases:
     - gli-1km-cloud-optical-thickness-of-ice-3027
     protocol: gportal
     short_name: '23013027'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.COPIE/Cloud Optical Thickness\
-      \ of ice cloud by emission method"
+    description: "ADEOS-II — L3STAMAP.COPIE/Cloud Optical Thickness\ of ice cloud by emission method"
   adeos2-gli-1km-cloud-optical-thickness-of-wat:
     aliases:
     - gli-1km-cloud-optical-thickness-of-wat
     protocol: gportal
     short_name: '23012006'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.COPWR/Cloud Optical Thickness of water\
-      \ cloud by reflection method"
+    description: "ADEOS-II — L2.COPWR/Cloud Optical Thickness of water\ cloud by reflection method"
   adeos2-gli-1km-cloud-optical-thickness-of-wat-3005:
     aliases:
     - gli-1km-cloud-optical-thickness-of-wat-3005
     protocol: gportal
     short_name: '23013005'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.COPWR/Cloud Optical Thickness of water\
-      \ cloud by reflection method"
+    description: "ADEOS-II — L3B.COPWR/Cloud Optical Thickness of water\ cloud by reflection method"
   adeos2-gli-1km-cloud-optical-thickness-of-wat-3025:
     aliases:
     - gli-1km-cloud-optical-thickness-of-wat-3025
     protocol: gportal
     short_name: '23013025'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.COPWR/Cloud Optical Thickness\
-      \ of water cloud by reflection method"
+    description: "ADEOS-II — L3STAMAP.COPWR/Cloud Optical Thickness\ of water cloud by reflection method"
   adeos2-gli-1km-cloud-top-height-of-water-clou:
     aliases:
     - gli-1km-cloud-top-height-of-water-clou
     protocol: gportal
     short_name: '23012011'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.CHTWR/Cloud Top Height of water cloude\
-      \ by emmission method"
+    description: "ADEOS-II — L2.CHTWR/Cloud Top Height of water cloude\ by emmission method"
   adeos2-gli-1km-cloud-top-height-of-water-clou-3010:
     aliases:
     - gli-1km-cloud-top-height-of-water-clou-3010
     protocol: gportal
     short_name: '23013010'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.CHTWR/Cloud Top Height of water cloude\
-      \ by emmission method"
+    description: "ADEOS-II — L3B.CHTWR/Cloud Top Height of water cloude\ by emmission method"
   adeos2-gli-1km-cloud-top-height-of-water-clou-3030:
     aliases:
     - gli-1km-cloud-top-height-of-water-clou-3030
     protocol: gportal
     short_name: '23013030'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.CHTWR/Cloud Top Height of water\
-      \ cloude by emmission method"
+    description: "ADEOS-II — L3STAMAP.CHTWR/Cloud Top Height of water\ cloude by emmission method"
   adeos2-gli-1km-cloud-top-temperature-of-ice-c:
     aliases:
     - gli-1km-cloud-top-temperature-of-ice-c
     protocol: gportal
     short_name: '23012010'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.CTTIE/Cloud Top Temperature of ice\
-      \ cloud by emission method"
+    description: "ADEOS-II — L2.CTTIE/Cloud Top Temperature of ice\ cloud by emission method"
   adeos2-gli-1km-cloud-top-temperature-of-ice-c-3009:
     aliases:
     - gli-1km-cloud-top-temperature-of-ice-c-3009
     protocol: gportal
     short_name: '23013009'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.CTTIE/Cloud Top Temperature of ice\
-      \ cloud by emission method"
+    description: "ADEOS-II — L3B.CTTIE/Cloud Top Temperature of ice\ cloud by emission method"
   adeos2-gli-1km-cloud-top-temperature-of-ice-c-3029:
     aliases:
     - gli-1km-cloud-top-temperature-of-ice-c-3029
     protocol: gportal
     short_name: '23013029'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.CTTIE/Cloud Top Temperature of\
-      \ ice cloud by emission method"
+    description: "ADEOS-II — L3STAMAP.CTTIE/Cloud Top Temperature of\ ice cloud by emission method"
   adeos2-gli-1km-cloud-top-temperature-of-water:
     aliases:
     - gli-1km-cloud-top-temperature-of-water
     protocol: gportal
     short_name: '23012009'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.CTTWR/Cloud Top Temperature of water\
-      \ cloud by reflection method"
+    description: "ADEOS-II — L2.CTTWR/Cloud Top Temperature of water\ cloud by reflection method"
   adeos2-gli-1km-cloud-top-temperature-of-water-3008:
     aliases:
     - gli-1km-cloud-top-temperature-of-water-3008
     protocol: gportal
     short_name: '23013008'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.CTTWR/Cloud Top Temperature of water\
-      \ cloud by reflection method"
+    description: "ADEOS-II — L3B.CTTWR/Cloud Top Temperature of water\ cloud by reflection method"
   adeos2-gli-1km-cloud-top-temperature-of-water-3028:
     aliases:
     - gli-1km-cloud-top-temperature-of-water-3028
     protocol: gportal
     short_name: '23013028'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.CTTWR/Cloud Top Temperature of\
-      \ water cloud by reflection method"
+    description: "ADEOS-II — L3STAMAP.CTTWR/Cloud Top Temperature of\ water cloud by reflection method"
   adeos2-gli-1km-day-night-separately-averaged:
     aliases:
     - gli-1km-day-night-separately-averaged
     protocol: gportal
     short_name: '23013038'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.STDN0/Sea Surface Temperature(day/night\
-      \ separately averaged)"
+    description: "ADEOS-II — L3STAMAP.STDN0/Sea Surface Temperature(day/night\ separately averaged)"
   adeos2-gli-1km-in-water-particles:
     aliases:
     - gli-1km-in-water-particles
     protocol: gportal
     short_name: '23012014'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.CSLR0/In-water Particles"
+    description: "ADEOS-II — L2.CSLR0/In-water Particles"
   adeos2-gli-1km-in-water-particles-3014:
     aliases:
     - gli-1km-in-water-particles-3014
     protocol: gportal
     short_name: '23013014'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.CS000/In-water Particles"
+    description: "ADEOS-II — L3B.CS000/In-water Particles"
   adeos2-gli-1km-land-and-cryosphere:
     aliases:
     - gli-1km-land-and-cryosphere
     protocol: gportal
     short_name: '23012021'
-    description: "ADEOS-II \xE2\u20AC\u201D L2A.L2ALC/Land and Cryosphere"
+    description: "ADEOS-II — L2A.L2ALC/Land and Cryosphere"
   adeos2-gli-1km-middle-and-thermal-infrared:
     aliases:
     - gli-1km-middle-and-thermal-infrared
     protocol: gportal
     short_name: '23011002'
-    description: "ADEOS-II \xE2\u20AC\u201D L1A.MTIR/Middle and thermal infrared"
+    description: "ADEOS-II — L1A.MTIR/Middle and thermal infrared"
   adeos2-gli-1km-middle-and-thermal-infrared-1006:
     aliases:
     - gli-1km-middle-and-thermal-infrared-1006
     protocol: gportal
     short_name: '23011006'
-    description: "ADEOS-II \xE2\u20AC\u201D L1B.MTIR/Middle and thermal infrared"
+    description: "ADEOS-II — L1B.MTIR/Middle and thermal infrared"
   adeos2-gli-1km-normalized-water-leaving-radia:
     aliases:
     - gli-1km-normalized-water-leaving-radia
     protocol: gportal
     short_name: '23013012'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.NW000/Normalized water-leaving radiance"
+    description: "ADEOS-II — L3B.NW000/Normalized water-leaving radiance"
   adeos2-gli-1km-normalized-water-leaving-radia-3032:
     aliases:
     - gli-1km-normalized-water-leaving-radia-3032
     protocol: gportal
     short_name: '23013032'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.NW000/Normalized water-leaving\
-      \ radiance"
+    description: "ADEOS-II — L3STAMAP.NW000/Normalized water-leaving\ radiance"
   adeos2-gli-1km-ocean-and-atmosphere:
     aliases:
     - gli-1km-ocean-and-atmosphere
     protocol: gportal
     short_name: '23012020'
-    description: "ADEOS-II \xE2\u20AC\u201D L2A.L2AOA/Ocean and Atmosphere"
+    description: "ADEOS-II — L2A.L2AOA/Ocean and Atmosphere"
   adeos2-gli-1km-precise-geometric-corrected-pa:
     aliases:
     - gli-1km-precise-geometric-corrected-pa
     protocol: gportal
     short_name: '23012017'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.PGCP0/Precise Geometric Corrected Parameter"
+    description: "ADEOS-II — L2.PGCP0/Precise Geometric Corrected Parameter"
   adeos2-gli-1km-sea-surface-temperature:
     aliases:
     - gli-1km-sea-surface-temperature
     protocol: gportal
     short_name: '23012015'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.STLR0/Sea Surface Temperature"
+    description: "ADEOS-II — L2.STLR0/Sea Surface Temperature"
   adeos2-gli-1km-sea-surface-temperature-3015:
     aliases:
     - gli-1km-sea-surface-temperature-3015
     protocol: gportal
     short_name: '23013015'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.ST000/Sea Surface Temperature"
+    description: "ADEOS-II — L3B.ST000/Sea Surface Temperature"
   adeos2-gli-1km-short-wavelength-infrared:
     aliases:
     - gli-1km-short-wavelength-infrared
     protocol: gportal
     short_name: '23011001'
-    description: "ADEOS-II \xE2\u20AC\u201D L1A.SWIR/Short-wavelength infrared"
+    description: "ADEOS-II — L1A.SWIR/Short-wavelength infrared"
   adeos2-gli-1km-short-wavelength-infrared-1005:
     aliases:
     - gli-1km-short-wavelength-infrared-1005
     protocol: gportal
     short_name: '23011005'
-    description: "ADEOS-II \xE2\u20AC\u201D L1B.SWIR/Short-wavelength infrared"
+    description: "ADEOS-II — L1B.SWIR/Short-wavelength infrared"
   adeos2-gli-1km-slpt:
     aliases:
     - gli-1km-slpt
     protocol: gportal
     short_name: '23011007'
-    description: "ADEOS-II \xE2\u20AC\u201D L1B.SLPT/ SLPT"
+    description: "ADEOS-II — L1B.SLPT/ SLPT"
   adeos2-gli-1km-snow-grain-size-retrieved-with:
     aliases:
     - gli-1km-snow-grain-size-retrieved-with
     protocol: gportal
     short_name: '23013016'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.SNWG0/Snow grain size retrieved with\
-      \ 865nm band"
+    description: "ADEOS-II — L3B.SNWG0/Snow grain size retrieved with\ 865nm band"
   adeos2-gli-1km-snow-grain-size-retrieved-with-3018:
     aliases:
     - gli-1km-snow-grain-size-retrieved-with-3018
     protocol: gportal
     short_name: '23013018'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.SNWGS/Snow grain size retrieved with\
-      \ 1640nm band"
+    description: "ADEOS-II — L3B.SNWGS/Snow grain size retrieved with\ 1640nm band"
   adeos2-gli-1km-snow-grain-size-retrieved-with-3041:
     aliases:
     - gli-1km-snow-grain-size-retrieved-with-3041
     protocol: gportal
     short_name: '23013041'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.SNWG0/Snow grain size retrieved\
-      \ with 865nm band"
+    description: "ADEOS-II — L3STAMAP.SNWG0/Snow grain size retrieved\ with 865nm band"
   adeos2-gli-1km-snow-grain-size-retrieved-with-3043:
     aliases:
     - gli-1km-snow-grain-size-retrieved-with-3043
     protocol: gportal
     short_name: '23013043'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.SNWGS/Snow grain size retrieved\
-      \ with 1640nm band"
+    description: "ADEOS-II — L3STAMAP.SNWGS/Snow grain size retrieved\ with 1640nm band"
   adeos2-gli-1km-snow-impurities:
     aliases:
     - gli-1km-snow-impurities
     protocol: gportal
     short_name: '23013017'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.SNWI0/Snow impurities"
+    description: "ADEOS-II — L3B.SNWI0/Snow impurities"
   adeos2-gli-1km-snow-impurities-3042:
     aliases:
     - gli-1km-snow-impurities-3042
     protocol: gportal
     short_name: '23013042'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.SNWI0/Snow impurities"
+    description: "ADEOS-II — L3STAMAP.SNWI0/Snow impurities"
   adeos2-gli-1km-snow-property:
     aliases:
     - gli-1km-snow-property
     protocol: gportal
     short_name: '23012019'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.SNGI0/Snow Property"
+    description: "ADEOS-II — L2.SNGI0/Snow Property"
   adeos2-gli-1km-snow-surface-temperature:
     aliases:
     - gli-1km-snow-surface-temperature
     protocol: gportal
     short_name: '23013019'
-    description: "ADEOS-II \xE2\u20AC\u201D L3B.SNWTS/Snow surface temperature"
+    description: "ADEOS-II — L3B.SNWTS/Snow surface temperature"
   adeos2-gli-1km-snow-surface-temperature-3044:
     aliases:
     - gli-1km-snow-surface-temperature-3044
     protocol: gportal
     short_name: '23013044'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.SNWTS/Snow surface temperature"
+    description: "ADEOS-II — L3STAMAP.SNWTS/Snow surface temperature"
   adeos2-gli-1km-suspended-solid-weight:
     aliases:
     - gli-1km-suspended-solid-weight
     protocol: gportal
     short_name: '23013035'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.SS000/Suspended solid weight"
+    description: "ADEOS-II — L3STAMAP.SS000/Suspended solid weight"
   adeos2-gli-1km-vegetation-index:
     aliases:
     - gli-1km-vegetation-index
     protocol: gportal
     short_name: '23012016'
-    description: "ADEOS-II \xE2\u20AC\u201D L2.VGI00/Vegetation Index"
+    description: "ADEOS-II — L2.VGI00/Vegetation Index"
   adeos2-gli-1km-vegetation-index-3040:
     aliases:
     - gli-1km-vegetation-index-3040
     protocol: gportal
     short_name: '23013040'
-    description: "ADEOS-II \xE2\u20AC\u201D L3STAMAP.VGI00/Vegetation index"
+    description: "ADEOS-II — L3STAMAP.VGI00/Vegetation index"
   adeos2-gli-1km-visible-and-near-infrared:
     aliases:
     - gli-1km-visible-and-near-infrared
     protocol: gportal
     short_name: '23011000'
-    description: "ADEOS-II \xE2\u20AC\u201D L1A.VNIR/Visible and near infrared"
+    description: "ADEOS-II — L1A.VNIR/Visible and near infrared"
   adeos2-gli-1km-visible-and-near-infrared-1004:
     aliases:
     - gli-1km-visible-and-near-infrared-1004
     protocol: gportal
     short_name: '23011004'
-    description: "ADEOS-II \xE2\u20AC\u201D L1B.VNIR/Visible and near infrared"
+    description: "ADEOS-II — L1B.VNIR/Visible and near infrared"
   adeos2-gli-250m-l1a:
     aliases:
     - gli-250m-l1a
     protocol: gportal
     short_name: '23021000'
-    description: "ADEOS-II \xE2\u20AC\u201D L1A"
+    description: "ADEOS-II — L1A"
   adeos2-gli-250m-l1b:
     aliases:
     - gli-250m-l1b
     protocol: gportal
     short_name: '23021001'
-    description: "ADEOS-II \xE2\u20AC\u201D L1B"
+    description: "ADEOS-II — L1B"

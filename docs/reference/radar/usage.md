@@ -16,7 +16,7 @@ Level-II volume carries every moment, so the whole volume is fetched and
 the list value is informational:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 lens = EarthLens(
     data_source="radar",                    # alias: "nexrad"

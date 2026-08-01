@@ -26,7 +26,7 @@ and a **`LicenseWarning`** is emitted when any `ODbL-1.0` rows are present:
 
 ```python
 import warnings
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 from earthlens.overture import LicenseWarning
 
 with warnings.catch_warnings(record=True) as caught:

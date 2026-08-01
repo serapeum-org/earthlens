@@ -68,8 +68,8 @@ The Copernicus EMS drought endpoint is **not a conformant OGC WCS server** —
 it is a REST shim. Only its `GetCoverage` operation is reliable; the
 standard `GetCapabilities` / `DescribeCoverage` discovery operations answer
 `502` / `400` (they require a non-standard `SELECTED_TIMESCALE` parameter),
-so pyramids' `Dataset.from_wcs` (which wraps GDAL's WCS driver and needs
-that discovery handshake) cannot read it.
+so pyramids' `Dataset.from_wcs` (whose underlying WCS driver needs that
+discovery handshake) cannot read it.
 
 Instead the backend builds the documented `GetCoverage` URL by hand with
 core `requests` and two Copernicus-custom parameters:
@@ -83,7 +83,7 @@ core `requests` and two Copernicus-custom parameters:
 plus a `SUBSET=Long(west,east)` / `SUBSET=Lat(south,north)` bbox and
 `CRS=EPSG:4326&format=GEOTIFF`. The response is streamed to disk and opened
 through `pyramids.dataset.Dataset.read_file` to validate it is a real
-raster — no `owslib`, no GDAL WCS driver, no `xarray`. When the server
+raster — no `owslib`, no WCS reader, no `xarray`. When the server
 rejects a request (e.g. a date outside an indicator's available coverage
 range, an HTTP 422), the Copernicus error message is surfaced verbatim.
 

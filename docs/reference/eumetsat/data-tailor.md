@@ -23,7 +23,7 @@ compose: tailor a product server-side, then reduce the result client-side.
 ## Usage
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 from earthlens.eumetsat import TailorConfig
 
 el = EarthLens(

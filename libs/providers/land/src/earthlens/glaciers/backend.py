@@ -31,7 +31,7 @@ pure pandas.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -45,6 +45,9 @@ from earthlens.base import (
 )
 from earthlens.glaciers import _helpers
 from earthlens.glaciers.catalog import Catalog, Dataset
+
+if TYPE_CHECKING:
+    from pyramids.feature.collection import FeatureCollection
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -341,7 +344,7 @@ class Glaciers(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-    ):
+    ) -> FeatureCollection | pd.DataFrame:
         """Fetch the dataset and return its per-instance shape.
 
         Args:

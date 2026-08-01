@@ -34,7 +34,7 @@ there is no SDK, no authentication, and no `pyramids` / array dependency (pure
 long-format frame tagged with `lat` / `lon` / `product`, and concatenates them.
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 df = EarthLens(
     data_source="pvgis",            # alias: "solar-pv"

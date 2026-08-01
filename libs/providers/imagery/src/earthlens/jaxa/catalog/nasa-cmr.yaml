@@ -10,314 +10,274 @@ datasets:
     - aqua-modis-aqua-aerosol-5-min-l2-sw
     protocol: gportal
     short_name: '28002002'
-    description: "NASA-CMR \xE2\u20AC\u201D Level2/MODIS/Aqua Aerosol 5-Min L2 Swath\
-      \ 3km"
+    description: "NASA-CMR — Level2/MODIS/Aqua Aerosol 5-Min L2 Swath\ 3km"
   nasacmr-aqua-modis-aqua-aerosol-5-min-l2-sw-2003:
     aliases:
     - aqua-modis-aqua-aerosol-5-min-l2-sw-2003
     protocol: gportal
     short_name: '28002003'
-    description: "NASA-CMR \xE2\u20AC\u201D Level2/MODIS/Aqua Aerosol 5-Min L2 Swath\
-      \ 10km"
+    description: "NASA-CMR — Level2/MODIS/Aqua Aerosol 5-Min L2 Swath\ 10km"
   nasacmr-aqua-modis-aqua-aerosol-cloud-water:
     aliases:
     - aqua-modis-aqua-aerosol-cloud-water
     protocol: gportal
     short_name: '28003013'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Aerosol Cloud Water\
-      \ Vapor Ozone Daily L3 Global 1Deg CMG"
+    description: "NASA-CMR — Level3/MODIS/Aqua Aerosol Cloud Water\ Vapor Ozone Daily L3 Global 1Deg CMG"
   nasacmr-aqua-modis-aqua-aerosol-cloud-water-3014:
     aliases:
     - aqua-modis-aqua-aerosol-cloud-water-3014
     protocol: gportal
     short_name: '28003014'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Aerosol Cloud Water\
-      \ Vapor Ozone 8-Day L3 Global 1Deg CMG"
+    description: "NASA-CMR — Level3/MODIS/Aqua Aerosol Cloud Water\ Vapor Ozone 8-Day L3 Global 1Deg CMG"
   nasacmr-aqua-modis-aqua-aerosol-cloud-water-3015:
     aliases:
     - aqua-modis-aqua-aerosol-cloud-water-3015
     protocol: gportal
     short_name: '28003015'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Aerosol Cloud Water\
-      \ Vapor Ozone Monthly L3 Global 1Deg CMG"
+    description: "NASA-CMR — Level3/MODIS/Aqua Aerosol Cloud Water\ Vapor Ozone Monthly L3 Global 1Deg CMG"
   nasacmr-aqua-modis-aqua-clouds-5-min-l2-swa:
     aliases:
     - aqua-modis-aqua-clouds-5-min-l2-swa
     protocol: gportal
     short_name: '28002004'
-    description: "NASA-CMR \xE2\u20AC\u201D Level2/MODIS/Aqua Clouds 5-Min L2 Swath\
-      \ 1km and 5km"
+    description: "NASA-CMR — Level2/MODIS/Aqua Clouds 5-Min L2 Swath\ 1km and 5km"
   nasacmr-aqua-modis-aqua-land-surface-temper:
     aliases:
     - aqua-modis-aqua-land-surface-temper
     protocol: gportal
     short_name: '28003000'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Land Surface Temperature/Emissivity\
-      \ Daily L3 Global 1km SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity\ Daily L3 Global 1km SIN Grid V006"
   nasacmr-aqua-modis-aqua-land-surface-temper-3001:
     aliases:
     - aqua-modis-aqua-land-surface-temper-3001
     protocol: gportal
     short_name: '28003001'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Land Surface Temperature/Emissivity\
-      \ 8-Day L3 Global 1km SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity\ 8-Day L3 Global 1km SIN Grid V006"
   nasacmr-aqua-modis-aqua-land-surface-temper-3002:
     aliases:
     - aqua-modis-aqua-land-surface-temper-3002
     protocol: gportal
     short_name: '28003002'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Land Surface Temperature/Emissivity\
-      \ Daily L3 Global 0.05Deg CMG V006"
+    description: "NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity\ Daily L3 Global 0.05Deg CMG V006"
   nasacmr-aqua-modis-aqua-land-surface-temper-3003:
     aliases:
     - aqua-modis-aqua-land-surface-temper-3003
     protocol: gportal
     short_name: '28003003'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Land Surface Temperature/Emissivity\
-      \ 8-Day L3 Global 0.05Deg CMG V006"
+    description: "NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity\ 8-Day L3 Global 0.05Deg CMG V006"
   nasacmr-aqua-modis-aqua-land-surface-temper-3004:
     aliases:
     - aqua-modis-aqua-land-surface-temper-3004
     protocol: gportal
     short_name: '28003004'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Land Surface Temperature/Emissivity\
-      \ Monthly L3 Global 0.05Deg CMG V006"
+    description: "NASA-CMR — Level3/MODIS/Aqua Land Surface Temperature/Emissivity\ Monthly L3 Global 0.05Deg CMG V006"
   nasacmr-aqua-modis-aqua-sea-surface-tempera:
     aliases:
     - aqua-modis-aqua-sea-surface-tempera
     protocol: gportal
     short_name: '28002000'
-    description: "NASA-CMR \xE2\u20AC\u201D Level2/MODIS/Aqua Sea Surface Temperature\
-      \ L2"
+    description: "NASA-CMR — Level2/MODIS/Aqua Sea Surface Temperature\ L2"
   nasacmr-aqua-modis-aqua-sea-surface-tempera-3011:
     aliases:
     - aqua-modis-aqua-sea-surface-tempera-3011
     protocol: gportal
     short_name: '28003011'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Sea Surface Temperature\
-      \ L3 Monthly"
+    description: "NASA-CMR — Level3/MODIS/Aqua Sea Surface Temperature\ L3 Monthly"
   nasacmr-aqua-modis-aqua-snow-cover-8-day-l3:
     aliases:
     - aqua-modis-aqua-snow-cover-8-day-l3
     protocol: gportal
     short_name: '28003017'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Snow Cover 8-Day L3\
-      \ Global 0.05Deg CMG V005"
+    description: "NASA-CMR — Level3/MODIS/Aqua Snow Cover 8-Day L3\ Global 0.05Deg CMG V005"
   nasacmr-aqua-modis-aqua-snow-cover-daily-l3:
     aliases:
     - aqua-modis-aqua-snow-cover-daily-l3
     protocol: gportal
     short_name: '28003016'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Snow Cover Daily L3\
-      \ Global 0.05Deg CMG V005"
+    description: "NASA-CMR — Level3/MODIS/Aqua Snow Cover Daily L3\ Global 0.05Deg CMG V005"
   nasacmr-aqua-modis-aqua-vegetation-indices:
     aliases:
     - aqua-modis-aqua-vegetation-indices
     protocol: gportal
     short_name: '28003005'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Vegetation Indices 16-Day\
-      \ L3 Global 500m SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day\ L3 Global 500m SIN Grid V006"
   nasacmr-aqua-modis-aqua-vegetation-indices-3006:
     aliases:
     - aqua-modis-aqua-vegetation-indices-3006
     protocol: gportal
     short_name: '28003006'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Vegetation Indices 16-Day\
-      \ L3 Global 1km SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day\ L3 Global 1km SIN Grid V006"
   nasacmr-aqua-modis-aqua-vegetation-indices-3007:
     aliases:
     - aqua-modis-aqua-vegetation-indices-3007
     protocol: gportal
     short_name: '28003007'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Vegetation Indices Monthly\
-      \ L3 Global 1km SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Aqua Vegetation Indices Monthly\ L3 Global 1km SIN Grid V006"
   nasacmr-aqua-modis-aqua-vegetation-indices-3008:
     aliases:
     - aqua-modis-aqua-vegetation-indices-3008
     protocol: gportal
     short_name: '28003008'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Vegetation Indices 16-Day\
-      \ L3 Global 0.05Deg CMG V006"
+    description: "NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day\ L3 Global 0.05Deg CMG V006"
   nasacmr-aqua-modis-aqua-vegetation-indices-3009:
     aliases:
     - aqua-modis-aqua-vegetation-indices-3009
     protocol: gportal
     short_name: '28003009'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Vegetation Indices Monthly\
-      \ L3 Global 0.05Deg CMG V006"
+    description: "NASA-CMR — Level3/MODIS/Aqua Vegetation Indices Monthly\ L3 Global 0.05Deg CMG V006"
   nasacmr-aqua-modis-aqua-vegetation-indices-3010:
     aliases:
     - aqua-modis-aqua-vegetation-indices-3010
     protocol: gportal
     short_name: '28003010'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Aqua Vegetation Indices 16-Day\
-      \ L3 Global 250m SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Aqua Vegetation Indices 16-Day\ L3 Global 250m SIN Grid V006"
   nasacmr-aqua-modisa-l2-ocean-color:
     aliases:
     - aqua-modisa-l2-ocean-color
     protocol: gportal
     short_name: '28002001'
-    description: "NASA-CMR \xE2\u20AC\u201D Level2/MODISA_L2_Ocean Color"
+    description: "NASA-CMR — Level2/MODISA_L2_Ocean Color"
   nasacmr-aqua-modisa-l3m-chlorophyll-a:
     aliases:
     - aqua-modisa-l3m-chlorophyll-a
     protocol: gportal
     short_name: '28003012'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODISA_L3m_Chlorophyll-a"
+    description: "NASA-CMR — Level3/MODISA_L3m_Chlorophyll-a"
   nasacmr-terra-modis-terra-aerosol-5-min-l2-s:
     aliases:
     - terra-modis-terra-aerosol-5-min-l2-s
     protocol: gportal
     short_name: '29002002'
-    description: "NASA-CMR \xE2\u20AC\u201D Level2/MODIS/Terra Aerosol 5-Min L2 Swath\
-      \ 3km"
+    description: "NASA-CMR — Level2/MODIS/Terra Aerosol 5-Min L2 Swath\ 3km"
   nasacmr-terra-modis-terra-aerosol-5-min-l2-s-2003:
     aliases:
     - terra-modis-terra-aerosol-5-min-l2-s-2003
     protocol: gportal
     short_name: '29002003'
-    description: "NASA-CMR \xE2\u20AC\u201D Level2/MODIS/Terra Aerosol 5-Min L2 Swath\
-      \ 10km"
+    description: "NASA-CMR — Level2/MODIS/Terra Aerosol 5-Min L2 Swath\ 10km"
   nasacmr-terra-modis-terra-aerosol-cloud-wate:
     aliases:
     - terra-modis-terra-aerosol-cloud-wate
     protocol: gportal
     short_name: '29003013'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Aerosol Cloud Water\
-      \ Vapor Ozone Daily L3 Global 1Deg CMG"
+    description: "NASA-CMR — Level3/MODIS/Terra Aerosol Cloud Water\ Vapor Ozone Daily L3 Global 1Deg CMG"
   nasacmr-terra-modis-terra-aerosol-cloud-wate-3014:
     aliases:
     - terra-modis-terra-aerosol-cloud-wate-3014
     protocol: gportal
     short_name: '29003014'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Aerosol Cloud Water\
-      \ Vapor Ozone 8-Day L3 Global 1Deg CMG"
+    description: "NASA-CMR — Level3/MODIS/Terra Aerosol Cloud Water\ Vapor Ozone 8-Day L3 Global 1Deg CMG"
   nasacmr-terra-modis-terra-aerosol-cloud-wate-3015:
     aliases:
     - terra-modis-terra-aerosol-cloud-wate-3015
     protocol: gportal
     short_name: '29003015'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Aerosol Cloud Water\
-      \ Vapor Ozone Monthly L3 Global 1Deg CMG"
+    description: "NASA-CMR — Level3/MODIS/Terra Aerosol Cloud Water\ Vapor Ozone Monthly L3 Global 1Deg CMG"
   nasacmr-terra-modis-terra-clouds-5-min-l2-sw:
     aliases:
     - terra-modis-terra-clouds-5-min-l2-sw
     protocol: gportal
     short_name: '29002004'
-    description: "NASA-CMR \xE2\u20AC\u201D Level2/MODIS/Terra Clouds 5-Min L2 Swath\
-      \ 1km and 5km"
+    description: "NASA-CMR — Level2/MODIS/Terra Clouds 5-Min L2 Swath\ 1km and 5km"
   nasacmr-terra-modis-terra-land-surface-tempe:
     aliases:
     - terra-modis-terra-land-surface-tempe
     protocol: gportal
     short_name: '29003000'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Land Surface Temperature/Emissivity\
-      \ Daily L3 Global 1km SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity\ Daily L3 Global 1km SIN Grid V006"
   nasacmr-terra-modis-terra-land-surface-tempe-3001:
     aliases:
     - terra-modis-terra-land-surface-tempe-3001
     protocol: gportal
     short_name: '29003001'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Land Surface Temperature/Emissivity\
-      \ 8-Day L3 Global 1km SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity\ 8-Day L3 Global 1km SIN Grid V006"
   nasacmr-terra-modis-terra-land-surface-tempe-3002:
     aliases:
     - terra-modis-terra-land-surface-tempe-3002
     protocol: gportal
     short_name: '29003002'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Land Surface Temperature/Emissivity\
-      \ Daily L3 Global 0.05Deg CMG V006"
+    description: "NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity\ Daily L3 Global 0.05Deg CMG V006"
   nasacmr-terra-modis-terra-land-surface-tempe-3003:
     aliases:
     - terra-modis-terra-land-surface-tempe-3003
     protocol: gportal
     short_name: '29003003'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Land Surface Temperature/Emissivity\
-      \ 8-Day L3 Global 0.05Deg CMG V006"
+    description: "NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity\ 8-Day L3 Global 0.05Deg CMG V006"
   nasacmr-terra-modis-terra-land-surface-tempe-3004:
     aliases:
     - terra-modis-terra-land-surface-tempe-3004
     protocol: gportal
     short_name: '29003004'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Land Surface Temperature/Emissivity\
-      \ Monthly L3 Global 0.05Deg CMG V006"
+    description: "NASA-CMR — Level3/MODIS/Terra Land Surface Temperature/Emissivity\ Monthly L3 Global 0.05Deg CMG V006"
   nasacmr-terra-modis-terra-snow-cover-8-day-l:
     aliases:
     - terra-modis-terra-snow-cover-8-day-l
     protocol: gportal
     short_name: '29003017'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Snow Cover 8-Day L3\
-      \ Global 0.05Deg CMG V005"
+    description: "NASA-CMR — Level3/MODIS/Terra Snow Cover 8-Day L3\ Global 0.05Deg CMG V005"
   nasacmr-terra-modis-terra-snow-cover-daily-l:
     aliases:
     - terra-modis-terra-snow-cover-daily-l
     protocol: gportal
     short_name: '29003016'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Snow Cover Daily L3\
-      \ Global 0.05Deg CMG V005"
+    description: "NASA-CMR — Level3/MODIS/Terra Snow Cover Daily L3\ Global 0.05Deg CMG V005"
   nasacmr-terra-modis-terra-vegetation-indices:
     aliases:
     - terra-modis-terra-vegetation-indices
     protocol: gportal
     short_name: '29003005'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Vegetation Indices\
-      \ 16-Day L3 Global 500m SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Terra Vegetation Indices\ 16-Day L3 Global 500m SIN Grid V006"
   nasacmr-terra-modis-terra-vegetation-indices-3006:
     aliases:
     - terra-modis-terra-vegetation-indices-3006
     protocol: gportal
     short_name: '29003006'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Vegetation Indices\
-      \ 16-Day L3 Global 1km SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Terra Vegetation Indices\ 16-Day L3 Global 1km SIN Grid V006"
   nasacmr-terra-modis-terra-vegetation-indices-3007:
     aliases:
     - terra-modis-terra-vegetation-indices-3007
     protocol: gportal
     short_name: '29003007'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Vegetation Indices\
-      \ Monthly L3 Global 1km SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Terra Vegetation Indices\ Monthly L3 Global 1km SIN Grid V006"
   nasacmr-terra-modis-terra-vegetation-indices-3008:
     aliases:
     - terra-modis-terra-vegetation-indices-3008
     protocol: gportal
     short_name: '29003008'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Vegetation Indices\
-      \ 16-Day L3 Global 0.05Deg CMG V006"
+    description: "NASA-CMR — Level3/MODIS/Terra Vegetation Indices\ 16-Day L3 Global 0.05Deg CMG V006"
   nasacmr-terra-modis-terra-vegetation-indices-3009:
     aliases:
     - terra-modis-terra-vegetation-indices-3009
     protocol: gportal
     short_name: '29003009'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Vegetation Indices\
-      \ Monthly L3 Global 0.05Deg CMG V006"
+    description: "NASA-CMR — Level3/MODIS/Terra Vegetation Indices\ Monthly L3 Global 0.05Deg CMG V006"
   nasacmr-terra-modis-terra-vegetation-indices-3010:
     aliases:
     - terra-modis-terra-vegetation-indices-3010
     protocol: gportal
     short_name: '29003010'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIS/Terra Vegetation Indices\
-      \ 16-Day L3 Global 250m SIN Grid V006"
+    description: "NASA-CMR — Level3/MODIS/Terra Vegetation Indices\ 16-Day L3 Global 250m SIN Grid V006"
   nasacmr-terra-modist-l2-oc:
     aliases:
     - terra-modist-l2-oc
     protocol: gportal
     short_name: '29002001'
-    description: "NASA-CMR \xE2\u20AC\u201D Level2/MODIST_L2_OC"
+    description: "NASA-CMR — Level2/MODIST_L2_OC"
   nasacmr-terra-modist-l2-sst:
     aliases:
     - terra-modist-l2-sst
     protocol: gportal
     short_name: '29002000'
-    description: "NASA-CMR \xE2\u20AC\u201D Level2/MODIST_L2_SST"
+    description: "NASA-CMR — Level2/MODIST_L2_SST"
   nasacmr-terra-modist-l3m-chl:
     aliases:
     - terra-modist-l3m-chl
     protocol: gportal
     short_name: '29003012'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIST_L3m_CHL"
+    description: "NASA-CMR — Level3/MODIST_L3m_CHL"
   nasacmr-terra-modist-l3m-sst:
     aliases:
     - terra-modist-l3m-sst
     protocol: gportal
     short_name: '29003011'
-    description: "NASA-CMR \xE2\u20AC\u201D Level3/MODIST_L3m_SST"
+    description: "NASA-CMR — Level3/MODIST_L3m_SST"

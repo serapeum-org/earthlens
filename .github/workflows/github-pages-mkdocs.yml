@@ -27,8 +27,45 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Gate every deploy on a warnings-as-errors build. The deploy action builds
+  # non-strict, so a broken nav entry, a dangling anchor or a malformed
+  # docstring would publish silently — this fails the run instead.
+  build-strict:
+    runs-on: ubuntu-latest
+    # Only reads the tree; the write scopes the workflow grants are for the
+    # deploy jobs, not for this one.
+    permissions:
+      contents: read
+    steps:
+    # No explicit ref: checkout's own default is what we want on every trigger,
+    # and it is the merge commit on a pull_request rather than the fork's head.
+    # Naming a ref from the event payload would put fork-controlled code into
+    # this job.
+    - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+
+    # The same setup the deploy jobs get. mkdocs-deploy calls this action
+    # internally with these inputs, so reusing it here keeps the gate and the
+    # deploy on one environment; installing the toolchain by hand would let the
+    # two drift and defeat the point of gating.
+    - uses: serapeum-org/github-actions/actions/python-setup/uv@bc6c376c15ffbfe4d9f46fe7e39b0c2e56302ca8  # uv/v1.2.0
+      with:
+        python-version: "3.12"
+        install-groups: "groups: docs"
+        version: "0.11.29"
+        verify-lock: false
+
+    # The setup action puts .venv on GITHUB_PATH, so call mkdocs straight from
+    # it. Going back through `uv run` would re-enter dependency resolution for a
+    # build whose environment is already installed.
+    - name: Build docs with --strict
+      run: mkdocs build --strict --site-dir /tmp/site
+
   deploy-pr:
       if: github.event_name == 'pull_request'
+      needs: build-strict
       runs-on: ubuntu-latest
       steps:
       - uses: actions/checkout@v5
@@ -45,6 +82,7 @@ jobs:
 
   deploy-main:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build-strict
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -62,6 +100,7 @@ jobs:
     if: >-
       github.event_name == 'release' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    needs: build-strict
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5

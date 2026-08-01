@@ -13,8 +13,7 @@ pip install earthlens[ecmwf]     # add a backend that needs an SDK
 pip install earthlens[all]       # everything
 ```
 
-See [Installation](installation.md) for the complete extras table and the GDAL
-note.
+See [Installation](installation.md) for the complete extras table.
 
 ## 2. Pick a backend
 
@@ -79,13 +78,19 @@ backend), e.g. `pyramids.dataset.Dataset.read_file(...)`.
 
 Any extra keyword not named by the facade is forwarded verbatim to the backend
 constructor — e.g. ECMWF's `skip_constraints=`, or GEE's `scale=` /
-`export_via=` / `reducer=`. (Credentials are not constructor keywords — they go
-to `authenticate(...)`; see each backend's reference page.)
+`export_via=` / `reducer=`. Credentials travel the same way for most backends
+(CMEMS's `service_username=`, WDPA's `token=`), while a few take theirs in
+`authenticate(...)` instead (GEE's `service_account=`, FIRMS's `api_key=`) —
+see each backend's reference page.
 
 ## Next steps
 
+- [Discovering datasets](discovery.md) — find which of the 48 providers has
+  what you need, with `sources()` / `find()` / `search()`.
 - [Temporal aggregation](aggregation.md) — reduce a downloaded stack into
   windowed composites (daily mean, monthly sum, …).
 - [Architecture](overview/architecture.md) — how the facade, backends, and
   catalogs fit together.
+- [Troubleshooting](troubleshooting.md) — when a download fails, and what to
+  change.
 - The **Examples** tab — a quickstart notebook for every backend.

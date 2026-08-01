@@ -28,7 +28,7 @@ export EARTHDATA_PASSWORD="••••"
 Find every Sentinel-1 SLC over a bbox and time window:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(
     data_source="asf",
@@ -136,7 +136,7 @@ pipeline — a temporal "mean across the stack" would not produce a
 useful artefact.
 
 ```python
->>> from earthlens.earthlens import EarthLens
+>>> from earthlens.core import EarthLens
 >>> from earthlens.aggregate import AggregationConfig
 >>> el = EarthLens(data_source="asf",
 ...                variables=["sentinel-1-slc"],

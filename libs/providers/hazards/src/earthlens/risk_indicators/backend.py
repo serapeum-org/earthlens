@@ -27,7 +27,7 @@ the parse uses no gridded-array dependency.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Literal, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -44,6 +44,9 @@ from earthlens.base import (
 from earthlens.risk_indicators import _helpers
 from earthlens.risk_indicators.auth import GfwAuth, GfwCredentials
 from earthlens.risk_indicators.catalog import Catalog, Dataset
+
+if TYPE_CHECKING:
+    from pyramids.feature.collection import FeatureCollection
 
 OutputFormat = Literal["csv", "parquet"]
 
@@ -336,7 +339,7 @@ class RiskIndicators(AbstractDataSource):
     def download(
         self,
         progress_bar: bool = True,
-    ):
+    ) -> pd.DataFrame | FeatureCollection:
         """Fetch the dataset and return its per-instance shape.
 
         Args:

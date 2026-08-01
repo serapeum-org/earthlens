@@ -149,6 +149,6 @@ The bbox is still used to **crop** the downloaded scene to your AOI.
   using pyramids `merge_rasters`).
 
 GOES geostationary imagery now downloads, warps to WGS84, and crops like any
-other dataset — the scan-angle grid is read from its GDAL NetCDF subdataset
+other dataset — the scan-angle grid is read from its NetCDF subdataset
 (`NETCDF:"<file>":<variable>`, carrying the CF `+proj=geos` grid-mapping) and
 reprojected with `to_crs(4326)`.

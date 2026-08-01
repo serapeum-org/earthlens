@@ -59,7 +59,7 @@ openEO is compute, not fetch, so the "catalog" has two layers (see
 A request names **either** a collection (plus optional bands) **or** a recipe:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # A recipe — its fixed graph runs server-side:
 EarthLens(

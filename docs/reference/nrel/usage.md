@@ -41,7 +41,7 @@ no email raises one naming `NREL_EMAIL`.
 | `"wtk"` | `data_source="wind-toolkit"` | WIND Toolkit hourly wind |
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 # Solar (NSRDB) — the default product
 solar = EarthLens(

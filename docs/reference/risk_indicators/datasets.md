@@ -8,7 +8,7 @@ a `pyramids.feature.collection.FeatureCollection`.
 List them live at any time:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 EarthLens.list_datasets("risk-indicators")
 ```

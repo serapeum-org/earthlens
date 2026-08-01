@@ -1516,12 +1516,12 @@ class EarthLens:
             tracks the backend's `OUTPUT_KIND`:
 
             * `"raster"` / `"mixed"` file-writers — the list of written
-              paths (`list[Path]`); GEE may also return export
-              destination strings / `TaskInfo` for async exports.
+                paths (`list[Path]`); GEE may also return export
+                destination strings / `TaskInfo` for async exports.
             * `"vector"` — an in-memory `FeatureCollection` (e.g. FDSN,
-              FIRMS, GDACS); radar returns a `GeoDataFrame`.
+                FIRMS, GDACS); radar returns a `GeoDataFrame`.
             * `"tabular"` — a `pandas.DataFrame` (e.g. OpenAQ,
-              USGS Water).
+                USGS Water).
 
             The legacy CHIRPS / ECMWF backends return their written
             `list[Path]` and also leave the files on disk under `path`.

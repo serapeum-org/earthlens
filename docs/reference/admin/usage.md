@@ -9,7 +9,7 @@ polygons in EPSG:4326. Reach it through the `EarthLens` facade with
 ## Selecting a dataset
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 fc = EarthLens(
     data_source="admin",

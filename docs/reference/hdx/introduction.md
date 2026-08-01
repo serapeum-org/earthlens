@@ -47,7 +47,7 @@ Because the result is files-as-is, the aggregator does not apply: the
 `HDX` is registered under the `"hdx"` key:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="hdx",

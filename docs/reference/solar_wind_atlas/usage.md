@@ -9,7 +9,7 @@ needs no credentials (both atlases are CC-BY-4.0). See
 ## A wind + solar subset
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="solar-wind-atlas",

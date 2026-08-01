@@ -40,6 +40,7 @@ import os
 import re
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, SecretStr
 
@@ -312,7 +313,7 @@ class EumetsatAuth(AbstractAuth[EumetsatCredentials]):
             # than forcing a re-mint. Genuinely unexpected errors propagate.
             return True
 
-    def datastore(self):
+    def datastore(self) -> Any:
         """Return an `eumdac.DataStore` bound to the live token.
 
         Returns:
@@ -333,7 +334,7 @@ class EumetsatAuth(AbstractAuth[EumetsatCredentials]):
             )
         return eumdac.DataStore(self._token)
 
-    def datatailor(self):
+    def datatailor(self) -> Any:
         """Return an `eumdac.DataTailor` bound to the live token.
 
         Used by the Data Tailor (server-side subset / reproject / reformat)

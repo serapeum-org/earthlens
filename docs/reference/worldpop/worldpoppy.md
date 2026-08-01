@@ -47,7 +47,7 @@ WorldPopPy is **MPL-2.0** and requires **Python ≥3.10**. Without the extra,
 ## Usage
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 EarthLens(
     data_source="worldpop",

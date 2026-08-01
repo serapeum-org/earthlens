@@ -116,6 +116,12 @@ repos:
     hooks:
       - id: nbstripout
         name: "[ipynb - format] strip notebook outputs"
+        # The showcase notebooks are the exception: their point is the rendered
+        # result — an embedded animation or a plotted series — and they need
+        # credentials the docs build does not have, so the build cannot
+        # regenerate what it strips. Everything else is stripped, because those
+        # notebooks are reproducible from a plain install.
+        exclude: ^docs/examples/showcases?/.*\.ipynb$
 
   # The local hooks below run inside the uv `dev` group of the workspace venv.
   # `uv run --active` targets the active env (on this machine the off-Drive uv venv

@@ -4,15 +4,38 @@
 
 Please install earthlens in a virtual environment so that its requirements don't tamper with your system's Python.
 
+### pip
+
+The simplest way to install `earthlens` is from PyPI:
+
+```bash
+pip install earthlens
+```
+
+That pulls in every runtime dependency. Add the backend extras you need (see
+[Available extras](#available-extras)) and you can skip the rest of these
+instructions.
+
 ### conda
 
-The easiest way to install `earthlens` is using the `conda` package manager. `earthlens` is available in the [conda-forge](https://conda-forge.org) channel:
+`earthlens` is also on the [conda-forge](https://conda-forge.org) channel:
 
 ```bash
 conda install -c conda-forge earthlens
 ```
 
-If this works, it will install earthlens with all dependencies including Python and GDAL, and you can skip the rest of the installation instructions.
+!!! warning "conda-forge can lag behind PyPI"
+    The feedstock is updated separately from the PyPI release, so the conda
+    channel is sometimes a release or two behind — which matters, because the
+    public import moved to `earthlens.core` in 0.11.0 and 0.12.0 carried
+    further breaking changes (see the [migration guide](migration.md)). Check
+    what the channel actually offers before relying on it:
+
+    ```bash
+    conda search earthlens --channel conda-forge
+    ```
+
+    If it is behind, install from PyPI instead.
 
 ### uv
 
@@ -22,21 +45,22 @@ You can also use [uv](https://docs.astral.sh/uv/) to manage the environment:
 uv add earthlens
 ```
 
-### Installing Python and GDAL dependencies
+### Installing Python
 
-The main dependencies for earthlens are Python 3.11+ and GDAL.
+earthlens requires Python 3.11+.
 
 For Python we recommend using the [Anaconda Distribution](https://www.anaconda.com/download/) for Python 3.
 
 ### Install as a conda environment
 
-The easiest and most robust way to install earthlens is in a separate conda environment. In the root repository directory there is an `environment.yml` file that lists all dependencies:
+To keep earthlens isolated from other projects, create a dedicated conda
+environment for it:
 
 ```bash
-conda env create -f environment.yml
+conda create -n earthlens python=3.12
 ```
 
-This creates a new environment with the name `earthlens`. To activate it:
+Then activate it:
 
 ```bash
 conda activate earthlens
@@ -243,18 +267,19 @@ unreleased version whose members are not on PyPI yet, and pip cannot install a
 workspace's sibling packages out of a single git URL. Clone the repository and
 use the editable workspace install above.
 
-Now you should be able to start Python and try `import earthlens` to verify the installation.
+To verify the installation, import from `earthlens.core` and print the version:
+
+```bash
+python -c "from earthlens.core import __version__; print(__version__)"
+```
+
+A bare `import earthlens` is **not** a useful check — `earthlens` is a PEP 420
+namespace package, so that import succeeds even when nothing is installed.
 
 ## Install using pip
 
-Besides the recommended conda environment setup, you can also install earthlens with `pip`. For the more difficult to install Python dependencies, it is best to use conda:
-
-```bash
-conda install numpy scipy gdal pyproj
-```
-
-Then install earthlens with pip, picking the backend extras you
-need (see "From PyPI" above for the available extras):
+Install earthlens with pip, picking the backend extras you
+need (see [Available extras](#available-extras) for the full list):
 
 ```bash
 pip install earthlens[ecmwf]

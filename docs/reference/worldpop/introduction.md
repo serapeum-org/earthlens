@@ -60,7 +60,7 @@ per-year raster stack across years — see [Usage](usage.md)).
 ## How it maps onto the facade
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="worldpop",          # or the "world-pop" alias

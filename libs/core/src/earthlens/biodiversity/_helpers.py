@@ -24,12 +24,15 @@ import datetime as dt
 import warnings
 from collections.abc import Iterable, Mapping
 from email.utils import parsedate_to_datetime
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import geopandas as gpd
 import pandas as pd
 from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import Point, box
+
+if TYPE_CHECKING:
+    from earthlens.base import SpatialExtent
 
 #: WGS84 — the CRS every occurrence/area FeatureCollection in the cluster carries.
 CRS = "EPSG:4326"
@@ -70,7 +73,7 @@ class LicenseWarning(UserWarning):
     """
 
 
-def wkt_from_bbox(space) -> str:
+def wkt_from_bbox(space: SpatialExtent) -> str:
     """Build a counter-clockwise WKT polygon from a spatial extent's bbox.
 
     `SpatialExtent` exposes the bbox edges as `.west/.south/.east/.north` but

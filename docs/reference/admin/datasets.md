@@ -7,7 +7,7 @@ Pass one (or more) as `variables=`. Every dataset returns a
 List them live at any time:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 EarthLens.list_datasets("admin")
 ```

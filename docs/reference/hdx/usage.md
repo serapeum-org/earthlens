@@ -6,7 +6,7 @@ HDX has no bbox/time query, so the request is a mapping from a curated
 **dataset key** to a list of **resource filters**:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 paths = EarthLens(
     data_source="hdx",

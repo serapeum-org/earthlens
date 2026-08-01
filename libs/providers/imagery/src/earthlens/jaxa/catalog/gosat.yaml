@@ -11,4 +11,4 @@ datasets:
     - amsr3
     protocol: gportal
     short_name: '31001001'
-    description: "GOSAT-GW/AMSR3 \xE2\u20AC\u201D L1B - Brightness Temperature (TBB)"
+    description: "GOSAT-GW/AMSR3 — L1B - Brightness Temperature (TBB)"

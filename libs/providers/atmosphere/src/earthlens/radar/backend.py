@@ -30,7 +30,7 @@ from __future__ import annotations
 import datetime as dt
 from functools import partial
 from pathlib import Path
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from tqdm import tqdm
 
@@ -41,6 +41,9 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.radar.catalog import Catalog, Station
+
+if TYPE_CHECKING:
+    import geopandas as gpd
 
 #: The unsigned AWS bucket holding the real-time Level-II chunk feed.
 BUCKET = "unidata-nexrad-level2-chunks"
@@ -403,7 +406,7 @@ class Radar(AbstractDataSource):
         self,
         progress_bar: bool = True,
         errors: str = "warn",
-    ):
+    ) -> gpd.GeoDataFrame:
         """Assemble the in-window volumes and return a `GeoDataFrame` inventory.
 
         Args:

@@ -6,7 +6,7 @@ A request is a `variables` mapping of `{collection_key: [asset, ...]}` plus a
 bbox and a date window:
 
 ```python
-from earthlens.earthlens import EarthLens
+from earthlens.core import EarthLens
 
 el = EarthLens(
     data_source="earth-search",          # endpoint alias (pre-binds endpoint=)

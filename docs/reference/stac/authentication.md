@@ -27,9 +27,9 @@ EarthLens(data_source="planetary-computer",
           variables={"sentinel-2-l2a": ["B04", "B08"]}, ...)
 ```
 
-The token rides in the URL, not in a header — this is deliberate, because GDAL
-forwards bearer headers across the cross-host redirects MPC blob URLs use, which
-would leak a bearer token.
+The token rides in the URL, not in a header — this is deliberate, because the
+asset reader forwards bearer headers across the cross-host redirects MPC blob
+URLs use, which would leak a bearer token.
 
 ## CDSE — S3 credentials
 
@@ -53,7 +53,7 @@ EarthLens(data_source="cdse",
 
 Resolution order is **kwarg → env var**. If neither supplies both halves, an
 `AuthenticationError` is raised naming the dashboard URL. The credentials are
-exposed to GDAL via the asset-read environment (`AWS_S3_ENDPOINT`,
+exposed to the asset reader through the environment (`AWS_S3_ENDPOINT`,
 `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, …), never as an `Authorization`
 header.
 
@@ -64,7 +64,7 @@ though their endpoint is otherwise anonymous — e.g. Earth Search's
 `landsat-c2-l2` resolves to `s3://usgs-landsat`. The catalog marks these with a
 per-collection `signer: aws-requester-pays`, so the backend reads them with the
 requester-pays signer (sets `AWS_REQUEST_PAYER=requester` and rewrites the
-`s3://` href to GDAL's `/vsis3/` path). **You must have valid AWS credentials**
+`s3://` href to a virtual `/vsis3/` path). **You must have valid AWS credentials**
 in the environment (`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`, or an
 instance role) — the requester (you) pays the egress. Without them the read
 fails with an S3 `403`.
