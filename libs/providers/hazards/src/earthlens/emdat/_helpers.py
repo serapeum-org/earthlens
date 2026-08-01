@@ -9,6 +9,7 @@ module owns the shaping.
 
 from __future__ import annotations
 
+import warnings
 import zipfile
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -20,6 +21,16 @@ if TYPE_CHECKING:
 
     from earthlens.base import HttpClient
     from earthlens.emdat.catalog import Dataset
+
+
+class UngeocodedRowsWarning(UserWarning):
+    """A bounding box discarded rows the source never gave coordinates for.
+
+    Raised rather than returned quietly because the drop is a property of the
+    source, not of the request: the EM-DAT archive geocodes roughly one event
+    in ten, so a bbox on it silently removes most of the table.
+    """
+
 
 #: CRS of every EM-DAT / GDIS coordinate: plain lon/lat degrees.
 CRS: str = "EPSG:4326"
@@ -136,6 +147,15 @@ def extract_member(archive: Path, member: str, dest_dir: Path) -> Path:
     extracted = dest_dir / member
     if extracted != target:
         extracted.replace(target)
+        # A member stored under a directory leaves that directory behind
+        # once the file is moved out of it.
+        for parent in extracted.parents:
+            if parent == dest_dir or not parent.is_dir():
+                break
+            try:
+                parent.rmdir()
+            except OSError:
+                break
     return target
 
 
@@ -247,6 +267,10 @@ def filter_frame(
 
     Returns:
         pandas.DataFrame: The surviving rows, with the original index reset.
+
+    Warns:
+        UngeocodedRowsWarning: When a `bbox` discards rows that carry no
+            coordinates at all.
     """
     mask = pd.Series(True, index=frame.index)
 
@@ -268,10 +292,25 @@ def filter_frame(
             mask &= (years <= last).fillna(False)
 
     lat_col, lon_col = dataset.latitude_column, dataset.longitude_column
-    if bbox and lat_col in frame.columns and lon_col in frame.columns:
+    if bbox and lat_col and lon_col and {lat_col, lon_col} <= set(frame.columns):
         min_lon, min_lat, max_lon, max_lat = bbox
         lats = pd.to_numeric(frame[lat_col], errors="coerce")
         lons = pd.to_numeric(frame[lon_col], errors="coerce")
+        located = lats.notna() & lons.notna()
+        # A source may geocode only a fraction of its rows — the EM-DAT archive
+        # carries coordinates for about one event in ten. A bbox can only ever
+        # match a located row, so an unqualified spatial filter silently drops
+        # the rest. Say so, rather than returning a suspiciously small table.
+        ungeocoded = int((~located).sum())
+        if ungeocoded:
+            warnings.warn(
+                f"{dataset.id}: {ungeocoded} of {len(frame)} row(s) carry no "
+                f"coordinates in {lat_col!r}/{lon_col!r} and cannot satisfy a "
+                "bounding box, so they were dropped. Omit lat_lim/lon_lim to "
+                "keep them, or filter by country= instead.",
+                UngeocodedRowsWarning,
+                stacklevel=2,
+            )
         mask &= (
             lats.between(min_lat, max_lat) & lons.between(min_lon, max_lon)
         ).fillna(False)
@@ -294,12 +333,23 @@ def points_to_feature_collection(
     Returns:
         FeatureCollection: Point features in `EPSG:4326`, carrying every
             non-coordinate attribute.
+
+    Raises:
+        ValueError: If the row does not name both coordinate columns, or the
+            table does not carry them.
     """
     import geopandas as gpd
     from pyramids.feature.collection import FeatureCollection
 
-    lats = pd.to_numeric(frame[dataset.latitude_column], errors="coerce")
-    lons = pd.to_numeric(frame[dataset.longitude_column], errors="coerce")
+    lat_col, lon_col = dataset.latitude_column, dataset.longitude_column
+    if not lat_col or not lon_col or not {lat_col, lon_col} <= set(frame.columns):
+        raise ValueError(
+            f"{dataset.id} cannot build point features: it names coordinate "
+            f"columns {lat_col!r}/{lon_col!r}, which are not both in the table "
+            f"(columns present: {list(frame.columns)})."
+        )
+    lats = pd.to_numeric(frame[lat_col], errors="coerce")
+    lons = pd.to_numeric(frame[lon_col], errors="coerce")
     usable = lats.notna() & lons.notna()
     rows = frame[usable].reset_index(drop=True)
     geometry = gpd.points_from_xy(lons[usable], lats[usable])

@@ -443,9 +443,15 @@ class EMDAT(AbstractDataSource):
             ValueError: If the named granule is not in the CMR collection.
         """
         dataset = self._dataset
-        local = self.root_dir / cast("str", dataset.granule)
+        # Reuse whatever a previous run left behind. earthaccess does not
+        # guarantee the catalogued file name, so fall back to the extracted
+        # member before deciding a re-download is needed.
+        local = self.root_dir / Path(cast("str", dataset.granule)).name
         if local.exists():
             return local
+        extracted = self.root_dir / Path(cast("str", dataset.member)).name
+        if extracted.exists():
+            return extracted
 
         self._warn_if_large()
         self.authenticate()
@@ -463,7 +469,9 @@ class EMDAT(AbstractDataSource):
                 "may have been re-issued; update `granule:` in the EM-DAT catalog."
             )
         logger.info(f"EMDAT {dataset.id}: downloading {dataset.granule}.")
-        fetched = earthaccess.download(wanted[:1], local_path=str(self.root_dir))
+        fetched = earthaccess.download(
+            wanted[:1], local_path=str(self.root_dir), show_progress=self._progress
+        )
         # Trust what the downloader reports rather than assuming it used the
         # catalogued file name, and fail loudly here instead of at unzip time.
         paths = [Path(item) for item in (fetched or []) if item]
@@ -606,7 +614,7 @@ class EMDAT(AbstractDataSource):
             "derivative database from it, so treat this result as fetched for "
             f"you alone. See {dataset.terms_url}.",
             LicenseWarning,
-            stacklevel=4,
+            stacklevel=3,
         )
 
     def _log_citation(self) -> None:

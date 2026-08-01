@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 import zipfile
 from pathlib import Path
 from typing import Any
@@ -125,6 +126,16 @@ class TestExtractMember:
         """A missing member names what the archive actually holds."""
         with pytest.raises(ValueError, match="codebook"):
             _helpers.extract_member(gdis_csv_zip, "absent.csv", tmp_path)
+
+    def test_nested_member_leaves_no_empty_directory(self, tmp_path: Path) -> None:
+        """Flattening a nested member cleans up the directory it came from."""
+        archive = tmp_path / "nested2.zip"
+        with zipfile.ZipFile(archive, "w") as bundle:
+            bundle.writestr("inner/data.csv", "a,b\n1,2\n")
+        dest = tmp_path / "out2"
+        dest.mkdir()
+        _helpers.extract_member(archive, "inner/data.csv", dest)
+        assert not (dest / "inner").exists()
 
     def test_nested_member_is_flattened(self, tmp_path: Path) -> None:
         """A member stored under a directory still lands directly in dest."""
@@ -271,6 +282,24 @@ class TestFilterFrame:
         )
         assert 5 not in set(out["id"])
 
+    def test_bbox_warns_about_ungeocoded_rows(self, gdis_csv_frame, points_row) -> None:
+        """A bbox that discards uncoordinated rows says so rather than hiding it."""
+        with pytest.warns(_helpers.UngeocodedRowsWarning, match="cannot satisfy"):
+            _helpers.filter_frame(
+                gdis_csv_frame, points_row, bbox=(-180.0, -90.0, 180.0, 90.0)
+            )
+
+    def test_bbox_does_not_warn_when_every_row_is_located(
+        self, gdis_csv_frame, points_row
+    ) -> None:
+        """A fully-geocoded table triggers no warning."""
+        located = gdis_csv_frame.dropna(subset=["latitude", "longitude"])
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", _helpers.UngeocodedRowsWarning)
+            _helpers.filter_frame(
+                located, points_row, bbox=(-180.0, -90.0, 180.0, 90.0)
+            )
+
     def test_filters_compose(self, gdis_csv_frame, points_row) -> None:
         """Several filters narrow the result together."""
         out = _helpers.filter_frame(
@@ -322,6 +351,13 @@ class TestPointsToFeatureCollection:
         """Every non-coordinate attribute rides along."""
         collection = _helpers.points_to_feature_collection(gdis_csv_frame, points_row)
         assert {"disasterno", "country", "adm1"} <= set(collection.columns)
+
+    def test_missing_coordinate_columns_is_an_error(self, points_row) -> None:
+        """A table without the named coordinates cannot become points."""
+        with pytest.raises(ValueError, match="cannot build point features"):
+            _helpers.points_to_feature_collection(
+                pd.DataFrame({"other": [1]}), points_row
+            )
 
     def test_empty_input_yields_empty_collection(
         self, gdis_csv_frame, points_row

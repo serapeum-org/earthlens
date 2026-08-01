@@ -134,10 +134,11 @@ datasets:
 
 # Disaster-type vocabularies, in canonical (lower-case, stripped) form. Every
 # dataset row names the one it validates `hazard=` against, because the two
-# sources do NOT share a vocabulary: GDIS geocoded only a subset of EM-DAT's
-# natural hazards, while the archive additionally carries the whole
-# technological group. Validating an archive request against the GDIS list
-# would reject perfectly valid EM-DAT types.
+# sources do NOT share a vocabulary, and neither list contains the other:
+# GDIS has 'landslide', which EM-DAT files under mass movement instead, while
+# the archive carries the whole technological group GDIS never geocoded.
+# Validating an archive request against the GDIS list would reject perfectly
+# valid EM-DAT types.
 #
 # The shipped data is not clean: the GDIS GeoPackage spells one value
 # "extreme temperature " with a trailing space, while the Earth Engine mirror

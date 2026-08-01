@@ -9,7 +9,8 @@ transport detail needed to fetch it.
 loads the bundled `emdat_data_catalog.yaml` and exposes each row as a
 :class:`Dataset`. The YAML also ships a `hazard_vocabularies:` block — one
 canonical disaster-type list per source — which :meth:`Catalog.normalize_hazard`
-uses to turn a caller's spelling into the canonical one for a given dataset. Resolve one dataset with
+uses to turn a caller's spelling into the canonical one for a given dataset.
+Resolve one dataset with
 :meth:`Catalog.get` (a did-you-mean hint on an unknown id); list the shipped ids
 with :meth:`Catalog.available`.
 
@@ -33,8 +34,8 @@ CATALOG_PATH: Path = Path(__file__).parent / "emdat_data_catalog.yaml"
 
 #: Module-level cache of parsed catalog data, keyed on the resolved path plus
 #: the YAML's `st_mtime_ns`, so editing the file invalidates the entry without
-#: re-parsing on every `Catalog()`. The value is the `(datasets, hazard_types)`
-#: pair both fields are built from.
+#: re-parsing on every `Catalog()`. The value is the
+#: `(datasets, hazard_vocabularies)` pair both fields are built from.
 _CATALOG_CACHE: dict[
     tuple[str, int], tuple[dict[str, Dataset], dict[str, tuple[str, ...]]]
 ] = CatalogParseCache()
@@ -153,8 +154,9 @@ class Dataset(BaseModel):
         type_column: Column holding the disaster type.
         hazard_vocabulary: Name of the `hazard_vocabularies:` entry this
             dataset validates `hazard=` against. The two sources do not
-            share a vocabulary — GDIS geocoded a subset of EM-DAT's natural
-            hazards, while the archive also carries the technological group.
+            share a vocabulary and neither list contains the other — GDIS has
+            `landslide`, EM-DAT files that under mass movement, and the archive
+            carries the technological group GDIS lacks.
         iso_column: Column holding the ISO3 country code, when present.
         year_column: Column holding the event year (`"year"` for the GDIS CSV,
             `"Start Year"` for the EM-DAT archive). `None` for the GDIS
@@ -334,7 +336,7 @@ class Catalog(AbstractCatalog):
             dict[str, Any]: The `datasets` and `hazard_types` read from the
                 bundled catalog.
         """
-        loaded = Catalog.load()
+        loaded = cls.load()
         return {
             "datasets": loaded.datasets,
             "hazard_vocabularies": loaded.hazard_vocabularies,
@@ -409,8 +411,9 @@ class Catalog(AbstractCatalog):
         """Turn a caller's hazard spelling into the canonical one for `dataset`.
 
         Validation is per dataset, because the two sources do not share a
-        vocabulary: GDIS geocoded only a subset of EM-DAT's natural hazards,
-        while the archive also carries the whole technological group. Checking
+        vocabulary. The two lists overlap but neither contains the other: GDIS
+        has `landslide`, which EM-DAT files under mass movement, and the archive
+        carries the whole technological group GDIS lacks. Checking
         an archive request against the GDIS list would reject valid EM-DAT
         types such as `"wildfire"` or `"industrial accident (general)"`.
 
