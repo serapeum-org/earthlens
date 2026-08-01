@@ -79,7 +79,7 @@ datasets:
         units: unknown
   cems-glofas-seasonal:
     endpoint: ewds
-    request_kind: seasonal
+    request_kind: form
     variables:
       river-discharge-in-the-last-24-hours:
         cds_variable: river_discharge_in_the_last_24_hours

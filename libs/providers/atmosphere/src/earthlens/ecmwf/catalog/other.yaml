@@ -1636,7 +1636,7 @@ datasets:
         units: Gt
   derived-reanalysis-energy-moisture-budget:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       divergence-of-vertical-integral-of-latent-heat-flux:
         cds_variable: divergence_of_vertical_integral_of_latent_heat_flux
@@ -1800,7 +1800,7 @@ datasets:
         units: unknown
   insitu-gridded-observations-global-and-regional:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       temperature:
         cds_variable: temperature
@@ -2440,7 +2440,7 @@ datasets:
         units: unknown
   projections-cmip6:
     endpoint: cds
-    request_kind: cams_inversion
+    request_kind: form
     variables:
       air-temperature:
         cds_variable: air_temperature
@@ -2648,7 +2648,7 @@ datasets:
         units: unknown
   projections-cmip6-decadal-prototype:
     endpoint: cds
-    request_kind: cams_inversion
+    request_kind: form
     variables:
       near-surface-air-temperature:
         cds_variable: near_surface_air_temperature
@@ -4064,7 +4064,7 @@ datasets:
         units: unknown
   sis-energy-derived-reanalysis:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       wind-speed-at-100m:
         cds_variable: wind_speed_at_100m
@@ -4116,7 +4116,7 @@ datasets:
         units: unknown
   sis-energy-global-reanalysis:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       2m-temperature:
         cds_variable: 2m_temperature
@@ -4216,7 +4216,7 @@ datasets:
         units: unknown
   sis-energy-pecd:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       100m-wind-speed:
         cds_variable: 100m_wind_speed
@@ -4376,7 +4376,7 @@ datasets:
         units: unknown
   sis-european-wind-storm-synthetic-events:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       wind-speed-of-gusts:
         cds_variable: wind_speed_of_gusts
@@ -4568,7 +4568,7 @@ datasets:
         units: unknown
   sis-hydrology-europe-seasonal-reforecast:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       2m-temperature:
         cds_variable: 2m_temperature
@@ -4708,7 +4708,7 @@ datasets:
         units: unknown
   sis-hydrology-variables-derived-seasonal-forecast:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       river-discharge:
         cds_variable: river_discharge
@@ -4740,7 +4740,7 @@ datasets:
         units: unknown
   sis-hydrology-variables-derived-seasonal-reforecast:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       river-discharge:
         cds_variable: river_discharge
@@ -4772,7 +4772,7 @@ datasets:
         units: unknown
   sis-marine-properties:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       apparent-oxygen-utilisation:
         cds_variable: apparent_oxygen_utilisation
@@ -4868,7 +4868,7 @@ datasets:
         units: unknown
   sis-ocean-wave-timeseries:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       Mean wave direction:
         cds_variable: Mean wave direction
@@ -4932,7 +4932,7 @@ datasets:
         units: unknown
   sis-tourism-snow-indicators:
     endpoint: cds
-    request_kind: seasonal
+    request_kind: form
     variables:
       start-of-the-longest-period-with-groomed-snow:
         cds_variable: start_of_the_longest_period_with_groomed_snow
@@ -5128,7 +5128,7 @@ datasets:
         units: unknown
   sis-water-level-change-timeseries-cmip6:
     endpoint: cds
-    request_kind: cams_inversion
+    request_kind: form
     variables:
       mean-sea-level:
         cds_variable: mean_sea_level

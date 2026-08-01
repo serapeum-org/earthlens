@@ -118,7 +118,7 @@ datasets:
         units: unknown
   cams-global-emission-inventories:
     endpoint: ads
-    request_kind: seasonal
+    request_kind: form
     variables:
       acetaldehyde:
         cds_variable: acetaldehyde
@@ -710,7 +710,7 @@ datasets:
         units: unknown
   cams-global-ghg-reanalysis-egg4-monthly:
     endpoint: ads
-    request_kind: seasonal
+    request_kind: form
     variables:
       snow-albedo:
         cds_variable: snow_albedo
@@ -1094,7 +1094,7 @@ datasets:
         units: unknown
   cams-global-radiative-forcing-auxilliary-variables:
     endpoint: ads
-    request_kind: seasonal
+    request_kind: form
     variables:
       aerosol-radiation-effect:
         cds_variable: aerosol_radiation_effect
@@ -1110,7 +1110,7 @@ datasets:
         units: unknown
   cams-global-radiative-forcings:
     endpoint: ads
-    request_kind: seasonal
+    request_kind: form
     variables:
       radiative-forcing-of-carbon-dioxide:
         cds_variable: radiative_forcing_of_carbon_dioxide
@@ -1138,7 +1138,7 @@ datasets:
         units: unknown
   cams-global-reanalysis-eac4-monthly:
     endpoint: ads
-    request_kind: seasonal
+    request_kind: form
     variables:
       2m-dewpoint-temperature:
         cds_variable: 2m_dewpoint_temperature
@@ -1466,7 +1466,7 @@ datasets:
         units: unknown
   cams-gridded-solar-radiation:
     endpoint: ads
-    request_kind: seasonal
+    request_kind: form
     variables:
       global-horizontal-irradiation:
         cds_variable: global_horizontal_irradiation
