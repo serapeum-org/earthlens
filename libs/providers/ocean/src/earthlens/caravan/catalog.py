@@ -451,7 +451,7 @@ class Catalog(AbstractCatalog):
             >>> from earthlens.caravan import Catalog
             >>> cat = Catalog()
             >>> sorted(cat.extensions)
-            ['base', 'denmark', 'germany', 'grdc', 'israel']
+            ['base', 'czechia', 'denmark', 'germany', 'grdc', 'israel', 'spain']
             >>> archive = cat.get_extension("denmark").resolve_version().file_for("csv")
             >>> archive.name
             'Caravan_extension_DK.zip'

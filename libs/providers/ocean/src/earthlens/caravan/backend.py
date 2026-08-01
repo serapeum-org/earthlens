@@ -803,7 +803,9 @@ class Caravan(AbstractDataSource):
                 f"{self.space.west},{self.space.east}",
             ]
         )
-        digest = hashlib.sha1(selector.encode()).hexdigest()[:8]  # noqa: S324
+        # Not a security primitive: this only has to be a short, stable id
+        # distinguishing one selection from another in a file name.
+        digest = hashlib.sha1(selector.encode(), usedforsecurity=False).hexdigest()[:8]
         return (
             self._ensure_root_dir()
             / f"caravan_{self._dataset}_{safe_version}_{window}_{digest}.csv"
