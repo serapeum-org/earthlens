@@ -20,13 +20,15 @@ class TestBundledCatalog:
     """The shipped YAML, as a reader of the plan would expect it."""
 
     def test_every_extension_is_present(self):
-        """All five wrapped extensions load."""
+        """All seven wrapped extensions load."""
         assert sorted(Catalog().extensions) == [
             "base",
+            "czechia",
             "denmark",
             "germany",
             "grdc",
             "israel",
+            "spain",
         ]
 
     def test_grdc_pins_the_current_version_not_the_superseded_one(self):
@@ -274,3 +276,44 @@ class TestLoader:
     def test_a_variable_row_is_self_describing(self):
         """The friendly name is stored on the row, not only as its key."""
         assert Variable(name="x", column="y").name == "x"
+
+
+class TestCommunityExtensions:
+    """The two extensions published under their source dataset's name."""
+
+    def test_czechia_pins_the_caravan_shaped_file(self):
+        """The record also ships native CAMELS-CZ zips, which are not Caravan."""
+        archive = Catalog().get_extension("czechia").resolve_version().file_for("csv")
+
+        assert archive.name == "Caravan-Extension-CZ.zip"
+        assert archive.root_prefix == "Caravan-Extension-CZ/"
+
+    def test_czechia_carries_the_most_recent_series(self):
+        """Its data runs to 2025 where GRDC stops in 2023."""
+        assert Catalog().get_extension("czechia").resolve_version().data_period == (
+            1950,
+            2025,
+        )
+
+    def test_spain_declares_its_own_column_set(self):
+        """Caravan-ES adds four EFAS/EMO-1 columns to the current set."""
+        assert (
+            Catalog().get_extension("spain").resolve_version().column_set == "camelses"
+        )
+
+    def test_the_spanish_extras_are_source_restricted(self):
+        """They exist only in Caravan-ES, so other extensions must refuse them."""
+        catalog = Catalog()
+
+        assert catalog.get_variable("spain", "discharge_efas").column == "dis_efas5"
+        with pytest.raises(ValueError, match="exists only in"):
+            catalog.get_variable("grdc", "discharge_efas")
+
+    def test_both_have_a_versioned_root_prefix_recorded(self):
+        """Neither uses a Caravan-ish root, which templating would have missed."""
+        catalog = Catalog()
+
+        assert (
+            catalog.get_extension("spain").resolve_version().file_for("csv").root_prefix
+            == "v110/"
+        )

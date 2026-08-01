@@ -1609,6 +1609,57 @@ _ZENODO_VERSIONS = "https://zenodo.org/api/records/{record}/versions"
 #: records, so watching the pinned version chains alone would never find them.
 _ZENODO_SEARCH = "https://zenodo.org/api/records"
 
+#: Queries whose **union** surfaces every known Caravan extension record.
+#:
+#: These are deliberately full-text rather than `title:`-scoped. A title-only
+#: search misses the extensions published under their source dataset's name -
+#: CAMELS-CZ and CAMELS-ES never say "Caravan" in their titles, only inside the
+#: record - and both were absent from this catalog until that was noticed by
+#: hand. No single query finds them all either: Denmark surfaces only on the
+#: phrase, GRDC only on the keyword, so the set is queried and unioned.
+_CARAVAN_DISCOVERY_QUERIES = (
+    '"Caravan extension"',
+    "Caravan AND CAMELS",
+    "caravan AND keywords:Hydrology",
+)
+
+#: Terms that mark a hit as hydrology rather than something else called a
+#: caravan. Full-text search for "caravan"/"camels" also returns camel-trade
+#: archaeology and animal taxonomy, and a discovery list that is mostly noise
+#: gets ignored - which defeats the point of running it. Deliberately excludes
+#: the bare words "caravan" and "camels": both are ambiguous (the animal, the
+#: trade route), and every real extension carries one of the terms below in its
+#: title or keywords anyway - including Denmark, whose keyword list is empty but
+#: whose title ends "for large-sample hydrology".
+_CARAVAN_HYDROLOGY_TERMS = (
+    "hydrolog",
+    "streamflow",
+    "rainfall-runoff",
+    "rainfall–runoff",
+    "runoff",
+    "catchment",
+    "discharge",
+)
+
+
+def _is_hydrological(hit: dict[str, Any]) -> bool:
+    """Whether a Zenodo hit looks like hydrology rather than a camel caravan.
+
+    Args:
+        hit: One record from a Zenodo search response.
+
+    Returns:
+        bool: `True` when the title or keywords carry a hydrology term.
+    """
+    metadata = hit.get("metadata") or {}
+    haystack = " ".join(
+        [
+            str(metadata.get("title", "")),
+            *(str(k) for k in metadata.get("keywords") or []),
+        ]
+    ).casefold()
+    return any(term in haystack for term in _CARAVAN_HYDROLOGY_TERMS)
+
 
 def _caravan_newer_releases(extension: Any, pinned: set[str]) -> list[str]:
     """List an extension's releases published after its newest pin.
@@ -1659,7 +1710,7 @@ def _caravan_discovered(
         list[str]: `"<record> (<title>)"` for each untracked record, sorted.
     """
     discovered: set[str] = set()
-    for query in ('title:"Caravan extension"', "title:Caravan AND keywords:Hydrology"):
+    for query in _CARAVAN_DISCOVERY_QUERIES:
         payload = _get_json(
             _ZENODO_SEARCH, params={"q": query, "size": 25, "sort": "newest"}
         )
@@ -1669,6 +1720,7 @@ def _caravan_discovered(
                 record in pinned
                 or str(hit.get("conceptrecid")) in concepts
                 or record in unsupported
+                or not _is_hydrological(hit)
             ):
                 continue
             title = str((hit.get("metadata") or {}).get("title", ""))[:60]

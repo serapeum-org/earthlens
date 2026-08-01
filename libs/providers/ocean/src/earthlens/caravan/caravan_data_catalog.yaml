@@ -186,6 +186,28 @@ variables:
     column: volumetric_soil_water_layer_4_max
     units: m3/m3
     description: Daily maximum soil moisture, layer 4 (100-289 cm).
+  discharge_efas:
+    column: dis_efas5
+    units: mm/d
+    sources: [camelses]
+    description: >-
+      EFAS v5 simulated discharge, normalised like `streamflow` so the two are
+      directly comparable (Caravan-ES only).
+  precipitation_emo1:
+    column: pr_emo1
+    units: mm/d
+    sources: [camelses]
+    description: Daily precipitation from the EMO-1 1 km grid (Caravan-ES only).
+  potential_evaporation_emo1:
+    column: e0_emo1
+    units: mm/d
+    sources: [camelses]
+    description: Daily potential evaporation from EMO-1 (Caravan-ES only).
+  temperature_emo1:
+    column: ta_emo1
+    units: degC
+    sources: [camelses]
+    description: Daily mean air temperature from EMO-1 (Caravan-ES only).
   streamflow_vol:
     column: streamflow_vol
     units: m3/s
@@ -351,6 +373,87 @@ extensions:
             archive_format: zip
             root_prefix: null
 
+  czechia:
+    title: >-
+      CAMELS-CZ: Catchment Attributes and Meteorology for Large-Sample Studies -
+      Czechia (Caravan extension)
+    concept_doi: 10.5281/zenodo.17338510
+    license: CC-BY-4.0
+    attribution: >-
+      CAMELS-CZ / Caravan-Extension-CZ. Cite Caravan and CAMELS-CZ alongside
+      this extension.
+    license_file: licenses/camelscz/license_caravan_cz.md
+    # The record also publishes CAMELS-CZ.zip and CAMELS-CZ-Hourly.zip, which are
+    # the native CAMELS format rather than Caravan's - only the file below is
+    # Caravan-shaped, so only it is pinned.
+    sources:
+      camelscz: {n_catchments: 249, name: CAMELS-CZ}
+    default_version: "2025-11-30"
+    versions:
+      "2025-11-30":
+        doi: 10.5281/zenodo.17769325
+        release_date: "2025-11-30"
+        # The most recent series of any extension - it runs to mid-2025 where
+        # GRDC stops in 2023.
+        data_period: [1950, 2025]
+        n_catchments: 249
+        n_catchments_verified: true
+        column_set: current
+        files:
+          csv:
+            record: 17769325
+            name: Caravan-Extension-CZ.zip
+            size: 913172886
+            md5: 201ca7897c52adca3ca32811c0f6d457
+            archive_format: zip
+            root_prefix: Caravan-Extension-CZ/
+          netcdf:
+            record: 17769325
+            name: Caravan-Extension-CZ.zip
+            size: 913172886
+            md5: 201ca7897c52adca3ca32811c0f6d457
+            archive_format: zip
+            root_prefix: Caravan-Extension-CZ/
+
+  spain:
+    title: >-
+      CAMELS-ES: Catchment Attributes and Meteorology for Large-Sample Studies -
+      Spain (Caravan extension)
+    concept_doi: 10.5281/zenodo.8373020
+    license: CC-BY-4.0
+    attribution: >-
+      CAMELS-ES. Includes EFAS v5 and EMO-1 fields from the Copernicus Emergency
+      Management Service. Cite Caravan and CAMELS-ES alongside this extension.
+    license_file: licenses/camelses/license_camelses.txt
+    sources:
+      camelses: {n_catchments: 269, name: CAMELS-ES}
+    default_version: "1.1.0"
+    versions:
+      "1.1.0":
+        doi: 10.5281/zenodo.15040948
+        release_date: "2025-03-17"
+        # Hydrological years: the series starts and ends on 1 October.
+        data_period: [1990, 2020]
+        n_catchments: 269
+        n_catchments_verified: true
+        # `current` plus four EFAS/EMO-1 columns, flagged on their variables.
+        column_set: camelses
+        files:
+          csv:
+            record: 15040948
+            name: CAMELS-ES_v110.zip
+            size: 402788602
+            md5: 7c61bcd8d33a34b094997e651b8d4c85
+            archive_format: zip
+            root_prefix: v110/
+          netcdf:
+            record: 15040948
+            name: CAMELS-ES_v110.zip
+            size: 402788602
+            md5: 7c61bcd8d33a34b094997e651b8d4c85
+            archive_format: zip
+            root_prefix: v110/
+
   denmark:
     title: Caravan extension Denmark - Danish dataset for large-sample hydrology
     concept_doi: 10.5281/zenodo.6645861
@@ -430,6 +533,10 @@ available_extensions:
   - key: grdc
     supported: true
   - key: germany
+    supported: true
+  - key: czechia
+    supported: true
+  - key: spain
     supported: true
   - key: denmark
     supported: true

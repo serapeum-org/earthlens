@@ -42,14 +42,14 @@ flow = EarthLens(
 
 This distinction decides how you address the data, and conflating them is the usual first mistake.
 
-- An **extension** is a separate **Zenodo record** — what you pass as `dataset=`. There are five:
-  `base`, `grdc`, `germany`, `denmark`, `israel`.
+- An **extension** is a separate **Zenodo record** — what you pass as `dataset=`. There are seven:
+  `base`, `grdc`, `germany`, `czechia`, `spain`, `denmark`, `israel`.
 - A **source dataset** is a directory *inside* an archive. `base` alone bundles seven of them — CAMELS-US,
   CAMELS-AUS, CAMELS-BR, CAMELS-CL, CAMELS-GB, HYSETS and LamaH-CE.
 
 So there is no `dataset="hysets"`: HYSETS lives inside `base` and is reached by requesting `base` and selecting
 its catchments. A `gauge_id` carries its source as a prefix (`hysets_01010070`, `camelsdk_100006`,
-`il_12130`) — and note **GRDC alone uses an uppercase prefix**, `GRDC_1159100`.
+`il_12130`, `camelscz_B4403000`) — and note **GRDC alone uses an uppercase prefix**, `GRDC_1159100`.
 
 ## A historical archive, not a live feed
 

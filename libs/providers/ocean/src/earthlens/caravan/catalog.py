@@ -52,9 +52,10 @@ TimeseriesFormat = Literal["csv", "netcdf"]
 
 #: The known timeseries column-set variants. `current` is the v1.5+ layout with
 #: the split ERA5-Land / FAO Penman-Monteith PET pair; `legacy` is base v1.2 and
-#: earlier with a single `potential_evaporation_sum`; `camelsde` is `current`
-#: plus Caravan-DE's two extra observed columns.
-ColumnSet = Literal["current", "legacy", "camelsde"]
+#: earlier with a single `potential_evaporation_sum`. `camelsde` and
+#: `camelses` are `current` plus that extension's own extra columns -
+#: Caravan-DE's two observed ones, Caravan-ES's four EFAS/EMO-1 ones.
+ColumnSet = Literal["current", "legacy", "camelsde", "camelses"]
 
 
 def clear_catalog_cache() -> None:

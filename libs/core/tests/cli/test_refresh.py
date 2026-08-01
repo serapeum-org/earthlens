@@ -1516,7 +1516,10 @@ class TestCaravanRefresher:
                         {
                             "id": 555,
                             "conceptrecid": "554",
-                            "metadata": {"title": "Caravan extension Narnia"},
+                            "metadata": {
+                                "title": "Caravan extension Narnia",
+                                "keywords": ["hydrology"],
+                            },
                         }
                     ]
                 }
@@ -1526,6 +1529,48 @@ class TestCaravanRefresher:
         assert refresh_mod._caravan_grouped(self._catalog())["discovered"] == [
             "555 (Caravan extension Narnia)"
         ]
+
+    def test_a_non_hydrological_hit_is_filtered_out(self):
+        """Searching full-text for "caravan" also returns camel-trade papers."""
+        hit = {
+            "metadata": {
+                "title": "Camels, donkeys and caravan trade in the Levant",
+                "keywords": ["Biodiversity", "Taxonomy"],
+            }
+        }
+
+        assert not refresh_mod._is_hydrological(hit)
+
+    def test_a_hydrology_title_alone_is_enough(self):
+        """Denmark's record carries no keywords at all, only a telling title."""
+        hit = {
+            "metadata": {
+                "title": "Caravan extension Denmark - Danish dataset for "
+                "large-sample hydrology",
+                "keywords": [],
+            }
+        }
+
+        assert refresh_mod._is_hydrological(hit)
+
+    def test_a_hydrology_keyword_alone_is_enough(self):
+        """CAMELS-ES says nothing about Caravan in its title."""
+        hit = {
+            "metadata": {
+                "title": "CAMELS-ES: Catchment Attributes for Spain",
+                "keywords": ["CAMELS; CARAVAN; large sample hydrology; Spain"],
+            }
+        }
+
+        assert refresh_mod._is_hydrological(hit)
+
+    def test_the_bare_word_caravan_is_not_a_hydrology_signal(self):
+        """ "caravan" and "camels" are both ambiguous, so neither qualifies alone."""
+        hit = {
+            "metadata": {"title": "A few camels or a whole caravan?", "keywords": []}
+        }
+
+        assert not refresh_mod._is_hydrological(hit)
 
 
 class TestCaravanValidator:
@@ -1602,4 +1647,4 @@ class TestCaravanValidator:
         checked, issues = _validate_caravan(Catalog())
 
         assert issues == []
-        assert checked == 5
+        assert checked == 7

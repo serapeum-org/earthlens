@@ -148,3 +148,66 @@ def test_base_1_2_is_readable_without_downloading_12_gb(tmp_path):
     assert "potential_evaporation_sum" in frame.columns
     _, megabytes = source._open_archive().transfer_stats
     assert megabytes < MAX_TRANSFER_MB
+
+
+def test_the_community_extensions_published_under_a_camels_name_fetch(tmp_path):
+    """czechia and spain are titled CAMELS-CZ / CAMELS-ES, not "Caravan ...".
+
+    They were absent from the catalog until a title-based census missed them, so
+    this pins that both are reachable and Caravan-shaped.
+    """
+    for dataset, gauge_id in (
+        ("czechia", "camelscz_24042409"),
+        ("spain", "camelses_1080"),
+    ):
+        frame = Caravan(
+            start="2019-01-01",
+            end="2019-01-05",
+            variables=["streamflow", "total_precipitation"],
+            lat_lim=[-90.0, 90.0],
+            lon_lim=[-180.0, 180.0],
+            dataset=dataset,
+            gauge_ids=[gauge_id],
+            path=str(tmp_path),
+        ).download()
+
+        assert len(frame) == 5, dataset
+        assert frame["gauge_id"].unique().tolist() == [gauge_id]
+        assert "total_precipitation_sum" in frame.columns
+
+
+def test_the_spanish_efas_columns_come_back(tmp_path):
+    """Caravan-ES carries four EFAS/EMO-1 fields no other extension has."""
+    frame = Caravan(
+        start="2019-01-01",
+        end="2019-01-03",
+        variables=["discharge_efas", "precipitation_emo1", "temperature_emo1"],
+        lat_lim=[-90.0, 90.0],
+        lon_lim=[-180.0, 180.0],
+        dataset="spain",
+        gauge_ids=["camelses_1080"],
+        path=str(tmp_path),
+    ).download()
+
+    assert list(frame.columns) == [
+        "gauge_id",
+        "date",
+        "dis_efas5",
+        "pr_emo1",
+        "ta_emo1",
+    ]
+    assert frame["dis_efas5"].notna().all()
+
+
+def test_every_pinned_extension_still_matches_zenodo():
+    """A stale pin anywhere in the catalog should fail here, not for a user."""
+    from earthlens.caravan._helpers import resolve_record
+
+    catalog = Catalog()
+    for key in sorted(catalog.extensions):
+        archive = catalog.get_extension(key).resolve_version().file_for("csv")
+        published = resolve_record(archive.record)
+
+        assert archive.name in published, f"{key}: {archive.name} is gone"
+        assert published[archive.name].md5 == archive.md5, f"{key}: md5 drift"
+        assert published[archive.name].size == archive.size, f"{key}: size drift"

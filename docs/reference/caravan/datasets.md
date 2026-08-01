@@ -4,12 +4,14 @@ Every row pins a **specific Zenodo version record**, never the moving concept DO
 Sizes and checksums were read from the Zenodo REST API on 2026-08-01; re-check with
 `earthlens datasets refresh caravan`.
 
-All five extensions are **CC-BY-4.0**.
+All seven extensions are **CC-BY-4.0**.
 
 | `dataset=` | Catchments | Period | Record | Archive | Size | Range-readable |
 |---|---|---|---|---|---|---|
 | `grdc` | 5,356 | 1950–2023 | [15349031](https://doi.org/10.5281/zenodo.15349031) (v0.6) | `GRDC_Caravan_extension_csv.zip` | 8.84 GB | ✅ |
 | `germany` | 1,887 | 1951–2020 | [14755229](https://doi.org/10.5281/zenodo.14755229) (v1.1.1) | `caravan_de.zip` | 6.09 GB | ✅ |
+| `spain` | 269 | 1990–2020 | [15040948](https://doi.org/10.5281/zenodo.15040948) (v1.1.0) | `CAMELS-ES_v110.zip` | 0.40 GB | ✅ |
+| `czechia` | 249 | 1950–**2025** | [17769325](https://doi.org/10.5281/zenodo.17769325) | `Caravan-Extension-CZ.zip` | 0.91 GB | ✅ |
 | `denmark` | 308 | 1981–2020 | [15200118](https://doi.org/10.5281/zenodo.15200118) | `Caravan_extension_DK.zip` | 0.52 GB | ✅ |
 | `israel` | 95 | 1950–2024 | [15181680](https://doi.org/10.5281/zenodo.15181680) | `Caravan_extension_Israel_Ver4.zip` | 0.29 GB | ✅ |
 | `base` | ≈16,300 | 1950–2023 | [15530022](https://doi.org/10.5281/zenodo.15530022) (v1.6) | `Caravan-csv.tar.gz` | 28.95 GB | ❌ opt-in |
@@ -37,7 +39,16 @@ valid `dataset=` values — request `base` and select their catchments by id or 
 
 (Counts measured from the v1.2 index — the newest base release that can be read without downloading it.)
 
+!!! note "Two extensions are published under their source dataset's name"
+    `czechia` and `spain` are titled *CAMELS-CZ* and *CAMELS-ES* — the word "Caravan" never appears in either
+    title, only inside the record. A title-based search misses them entirely, which is why
+    `earthlens datasets refresh caravan` searches record **content**. `czechia` also carries the most recent
+    series of any extension, running to mid-2025.
+
 ## Known but not wrapped
+
+**CAMELS-CH** ([15025258](https://doi.org/10.5281/zenodo.15025258)) is published in the native CAMELS layout
+rather than Caravan's — verified by opening it — so it is not reachable through this backend.
 
 **Caravan MultiMet** ([14196771](https://doi.org/10.5281/zenodo.14196771) /
 [14196772](https://doi.org/10.5281/zenodo.14196772)) adds nowcast and forecast weather products — CPC, IMERG v07,
