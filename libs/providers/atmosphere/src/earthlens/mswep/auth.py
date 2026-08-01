@@ -65,7 +65,7 @@ DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.readonly"
 
 #: Google's OAuth 2.0 token endpoint, used to refresh an authorized-user
 #: credential. `rclone` remotes do not record it, so it is supplied here.
-TOKEN_URI = "https://oauth2.googleapis.com/token"
+TOKEN_URI = "https://oauth2.googleapis.com/token"  # nosec B105 - not a secret (public URL / identifier)
 
 #: Where a user requests non-commercial access, per product. Named in the
 #: `AuthenticationError` message so a stuck user reads the actual fix.
@@ -78,7 +78,7 @@ RCLONE_CLIENT_ID_URL = "https://rclone.org/drive/#making-your-own-client-id"
 
 #: Environment fallbacks for every field on :class:`MswepCredentials`.
 FOLDER_ID_ENV = "MSWEP_DRIVE_FOLDER"
-TOKEN_FILE_ENV = "MSWEP_TOKEN_FILE"
+TOKEN_FILE_ENV = "MSWEP_TOKEN_FILE"  # nosec B105 - not a secret (env var name)
 RCLONE_CONFIG_ENV = "MSWEP_RCLONE_CONFIG"
 RCLONE_REMOTE_ENV = "MSWEP_RCLONE_REMOTE"
 
