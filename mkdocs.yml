@@ -643,6 +643,8 @@ nav:
       - Quickstart — recent fires: examples/firms/quickstart.ipynb
       - Fire-season time-series: examples/firms/fire_season_timeseries.ipynb
       - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
+    - MSWEP / MSWX (GloH2O):
+      - Catalog explorer (no network): examples/mswep/catalog_explorer.ipynb
     - National Water Model (NWM):
       - Catalog explorer (no network): examples/nwm/catalog_explorer.ipynb
       - Short-range streamflow (live): examples/nwm/streamflow_short_range.ipynb
