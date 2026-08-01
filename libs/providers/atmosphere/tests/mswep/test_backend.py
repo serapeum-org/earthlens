@@ -86,7 +86,59 @@ class TestDownload:
     def test_no_partial_files_remain(self, build, tmp_path):
         """The atomic write leaves no `.part` sibling behind."""
         _quiet_download(build())
-        assert list(tmp_path.glob("*.part")) == []
+        assert list(tmp_path.rglob("*.part")) == []
+
+    def test_output_mirrors_the_share_layout(self, build, tmp_path):
+        """Granules land under `<root>/<variant>/<temporal>/`, as rclone writes them."""
+        paths = _quiet_download(build())
+        assert paths[0].relative_to(tmp_path).as_posix() == (
+            "MSWEP_V315/Past/Daily/2020116.nc"
+        )
+
+    def test_mswx_output_includes_the_variable_level(self, build, tmp_path):
+        """An MSWX granule keeps its variable folder on disk."""
+        paths = _quiet_download(
+            build(
+                start="2007-05-13",
+                end="2007-05-13",
+                product="mswx",
+                variables=["Temp"],
+            )
+        )
+        assert paths[0].relative_to(tmp_path).as_posix() == (
+            "MSWX_V100/Past/Temp/Daily/2007133.nc"
+        )
+
+    def test_variables_sharing_a_granule_name_do_not_collide(self, share, tmp_path):
+        """Two MSWX variables for one date write to distinct paths.
+
+        Granule names repeat across variables, so a flat output directory
+        would make the second request reuse the first file.
+        """
+        from earthlens.mswep.catalog import Catalog
+
+        share.add_tree("SHARE", {"MSWX_V100_x": {}})
+        catalog = Catalog()
+        pres = catalog.get_product("mswx").variables["Pres"]
+        object.__setattr__(pres, "provisional", False)
+        share.add_tree(
+            share.path_id("MSWX_V100/Past"), {"Pres": {"Daily": ["2007133.nc"]}}
+        )
+        source = MSWEP(
+            start="2007-05-13",
+            end="2007-05-13",
+            product="mswx",
+            variables=["Temp", "Pres"],
+            temporal_resolution="daily",
+            folder_id="SHARE",
+            service=share,
+            path=tmp_path,
+            catalog=catalog,
+        )
+        paths = _quiet_download(source)
+        assert len(paths) == 2
+        assert len(set(paths)) == 2
+        assert len(share.media_calls) == 2
 
     def test_monthly_uses_the_yyyymm_stem(self, build):
         """A monthly request names granules `YYYYMM.nc`."""

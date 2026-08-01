@@ -93,7 +93,7 @@ lens = EarthLens(
     temporal_resolution="daily",
     path="out",
 )
-print(lens.download())   # -> [PosixPath('out/2020116.nc')]
+print(lens.download())   # -> [PosixPath('out/MSWEP_V315/Past/Daily/2020116.nc')]
 ```
 
 Or run the gated live tests, which skip cleanly when nothing is configured:

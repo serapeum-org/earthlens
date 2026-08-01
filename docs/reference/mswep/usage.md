@@ -77,6 +77,18 @@ skipped rather than raising. GloH2O then **rewrites NRT granules for about ten d
 ("Users should redownload upgraded files"), so a local copy inside that window is stale, not cached: the backend
 re-downloads it automatically. Older granules already on disk are reused.
 
+## Where the files land
+
+Granules mirror the share's own layout under `path=`, because a granule name is only unique **within its
+folder** — MSWEP and MSWX share the `YYYYDOY.nc` stem, and all ten MSWX variables repeat it:
+
+```text
+out/MSWEP_V315/Past/Daily/2020116.nc
+out/MSWX_V100/Past/Temp/Daily/2007133.nc
+```
+
+This is the same tree `rclone sync` produces, so a bulk pull and a targeted one can share a directory.
+
 ## Spatial subsetting is downstream
 
 `lat_lim` / `lon_lim` are recorded for provenance but **do not shape the request** — GloH2O serves whole-globe

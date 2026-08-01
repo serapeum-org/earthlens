@@ -461,7 +461,17 @@ class MSWEP(AbstractDataSource):
         return dt.datetime.now(dt.UTC)
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
-        """Download each resolved granule into the output directory.
+        """Download each resolved granule, mirroring the share's layout.
+
+        Output goes to `<path>/<root>/<variant>[/<variable>]/<temporal>/`
+        rather than a flat directory, because granule names are **only
+        unique within their folder**: MSWEP and MSWX use the same
+        `YYYYDOY.nc` stem, and every one of MSWX's ten variables repeats
+        it. Flattening would make a two-variable request write both to
+        one path — and the reuse check below would then return the first
+        file twice, labelled as both. Mirroring also matches what
+        `rclone sync` produces, so a bulk pull and a targeted one can
+        share a tree.
 
         A granule already on disk is reused, **except** inside the NRT
         revision window, where the local copy is known to be superseded.
@@ -477,11 +487,11 @@ class MSWEP(AbstractDataSource):
         written: list[Path] = []
         for product in tqdm(products, desc="mswep", disable=not self._progress):
             name = str(product.metadata["name"])
-            destination = root / name
-            stamp = product.metadata["timestamp"]
             folder = str(product.metadata["folder"])
+            destination = root.joinpath(*folder.split("/"), name)
+            stamp = product.metadata["timestamp"]
             if destination.exists() and not self.is_under_revision(stamp, folder):
-                logger.debug(f"mswep: {name} already present; skipping download.")
+                logger.debug(f"mswep: {folder}/{name} already present; skipping.")
                 written.append(destination)
                 continue
             download_media(self._auth.service, product.id, destination)
