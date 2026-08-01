@@ -46,6 +46,8 @@ once, or the download returns a `401`.
 
 Public surface (re-exported from this package):
 
+* :class:`EMDAT` — the backend; instantiate with a dataset id in `variables`,
+  then call :meth:`EMDAT.download`.
 * :class:`Catalog` — pydantic-backed loader for the bundled
   `emdat_data_catalog.yaml`.
 * :class:`Dataset` — one catalog row (provider, output kind, transport detail,
@@ -66,8 +68,13 @@ from earthlens.emdat.catalog import (
     clear_catalog_cache,
 )
 
+# Imported last: `backend` imports `_helpers`, which reads this package's
+# catalog types, so the names above have to be bound first.
+from earthlens.emdat.backend import EMDAT  # isort: skip
+
 __all__ = [
     "CATALOG_PATH",
+    "EMDAT",
     "Catalog",
     "Dataset",
     "EmdatAuth",
