@@ -52,6 +52,17 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # (carried in `extras`), not a time-of-day; the dataset rejects the
     # four 6-hourly `time` slots the daily template adds, so drop `time`.
     "glofas": ("time",),
+    # GloFAS/EFAS hindcast (reforecast): keys on `hyear`/`hmonth`/`hday`
+    # (remapped in `_build_request`) + `leadtime_hour`; drop `time`.
+    "glofas_hindcast": ("time",),
+    # Seasonal (GloFAS/EFAS/CDS seasonal): keyed by `year`/`month` + a lead
+    # (`leadtime_month`/`leadtime_hour`) + `originating_centre`/`system` from
+    # `extras`; no `day`, no time-of-day.
+    "seasonal": ("day", "time"),
+    # CAMS grid datasets (ADS): a single `date` range string replaces
+    # year/month/day and `product_type` (see the `cams_date` branch); nothing
+    # extra to strip here.
+    "cams_date": (),
 }
 
 
@@ -1265,7 +1276,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             second positional argument to
             :meth:`cdsapi.Client.retrieve`.
         """
-        if var_info.request_kind == "glofas" and self.temporal_resolution == "monthly":
+        if (
+            var_info.request_kind in ("glofas", "glofas_hindcast")
+            and self.temporal_resolution == "monthly"
+        ):
             raise ValueError(
                 f"{var_info.cds_dataset!r} (GloFAS) must be requested with "
                 "temporal_resolution='daily': the monthly branch omits the "
@@ -1292,6 +1306,28 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         else:
             request["day"] = sorted({f"{d.day:02d}" for d in dates})
             request["time"] = ["00:00", "06:00", "12:00", "18:00"]
+
+        # Request-kind date representation (G11). CAMS grid datasets key on a
+        # single `date` range string (not year/month/day) and carry `type` /
+        # levels rather than `product_type`; the hindcast families remap
+        # year/month/day → hyear/hmonth/hday (G7).
+        if var_info.request_kind == "cams_date":
+            for key in ("year", "month", "day", "product_type"):
+                request.pop(key, None)
+            request["date"] = (
+                f"{self.time.start_date:%Y-%m-%d}/{self.time.end_date:%Y-%m-%d}"
+            )
+            # Reset the daily template's 6-hourly slots to a single default
+            # (a per-row `extras: {time: [...]}` overrides it below).
+            request["time"] = ["00:00"]
+        elif var_info.request_kind == "glofas_hindcast":
+            for src_key, dst_key in (
+                ("year", "hyear"),
+                ("month", "hmonth"),
+                ("day", "hday"),
+            ):
+                if src_key in request:
+                    request[dst_key] = request.pop(src_key)
 
         if var_info.cds_pressure_level is not None:
             request["pressure_level"] = var_info.cds_pressure_level
