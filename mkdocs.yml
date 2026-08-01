@@ -344,6 +344,12 @@ nav:
       - Usage: reference/firms/usage.md
       - Authentication: reference/firms/authentication.md
       - Reference: reference/firms/firms.md
+    - MSWEP / MSWX (GloH2O):
+      - Introduction: reference/mswep/introduction.md
+      - Authentication: reference/mswep/authentication.md
+      - Usage: reference/mswep/usage.md
+      - Products & catalog: reference/mswep/datasets.md
+      - Reference: reference/mswep/mswep.md
     - National Water Model:
       - Introduction: reference/nwm/introduction.md
       - Usage: reference/nwm/usage.md
