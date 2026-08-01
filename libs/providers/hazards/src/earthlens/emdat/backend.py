@@ -252,7 +252,12 @@ class EMDAT(AbstractDataSource):
 
     @property
     def _year_range(self) -> tuple[int | None, int | None]:
-        """Return the requested window as inclusive `(first_year, last_year)`."""
+        """Return the requested window as inclusive year bounds.
+
+        Returns:
+            tuple[int | None, int | None]: `(first_year, last_year)`, either of
+                which is `None` when that end of the window was not given.
+        """
         start = self.time.start_date
         end = self.time.end_date
         return (
@@ -262,10 +267,15 @@ class EMDAT(AbstractDataSource):
 
     @property
     def _bbox(self) -> tuple[float, float, float, float] | None:
-        """Return the request bbox as `(min_lon, min_lat, max_lon, max_lat)`.
+        """Return the request bbox, or `None` for a world-wide request.
 
-        `None` when the request covers the whole globe, so a world-wide request
+        A whole-globe request yields `None` rather than global bounds, so it
         never drops rows that merely lack coordinates.
+
+        Returns:
+            tuple[float, float, float, float] | None:
+                `(min_lon, min_lat, max_lon, max_lat)`, or `None` when the
+                request covers the whole globe.
         """
         space = self.space
         whole_globe = (
@@ -284,7 +294,12 @@ class EMDAT(AbstractDataSource):
         )
 
     def _client(self) -> HttpClient:
-        """Return this instance's pooled :class:`HttpClient`, building it once."""
+        """Return this instance's pooled client, building it on first use.
+
+        Returns:
+            HttpClient: The same instance on every later call, so the pooled
+                connection is reused rather than rebuilt per request.
+        """
         if self._http is None:
             self._http = HttpClient()
         return self._http

@@ -149,11 +149,19 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
         self._auth: Any = None
 
     def _has_explicit_credentials(self) -> bool:
-        """Return whether both an explicit username and password were given."""
+        """Report whether both an explicit username and password were given.
+
+        Returns:
+            bool: `True` when the constructor received both halves of a pair.
+        """
         return self._creds.username is not None and self._creds.password is not None
 
     def _has_explicit_token(self) -> bool:
-        """Return whether an explicit EDL bearer token was given."""
+        """Report whether an explicit EDL bearer token was given.
+
+        Returns:
+            bool: `True` when the constructor received a token.
+        """
         return self._creds.token is not None
 
     def _resolve_strategy(self) -> str:
