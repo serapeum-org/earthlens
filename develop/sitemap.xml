@@ -277,6 +277,14 @@
          <lastmod>2026-08-01</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/emdat/flood_events_and_footprints/</loc>
+         <lastmod>2026-08-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/emdat/flood_footprints_and_area/</loc>
+         <lastmod>2026-08-01</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/erddap/01_catalog_explorer/</loc>
          <lastmod>2026-08-01</lastmod>
     </url>
@@ -1237,10 +1245,6 @@
          <lastmod>2026-08-01</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/ecmwf/datastores/</loc>
-         <lastmod>2026-08-01</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/ecmwf/ecmwf/</loc>
          <lastmod>2026-08-01</lastmod>
     </url>
@@ -1270,6 +1274,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/eea-aq/usage/</loc>
+         <lastmod>2026-08-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/emdat/emdat/</loc>
+         <lastmod>2026-08-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/emdat/introduction/</loc>
+         <lastmod>2026-08-01</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/emdat/usage/</loc>
          <lastmod>2026-08-01</lastmod>
     </url>
     <url>
