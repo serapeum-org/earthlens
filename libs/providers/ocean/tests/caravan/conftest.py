@@ -244,6 +244,11 @@ def _fixture_catalog() -> dict[str, Any]:
             legacy_column="potential_evaporation_sum",
             units="mm/d",
         ),
+        "potential_evaporation_fao": Variable(
+            name="potential_evaporation_fao",
+            column="potential_evaporation_sum_FAO_PENMAN_MONTEITH",
+            units="mm/d",
+        ),
         "temperature_2m_mean": Variable(
             name="temperature_2m_mean", column="temperature_2m_mean", units="degC"
         ),

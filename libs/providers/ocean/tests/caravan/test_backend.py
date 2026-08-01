@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import io
+import zipfile
 from pathlib import Path
 from typing import Any
 
@@ -311,7 +313,7 @@ class TestExtras:
         """The written artifact is named after the extension and version."""
         _source(catalog, tmp_path, write_table=True).download()
 
-        assert (tmp_path / "caravan_demo_1-0.csv").is_file()
+        assert list(tmp_path.glob("caravan_demo_1-0_*.csv"))
 
     def test_the_tar_transport_reads_the_same_way(self, catalog, tmp_path, monkeypatch):
         """The download fallback yields an identical frame."""
@@ -471,3 +473,74 @@ class TestDegradedPaths:
         ).download()
 
         assert frame.empty
+
+
+class TestReviewRegressions:
+    """Cases the round-1 review proved were broken."""
+
+    def test_the_dict_variables_form_resolves_its_values(self, catalog, tmp_path):
+        """`list(a_dict)` yields keys, so the advertised dict form always raised."""
+        frame = _source(
+            catalog, tmp_path, variables={"demo": ["streamflow", "temperature_2m_mean"]}
+        ).download()
+
+        assert list(frame.columns) == [
+            "gauge_id",
+            "date",
+            "streamflow",
+            "temperature_2m_mean",
+        ]
+
+    def test_an_archive_with_no_timeseries_reports_the_layout(self, catalog, tmp_path):
+        """The error path itself used to raise IndexError and hide the cause."""
+        empty = io.BytesIO()
+        with zipfile.ZipFile(empty, "w") as archive:
+            archive.writestr("readme.txt", "nothing useful here")
+        source = _source(catalog, tmp_path, blob=empty.getvalue())
+
+        with pytest.raises(ValueError, match="exposes no timeseries members"):
+            source.download()
+
+    def test_an_absent_column_stays_numeric(self, catalog, tmp_path):
+        """A `pd.NA` fill made the whole concatenated column `object` dtype."""
+        frame = _source(
+            catalog,
+            tmp_path,
+            blob=build_zip(header=LEGACY_HEADER),
+            variables=["streamflow", "potential_evaporation_fao"],
+            gauge_ids=["dk_1", "dk_2"],
+        ).download()
+
+        assert frame["potential_evaporation_sum_FAO_PENMAN_MONTEITH"].dtype.kind == "f"
+
+    def test_columns_come_back_in_the_requested_order(self, catalog, tmp_path):
+        """A missing column used to be appended after the present ones."""
+        frame = _source(
+            catalog,
+            tmp_path,
+            blob=build_zip(header=LEGACY_HEADER),
+            variables=["potential_evaporation_fao", "streamflow"],
+        ).download()
+
+        assert list(frame.columns)[2:] == [
+            "potential_evaporation_sum_FAO_PENMAN_MONTEITH",
+            "streamflow",
+        ]
+
+    def test_a_stale_pin_names_the_catalog_not_the_zip(self, catalog, tmp_path):
+        """A bare BadZipFile reads as a corrupt download, not a stale record."""
+        source = _source(catalog, tmp_path, blob=b"not a zip at all" * 64)
+
+        with pytest.raises(ValueError, match="the pin is stale"):
+            source.download()
+
+    def test_the_output_name_carries_the_window(self, catalog, tmp_path):
+        """Two different requests must not overwrite each other's table."""
+        _source(
+            catalog, tmp_path, write_table=True, start="2020-01-01", end="2020-01-02"
+        ).download()
+        _source(
+            catalog, tmp_path, write_table=True, start="2020-01-03", end="2020-01-03"
+        ).download()
+
+        assert len(list(tmp_path.glob("caravan_demo_*.csv"))) == 2

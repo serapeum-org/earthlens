@@ -26,10 +26,12 @@ current discharge is what is needed.
 
 from __future__ import annotations
 
+import zipfile
 from io import BytesIO
 from pathlib import Path
 from typing import Any, cast
 
+import numpy as np
 import pandas as pd
 from loguru import logger
 
@@ -233,8 +235,8 @@ class Caravan(AbstractDataSource):
         network round trip.
 
         Returns:
-            None: The backend holds no client; the transport is created per
-                archive in :meth:`_search`.
+            None: Nothing is bound onto `self.client` - the HTTP transport is
+                built in `__init__` and handed to each archive as it opens.
 
         Raises:
             ValueError: If the extension or version is unknown, or the release
@@ -260,12 +262,21 @@ class Caravan(AbstractDataSource):
         """
         if self.archive_file.is_range_readable or self._allow_full_download:
             return
-        alternatives = sorted(
+        # Ordered by release date, not by key: a lexicographic sort would rank
+        # "1.10" below "1.9" and recommend the older release.
+        alternatives = [
             key
-            for key, release in self.extension.versions.items()
-            if release.files.get(self._timeseries_format, None) is not None
-            and release.file_for(self._timeseries_format).is_range_readable
-        )
+            for key, _ in sorted(
+                (
+                    (key, release.release_date)
+                    for key, release in self.extension.versions.items()
+                    if release.files.get(self._timeseries_format) is not None
+                    and release.file_for(self._timeseries_format).is_range_readable
+                ),
+                key=lambda pair: pair[1],
+                reverse=True,
+            )
+        ]
         hint = (
             f" Pass version={alternatives[0]!r} to read a range-accessible "
             f"release instead (note it is an older, smaller release)."
@@ -327,15 +338,28 @@ class Caravan(AbstractDataSource):
             return self._archive
         archive_file = self.archive_file
         if archive_file.is_range_readable:
-            self._archive = _helpers.CaravanArchive.open_remote_zip(
-                archive_file.url,
-                client=self._client,
-                # A catalogued size saves the HEAD probe, but zero means the row
-                # simply does not record one - probe rather than believe the
-                # archive is empty.
-                size=archive_file.size or None,
-                label=f"caravan/{self._dataset}",
-            )
+            try:
+                self._archive = _helpers.CaravanArchive.open_remote_zip(
+                    archive_file.url,
+                    client=self._client,
+                    # A catalogued size saves the HEAD probe, but zero means the
+                    # row records none - probe rather than believe the archive
+                    # is empty.
+                    size=archive_file.size or None,
+                    label=f"caravan/{self._dataset}",
+                )
+            except zipfile.BadZipFile as exc:
+                # Almost always a stale pin: the catalogued size no longer
+                # matches what Zenodo serves, so the central directory is not
+                # where the offsets say. Raised bare, that reads as a corrupt
+                # download rather than a catalog problem.
+                raise ValueError(
+                    f"could not read the {self._dataset!r} archive "
+                    f"({archive_file.name}) as a ZIP. The catalog pins record "
+                    f"{archive_file.record} at {archive_file.size} bytes; if "
+                    f"Zenodo now serves something else the pin is stale. Run "
+                    f"`earthlens datasets refresh caravan` to check."
+                ) from exc
         else:
             tarball = _helpers.ensure_archive(
                 archive_file, cache_root=self._cache_root, client=self._client
@@ -398,7 +422,22 @@ class Caravan(AbstractDataSource):
             else:
                 missing.append(gauge_id)
         if missing:
-            sample = archive.gauge_ids(archive.sources[0], self._timeseries_format)[:3]
+            # `sources` is empty when nothing matched the timeseries pattern, so
+            # the sample lookup - inside the error path - used to raise
+            # IndexError and hide the real problem.
+            sample = (
+                archive.gauge_ids(archive.sources[0], self._timeseries_format)[:3]
+                if archive.sources
+                else []
+            )
+            if not sample:
+                raise ValueError(
+                    f"the {self._dataset!r} archive "
+                    f"({self.archive_file.name}) exposes no timeseries members "
+                    f"for format {self._timeseries_format!r}, so {missing} - and "
+                    f"any other id - cannot be resolved. The archive layout may "
+                    f"have changed; run `earthlens datasets refresh caravan`."
+                )
             raise ValueError(
                 f"{missing} not found in the {self._dataset!r} extension. "
                 f"Ids look like {sample} - note the prefix and its casing differ "
@@ -482,7 +521,8 @@ class Caravan(AbstractDataSource):
                 f"caravan {self._dataset}: {len(products)} catchments selected. "
                 f"Each is a separate ranged read and Zenodo is rate-limited, so "
                 f"this will take roughly {len(products) * 2 // 60 + 1} minute(s). "
-                f"Narrow the filters or pass limit= to stop early."
+                f"Narrow the filters, or pass limit= (a cap on ROWS, not "
+                f"catchments) to stop reading early."
             )
         return products
 
@@ -496,7 +536,13 @@ class Caravan(AbstractDataSource):
             ValueError: If a variable is unknown, or exists only in source
                 data this extension does not contain.
         """
-        names = self.vars if isinstance(self.vars, list) else list(self.vars)
+        # The ABC advertises `dict[str, list[str]] | list[str]`. `list(a_dict)`
+        # yields its KEYS, so the dict form resolved a dataset key as a variable
+        # name and always raised; flatten the grouped values instead.
+        if isinstance(self.vars, dict):
+            names: list[Any] = [name for group in self.vars.values() for name in group]
+        else:
+            names = list(self.vars)
         columns: list[str] = []
         for name in names:
             variable = self._catalog.get_variable(self._dataset, str(name))
@@ -617,16 +663,18 @@ class Caravan(AbstractDataSource):
             pd.Timestamp(self.time.start_date), pd.Timestamp(self.time.end_date)
         )
         frame = frame.loc[window].copy()
-        present = [column for column in columns if column in frame.columns]
         for absent in [column for column in columns if column not in frame.columns]:
             logger.warning(
                 f"caravan {self._dataset}: column {absent!r} is absent from "
                 f"{gauge_id}; returning it empty."
             )
-            frame[absent] = pd.NA
-            present.append(absent)
+            # A `pd.NA` column comes out `object`, which survives the concat
+            # and breaks arithmetic on a column the caller asked for as numeric.
+            frame[absent] = np.nan
         frame.insert(0, "gauge_id", gauge_id)
-        return frame[[*INDEX_COLUMNS, *present]]
+        # Requested order, not archive order: the columns the caller listed come
+        # back in the order they listed them, present or not.
+        return frame[[*INDEX_COLUMNS, *columns]]
 
     def _read_member(self, blob: bytes) -> pd.DataFrame:
         """Decode one timeseries member into a frame.
@@ -694,7 +742,13 @@ class Caravan(AbstractDataSource):
                     collections.append(FeatureCollection.read_file(str(shp)))
         if not collections:
             return None
-        return collections[0] if len(collections) == 1 else collections
+        if len(collections) > 1:
+            logger.warning(
+                f"caravan {self._dataset}: {len(collections)} sources ship basin "
+                f"shapes; returning the first ({archive.sources[0]}). Request one "
+                f"extension at a time for a single-source geometry."
+            )
+        return collections[0]
 
     def _create_output_path(self) -> Path:
         """Return the path the assembled table is written to.
@@ -704,7 +758,13 @@ class Caravan(AbstractDataSource):
         """
         version = self._version or self.extension.default_version
         safe_version = version.replace(".", "-")
-        return self._ensure_root_dir() / f"caravan_{self._dataset}_{safe_version}.csv"
+        # The selection and window are part of the identity: without them two
+        # different requests against one extension overwrite each other.
+        window = f"{self.time.start_date:%Y%m%d}-{self.time.end_date:%Y%m%d}"
+        return (
+            self._ensure_root_dir()
+            / f"caravan_{self._dataset}_{safe_version}_{window}.csv"
+        )
 
     def download(
         self, progress_bar: bool = True, limit: int | None = None
