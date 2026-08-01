@@ -711,6 +711,7 @@ nav:
       - Country Red List breakdown (live): examples/iucn/country_redlist_breakdown.ipynb
     - Caravan (large-sample hydrology):
       - Quickstart — an open GRDC hydrograph: examples/caravan/quickstart.ipynb
+      - Attributes, basin polygons & the base extension: examples/caravan/attributes_geometry_and_base.ipynb
     - Argo (float profiles):
       - Quickstart — float profiles: examples/argo/quickstart.ipynb
       - Catalog, selectors & T–S diagram: examples/argo/catalog_and_selectors.ipynb
