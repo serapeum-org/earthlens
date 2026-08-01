@@ -1601,6 +1601,87 @@ def _iucn_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"iucn": sorted(set(catalog.available_datasets) | set(catalog.datasets))}
 
 
+#: Zenodo's version-chain endpoint for one record.
+_ZENODO_VERSIONS = "https://zenodo.org/api/records/{record}/versions"
+
+#: Zenodo's search endpoint, used to discover Caravan extensions the catalog
+#: does not yet know about. The community publishes new extensions as brand-new
+#: records, so watching the pinned version chains alone would never find them.
+_ZENODO_SEARCH = "https://zenodo.org/api/records"
+
+
+def _caravan_grouped(catalog: Any) -> dict[str, list[str]]:
+    """Report Caravan release drift: newer versions, and undiscovered extensions.
+
+    Two kinds of drift matter for this backend and neither is visible from the
+    curated rows alone:
+
+    * A pinned extension gains a newer version. The catalog deliberately pins a
+      **specific** version record rather than the moving concept DOI, so a new
+      release is invisible until something looks. Worse, Caravan has changed
+      *packaging* mid-life — GRDC went `.tar.gz` to `.zip` at v0.4 — which
+      silently changes whether the archive can be range-read at all.
+    * A brand-new community extension is published as its own record, so it
+      never appears in any pinned version chain. The title search finds those.
+
+    This reports; it never rewrites the catalog. Bumping a pin means re-checking
+    the archive layout, gauge-id convention and column set, which is a human
+    decision — hence no `_WRITERS` entry, so `--write` says "live read only".
+
+    Args:
+        catalog: The loaded Caravan `Catalog`.
+
+    Returns:
+        One group per extension holding only the releases published *after* its
+        pin (empty when current), plus a `discovered` group naming Caravan
+        records whose concept the catalog does not track at all.
+    """
+    grouped: dict[str, list[str]] = {}
+    pinned: set[str] = set()
+    known_concepts = {
+        str(extension.concept_doi).rsplit(".", 1)[-1]
+        for extension in catalog.datasets.values()
+        if extension.concept_doi
+    }
+    for key, extension in sorted(catalog.datasets.items()):
+        newer: set[str] = set()
+        # Compare against the NEWEST pin, not each one. `base` pins both 1.6 and
+        # the older range-readable 1.2, and every release between them would
+        # otherwise be reported as drift when the row is in fact current.
+        latest_pin = max(
+            (version.release_date for version in extension.versions.values()),
+            default="",
+        )
+        records = {
+            archive.record
+            for version in extension.versions.values()
+            for archive in version.files.values()
+        }
+        pinned.update(str(record) for record in records)
+        for record in sorted(records):
+            payload = _get_json(_ZENODO_VERSIONS.format(record=record))
+            for hit in (payload.get("hits") or {}).get("hits") or []:
+                published = str((hit.get("metadata") or {}).get("publication_date", ""))
+                if published > latest_pin and str(hit.get("id")) not in pinned:
+                    newer.add(f"{hit.get('id')} ({published})")
+        grouped[key] = sorted(newer)
+
+    discovered: set[str] = set()
+    for query in ('title:"Caravan extension"', "title:Caravan AND keywords:Hydrology"):
+        payload = _get_json(
+            _ZENODO_SEARCH, params={"q": query, "size": 25, "sort": "newest"}
+        )
+        for hit in (payload.get("hits") or {}).get("hits") or []:
+            record = str(hit.get("id"))
+            concept = str(hit.get("conceptrecid"))
+            if record not in pinned and concept not in known_concepts:
+                discovered.add(
+                    f"{record} ({(hit.get('metadata') or {}).get('title', '')[:60]})"
+                )
+    grouped["discovered"] = sorted(discovered)
+    return grouped
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
 #: credentials; credentialed ones (openaq, firms) read their key from the env.
@@ -1630,6 +1711,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "obis": _obis_grouped,
     "wdpa": _wdpa_grouped,
     "iucn": _iucn_grouped,
+    "caravan": _caravan_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
