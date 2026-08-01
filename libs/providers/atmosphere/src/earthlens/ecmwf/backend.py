@@ -300,6 +300,72 @@ def _describe_pair(pair: tuple[str, str]) -> str:
     return f"{pair[0]}/{pair[1]}"
 
 
+def _remap_date_keys(
+    request: dict[str, Any], pairs: tuple[tuple[str, str], ...]
+) -> None:
+    """Rename request date keys in place (e.g. `year`→`hyear` for hindcasts).
+
+    Args:
+        request: The request dict being assembled (mutated in place).
+        pairs: `(source_key, destination_key)` renames to apply when the
+            source key is present.
+    """
+    for src_key, dst_key in pairs:
+        if src_key in request:
+            request[dst_key] = request.pop(src_key)
+
+
+def _apply_request_kind_dates(
+    request: dict[str, Any], var_info: Variable, start_date: Any, end_date: Any
+) -> None:
+    """Rewrite the request's date keys for the date-representation kinds (G11).
+
+    `cams_date` replaces year/month/day with a single `date` range string;
+    `glofas_hindcast` / `seasonal_hindcast` remap year/month(/day) to the
+    `hyear`/`hmonth`(/`hday`) hindcast-reference keys. Any other kind is a no-op.
+
+    Args:
+        request: The request dict assembled so far (mutated in place).
+        var_info: The catalog row whose `request_kind` selects the rewrite.
+        start_date: The window start (used for the `cams_date` range).
+        end_date: The window end (used for the `cams_date` range).
+    """
+    if var_info.request_kind == "cams_date":
+        for key in ("year", "month", "day", "product_type"):
+            request.pop(key, None)
+        request["date"] = f"{start_date:%Y-%m-%d}/{end_date:%Y-%m-%d}"
+        # Reset the daily template's 6-hourly slots to a single default
+        # (a per-row `extras: {time: [...]}` overrides it later).
+        request["time"] = ["00:00"]
+    elif var_info.request_kind == "glofas_hindcast":
+        _remap_date_keys(
+            request, (("year", "hyear"), ("month", "hmonth"), ("day", "hday"))
+        )
+    elif var_info.request_kind == "seasonal_hindcast":
+        # Seasonal reforecast: hindcast year/month, no day (stripped elsewhere).
+        _remap_date_keys(request, (("year", "hyear"), ("month", "hmonth")))
+
+
+def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> None:
+    """Merge per-row extras, drop the request-kind strips, apply None opt-outs.
+
+    The strip runs after the extras merge so a user can re-introduce a stripped
+    key by setting it in `extras`; the `None` opt-out then drops any `extras`
+    key explicitly set to `None`.
+
+    Args:
+        request: The request dict assembled so far (mutated in place).
+        var_info: The catalog row supplying `extras` and `request_kind`.
+    """
+    request.update(var_info.extras)
+    for stripped in _REQUEST_KIND_STRIPS.get(var_info.request_kind, ()):
+        if stripped not in var_info.extras:
+            request.pop(stripped, None)
+    for key, value in list(var_info.extras.items()):
+        if value is None:
+            request.pop(key, None)
+
+
 class ECMWF(LazyClientMixin, AbstractDataSource):
     """ECMWF / Copernicus Climate Data Store backend.
 
@@ -1014,7 +1080,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         )
         try:
             client.retrieve(dataset, request, str(target))
-        except Exception as exc:  # noqa: BLE001 - classify licence errors, re-raise the rest
+        except Exception as exc:  # noqa: BLE001
+            # Broad catch on purpose: classify a licence rejection into a clear
+            # PermissionError and re-raise everything else unchanged.
             if _looks_like_licence_not_accepted(exc):
                 base = endpoint_url(endpoint).rsplit("/api", 1)[0]
                 raise PermissionError(
@@ -1357,44 +1425,16 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             request["day"] = sorted({f"{d.day:02d}" for d in dates})
             request["time"] = ["00:00", "06:00", "12:00", "18:00"]
 
-        # Request-kind date representation (G11). CAMS grid datasets key on a
-        # single `date` range string (not year/month/day) and carry `type` /
-        # levels rather than `product_type`; the hindcast families remap
-        # year/month/day → hyear/hmonth/hday (G7).
-        if var_info.request_kind == "cams_date":
-            for key in ("year", "month", "day", "product_type"):
-                request.pop(key, None)
-            request["date"] = (
-                f"{self.time.start_date:%Y-%m-%d}/{self.time.end_date:%Y-%m-%d}"
-            )
-            # Reset the daily template's 6-hourly slots to a single default
-            # (a per-row `extras: {time: [...]}` overrides it below).
-            request["time"] = ["00:00"]
-        elif var_info.request_kind == "glofas_hindcast":
-            for src_key, dst_key in (
-                ("year", "hyear"),
-                ("month", "hmonth"),
-                ("day", "hday"),
-            ):
-                if src_key in request:
-                    request[dst_key] = request.pop(src_key)
-        elif var_info.request_kind == "seasonal_hindcast":
-            # Seasonal reforecast: hindcast year/month, no day (stripped below).
-            for src_key, dst_key in (("year", "hyear"), ("month", "hmonth")):
-                if src_key in request:
-                    request[dst_key] = request.pop(src_key)
+        # Request-kind date representation (G11): cams_date → a single `date`
+        # range string; the hindcast families remap year/month/day →
+        # hyear/hmonth/hday (G7).
+        _apply_request_kind_dates(
+            request, var_info, self.time.start_date, self.time.end_date
+        )
 
         if var_info.cds_pressure_level is not None:
             request["pressure_level"] = var_info.cds_pressure_level
 
-        request.update(var_info.extras)
-
-        for stripped in _REQUEST_KIND_STRIPS.get(var_info.request_kind, ()):
-            if stripped not in var_info.extras:
-                request.pop(stripped, None)
-
-        for key, value in list(var_info.extras.items()):
-            if value is None:
-                request.pop(key, None)
+        _apply_extras_and_strips(request, var_info)
 
         return request
