@@ -11,10 +11,20 @@ import pandas as pd
 import pytest
 
 from earthlens.base import SpatialExtent, TemporalExtent
-from earthlens.ecmwf import Variable
-from earthlens.ecmwf.backend import ECMWF
+from earthlens.ecmwf import Catalog, Variable
+from earthlens.ecmwf.backend import ECMWF, _REQUEST_KIND_STRIPS
 
 pytestmark = [pytest.mark.unit]
+
+
+class TestRequestKindIntegrity:
+    """Every curated dataset uses a request kind the backend recognises."""
+
+    def test_no_orphan_request_kinds(self):
+        """No curated row names a request_kind with no handler / strip entry."""
+        used = {record.request_kind for record in Catalog().datasets.values()}
+        unknown = used - set(_REQUEST_KIND_STRIPS)
+        assert not unknown, f"unrecognised request kinds in the catalog: {unknown}"
 
 
 def _backend(resolution="daily"):

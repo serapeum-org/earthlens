@@ -436,6 +436,15 @@ class TestCoverageOne:
         assert outcome.status == "ok", "gee coverage ran"
         assert outcome.counts["addressable"] == 1 and outcome.todo == ["B"]
 
+    def test_ecmwf_reports_done_and_addressable_across_stores(self):
+        """ecmwf coverage buckets the 3-store universe into DONE vs addressable."""
+        outcome = coverage_one(_info("ecmwf"))
+        assert outcome.status == "ok", "ecmwf coverage is supported"
+        assert outcome.counts["DONE"] > 0, "curated rows are DONE"
+        assert outcome.counts["addressable"] > 0, "uncurated ids are addressable"
+        # a curated ADS row is DONE, not in the addressable todo
+        assert "cams-global-reanalysis-eac4" not in outcome.todo
+
     def test_unsupported_provider(self):
         """A provider with no classifier reports unsupported."""
         assert coverage_one(_info("gdacs")).status == "unsupported"
