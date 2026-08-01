@@ -1116,10 +1116,20 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
 def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     """Retrieve a tiny CDS NetCDF and read each variable's long_name/units.
 
-    Builds a minimal request from the dataset's first `constraints.json`
-    row, retrieves it via `cdsapi` (`~/.cdsapirc`), and reads the NetCDF.
+    Builds a **complete** minimal request from the dataset's first usable
+    `constraints.json` entry — one value per selector, so the family selectors
+    a dataset requires beyond year/month/day (a satellite CDR's
+    sensor / version / record-type / aggregation, CMIP's experiment/model, ...)
+    are carried and the retrieve is a valid combination rather than a 400.
+    Only keys the entry actually enumerates are sent, so a product that does
+    not partition by day/time (obs4mips CO2/CH4) is not handed a spurious one.
+    Retrieves via `cdsapi` (`~/.cdsapirc`); a zip-of-NetCDF response (satellite
+    CDRs deliver one) is unwrapped to its first member before the variable
+    metadata is read via GDAL.
     """
+    import shutil
     import tempfile
+    import zipfile
     from pathlib import Path
 
     import cdsapi
@@ -1127,23 +1137,24 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     rows = _ecmwf_constraints(dataset)
     if not rows:
         return {}
-    row = rows[0]
-
-    def first(key: str, fallback: str) -> str:
-        """Return the first listed value for `key` in the row, else `fallback`."""
-        value = row.get(key)
-        return value[0] if isinstance(value, list) and value else fallback
-
-    request: dict[str, Any] = {
-        "variable": first("variable", "2m_temperature"),
-        "year": first("year", "2020"),
-        "month": first("month", "01"),
-        "day": first("day", "01"),
-        "time": first("time", "00:00"),
-        "data_format": "netcdf",
-    }
+    # Prefer the first entry that enumerates a variable (a usable retrieve);
+    # fall back to the first entry for datasets with no variable dimension.
+    row = next((entry for entry in rows if entry.get("variable")), rows[0])
+    request: dict[str, Any] = {"data_format": "netcdf"}
+    for key, value in row.items():
+        request[key] = value[:1] if isinstance(value, list) and value else value
+    # A dataset with no variable dimension still needs the widget's "all".
+    request.setdefault("variable", ["all"])
     target = Path(tempfile.mkdtemp()) / "probe.nc"
     cdsapi.Client().retrieve(dataset, request, str(target))
+    if zipfile.is_zipfile(target):
+        with zipfile.ZipFile(target) as archive:
+            members = [name for name in archive.namelist() if name.endswith(".nc")]
+            if members:
+                inner = target.parent / Path(members[0]).name
+                with archive.open(members[0]) as src, inner.open("wb") as dst:
+                    shutil.copyfileobj(src, dst)
+                target = inner
     return _read_netcdf_var_meta(str(target))
 
 
