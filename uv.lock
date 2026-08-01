@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.11, <4"
 resolution-markers = [
     "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
@@ -202,7 +202,7 @@ version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "frozenlist" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/61/62/06741b579156360248d1ec624842ad0edf697050bbaf7c3e46394e106ad1/aiosignal-1.4.0.tar.gz", hash = "sha256:f47eecd9468083c2029cc99945502cb7708b082c232f9aca65da147157b251c7", size = 25007, upload-time = "2025-07-03T22:54:43.528Z" }
 wheels = [
@@ -1884,8 +1884,53 @@ wheels = [
 
 [[package]]
 name = "earthaccess"
+version = "0.17.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.12' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "(python_full_version < '3.12' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version < '3.12' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
+    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+]
+dependencies = [
+    { name = "fsspec", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "importlib-resources", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "multimethod", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "pqdm", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "python-cmr", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "requests", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "s3fs", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "tenacity", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "tinynetrc", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/35/8c/3af48281cc6cb923fa3cebc12fe3affe2dd010264ea8163fbc43bcdfe02b/earthaccess-0.17.0.tar.gz", hash = "sha256:a353e40f4c7eb5445f543dcacc81e905ef16799f816a471a68a57f7a407d66ef", size = 12876625, upload-time = "2026-04-02T16:53:19.28Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0c/88/386bbc53666cd7b54144d258a1bcb2753a89404b14f5f043c44b200f3b48/earthaccess-0.17.0-py3-none-any.whl", hash = "sha256:b6628b7f9dff4eb1caaa631bd4acadf7be1b8a38f9f110b6d511994b037c016f", size = 76982, upload-time = "2026-04-02T16:53:17.777Z" },
+]
+
+[[package]]
+name = "earthaccess"
 version = "0.18.0"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.15' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version == '3.14.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "(python_full_version >= '3.15' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version >= '3.15' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
+    "(python_full_version == '3.14.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.14.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
+    "python_full_version == '3.13.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "(python_full_version == '3.13.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.13.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
+    "python_full_version == '3.12.*' and platform_machine == 'ARM64' and sys_platform == 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "(python_full_version == '3.12.*' and platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo') or (python_full_version == '3.12.*' and sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo')",
+    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version >= '3.15' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version == '3.14.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version == '3.13.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+    "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
+]
 dependencies = [
     { name = "fsspec", marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
     { name = "importlib-resources", marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -1936,7 +1981,7 @@ dependencies = [
 [package.optional-dependencies]
 all = [
     { name = "earthlens-atmosphere", extra = ["ecmwf", "ecmwf-modern", "eea-aq", "goes", "nwp", "radar", "s3", "tropycal"] },
-    { name = "earthlens-hazards", extra = ["fdsn", "hdx", "osm", "overture"] },
+    { name = "earthlens-hazards", extra = ["emdat", "fdsn", "hdx", "osm", "overture"] },
     { name = "earthlens-imagery", extra = ["asf", "earthdata", "eumetsat", "gee", "jaxa", "sentinel-hub", "stac"] },
     { name = "earthlens-imagery", extra = ["openeo"], marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
     { name = "earthlens-land", extra = ["dem", "gbif", "worldpop"] },
@@ -1968,6 +2013,9 @@ ecmwf-modern = [
 ]
 eea-aq = [
     { name = "earthlens-atmosphere", extra = ["eea-aq"] },
+]
+emdat = [
+    { name = "earthlens-hazards", extra = ["emdat"] },
 ]
 erddap = [
     { name = "earthlens-ocean", extra = ["erddap"] },
@@ -2095,6 +2143,7 @@ requires-dist = [
     { name = "earthlens", extras = ["ecmwf"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["ecmwf-modern"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["eea-aq"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["emdat"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["erddap"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["eumetsat"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["fdsn"], marker = "extra == 'all'" },
@@ -2129,6 +2178,7 @@ requires-dist = [
     { name = "earthlens-atmosphere", extras = ["tropycal"], marker = "extra == 'tropycal'", editable = "libs/providers/atmosphere" },
     { name = "earthlens-core", editable = "libs/core" },
     { name = "earthlens-hazards", editable = "libs/providers/hazards" },
+    { name = "earthlens-hazards", extras = ["emdat"], marker = "extra == 'emdat'", editable = "libs/providers/hazards" },
     { name = "earthlens-hazards", extras = ["fdsn"], marker = "extra == 'fdsn'", editable = "libs/providers/hazards" },
     { name = "earthlens-hazards", extras = ["hdx"], marker = "extra == 'hdx'", editable = "libs/providers/hazards" },
     { name = "earthlens-hazards", extras = ["osm"], marker = "extra == 'osm'", editable = "libs/providers/hazards" },
@@ -2156,7 +2206,7 @@ requires-dist = [
     { name = "earthlens-ocean", extras = ["obis"], marker = "extra == 'obis'", editable = "libs/providers/ocean" },
     { name = "earthlens-ocean", extras = ["usgs-water"], marker = "extra == 'usgs-water'", editable = "libs/providers/ocean" },
 ]
-provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf", "ecmwf-modern", "eea-aq", "erddap", "eumetsat", "fdsn", "gbif", "gee", "ghsl", "goes", "hdx", "jaxa", "nwm", "nwp", "obis", "openeo", "osm", "osm-pbf", "overture", "radar", "s3", "sentinel-hub", "stac", "tropycal", "usgs-water", "worldpop", "all"]
+provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf", "ecmwf-modern", "eea-aq", "emdat", "erddap", "eumetsat", "fdsn", "gbif", "gee", "ghsl", "goes", "hdx", "jaxa", "nwm", "nwp", "obis", "openeo", "osm", "osm-pbf", "overture", "radar", "s3", "sentinel-hub", "stac", "tropycal", "usgs-water", "worldpop", "all"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2305,12 +2355,12 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyproj", specifier = ">=3.7.0" },
     { name = "pyramids-gis", specifier = ">=0.46.0" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=8" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "requests", specifier = ">=2.28.1" },
     { name = "rich", specifier = ">=13" },
     { name = "shapely", specifier = ">=2.0.0" },
     { name = "tqdm", specifier = ">=4.66.0" },
-    { name = "pytest", marker = "extra == 'test'", specifier = ">=8" },
     { name = "typer", specifier = ">=0.12" },
 ]
 provides-extras = ["s3", "test"]
@@ -2324,6 +2374,10 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+emdat = [
+    { name = "earthaccess", version = "0.17.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "earthaccess", version = "0.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+]
 fdsn = [
     { name = "obspy" },
 ]
@@ -2346,6 +2400,7 @@ overture = [
 [package.metadata]
 requires-dist = [
     { name = "duckdb", marker = "extra == 'overture'", specifier = ">=1.0.0" },
+    { name = "earthaccess", marker = "extra == 'emdat'", specifier = ">=0.17.0" },
     { name = "earthlens-core", editable = "libs/core" },
     { name = "hdx-python-api", marker = "extra == 'hdx'", specifier = ">=6,<7" },
     { name = "obspy", marker = "extra == 'fdsn'", specifier = ">=1.5.0" },
@@ -2355,7 +2410,7 @@ requires-dist = [
     { name = "overturemaps", marker = "extra == 'overture'", specifier = ">=1.0.0" },
     { name = "pyrosm", marker = "extra == 'osm-pbf'", specifier = ">=0.11.0" },
 ]
-provides-extras = ["fdsn", "hdx", "overture", "osm", "osm-pbf"]
+provides-extras = ["emdat", "fdsn", "hdx", "overture", "osm", "osm-pbf"]
 
 [[package]]
 name = "earthlens-imagery"
@@ -2368,10 +2423,10 @@ dependencies = [
 [package.optional-dependencies]
 asf = [
     { name = "asf-search" },
-    { name = "earthaccess", marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "earthaccess", version = "0.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
 earthdata = [
-    { name = "earthaccess", marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "earthaccess", version = "0.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
 eumetsat = [
     { name = "eumdac" },
@@ -7473,9 +7528,9 @@ name = "python-cmr"
 version = "0.13.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "python-dateutil", marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "requests", marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "typing-extensions", marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "python-dateutil" },
+    { name = "requests" },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5d/04/fbe29a33172fc093d998600c8ee14bfb82e6b4b2ce3d08da1afc04ff5fce/python_cmr-0.13.0.tar.gz", hash = "sha256:ac671d9696979427ee1f98104bf1dbe2ae547f8e0cc9f63ae5efcc6d1f436c6d", size = 17175, upload-time = "2024-09-13T22:35:08.531Z" }
 wheels = [
@@ -8422,7 +8477,7 @@ resolution-markers = [
     "python_full_version < '3.12' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7a/97/5a3609c4f8d58b039179648e62dd220f89864f56f7357f5d4f45c29eb2cc/scipy-1.17.1.tar.gz", hash = "sha256:95d8e012d8cb8816c226aef832200b1d45109ed4464303e997c5b13122b297c0", size = 30573822, upload-time = "2026-02-23T00:26:24.851Z" }
 wheels = [
@@ -8511,7 +8566,7 @@ resolution-markers = [
     "python_full_version == '3.12.*' and extra != 'extra-15-earthlens-ocean-argo' and extra != 'extra-17-earthlens-imagery-openeo'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a7/25/c2700dfaf6442b4effaa91af24ebce5dc9d31bb4a69706313aae70d72cd0/scipy-1.18.0.tar.gz", hash = "sha256:67b2ad2ad54c72ca6d04975a9b2df8c3638c34ddd5b28738e94fc2b57929d378", size = 30774447, upload-time = "2026-06-19T15:01:43.456Z" }
 wheels = [
@@ -9694,8 +9749,8 @@ resolution-markers = [
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra == 'extra-15-earthlens-ocean-argo') or (python_full_version < '3.12' and extra != 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
     { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and extra == 'extra-15-earthlens-ocean-argo') or (python_full_version >= '3.12' and extra != 'extra-17-earthlens-imagery-openeo') or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "packaging", marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
-    { name = "pandas", marker = "extra == 'extra-15-earthlens-ocean-argo' or extra != 'extra-17-earthlens-imagery-openeo'" },
+    { name = "packaging" },
+    { name = "pandas" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/4e/0b/bbb76e05c8e2099baf90e259c29cafe6a525524b1d1da8bfbc39577c043e/xarray-2025.9.0.tar.gz", hash = "sha256:7dd6816fe0062c49c5e9370dd483843bc13e5ed80a47a9ff10baff2b51e070fb", size = 3040318, upload-time = "2025-09-04T04:20:26.296Z" }
 wheels = [

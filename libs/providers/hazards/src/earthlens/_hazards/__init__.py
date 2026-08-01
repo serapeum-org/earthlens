@@ -13,10 +13,12 @@ from __future__ import annotations
 __all__ = ["BACKENDS"]
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 19 data-source keys.
+#: distribution's 21 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
+    'emdat': ('earthlens.emdat', 'EMDAT', 'emdat', {}),
+    'gdis': ('earthlens.emdat', 'EMDAT', 'emdat', {}),
     'hdx': ('earthlens.hdx', 'HDX', 'hdx', {}),
     'overture': ('earthlens.overture', 'Overture', 'overture', {}),
     'firms': ('earthlens.firms', 'FIRMS', '', {}),
