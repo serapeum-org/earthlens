@@ -315,7 +315,10 @@ class Caravan(AbstractDataSource):
             self._archive = _helpers.CaravanArchive.open_remote_zip(
                 archive_file.url,
                 client=self._client,
-                size=archive_file.size,
+                # A catalogued size saves the HEAD probe, but zero means the row
+                # simply does not record one - probe rather than believe the
+                # archive is empty.
+                size=archive_file.size or None,
                 label=f"caravan/{self._dataset}",
             )
         else:
@@ -685,7 +688,7 @@ class Caravan(AbstractDataSource):
         """
         import tempfile
 
-        from pyramids.featurecollection import FeatureCollection
+        from pyramids.feature.collection import FeatureCollection
 
         archive = self._open_archive()
         collections = []
@@ -739,7 +742,10 @@ class Caravan(AbstractDataSource):
                 unknown variable, or a release needing `allow_full_download`.
         """
         self._limit = self.check_limit(limit)
-        frames = self._api()
+        # Drop the empty fragments a skipped catchment or an out-of-window
+        # member leaves behind: concatenating them makes pandas infer dtypes
+        # from all-NA columns, which it warns about and will change.
+        frames = [frame for frame in self._api() if not frame.empty]
         if frames:
             table = pd.concat(frames, ignore_index=True)
         else:
