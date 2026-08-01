@@ -608,11 +608,20 @@ def curate(
     fill_empty: bool = typer.Option(
         False,
         "--fill-empty",
-        help="gee: bulk-hydrate EVERY empty-band curated row in place from "
-        "Earth Engine (needs --write + GEE creds; ignores upstream_id).",
+        help="gee/ecmwf: bulk-hydrate EVERY placeholder curated row in place "
+        "from a live read (needs --write + creds; ignores upstream_id).",
+    ),
+    all_: bool = typer.Option(
+        False,
+        "--all",
+        help="ecmwf: bulk-seed every uncurated dataset into the shards "
+        "(needs --write; ignores upstream_id).",
     ),
     limit: int = typer.Option(
-        0, "--limit", help="gee --fill-empty: only hydrate the first N rows (0=all)."
+        0,
+        "--limit",
+        help="ecmwf --all / gee|ecmwf --fill-empty: only process the first N "
+        "rows (0=all).",
     ),
     version: str = typer.Option("", "--version", help="earthdata: collection version."),
     cmr_provider: str = typer.Option(
@@ -666,6 +675,9 @@ def curate(
     if len(backends) != 1:
         raise typer.BadParameter("curate takes exactly one provider")
 
+    if all_:
+        _curate_all(backends[0], write=write, limit=limit or None)
+        return
     if fill_empty:
         _curate_fill_empty(backends[0], write=write, limit=limit or None)
         return
@@ -717,6 +729,28 @@ def curate(
             f"[dim]# paste into the curated datasets: block ({result.provider})[/dim]"
         )
         typer.echo(result.to_yaml())
+
+
+def _curate_all(info, *, write: bool, limit: int | None) -> None:
+    """Run `curate ecmwf --all`: bulk-seed every uncurated dataset into shards.
+
+    Args:
+        info: The backend (must be ecmwf).
+        write: `--all` mutates the catalog shards, so `--write` is required.
+        limit: Only seed the first N uncurated datasets (None = all).
+    """
+    if info.provider != "ecmwf":
+        raise typer.BadParameter("--all is only supported for ecmwf")
+    if not write:
+        raise typer.BadParameter("--all writes the catalog shards; pass --write")
+    from earthlens.cli._ecmwf_seed import bulk_seed_uncurated
+
+    summary = bulk_seed_uncurated(limit=limit)
+    out_console().print(
+        f"[green]seeded {summary['seeded']}[/green] / "
+        f"{summary['candidates']} uncurated "
+        f"(skipped {summary['skipped']})"
+    )
 
 
 def _curate_fill_empty(info, *, write: bool, limit: int | None) -> None:

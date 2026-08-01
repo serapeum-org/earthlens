@@ -511,6 +511,34 @@ class TestCurate:
         result = runner.invoke(app, ["datasets", "curate", "usgs_water"])
         assert result.exit_code == 2, "missing id -> exit 2"
 
+    def test_all_runs_bulk_seed(self, monkeypatch):
+        """ecmwf --all --write drives the bulk seed and reports a summary."""
+        from earthlens.cli import _ecmwf_seed as seed_mod
+
+        monkeypatch.setattr(
+            seed_mod,
+            "bulk_seed_uncurated",
+            lambda limit=None: {
+                "candidates": 5,
+                "seeded": 4,
+                "skipped": 1,
+                "failed": [("x", "boom")],
+            },
+        )
+        result = runner.invoke(app, ["datasets", "curate", "ecmwf", "--all", "--write"])
+        assert result.exit_code == 0, f"--all failed: {result.output}"
+        assert "seeded 4" in result.output and "/ 5" in result.output
+
+    def test_all_requires_write(self):
+        """--all without --write is a usage error (it mutates the catalog)."""
+        result = runner.invoke(app, ["datasets", "curate", "ecmwf", "--all"])
+        assert result.exit_code == 2, "--all without --write -> exit 2"
+
+    def test_all_ecmwf_only(self):
+        """--all on a non-ecmwf provider is rejected."""
+        result = runner.invoke(app, ["datasets", "curate", "gee", "--all", "--write"])
+        assert result.exit_code == 2, "--all non-ecmwf -> exit 2"
+
 
 class TestValidate:
     """Tests for `datasets validate` (per-entry checks)."""
