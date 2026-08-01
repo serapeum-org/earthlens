@@ -207,6 +207,7 @@ nav:
     - ECMWF:
       - Introduction: reference/ecmwf/introduction.md
       - Usage: reference/ecmwf/usage.md
+      - Data stores (CDS + ADS + EWDS): reference/ecmwf/datastores.md
       - EWDS (GloFAS / floods): reference/ecmwf/ewds.md
       - Catalog & tooling: reference/ecmwf/catalog.md
       - Reference: reference/ecmwf/ecmwf.md
