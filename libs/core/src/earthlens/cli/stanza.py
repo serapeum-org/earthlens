@@ -777,7 +777,9 @@ def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
         return "glofas_hindcast" if "hday" in fields else "seasonal_hindcast"
     if "date" in fields:
         return "cams_date"
-    if "quantity" in fields or ("year" in fields and "day" not in fields and "model" in fields):
+    if "quantity" in fields or (
+        "year" in fields and "day" not in fields and "model" in fields
+    ):
         return "cams_inversion"
     if "year" in fields and "day" not in fields:
         return "seasonal"

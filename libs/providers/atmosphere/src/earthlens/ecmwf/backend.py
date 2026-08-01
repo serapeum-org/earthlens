@@ -1009,9 +1009,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         )
         try:
             client.retrieve(dataset, request, str(target))
-        except (
-            Exception
-        ) as exc:  # noqa: BLE001 - classify licence errors, re-raise the rest
+        except Exception as exc:  # noqa: BLE001 - classify licence errors, re-raise the rest
             if _looks_like_licence_not_accepted(exc):
                 base = endpoint_url(endpoint).rsplit("/api", 1)[0]
                 raise PermissionError(

@@ -12,7 +12,7 @@ import pytest
 
 from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.ecmwf import Catalog, Variable
-from earthlens.ecmwf.backend import ECMWF, _REQUEST_KIND_STRIPS
+from earthlens.ecmwf.backend import _REQUEST_KIND_STRIPS, ECMWF
 
 pytestmark = [pytest.mark.unit]
 

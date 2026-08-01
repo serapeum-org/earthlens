@@ -91,9 +91,9 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # script append) invalidates the entry naturally. Mirrors the GEE
 # pattern (H1 / M2) so repeated `Catalog()` construction is ~1 ms
 # instead of paying the YAML parse + pydantic validation each time.
-_CATALOG_CACHE: dict[
-    Any, tuple[list[str], dict[str, Dataset], dict[str, str]]
-] = CatalogParseCache()
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset], dict[str, str]]] = (
+    CatalogParseCache()
+)
 
 
 def clear_catalog_cache() -> None:

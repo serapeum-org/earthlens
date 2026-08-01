@@ -138,7 +138,9 @@ class TestPassthroughRetrieve:
         """An explicit `endpoint=` is used verbatim."""
         backend = _passthrough(tmp_path, dataset="whatever", endpoint="ewds")
         captured: list[str] = []
-        backend._client_for = lambda endpoint: captured.append(endpoint) or _RecordingClient()
+        backend._client_for = lambda endpoint: (
+            captured.append(endpoint) or _RecordingClient()
+        )
         backend.download()
         assert captured == ["ewds"]
 
