@@ -1018,25 +1018,27 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         )
         var_info = catalog.get_variable(dataset_name, var)
         nc_path = self._download_dataset(var_info, progress_bar=progress_bar)
-        if aggregate is None:
-            # A multi-member retrieve was unpacked into a sibling `<stem>/` dir,
-            # so the returned member's parent is that dir rather than `root_dir`;
-            # return every member (already masked in `_api`) so `download()`'s
-            # list is complete, not just the first.
-            if nc_path.parent != self.root_dir:
-                return sorted(nc_path.parent.glob("*.nc"))
-            return [nc_path]
         # A multi-member zip-of-NetCDF (satellite CDR / CAMS `netcdf_zip` over
-        # several timesteps) is unpacked into a sibling `<stem>/` dir, so the
-        # returned member's parent is that dir rather than `root_dir`.
+        # several timesteps) is unpacked by `_api` into this sibling
+        # `<cds_variable>_<cds_dataset>/` directory; the returned member's parent
+        # equals it exactly (a single-file retrieve returns the file at
+        # `root_dir` itself).
+        member_dir = self.root_dir / f"{var_info.cds_variable}_{var_info.cds_dataset}"
+        is_multi_member = member_dir.is_dir() and nc_path.parent == member_dir
+        if aggregate is None:
+            # Return every member (already masked in `_api`) so `download()`'s
+            # list is complete, not just the first.
+            if is_multi_member:
+                return sorted(member_dir.glob("*.nc"))
+            return [nc_path]
         # `aggregate_netcdf` reduces a single cube — reducing only the first
         # member would return a plausible-looking but partial result, so refuse.
-        if nc_path.parent != self.root_dir:
+        if is_multi_member:
             raise ValueError(
                 f"{dataset_name}/{var}: the retrieve returned a multi-member "
                 "zip-of-NetCDF (one file per timestep); aggregating across "
                 "members is not supported. Re-run without `aggregate=` and "
-                f"reduce the member directory ({nc_path.parent}) yourself, or "
+                f"reduce the member directory ({member_dir}) yourself, or "
                 "request a single window."
             )
         agg = aggregate_netcdf(nc_path, var_info, aggregate)

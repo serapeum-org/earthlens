@@ -176,7 +176,11 @@ class TestCuratedApiMultiMemberZip:
         from earthlens.ecmwf import Catalog
 
         backend = _curated_backend(tmp_path)
-        member_dir = tmp_path / "sm_satellite-soil-moisture"
+        catalog = Catalog()
+        var = catalog.get_variable(
+            "satellite-soil-moisture", "surface-soil-moisture-volumetric"
+        )
+        member_dir = tmp_path / f"{var.cds_variable}_{var.cds_dataset}"
         member_dir.mkdir()
         (member_dir / "2020.nc").write_bytes(b"CDF")
         (member_dir / "2021.nc").write_bytes(b"CDF")
@@ -185,7 +189,7 @@ class TestCuratedApiMultiMemberZip:
         )
         out = backend._download_pair(
             ("satellite-soil-moisture", "surface-soil-moisture-volumetric"),
-            catalog=Catalog(),
+            catalog=catalog,
             progress_bar=True,
             aggregate=None,
         )
@@ -197,12 +201,15 @@ class TestCuratedApiMultiMemberZip:
         from earthlens.ecmwf import Catalog
 
         backend = _curated_backend(tmp_path)
-        member_dir = tmp_path / "sm_satellite-soil-moisture"
+        catalog = Catalog()
+        var = catalog.get_variable(
+            "satellite-soil-moisture", "surface-soil-moisture-volumetric"
+        )
+        member_dir = tmp_path / f"{var.cds_variable}_{var.cds_dataset}"
         member_dir.mkdir()
         member = member_dir / "2020.nc"
         member.write_bytes(b"CDF")
         backend._download_dataset = lambda var_info, progress_bar=True: member
-        catalog = Catalog()
         aggregate = AggregationConfig(freq="1D")
         with pytest.raises(ValueError, match="multi-member"):
             backend._download_pair(
