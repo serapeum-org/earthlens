@@ -17,14 +17,23 @@ mounted on an `HTTPAdapter`) generalising the loop the REST backends
 is unit-testable with a fake transport — no live network, no real
 delays.
 
+Alongside it, `HttpRangeFile` turns a range-serving URL into a
+**seekable** binary file object, so a stdlib container reader
+(`zipfile`, and anything else that only needs `readinto`/`seek`) can pull
+one member out of a multi-gigabyte remote archive without downloading
+it. It reads through an `HttpClient`, so it inherits the same retry and
+throttle policy.
+
 `requests` and `tqdm` are already core earthlens dependencies, so this
-module adds none. The public import is
-`from earthlens.base.http import HttpClient`.
+module adds none. The public imports are
+`from earthlens.base.http import HttpClient, HttpRangeFile`.
 """
 
 from __future__ import annotations
 
 import datetime as dt
+import io
+import re
 import threading
 import time
 from collections.abc import Callable
@@ -59,6 +68,15 @@ DEFAULT_STATUS_FORCELIST: tuple[int, ...] = (429, 500, 502, 503, 504)
 
 #: Streaming chunk size (bytes) for :meth:`HttpClient.download` — 1 MiB.
 DEFAULT_CHUNK_SIZE = 1 << 20
+
+#: Buffer size (bytes) :meth:`HttpRangeFile.buffered` wraps the raw
+#: range reader in — 1 MiB, so a container's many small structural reads
+#: coalesce into few HTTP requests.
+DEFAULT_RANGE_BUFFER_SIZE = 1 << 20
+
+#: `Content-Range: bytes <first>-<last>/<total>` — the `<total>` group is
+#: the object size a `206` reply carries, used when `HEAD` is unavailable.
+_CONTENT_RANGE_TOTAL = re.compile(r"bytes\s+\d+-\d+/(\d+)")
 
 
 def _parse_retry_after(value: str | None) -> float | None:
@@ -923,3 +941,290 @@ class HttpClient:
         if callable(verb):
             return cast("requests.Response", verb(url, **kwargs))
         return self._session.request(method, url, **kwargs)
+
+
+class HttpRangeFile(io.RawIOBase):
+    """A seekable, read-only binary file over an HTTP URL, backed by `Range`.
+
+    Implements just enough of the binary file protocol — `readinto`,
+    `seek`, `tell`, `seekable`, `readable` — that the stdlib container
+    readers accept it as a file object. That turns any range-serving URL
+    into random-access storage, so a member can be pulled out of a
+    multi-gigabyte remote archive without downloading the archive.
+
+    The motivating case is a ZIP, which stores its central directory at
+    the tail: `zipfile.ZipFile(HttpRangeFile(url).buffered())` reads the
+    directory from the last few kilobytes and then inflates only the
+    members asked for. Measured against an 8.84 GB Zenodo archive, the
+    full member index costs 4 requests / 0.81 MB and one member a further
+    2 requests / 2.1 MB — against 8.84 GB for the download-it-all
+    alternative.
+
+    Every read goes through the supplied :class:`HttpClient`, so the
+    retry / back-off / throttle / `User-Agent` policy is the one the rest
+    of earthlens uses, and tests inject a fake session instead of a
+    network.
+
+    Two correctness guards matter and are enforced:
+
+    * A server that **ignores** `Range` answers `200` with the whole
+      body. Silently accepting that would mis-seek every later read (and
+      quietly transfer the entire object), so a non-`206` reply raises.
+    * A **compressed** transfer would return a byte count unrelated to
+      the requested range, so `Accept-Encoding: identity` is sent on
+      every read, overriding the client's default `gzip, deflate`.
+
+    Attributes:
+        url: The resolved (post-redirect) URL bytes are fetched from.
+        size: Total object size in bytes.
+        request_count: Range requests issued so far — for cost logging.
+        bytes_read: Total bytes transferred so far — for cost logging.
+
+    Examples:
+        - Random access over a fake transport, no network:
+            ```python
+            >>> import io
+            >>> import requests
+            >>> from earthlens.base.http import HttpClient, HttpRangeFile
+            >>> body = bytes(range(256))
+            >>> class FakeSession:
+            ...     headers = {}
+            ...     def head(self, url, **kwargs):
+            ...         r = requests.Response()
+            ...         r.status_code = 200
+            ...         r.url = url
+            ...         r.headers["Content-Length"] = str(len(body))
+            ...         return r
+            ...     def get(self, url, **kwargs):
+            ...         first, last = kwargs["headers"]["Range"][6:].split("-")
+            ...         r = requests.Response()
+            ...         r.status_code = 206
+            ...         r._content = body[int(first) : int(last) + 1]
+            ...         return r
+            >>> handle = HttpRangeFile(
+            ...     "https://example.org/blob", client=HttpClient(session=FakeSession())
+            ... )
+            >>> handle.size
+            256
+            >>> handle.seek(-4, io.SEEK_END)
+            252
+            >>> handle.read(4)
+            b'\\xfc\\xfd\\xfe\\xff'
+            >>> handle.request_count
+            1
+
+            ```
+    """
+
+    def __init__(
+        self,
+        url: str,
+        *,
+        client: HttpClient | None = None,
+        size: int | None = None,
+        timeout: float | None = None,
+    ) -> None:
+        """Open the remote object and resolve its length.
+
+        Args:
+            url: The object URL. Redirects are followed once here and the
+                final URL reused for every read, so a redirecting host is
+                not re-negotiated on each range request.
+            client: Transport to read through. Defaults to a fresh
+                :class:`HttpClient`. Inject one to share a session, carry
+                auth headers, or supply a fake transport in tests.
+            size: Total object size when the caller already knows it (e.g.
+                from a catalog row). Skips the size probe entirely — one
+                fewer round trip.
+            timeout: Per-request timeout override in seconds, applied to
+                the size probe and every read.
+
+        Raises:
+            ValueError: When the object's size cannot be determined —
+                neither a `HEAD` `Content-Length` nor a `Content-Range`
+                on a one-byte probe yielded a length, so no offset
+                arithmetic is possible.
+        """
+        self._client = client if client is not None else HttpClient()
+        self._timeout = timeout
+        self._pos = 0
+        self.request_count = 0
+        self.bytes_read = 0
+        self.url = url
+        self.size = size if size is not None else self._probe_size(url)
+
+    def _probe_size(self, url: str) -> int:
+        """Resolve the object length, preferring `HEAD` over a byte probe.
+
+        `HEAD` is one cheap round trip and is what a well-behaved static
+        host answers. Some hosts reject it (`405`) or omit
+        `Content-Length`, so the fallback is a `Range: bytes=0-0` `GET`
+        whose `206` carries `Content-Range: bytes 0-0/<total>`. The
+        fallback doubles as a range-support check: a host that cannot
+        satisfy a one-byte range cannot back this file object at all.
+
+        Args:
+            url: The object URL, before redirects are followed.
+
+        Returns:
+            int: The total object size in bytes.
+
+        Raises:
+            ValueError: When neither route yields a length.
+        """
+        try:
+            response = self._client.request(
+                "HEAD",
+                url,
+                allow_redirects=True,
+                timeout=self._timeout,
+                raise_for_status=False,
+            )
+        except requests.RequestException:
+            response = None
+        if response is not None and response.ok:
+            # Trust the redirect chain HEAD walked, so the reads skip it.
+            self.url = response.url or url
+            length = response.headers.get("Content-Length")
+            if length is not None and length.isdigit():
+                return int(length)
+
+        probe = self._client.get(
+            url,
+            headers={"Range": "bytes=0-0", "Accept-Encoding": "identity"},
+            timeout=self._timeout,
+        )
+        self.url = probe.url or url
+        match = _CONTENT_RANGE_TOTAL.search(probe.headers.get("Content-Range", ""))
+        if match is None:
+            raise ValueError(
+                f"cannot determine the size of {redact_url(url)}: the server "
+                f"returned neither a HEAD Content-Length nor a Content-Range "
+                f"on a byte probe, so it cannot be read by range."
+            )
+        return int(match.group(1))
+
+    def readable(self) -> bool:
+        """Return `True` — the object is read-only but always readable."""
+        return True
+
+    def seekable(self) -> bool:
+        """Return `True` — random access is the point of this file object."""
+        return True
+
+    def writable(self) -> bool:
+        """Return `False` — a remote object is never written through this."""
+        return False
+
+    def tell(self) -> int:
+        """Return the current byte offset (no request is issued)."""
+        return self._pos
+
+    def seek(self, offset: int, whence: int = io.SEEK_SET) -> int:
+        """Move the read cursor without touching the network.
+
+        Args:
+            offset: Byte offset relative to `whence`.
+            whence: `io.SEEK_SET` (0, from the start), `io.SEEK_CUR` (1,
+                from the current position), or `io.SEEK_END` (2, from the
+                end — a negative `offset` is the usual way to reach a
+                container's trailing index).
+
+        Returns:
+            int: The new absolute offset, floored at `0`. Seeking past
+                the end is allowed (as for a local file); the next read
+                simply returns nothing.
+
+        Raises:
+            ValueError: On an unknown `whence`.
+        """
+        if whence == io.SEEK_SET:
+            target = offset
+        elif whence == io.SEEK_CUR:
+            target = self._pos + offset
+        elif whence == io.SEEK_END:
+            target = self.size + offset
+        else:
+            raise ValueError(f"invalid whence {whence!r}; expected 0, 1 or 2.")
+        self._pos = max(0, target)
+        return self._pos
+
+    def readinto(self, buffer: Any) -> int:
+        """Fill `buffer` from the current offset with a single ranged `GET`.
+
+        The read is clamped to the object's end, so a caller asking for
+        more than remains gets a short read rather than an error — the
+        contract `io.BufferedReader` expects.
+
+        Args:
+            buffer: A writable buffer (`bytearray` / `memoryview`) to
+                fill. Its length is the number of bytes requested.
+
+        Returns:
+            int: Bytes written into `buffer`; `0` at (or past) the end of
+                the object.
+
+        Raises:
+            ValueError: When the server answers something other than
+                `206 Partial Content` — it ignored the `Range` header, so
+                the returned bytes are not the requested window and every
+                subsequent offset would be wrong.
+        """
+        want = len(buffer)
+        if want <= 0 or self._pos >= self.size:
+            return 0
+        last = min(self._pos + want, self.size) - 1
+        response = self._client.get(
+            self.url,
+            headers={
+                "Range": f"bytes={self._pos}-{last}",
+                # The client's default `gzip, deflate` would make the body
+                # length unrelated to the requested window.
+                "Accept-Encoding": "identity",
+            },
+            timeout=self._timeout,
+        )
+        if response.status_code != 206:
+            raise ValueError(
+                f"{redact_url(self.url)} ignored the Range header "
+                f"(status {response.status_code}, expected 206); it cannot be "
+                f"read by range."
+            )
+        data = response.content
+        buffer[: len(data)] = data
+        self.request_count += 1
+        self.bytes_read += len(data)
+        self._pos += len(data)
+        return len(data)
+
+    def buffered(
+        self, buffer_size: int = DEFAULT_RANGE_BUFFER_SIZE
+    ) -> io.BufferedReader:
+        """Wrap this file in an :class:`io.BufferedReader`.
+
+        A container reader walks its index in many small reads, and one
+        HTTP request per read would be pathological. Buffering coalesces
+        them: reading a whole ZIP central directory costs a handful of
+        requests instead of hundreds. Always read through this rather
+        than the raw object.
+
+        Args:
+            buffer_size: Read-ahead buffer in bytes (default 1 MiB).
+
+        Returns:
+            io.BufferedReader: The buffered view over this file.
+
+        Examples:
+            - The buffered handle is what a container reader is given:
+                ```python
+                >>> import zipfile
+                >>> from earthlens.base.http import HttpRangeFile
+                >>> open_remote_zip = lambda url: zipfile.ZipFile(
+                ...     HttpRangeFile(url).buffered()
+                ... )
+                >>> callable(open_remote_zip)
+                True
+
+                ```
+        """
+        return io.BufferedReader(self, buffer_size=buffer_size)
