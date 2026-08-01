@@ -120,6 +120,17 @@ class TestConstruction:
         with pytest.raises(ValueError, match="gdis:points"):
             EMDAT(variables=["gdis:points"], hazard=hazard, path=str(tmp_path))
 
+    @pytest.mark.parametrize("country", ["BG", "BANGLA", "B1D", ""])
+    def test_bad_country_code_rejected(self, tmp_path: Path, country: str) -> None:
+        """A malformed ISO3 fails loudly rather than filtering everything away."""
+        with pytest.raises(ValueError, match="3-letter ISO3"):
+            EMDAT(variables=["emdat:events"], country=country, path=str(tmp_path))
+
+    def test_country_is_optional(self, tmp_path: Path) -> None:
+        """Omitting the country keeps every country."""
+        backend = EMDAT(variables=["emdat:events"], path=str(tmp_path))
+        assert backend._country is None
+
     def test_events_builds_no_auth(self, tmp_path: Path) -> None:
         """The Dataverse route is anonymous, so no auth object is built."""
         assert EMDAT(variables=["emdat:events"], path=str(tmp_path))._auth is None
@@ -239,7 +250,7 @@ class TestEventsRoute:
         """A tabular result is also written as CSV for the caller."""
         http = FakeHttp(dataverse_listing, events_workbook)
         _events_backend(tmp_path, http).download()
-        assert (tmp_path / "emdat_emdat_events.csv").is_file()
+        assert (tmp_path / "emdat_events.csv").is_file()
 
     def test_source_file_is_reused(
         self, tmp_path: Path, dataverse_listing: dict[str, Any], events_workbook: Path
@@ -335,6 +346,16 @@ class TestGdisPointsRoute:
         backend.download()
         backend.download()
         assert len(fake.searched) == 1
+
+    def test_empty_download_result_is_reported(
+        self, tmp_path: Path, gdis_csv_zip: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A download that produced no file names the EULA step in its error."""
+        fake = FakeEarthaccess([FakeGranule(_GDIS_LINK)], gdis_csv_zip)
+        monkeypatch.setattr(fake, "download", lambda *a, **k: [])
+        monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        with pytest.raises(OSError, match="unaccepted_eulas"):
+            _points_backend(tmp_path).download()
 
     def test_missing_granule_is_reported(
         self, tmp_path: Path, gdis_csv_zip: Path, monkeypatch: pytest.MonkeyPatch

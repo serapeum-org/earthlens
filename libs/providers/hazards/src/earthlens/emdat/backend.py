@@ -127,7 +127,9 @@ class EMDAT(AbstractDataSource):
                 `["flood", "storm"]`). Matched case- and whitespace
                 -insensitively. `None` keeps every type.
             country: ISO3 country code to keep (`"BGD"`), matched
-                case-insensitively. `None` keeps every country.
+                case-insensitively. `None` keeps every country. A value that
+                is not three letters is rejected rather than silently
+                matching nothing.
             username: Earthdata Login username for the `gdis:*` sources. Falls
                 back to `EARTHDATA_USERNAME`.
             password: Earthdata Login password. Falls back to
@@ -137,9 +139,10 @@ class EMDAT(AbstractDataSource):
 
         Raises:
             TypeError: If `variables` is a mapping (pass a list of one id).
-            ValueError: If `variables` is not exactly one dataset id, or a
+            ValueError: If `variables` is not exactly one dataset id, if a
                 requested `hazard` is not a disaster type of the resolved
-                dataset. The two sources have different vocabularies.
+                dataset (the two sources have different vocabularies), or if
+                `country` is not a 3-letter ISO3 code.
         """
         if isinstance(variables, dict):
             raise TypeError(
@@ -156,6 +159,14 @@ class EMDAT(AbstractDataSource):
 
         self._catalog = Catalog()
         self._dataset: Dataset = self._catalog.get(ids[0])
+        if country is not None and not (
+            len(country.strip()) == 3 and country.strip().isalpha()
+        ):
+            raise ValueError(
+                f"country= must be a 3-letter ISO3 code (e.g. 'BGD'); got "
+                f"{country!r}. An unrecognised code would otherwise filter every "
+                "row away and look like an empty result."
+            )
         self._country = country
 
         requested = [hazard] if isinstance(hazard, str) else list(hazard or [])
@@ -188,7 +199,7 @@ class EMDAT(AbstractDataSource):
             path=path,
         )
 
-    def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
+    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
         """Capture the requested bounds as a :class:`SpatialExtent`.
 
         Args:
@@ -304,14 +315,14 @@ class EMDAT(AbstractDataSource):
             )
         ]
 
-    def _fetch(self, products: list[RemoteProduct]) -> list:
+    def _fetch(self, products: list[RemoteProduct]) -> list[Any]:
         """Fetch each product from its provider and parse it.
 
         Args:
             products: The list from :meth:`_search` (one product).
 
         Returns:
-            list: One element per product — a :class:`pandas.DataFrame` for a
+            list[Any]: One element per product — a :class:`pandas.DataFrame` for a
                 `tabular` dataset, a
                 :class:`~pyramids.feature.collection.FeatureCollection` for a
                 `vector` one.
@@ -331,11 +342,11 @@ class EMDAT(AbstractDataSource):
             return self._fetch_events()
         return self._fetch_gdis()
 
-    def _api(self) -> list:
+    def _api(self) -> list[Any]:
         """Compose :meth:`_search` and :meth:`_fetch`.
 
         Returns:
-            list: The fetched results.
+            list[Any]: The fetched results.
         """
         return self._api_via_search_fetch()
 
@@ -530,7 +541,9 @@ class EMDAT(AbstractDataSource):
             keep &= (years >= first).fillna(False)
         if last is not None:
             keep &= (years <= last).fillna(False)
-        filtered = collection[keep]
+        # `reset_index` so this route matches the other two, which filter
+        # through `filter_frame` and hand back a contiguous index.
+        filtered = collection[keep].reset_index(drop=True)
         logger.info(f"EMDAT {dataset.id}: {len(filtered)} footprint(s) matched.")
         return FeatureCollection(filtered)
 
@@ -553,9 +566,11 @@ class EMDAT(AbstractDataSource):
             requests.HTTPError: If an upstream source returns a non-2xx status.
         """
         self._progress = progress_bar
+        # Warn before the fetch: a user who is not eligible should learn that
+        # before an 8 MB download, not after it.
+        self._warn_license()
         results = self._api()
         result = results[0]
-        self._warn_license()
         self._log_citation()
         if self.OUTPUT_KIND == "vector":
             logger.info(
@@ -563,7 +578,7 @@ class EMDAT(AbstractDataSource):
                 f"({len(result)} feature(s))."
             )
             return result
-        out_path = self.root_dir / f"emdat_{self._dataset.id.replace(':', '_')}.csv"
+        out_path = self.root_dir / f"{self._dataset.id.replace(':', '_')}.csv"
         result.to_csv(out_path, index=False)
         logger.info(
             f"EMDAT {self._dataset.id}: {len(result)} row(s) written to {out_path}."
@@ -591,7 +606,7 @@ class EMDAT(AbstractDataSource):
             "derivative database from it, so treat this result as fetched for "
             f"you alone. See {dataset.terms_url}.",
             LicenseWarning,
-            stacklevel=2,
+            stacklevel=4,
         )
 
     def _log_citation(self) -> None:

@@ -42,6 +42,20 @@ _REGISTER_URL = "https://urs.earthdata.nasa.gov/users/new"
 _EULA_URL = "https://urs.earthdata.nasa.gov/users/earthaccess/unaccepted_eulas"
 
 
+def _restore_env(previous: dict[str, str | None]) -> None:
+    """Put environment variables back to the values in `previous`.
+
+    Args:
+        previous: Variable name to its value before it was overwritten, or
+            `None` when it was unset.
+    """
+    for name, value in previous.items():
+        if value is None:
+            os.environ.pop(name, None)
+        else:
+            os.environ[name] = value
+
+
 class EmdatCredentials(BaseModel):
     """Earthdata Login credentials for the GDIS sources.
 
@@ -155,23 +169,33 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
             return "netrc"
         return "interactive"
 
-    def _export_explicit_credentials(self) -> None:
+    def _export_explicit_credentials(self) -> dict[str, str | None]:
         """Put an explicitly-passed credential where `earthaccess` will read it.
 
         `earthaccess.login` takes no token or username/password argument — its
         environment strategy reads `EARTHDATA_TOKEN` (preferred) or
         `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` — so whichever explicit
         credential was supplied is exported before the login call.
+
+        Returns:
+            dict[str, str | None]: The previous value of every variable this
+                touched, so the caller can put the environment back. Leaving a
+                credential in `os.environ` would make it process-global and
+                inherit into any subprocess the caller later spawns.
         """
+        wanted: dict[str, str] = {}
         if self._has_explicit_token() and self._creds.token is not None:
-            os.environ["EARTHDATA_TOKEN"] = self._creds.token.get_secret_value()
+            wanted["EARTHDATA_TOKEN"] = self._creds.token.get_secret_value()
         elif (
             self._has_explicit_credentials()
             and self._creds.username is not None
             and self._creds.password is not None
         ):
-            os.environ["EARTHDATA_USERNAME"] = self._creds.username
-            os.environ["EARTHDATA_PASSWORD"] = self._creds.password.get_secret_value()
+            wanted["EARTHDATA_USERNAME"] = self._creds.username
+            wanted["EARTHDATA_PASSWORD"] = self._creds.password.get_secret_value()
+        previous = {name: os.environ.get(name) for name in wanted}
+        os.environ.update(wanted)
+        return previous
 
     def configure(self) -> None:
         """Authenticate against EDL via `earthaccess.login`.
@@ -208,8 +232,9 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
             ) from exc
 
         strategy = self._resolve_strategy()
+        previous: dict[str, str | None] = {}
         if strategy == "environment":
-            self._export_explicit_credentials()
+            previous = self._export_explicit_credentials()
 
         try:
             auth = earthaccess.login(strategy=strategy, persist=True)
@@ -221,6 +246,11 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
                 "urs.earthdata.nasa.gov' entry to ~/.netrc, or register a free "
                 f"account at {_REGISTER_URL}."
             ) from exc
+        finally:
+            # An explicit credential is put in the environment only because
+            # earthaccess has no argument for one. Leaving it there would make
+            # it process-global and inherit into any later subprocess.
+            _restore_env(previous)
 
         if not getattr(auth, "authenticated", False):
             raise AuthenticationError(

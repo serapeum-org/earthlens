@@ -17,6 +17,9 @@ __all__ = ["BACKENDS"]
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
+    # The extras hint covers the gdis:* sources, which need earthaccess. The
+    # emdat:events source is anonymous HTTP and needs no extra; the hint is
+    # per key, not per dataset, so it is stated once here.
     'emdat': ('earthlens.emdat', 'EMDAT', 'emdat', {}),
     'gdis': ('earthlens.emdat', 'EMDAT', 'emdat', {}),
     'hdx': ('earthlens.hdx', 'HDX', 'hdx', {}),

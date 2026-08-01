@@ -43,8 +43,8 @@ events = EarthLens(
 events[["DisNo.", "Start Year", "Total Deaths", "Total Affected"]].head()
 ```
 
-That returns 24 rows — every flood EM-DAT recorded in Bangladesh over those eleven years — and writes them to
-`out/emdat_emdat_events.csv`. The fetched archive workbook also lands in `out/`, and a second call reuses it
+That returns every flood EM-DAT recorded in Bangladesh over those eleven years — a couple of dozen rows, though
+the exact count moves as CRED re-cuts the archive — and writes them to `out/emdat_events.csv`. The fetched archive workbook also lands in `out/`, and a second call reuses it
 rather than re-downloading.
 
 Every `emdat:events` download raises a `LicenseWarning`. That is deliberate: it names the eligibility restriction
@@ -80,14 +80,22 @@ fetch the first time.
 
 ## Filtering
 
-All four filters are optional and work the same way on every source.
+All four filters are optional. They work the same way on every source, with one difference in `hazard=`.
 
-- **`hazard=`** — one type or a list. Matched case- and whitespace-insensitively against the GDIS vocabulary:
-  `drought`, `earthquake`, `extreme temperature`, `flood`, `landslide`, `mass movement (dry)`, `storm`,
-  `volcanic activity`. An unknown value fails at construction with a did-you-mean hint rather than silently
+- **`hazard=`** — one type or a list, matched case- and whitespace-insensitively. **The vocabulary is per
+  source**, because the two do not carry the same types:
+    - `gdis:*` accepts the eight values GDIS geocoded — `drought`, `earthquake`, `extreme temperature`, `flood`,
+      `landslide`, `mass movement (dry)`, `storm`, `volcanic activity`.
+    - `emdat:events` accepts EM-DAT's fuller `Disaster Type` list, which adds `wildfire`, `epidemic`,
+      `infestation`, `glacial lake outburst flood` and the whole technological group (`oil spill`, `road`,
+      `rail`, `gas leak`, `industrial accident (general)`, …). It has no `landslide` — EM-DAT files those under
+      mass movement.
+
+  An unknown value fails at construction with a did-you-mean hint naming the dataset, rather than silently
   returning nothing. (The shipped GeoPackage spells one value `"extreme temperature "` with a trailing space; you
   never have to care — pass the canonical name.)
-- **`country=`** — an ISO3 code, any casing.
+- **`country=`** — an ISO3 code, any casing. A value that is not three letters is rejected, so a typo fails
+  loudly instead of looking like an empty result.
 - **`start=` / `end=`** — only the *year* is significant; both sources are indexed by event year. Either bound may
   be omitted for an open-ended window.
 - **`lat_lim=` / `lon_lim=`** — a bounding box. Omit both for a world-wide request, which applies no spatial

@@ -341,6 +341,37 @@ datasets:
         with pytest.raises(ValueError, match="year_column"):
             Catalog.load(_write_catalog(tmp_path, body))
 
+    def test_year_from_id_prefix_needs_an_id_column(self, tmp_path: Path) -> None:
+        """Deriving the year from the id requires naming the id column."""
+        body = """
+datasets:
+  gdis:polygons:
+    provider: earthdata
+    output_kind: vector
+    long_name: Test polygons
+    short_name: TEST
+    granule: g.zip
+    member: inner.gpkg
+    format: gpkg
+    layer: GPKG
+    year_from_id_prefix: true
+    hazard_vocabulary: gdis
+    licence: CC-BY-4.0
+hazard_vocabularies:
+  gdis:
+    - flood
+"""
+        with pytest.raises(ValueError, match="no `id_column:`"):
+            Catalog.load(_write_catalog(tmp_path, body))
+
+    def test_unknown_vocabulary_rejected(self, tmp_path: Path) -> None:
+        """A row naming a vocabulary that does not exist is refused."""
+        body = _MINIMAL_EVENTS.replace(
+            "hazard_vocabulary: gdis", "hazard_vocabulary: nope"
+        )
+        with pytest.raises(ValueError, match="not in the"):
+            Catalog.load(_write_catalog(tmp_path, body))
+
     def test_unknown_field_rejected(self, tmp_path: Path) -> None:
         """An unrecognised key is a typo, so the row is refused."""
         body = _MINIMAL_EVENTS.replace(

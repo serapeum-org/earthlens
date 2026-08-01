@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -167,34 +168,71 @@ class TestConfigure:
         auth.configure()
         assert len(fake.calls) == 1
 
-    def test_explicit_token_is_exported(
+    def test_explicit_token_reaches_the_login(
         self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
     ) -> None:
-        """The token reaches the env var `earthaccess` reads."""
+        """The token is in the environment while `earthaccess.login` runs."""
+        seen: list[str | None] = []
+        fake = _FakeEarthaccess(_FakeAuth())
+        original = fake.login
+
+        def record(**kwargs: object) -> object:
+            seen.append(os.environ.get("EARTHDATA_TOKEN"))
+            return original(**kwargs)
+
+        fake.login = record  # type: ignore[method-assign]
+        _install_fake(monkeypatch, fake)
+        EmdatAuth(
+            EmdatCredentials(token=SecretStr("tok"), netrc_path=missing_netrc)
+        ).configure()
+        assert seen == ["tok"]
+
+    def test_credentials_do_not_linger_in_the_environment(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
+    ) -> None:
+        """The exported credential is removed once the login has run."""
         _install_fake(monkeypatch, _FakeEarthaccess(_FakeAuth()))
         EmdatAuth(
             EmdatCredentials(token=SecretStr("tok"), netrc_path=missing_netrc)
         ).configure()
-        import os
+        assert "EARTHDATA_TOKEN" not in os.environ
 
-        assert os.environ["EARTHDATA_TOKEN"] == "tok"
-
-    def test_explicit_pair_is_exported(
+    def test_a_pre_existing_value_is_restored(
         self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
     ) -> None:
-        """The username and password reach the env vars `earthaccess` reads."""
+        """An env var the caller already set keeps its original value."""
+        monkeypatch.setenv("EARTHDATA_TOKEN", "caller-owned")
         _install_fake(monkeypatch, _FakeEarthaccess(_FakeAuth()))
+        EmdatAuth(
+            EmdatCredentials(token=SecretStr("tok"), netrc_path=missing_netrc)
+        ).configure()
+        assert os.environ["EARTHDATA_TOKEN"] == "caller-owned"
+
+    def test_explicit_pair_reaches_the_login(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
+    ) -> None:
+        """The username and password are set while `earthaccess.login` runs."""
+        seen: list[tuple[str | None, str | None]] = []
+        fake = _FakeEarthaccess(_FakeAuth())
+        original = fake.login
+
+        def record(**kwargs: object) -> object:
+            seen.append(
+                (
+                    os.environ.get("EARTHDATA_USERNAME"),
+                    os.environ.get("EARTHDATA_PASSWORD"),
+                )
+            )
+            return original(**kwargs)
+
+        fake.login = record  # type: ignore[method-assign]
+        _install_fake(monkeypatch, fake)
         EmdatAuth(
             EmdatCredentials(
                 username="u", password=SecretStr("p"), netrc_path=missing_netrc
             )
         ).configure()
-        import os
-
-        assert (os.environ["EARTHDATA_USERNAME"], os.environ["EARTHDATA_PASSWORD"]) == (
-            "u",
-            "p",
-        )
+        assert seen == [("u", "p")]
 
     def test_empty_env_vars_are_dropped(
         self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path

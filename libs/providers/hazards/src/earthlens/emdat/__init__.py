@@ -55,12 +55,15 @@ Public surface (re-exported from this package):
   licence).
 * :class:`EmdatAuth` / :class:`EmdatCredentials` — Earthdata Login for the
   `gdis:*` sources.
+* :class:`LicenseWarning` — re-exported from core so callers can filter the
+  `emdat:events` restricted-use warning without importing another module.
 * :func:`clear_catalog_cache` — drop the module-level parse cache.
 * :data:`CATALOG_PATH` — path to the bundled catalog YAML.
 """
 
 from __future__ import annotations
 
+from earthlens.biodiversity import LicenseWarning
 from earthlens.emdat.auth import EmdatAuth, EmdatCredentials
 from earthlens.emdat.catalog import (
     CATALOG_PATH,
@@ -80,5 +83,6 @@ __all__ = [
     "Dataset",
     "EmdatAuth",
     "EmdatCredentials",
+    "LicenseWarning",
     "clear_catalog_cache",
 ]

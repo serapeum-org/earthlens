@@ -248,6 +248,12 @@ class Dataset(BaseModel):
                 raise ValueError(
                     f"dataset {self.id!r} is format='gpkg' and must name its `layer:`."
                 )
+        if self.year_from_id_prefix and not self.id_column:
+            raise ValueError(
+                f"dataset {self.id!r} sets `year_from_id_prefix: true` but names "
+                "no `id_column:`, so no year could ever be derived and every "
+                "windowed request would return nothing."
+            )
         if self.year_column is None and not self.year_from_id_prefix:
             raise ValueError(
                 f"dataset {self.id!r} must either name a `year_column:` or set "
