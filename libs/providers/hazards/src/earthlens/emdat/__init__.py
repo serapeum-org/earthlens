@@ -31,9 +31,10 @@ Licensing differs per route and is not incidental. GDIS is **CC-BY-4.0** and
 may be cached freely. The EM-DAT archive is **CC-BY-NC-ND-4.0** under Terms of
 Use that limit free use to academic, non-profit-research, international-public
 -organisation, government and media users, and that forbid redistributing the
-database or building derivative databases from it — so earthlens fetches it for
-the user and never caches or repacks it, and a `LicenseWarning` naming those
-restrictions is emitted on download.
+database or building derivative databases from it — so earthlens keeps no hidden
+cache and redistributes nothing: the workbook is fetched into the caller's own
+output directory and reused from there, the filtered result is written beside
+it, and a `LicenseWarning` naming those restrictions is emitted on download.
 
 Not served here: the EM-DAT country-profile summaries, which are already
 reachable through the shipped `hdx` backend as

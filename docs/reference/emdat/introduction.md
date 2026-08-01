@@ -55,9 +55,10 @@ done. The EM-DAT archive is **CC-BY-NC-ND-4.0**, and the
 is limited to **academic organisations, universities, non-profit research institutions, international public
 organisations (UN agencies, multilateral banks, national governments) and media**, for research, teaching or
 information purposes. Anything else is Commercial Use and needs a paid agreement with CRED. The terms also forbid
-redistributing the database or building a derivative database from it. earthlens therefore fetches the archive
-into *your* output directory and never caches or repacks it, and raises a `LicenseWarning` naming these
-restrictions on every `emdat:events` download.
+redistributing the database or building a derivative database from it. earthlens therefore keeps **no hidden cache and
+redistributes nothing**: the archive workbook is fetched into *your* output directory and reused from there, the
+filtered result is written beside it, and a `LicenseWarning` naming these restrictions is raised on every
+`emdat:events` download.
 
 **4. Only GDIS needs credentials.** `emdat:events` is anonymous. The GDIS granules used to be served openly from
 NASA SEDAC, but that host is gone and they now live in NASA Earthdata Cloud, so `gdis:*` needs an

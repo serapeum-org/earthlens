@@ -361,8 +361,9 @@ class EMDAT(AbstractDataSource):
         file_id, filename = _helpers.pick_dataverse_file(listing, dataset)
 
         # Delivered into the caller's own output directory rather than a hidden
-        # cache: the EM-DAT terms forbid redistributing the database, so the
-        # only copy earthlens creates is the user's.
+        # cache, and reused from there on a later call. The EM-DAT terms forbid
+        # redistributing the database, so every copy earthlens creates lives in
+        # the caller's own directory and none is published anywhere.
         #
         # `filename` comes from a remote listing, so only its basename is used —
         # a name containing path separators would otherwise let the server pick

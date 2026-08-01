@@ -61,8 +61,10 @@ datasets:
     # research, teaching or information purposes. Any other use is Commercial
     # Use and needs a separate paid agreement with CRED/UCLouvain. The Terms of
     # Use also forbid redistributing EM-DAT or a substantial part of it, and
-    # forbid creating derivative databases — so earthlens fetches for the user
-    # and never caches or repacks the table.
+    # forbid creating derivative databases — so earthlens keeps no hidden cache
+    # and redistributes nothing: the workbook is fetched into the caller's own
+    # output directory and reused there, and the filtered result is written
+    # beside it.
     restricted_use: true
     terms_url: https://doc.emdat.be/docs/legal/terms-of-use/
     citation: >-
