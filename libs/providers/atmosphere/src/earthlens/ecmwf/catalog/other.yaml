@@ -1701,6 +1701,10 @@ datasets:
   insitu-comprehensive-upper-air-observation-network:
     endpoint: cds
     request_kind: form
+    extras:
+      time: null
+      data_format: null
+      area: null
     variables:
       air-dewpoint:
         cds_variable: air_dewpoint
@@ -1745,6 +1749,16 @@ datasets:
   insitu-glaciers-extent:
     endpoint: cds
     request_kind: form
+    extras:
+      product_type: [gridded]
+      resolution: ['0_1']
+      version: [rgi_7_0]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       glacier-area:
         cds_variable: glacier_area
@@ -1761,6 +1775,17 @@ datasets:
   insitu-gridded-observations-europe:
     endpoint: cds
     request_kind: form
+    extras:
+      grid_resolution: [0_1deg]
+      period: [full_period]
+      product_type: [elevation]
+      version: [27_0e]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       mean-temperature:
         cds_variable: mean_temperature
@@ -1801,6 +1826,17 @@ datasets:
   insitu-gridded-observations-global-and-regional:
     endpoint: cds
     request_kind: form
+    extras:
+      horizontal_aggregation: [0_25_x_0_25]
+      origin: [chirps]
+      region: [africa]
+      time_aggregation: [daily]
+      version: [v2_0]
+      day: null
+      month: null
+      time: null
+      data_format: null
+      area: null
     variables:
       temperature:
         cds_variable: temperature
@@ -1817,6 +1853,12 @@ datasets:
   insitu-gridded-observations-nordic:
     endpoint: cds
     request_kind: form
+    extras:
+      spatial_interpolation_method: [type_1]
+      version: ['24_09']
+      time: null
+      data_format: null
+      area: null
     variables:
       precipitation:
         cds_variable: precipitation
@@ -1837,6 +1879,11 @@ datasets:
   insitu-observations-gnss:
     endpoint: cds
     request_kind: form
+    extras:
+      network_type: [epn_repro2]
+      time: null
+      data_format: null
+      area: null
     variables:
       total-column-water-vapour:
         cds_variable: total_column_water_vapour
@@ -1853,6 +1900,10 @@ datasets:
   insitu-observations-gruan-reference-network:
     endpoint: cds
     request_kind: form
+    extras:
+      time: null
+      data_format: null
+      area: null
     variables:
       air-temperature:
         cds_variable: air_temperature
@@ -1917,6 +1968,11 @@ datasets:
   insitu-observations-igra-baseline-network:
     endpoint: cds
     request_kind: form
+    extras:
+      archive: [integrated_global_radiosonde_archive_version_2]
+      time: null
+      data_format: null
+      area: null
     variables:
       air-dewpoint-depression:
         cds_variable: air_dewpoint_depression
@@ -1969,6 +2025,11 @@ datasets:
   insitu-observations-near-surface-temperature-us-climate-reference-network:
     endpoint: cds
     request_kind: form
+    extras:
+      time_aggregation: [daily]
+      time: null
+      data_format: null
+      area: null
     variables:
       air-temperature:
         cds_variable: air_temperature
@@ -2085,6 +2146,12 @@ datasets:
   insitu-observations-surface-land:
     endpoint: cds
     request_kind: form
+    extras:
+      time_aggregation: [daily]
+      version: ['2_0_0']
+      time: null
+      data_format: null
+      area: null
     variables:
       accumulated-precipitation:
         cds_variable: accumulated_precipitation
@@ -2129,6 +2196,10 @@ datasets:
   insitu-observations-surface-marine:
     endpoint: cds
     request_kind: form
+    extras:
+      time: null
+      data_format: null
+      area: null
     variables:
       air-pressure-at-sea-level:
         cds_variable: air_pressure_at_sea_level
@@ -2161,6 +2232,11 @@ datasets:
   insitu-observations-woudc-ozone-total-column-and-profiles:
     endpoint: cds
     request_kind: form
+    extras:
+      observation_type: [vertical_profile]
+      time: null
+      data_format: null
+      area: null
     variables:
       air-pressure:
         cds_variable: air_pressure
@@ -2205,6 +2281,17 @@ datasets:
   multi-origin-c3s-atlas:
     endpoint: cds
     request_kind: form
+    extras:
+      bias_adjustment: [no_bias_adjustment]
+      domain: [europe]
+      origin: [e_obs]
+      period: [1950-2021]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       monthly-temperature:
         cds_variable: monthly_temperature
@@ -2349,6 +2436,17 @@ datasets:
   projections-climate-atlas:
     endpoint: cds
     request_kind: form
+    extras:
+      domain: [africa]
+      experiment: [historical]
+      origin: [cordex]
+      period: [1970-2005]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       monthly-mean-of-daily-accumulated-precipitation:
         cds_variable: monthly_mean_of_daily_accumulated_precipitation
@@ -2441,6 +2539,15 @@ datasets:
   projections-cmip6:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: [historical]
+      level: ['1']
+      model: [access_cm2]
+      temporal_resolution: [monthly]
+      day: null
+      time: null
+      data_format: null
+      area: null
     variables:
       air-temperature:
         cds_variable: air_temperature
@@ -2649,6 +2756,14 @@ datasets:
   projections-cmip6-decadal-prototype:
     endpoint: cds
     request_kind: form
+    extras:
+      base_year: ['1960']
+      model: [cmcc_cm2_sr5]
+      temporal_resolution: [monthly]
+      day: null
+      time: null
+      data_format: null
+      area: null
     variables:
       near-surface-air-temperature:
         cds_variable: near_surface_air_temperature
@@ -2677,6 +2792,10 @@ datasets:
   reanalysis-oras5-timeseries:
     endpoint: cds
     request_kind: cams_date
+    extras:
+      product_type: [operational]
+      data_format: null
+      area: null
     variables:
       salinity:
         cds_variable: salinity
@@ -2749,6 +2868,11 @@ datasets:
   reanalysis-uerra-europe-height-levels:
     endpoint: cds
     request_kind: form
+    extras:
+      height_level: [100_m]
+      time: ['00:00']
+      data_format: null
+      area: null
     variables:
       pressure:
         cds_variable: pressure
@@ -2773,6 +2897,11 @@ datasets:
   reanalysis-uerra-europe-pressure-levels:
     endpoint: cds
     request_kind: form
+    extras:
+      pressure_level: ['10']
+      time: ['00:00']
+      data_format: null
+      area: null
     variables:
       geopotential:
         cds_variable: geopotential
@@ -2801,6 +2930,11 @@ datasets:
   reanalysis-uerra-europe-single-levels:
     endpoint: cds
     request_kind: form
+    extras:
+      origin: [uerra_harmonie]
+      time: ['00:00']
+      data_format: null
+      area: null
     variables:
       10m-wind-direction:
         cds_variable: 10m_wind_direction
@@ -2881,6 +3015,12 @@ datasets:
   reanalysis-uerra-europe-soil-levels:
     endpoint: cds
     request_kind: form
+    extras:
+      origin: [mescan_surfex]
+      soil_level: ['1']
+      time: ['00:00']
+      data_format: null
+      area: null
     variables:
       soil-temperature:
         cds_variable: soil_temperature
@@ -2901,6 +3041,18 @@ datasets:
   sis-agroclimatic-indicators:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: [historical]
+      origin: [era_interim_reanalysis]
+      period: ['198101_201012']
+      temporal_aggregation: [10_day]
+      version: ['1_0']
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       biologically-effective-degree-days:
         cds_variable: biologically_effective_degree_days
@@ -3009,6 +3161,11 @@ datasets:
   sis-agrometeorological-indicators:
     endpoint: cds
     request_kind: form
+    extras:
+      version: ['1_1']
+      time: null
+      data_format: null
+      area: null
     variables:
       10m-wind-speed:
         cds_variable: 10m_wind_speed
@@ -3189,6 +3346,18 @@ datasets:
   sis-biodiversity-cmip5-global:
     endpoint: cds
     request_kind: form
+    extras:
+      ensemble_member: [r1i1p1]
+      experiment: [rcp4_5]
+      model: [access1_0]
+      temporal_aggregation: [annual]
+      version: ['1_0']
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
@@ -3361,6 +3530,19 @@ datasets:
   sis-biodiversity-cmip5-regional:
     endpoint: cds
     request_kind: form
+    extras:
+      ensemble_member: [r1i1p1]
+      experiment: [rcp4_5]
+      model: [access1_0]
+      region: [northern_brazil]
+      statistic: [25th_quartile]
+      version: ['1_0']
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
@@ -3517,6 +3699,15 @@ datasets:
   sis-biodiversity-era5-global:
     endpoint: cds
     request_kind: form
+    extras:
+      temporal_aggregation: [annual]
+      version: ['1_0']
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
@@ -3689,6 +3880,17 @@ datasets:
   sis-biodiversity-era5-regional:
     endpoint: cds
     request_kind: form
+    extras:
+      origin: [era5]
+      region: [central_africa]
+      statistic: [mean]
+      version: ['1_0']
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
@@ -3853,6 +4055,17 @@ datasets:
   sis-ecde-climate-indicators:
     endpoint: cds
     request_kind: form
+    extras:
+      origin: [reanalysis]
+      spatial_aggregation: [gridded]
+      temporal_aggregation: [monthly]
+      version: [v1_0]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       mean-temperature:
         cds_variable: mean_temperature
@@ -3997,6 +4210,16 @@ datasets:
   sis-ecv-cmip5-bias-corrected:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: [rcp_4_5]
+      model: [access1_0]
+      period: ['19500101_19741231']
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       precipitation-flux:
         cds_variable: precipitation_flux
@@ -4017,6 +4240,18 @@ datasets:
   sis-energy-derived-projections:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: [rcp_2_6]
+      gcm: [ec_earth]
+      rcm: [hirham5]
+      spatial_aggregation: [maritime_country_level]
+      temporal_aggregation: [3_hourly]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       wind-speed-at-100m:
         cds_variable: wind_speed_at_100m
@@ -4065,6 +4300,15 @@ datasets:
   sis-energy-derived-reanalysis:
     endpoint: cds
     request_kind: form
+    extras:
+      spatial_aggregation: [maritime_country_level]
+      temporal_aggregation: [annual]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       wind-speed-at-100m:
         cds_variable: wind_speed_at_100m
@@ -4117,6 +4361,16 @@ datasets:
   sis-energy-global-reanalysis:
     endpoint: cds
     request_kind: form
+    extras:
+      file_format: [csv]
+      spatial_resolution: [admin_0]
+      version: ['1_00']
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       2m-temperature:
         cds_variable: 2m_temperature
@@ -4217,6 +4471,15 @@ datasets:
   sis-energy-pecd:
     endpoint: cds
     request_kind: form
+    extras:
+      origin: [era5_reanalysis]
+      pecd_version: [deprecated]
+      spatial_resolution: [0_25_degree]
+      temporal_period: [historical]
+      day: null
+      time: null
+      data_format: null
+      area: null
     variables:
       100m-wind-speed:
         cds_variable: 100m_wind_speed
@@ -4317,6 +4580,17 @@ datasets:
   sis-european-risk-extreme-precipitation-indicators:
     endpoint: cds
     request_kind: form
+    extras:
+      period: ['1950']
+      product_type: [e_obs]
+      spatial_coverage: [europe]
+      temporal_aggregation: [monthly]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       maximum-1-day-precipitation:
         cds_variable: maximum_1_day_precipitation
@@ -4361,6 +4635,15 @@ datasets:
   sis-european-wind-storm-indicators:
     endpoint: cds
     request_kind: form
+    extras:
+      product: [loss_indicators]
+      spatial_aggregation: [agriculture]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       all:
         cds_variable: all
@@ -4369,6 +4652,15 @@ datasets:
   sis-european-wind-storm-reanalysis:
     endpoint: cds
     request_kind: form
+    extras:
+      product: [windstorm_summary_indicator]
+      tracking_algorithm: [hodges]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       all:
         cds_variable: all
@@ -4377,6 +4669,12 @@ datasets:
   sis-european-wind-storm-synthetic-events:
     endpoint: cds
     request_kind: form
+    extras:
+      version_id: [synthetic_set_1_2]
+      day: null
+      time: null
+      data_format: null
+      area: null
     variables:
       wind-speed-of-gusts:
         cds_variable: wind_speed_of_gusts
@@ -4385,6 +4683,20 @@ datasets:
   sis-extreme-indices-cmip6:
     endpoint: cds
     request_kind: form
+    extras:
+      ensemble_member: [r10i1p1f1]
+      experiment: [historical]
+      model: [canesm5]
+      period: ['1850_2014']
+      product_type: [base_period_1961_1990]
+      temporal_aggregation: [yearly]
+      version: ['1_0']
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       cold-days:
         cds_variable: cold_days
@@ -4529,6 +4841,16 @@ datasets:
   sis-heat-and-cold-spells:
     endpoint: cds
     request_kind: form
+    extras:
+      definition: [climatological_related]
+      ensemble_statistic: [ensemble_members_average]
+      experiment: [rcp4_5]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       heat-wave-days:
         cds_variable: heat_wave_days
@@ -4541,6 +4863,15 @@ datasets:
   sis-hydrology-europe-seasonal:
     endpoint: cds
     request_kind: form
+    extras:
+      hydrological_model: [e_hypecatch00_v30]
+      product_type: [historical]
+      spatial_extent: [catchment]
+      temporal_aggregation: [monthly]
+      day: null
+      time: null
+      data_format: null
+      area: null
     variables:
       2m-temperature:
         cds_variable: 2m_temperature
@@ -4569,6 +4900,13 @@ datasets:
   sis-hydrology-europe-seasonal-reforecast:
     endpoint: cds
     request_kind: form
+    extras:
+      leadtime_hour: ['0000']
+      meteorology_source: [cmcc_s35]
+      day: null
+      time: null
+      data_format: null
+      area: null
     variables:
       2m-temperature:
         cds_variable: 2m_temperature
@@ -4597,6 +4935,23 @@ datasets:
   sis-hydrology-meteorology-derived-projections:
     endpoint: cds
     request_kind: form
+    extras:
+      ensemble_member: [r12i1p1]
+      experiment: [degree_scenario]
+      gcm: [ec_earth]
+      horizontal_resolution: [0_11_degrees]
+      period: [1_5_c]
+      processing_type: [original]
+      product_type: [climate_impact_indicators]
+      rcm: [cclm4_8_17]
+      time_aggregation: [annual_mean]
+      variable_type: [relative_change_from_reference_period]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       2m-air-temperature:
         cds_variable: 2m_air_temperature
@@ -4621,6 +4976,22 @@ datasets:
   sis-hydrology-variables-derived-projections:
     endpoint: cds
     request_kind: form
+    extras:
+      ensemble_member: [r12i1p1]
+      experiment: [degree_scenario]
+      gcm: [ec_earth]
+      hydrological_model: [e_hypecatch_m00]
+      period: [1_5_c]
+      product_type: [climate_impact_indicators]
+      rcm: [cclm4_8_17]
+      time_aggregation: [annual_mean]
+      variable_type: [absolute_values]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       river-discharge:
         cds_variable: river_discharge
@@ -4709,6 +5080,15 @@ datasets:
   sis-hydrology-variables-derived-seasonal-forecast:
     endpoint: cds
     request_kind: form
+    extras:
+      hydrological_model: [e_hypecatch_m00]
+      version: ['1']
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       river-discharge:
         cds_variable: river_discharge
@@ -4741,6 +5121,15 @@ datasets:
   sis-hydrology-variables-derived-seasonal-reforecast:
     endpoint: cds
     request_kind: form
+    extras:
+      hydrological_model: [e_hypecatch_m00]
+      version: ['1']
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       river-discharge:
         cds_variable: river_discharge
@@ -4773,6 +5162,15 @@ datasets:
   sis-marine-properties:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: [rcp4_5]
+      origin: [nemo_ersem]
+      time_aggregation: [day]
+      vertical_resolution: [water_column]
+      day: null
+      time: null
+      data_format: null
+      area: null
     variables:
       apparent-oxygen-utilisation:
         cds_variable: apparent_oxygen_utilisation
@@ -4857,6 +5255,16 @@ datasets:
   sis-ocean-wave-indicators:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: [era5_reanalysis]
+      period: ['2001_2017']
+      statistic: [100_year_return_period]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       peak-wave-period:
         cds_variable: peak_wave_period
@@ -4869,6 +5277,13 @@ datasets:
   sis-ocean-wave-timeseries:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: [ERA5 reanalysis]
+      day: null
+      month: null
+      time: null
+      data_format: null
+      area: null
     variables:
       Mean wave direction:
         cds_variable: Mean wave direction
@@ -4909,6 +5324,18 @@ datasets:
   sis-tourism-fire-danger-indicators:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: [historical]
+      period: ['1971_1975']
+      product_type: [multi_model_best_case]
+      time_aggregation: [annual_indicators]
+      version: [v1_0]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       daily-fire-weather-index:
         cds_variable: daily_fire_weather_index
@@ -4933,6 +5360,15 @@ datasets:
   sis-tourism-snow-indicators:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: [uerra_reanalysis]
+      time_aggregation: [annual_data]
+      version: ['1_0']
+      day: null
+      month: null
+      time: null
+      data_format: null
+      area: null
     variables:
       start-of-the-longest-period-with-groomed-snow:
         cds_variable: start_of_the_longest_period_with_groomed_snow
@@ -5093,6 +5529,19 @@ datasets:
   sis-water-level-change-indicators-cmip6:
     endpoint: cds
     request_kind: form
+    extras:
+      derived_variable: [absolute_change]
+      experiment: [future]
+      multi_model_ensemble_statistic: [negative_ensemble_counts]
+      period: ['2021_2050']
+      product_type: [multi_model_ensemble]
+      statistic: [10th]
+      day: null
+      month: null
+      year: null
+      time: null
+      data_format: null
+      area: null
     variables:
       surge-level:
         cds_variable: surge_level
@@ -5129,6 +5578,15 @@ datasets:
   sis-water-level-change-timeseries-cmip6:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: [future]
+      temporal_aggregation: [annual]
+      version: [v1]
+      day: null
+      month: null
+      time: null
+      data_format: null
+      area: null
     variables:
       mean-sea-level:
         cds_variable: mean_sea_level
