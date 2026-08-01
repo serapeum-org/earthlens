@@ -106,6 +106,52 @@ class TestEcmwfEmitter:
         assert result.row["request_kind"] == "satellite_cdr"
 
 
+class TestEcmwfRequestKind:
+    """`_ecmwf_request_kind` maps a form's fields (+ dataset id) to a request kind."""
+
+    @pytest.mark.parametrize(
+        "upstream_id, field_names, expected",
+        [
+            (
+                "satellite-soil-moisture",
+                ["type_of_sensor", "year", "day"],
+                "satellite_cdr",
+            ),
+            ("cems-glofas-reforecast", ["hyear", "hmonth", "hday"], "glofas_hindcast"),
+            ("efas-seasonal-reforecast", ["hyear", "hmonth"], "seasonal_hindcast"),
+            ("cams-global-reanalysis-eac4", ["date", "variable"], "cams_date"),
+            ("cams-ghg-inversion", ["quantity", "year", "month"], "cams_inversion"),
+            ("aq-reanalysis", ["year", "month", "model"], "cams_inversion"),
+            ("some-seasonal", ["year", "month"], "seasonal"),
+            (
+                "cems-fire-historical-v1",
+                ["grid", "dataset_type", "year", "day"],
+                "fire",
+            ),
+            ("grid-only-cdr", ["grid", "year", "day"], "satellite_cdr"),
+            ("reanalysis-era5-single-levels", ["year", "month", "day", "time"], "form"),
+        ],
+    )
+    def test_kind_from_id_and_fields(self, upstream_id, field_names, expected):
+        """Each id/field-set combination maps to the documented request kind.
+
+        Args:
+            upstream_id: The dataset id (a `satellite-*` id short-circuits).
+            field_names: The `form.json` field names present.
+            expected: The request kind the heuristic should return.
+        """
+        form = [{"name": name} for name in field_names]
+        result = stanza_mod._ecmwf_request_kind(form, upstream_id)
+        assert result == expected, (
+            f"{upstream_id}/{field_names} → {result}, want {expected}"
+        )
+
+    def test_glofas_forecast_grid_absent_falls_through_to_form(self):
+        """A leadtime_hour form with no grid is not misread as a grid kind."""
+        form = [{"name": "year"}, {"name": "day"}, {"name": "leadtime_hour"}]
+        assert stanza_mod._ecmwf_request_kind(form, "cems-glofas-forecast") == "form"
+
+
 class TestErddapEmitter:
     """Tests for the ERDDAP emitter (seeds from `/info`, network mocked)."""
 

@@ -54,6 +54,10 @@ class TestDetectOutputFormat:
         target.write_bytes(head)
         assert _detect_output_format(target) == expected
 
+    def test_unreadable_path_is_unknown(self, tmp_path):
+        """A path that cannot be opened classifies as unknown, not a crash."""
+        assert _detect_output_format(tmp_path / "does-not-exist") == "unknown"
+
 
 class TestUnpackArchive:
     """`_unpack_netcdf_archive` unpacks zip-of-NetCDF to member NetCDFs."""
