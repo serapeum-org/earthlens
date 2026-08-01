@@ -120,7 +120,7 @@ def _get_json(
     *,
     headers: dict[str, str] | None = None,
     params: dict[str, Any] | None = None,
-) -> dict[str, Any]:
+) -> dict[str, Any] | list[Any]:
     """GET `url` and return the parsed JSON body (raising on HTTP error).
 
     Args:
@@ -130,11 +130,12 @@ def _get_json(
         params: Optional query parameters.
 
     Returns:
-        The parsed JSON body.
+        The parsed JSON body — a mapping for most endpoints, or a top-level
+        list for the CADS `form.json` (the caller narrows the shape).
     """
     response = requests.get(url, headers=headers, params=params, timeout=_TIMEOUT)
     response.raise_for_status()
-    return cast("dict[str, Any]", response.json())
+    return cast("dict[str, Any] | list[Any]", response.json())
 
 
 def _redact(text: str, secret: str) -> str:
