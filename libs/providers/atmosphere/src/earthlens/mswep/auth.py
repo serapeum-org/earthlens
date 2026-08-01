@@ -172,7 +172,7 @@ def reject_service_account(payload: dict[str, Any], source: str) -> None:
         "cannot read the GloH2O share. Drive authorises per principal: "
         "GloH2O shares the folder with your personal Google account, and a "
         "service account is a separate identity whose 'Shared with me' is "
-        "empty — listing the folder would silently return nothing rather "
+        "empty - listing the folder would silently return nothing rather "
         "than raise. Supply a user credential instead: an rclone remote "
         f"(see {RCLONE_CLIENT_ID_URL}) or an authorized-user token.json."
     )
@@ -273,7 +273,7 @@ def credentials_from_rclone_remote(config_path: Path, remote: str) -> Any:
         raise AuthenticationError(
             f"rclone remote {remote!r} in {config_path} has type "
             f"{section.get('type', '<unset>')!r}, not 'drive'. The GloH2O "
-            "share is a Google Drive folder — point at the Drive remote."
+            "share is a Google Drive folder - point at the Drive remote."
         )
 
     raw_token = section.get("token", "")
@@ -298,7 +298,7 @@ def credentials_from_rclone_remote(config_path: Path, remote: str) -> Any:
             "`client_secret`. rclone falls back to its own built-in OAuth "
             "client, which it never writes to the config, so the token "
             "cannot be refreshed outside rclone. Create a personal OAuth "
-            f"client and re-run `rclone config` — see {RCLONE_CLIENT_ID_URL}."
+            f"client and re-run `rclone config` - see {RCLONE_CLIENT_ID_URL}."
         )
     if not token.get("refresh_token"):
         raise AuthenticationError(
@@ -513,12 +513,12 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
             "no Google Drive credential resolved for MSWEP / MSWX. This "
             "backend automates *your own* approved GloH2O download, so it "
             "needs two things. (1) Approved access: request it at "
-            f"{MSWEP_REQUEST_URL} (MSWEP) and {MSWX_REQUEST_URL} (MSWX) — "
+            f"{MSWEP_REQUEST_URL} (MSWEP) and {MSWX_REQUEST_URL} (MSWX) - "
             "GloH2O shares a Drive folder with your Google account. (2) A "
             "user credential for that account: configure an rclone Drive "
             f"remote (then set ${RCLONE_REMOTE_ENV}) or point "
             f"${TOKEN_FILE_ENV} at an authorized-user token.json. A service "
-            "account will not work — see the backend documentation."
+            "account will not work - see the backend documentation."
         )
 
     def configure(self) -> None:

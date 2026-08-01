@@ -7,7 +7,7 @@
 # that does not exist. Correcting them is task `A1` of the completion plan:
 # drop the `provisional:` flag once the value is confirmed inside the share.
 #
-# Licence: CC BY-NC 4.0 — non-commercial only. Every request emits a
+# Licence: CC BY-NC 4.0 - non-commercial only. Every request emits a
 # LicenseWarning.
 
 license: CC-BY-NC
