@@ -757,9 +757,9 @@ def _collect_variable_values(node: Any, out: list[str]) -> None:
 def _ecmwf_form_variables(form: list[Any]) -> list[str]:
     """Enumerate the `variable` widget's allowed values from a `form.json`."""
     out: list[str] = []
-    for field in form:
-        if isinstance(field, dict) and field.get("name") == "variable":
-            _collect_variable_values(field.get("details", {}) or {}, out)
+    for entry in form:
+        if isinstance(entry, dict) and entry.get("name") == "variable":
+            _collect_variable_values(entry.get("details", {}) or {}, out)
     return out
 
 
