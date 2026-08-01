@@ -369,3 +369,89 @@ class _BlobSession:
         response.headers["Content-Length"] = str(len(self.blob))
         response.raw = io.BytesIO(self.blob)
         return response
+
+
+class TestTarScanCost:
+    """The tar fallback must decompress the archive once, not once per read."""
+
+    def _counting_tarball(self, tmp_path, monkeypatch):
+        """Write a fixture tarball and count how often the stream is opened."""
+        tarball = tmp_path / "a.tar.gz"
+        tarball.write_bytes(build_tar())
+        opens: list[str] = []
+        original = tarfile.open
+
+        def _counted(*args: Any, **kwargs: Any) -> Any:
+            opens.append(str(args[0] if args else kwargs.get("name")))
+            return original(*args, **kwargs)
+
+        monkeypatch.setattr(tarfile, "open", _counted)
+        return tarball, opens
+
+    def test_indexing_extracts_the_metadata_in_the_same_pass(
+        self, tmp_path, monkeypatch
+    ):
+        """Attribute reads must not each trigger another full decompression."""
+        tarball, opens = self._counting_tarball(tmp_path, monkeypatch)
+
+        archive = _helpers.CaravanArchive.open_local_tar(
+            tarball, extract_dir=tmp_path / "members"
+        )
+        during_index = len(opens)
+        _helpers.attribute_index(archive, "dk")
+        _helpers.merge_attributes(archive, "dk")
+
+        assert during_index == 1, "indexing should scan once"
+        assert len(opens) == during_index, (
+            "attribute reads re-scanned the archive; they must come from the "
+            "members extracted during indexing"
+        )
+
+    def test_a_repeat_member_read_does_not_rescan(self, tmp_path, monkeypatch):
+        """An already-extracted member is read from disk."""
+        tarball, opens = self._counting_tarball(tmp_path, monkeypatch)
+        archive = _helpers.CaravanArchive.open_local_tar(
+            tarball, extract_dir=tmp_path / "members"
+        )
+        member = archive.timeseries_member("dk", "dk_1")
+
+        archive.read(member)
+        after_first = len(opens)
+        archive.read(member)
+
+        assert len(opens) == after_first
+
+    def test_several_missing_members_share_one_scan(self, tmp_path, monkeypatch):
+        """Two uncached catchments cost one pass between them, not two."""
+        tarball, opens = self._counting_tarball(tmp_path, monkeypatch)
+        archive = _helpers.CaravanArchive.open_local_tar(
+            tarball, extract_dir=tmp_path / "members"
+        )
+        before = len(opens)
+
+        archive.read_many(
+            [
+                archive.timeseries_member("dk", "dk_1"),
+                archive.timeseries_member("dk", "dk_2"),
+            ]
+        )
+
+        assert len(opens) - before == 1
+
+    def test_a_partial_extraction_is_not_mistaken_for_a_member(
+        self, tmp_path, monkeypatch
+    ):
+        """Members are staged as `.part` and renamed, so a crash leaves no stub."""
+        tarball, _ = self._counting_tarball(tmp_path, monkeypatch)
+        dest = tmp_path / "members"
+        _helpers.CaravanArchive.open_local_tar(tarball, extract_dir=dest)
+
+        assert not list(dest.rglob("*.part"))
+
+    def test_the_cached_index_is_written_atomically(self, tmp_path, monkeypatch):
+        """A half-written index would silently hide members from every lookup."""
+        tarball, _ = self._counting_tarball(tmp_path, monkeypatch)
+        _helpers.CaravanArchive.open_local_tar(tarball, extract_dir=tmp_path / "m")
+
+        assert (tmp_path / "a.tar.gz.index.json").is_file()
+        assert not list(tmp_path.glob("*.part"))

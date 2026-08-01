@@ -257,50 +257,122 @@ def extract_tar_members(
     extracted: dict[str, Path] = {}
     if not members:
         return extracted
-    wanted = set(members)
+    # Anything already extracted by an earlier pass is reused. Without this, a
+    # second read of the same member costs another full decompression of the
+    # archive - ~29 GB for base.
+    wanted: set[str] = set()
+    for name in members:
+        _assert_safe_member(name, dest_dir)
+        cached = dest_dir / name
+        if cached.is_file():
+            extracted[name] = cached
+        else:
+            wanted.add(name)
+    if not wanted:
+        return extracted
     with tarfile.open(tarball, mode="r|gz") as archive:
         for entry in archive:
             if entry.name not in wanted or not entry.isfile():
                 continue
-            _assert_safe_member(entry.name, dest_dir)
-            target = dest_dir / entry.name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            source = archive.extractfile(entry)
-            if source is None:  # pragma: no cover - isfile() already excludes this
-                continue
-            with target.open("wb") as handle:
-                for block in iter(lambda: source.read(_BLOCK), b""):  # noqa: B023
-                    handle.write(block)
-            extracted[entry.name] = target
+            target = _extract_entry(archive, entry, dest_dir)
+            if target is not None:
+                extracted[entry.name] = target
             wanted.discard(entry.name)
             if not wanted:
                 break
     return extracted
 
 
-def _tar_member_names(tarball: Path) -> list[str]:
-    """List a tarball's members, caching the listing beside the archive.
+#: Member prefixes worth extracting during the index scan. They are small
+#: (a few MB against a 29 GB archive) and every metadata-shaped request -
+#: a bounding box, `country=`, `with_attributes`, `with_geometry` - needs them.
+#: Pulling them out while the stream is already decompressing turns each of
+#: those from a full re-scan into a local file read.
+_METADATA_DIRS = ("attributes/", "licenses/", "shapefiles/")
 
-    Listing a `.tar.gz` decompresses the whole stream, which for base means
-    ~29 GB of work. The result is written to `<tarball>.index.json` so the scan
-    happens once per cached archive rather than once per request.
+
+def _is_metadata(name: str) -> bool:
+    """Whether a member is small catalog-ish metadata rather than a timeseries.
+
+    Args:
+        name: The archive member name.
+
+    Returns:
+        bool: `True` for an attributes / licences / shapefiles member.
+    """
+    return any(f"/{part}" in f"/{name}" for part in _METADATA_DIRS)
+
+
+def _extract_entry(
+    archive: tarfile.TarFile, entry: tarfile.TarInfo, dest_dir: Path
+) -> Path | None:
+    """Write one already-positioned tar entry to `dest_dir`.
+
+    Args:
+        archive: The open tar stream, positioned at `entry`.
+        entry: The member to write.
+        dest_dir: Directory to write into.
+
+    Returns:
+        Path | None: The written file, or `None` when the entry carries no data.
+
+    Raises:
+        ValueError: If the member name would escape `dest_dir`.
+    """
+    _assert_safe_member(entry.name, dest_dir)
+    target = dest_dir / entry.name
+    target.parent.mkdir(parents=True, exist_ok=True)
+    source = archive.extractfile(entry)
+    if source is None:  # pragma: no cover - callers already filter to files
+        return None
+    # Staged then renamed, so an interrupted extraction cannot leave a truncated
+    # member that a later read would treat as complete.
+    tmp = target.with_name(target.name + ".part")
+    with tmp.open("wb") as handle:
+        while block := source.read(_BLOCK):
+            handle.write(block)
+    tmp.replace(target)
+    return target
+
+
+def _tar_index(tarball: Path, extract_dir: Path) -> list[str]:
+    """Index a tarball, extracting its metadata members in the same pass.
+
+    A gzip stream has no directory, so listing it decompresses the whole
+    archive - ~29 GB for base. That scan happens **once** per cached archive:
+    the member listing is written to `<tarball>.index.json`, and every small
+    metadata member is extracted while those bytes are already flowing past, so
+    the attribute and shapefile reads that follow never trigger another scan.
 
     Args:
         tarball: The local `.tar.gz`.
+        extract_dir: Directory metadata members are extracted into.
 
     Returns:
-        list[str]: Every member name in the archive.
+        list[str]: Every file member name in the archive.
     """
     index_path = tarball.with_suffix(tarball.suffix + ".index.json")
     if index_path.exists():
         return list(json.loads(index_path.read_text(encoding="utf-8")))
     logger.warning(
         f"caravan: indexing {tarball.name} - a gzip stream has no directory, so "
-        f"this decompresses the whole archive once. The listing is then cached."
+        f"this decompresses the whole archive once. The listing and the small "
+        f"metadata members are cached, so later reads do not re-scan."
     )
+    extract_dir.mkdir(parents=True, exist_ok=True)
+    names: list[str] = []
     with tarfile.open(tarball, mode="r|gz") as archive:
-        names = [entry.name for entry in archive if entry.isfile()]
-    index_path.write_text(json.dumps(names), encoding="utf-8")
+        for entry in archive:
+            if not entry.isfile():
+                continue
+            names.append(entry.name)
+            if _is_metadata(entry.name):
+                _extract_entry(archive, entry, extract_dir)
+    # Staged then renamed: a half-written index read back on the next run would
+    # silently hide members from every lookup.
+    tmp_index = index_path.with_name(index_path.name + ".part")
+    tmp_index.write_text(json.dumps(names), encoding="utf-8")
+    tmp_index.replace(index_path)
     return names
 
 
@@ -387,12 +459,13 @@ class CaravanArchive:
         Returns:
             CaravanArchive: The opened archive.
         """
-        names = tuple(_tar_member_names(tarball))
+        destination = extract_dir or tarball.parent / "members"
+        names = tuple(_tar_index(tarball, destination))
         return cls(
             members=names,
             label=label or tarball.name,
             _tarball=tarball,
-            _extract_dir=extract_dir or tarball.parent / "members",
+            _extract_dir=destination,
         )
 
     @property
@@ -511,9 +584,10 @@ class CaravanArchive:
         """Read several members, using one archive pass where that matters.
 
         For a ZIP each member is an independent ranged read, so this is just a
-        loop. For a tar it is the difference between one streaming scan and one
-        per member, which on the base archive is the difference between minutes
-        and hours.
+        loop. For a tar every member still missing from the extract directory is
+        collected in **one** streaming scan, and members already extracted are
+        read straight off disk - so repeat reads, and the metadata pulled out
+        during indexing, cost no decompression at all.
 
         Args:
             members: Member names to read.
