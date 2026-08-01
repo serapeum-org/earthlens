@@ -128,8 +128,8 @@ class TestHazardVocabulary:
         emdat = Catalog().hazard_vocabularies["emdat"]
         assert {"wildfire", "epidemic", "oil spill", "road"} <= set(emdat)
 
-    def test_emdat_vocabulary_is_wider_than_gdis(self) -> None:
-        """GDIS geocoded a subset, so its list is strictly smaller."""
+    def test_neither_vocabulary_contains_the_other(self) -> None:
+        """GDIS has landslide, which EM-DAT files under mass movement."""
         catalog = Catalog()
         gdis = set(catalog.hazard_vocabularies["gdis"])
         emdat = set(catalog.hazard_vocabularies["emdat"])
@@ -280,8 +280,9 @@ datasets:
     year_column: Start Year
     licence: CC-BY-NC-ND-4.0
 """
+        path = _write_catalog(tmp_path, body)
         with pytest.raises(ValueError, match="[Dd]uplicate"):
-            Catalog.load(_write_catalog(tmp_path, body))
+            Catalog.load(path)
 
     def test_get_catalog_returns_rows(self) -> None:
         """`get_catalog` satisfies the abstract contract with the row map."""
@@ -296,8 +297,9 @@ class TestRowValidation:
     def test_dataverse_row_needs_its_fields(self, tmp_path: Path) -> None:
         """A dataverse row without a doi is rejected."""
         body = _MINIMAL_EVENTS.replace("    doi: doi:10.0000/TEST\n", "")
+        path = _write_catalog(tmp_path, body)
         with pytest.raises(ValueError, match="missing required field"):
-            Catalog.load(_write_catalog(tmp_path, body))
+            Catalog.load(path)
 
     def test_earthdata_row_needs_its_fields(self, tmp_path: Path) -> None:
         """An earthdata row without a granule is rejected."""
@@ -313,8 +315,9 @@ datasets:
     year_column: year
     licence: CC-BY-4.0
 """
+        path = _write_catalog(tmp_path, body)
         with pytest.raises(ValueError, match="missing required field"):
-            Catalog.load(_write_catalog(tmp_path, body))
+            Catalog.load(path)
 
     def test_gpkg_row_needs_a_layer(self, tmp_path: Path) -> None:
         """A GeoPackage row must name the layer to read."""
@@ -332,14 +335,16 @@ datasets:
     id_column: disasterno
     licence: CC-BY-4.0
 """
+        path = _write_catalog(tmp_path, body)
         with pytest.raises(ValueError, match="must name its `layer:`"):
-            Catalog.load(_write_catalog(tmp_path, body))
+            Catalog.load(path)
 
     def test_row_needs_a_year_source(self, tmp_path: Path) -> None:
         """A row with no year column and no id fallback cannot be windowed."""
         body = _MINIMAL_EVENTS.replace("    year_column: Start Year\n", "")
+        path = _write_catalog(tmp_path, body)
         with pytest.raises(ValueError, match="year_column"):
-            Catalog.load(_write_catalog(tmp_path, body))
+            Catalog.load(path)
 
     def test_year_from_id_prefix_needs_an_id_column(self, tmp_path: Path) -> None:
         """Deriving the year from the id requires naming the id column."""
@@ -361,16 +366,18 @@ hazard_vocabularies:
   gdis:
     - flood
 """
+        path = _write_catalog(tmp_path, body)
         with pytest.raises(ValueError, match="no `id_column:`"):
-            Catalog.load(_write_catalog(tmp_path, body))
+            Catalog.load(path)
 
     def test_unknown_vocabulary_rejected(self, tmp_path: Path) -> None:
         """A row naming a vocabulary that does not exist is refused."""
         body = _MINIMAL_EVENTS.replace(
             "hazard_vocabulary: gdis", "hazard_vocabulary: nope"
         )
+        path = _write_catalog(tmp_path, body)
         with pytest.raises(ValueError, match="not in the"):
-            Catalog.load(_write_catalog(tmp_path, body))
+            Catalog.load(path)
 
     def test_unknown_field_rejected(self, tmp_path: Path) -> None:
         """An unrecognised key is a typo, so the row is refused."""
@@ -378,5 +385,6 @@ hazard_vocabularies:
             "    licence: CC-BY-NC-ND-4.0\n",
             "    licence: CC-BY-NC-ND-4.0\n    nonsense: 1\n",
         )
+        path = _write_catalog(tmp_path, body)
         with pytest.raises(ValueError, match="failed validation"):
-            Catalog.load(_write_catalog(tmp_path, body))
+            Catalog.load(path)

@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 import pytest
-from pydantic import SecretStr
+from pydantic import SecretStr, ValidationError
 
 from earthlens.base import AuthenticationError
 from earthlens.emdat import EmdatAuth, EmdatCredentials
@@ -79,7 +79,7 @@ class TestCredentials:
     def test_is_frozen(self) -> None:
         """Credentials are immutable once built."""
         creds = EmdatCredentials(username="u")
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             creds.username = "other"
 
 
