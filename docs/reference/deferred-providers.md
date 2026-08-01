@@ -29,7 +29,7 @@ time, not a legal guarantee.
 - **Restricted-access sources** — the **raw GRDC portal** has no API (form → email delivery) and prohibits
   redistribution, so the *full* database cannot be wrapped behind an anonymous `download()`. **However**, GRDC's
   openly-licensed stations are published as the **GRDC-Caravan** extension (CC-BY-4.0), which *is* fetchable and
-  redistributable from Zenodo — that is what [`earthlens.caravan`](caravan/index.md) wraps, and it is the
+  redistributable from Zenodo — that is what [`earthlens.caravan`](caravan/introduction.md) wraps, and it is the
   recommended route for open GRDC discharge. Only the restricted stations remain portal-only. Note GRDC-Caravan is
   a **versioned historical archive**, not a live feed; for current discharge use `earthlens.usgs_water` (US
   near-real-time) or GloFAS via `earthlens.ecmwf`.

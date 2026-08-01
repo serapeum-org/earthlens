@@ -375,6 +375,11 @@ nav:
       - Usage: reference/goes/usage.md
       - Products & domains: reference/goes/datasets.md
       - Reference: reference/goes/goes.md
+    - Caravan (large-sample hydrology):
+      - Introduction: reference/caravan/introduction.md
+      - Usage: reference/caravan/usage.md
+      - Available extensions: reference/caravan/datasets.md
+      - Reference: reference/caravan/caravan.md
     - USGS Water (NWIS):
       - Introduction: reference/usgs-water/introduction.md
       - Usage: reference/usgs-water/usage.md
@@ -704,6 +709,8 @@ nav:
       - Catalog explorer (no network): examples/iucn/catalog_explorer.ipynb
       - Quickstart — species assessments: examples/iucn/quickstart.ipynb
       - Country Red List breakdown (live): examples/iucn/country_redlist_breakdown.ipynb
+    - Caravan (large-sample hydrology):
+      - Quickstart — an open GRDC hydrograph: examples/caravan/quickstart.ipynb
     - Argo (float profiles):
       - Quickstart — float profiles: examples/argo/quickstart.ipynb
       - Catalog, selectors & T–S diagram: examples/argo/catalog_and_selectors.ipynb
