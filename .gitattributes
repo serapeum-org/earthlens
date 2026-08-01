@@ -1,0 +1,15 @@
+# Jupyter notebooks are checked out with LF on every platform.
+#
+# Notebooks are stored LF in the repo, like everything else. On a Windows
+# checkout `core.autocrlf=true` rewrites them to CRLF on disk, and the
+# `mixed-line-ending` pre-commit hook then rewrites them straight back to LF —
+# so a single `pre-commit run --all-files` leaves every notebook in the tree
+# looking modified. The diffs are empty (`git diff --numstat` reports nothing),
+# but `git status` shows 200+ dirty files, which is easy to mistake for real
+# work and easy to sweep into a commit by accident.
+#
+# Pinning the checkout to LF removes the disagreement: jupyter and nbformat
+# already write LF, so the hook has nothing left to fix. This changes only how
+# the file is written into the working tree — the stored blobs are already LF
+# and are untouched, so no renormalisation happens and no diff is produced.
+*.ipynb text eol=lf
