@@ -15,6 +15,15 @@ name: Tests - E2E (live CDS + GEE + STAC)
 permissions:
   contents: read
 
+# Matches the PR-cancels / main-runs-fully rule the other workflows use. This
+# one has no `pull_request` trigger, so `cancel-in-progress` is always false
+# here - a scheduled or manually dispatched live run always completes. Two
+# dispatches on the same ref queue, which is what you want against
+# quota-limited services rather than burning CDS quota twice over.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 on:
   schedule:
     - cron: '0 4 * * 0'
