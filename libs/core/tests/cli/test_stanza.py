@@ -24,6 +24,7 @@ class TestSupportedProviders:
     def test_emitters_wired_up(self):
         """Every add-* provider has an emitter."""
         assert set(supported_providers()) == {
+            "ecmwf",
             "earthdata",
             "usgs_water",
             "hdx",
@@ -36,6 +37,44 @@ class TestSupportedProviders:
             "wdpa",
             "iucn",
         }
+
+
+class TestEcmwfEmitter:
+    """Tests for the ECMWF emitter (seeds from the live CADS form.json, mocked)."""
+
+    _HINDCAST_FORM = [
+        {"name": "hyear", "details": {}},
+        {"name": "hmonth", "details": {}},
+        {"name": "hday", "details": {}},
+        {"name": "leadtime_hour", "details": {}},
+        {
+            "name": "variable",
+            "details": {"values": ["river_discharge_in_the_last_24_hours"]},
+        },
+    ]
+
+    def test_seeds_hindcast_row_with_ewds_endpoint(self, monkeypatch):
+        """A `hyear`/`hday` form seeds a glofas_hindcast row on the ewds store."""
+        monkeypatch.setattr(
+            stanza_mod, "_get_json", lambda url, **kw: self._HINDCAST_FORM
+        )
+        result = emit_stanza(_info("ecmwf"), "cems-glofas-reforecast")
+        assert result.status == "ok"
+        assert result.row["endpoint"] == "ewds"
+        assert result.row["request_kind"] == "glofas_hindcast"
+        assert "river-discharge-in-the-last-24-hours" in result.row["variables"]
+
+    def test_cams_date_form_seeds_ads_endpoint(self, monkeypatch):
+        """A `date`-range form on a `cams-*` id seeds a cams_date row on ads."""
+        form = [
+            {"name": "date", "details": {}},
+            {"name": "variable", "details": {"values": ["total_column_ozone"]}},
+        ]
+        monkeypatch.setattr(stanza_mod, "_get_json", lambda url, **kw: form)
+        result = emit_stanza(_info("ecmwf"), "cams-global-reanalysis-eac4")
+        assert result.status == "ok"
+        assert result.row["endpoint"] == "ads"
+        assert result.row["request_kind"] == "cams_date"
 
 
 class TestErddapEmitter:

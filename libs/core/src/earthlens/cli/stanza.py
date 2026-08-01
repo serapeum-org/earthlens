@@ -711,7 +711,114 @@ def _emit_iucn(
 
 #: Provider id -> a callable taking the loaded catalog, the upstream id, and
 #: per-provider keyword options, returning the seeded curated row.
+# ecmwf — seed from the live CADS `form.json` (CDS / ADS / EWDS).
+
+#: The three Copernicus store API roots, by `endpoint` slug.
+_ECMWF_STORE_URLS = {
+    "cds": "https://cds.climate.copernicus.eu/api",
+    "ads": "https://ads.atmosphere.copernicus.eu/api",
+    "ewds": "https://ewds.climate.copernicus.eu/api",
+}
+
+
+def _ecmwf_token() -> str | None:
+    """Return the shared CDS Personal Access Token from `~/.cdsapirc`, if any."""
+    rc = Path.home() / ".cdsapirc"
+    if not rc.is_file():
+        return None
+    for line in rc.read_text().splitlines():
+        if line.strip().startswith("key"):
+            return line.partition(":")[2].strip() or None
+    return None
+
+
+def _ecmwf_endpoint_for(catalog: Any, dataset_id: str) -> str:
+    """Resolve which store hosts `dataset_id` (per-store index, else prefix)."""
+    store = getattr(catalog, "store_for", lambda _id: None)(dataset_id)
+    if store:
+        return str(store)
+    if dataset_id.startswith("cams-"):
+        return "ads"
+    if dataset_id.startswith(("cems-", "efas-")):
+        return "ewds"
+    return "cds"
+
+
+def _collect_variable_values(node: Any, out: list[str]) -> None:
+    """Recurse a `variable` widget's (possibly grouped) values into `out`."""
+    if isinstance(node, dict):
+        for value in node.get("values", []) or []:
+            if isinstance(value, str):
+                out.append(value)
+        for group in node.get("groups", []) or []:
+            _collect_variable_values(group, out)
+
+
+def _ecmwf_form_variables(form: list[Any]) -> list[str]:
+    """Enumerate the `variable` widget's allowed values from a `form.json`."""
+    out: list[str] = []
+    for field in form:
+        if isinstance(field, dict) and field.get("name") == "variable":
+            _collect_variable_values(field.get("details", {}) or {}, out)
+    return out
+
+
+def _ecmwf_request_kind(form: list[Any]) -> str:
+    """Guess the `request_kind` from a `form.json`'s date/selector fields."""
+    fields = {f.get("name") for f in form if isinstance(f, dict)}
+    if "hyear" in fields:
+        return "glofas_hindcast" if "hday" in fields else "seasonal_hindcast"
+    if "date" in fields:
+        return "cams_date"
+    if "quantity" in fields or ("year" in fields and "day" not in fields and "model" in fields):
+        return "cams_inversion"
+    if "year" in fields and "day" not in fields:
+        return "seasonal"
+    if "grid" in fields and "leadtime_hour" not in fields:
+        return "satellite_cdr"
+    return "form"
+
+
+def _emit_ecmwf(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
+    """Seed an ECMWF `datasets:` row from the live CADS `form.json`.
+
+    Resolves the dataset's store (CDS / ADS / EWDS) from the per-store index,
+    fetches its `form.json`, guesses the `request_kind` from the date/selector
+    fields, and enumerates the first variable. `nc_variable` is a placeholder
+    (the form does not carry it) — confirm it from a live retrieve.
+
+    Args:
+        catalog: The loaded ECMWF `Catalog` (its per-store index resolves the
+            endpoint).
+        upstream_id: The Copernicus dataset id.
+        **opts: Unused.
+
+    Returns:
+        The seeded row (`endpoint` / `request_kind` / `variables`).
+    """
+    endpoint = _ecmwf_endpoint_for(catalog, upstream_id)
+    token = _ecmwf_token()
+    headers = {"PRIVATE-TOKEN": token} if token else None
+    url = f"{_ECMWF_STORE_URLS[endpoint]}/catalogue/v1/collections/{upstream_id}/form.json"
+    form = _get_json(url, headers=headers)
+    if isinstance(form, dict):
+        form = form.get("form") or []
+    variables = _ecmwf_form_variables(cast("list[Any]", form)) or ["all"]
+    return {
+        "endpoint": endpoint,
+        "request_kind": _ecmwf_request_kind(cast("list[Any]", form)),
+        "variables": {
+            variables[0].replace("_", "-"): {
+                "cds_variable": variables[0],
+                "nc_variable": variables[0],
+                "units": "unknown",
+            }
+        },
+    }
+
+
 _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
+    "ecmwf": _emit_ecmwf,
     "earthdata": _emit_earthdata,
     "usgs_water": _emit_usgs_water,
     "hdx": _emit_hdx,
