@@ -302,6 +302,13 @@ def _unpack_netcdf_archive(target: Path) -> list[Path]:
         _unwrap_zipped_netcdf(target)
         return [target]
     out_dir = target.parent / target.stem
+    # Start clean: a prior multi-member retrieve to the same path left its members
+    # here, and `_unique_dest` would otherwise treat them as collisions and suffix
+    # this retrieve's members (`_1`/`_2`), so the caller's `glob("*.nc")` would
+    # return a stale + fresh (possibly foreign-window) union. Reset the dir so it
+    # holds exactly this retrieve's members.
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     extracted: list[Path] = []
     with zipfile.ZipFile(target) as archive:

@@ -116,6 +116,20 @@ class TestUnpackArchive:
         assert {p.read_bytes() for p in out} == {b"CDF2020", b"CDF2021"}
         assert sorted(p.name for p in out) == ["data.nc", "data_1.nc"]
 
+    def test_re_extract_clears_stale_members(self, tmp_path):
+        """A re-extract to the same path replaces stale members, not accumulates."""
+        stale_dir = tmp_path / "cdr"
+        stale_dir.mkdir()
+        (stale_dir / "old.nc").write_bytes(b"CDFold")
+        target = tmp_path / "cdr.zip"
+        with zipfile.ZipFile(target, "w") as archive:
+            archive.writestr("2020.nc", b"CDF2020")
+            archive.writestr("2021.nc", b"CDF2021")
+        out = _unpack_netcdf_archive(target)
+        assert sorted(p.name for p in out) == ["2020.nc", "2021.nc"]
+        assert not (stale_dir / "old.nc").exists(), "stale member cleared"
+        assert sorted(p.name for p in stale_dir.glob("*.nc")) == ["2020.nc", "2021.nc"]
+
 
 class _ZipClient:
     """Fake cdsapi client whose retrieve writes a multi-member zip to `target`."""
