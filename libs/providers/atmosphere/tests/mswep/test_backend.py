@@ -190,6 +190,20 @@ class TestPathShapes:
         with pytest.raises(ProvisionalValueError, match="provisional"):
             _quiet_download(source)
 
+    def test_mswx_without_variables_raises(self, build):
+        """MSWX shards by variable, so selecting none is an error, not an empty result."""
+        source = build(
+            start="2007-05-13", end="2007-05-13", product="mswx", variables=[]
+        )
+        with pytest.raises(ValueError, match="at least one must be requested"):
+            _quiet_download(source)
+
+    def test_unknown_mswep_variable_raises(self, build):
+        """A bogus MSWEP variable is rejected rather than silently ignored."""
+        source = build(variables=["temperature"])
+        with pytest.raises(ValueError, match="not a mswep variable"):
+            _quiet_download(source)
+
     def test_unknown_product_raises(self, build):
         """An unknown product key is rejected at construction."""
         with pytest.raises(ValueError, match="not in the MSWEP catalog"):

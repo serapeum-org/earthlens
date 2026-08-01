@@ -336,18 +336,37 @@ class MSWEP(AbstractDataSource):
         )
         root = self.resolver.resolve(self._product_key, self._version)
 
-        variables = self._variables() if self._product.needs_variable_folder else [None]
-        for name in variables:
-            if name is not None:
-                if name not in self._product.variables:
-                    raise ValueError(
-                        f"{name!r} is not a {self._product_key} variable. Known: "
-                        f"{sorted(self._product.variables)}."
-                    )
+        requested = self._variables()
+        unknown = [name for name in requested if name not in self._product.variables]
+        if unknown:
+            subject = (
+                f"{unknown[0]!r} is not a {self._product_key} variable"
+                if len(unknown) == 1
+                else f"{unknown!r} are not {self._product_key} variables"
+            )
+            raise ValueError(f"{subject}. Known: {sorted(self._product.variables)}.")
+
+        if self._product.needs_variable_folder:
+            # MSWX shards by variable, so "no variables" selects nothing. Left
+            # unguarded this returns an empty list rather than an error, which
+            # is indistinguishable from "the window is not published yet".
+            if not requested:
+                raise ValueError(
+                    f"{self._product_key} shards its granules by variable, so at "
+                    "least one must be requested. Known variables: "
+                    f"{sorted(self._product.variables)}."
+                )
+            variables: list[str | None] = list(requested)
+            for name in requested:
                 self._catalog.check_not_provisional(
                     self._product.variables[name],
                     f"the {self._product_key} variable folder {name!r}",
                 )
+        else:
+            # MSWEP has no variable level; the request still names its single
+            # field, and an unknown name was rejected above rather than
+            # silently downloading precipitation under another label.
+            variables = [None]
 
         grouped: dict[tuple[str, ...], list[tuple[str, dt.datetime]]] = {}
         for stamp in self.time.dates:
