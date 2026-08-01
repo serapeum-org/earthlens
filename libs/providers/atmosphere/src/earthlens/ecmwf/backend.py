@@ -74,6 +74,11 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # `area` bbox (global-gridded); `data_format`/`product_type` are dropped
     # per-row via `extras: {…: null}`.
     "cams_inversion": ("day", "time", "area"),
+    # Satellite Climate Data Records (CDS): year/month/day + per-CDR selectors
+    # (sensor/version/…) from `extras`, no time-of-day; the response is a
+    # zip-of-NetCDF (unpacked by the C3 handler) with no `data_format` choice
+    # (dropped per-row via `extras: {data_format: null}`).
+    "satellite_cdr": ("time",),
 }
 
 

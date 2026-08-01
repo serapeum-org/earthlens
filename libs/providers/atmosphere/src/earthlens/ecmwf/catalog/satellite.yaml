@@ -1,0 +1,57 @@
+# Satellite Climate Data Records (CDRs) — CDS endpoint.
+#
+# High-value drought / hydrology satellite CDRs. Request shapes + valid combos
+# are pinned from the live constraints.json
+# (`planning/ecmwf/captures/a1_form_satellite-*.json`, 2026-08-01). The `type`
+# axis is the ESA-CCI sensor/record/version selector, carried in `extras`. The
+# response is a zip-of-NetCDF (unpacked by the C3 output-format handler); there
+# is no `data_format` choice (dropped per-row). No time-of-day (`satellite_cdr`
+# drops the template `time` slots). `nc_variable` is best-effort — the gated
+# live e2e confirms it; each CDR needs its licence accepted per account (G5).
+
+datasets:
+  satellite-soil-moisture:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      type_of_sensor: [passive]
+      time_aggregation: [month_average]
+      type_of_record: [icdr]
+      version: [v202212]
+      day: ["01"]
+      data_format: null
+    variables:
+      surface-soil-moisture-volumetric:
+        cds_variable: surface_soil_moisture_volumetric
+        nc_variable: sm
+        units: m3 m-3
+
+  satellite-precipitation:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      time_aggregation: [monthly_mean]
+      version: [v2_3_and_v1_3]
+      day: ["01"]
+      data_format: null
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: precip
+        units: mm
+
+  satellite-sea-surface-temperature:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      processinglevel: [level_4]
+      sensor_on_satellite: [combined_product]
+      version: ["3_0"]
+      temporal_resolution: [monthly]
+      day: ["01"]
+      data_format: null
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: analysed_sst
+        units: K
