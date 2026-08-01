@@ -72,3 +72,14 @@ class TestSatelliteRequestShape:
         assert request["type_of_sensor"] == ["passive"]
         assert request["type_of_record"] == ["icdr"]
         assert request["version"] == ["v202212"]
+
+    @pytest.mark.parametrize(
+        "dataset", ["satellite-soil-moisture", "satellite-sea-surface-temperature"]
+    )
+    def test_no_area_when_form_lacks_the_widget(self, dataset):
+        """A CDR whose form has no `area` widget strips the template bbox."""
+        assert "area" not in _request(dataset)
+
+    def test_precipitation_keeps_area(self):
+        """satellite-precipitation has an `area` widget, so it keeps the bbox."""
+        assert "area" in _request("satellite-precipitation")

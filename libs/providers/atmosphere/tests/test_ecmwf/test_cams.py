@@ -69,10 +69,11 @@ class TestCamsDateShape:
         assert request["data_format"] == "netcdf_zip"
         assert not {"year", "month", "day", "product_type"} & set(request)
 
-    def test_gfas_drops_time(self):
-        """GFAS is date-only (the row nulls `time`)."""
+    def test_gfas_drops_time_and_area(self):
+        """GFAS is date-only; its form has no `area` widget, so the bbox is stripped."""
         request = _request("cams-global-fire-emissions-gfas")
         assert "date" in request and "time" not in request
+        assert "area" not in request
 
 
 class TestCamsInversionShape:

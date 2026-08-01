@@ -46,6 +46,7 @@ datasets:
     extras:
       time: null
       data_format: netcdf
+      area: null  # GFAS form has no `area` widget — strip the template bbox
     variables:
       wildfire-flux-of-carbon-dioxide:
         cds_variable: wildfire_flux_of_carbon_dioxide

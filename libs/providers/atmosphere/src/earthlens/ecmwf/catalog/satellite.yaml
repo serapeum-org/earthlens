@@ -20,6 +20,7 @@ datasets:
       version: [v202212]
       day: ["01"]
       data_format: null
+      area: null  # no `area` widget on this form — strip the template bbox
     variables:
       surface-soil-moisture-volumetric:
         cds_variable: surface_soil_moisture_volumetric
@@ -50,6 +51,7 @@ datasets:
       temporal_resolution: [monthly]
       day: ["01"]
       data_format: null
+      area: null  # no `area` widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
