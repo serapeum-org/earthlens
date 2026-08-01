@@ -83,6 +83,11 @@ class EMDAT(AbstractDataSource):
     #: legal and simply returns every year the dataset covers.
     REQUIRES_TIME_WINDOW = False
 
+    #: Whether the transport should draw a progress bar. Set from
+    #: `download(progress_bar=...)` so the flag actually reaches the fetch
+    #: rather than being accepted and dropped.
+    _progress: bool = True
+
     def __init__(
         self,
         start: str | None = None,
@@ -133,7 +138,8 @@ class EMDAT(AbstractDataSource):
         Raises:
             TypeError: If `variables` is a mapping (pass a list of one id).
             ValueError: If `variables` is not exactly one dataset id, or a
-                requested `hazard` is not a known disaster type.
+                requested `hazard` is not a disaster type of the resolved
+                dataset. The two sources have different vocabularies.
         """
         if isinstance(variables, dict):
             raise TypeError(
@@ -153,7 +159,9 @@ class EMDAT(AbstractDataSource):
         self._country = country
 
         requested = [hazard] if isinstance(hazard, str) else list(hazard or [])
-        self._hazards = [self._catalog.normalize_hazard(name) for name in requested]
+        self._hazards = [
+            self._catalog.normalize_hazard(name, self._dataset) for name in requested
+        ]
 
         # The events route is anonymous; only GDIS rides Earthdata Login.
         self._auth: EmdatAuth | None = None
@@ -355,10 +363,22 @@ class EMDAT(AbstractDataSource):
         # Delivered into the caller's own output directory rather than a hidden
         # cache: the EM-DAT terms forbid redistributing the database, so the
         # only copy earthlens creates is the user's.
-        local = self.root_dir / filename
+        #
+        # `filename` comes from a remote listing, so only its basename is used —
+        # a name containing path separators would otherwise let the server pick
+        # where on the caller's disk the download lands.
+        local = self.root_dir / Path(filename).name
         if not local.exists():
             logger.info(f"EMDAT: downloading {filename} from {base}.")
-            http.download(_helpers.dataverse_download_url(base, file_id), local)
+            # `expect_magic` rejects an HTML error page served with a 200, which
+            # would otherwise be cached under an .xlsx name and fail confusingly
+            # at parse time on every later call. xlsx is a zip container.
+            http.download(
+                _helpers.dataverse_download_url(base, file_id),
+                local,
+                expect_magic=b"PK",
+                progress=self._progress,
+            )
 
         frame = pd.read_excel(local, sheet_name=cast("str", dataset.sheet))
         rows = _helpers.filter_frame(
@@ -431,8 +451,19 @@ class EMDAT(AbstractDataSource):
                 "may have been re-issued; update `granule:` in the EM-DAT catalog."
             )
         logger.info(f"EMDAT {dataset.id}: downloading {dataset.granule}.")
-        earthaccess.download(wanted[:1], local_path=str(self.root_dir))
-        return local
+        fetched = earthaccess.download(wanted[:1], local_path=str(self.root_dir))
+        # Trust what the downloader reports rather than assuming it used the
+        # catalogued file name, and fail loudly here instead of at unzip time.
+        paths = [Path(item) for item in (fetched or []) if item]
+        if not paths or not paths[0].is_file():
+            raise OSError(
+                f"earthaccess reported no downloaded file for "
+                f"{dataset.granule!r} (returned {fetched!r}). The granule may "
+                "be unavailable, or the Earthdata account may not have accepted "
+                "the SEDAC data-use agreement — see "
+                "https://urs.earthdata.nasa.gov/users/earthaccess/unaccepted_eulas."
+            )
+        return paths[0]
 
     def _read_gdis_csv(self, path: Path) -> FeatureCollection:
         """Read the GDIS centroid CSV and build a point collection.
@@ -506,8 +537,8 @@ class EMDAT(AbstractDataSource):
         """Fetch the dataset and return its per-instance shape.
 
         Args:
-            progress_bar: Accepted for signature parity; one request is issued,
-                so this is a no-op.
+            progress_bar: Whether to draw a download progress bar. Passed
+                through to the transport, so `False` really does silence it.
 
         Returns:
             A :class:`pandas.DataFrame` for `emdat:events` (also written to
@@ -520,6 +551,7 @@ class EMDAT(AbstractDataSource):
                 Earthdata Login credentials.
             requests.HTTPError: If an upstream source returns a non-2xx status.
         """
+        self._progress = progress_bar
         results = self._api()
         result = results[0]
         self._warn_license()

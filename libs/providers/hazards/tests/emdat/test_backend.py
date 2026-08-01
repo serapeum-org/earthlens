@@ -101,8 +101,24 @@ class TestConstruction:
 
     def test_unknown_hazard_rejected(self, tmp_path: Path) -> None:
         """An unknown hazard fails at construction, not mid-download."""
-        with pytest.raises(ValueError, match="not a GDIS disaster type"):
+        with pytest.raises(ValueError, match="not a disaster type"):
             EMDAT(variables=["gdis:points"], hazard="floods", path=str(tmp_path))
+
+    @pytest.mark.parametrize(
+        "hazard", ["wildfire", "epidemic", "industrial accident (general)"]
+    )
+    def test_archive_accepts_types_gdis_never_geocoded(
+        self, tmp_path: Path, hazard: str
+    ) -> None:
+        """The archive covers technological and other types GDIS lacks."""
+        backend = EMDAT(variables=["emdat:events"], hazard=hazard, path=str(tmp_path))
+        assert backend._hazards == [hazard]
+
+    @pytest.mark.parametrize("hazard", ["wildfire", "epidemic"])
+    def test_gdis_still_rejects_those_types(self, tmp_path: Path, hazard: str) -> None:
+        """The same type is refused on GDIS, whose data does not contain it."""
+        with pytest.raises(ValueError, match="gdis:points"):
+            EMDAT(variables=["gdis:points"], hazard=hazard, path=str(tmp_path))
 
     def test_events_builds_no_auth(self, tmp_path: Path) -> None:
         """The Dataverse route is anonymous, so no auth object is built."""
