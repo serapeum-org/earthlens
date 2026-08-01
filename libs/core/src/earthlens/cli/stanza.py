@@ -1016,6 +1016,10 @@ def write_stanza(info: BackendInfo, result: StanzaResult, target: str | None) ->
             target = categorise_asset(
                 result.upstream_id, str(result.row.get("title", ""))
             )
+        if not target and info.provider == "ecmwf":
+            from earthlens.cli._ecmwf_categories import categorise_dataset
+
+            target = categorise_dataset(result.upstream_id)
         if not target:
             raise ValueError(
                 f"{info.provider} has a sharded catalog; pass --target <file-stem> "

@@ -487,6 +487,24 @@ class TestWriteStanza:
         assert written.endswith("sar-radar.yaml"), "SAR asset routed to sar-radar"
         assert (tmp_path / "sar-radar.yaml").exists(), "the category file was written"
 
+    def test_ecmwf_auto_categorises_target(self, tmp_path, monkeypatch):
+        """ecmwf without --target auto-picks the per-family shard from the id."""
+        import importlib
+
+        info = _info("ecmwf")
+        module = importlib.import_module(f"{info.module}.catalog")
+        monkeypatch.setattr(module, "CATALOG_PATH", tmp_path)
+        result = StanzaResult(
+            "ecmwf",
+            "reanalysis-era5-complete",
+            "reanalysis-era5-complete",
+            "ok",
+            row={"endpoint": "cds", "request_kind": "form"},
+        )
+        written = stanza_mod.write_stanza(info, result, None)
+        assert written.endswith("era5.yaml"), "era5 id routed to era5.yaml"
+        assert (tmp_path / "era5.yaml").exists(), "the shard file was written"
+
     def test_duplicate_key_rejected(self, tmp_path, monkeypatch):
         """Writing a key that already exists raises rather than duplicating."""
         import importlib
