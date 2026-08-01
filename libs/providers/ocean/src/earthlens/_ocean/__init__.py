@@ -12,16 +12,19 @@ from __future__ import annotations
 
 __all__ = ["BACKENDS"]
 
+#: The caravan backend's module path, named once because three keys share it.
+_CARAVAN = "earthlens.caravan"
+
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
 #: distribution's 15 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     # No extras hint: Caravan reads static Zenodo archives over plain HTTP, so
     # it needs no SDK beyond the core dependencies.
-    'caravan': ('earthlens.caravan', 'Caravan', '', {}),
+    'caravan': (_CARAVAN, 'Caravan', '', {}),
     # GRDC-Caravan is the reason this backend exists - the legal, scriptable
     # route to open GRDC discharge - so it is reachable under its own name.
-    'caravan-grdc': ('earthlens.caravan', 'Caravan', '', {'dataset': 'grdc'}),
-    'grdc-caravan': ('earthlens.caravan', 'Caravan', '', {'dataset': 'grdc'}),
+    'caravan-grdc': (_CARAVAN, 'Caravan', '', {'dataset': 'grdc'}),
+    'grdc-caravan': (_CARAVAN, 'Caravan', '', {'dataset': 'grdc'}),
     'cmems': ('earthlens.cmems', 'CMEMS', 'cmems', {}),
     'nwm': ('earthlens.nwm', 'NWM', 'nwm', {}),
     'national-water-model': ('earthlens.nwm', 'NWM', 'nwm', {}),

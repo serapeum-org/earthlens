@@ -500,7 +500,7 @@ class TestArchiveIdentity:
 class TestCachedArchiveStamp:
     """The md5 stamp that lets a cached archive skip a full re-hash."""
 
-    def test_a_stamped_cache_is_reused_without_rehashing(self, tmp_path):
+    def test_a_stamped_cache_is_reused_without_rehashing(self, tmp_path, monkeypatch):
         """The fast path was added in round 1 and had no coverage at all."""
         blob = build_tar()
         cached = tmp_path / "1" / "a.tar.gz"
@@ -522,15 +522,12 @@ class TestCachedArchiveStamp:
             calls.append(path)
             return original(path)
 
-        _helpers._file_md5 = _counted  # type: ignore[assignment]
-        try:
-            result = _helpers.ensure_archive(
-                descriptor,
-                cache_root=tmp_path,
-                client=HttpClient(session=_ExplodingSession()),
-            )
-        finally:
-            _helpers._file_md5 = original  # type: ignore[assignment]
+        monkeypatch.setattr(_helpers, "_file_md5", _counted)
+        result = _helpers.ensure_archive(
+            descriptor,
+            cache_root=tmp_path,
+            client=HttpClient(session=_ExplodingSession()),
+        )
 
         assert result == cached
         assert calls == [], "a stamped cache must not be re-hashed"

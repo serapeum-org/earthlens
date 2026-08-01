@@ -168,6 +168,27 @@ def resolve_record(
     return files
 
 
+def _safe_target(name: str, dest_dir: Path) -> Path:
+    """Resolve an archive member name to a path guaranteed inside `dest_dir`.
+
+    The only way a member name becomes a path in this module. Returning the
+    checked path - rather than validating and letting the caller re-join -
+    means an unchecked join cannot exist by construction (CWE-22).
+
+    Args:
+        name: The archive member name, which is attacker-controlled data.
+        dest_dir: The directory extraction is confined to.
+
+    Returns:
+        Path: The destination path, verified to be within `dest_dir`.
+
+    Raises:
+        ValueError: If the member resolves outside `dest_dir`.
+    """
+    _assert_safe_member(name, dest_dir)
+    return dest_dir / name
+
+
 def _assert_safe_member(name: str, dest_dir: Path) -> None:
     """Reject a member name that would extract outside `dest_dir`.
 
@@ -205,7 +226,10 @@ def _file_md5(path: Path) -> str:
     Returns:
         str: The lowercase hex digest.
     """
-    digest = hashlib.md5()  # noqa: S324 - Zenodo publishes md5, not a secure hash
+    # Not a security primitive: md5 is the checksum Zenodo publishes, so it is
+    # what a download has to be compared against. `usedforsecurity=False` says
+    # so to the interpreter as well as to the reader.
+    digest = hashlib.md5(usedforsecurity=False)  # NOSONAR - integrity check only
     with path.open("rb") as handle:
         for block in iter(lambda: handle.read(_BLOCK), b""):
             digest.update(block)
@@ -309,8 +333,7 @@ def extract_tar_members(
     # same member costs another full decompression - ~29 GB for base.
     wanted: set[str] = set()
     for name in members:
-        _assert_safe_member(name, dest_dir)
-        cached = dest_dir / name
+        cached = _safe_target(name, dest_dir)
         if cached.is_file():
             extracted[name] = cached
         else:
@@ -367,8 +390,7 @@ def _extract_entry(
     Raises:
         ValueError: If the member name would escape `dest_dir`.
     """
-    _assert_safe_member(entry.name, dest_dir)
-    target = dest_dir / entry.name
+    target = _safe_target(entry.name, dest_dir)
     target.parent.mkdir(parents=True, exist_ok=True)
     source = archive.extractfile(entry)
     if source is None:  # pragma: no cover - callers already filter to files
