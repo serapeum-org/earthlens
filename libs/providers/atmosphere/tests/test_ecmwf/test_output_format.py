@@ -160,6 +160,26 @@ class TestCuratedApiMultiMemberZip:
         assert out.parent == member_dir, "returns a member under the sibling dir"
         assert sorted(p.name for p in member_dir.glob("*.nc")) == ["2020.nc", "2021.nc"]
 
+    def test_non_aggregate_returns_all_members(self, tmp_path):
+        """A multi-member curated retrieve returns every member, not just one."""
+        from earthlens.ecmwf import Catalog
+
+        backend = _curated_backend(tmp_path)
+        member_dir = tmp_path / "sm_satellite-soil-moisture"
+        member_dir.mkdir()
+        (member_dir / "2020.nc").write_bytes(b"CDF")
+        (member_dir / "2021.nc").write_bytes(b"CDF")
+        backend._download_dataset = lambda var_info, progress_bar=True: (
+            member_dir / "2020.nc"
+        )
+        out = backend._download_pair(
+            ("satellite-soil-moisture", "surface-soil-moisture-volumetric"),
+            catalog=Catalog(),
+            progress_bar=True,
+            aggregate=None,
+        )
+        assert sorted(p.name for p in out) == ["2020.nc", "2021.nc"]
+
     def test_aggregate_over_multi_member_is_refused(self, tmp_path):
         """A multi-member response + aggregate= raises rather than reducing 1/N."""
         from earthlens.aggregate import AggregationConfig

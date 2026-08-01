@@ -865,8 +865,13 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             NetCDF at `<self.root_dir>/<cds_variable>_<cds_dataset>.nc`,
             or, when `aggregate` is set, the per-window GeoTIFFs at
             `<aggregate.out_dir or self.root_dir/aggregated>/<cds_variable>_<freq>_<window>.tif`.
-            Under the default `errors="warn"`, variables whose download
-            (or aggregate) failed are logged and omitted from the returned
+            A zip-of-NetCDF response (satellite CDRs, CAMS `netcdf_zip`)
+            that unpacks to more than one member is returned as every
+            member under a sibling `<cds_variable>_<cds_dataset>/`
+            directory (all masked to a polygon `aoi=` if one was given);
+            such a multi-member response cannot be aggregated. Under the
+            default `errors="warn"`, variables whose download (or
+            aggregate) failed are logged and omitted from the returned
             list rather than aborting the batch.
 
         Raises:
@@ -982,6 +987,12 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         var_info = catalog.get_variable(dataset_name, var)
         nc_path = self._download_dataset(var_info, progress_bar=progress_bar)
         if aggregate is None:
+            # A multi-member retrieve was unpacked into a sibling `<stem>/` dir,
+            # so the returned member's parent is that dir rather than `root_dir`;
+            # return every member (already masked in `_api`) so `download()`'s
+            # list is complete, not just the first.
+            if nc_path.parent != self.root_dir:
+                return sorted(nc_path.parent.glob("*.nc"))
             return [nc_path]
         # A multi-member zip-of-NetCDF (satellite CDR / CAMS `netcdf_zip` over
         # several timesteps) is unpacked into a sibling `<stem>/` dir, so the
@@ -1300,13 +1311,15 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         if len(members) > 1:
             logger.warning(
                 f"{dataset}: retrieve returned {len(members)} NetCDF members "
-                f"(unpacked to {members[0].parent}); returning the first. A "
-                "multi-member curated aggregate is not yet supported — read the "
-                "member directory for the full time series."
+                f"(unpacked to {members[0].parent}). A plain download returns "
+                "every member; a multi-member curated aggregate is not supported."
             )
-        primary = members[0]
-        self._mask_netcdf_to_geometry(primary)
-        return primary
+        # Mask every member (not just the first) so a polygon `aoi=` trims the
+        # whole time series, and return the primary — `_download_pair` fans the
+        # sibling dir out into the full member list for a plain download.
+        for member in members:
+            self._mask_netcdf_to_geometry(member)
+        return members[0]
 
     def _mask_netcdf_to_geometry(self, target: Path) -> None:
         """Mask a written NetCDF cube to a polygon `aoi=`, if one was given.
