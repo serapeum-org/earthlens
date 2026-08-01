@@ -22948,7 +22948,9 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-882">882</a></span>
 <span class="normal"><a href="#__codelineno-0-883">883</a></span>
 <span class="normal"><a href="#__codelineno-0-884">884</a></span>
-<span class="normal"><a href="#__codelineno-0-885">885</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="k">class</span><span class="w"> </span><span class="nc">Caravan</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-885">885</a></span>
+<span class="normal"><a href="#__codelineno-0-886">886</a></span>
+<span class="normal"><a href="#__codelineno-0-887">887</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="k">class</span><span class="w"> </span><span class="nc">Caravan</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch Caravan per-catchment daily hydrology from static Zenodo archives.</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    Attributes:</span>
@@ -23678,86 +23680,88 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-803" name="__codelineno-0-803"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-804" name="__codelineno-0-804"></a>            <span class="p">]</span>
 <a id="__codelineno-0-805" name="__codelineno-0-805"></a>        <span class="p">)</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">selector</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>  <span class="c1"># noqa: S324</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a>        <span class="k">return</span> <span class="p">(</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_root_dir</span><span class="p">()</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a>            <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;caravan_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">safe_version</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">window</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.csv&quot;</span>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a>        <span class="p">)</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the selected catchments and return them as one long frame.</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">                backends. Members are read individually and the cost is</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">                dominated by the archive index, so no bar is shown.</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">            limit: Cap on the total rows returned. `None` returns everything.</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">            pandas.DataFrame: `[gauge_id, date, &lt;requested variables&gt;]`, one</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">                row per catchment-day. `streamflow` is in **mm/day**; blank</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">                values are genuine missing observations. Empty selections</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">                return a schema-only frame rather than `None`.</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">            ValueError: On an unbounded request, an unknown catchment id, an</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">                unknown variable, or a release needing `allow_full_download`.</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>        <span class="c1"># Drop the empty fragments a skipped catchment or an out-of-window</span>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a>        <span class="c1"># member leaves behind: concatenating them makes pandas infer dtypes</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a>        <span class="c1"># from all-NA columns, which it warns about and will change.</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">]</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a>        <span class="k">if</span> <span class="n">frames</span><span class="p">:</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">INDEX_COLUMNS</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested_columns</span><span class="p">()])</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_attributes</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">table</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a>            <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attach_attributes</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">)</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_geometry</span><span class="p">()</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table_enabled</span><span class="p">:</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a>            <span class="n">table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a>                <span class="sa">f</span><span class="s2">&quot;caravan </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a>            <span class="p">)</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a>        <span class="k">return</span> <span class="n">table</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Release the opened archive and the HTTP session behind it.</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">        `download()` deliberately does not call this: the archive carries the</span>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">        transfer statistics a caller may want to inspect afterwards. Use the</span>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">        backend as a context manager, or call this when done.</span>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_owns_client</span><span class="p">:</span>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a>            <span class="n">closer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a>            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">closer</span><span class="p">):</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a>                <span class="n">closer</span><span class="p">()</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Caravan</span><span class="p">:</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return self, so a request can be used as a context manager.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a>        <span class="k">return</span> <span class="bp">self</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc_info</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the archive and session on leaving the block.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a>
-<a id="__codelineno-0-879" name="__codelineno-0-879"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
-<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the search then fetch steps.</span>
-<a id="__codelineno-0-881" name="__codelineno-0-881"></a>
-<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">            list[pd.DataFrame]: One frame per selected catchment.</span>
-<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-885" name="__codelineno-0-885"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a>        <span class="c1"># Not a security primitive: this only has to be a short, stable id</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a>        <span class="c1"># distinguishing one selection from another in a file name.</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">selector</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a>        <span class="k">return</span> <span class="p">(</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_root_dir</span><span class="p">()</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a>            <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;caravan_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">safe_version</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">window</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a>        <span class="p">)</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the selected catchments and return them as one long frame.</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">                backends. Members are read individually and the cost is</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">                dominated by the archive index, so no bar is shown.</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">            limit: Cap on the total rows returned. `None` returns everything.</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">            pandas.DataFrame: `[gauge_id, date, &lt;requested variables&gt;]`, one</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">                row per catchment-day. `streamflow` is in **mm/day**; blank</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">                values are genuine missing observations. Empty selections</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">                return a schema-only frame rather than `None`.</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">            ValueError: On an unbounded request, an unknown catchment id, an</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">                unknown variable, or a release needing `allow_full_download`.</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a>        <span class="c1"># Drop the empty fragments a skipped catchment or an out-of-window</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a>        <span class="c1"># member leaves behind: concatenating them makes pandas infer dtypes</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>        <span class="c1"># from all-NA columns, which it warns about and will change.</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">]</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>        <span class="k">if</span> <span class="n">frames</span><span class="p">:</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">INDEX_COLUMNS</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested_columns</span><span class="p">()])</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_attributes</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">table</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a>            <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attach_attributes</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">)</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_geometry</span><span class="p">()</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table_enabled</span><span class="p">:</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a>            <span class="n">table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a>                <span class="sa">f</span><span class="s2">&quot;caravan </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a>            <span class="p">)</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>        <span class="k">return</span> <span class="n">table</span>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Release the opened archive and the HTTP session behind it.</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">        `download()` deliberately does not call this: the archive carries the</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">        transfer statistics a caller may want to inspect afterwards. Use the</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">        backend as a context manager, or call this when done.</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_owns_client</span><span class="p">:</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a>            <span class="n">closer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a>            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">closer</span><span class="p">):</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a>                <span class="n">closer</span><span class="p">()</span>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Caravan</span><span class="p">:</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return self, so a request can be used as a context manager.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a>        <span class="k">return</span> <span class="bp">self</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc_info</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the archive and session on leaving the block.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the search then fetch steps.</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a>
+<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">            list[pd.DataFrame]: One frame per selected catchment.</span>
+<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-887" name="__codelineno-0-887"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -23790,11 +23794,11 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/caravan/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-871">871</a></span>
-<span class="normal"><a href="#__codelineno-0-872">872</a></span>
-<span class="normal"><a href="#__codelineno-0-873">873</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Caravan</span><span class="p">:</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return self, so a request can be used as a context manager.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a>    <span class="k">return</span> <span class="bp">self</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-873">873</a></span>
+<span class="normal"><a href="#__codelineno-0-874">874</a></span>
+<span class="normal"><a href="#__codelineno-0-875">875</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Caravan</span><span class="p">:</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return self, so a request can be used as a context manager.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a>    <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -23817,11 +23821,11 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/caravan/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-875">875</a></span>
-<span class="normal"><a href="#__codelineno-0-876">876</a></span>
-<span class="normal"><a href="#__codelineno-0-877">877</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc_info</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Close the archive and session on leaving the block.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-877">877</a></span>
+<span class="normal"><a href="#__codelineno-0-878">878</a></span>
+<span class="normal"><a href="#__codelineno-0-879">879</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc_info</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Close the archive and session on leaving the block.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24531,9 +24535,7 @@ backend as a context manager, or call this when done.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/caravan/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-856">856</a></span>
-<span class="normal"><a href="#__codelineno-0-857">857</a></span>
-<span class="normal"><a href="#__codelineno-0-858">858</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-858">858</a></span>
 <span class="normal"><a href="#__codelineno-0-859">859</a></span>
 <span class="normal"><a href="#__codelineno-0-860">860</a></span>
 <span class="normal"><a href="#__codelineno-0-861">861</a></span>
@@ -24544,20 +24546,22 @@ backend as a context manager, or call this when done.</p>
 <span class="normal"><a href="#__codelineno-0-866">866</a></span>
 <span class="normal"><a href="#__codelineno-0-867">867</a></span>
 <span class="normal"><a href="#__codelineno-0-868">868</a></span>
-<span class="normal"><a href="#__codelineno-0-869">869</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Release the opened archive and the HTTP session behind it.</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">    `download()` deliberately does not call this: the archive carries the</span>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">    transfer statistics a caller may want to inspect afterwards. Use the</span>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">    backend as a context manager, or call this when done.</span>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_owns_client</span><span class="p">:</span>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a>        <span class="n">closer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a>        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">closer</span><span class="p">):</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a>            <span class="n">closer</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-869">869</a></span>
+<span class="normal"><a href="#__codelineno-0-870">870</a></span>
+<span class="normal"><a href="#__codelineno-0-871">871</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Release the opened archive and the HTTP session behind it.</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">    `download()` deliberately does not call this: the archive carries the</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">    transfer statistics a caller may want to inspect afterwards. Use the</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">    backend as a context manager, or call this when done.</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_owns_client</span><span class="p">:</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a>        <span class="n">closer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a>        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">closer</span><span class="p">):</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a>            <span class="n">closer</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24679,9 +24683,7 @@ unknown variable, or a release needing <code>allow_full_download</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/caravan/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-812">812</a></span>
-<span class="normal"><a href="#__codelineno-0-813">813</a></span>
-<span class="normal"><a href="#__codelineno-0-814">814</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-814">814</a></span>
 <span class="normal"><a href="#__codelineno-0-815">815</a></span>
 <span class="normal"><a href="#__codelineno-0-816">816</a></span>
 <span class="normal"><a href="#__codelineno-0-817">817</a></span>
@@ -24721,49 +24723,51 @@ unknown variable, or a release needing <code>allow_full_download</code>.</p>
 <span class="normal"><a href="#__codelineno-0-851">851</a></span>
 <span class="normal"><a href="#__codelineno-0-852">852</a></span>
 <span class="normal"><a href="#__codelineno-0-853">853</a></span>
-<span class="normal"><a href="#__codelineno-0-854">854</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the selected catchments and return them as one long frame.</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">            backends. Members are read individually and the cost is</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">            dominated by the archive index, so no bar is shown.</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">        limit: Cap on the total rows returned. `None` returns everything.</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">        pandas.DataFrame: `[gauge_id, date, &lt;requested variables&gt;]`, one</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">            row per catchment-day. `streamflow` is in **mm/day**; blank</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">            values are genuine missing observations. Empty selections</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">            return a schema-only frame rather than `None`.</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">        ValueError: On an unbounded request, an unknown catchment id, an</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">            unknown variable, or a release needing `allow_full_download`.</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>    <span class="c1"># Drop the empty fragments a skipped catchment or an out-of-window</span>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="c1"># member leaves behind: concatenating them makes pandas infer dtypes</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="c1"># from all-NA columns, which it warns about and will change.</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">]</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a>    <span class="k">if</span> <span class="n">frames</span><span class="p">:</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">INDEX_COLUMNS</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested_columns</span><span class="p">()])</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_attributes</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">table</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a>        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attach_attributes</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">)</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_geometry</span><span class="p">()</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table_enabled</span><span class="p">:</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a>        <span class="n">table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a>            <span class="sa">f</span><span class="s2">&quot;caravan </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a>        <span class="p">)</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a>    <span class="k">return</span> <span class="n">table</span>
+<span class="normal"><a href="#__codelineno-0-854">854</a></span>
+<span class="normal"><a href="#__codelineno-0-855">855</a></span>
+<span class="normal"><a href="#__codelineno-0-856">856</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the selected catchments and return them as one long frame.</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">            backends. Members are read individually and the cost is</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">            dominated by the archive index, so no bar is shown.</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">        limit: Cap on the total rows returned. `None` returns everything.</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">        pandas.DataFrame: `[gauge_id, date, &lt;requested variables&gt;]`, one</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">            row per catchment-day. `streamflow` is in **mm/day**; blank</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">            values are genuine missing observations. Empty selections</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">            return a schema-only frame rather than `None`.</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">        ValueError: On an unbounded request, an unknown catchment id, an</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">            unknown variable, or a release needing `allow_full_download`.</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="c1"># Drop the empty fragments a skipped catchment or an out-of-window</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="c1"># member leaves behind: concatenating them makes pandas infer dtypes</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>    <span class="c1"># from all-NA columns, which it warns about and will change.</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">]</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>    <span class="k">if</span> <span class="n">frames</span><span class="p">:</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">INDEX_COLUMNS</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested_columns</span><span class="p">()])</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_attributes</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">table</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a>        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attach_attributes</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">)</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_geometry</span><span class="p">()</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table_enabled</span><span class="p">:</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a>        <span class="n">table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a>            <span class="sa">f</span><span class="s2">&quot;caravan </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a>        <span class="p">)</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>    <span class="k">return</span> <span class="n">table</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24848,7 +24852,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.caravan</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">extensions</span><span class="p">)</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="s1">&#39;denmark&#39;</span><span class="p">,</span> <span class="s1">&#39;germany&#39;</span><span class="p">,</span> <span class="s1">&#39;grdc&#39;</span><span class="p">,</span> <span class="s1">&#39;israel&#39;</span><span class="p">]</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="s1">&#39;czechia&#39;</span><span class="p">,</span> <span class="s1">&#39;denmark&#39;</span><span class="p">,</span> <span class="s1">&#39;germany&#39;</span><span class="p">,</span> <span class="s1">&#39;grdc&#39;</span><span class="p">,</span> <span class="s1">&#39;israel&#39;</span><span class="p">,</span> <span class="s1">&#39;spain&#39;</span><span class="p">]</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">archive</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_extension</span><span class="p">(</span><span class="s2">&quot;denmark&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve_version</span><span class="p">()</span><span class="o">.</span><span class="n">file_for</span><span class="p">(</span><span class="s2">&quot;csv&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">archive</span><span class="o">.</span><span class="n">name</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="s1">&#39;Caravan_extension_DK.zip&#39;</span>
@@ -25044,7 +25048,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">            &gt;&gt;&gt; from earthlens.caravan import Catalog</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">            &gt;&gt;&gt; sorted(cat.extensions)</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            [&#39;base&#39;, &#39;denmark&#39;, &#39;germany&#39;, &#39;grdc&#39;, &#39;israel&#39;]</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            [&#39;base&#39;, &#39;czechia&#39;, &#39;denmark&#39;, &#39;germany&#39;, &#39;grdc&#39;, &#39;israel&#39;, &#39;spain&#39;]</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">            &gt;&gt;&gt; archive = cat.get_extension(&quot;denmark&quot;).resolve_version().file_for(&quot;csv&quot;)</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">            &gt;&gt;&gt; archive.name</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            &#39;Caravan_extension_DK.zip&#39;</span>
@@ -28334,7 +28338,9 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <span class="normal"><a href="#__codelineno-0-882">882</a></span>
 <span class="normal"><a href="#__codelineno-0-883">883</a></span>
 <span class="normal"><a href="#__codelineno-0-884">884</a></span>
-<span class="normal"><a href="#__codelineno-0-885">885</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="k">class</span><span class="w"> </span><span class="nc">Caravan</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-885">885</a></span>
+<span class="normal"><a href="#__codelineno-0-886">886</a></span>
+<span class="normal"><a href="#__codelineno-0-887">887</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="k">class</span><span class="w"> </span><span class="nc">Caravan</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch Caravan per-catchment daily hydrology from static Zenodo archives.</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    Attributes:</span>
@@ -29064,86 +29070,88 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 <a id="__codelineno-0-803" name="__codelineno-0-803"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">west</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">east</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-804" name="__codelineno-0-804"></a>            <span class="p">]</span>
 <a id="__codelineno-0-805" name="__codelineno-0-805"></a>        <span class="p">)</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">selector</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>  <span class="c1"># noqa: S324</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a>        <span class="k">return</span> <span class="p">(</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_root_dir</span><span class="p">()</span>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a>            <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;caravan_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">safe_version</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">window</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.csv&quot;</span>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a>        <span class="p">)</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the selected catchments and return them as one long frame.</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">                backends. Members are read individually and the cost is</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">                dominated by the archive index, so no bar is shown.</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">            limit: Cap on the total rows returned. `None` returns everything.</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">            pandas.DataFrame: `[gauge_id, date, &lt;requested variables&gt;]`, one</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">                row per catchment-day. `streamflow` is in **mm/day**; blank</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">                values are genuine missing observations. Empty selections</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">                return a schema-only frame rather than `None`.</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">            ValueError: On an unbounded request, an unknown catchment id, an</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">                unknown variable, or a release needing `allow_full_download`.</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>        <span class="c1"># Drop the empty fragments a skipped catchment or an out-of-window</span>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a>        <span class="c1"># member leaves behind: concatenating them makes pandas infer dtypes</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a>        <span class="c1"># from all-NA columns, which it warns about and will change.</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">]</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a>        <span class="k">if</span> <span class="n">frames</span><span class="p">:</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">INDEX_COLUMNS</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested_columns</span><span class="p">()])</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_attributes</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">table</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a>            <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attach_attributes</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">)</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_geometry</span><span class="p">()</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table_enabled</span><span class="p">:</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a>            <span class="n">table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a>                <span class="sa">f</span><span class="s2">&quot;caravan </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a>            <span class="p">)</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a>        <span class="k">return</span> <span class="n">table</span>
-<a id="__codelineno-0-855" name="__codelineno-0-855"></a>
-<a id="__codelineno-0-856" name="__codelineno-0-856"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Release the opened archive and the HTTP session behind it.</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">        `download()` deliberately does not call this: the archive carries the</span>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">        transfer statistics a caller may want to inspect afterwards. Use the</span>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">        backend as a context manager, or call this when done.</span>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_owns_client</span><span class="p">:</span>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a>            <span class="n">closer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a>            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">closer</span><span class="p">):</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a>                <span class="n">closer</span><span class="p">()</span>
-<a id="__codelineno-0-870" name="__codelineno-0-870"></a>
-<a id="__codelineno-0-871" name="__codelineno-0-871"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Caravan</span><span class="p">:</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return self, so a request can be used as a context manager.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a>        <span class="k">return</span> <span class="bp">self</span>
-<a id="__codelineno-0-874" name="__codelineno-0-874"></a>
-<a id="__codelineno-0-875" name="__codelineno-0-875"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc_info</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the archive and session on leaving the block.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-878" name="__codelineno-0-878"></a>
-<a id="__codelineno-0-879" name="__codelineno-0-879"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
-<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the search then fetch steps.</span>
-<a id="__codelineno-0-881" name="__codelineno-0-881"></a>
-<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">            list[pd.DataFrame]: One frame per selected catchment.</span>
-<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-885" name="__codelineno-0-885"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a>        <span class="c1"># Not a security primitive: this only has to be a short, stable id</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a>        <span class="c1"># distinguishing one selection from another in a file name.</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a>        <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">selector</span><span class="o">.</span><span class="n">encode</span><span class="p">(),</span> <span class="n">usedforsecurity</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">8</span><span class="p">]</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a>        <span class="k">return</span> <span class="p">(</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_root_dir</span><span class="p">()</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a>            <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;caravan_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">safe_version</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">window</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.csv&quot;</span>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a>        <span class="p">)</span>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch the selected catchments and return them as one long frame.</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">            progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">                backends. Members are read individually and the cost is</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">                dominated by the archive index, so no bar is shown.</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">            limit: Cap on the total rows returned. `None` returns everything.</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">            pandas.DataFrame: `[gauge_id, date, &lt;requested variables&gt;]`, one</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">                row per catchment-day. `streamflow` is in **mm/day**; blank</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">                values are genuine missing observations. Empty selections</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">                return a schema-only frame rather than `None`.</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">            ValueError: On an unbounded request, an unknown catchment id, an</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">                unknown variable, or a release needing `allow_full_download`.</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a>        <span class="c1"># Drop the empty fragments a skipped catchment or an out-of-window</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a>        <span class="c1"># member leaves behind: concatenating them makes pandas infer dtypes</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>        <span class="c1"># from all-NA columns, which it warns about and will change.</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">]</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>        <span class="k">if</span> <span class="n">frames</span><span class="p">:</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">INDEX_COLUMNS</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested_columns</span><span class="p">()])</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_attributes</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">table</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a>            <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attach_attributes</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a>            <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">)</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_geometry</span><span class="p">()</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table_enabled</span><span class="p">:</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a>            <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a>            <span class="n">table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a>                <span class="sa">f</span><span class="s2">&quot;caravan </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a>            <span class="p">)</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>        <span class="k">return</span> <span class="n">table</span>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Release the opened archive and the HTTP session behind it.</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">        `download()` deliberately does not call this: the archive carries the</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">        transfer statistics a caller may want to inspect afterwards. Use the</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">        backend as a context manager, or call this when done.</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_owns_client</span><span class="p">:</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a>            <span class="n">closer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a>            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">closer</span><span class="p">):</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a>                <span class="n">closer</span><span class="p">()</span>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Caravan</span><span class="p">:</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return self, so a request can be used as a context manager.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a>        <span class="k">return</span> <span class="bp">self</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc_info</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the archive and session on leaving the block.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_api</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the search then fetch steps.</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a>
+<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">            list[pd.DataFrame]: One frame per selected catchment.</span>
+<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-887" name="__codelineno-0-887"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_via_search_fetch</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29176,11 +29184,11 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/caravan/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-871">871</a></span>
-<span class="normal"><a href="#__codelineno-0-872">872</a></span>
-<span class="normal"><a href="#__codelineno-0-873">873</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Caravan</span><span class="p">:</span>
-<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return self, so a request can be used as a context manager.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-873" name="__codelineno-0-873"></a>    <span class="k">return</span> <span class="bp">self</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-873">873</a></span>
+<span class="normal"><a href="#__codelineno-0-874">874</a></span>
+<span class="normal"><a href="#__codelineno-0-875">875</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Caravan</span><span class="p">:</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return self, so a request can be used as a context manager.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a>    <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29203,11 +29211,11 @@ catchment-days, so the facade refuses an <code>aggregate=</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/caravan/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-875">875</a></span>
-<span class="normal"><a href="#__codelineno-0-876">876</a></span>
-<span class="normal"><a href="#__codelineno-0-877">877</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc_info</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Close the archive and session on leaving the block.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-877" name="__codelineno-0-877"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-877">877</a></span>
+<span class="normal"><a href="#__codelineno-0-878">878</a></span>
+<span class="normal"><a href="#__codelineno-0-879">879</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc_info</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Close the archive and session on leaving the block.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29917,9 +29925,7 @@ backend as a context manager, or call this when done.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/caravan/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-856">856</a></span>
-<span class="normal"><a href="#__codelineno-0-857">857</a></span>
-<span class="normal"><a href="#__codelineno-0-858">858</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-858">858</a></span>
 <span class="normal"><a href="#__codelineno-0-859">859</a></span>
 <span class="normal"><a href="#__codelineno-0-860">860</a></span>
 <span class="normal"><a href="#__codelineno-0-861">861</a></span>
@@ -29930,20 +29936,22 @@ backend as a context manager, or call this when done.</p>
 <span class="normal"><a href="#__codelineno-0-866">866</a></span>
 <span class="normal"><a href="#__codelineno-0-867">867</a></span>
 <span class="normal"><a href="#__codelineno-0-868">868</a></span>
-<span class="normal"><a href="#__codelineno-0-869">869</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-857" name="__codelineno-0-857"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Release the opened archive and the HTTP session behind it.</span>
-<a id="__codelineno-0-858" name="__codelineno-0-858"></a>
-<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">    `download()` deliberately does not call this: the archive carries the</span>
-<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">    transfer statistics a caller may want to inspect afterwards. Use the</span>
-<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">    backend as a context manager, or call this when done.</span>
-<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-863" name="__codelineno-0-863"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-864" name="__codelineno-0-864"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-<a id="__codelineno-0-865" name="__codelineno-0-865"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-866" name="__codelineno-0-866"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_owns_client</span><span class="p">:</span>
-<a id="__codelineno-0-867" name="__codelineno-0-867"></a>        <span class="n">closer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-868" name="__codelineno-0-868"></a>        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">closer</span><span class="p">):</span>
-<a id="__codelineno-0-869" name="__codelineno-0-869"></a>            <span class="n">closer</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-869">869</a></span>
+<span class="normal"><a href="#__codelineno-0-870">870</a></span>
+<span class="normal"><a href="#__codelineno-0-871">871</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Release the opened archive and the HTTP session behind it.</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">    `download()` deliberately does not call this: the archive carries the</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">    transfer statistics a caller may want to inspect afterwards. Use the</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a><span class="sd">    backend as a context manager, or call this when done.</span>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_archive</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_owns_client</span><span class="p">:</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a>        <span class="n">closer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a>        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">closer</span><span class="p">):</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a>            <span class="n">closer</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -30065,9 +30073,7 @@ unknown variable, or a release needing <code>allow_full_download</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/ocean/src/earthlens/caravan/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-812">812</a></span>
-<span class="normal"><a href="#__codelineno-0-813">813</a></span>
-<span class="normal"><a href="#__codelineno-0-814">814</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-814">814</a></span>
 <span class="normal"><a href="#__codelineno-0-815">815</a></span>
 <span class="normal"><a href="#__codelineno-0-816">816</a></span>
 <span class="normal"><a href="#__codelineno-0-817">817</a></span>
@@ -30107,49 +30113,51 @@ unknown variable, or a release needing <code>allow_full_download</code>.</p>
 <span class="normal"><a href="#__codelineno-0-851">851</a></span>
 <span class="normal"><a href="#__codelineno-0-852">852</a></span>
 <span class="normal"><a href="#__codelineno-0-853">853</a></span>
-<span class="normal"><a href="#__codelineno-0-854">854</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-812" name="__codelineno-0-812"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the selected catchments and return them as one long frame.</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">            backends. Members are read individually and the cost is</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">            dominated by the archive index, so no bar is shown.</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">        limit: Cap on the total rows returned. `None` returns everything.</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">        pandas.DataFrame: `[gauge_id, date, &lt;requested variables&gt;]`, one</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">            row per catchment-day. `streamflow` is in **mm/day**; blank</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">            values are genuine missing observations. Empty selections</span>
-<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">            return a schema-only frame rather than `None`.</span>
-<a id="__codelineno-0-828" name="__codelineno-0-828"></a>
-<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-830" name="__codelineno-0-830"></a><span class="sd">        ValueError: On an unbounded request, an unknown catchment id, an</span>
-<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">            unknown variable, or a release needing `allow_full_download`.</span>
-<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-833" name="__codelineno-0-833"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-834" name="__codelineno-0-834"></a>    <span class="c1"># Drop the empty fragments a skipped catchment or an out-of-window</span>
-<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="c1"># member leaves behind: concatenating them makes pandas infer dtypes</span>
-<a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="c1"># from all-NA columns, which it warns about and will change.</span>
-<a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">]</span>
-<a id="__codelineno-0-838" name="__codelineno-0-838"></a>    <span class="k">if</span> <span class="n">frames</span><span class="p">:</span>
-<a id="__codelineno-0-839" name="__codelineno-0-839"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-840" name="__codelineno-0-840"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-841" name="__codelineno-0-841"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">INDEX_COLUMNS</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested_columns</span><span class="p">()])</span>
-<a id="__codelineno-0-842" name="__codelineno-0-842"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_attributes</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">table</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-843" name="__codelineno-0-843"></a>        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attach_attributes</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
-<a id="__codelineno-0-844" name="__codelineno-0-844"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-845" name="__codelineno-0-845"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">)</span>
-<a id="__codelineno-0-846" name="__codelineno-0-846"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
-<a id="__codelineno-0-847" name="__codelineno-0-847"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_geometry</span><span class="p">()</span>
-<a id="__codelineno-0-848" name="__codelineno-0-848"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table_enabled</span><span class="p">:</span>
-<a id="__codelineno-0-849" name="__codelineno-0-849"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-850" name="__codelineno-0-850"></a>        <span class="n">table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-851" name="__codelineno-0-851"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-852" name="__codelineno-0-852"></a>            <span class="sa">f</span><span class="s2">&quot;caravan </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-853" name="__codelineno-0-853"></a>        <span class="p">)</span>
-<a id="__codelineno-0-854" name="__codelineno-0-854"></a>    <span class="k">return</span> <span class="n">table</span>
+<span class="normal"><a href="#__codelineno-0-854">854</a></span>
+<span class="normal"><a href="#__codelineno-0-855">855</a></span>
+<span class="normal"><a href="#__codelineno-0-856">856</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch the selected catchments and return them as one long frame.</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a><span class="sd">        progress_bar: Accepted for signature parity with the other</span>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">            backends. Members are read individually and the cost is</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">            dominated by the archive index, so no bar is shown.</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">        limit: Cap on the total rows returned. `None` returns everything.</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">        pandas.DataFrame: `[gauge_id, date, &lt;requested variables&gt;]`, one</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">            row per catchment-day. `streamflow` is in **mm/day**; blank</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">            values are genuine missing observations. Empty selections</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a><span class="sd">            return a schema-only frame rather than `None`.</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a><span class="sd">        ValueError: On an unbounded request, an unknown catchment id, an</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a><span class="sd">            unknown variable, or a release needing `allow_full_download`.</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-835" name="__codelineno-0-835"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-836" name="__codelineno-0-836"></a>    <span class="c1"># Drop the empty fragments a skipped catchment or an out-of-window</span>
+<a id="__codelineno-0-837" name="__codelineno-0-837"></a>    <span class="c1"># member leaves behind: concatenating them makes pandas infer dtypes</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>    <span class="c1"># from all-NA columns, which it warns about and will change.</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>    <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">frame</span><span class="o">.</span><span class="n">empty</span><span class="p">]</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>    <span class="k">if</span> <span class="n">frames</span><span class="p">:</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="o">*</span><span class="n">INDEX_COLUMNS</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_requested_columns</span><span class="p">()])</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_attributes</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">table</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a>        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attach_attributes</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_limit</span><span class="p">)</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_geometry</span><span class="p">:</span>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_geometry</span><span class="p">()</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_table_enabled</span><span class="p">:</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a>        <span class="n">table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a>            <span class="sa">f</span><span class="s2">&quot;caravan </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="si">}</span><span class="s2"> row(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a>        <span class="p">)</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a>    <span class="k">return</span> <span class="n">table</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -30682,7 +30690,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.caravan</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">extensions</span><span class="p">)</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="s1">&#39;denmark&#39;</span><span class="p">,</span> <span class="s1">&#39;germany&#39;</span><span class="p">,</span> <span class="s1">&#39;grdc&#39;</span><span class="p">,</span> <span class="s1">&#39;israel&#39;</span><span class="p">]</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">[</span><span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="s1">&#39;czechia&#39;</span><span class="p">,</span> <span class="s1">&#39;denmark&#39;</span><span class="p">,</span> <span class="s1">&#39;germany&#39;</span><span class="p">,</span> <span class="s1">&#39;grdc&#39;</span><span class="p">,</span> <span class="s1">&#39;israel&#39;</span><span class="p">,</span> <span class="s1">&#39;spain&#39;</span><span class="p">]</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">archive</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_extension</span><span class="p">(</span><span class="s2">&quot;denmark&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve_version</span><span class="p">()</span><span class="o">.</span><span class="n">file_for</span><span class="p">(</span><span class="s2">&quot;csv&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">archive</span><span class="o">.</span><span class="n">name</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="s1">&#39;Caravan_extension_DK.zip&#39;</span>
@@ -30878,7 +30886,7 @@ rows. Instantiate with no arguments (<code>Catalog()</code>).</p>
 <a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">            &gt;&gt;&gt; from earthlens.caravan import Catalog</span>
 <a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="sd">            &gt;&gt;&gt; cat = Catalog()</span>
 <a id="__codelineno-0-453" name="__codelineno-0-453"></a><span class="sd">            &gt;&gt;&gt; sorted(cat.extensions)</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            [&#39;base&#39;, &#39;denmark&#39;, &#39;germany&#39;, &#39;grdc&#39;, &#39;israel&#39;]</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a><span class="sd">            [&#39;base&#39;, &#39;czechia&#39;, &#39;denmark&#39;, &#39;germany&#39;, &#39;grdc&#39;, &#39;israel&#39;, &#39;spain&#39;]</span>
 <a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="sd">            &gt;&gt;&gt; archive = cat.get_extension(&quot;denmark&quot;).resolve_version().file_for(&quot;csv&quot;)</span>
 <a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="sd">            &gt;&gt;&gt; archive.name</span>
 <a id="__codelineno-0-457" name="__codelineno-0-457"></a><span class="sd">            &#39;Caravan_extension_DK.zip&#39;</span>
