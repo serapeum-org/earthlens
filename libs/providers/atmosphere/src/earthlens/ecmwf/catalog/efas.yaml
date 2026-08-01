@@ -36,12 +36,10 @@ datasets:
     endpoint: ewds
     grid_resolution: 0.05
     request_kind: glofas_hindcast
-    product_type: [consolidated]
     extras:
       system_version: [version_5_0]
       model_levels: surface_level
       time: ["00:00"]
-      product_type: null
       download_format: unarchived
     variables:
       river-discharge-in-the-last-24-hours:
@@ -70,11 +68,9 @@ datasets:
     endpoint: ewds
     grid_resolution: 0.05
     request_kind: seasonal
-    product_type: [ensemble_perturbed_forecasts]
     extras:
       model_levels: surface_level
       leadtime_hour: ["24"]
-      product_type: null
       download_format: unarchived
     variables:
       river-discharge-in-the-last-24-hours:
@@ -86,12 +82,10 @@ datasets:
     endpoint: ewds
     grid_resolution: 0.05
     request_kind: seasonal_hindcast
-    product_type: [ensemble_perturbed_reforecast]
     extras:
       system_version: [version_5_0]
       model_levels: surface_level
       leadtime_hour: ["24"]
-      product_type: null
       download_format: unarchived
     variables:
       river-discharge-in-the-last-24-hours:

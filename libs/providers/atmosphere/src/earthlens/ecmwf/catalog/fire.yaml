@@ -29,12 +29,10 @@ datasets:
     endpoint: ewds
     grid_resolution: 0.25
     request_kind: fire
-    product_type: [reanalysis]
     extras:
       release_version: ["5"]
       leadtime_hour: ["1020"]
       day: ["01"]
-      product_type: null
     variables:
       fire-weather-index:
         cds_variable: fire_weather_index
