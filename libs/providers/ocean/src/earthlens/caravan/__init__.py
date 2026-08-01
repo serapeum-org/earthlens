@@ -27,6 +27,7 @@ Public surface:
 
 from __future__ import annotations
 
+from earthlens.caravan.backend import Caravan
 from earthlens.caravan.catalog import (
     CATALOG_PATH,
     ArchiveFile,
@@ -44,6 +45,7 @@ from earthlens.caravan.catalog import (
 __all__ = [
     "ArchiveFile",
     "ArchiveFormat",
+    "Caravan",
     "Catalog",
     "CATALOG_PATH",
     "ColumnSet",

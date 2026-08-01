@@ -215,7 +215,7 @@ def ensure_archive(
         return destination
 
     logger.warning(
-        f"caravan: downloading {archive.name} ({archive.size / 1e9:.1f} GB) — "
+        f"caravan: downloading {archive.name} ({archive.size / 1e9:.1f} GB) - "
         f"this archive is a single gzip stream and cannot be read in place."
     )
     client = client if client is not None else HttpClient()
@@ -295,7 +295,7 @@ def _tar_member_names(tarball: Path) -> list[str]:
     if index_path.exists():
         return list(json.loads(index_path.read_text(encoding="utf-8")))
     logger.warning(
-        f"caravan: indexing {tarball.name} — a gzip stream has no directory, so "
+        f"caravan: indexing {tarball.name} - a gzip stream has no directory, so "
         f"this decompresses the whole archive once. The listing is then cached."
     )
     with tarfile.open(tarball, mode="r|gz") as archive:
