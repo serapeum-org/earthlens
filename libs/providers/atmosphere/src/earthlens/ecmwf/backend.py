@@ -187,6 +187,79 @@ def _unwrap_zipped_netcdf(target: Path) -> None:
             tmp.unlink(missing_ok=True)
 
 
+def _detect_output_format(target: Path) -> str:
+    """Classify a retrieved file by its magic bytes.
+
+    The store's `data_format` is a request hint, not a guarantee (CDS zips a
+    NetCDF even when `netcdf` is asked for). Sniffing the leading bytes is the
+    reliable signal for the format handler.
+
+    Args:
+        target: The file a retrieve wrote.
+
+    Returns:
+        str: `"zip"`, `"netcdf"`, `"grib"`, or `"unknown"`.
+    """
+    try:
+        head = target.read_bytes()[:8]
+    except OSError:
+        return "unknown"
+    if head[:4] == b"PK\x03\x04":
+        return "zip"
+    if head[:4] == b"GRIB":
+        return "grib"
+    if head[:3] == b"CDF" or head[:4] == b"\x89HDF":
+        return "netcdf"
+    return "unknown"
+
+
+def _unpack_netcdf_archive(target: Path) -> list[Path]:
+    r"""Unpack a zip-of-NetCDF response into its member NetCDFs.
+
+    Many `satellite-*` CDRs and the ADS `netcdf_zip` format return a zip whose
+    members are per-timestep / per-variable NetCDFs. A single-member zip is
+    unwrapped in place (the file keeps its name); a multi-member zip is
+    extracted into a sibling `<stem>/` directory and the original archive is
+    removed, so downstream code sees real NetCDFs, not a blob. Member names are
+    flattened to their basename to defeat zip path-traversal. Non-zip inputs
+    and zips with no `.nc` member are returned unchanged.
+
+    Args:
+        target: The file a retrieve wrote.
+
+    Returns:
+        list[Path]: The resulting NetCDF path(s) — `[target]` for a plain file
+        or single-member zip, or the extracted members for a multi-member zip.
+    """
+    if not zipfile.is_zipfile(target):
+        return [target]
+    with zipfile.ZipFile(target) as archive:
+        all_names = archive.namelist()
+    members = [name for name in all_names if name.endswith(".nc")]
+    if not members:
+        logger.warning(f"{target.name}: zip has no .nc member; left raw {all_names}")
+        return [target]
+    if len(members) == 1:
+        # Single-member — unwrap in place (the archive is already closed, so the
+        # atomic swap won't hit a Windows file lock).
+        _unwrap_zipped_netcdf(target)
+        return [target]
+    out_dir = target.parent / target.stem
+    out_dir.mkdir(parents=True, exist_ok=True)
+    extracted: list[Path] = []
+    with zipfile.ZipFile(target) as archive:
+        for name in members:
+            dest = out_dir / Path(name).name
+            with archive.open(name) as src, dest.open("wb") as dst:
+                shutil.copyfileobj(src, dst)
+            extracted.append(dest)
+    target.unlink(missing_ok=True)
+    logger.debug(
+        f"Unpacked {len(extracted)} NetCDF member(s) from {target.name} → {out_dir}"
+    )
+    return sorted(extracted)
+
+
 def _describe_pair(pair: tuple[str, str]) -> str:
     """Render a `(dataset, variable)` pair for the `_run_items` log lines.
 
@@ -867,7 +940,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             aggregate: Rejected — aggregation needs a curated `Variable`.
 
         Returns:
-            list[Path]: The single written file.
+            list[Path]: The written file(s) — one for a plain retrieve, or the
+            member NetCDFs for a multi-member zip-of-NetCDF response.
 
         Raises:
             ValueError: If `aggregate` is set (it needs a curated `Variable`).
@@ -903,30 +977,39 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                     "licence at the bottom of the 'Download' tab."
                 ) from exc
             raise
-        self._passthrough_postprocess(target)
-        return [target]
+        return self._passthrough_postprocess(target)
 
-    def _passthrough_postprocess(self, target: Path) -> None:
-        """Normalise a raw-retrieve output: unwrap single-member NetCDF zips.
+    def _passthrough_postprocess(self, target: Path) -> list[Path]:
+        """Normalise a raw-retrieve output by its detected format.
 
-        A single-member `netcdf_zip` is unwrapped to a plain `.nc` in place;
-        multi-member archives and GRIB are left raw (the C3 format handler /
-        pyramids read them) with a clear log. Never raises on the archive
-        shape — passthrough must not fail after a successful retrieve.
+        A zip-of-NetCDF is unpacked to its member NetCDF(s) (single-member in
+        place, multi-member into a sibling directory); GRIB and plain NetCDF are
+        left as written (pyramids reads both); an unrecognised blob (CSV/point)
+        is left raw with a clear log for the tabular path (`C9`). Never raises on
+        the archive shape — passthrough must not fail after a successful
+        retrieve.
 
         Args:
             target: The file the retrieve wrote.
+
+        Returns:
+            list[Path]: The resulting file path(s).
         """
-        if zipfile.is_zipfile(target):
-            try:
-                _unwrap_zipped_netcdf(target)
-            except RuntimeError:
-                logger.warning(
-                    f"{target.name}: multi-member archive written raw "
-                    "(zip-of-NetCDF unpacking lands in C3)."
-                )
+        output_format = _detect_output_format(target)
+        if output_format == "zip":
+            return _unpack_netcdf_archive(target)
+        if output_format == "grib":
+            logger.info(f"{target.name}: GRIB written (readable via pyramids/GDAL).")
+        elif output_format == "unknown":
+            logger.warning(
+                f"{target.name}: unrecognised format written raw "
+                "(CSV/point tabular handling lands in C9)."
+            )
         else:
-            logger.info(f"{target.name}: written ({target.stat().st_size} bytes).")
+            logger.info(
+                f"{target.name}: NetCDF written ({target.stat().st_size} bytes)."
+            )
+        return [target]
 
     def _download_dataset(
         self,

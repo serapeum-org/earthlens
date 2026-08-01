@@ -162,16 +162,19 @@ class TestPostprocess:
         with zipfile.ZipFile(target, "w") as archive:
             archive.writestr("inner.nc", b"CDF-netcdf-bytes")
         backend = _passthrough(tmp_path)
-        backend._passthrough_postprocess(target)
+        out = backend._passthrough_postprocess(target)
+        assert out == [target], "single member keeps the target path"
         assert not zipfile.is_zipfile(target), "zip replaced by its member"
         assert target.read_bytes() == b"CDF-netcdf-bytes"
 
-    def test_multi_member_zip_left_raw(self, tmp_path):
-        """A multi-member archive is left untouched (C3 handles it)."""
+    def test_multi_member_zip_is_unpacked(self, tmp_path):
+        """A multi-member archive is unpacked to its member NetCDFs."""
         target = tmp_path / "ds.zip"
         with zipfile.ZipFile(target, "w") as archive:
-            archive.writestr("a.nc", b"a")
-            archive.writestr("b.nc", b"b")
+            archive.writestr("a.nc", b"CDFa")
+            archive.writestr("b.nc", b"CDFb")
         backend = _passthrough(tmp_path)
-        backend._passthrough_postprocess(target)
-        assert zipfile.is_zipfile(target), "multi-member archive left raw"
+        out = backend._passthrough_postprocess(target)
+        assert len(out) == 2, "both members extracted"
+        assert not target.exists(), "archive removed after unpacking"
+        assert all(p.suffix == ".nc" and p.exists() for p in out)
