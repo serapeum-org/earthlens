@@ -1045,6 +1045,7 @@ class HttpRangeFile(io.RawIOBase):
                 on a one-byte probe yielded a length, so no offset
                 arithmetic is possible.
         """
+        self._owns_client = client is None
         self._client = client if client is not None else HttpClient()
         self._timeout = timeout
         self._pos = 0
@@ -1077,6 +1078,10 @@ class HttpRangeFile(io.RawIOBase):
                 "HEAD",
                 url,
                 allow_redirects=True,
+                # Same reason the reads send it: a host that negotiates gzip
+                # would report the *compressed* length, and every range offset
+                # would then be computed against the wrong total.
+                headers={"Accept-Encoding": "identity"},
                 timeout=self._timeout,
                 raise_for_status=False,
             )
@@ -1094,6 +1099,8 @@ class HttpRangeFile(io.RawIOBase):
             headers={"Range": "bytes=0-0", "Accept-Encoding": "identity"},
             timeout=self._timeout,
         )
+        self.request_count += 1
+        self.bytes_read += len(probe.content)
         self.url = probe.url or url
         match = _CONTENT_RANGE_TOTAL.search(probe.headers.get("Content-Range", ""))
         if match is None:
@@ -1131,12 +1138,13 @@ class HttpRangeFile(io.RawIOBase):
                 container's trailing index).
 
         Returns:
-            int: The new absolute offset, floored at `0`. Seeking past
-                the end is allowed (as for a local file); the next read
-                simply returns nothing.
+            int: The new absolute offset. Seeking past the end is allowed (as
+                for a local file); the next read simply returns nothing.
 
         Raises:
-            ValueError: On an unknown `whence`.
+            ValueError: On an unknown `whence`, or when the result would be a
+                negative offset - that is caller arithmetic gone wrong, and
+                silently flooring it to `0` would hand back the wrong bytes.
         """
         if whence == io.SEEK_SET:
             target = offset
@@ -1146,7 +1154,12 @@ class HttpRangeFile(io.RawIOBase):
             target = self.size + offset
         else:
             raise ValueError(f"invalid whence {whence!r}; expected 0, 1 or 2.")
-        self._pos = max(0, target)
+        if target < 0:
+            raise ValueError(
+                f"cannot seek to a negative offset ({target}); "
+                f"whence={whence} offset={offset} against size {self.size}."
+            )
+        self._pos = target
         return self._pos
 
     def readinto(self, buffer: Any) -> int:
@@ -1190,12 +1203,29 @@ class HttpRangeFile(io.RawIOBase):
                 f"(status {response.status_code}, expected 206); it cannot be "
                 f"read by range."
             )
-        data = response.content
+        # Trust the offsets, not the reply length. A server that answers `206`
+        # with more bytes than the range asked for would otherwise grow a
+        # `bytearray` caller's buffer (assigning past its length is legal) and
+        # advance `_pos` by the wrong amount, desyncing every later read.
+        data = response.content[:want]
         buffer[: len(data)] = data
         self.request_count += 1
         self.bytes_read += len(data)
         self._pos += len(data)
         return len(data)
+
+    def close(self) -> None:
+        """Release the underlying transport.
+
+        Only closes the session when this object created it; an injected
+        client is the caller's to manage and may be shared with other readers.
+        """
+        if self._owns_client:
+            # A fake transport injected by a test need not implement `close`.
+            closer = getattr(self._client.session, "close", None)
+            if callable(closer):
+                closer()
+        super().close()
 
     def buffered(
         self, buffer_size: int = DEFAULT_RANGE_BUFFER_SIZE

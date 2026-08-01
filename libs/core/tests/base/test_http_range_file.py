@@ -57,10 +57,12 @@ class _RangeSession:
         self.ignore_range = ignore_range
         self.redirect_to = redirect_to
         self.head_calls: list[str] = []
+        self.head_kwargs: list[dict[str, Any]] = []
         self.get_calls: list[tuple[str, dict[str, Any]]] = []
 
     def head(self, url: str, **kwargs: Any) -> _RangeResp:
         self.head_calls.append(url)
+        self.head_kwargs.append(kwargs)
         headers: dict[str, str] = {}
         if self.send_content_length and self.head_status < 400:
             headers["Content-Length"] = str(len(self.blob))
@@ -168,12 +170,6 @@ class TestSeek:
         assert handle.seek(2, io.SEEK_CUR) == 5
         assert handle.seek(-2, io.SEEK_END) == 8
         assert handle.tell() == 8
-
-    def test_seeking_before_the_start_is_floored(self):
-        """A negative absolute offset clamps to zero rather than failing."""
-        handle = _range_file(_RangeSession(b"0123456789"))
-
-        assert handle.seek(-100, io.SEEK_END) == 0
 
     def test_an_unknown_whence_raises(self):
         """Only 0, 1 and 2 are valid."""
@@ -283,3 +279,98 @@ class TestBuffered:
         assert archive.read("timeseries/csv/dk/dk_1.csv").decode() == (
             "date,streamflow\n2020-01-01,1.5\n"
         )
+
+
+class TestHostileServer:
+    """Guards against a server that answers a range request badly."""
+
+    def test_an_overlong_reply_is_truncated_to_the_window(self):
+        """More bytes than asked for must not grow the buffer or desync `_pos`."""
+        session = _RangeSession(bytes(range(64)))
+        original_get = session.get
+
+        def _overlong(url: str, **kwargs: Any) -> _RangeResp:
+            response = original_get(url, **kwargs)
+            response.content = response.content + b"\xff" * 40
+            return response
+
+        session.get = _overlong  # type: ignore[method-assign]
+        handle = _range_file(session, size=64)
+        buffer = bytearray(10)
+
+        written = handle.readinto(buffer)
+
+        assert written == 10
+        assert len(buffer) == 10
+        assert handle.tell() == 10
+
+    def test_the_head_probe_disables_content_encoding(self):
+        """A gzip-negotiating host would report the compressed length as size."""
+        session = _RangeSession(b"0123456789")
+
+        _range_file(session)
+
+        assert session.head_kwargs[0]["headers"]["Accept-Encoding"] == "identity"
+
+    def test_the_size_probe_is_counted_in_the_transfer_stats(self):
+        """A budget assertion that ignores the probe under-reports the cost."""
+        session = _RangeSession(b"0123456789", send_content_length=False)
+
+        handle = _range_file(session)
+
+        assert handle.request_count == 1
+        assert handle.bytes_read == 1
+
+
+class TestSeekBounds:
+    """Seeking outside the object."""
+
+    def test_a_negative_absolute_offset_raises(self):
+        """Flooring it would silently hand back the wrong bytes."""
+        handle = _range_file(_RangeSession(b"0123456789"))
+
+        with pytest.raises(ValueError, match="negative offset"):
+            handle.seek(-100, io.SEEK_END)
+
+    def test_seeking_past_the_end_is_allowed(self):
+        """As for a local file; the next read simply returns nothing."""
+        handle = _range_file(_RangeSession(b"0123456789"))
+
+        assert handle.seek(500) == 500
+        assert handle.read(4) == b""
+
+
+class TestClose:
+    """Releasing the transport."""
+
+    def test_closing_releases_a_client_it_created(self):
+        """A reader that built its own session must not leak it."""
+        closed: list[bool] = []
+        handle = HttpRangeFile("https://example.org/blob", size=10)
+        handle._client._session = _ClosableSession(closed)  # type: ignore[assignment]
+
+        handle.close()
+
+        assert handle.closed
+        assert closed == [True]
+
+    def test_closing_leaves_an_injected_client_alone(self):
+        """An injected client may be shared, so it is the caller's to close."""
+        closed: list[bool] = []
+        handle = _range_file(_RangeSession(b"0123456789"), size=10)
+        handle._client._session = _ClosableSession(closed)  # type: ignore[assignment]
+
+        handle.close()
+
+        assert handle.closed
+        assert closed == [], "an injected client must not be closed for the caller"
+
+
+class _ClosableSession:
+    """Records whether the reader closed it."""
+
+    def __init__(self, log: list[bool]) -> None:
+        self._log = log
+
+    def close(self) -> None:
+        self._log.append(True)
