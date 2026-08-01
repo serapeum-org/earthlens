@@ -780,14 +780,23 @@ def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
     fields = {f.get("name") for f in form if isinstance(f, dict)}
     if "hyear" in fields:
         return "glofas_hindcast" if "hday" in fields else "seasonal_hindcast"
+    # A real seasonal forecast keys on `leadtime_month`. Without it, a
+    # year/month-only form is a monthly reanalysis / emission inventory /
+    # radiative-forcing product, not a seasonal forecast — so require the lead
+    # field rather than firing on `year` + no `day` (which over-caught ~15
+    # non-seasonal families).
+    if "leadtime_month" in fields:
+        return "seasonal"
     if "date" in fields:
         return "cams_date"
+    # `cams_inversion` (CAMS GHG inversion / EU air-quality reanalyses) is
+    # CAMS-only: a `quantity` widget, or a `cams-*` id carrying a model/level
+    # selector with no `day`. A `model` widget on a `projections-*` id is a
+    # climate model, not a CAMS inversion — do not misread it.
     if "quantity" in fields or (
-        "year" in fields and "day" not in fields and "model" in fields
+        upstream_id.startswith("cams-") and "model" in fields and "day" not in fields
     ):
         return "cams_inversion"
-    if "year" in fields and "day" not in fields:
-        return "seasonal"
     if "grid" in fields and "leadtime_hour" not in fields:
         # CEMS fire-danger forms carry a `dataset_type` selector alongside the
         # grid; the satellite CDRs are matched by id above.

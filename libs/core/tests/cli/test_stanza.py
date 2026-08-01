@@ -141,8 +141,16 @@ class TestEcmwfRequestKind:
             ("efas-seasonal-reforecast", ["hyear", "hmonth"], "seasonal_hindcast"),
             ("cams-global-reanalysis-eac4", ["date", "variable"], "cams_date"),
             ("cams-ghg-inversion", ["quantity", "year", "month"], "cams_inversion"),
-            ("aq-reanalysis", ["year", "month", "model"], "cams_inversion"),
-            ("some-seasonal", ["year", "month"], "seasonal"),
+            (
+                "cams-europe-air-quality-reanalyses",
+                ["year", "month", "model"],
+                "cams_inversion",
+            ),
+            ("cems-glofas-seasonal", ["leadtime_month", "year", "month"], "seasonal"),
+            # A year/month-only form with no leadtime_month is NOT seasonal (was
+            # mis-seeded as `seasonal`); a projections-* `model` is not CAMS.
+            ("cams-global-emission-inventories", ["year", "month"], "form"),
+            ("projections-cmip6", ["year", "month", "model"], "form"),
             (
                 "cems-fire-historical-v1",
                 ["grid", "dataset_type", "year", "day"],
