@@ -674,15 +674,89 @@ def _validate_soilgrids(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, _soilgrids_row_issues)
 
 
-#: Provider id -> a callable taking the loaded catalog and returning
-#: `(checked, issues)`. Providers without one report `"unsupported"`.
+def _caravan_archive_issues(label: str, archive: Any) -> list[str]:
+    """Flag one archive file that could not be fetched or verified.
+
+    Args:
+        label: `"<extension>/<version>[<format>]"`, for the message.
+        archive: One `ArchiveFile` row.
+
+    Returns:
+        list[str]: One entry per problem found.
+    """
+    issues = []
+    if not archive.record:
+        issues.append(f"{label}: no pinned Zenodo record")
+    if not archive.md5:
+        issues.append(f"{label}: no md5 to verify the download")
+    if archive.size <= 0:
+        issues.append(f"{label}: size must be positive")
+    if archive.archive_format not in {"zip", "tar.gz"}:
+        issues.append(f"{label}: unreadable archive_format {archive.archive_format!r}")
+    return issues
+
+
+def _caravan_release_issues(
+    label: str, release: Any, column_sets: set[str]
+) -> list[str]:
+    """Flag one release whose declared shape is self-inconsistent.
+
+    Args:
+        label: `"<extension>/<version>"`, for the message.
+        release: One `Version` row.
+        column_sets: The column-set names the backend knows how to read.
+
+    Returns:
+        list[str]: One entry per problem found.
+    """
+    issues = []
+    if release.column_set not in column_sets:
+        issues.append(f"{label}: unknown column_set {release.column_set!r}")
+    if not release.files:
+        issues.append(f"{label}: no archive files declared")
+    for fmt, archive in release.files.items():
+        issues.extend(_caravan_archive_issues(f"{label}[{fmt}]", archive))
+    period = release.data_period
+    if period is not None and period[0] > period[1]:
+        issues.append(f"{label}: data_period {period} is inverted")
+    return issues
+
+
+def _caravan_row_issues(key: str, record: Any, column_sets: set[str]) -> list[str]:
+    """Flag one extension whose releases are unpinned or self-inconsistent.
+
+    Args:
+        key: The extension key.
+        record: One `Extension` row.
+        column_sets: The column-set names the backend knows how to read.
+
+    Returns:
+        list[str]: One entry per problem found.
+    """
+    versions = getattr(record, "versions", None) or {}
+    if not versions:
+        return [f"{key}: no versions declared"]
+    issues = []
+    if getattr(record, "default_version", "") not in versions:
+        issues.append(
+            f"{key}: default_version {record.default_version!r} is not among "
+            f"{sorted(versions)}"
+        )
+    if not getattr(record, "license", ""):
+        issues.append(f"{key}: no license recorded")
+    if not getattr(record, "sources", None):
+        issues.append(f"{key}: no source datasets recorded")
+    for name, release in versions.items():
+        issues.extend(_caravan_release_issues(f"{key}/{name}", release, column_sets))
+    return issues
+
+
 def _validate_caravan(catalog: Any) -> tuple[int, list[str]]:
     """Each Caravan extension must pin a fetchable, self-consistent release.
 
-    The catalog's whole job is reproducibility: a row that pins a moving concept
-    DOI, or names an archive format the fetcher cannot read, or claims a
-    column set that does not exist, fails silently at request time rather than
-    here. These are the offline checks that catch that.
+    The catalog's whole job is reproducibility: a row pinning no record, or
+    naming an archive format the fetcher cannot read, or claiming a column set
+    that does not exist, fails at request time rather than here.
 
     Args:
         catalog: The loaded Caravan `Catalog`.
@@ -692,49 +766,12 @@ def _validate_caravan(catalog: Any) -> tuple[int, list[str]]:
     """
     from earthlens.caravan.catalog import ColumnSet
 
-    valid_column_sets = set(ColumnSet.__args__)  # type: ignore[attr-defined]
-
-    def check(key: str, record: Any) -> list[str]:
-        """Flag an extension whose releases are unpinned or self-inconsistent."""
-        issues: list[str] = []
-        versions = getattr(record, "versions", None) or {}
-        if not versions:
-            return [f"{key}: no versions declared"]
-        default = getattr(record, "default_version", "")
-        if default not in versions:
-            issues.append(
-                f"{key}: default_version {default!r} is not among {sorted(versions)}"
-            )
-        if not getattr(record, "license", ""):
-            issues.append(f"{key}: no license recorded")
-        if not getattr(record, "sources", None):
-            issues.append(f"{key}: no source datasets recorded")
-        for name, release in versions.items():
-            label = f"{key}/{name}"
-            if release.column_set not in valid_column_sets:
-                issues.append(f"{label}: unknown column_set {release.column_set!r}")
-            if not release.files:
-                issues.append(f"{label}: no archive files declared")
-            for fmt, archive in release.files.items():
-                where = f"{label}[{fmt}]"
-                if not archive.record:
-                    issues.append(f"{where}: no pinned Zenodo record")
-                if not archive.md5:
-                    issues.append(f"{where}: no md5 to verify the download")
-                if archive.size <= 0:
-                    issues.append(f"{where}: size must be positive")
-                if archive.archive_format not in {"zip", "tar.gz"}:
-                    issues.append(
-                        f"{where}: unreadable archive_format {archive.archive_format!r}"
-                    )
-            period = release.data_period
-            if period is not None and period[0] > period[1]:
-                issues.append(f"{label}: data_period {period} is inverted")
-        return issues
-
-    return _lint(catalog, check)
+    column_sets = set(ColumnSet.__args__)  # type: ignore[attr-defined]
+    return _lint(catalog, lambda k, r: _caravan_row_issues(k, r, column_sets))
 
 
+#: Provider id -> a callable taking the loaded catalog and returning
+#: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "caravan": _validate_caravan,
     "nwp": _validate_nwp,

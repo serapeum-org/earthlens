@@ -190,8 +190,10 @@ class TestAttributeIndex:
 
     def test_a_source_without_the_table_raises(self):
         """Without centroids, a spatial request cannot be honoured."""
+        archive = _archive(build_zip())
+
         with pytest.raises(ValueError, match="cannot be resolved by bounding box"):
-            _helpers.attribute_index(_archive(build_zip()), "nope")
+            _helpers.attribute_index(archive, "nope")
 
     def test_merge_attributes_joins_the_tables(self):
         """`with_attributes` needs the locations and the indices together."""
@@ -340,12 +342,11 @@ class TestEnsureArchive:
             record=1, name="a.tar.gz", size=1, md5="deadbeef", archive_format="tar.gz"
         )
 
+        client = HttpClient(session=_BlobSession(b"wrong"))
+
         with pytest.raises(ValueError, match="failed its checksum"):
             _helpers.ensure_archive(
-                descriptor,
-                cache_root=tmp_path,
-                client=HttpClient(session=_BlobSession(b"wrong")),
-                progress=False,
+                descriptor, cache_root=tmp_path, client=client, progress=False
             )
 
 

@@ -127,8 +127,10 @@ class TestVariables:
 
     def test_a_source_restricted_variable_is_refused_elsewhere(self):
         """Caravan-DE's extra columns do not exist in the other archives."""
+        catalog = Catalog()
+
         with pytest.raises(ValueError, match="exists only in"):
-            Catalog().get_variable("grdc", "water_level")
+            catalog.get_variable("grdc", "water_level")
 
     def test_a_source_restricted_variable_is_allowed_in_its_own_extension(self):
         """The same variable resolves for the extension that has it."""
@@ -136,8 +138,10 @@ class TestVariables:
 
     def test_an_unknown_variable_lists_the_known_ones(self):
         """The error has to be actionable without opening the YAML."""
+        catalog = Catalog()
+
         with pytest.raises(ValueError, match="is not a Caravan variable"):
-            Catalog().get_variable("grdc", "rainfall")
+            catalog.get_variable("grdc", "rainfall")
 
 
 class TestLookupErrors:
@@ -145,13 +149,17 @@ class TestLookupErrors:
 
     def test_an_unknown_extension_gets_a_hint(self):
         """A typo names the catalog and the valid keys."""
+        catalog = Catalog()
+
         with pytest.raises(ValueError, match="Caravan catalog"):
-            Catalog().get_extension("grcd")
+            catalog.get_extension("grcd")
 
     def test_an_unknown_version_lists_the_valid_ones(self):
         """Version keys are not guessable, so the error enumerates them."""
+        base = Catalog().get_extension("base")
+
         with pytest.raises(ValueError, match=r"Known versions: \['1.2', '1.6'\]"):
-            Catalog().get_extension("base").resolve_version("9.9")
+            base.resolve_version("9.9")
 
     def test_an_unpublished_format_is_refused(self):
         """Asking for a format a release does not ship names what it does."""

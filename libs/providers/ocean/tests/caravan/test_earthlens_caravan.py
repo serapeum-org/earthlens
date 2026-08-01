@@ -83,5 +83,7 @@ def test_aggregate_rejected_for_tabular(tmp_path, catalog):
     """A tabular OUTPUT_KIND cannot be reduced, exactly as for openaq."""
     facade = _facade(tmp_path, catalog)
 
+    reducer = AggregationConfig(freq="1MS", op="mean")
+
     with pytest.raises(NotImplementedError):
-        facade.download(aggregate=AggregationConfig(freq="1MS", op="mean"))
+        facade.download(aggregate=reducer)

@@ -291,8 +291,10 @@ class TestLimit:
 
     def test_a_zero_cap_raises(self, catalog, tmp_path):
         """A request for no rows is a caller bug, per the shared contract."""
+        source = _source(catalog, tmp_path)
+
         with pytest.raises(ValueError):
-            _source(catalog, tmp_path).download(limit=0)
+            source.download(limit=0)
 
 
 class TestExtras:
@@ -448,7 +450,8 @@ class TestDegradedPaths:
         source.download()
 
         assert source.geometry == "collection"
-        assert seen and seen[0].endswith(".shp")
+        assert len(seen) == 1
+        assert seen[0].endswith(".shp")
 
     def test_geometry_is_none_when_the_archive_ships_none(
         self, catalog, tmp_path, monkeypatch
