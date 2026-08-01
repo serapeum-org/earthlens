@@ -712,6 +712,24 @@ class Catalog(AbstractCatalog):
 
         Returns:
             str | None: The store slug, or `None` if the id is not in the index.
+
+        Examples:
+            - An ADS (CAMS) dataset resolves to the `ads` store:
+
+                ```python
+                >>> from earthlens.ecmwf import Catalog
+                >>> Catalog().store_for("cams-global-reanalysis-eac4")
+                'ads'
+
+                ```
+            - An id absent from every store's index returns `None`:
+
+                ```python
+                >>> from earthlens.ecmwf import Catalog
+                >>> Catalog().store_for("not-a-real-dataset") is None
+                True
+
+                ```
         """
         return self.available_by_store.get(dataset_id)
 
