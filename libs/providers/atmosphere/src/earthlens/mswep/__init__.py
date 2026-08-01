@@ -30,6 +30,14 @@ Public surface (re-exported from this package):
   folder id resolves; a subclass of
   :class:`earthlens.base.AuthenticationError`.
 * :data:`DRIVE_SCOPE` — the read-only Drive scope the backend requests.
+* :class:`Catalog` — loader for the bundled `mswep_data_catalog.yaml`.
+* :class:`MswepProduct` / :class:`MswepVersion` / :class:`MswepVariant` /
+  :class:`MswepResolution` / :class:`MswepVariable` — one product row and
+  its four coordinate maps.
+* :class:`ProvisionalValueError` — raised when a request resolves onto a
+  catalog value that could not be verified without an approved share.
+* :data:`CATALOG_PATH` — path to the bundled YAML; monkey-patchable in
+  tests.
 
 Examples:
     - Construct credentials that resolve entirely from the environment:
@@ -37,6 +45,13 @@ Examples:
         >>> from earthlens.mswep import MswepCredentials
         >>> MswepCredentials().folder_id is None
         True
+
+        ```
+    - The two products carry different Drive path shapes:
+        ```python
+        >>> from earthlens.mswep import Catalog
+        >>> Catalog().products()
+        ['mswep', 'mswx']
 
         ```
 """
@@ -49,10 +64,30 @@ from earthlens.mswep.auth import (
     MswepAuth,
     MswepCredentials,
 )
+from earthlens.mswep.catalog import (
+    CATALOG_PATH,
+    Catalog,
+    MswepProduct,
+    MswepResolution,
+    MswepVariable,
+    MswepVariant,
+    MswepVersion,
+    ProvisionalValueError,
+    clear_catalog_cache,
+)
 
 __all__ = [
     "AuthenticationError",
+    "CATALOG_PATH",
+    "Catalog",
     "DRIVE_SCOPE",
     "MswepAuth",
     "MswepCredentials",
+    "MswepProduct",
+    "MswepResolution",
+    "MswepVariable",
+    "MswepVariant",
+    "MswepVersion",
+    "ProvisionalValueError",
+    "clear_catalog_cache",
 ]

@@ -312,9 +312,7 @@ class TestMswepAuth:
 
     def test_context_manager_configures(self):
         """The context-manager form authenticates on enter."""
-        with MswepAuth(
-            MswepCredentials(folder_id="1AbC"), service=object()
-        ) as auth:
+        with MswepAuth(MswepCredentials(folder_id="1AbC"), service=object()) as auth:
             assert auth.is_authenticated()
 
     def test_service_account_key_rejected_end_to_end(self, tmp_path, monkeypatch):
