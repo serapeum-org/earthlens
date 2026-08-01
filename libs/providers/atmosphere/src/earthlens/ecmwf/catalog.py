@@ -120,6 +120,56 @@ def _yaml_files_for(path: Path) -> list[Path]:
     return yaml_files_for(path, provider='CDS', shard_noun='per-family')
 
 
+def _merge_available(
+    block: Any, available: list[str], by_store: dict[str, str]
+) -> None:
+    """Union one file's `available_datasets` block into the flat list + store map.
+
+    Args:
+        block: A file's `available_datasets` value — a flat list of ids, or a
+            per-store `{cds: [...], ads: [...], ewds: [...]}` mapping (in which
+            case each id is also recorded against its store for endpoint
+            auto-resolution).
+        available: Accumulator for the flat id list (mutated in place).
+        by_store: Accumulator mapping each id to its store slug (mutated).
+    """
+    if isinstance(block, dict):
+        for store, ids in block.items():
+            for ident in ids or []:
+                available.append(ident)
+                by_store[str(ident)] = str(store)
+    else:
+        available += list(block)
+
+
+def _merge_datasets(
+    data: dict[str, Any],
+    yaml_path: Path,
+    datasets_yaml: dict[str, Any],
+    seen_in: dict[str, str],
+) -> None:
+    """Union one file's `datasets:` map, rejecting a key declared twice.
+
+    Args:
+        data: The parsed YAML mapping for one catalog file.
+        yaml_path: That file's path (named in the duplicate-key error).
+        datasets_yaml: Accumulator of `dataset_key -> body` (mutated in place).
+        seen_in: Accumulator of `dataset_key -> filename` for the error message.
+
+    Raises:
+        ValueError: If a dataset key already appears in `datasets_yaml`.
+    """
+    for ds_key, ds_body in (data.get("datasets") or {}).items():
+        if ds_key in datasets_yaml:
+            raise ValueError(
+                f"duplicate dataset key {ds_key!r}: declared in both "
+                f"`{seen_in[ds_key]}` and `{yaml_path.name}`. Each CDS "
+                "dataset key must live in exactly one file."
+            )
+        seen_in[ds_key] = yaml_path.name
+        datasets_yaml[ds_key] = ds_body
+
+
 def _load_catalog_data(
     path: Path,
 ) -> tuple[list[str], dict[str, Dataset], dict[str, str]]:
@@ -153,26 +203,8 @@ def _load_catalog_data(
     seen_in: dict[str, str] = {}
     for yaml_path in files:
         data = load_yaml_strict(yaml_path) or {}
-        block = data.get("available_datasets") or []
-        if isinstance(block, dict):
-            # Per-store mapping (`{cds: [...], ads: [...], ewds: [...]}`) →
-            # union every store's ids into the flat availability list and
-            # record which store hosts each id (for endpoint auto-resolution).
-            for store, ids in block.items():
-                for ident in ids or []:
-                    available.append(ident)
-                    by_store[str(ident)] = str(store)
-        else:
-            available += list(block)
-        for ds_key, ds_body in (data.get("datasets") or {}).items():
-            if ds_key in datasets_yaml:
-                raise ValueError(
-                    f"duplicate dataset key {ds_key!r}: declared in both "
-                    f"`{seen_in[ds_key]}` and `{yaml_path.name}`. Each CDS "
-                    "dataset key must live in exactly one file."
-                )
-            seen_in[ds_key] = yaml_path.name
-            datasets_yaml[ds_key] = ds_body
+        _merge_available(data.get("available_datasets") or [], available, by_store)
+        _merge_datasets(data, yaml_path, datasets_yaml, seen_in)
 
     if not datasets_yaml:
         raise ValueError(
