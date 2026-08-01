@@ -149,8 +149,10 @@ class Caravan(AbstractDataSource):
             country: Restrict to one country. Matched case-insensitively
                 against the full English name in `attributes_other_*`
                 (`"Denmark"`, `"South Africa"`).
-            timeseries_format: `"csv"` (default, parsed directly by pandas) or
-                `"netcdf"`, which is read through pyramids.
+            timeseries_format: Only `"csv"` is supported. The archives also
+                publish a `.nc` variant of the same data, but decoding it would
+                need an array library earthlens does not depend on, so
+                `"netcdf"` raises `NotImplementedError`.
             with_attributes: Merge the static catchment attributes onto every
                 row.
             with_geometry: Attach the basin polygons, returned alongside the
@@ -170,18 +172,31 @@ class Caravan(AbstractDataSource):
             catalog: A pre-built catalog; the bundled one when `None`.
 
         Raises:
-            ValueError: If `dataset`, `version` or `timeseries_format` is
-                unknown, or the release needs `allow_full_download=True`.
+            ValueError: If `dataset` or `version` is unknown, if
+                `timeseries_format` is not `"csv"`, or if the release needs
+                `allow_full_download=True`.
+            NotImplementedError: If `timeseries_format="netcdf"` - see that
+                argument's note.
         """
         self._catalog = catalog if catalog is not None else Catalog()
         self._dataset = dataset
         self._version = version
         self._gauge_ids = list(gauge_ids) if gauge_ids else []
         self._country = country
-        if timeseries_format not in {"csv", "netcdf"}:
+        if timeseries_format == "netcdf":
+            raise NotImplementedError(
+                "timeseries_format='netcdf' is not supported. Caravan's .nc "
+                "members are 1-D per-catchment time series, but pyramids - which "
+                "owns every array container in this ecosystem - models NetCDF as "
+                "raster, so it reads them as an empty 0-band grid. Decoding them "
+                "would need h5py/netCDF4/xarray, none of which earthlens depends "
+                "on. Use the default timeseries_format='csv': the CSV archive "
+                "carries the same catchments, columns and period."
+            )
+        if timeseries_format != "csv":
             raise ValueError(
                 f"timeseries_format={timeseries_format!r} is not supported; "
-                f"expected 'csv' or 'netcdf'."
+                f"expected 'csv'."
             )
         self._timeseries_format = cast("TimeseriesFormat", timeseries_format)
         self._with_attributes = with_attributes
@@ -616,9 +631,8 @@ class Caravan(AbstractDataSource):
     def _read_member(self, blob: bytes) -> pd.DataFrame:
         """Decode one timeseries member into a frame.
 
-        CSV is parsed directly by pandas. NetCDF goes through pyramids, which
-        owns every raster/array container format in this ecosystem — earthlens
-        never imports `xarray` itself.
+        Always CSV: `pandas` parses the member directly, with no decode step
+        and no array library involved.
 
         Args:
             blob: The member's bytes.
@@ -626,35 +640,7 @@ class Caravan(AbstractDataSource):
         Returns:
             pandas.DataFrame: The catchment's full record, one row per day.
         """
-        if self._timeseries_format == "csv":
-            return pd.read_csv(BytesIO(blob))
-        return self._read_netcdf_member(blob)
-
-    def _read_netcdf_member(self, blob: bytes) -> pd.DataFrame:
-        """Decode a netCDF-4 timeseries member through pyramids.
-
-        The member is written to a temporary file because the reader takes a
-        path, and Caravan's `.nc` members are HDF5-backed netCDF-4.
-
-        Args:
-            blob: The member's bytes.
-
-        Returns:
-            pandas.DataFrame: The catchment's record with a `date` column.
-        """
-        import tempfile
-
-        from pyramids.netcdf import NetCDF
-
-        with tempfile.TemporaryDirectory() as scratch:
-            target = Path(scratch) / "timeseries.nc"
-            target.write_bytes(blob)
-            dataset = NetCDF.read_file(str(target))
-            frame = dataset.to_dataframe()
-        frame = frame.reset_index()
-        if "date" not in frame.columns and "time" in frame.columns:
-            frame = frame.rename(columns={"time": "date"})
-        return frame
+        return pd.read_csv(BytesIO(blob))
 
     def _attach_attributes(self, frame: pd.DataFrame) -> pd.DataFrame:
         """Merge the static catchment attributes onto every row.

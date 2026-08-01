@@ -71,11 +71,6 @@ class TestConstruction:
         with pytest.raises(ValueError, match="Caravan catalog"):
             _source(catalog, tmp_path, dataset="nope")
 
-    def test_an_unknown_timeseries_format_raises(self, catalog, tmp_path):
-        """Only the two published encodings are accepted."""
-        with pytest.raises(ValueError, match="timeseries_format"):
-            _source(catalog, tmp_path, timeseries_format="parquet")
-
     def test_no_request_is_made_at_construction(self, catalog, tmp_path):
         """Building a request must not touch the network."""
         session = FakeRangeSession(build_zip())
@@ -419,36 +414,17 @@ class TestDegradedPaths:
 
         assert any("catchments selected" in message for message in messages)
 
-    def test_netcdf_goes_through_pyramids(self, catalog, tmp_path, monkeypatch):
-        """The `.nc` variant must be decoded by pyramids, never by xarray."""
-        calls: list[str] = []
+    def test_netcdf_is_refused_with_the_reason(self, catalog, tmp_path):
+        """The .nc variant cannot be decoded without an array library we lack."""
+        with pytest.raises(NotImplementedError, match="1-D per-catchment"):
+            _source(catalog, tmp_path, timeseries_format="netcdf")
 
-        class _FakeDataset:
-            def to_dataframe(self) -> pd.DataFrame:
-                return pd.DataFrame(
-                    {
-                        "time": pd.to_datetime(["2020-01-01", "2020-01-02"]),
-                        "streamflow": [1.0, 2.0],
-                    }
-                ).set_index("time")
-
-        class _FakeNetCDF:
-            @staticmethod
-            def read_file(path: str) -> _FakeDataset:
-                calls.append(path)
-                return _FakeDataset()
-
-        monkeypatch.setitem(
-            __import__("sys").modules,
-            "pyramids.netcdf",
-            type("M", (), {"NetCDF": _FakeNetCDF}),
-        )
-        source = _source(catalog, tmp_path, timeseries_format="netcdf")
-
-        frame = source.download()
-
-        assert calls, "pyramids must be the reader for the netcdf variant"
-        assert list(frame["gauge_id"].unique()) == ["dk_1"]
+    def test_an_unknown_timeseries_format_still_raises_value_error(
+        self, catalog, tmp_path
+    ):
+        """A typo is a caller bug, distinct from the unsupported-but-real netcdf."""
+        with pytest.raises(ValueError, match="expected 'csv'"):
+            _source(catalog, tmp_path, timeseries_format="parquet")
 
     def test_geometry_is_read_when_requested(self, catalog, tmp_path, monkeypatch):
         """with_geometry attaches the basin polygons alongside the frame."""

@@ -107,11 +107,16 @@ basins = source.datasource.geometry   # a pyramids FeatureCollection
 `with_attributes` adds the catchment's area, country, gauge name and the Caravan climate indices (aridity,
 `p_mean`, snow fraction, seasonality).
 
-## CSV or NetCDF
+## Why there is no NetCDF option
 
-`timeseries_format="csv"` (the default) is parsed straight by pandas. `timeseries_format="netcdf"` reads the
-netCDF-4 variant through **pyramids** — earthlens never imports `xarray` itself. For `base` the two formats live
-in two *different* Zenodo records; the catalog handles that.
+Each archive also publishes a `.nc` variant of the *same* data — same catchments, same columns, same period. The
+backend does not read it, and `timeseries_format="netcdf"` raises `NotImplementedError`.
+
+The reason is a genuine boundary rather than an oversight. Caravan's `.nc` members are **1-D per-catchment time
+series**, but pyramids — which owns every array container in this ecosystem — models NetCDF as *raster*, so it
+opens them as an empty zero-band grid. Decoding them properly would need `h5py` / `netCDF4` / `xarray`, none of
+which earthlens depends on, and adding one to duplicate data the CSV path already returns is not a trade worth
+making. The catalog still records the `.nc` files, because they are real and a future backend may want them.
 
 ## The `base` extension is opt-in
 
