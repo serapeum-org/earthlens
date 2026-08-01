@@ -912,6 +912,19 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         nc_path = self._download_dataset(var_info, progress_bar=progress_bar)
         if aggregate is None:
             return [nc_path]
+        # A multi-member zip-of-NetCDF (satellite CDR / CAMS `netcdf_zip` over
+        # several timesteps) is unpacked into a sibling `<stem>/` dir, so the
+        # returned member's parent is that dir rather than `root_dir`.
+        # `aggregate_netcdf` reduces a single cube — reducing only the first
+        # member would return a plausible-looking but partial result, so refuse.
+        if nc_path.parent != self.root_dir:
+            raise ValueError(
+                f"{dataset_name}/{var}: the retrieve returned a multi-member "
+                "zip-of-NetCDF (one file per timestep); aggregating across "
+                "members is not supported. Re-run without `aggregate=` and "
+                f"reduce the member directory ({nc_path.parent}) yourself, or "
+                "request a single window."
+            )
         agg = aggregate_netcdf(nc_path, var_info, aggregate)
         return [path for _, _, path in agg if path is not None]
 

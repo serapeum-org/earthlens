@@ -156,6 +156,25 @@ class TestCuratedApiMultiMemberZip:
         assert out.parent == member_dir, "returns a member under the sibling dir"
         assert sorted(p.name for p in member_dir.glob("*.nc")) == ["2020.nc", "2021.nc"]
 
+    def test_aggregate_over_multi_member_is_refused(self, tmp_path):
+        """A multi-member response + aggregate= raises rather than reducing 1/N."""
+        from earthlens.aggregate import AggregationConfig
+        from earthlens.ecmwf import Catalog
+
+        backend = _curated_backend(tmp_path)
+        member_dir = tmp_path / "sm_satellite-soil-moisture"
+        member_dir.mkdir()
+        member = member_dir / "2020.nc"
+        member.write_bytes(b"CDF")
+        backend._download_dataset = lambda var_info, progress_bar=True: member
+        with pytest.raises(ValueError, match="multi-member"):
+            backend._download_pair(
+                ("satellite-soil-moisture", "surface-soil-moisture-volumetric"),
+                catalog=Catalog(),
+                progress_bar=True,
+                aggregate=AggregationConfig(freq="1D"),
+            )
+
 
 class TestPyramidsReadsUnpackedMember:
     """An unpacked member NetCDF reads into a pyramids Dataset (C3 acceptance)."""
