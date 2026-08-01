@@ -23,6 +23,9 @@ requests.
 
 Public surface (re-exported from this package):
 
+* :class:`MSWEP` — the backend; instantiate with a date window, a
+  product / variant / resolution and the shared-folder id, then call
+  :meth:`MSWEP.download`.
 * :class:`MswepAuth` / :class:`MswepCredentials` — the Drive credential
   ladder (explicit `token.json` → `rclone` remote → environment) and the
   shared-folder id.
@@ -64,6 +67,7 @@ from earthlens.mswep.auth import (
     MswepAuth,
     MswepCredentials,
 )
+from earthlens.mswep.backend import CADENCES, MSWEP
 from earthlens.mswep.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -75,12 +79,21 @@ from earthlens.mswep.catalog import (
     ProvisionalValueError,
     clear_catalog_cache,
 )
+from earthlens.mswep.drive import (
+    DownloadQuotaExceededError,
+    DriveTransportError,
+    RateLimitedError,
+)
 
 __all__ = [
     "AuthenticationError",
+    "CADENCES",
     "CATALOG_PATH",
     "Catalog",
     "DRIVE_SCOPE",
+    "DownloadQuotaExceededError",
+    "DriveTransportError",
+    "MSWEP",
     "MswepAuth",
     "MswepCredentials",
     "MswepProduct",
@@ -89,5 +102,6 @@ __all__ = [
     "MswepVariant",
     "MswepVersion",
     "ProvisionalValueError",
+    "RateLimitedError",
     "clear_catalog_cache",
 ]
