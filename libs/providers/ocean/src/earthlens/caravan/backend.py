@@ -195,7 +195,6 @@ class Caravan(AbstractDataSource):
         )
         self._cache_root = cache_root
         self._archive: _helpers.CaravanArchive | None = None
-        self._limit: int | None = None
 
         #: Basin polygons, populated by `download()` when `with_geometry`.
         self.geometry: Any = None

@@ -60,7 +60,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._ocean*", "earthlens.argo*", "earthlens.cmems*", "earthlens.erddap*", "earthlens.nwm*", "earthlens.obis*", "earthlens.usgs_water*"]
+include = ["earthlens._ocean*", "earthlens.argo*", "earthlens.caravan*", "earthlens.cmems*", "earthlens.erddap*", "earthlens.nwm*", "earthlens.obis*", "earthlens.usgs_water*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -86,6 +86,7 @@ consider_namespace_packages = true
 addopts = "--import-mode=importlib"
 markers = [
     "argo: tests for the Argo float-profile backend (requires the `argo` extra: argopy; open data, no auth).",
+    "caravan: tests for the Caravan large-sample hydrology backend (no extra SDK; static Zenodo archives read over HTTP Range, includes the open GRDC-Caravan subset).",
     "cmems: tests for the Copernicus Marine backend (requires the `cmems` extra: copernicusmarine).",
     "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
     "erddap: tests for the generic ERDDAP backend (requires the `erddap` extra: erddapy; griddap raster via direct .nc download + pyramids, tabledap tabular via to_pandas; public servers only).",
