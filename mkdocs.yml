@@ -550,6 +550,7 @@ nav:
       - Country hazard profile: examples/gdacs/country_hazard_profile.ipynb
     - Disaster impacts (EM-DAT):
       - Flood events and where they happened: examples/emdat/flood_events_and_footprints.ipynb
+      - Real footprints and flooded area: examples/emdat/flood_footprints_and_area.ipynb
     - OpenStreetMap (Overpass / ohsome):
       - Quickstart — current-state features (Overpass): examples/osm/quickstart.ipynb
       - History — building footprints over time (ohsome): examples/osm/ohsome_history.ipynb
