@@ -68,6 +68,12 @@ class TestPassthroughConstruction:
         with pytest.raises(ValueError, match="dataset id"):
             ECMWF(request={"variable": ["x"]}, path=str(tmp_path))
 
+    def test_construction_does_not_create_root_dir(self, tmp_path):
+        """Constructing a passthrough is read-only — no output dir until download."""
+        out = tmp_path / "not-yet"
+        ECMWF(variables={_EAC4: []}, request=dict(_EAC4_REQUEST), path=str(out))
+        assert not out.exists(), "root_dir is created only at download() time"
+
     def test_typed_mode_still_requires_standard_args(self, tmp_path):
         """Typed construction with a missing arg names what is missing."""
         with pytest.raises(ValueError, match="lat_lim"):

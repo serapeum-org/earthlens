@@ -421,8 +421,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 "request": dict(request),
                 "endpoint": endpoint,
             }
+            # Construction stays read-only: the base `download` wrapper's
+            # `_ensure_root_dir` creates (and unwinds on failure) the output
+            # directory at download time, exactly as the typed path relies on.
             self.root_dir = Path(path).absolute()
-            self.root_dir.mkdir(parents=True, exist_ok=True)
             self.path = self.root_dir
             return
 
