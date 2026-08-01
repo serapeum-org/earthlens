@@ -19784,8 +19784,10 @@ into <code>self.space</code> and <code>self.time</code>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpatialExtent</span><span class="p">,</span> <span class="n">TemporalExtent</span>
 </code></pre></div>
 <p>These are values, not dicts — they are immutable, and <code>SpatialExtent</code> is comparable and hashable.</p>
-<p><code>TemporalExtent</code> is neither, because its <code>dates</code> field holds a <code>DatetimeIndex</code>: <code>==</code> raises <code>ValueError</code>
-("truth value of an array ... is ambiguous") and <code>hash()</code> raises <code>TypeError</code>. Compare its scalar fields
+<p><code>TemporalExtent</code> is neither, because its <code>dates</code> field holds a <code>DatetimeIndex</code>. <code>hash()</code> always raises
+<code>TypeError</code>. <code>==</code> is worse than simply failing: it returns <code>True</code> when both extents share the <em>same</em>
+<code>dates</code> object, and raises <code>ValueError</code> ("truth value of an array ... is ambiguous") when they hold
+equal-but-distinct ones — so it appears to work until it doesn't. Compare the scalar fields
 (<code>start_date</code>, <code>end_date</code>, <code>resolution</code>) rather than the object.</p>
 <h2 id="spatialextent"><a class="toclink" href="#spatialextent"><code>SpatialExtent</code></a><a class="headerlink" href="#spatialextent" title="Permanent link">#</a></h2>
 

@@ -20136,13 +20136,15 @@ quoted as earthlens raises them.</p>
 <p>See the <a href="../migration/">migration guide</a>. <code>earthlens.earthlens</code> also resolves, but it is the internal module path —
 use <code>earthlens.core</code>.</p>
 <h3 id="a-backend-raises-importerror-about-an-extra"><a class="toclink" href="#a-backend-raises-importerror-about-an-extra">A backend raises <code>ImportError</code> about an extra</a><a class="headerlink" href="#a-backend-raises-importerror-about-an-extra" title="Permanent link">#</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>... SDK is not installed. Install with `pip install earthlens[cmems]`.
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ImportError: backend &#39;cmems&#39; is unavailable — its runtime dependency is not
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>installed. Install with `pip install earthlens[cmems]`.
 </code></pre></div>
 <p>Each backend's SDK is optional and imported lazily. Install the extra named in the message, or <code>earthlens[all]</code>
 for everything. The <a href="../reference/providers/">provider matrix</a> lists the extra for every backend.</p>
 <h3 id="uv-sync-all-extras-fails-with-a-conflict"><a class="toclink" href="#uv-sync-all-extras-fails-with-a-conflict"><code>uv sync --all-extras</code> fails with a conflict</a><a class="headerlink" href="#uv-sync-all-extras-fails-with-a-conflict" title="Permanent link">#</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Extras `openeo` and `argo` are incompatible with the declared conflicts
 </code></pre></div>
+<p>(That one is uv's message, not earthlens'.)</p>
 <p><code>argopy</code> needs <code>xarray&gt;=2025.7</code> and <code>openeo</code> needs <code>xarray&lt;2025.1.2</code> — mutually unsatisfiable. Use the curated
 extra instead:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--extra<span class="w"> </span>all<span class="w"> </span>--group<span class="w"> </span>dev<span class="w">      </span><span class="c1"># includes openeo and osm; omits argo / osm-pbf</span>

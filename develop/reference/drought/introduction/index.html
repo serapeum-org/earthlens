@@ -19646,8 +19646,8 @@ stack reducer ships).</p>
 it is a REST shim. Only its <code>GetCoverage</code> operation is reliable; the
 standard <code>GetCapabilities</code> / <code>DescribeCoverage</code> discovery operations answer
 <code>502</code> / <code>400</code> (they require a non-standard <code>SELECTED_TIMESCALE</code> parameter),
-so pyramids' <code>Dataset.from_wcs</code> (whose WCS reader needs that discovery
-handshake) cannot read it.</p>
+so pyramids' <code>Dataset.from_wcs</code> (whose underlying WCS driver needs that
+discovery handshake) cannot read it.</p>
 <p>Instead the backend builds the documented <code>GetCoverage</code> URL by hand with
 core <code>requests</code> and two Copernicus-custom parameters:</p>
 <ul>

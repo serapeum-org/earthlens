@@ -20866,7 +20866,8 @@ all the way to 24 July, where the satellite record has no such lag.</p>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">NL_LAT</span><span class="p">,</span> <span class="n">NL_LON</span> <span class="o">=</span> <span class="p">[</span><span class="mf">50.7</span><span class="p">,</span> <span class="mf">53.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.3</span><span class="p">,</span> <span class="mf">7.3</span><span class="p">]</span>
 
 <span class="n">edo_dir</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"edo_cdi"</span>
-<span class="n">edo_cached</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">edo_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.tif"</span><span class="p">))</span>
+<span class="n">TIF_GLOB</span> <span class="o">=</span> <span class="s2">"*.tif"</span>  <span class="c1"># reused by the ERA5-Land and CDI cache checks below</span>
+<span class="n">edo_cached</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">edo_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">TIF_GLOB</span><span class="p">))</span>
 <span class="k">if</span> <span class="n">edo_cached</span><span class="p">:</span>  <span class="c1"># reuse a previous run's rasters instead of re-hitting Copernicus</span>
     <span class="n">edo_paths</span> <span class="o">=</span> <span class="n">edo_cached</span>
 <span class="k">else</span><span class="p">:</span>
@@ -20885,7 +20886,8 @@ all the way to 24 July, where the satellite record has no such lag.</p>
 <div class="clipboard-copy-txt" id="cell-3">NL_LAT, NL_LON = [50.7, 53.6], [3.3, 7.3]
 
 edo_dir = OUT / "edo_cdi"
-edo_cached = sorted(edo_dir.glob("*.tif"))
+TIF_GLOB = "*.tif"  # reused by the ERA5-Land and CDI cache checks below
+edo_cached = sorted(edo_dir.glob(TIF_GLOB))
 if edo_cached:  # reuse a previous run's rasters instead of re-hitting Copernicus
     edo_paths = edo_cached
 else:
@@ -20949,7 +20951,7 @@ range), so every frame shares one consistent scale.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dc_cdi</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_multiple_files</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">edo_dir</span><span class="p">),</span> <span class="n">date</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">cdi_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">edo_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.tif"</span><span class="p">))]</span>
+<span class="n">cdi_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">edo_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">TIF_GLOB</span><span class="p">))]</span>
 <span class="n">cdi_stack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
     <span class="p">[</span>
         <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dc_cdi</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"float32"</span><span class="p">)</span>
@@ -20960,7 +20962,7 @@ range), so every frame shares one consistent scale.</p>
 <span class="n">cdi_vmin</span><span class="p">,</span> <span class="n">cdi_vmax</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">dc_cdi = DatasetCollection.read_multiple_files(str(edo_dir), date=False)
-cdi_labels = [p.stem.split("_")[-1] for p in sorted(edo_dir.glob("*.tif"))]
+cdi_labels = [p.stem.split("_")[-1] for p in sorted(edo_dir.glob(TIF_GLOB))]
 cdi_stack = np.stack(
     [
         np.asarray(dc_cdi.iloc(i).read_array(), dtype="float32")
@@ -21170,7 +21172,7 @@ only ever compare each year's cumulative total at the <em>same</em> day-of-seaso
 <span class="n">era5_daily</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">YEARS</span><span class="p">:</span>
     <span class="n">year_dir</span> <span class="o">=</span> <span class="n">precip_dir</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
-    <span class="n">cached</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">year_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.tif"</span><span class="p">))</span>
+    <span class="n">cached</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">year_dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">TIF_GLOB</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">cached</span><span class="p">:</span>  <span class="c1"># reuse a previous run's tiles instead of re-pulling from Earth Engine</span>
         <span class="n">era5_daily</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">cached</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cached</span><span class="p">),</span> <span class="s2">"daily tiles (cached)"</span><span class="p">)</span>
@@ -21200,7 +21202,7 @@ LAST_AVAILABLE_2026 = "2026-07-15"  # verified live against ECMWF/ERA5_LAND/DAIL
 era5_daily = {}
 for year in YEARS:
     year_dir = precip_dir / str(year)
-    cached = sorted(year_dir.glob("*.tif"))
+    cached = sorted(year_dir.glob(TIF_GLOB))
     if cached:  # reuse a previous run's tiles instead of re-pulling from Earth Engine
         era5_daily[year] = cached
         print(year, len(cached), "daily tiles (cached)")
@@ -21378,7 +21380,7 @@ shortage arrived on top of an already-depleted 2025, not after a wet year.</p>
     <span class="n">grp</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="n">grp</span><span class="p">[</span><span class="s2">"season_day"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">common_last</span><span class="p">]</span>
     <span class="n">cum</span> <span class="o">=</span> <span class="n">grp</span><span class="p">[</span><span class="s2">"precip_mm"</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
     <span class="n">totals</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cum</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">style</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#c1440e"</span><span class="p">)</span> <span class="k">if</span> <span class="n">year</span> <span class="o">==</span> <span class="mi">2026</span> <span class="k">else</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"lw"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">:</span> <span class="s2">"#c1440e"</span><span class="p">}</span> <span class="k">if</span> <span class="n">year</span> <span class="o">==</span> <span class="mi">2026</span> <span class="k">else</span> <span class="p">{</span><span class="s2">"lw"</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s2">"alpha"</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">}</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grp</span><span class="p">[</span><span class="s2">"season_day"</span><span class="p">],</span> <span class="n">cum</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="o">**</span><span class="n">style</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"days since 1 April"</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"cumulative precipitation (mm)"</span><span class="p">)</span>
@@ -21407,7 +21409,7 @@ for year, grp in era5_df.groupby("year"):
     grp = grp[grp["season_day"] &lt;= common_last]
     cum = grp["precip_mm"].cumsum()
     totals[year] = float(cum.iloc[-1])
-    style = dict(lw=3, color="#c1440e") if year == 2026 else dict(lw=1.5, alpha=0.6)
+    style = {"lw": 3, "color": "#c1440e"} if year == 2026 else {"lw": 1.5, "alpha": 0.6}
     ax.plot(grp["season_day"], cum, label=str(year), **style)
 ax.set_xlabel("days since 1 April")
 ax.set_ylabel("cumulative precipitation (mm)")
@@ -22049,7 +22051,7 @@ charted — a cloud-contaminated composite's NDWI count is not a real measuremen
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span>
-        <span class="s2">"wetted area (km^2):"</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">clear_labels</span><span class="p">,</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">wet_areas</span><span class="p">]))</span>
+        <span class="s2">"wetted area (km^2):"</span><span class="p">,</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">clear_labels</span><span class="p">,</span> <span class="n">wet_areas</span><span class="p">)}</span>
     <span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">"no cloud-clear windows to measure"</span><span class="p">)</span>
@@ -22075,7 +22077,7 @@ charted — a cloud-contaminated composite's NDWI count is not a real measuremen
     plt.tight_layout()
     plt.show()
     print(
-        "wetted area (km^2):", dict(zip(clear_labels, [round(v, 2) for v in wet_areas]))
+        "wetted area (km^2):", {k: round(v, 2) for k, v in zip(clear_labels, wet_areas)}
     )
 else:
     print("no cloud-clear windows to measure")</div>

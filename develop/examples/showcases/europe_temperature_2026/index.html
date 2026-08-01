@@ -20473,7 +20473,7 @@ continental box; <code>START</code> / <code>END</code> bracket the June-to-mid-J
 <span class="n">SERVICE_ACCOUNT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_ACCOUNT"</span><span class="p">]</span>
 <span class="n">SERVICE_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"GEE_SERVICE_KEY"</span><span class="p">]</span>
 
-<span class="n">EUROPE</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">62.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">])</span>
+<span class="n">EUROPE</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"lat_lim"</span><span class="p">:</span> <span class="p">[</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">62.0</span><span class="p">],</span> <span class="s2">"lon_lim"</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="mf">32.0</span><span class="p">]}</span>
 <span class="n">START</span><span class="p">,</span> <span class="n">END</span> <span class="o">=</span> <span class="s2">"2026-06-01"</span><span class="p">,</span> <span class="s2">"2026-07-15"</span>  <span class="c1"># 07-15 = latest published ERA5-Land daily day</span>
 
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"out"</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"europe_temperature_2026"</span>
@@ -20485,7 +20485,7 @@ load_dotenv(find_dotenv(usecwd=True))
 SERVICE_ACCOUNT = os.environ["GEE_SERVICE_ACCOUNT"]
 SERVICE_KEY = os.environ["GEE_SERVICE_KEY"]
 
-EUROPE = dict(lat_lim=[34.0, 62.0], lon_lim=[-12.0, 32.0])
+EUROPE = {"lat_lim": [34.0, 62.0], "lon_lim": [-12.0, 32.0]}
 START, END = "2026-06-01", "2026-07-15"  # 07-15 = latest published ERA5-Land daily day
 
 OUT = Path("out") / "europe_temperature_2026"
