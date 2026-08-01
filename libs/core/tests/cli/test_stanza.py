@@ -88,11 +88,18 @@ class TestEcmwfEmitter:
         assert result.status == "ok"
         assert result.row["request_kind"] == "fire"
 
-    def test_grid_form_without_dataset_type_seeds_satellite_cdr(self, monkeypatch):
-        """A grid form with no `dataset_type` / leadtime_hour seeds satellite_cdr."""
+    def test_satellite_id_seeds_satellite_cdr(self, monkeypatch):
+        """A `satellite-*` id seeds satellite_cdr from its real (grid-less) form."""
         form = [
-            {"name": "grid", "details": {}},
-            {"name": "variable", "details": {"values": ["surface_soil_moisture"]}},
+            {"name": "type_of_sensor", "details": {}},
+            {"name": "time_aggregation", "details": {}},
+            {"name": "year", "details": {}},
+            {"name": "month", "details": {}},
+            {"name": "day", "details": {}},
+            {
+                "name": "variable",
+                "details": {"values": ["surface_soil_moisture_volumetric"]},
+            },
         ]
         monkeypatch.setattr(stanza_mod, "_get_json", lambda url, **kw: form)
         result = emit_stanza(_info("ecmwf"), "satellite-soil-moisture")

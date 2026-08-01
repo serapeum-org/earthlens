@@ -65,7 +65,7 @@ shapes the request for its schema family:
 | `seasonal` / `seasonal_hindcast` | year/month (or hyear/hmonth) + lead, no day | GloFAS/EFAS seasonal (+ reforecast) |
 | `cams_date` | a single `date` range string + time | EAC4, composition forecasts, GFAS, EU air-quality forecasts |
 | `cams_inversion` | year/month, no day/time/area | GHG inversion, EU air-quality reanalyses |
-| `fire` | year/month/day + `grid`, no time | CEMS fire danger |
+| `fire` | year/month/day, no time (historical adds `grid` + `dataset_type`; seasonal adds `leadtime_hour`) | CEMS fire danger |
 | `satellite_cdr` | year/month/day + sensor/version selectors, zip output | satellite CDRs (soil-moisture, precip, SST) |
 
 ## Curation tooling

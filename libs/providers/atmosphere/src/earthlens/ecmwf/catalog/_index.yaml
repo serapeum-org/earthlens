@@ -51,10 +51,14 @@
 #                                      emitted by CDS (used in the
 #                                      output filename).
 #
-# Refreshed from the CDS STAC catalogue on 2026-04-26 (134 datasets
-# in `available_datasets`).
+# Refreshed from all three Copernicus Data Store `/collections` endpoints
+# (CDS + ADS + EWDS) — `available_datasets` is a per-store mapping totalling
+# 169 ids (cds: 141, ads: 16, ewds: 12). Regenerate with
+# `earthlens datasets refresh ecmwf --write`.
 #
-# See: https://cds.climate.copernicus.eu/datasets
+# See: https://cds.climate.copernicus.eu/datasets,
+#      https://ads.atmosphere.copernicus.eu/datasets,
+#      https://ewds.climate.copernicus.eu/datasets
 
 version: 3
 available_datasets:

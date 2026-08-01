@@ -763,8 +763,15 @@ def _ecmwf_form_variables(form: list[Any]) -> list[str]:
     return out
 
 
-def _ecmwf_request_kind(form: list[Any]) -> str:
-    """Guess the `request_kind` from a `form.json`'s date/selector fields."""
+def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
+    """Guess the `request_kind` from a dataset id + its `form.json` fields.
+
+    The ESA-CCI satellite CDRs are all `satellite-*` ids and their forms carry
+    no `grid` widget, so the id is the reliable signal for `satellite_cdr`;
+    every other kind is inferred from the form's date / selector fields.
+    """
+    if upstream_id.startswith("satellite-"):
+        return "satellite_cdr"
     fields = {f.get("name") for f in form if isinstance(f, dict)}
     if "hyear" in fields:
         return "glofas_hindcast" if "hday" in fields else "seasonal_hindcast"
@@ -776,7 +783,7 @@ def _ecmwf_request_kind(form: list[Any]) -> str:
         return "seasonal"
     if "grid" in fields and "leadtime_hour" not in fields:
         # CEMS fire-danger forms carry a `dataset_type` selector alongside the
-        # grid; satellite CDRs carry the grid but no `dataset_type`.
+        # grid; the satellite CDRs are matched by id above.
         return "fire" if "dataset_type" in fields else "satellite_cdr"
     return "form"
 
@@ -808,7 +815,7 @@ def _emit_ecmwf(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
     variables = _ecmwf_form_variables(cast("list[Any]", form)) or ["all"]
     return {
         "endpoint": endpoint,
-        "request_kind": _ecmwf_request_kind(cast("list[Any]", form)),
+        "request_kind": _ecmwf_request_kind(cast("list[Any]", form), upstream_id),
         "variables": {
             variables[0].replace("_", "-"): {
                 "cds_variable": variables[0],
