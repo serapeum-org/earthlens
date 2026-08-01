@@ -106,7 +106,7 @@ def test_the_pinned_grdc_record_still_matches_zenodo():
 
     assert archive.name in published, (
         f"record {archive.record} no longer publishes {archive.name}; "
-        f"run tools/caravan/refresh_caravan_catalog.py"
+        f"run `earthlens datasets refresh caravan`"
     )
     assert published[archive.name].md5 == archive.md5
     assert published[archive.name].size == archive.size

@@ -212,6 +212,7 @@ class Caravan(AbstractDataSource):
         )
         self._cache_root = cache_root
         self._archive: _helpers.CaravanArchive | None = None
+        self._selected: list[tuple[str, str]] = []
 
         #: Basin polygons, populated by `download()` when `with_geometry`.
         self.geometry: Any = None
@@ -500,6 +501,7 @@ class Caravan(AbstractDataSource):
         """
         archive = self._open_archive()
         pairs = self._resolve_gauges(archive)
+        self._selected = pairs
         products = []
         for source, gauge_id in pairs:
             member = archive.timeseries_member(
@@ -701,13 +703,27 @@ class Caravan(AbstractDataSource):
                 `gauge_id`.
         """
         archive = self._open_archive()
+        # Only the sources actually selected: reading every source's tables is
+        # wasted work, and a gauge_id duplicated across sources would fan one
+        # output row out into several.
+        wanted = {source for source, _ in self._selected}
         tables = [
-            _helpers.merge_attributes(archive, source) for source in archive.sources
+            _helpers.merge_attributes(archive, source)
+            for source in archive.sources
+            if not wanted or source in wanted
         ]
         tables = [table for table in tables if not table.empty]
         if not tables:
             return frame
         attributes = pd.concat(tables)
+        duplicated = attributes.index.duplicated()
+        if duplicated.any():
+            logger.warning(
+                f"caravan {self._dataset}: {int(duplicated.sum())} gauge_id(s) "
+                f"appear in more than one source's attributes; keeping the first "
+                f"so the row count is preserved."
+            )
+            attributes = attributes[~duplicated]
         return frame.merge(attributes, how="left", left_on="gauge_id", right_index=True)
 
     def _load_geometry(self) -> Any:

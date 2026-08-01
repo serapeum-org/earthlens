@@ -52,7 +52,9 @@ RECORD_URL = "https://zenodo.org/api/records/{record}"
 #: `timeseries/csv/camelsdk/camelsdk_100006.csv` (Denmark, no root directory)
 #: and `GRDC_Caravan_extension_csv/timeseries/csv/grdc/GRDC_1159100.csv`.
 _TIMESERIES_RE = re.compile(
-    r"(?:^|/)timeseries/(?P<fmt>csv|netcdf)/(?P<source>[^/]+)/(?P<gauge>[^/]+)\.(?:csv|nc)$"
+    r"(?:^|/)timeseries/"
+    r"(?:csv/(?P<csv_source>[^/]+)/(?P<csv_gauge>[^/]+)\.csv"
+    r"|netcdf/(?P<nc_source>[^/]+)/(?P<nc_gauge>[^/]+)\.nc)$"
 )
 
 #: An attribute table, e.g. `attributes/grdc/attributes_other_grdc.csv`.
@@ -68,6 +70,25 @@ _SHAPEFILE_RE = re.compile(
 
 #: Read size for hashing and streamed copies — 1 MiB.
 _BLOCK = 1 << 20
+
+
+def _label_from(url: str) -> str:
+    """Derive a short archive label from a URL, tolerating a short path.
+
+    Zenodo content URLs end `.../files/<name>/content`, so the useful segment is
+    the second-to-last. A URL without that shape must still yield something
+    printable rather than an `IndexError` from a log line.
+
+    Args:
+        url: The archive URL.
+
+    Returns:
+        str: A short label for log and error messages.
+    """
+    parts = [part for part in url.split("/") if part]
+    if len(parts) >= 2 and parts[-1] == "content":
+        return parts[-2]
+    return parts[-1] if parts else url
 
 
 def cache_dir() -> Path:
@@ -156,6 +177,10 @@ def _assert_safe_member(name: str, dest_dir: Path) -> None:
     Raises:
         ValueError: If the member resolves outside `dest_dir`.
     """
+    # Deliberately duplicated rather than imported from `earthlens.base.archive`:
+    # that module's guard is private, and a core contract test forbids a provider
+    # reaching for a private core symbol. Promoting it is a core API change, not
+    # something to slip into a provider branch.
     base = dest_dir.resolve()
     target = (dest_dir / name).resolve()
     if target != base and base not in target.parents:
@@ -210,9 +235,20 @@ def ensure_archive(
     """
     root = cache_root if cache_root is not None else cache_dir()
     destination = root / str(archive.record) / archive.name
-    if destination.exists() and _file_md5(destination) == archive.md5:
-        logger.debug(f"caravan: reusing cached archive {destination}")
-        return destination
+    # A verified download drops a stamp beside the archive. Re-hashing 29 GB on
+    # every open would cost minutes of disk read before a single catchment is
+    # served, so a cached copy is trusted when its size matches and the stamp
+    # records the same checksum this catalog pins.
+    stamp = destination.with_name(destination.name + ".md5")
+    if destination.exists():
+        verified = stamp.read_text(encoding="utf-8").strip() if stamp.exists() else ""
+        if verified == archive.md5 and destination.stat().st_size == archive.size:
+            logger.debug(f"caravan: reusing cached archive {destination}")
+            return destination
+        if _file_md5(destination) == archive.md5:
+            stamp.write_text(archive.md5, encoding="utf-8")
+            logger.debug(f"caravan: re-verified cached archive {destination}")
+            return destination
 
     logger.warning(
         f"caravan: downloading {archive.name} ({archive.size / 1e9:.1f} GB) - "
@@ -221,7 +257,9 @@ def ensure_archive(
     client = client if client is not None else HttpClient()
     client.download(archive.url, destination, progress=progress)
     actual = _file_md5(destination)
-    if actual != archive.md5:
+    if actual == archive.md5:
+        stamp.write_text(archive.md5, encoding="utf-8")
+    else:
         raise ValueError(
             f"{archive.name} failed its checksum: expected md5 {archive.md5}, "
             f"got {actual}. The download is corrupt or the catalog is stale."
@@ -390,21 +428,27 @@ class CaravanArchive:
         label: A short human-readable name, used in log and error messages.
     """
 
-    members: tuple[str, ...]
+    members: tuple[str, ...] = field(repr=False)
     label: str
     _zip: zipfile.ZipFile | None = None
     _tarball: Path | None = None
     _extract_dir: Path | None = None
     _range_file: HttpRangeFile | None = None
-    _timeseries: dict[tuple[str, str, str], str] = field(default_factory=dict)
+    _timeseries: dict[tuple[str, str, str], str] = field(
+        default_factory=dict, repr=False, compare=False
+    )
 
     def __post_init__(self) -> None:
         """Index the timeseries members by `(format, source, gauge_id)`."""
         for name in self.members:
             match = _TIMESERIES_RE.search(name)
-            if match is not None:
-                key = (match["fmt"], match["source"], match["gauge"])
-                self._timeseries[key] = name
+            if match is None:
+                continue
+            if match["csv_source"] is not None:
+                key = ("csv", match["csv_source"], match["csv_gauge"])
+            else:
+                key = ("netcdf", match["nc_source"], match["nc_gauge"])
+            self._timeseries[key] = name
 
     @classmethod
     def open_remote_zip(
@@ -438,7 +482,7 @@ class CaravanArchive:
         )
         return cls(
             members=names,
-            label=label or url.rsplit("/", 2)[-2],
+            label=label or _label_from(url),
             _zip=zip_file,
             _range_file=handle,
         )

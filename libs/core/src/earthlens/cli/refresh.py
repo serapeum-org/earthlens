@@ -1666,6 +1666,14 @@ def _caravan_grouped(catalog: Any) -> dict[str, list[str]]:
                     newer.add(f"{hit.get('id')} ({published})")
         grouped[key] = sorted(newer)
 
+    # Records the catalog deliberately does not wrap. Without this they surface
+    # as "discovered" on every run, which trains the reader to ignore the signal.
+    known_unsupported = {
+        str(entry.get("records") or []) and str(record)
+        for entry in (catalog.available_datasets or [])
+        if isinstance(entry, dict)
+        for record in (entry.get("records") or [])
+    }
     discovered: set[str] = set()
     for query in ('title:"Caravan extension"', "title:Caravan AND keywords:Hydrology"):
         payload = _get_json(
@@ -1674,10 +1682,15 @@ def _caravan_grouped(catalog: Any) -> dict[str, list[str]]:
         for hit in (payload.get("hits") or {}).get("hits") or []:
             record = str(hit.get("id"))
             concept = str(hit.get("conceptrecid"))
-            if record not in pinned and concept not in known_concepts:
-                discovered.add(
-                    f"{record} ({(hit.get('metadata') or {}).get('title', '')[:60]})"
-                )
+            if (
+                record in pinned
+                or concept in known_concepts
+                or record in known_unsupported
+            ):
+                continue
+            discovered.add(
+                f"{record} ({(hit.get('metadata') or {}).get('title', '')[:60]})"
+            )
     grouped["discovered"] = sorted(discovered)
     return grouped
 
