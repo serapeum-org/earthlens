@@ -21,8 +21,10 @@ datasets:
     sheet: Sheet1
     year_column: Start Year
     licence: CC-BY-NC-ND-4.0
-hazard_types:
-  - flood
+    hazard_vocabulary: gdis
+hazard_vocabularies:
+  gdis:
+    - flood
 """
 
 
@@ -107,34 +109,95 @@ class TestShippedCatalog:
 
 @pytest.mark.emdat
 class TestHazardVocabulary:
-    """`normalize_hazard` absorbs the shipped data's inconsistent spellings."""
+    """`normalize_hazard` is per dataset and absorbs inconsistent spellings."""
 
-    def test_vocabulary_is_canonical(self) -> None:
+    def test_vocabularies_are_canonical(self) -> None:
         """Every shipped hazard name is lower-case and stripped."""
-        hazards = Catalog().hazard_types
-        assert all(name == name.strip().lower() for name in hazards)
-        assert "extreme temperature" in hazards
+        catalog = Catalog()
+        for names in catalog.hazard_vocabularies.values():
+            assert all(name == name.strip().lower() for name in names)
+
+    def test_gdis_vocabulary_is_the_eight_shipped_types(self) -> None:
+        """GDIS validates against exactly the values its data carries."""
+        gdis = Catalog().hazard_vocabularies["gdis"]
+        assert len(gdis) == 8
+        assert "extreme temperature" in gdis
+
+    def test_emdat_vocabulary_covers_technological_types(self) -> None:
+        """The archive's vocabulary includes the technological group."""
+        emdat = Catalog().hazard_vocabularies["emdat"]
+        assert {"wildfire", "epidemic", "oil spill", "road"} <= set(emdat)
+
+    def test_emdat_vocabulary_is_wider_than_gdis(self) -> None:
+        """GDIS geocoded a subset, so its list is strictly smaller."""
+        catalog = Catalog()
+        gdis = set(catalog.hazard_vocabularies["gdis"])
+        emdat = set(catalog.hazard_vocabularies["emdat"])
+        assert gdis - emdat == {"landslide"}
+        assert len(emdat) > len(gdis)
 
     @pytest.mark.parametrize("spelling", ["flood", "Flood", "  FLOOD  ", "FlOoD"])
     def test_case_and_whitespace_insensitive(self, spelling: str) -> None:
         """Any casing or padding resolves to the canonical name."""
-        assert Catalog().normalize_hazard(spelling) == "flood"
+        catalog = Catalog()
+        row = catalog.get("gdis:points")
+        assert catalog.normalize_hazard(spelling, row) == "flood"
 
     def test_trailing_space_spelling_resolves(self) -> None:
         """The GeoPackage's trailing-space spelling maps to the canonical one."""
+        catalog = Catalog()
+        row = catalog.get("gdis:polygons")
         assert (
-            Catalog().normalize_hazard("extreme temperature ") == "extreme temperature"
+            catalog.normalize_hazard("extreme temperature ", row)
+            == "extreme temperature"
         )
+
+    @pytest.mark.parametrize(
+        "hazard",
+        ["wildfire", "epidemic", "industrial accident (general)", "fog", "road"],
+    )
+    def test_archive_accepts_its_own_types(self, hazard: str) -> None:
+        """A valid EM-DAT type is accepted on the archive, not rejected as GDIS."""
+        catalog = Catalog()
+        row = catalog.get("emdat:events")
+        assert catalog.normalize_hazard(hazard, row) == hazard
+
+    @pytest.mark.parametrize("hazard", ["wildfire", "epidemic", "oil spill"])
+    def test_gdis_still_rejects_ungeocoded_types(self, hazard: str) -> None:
+        """A type GDIS never geocoded is still refused on the GDIS rows."""
+        catalog = Catalog()
+        row = catalog.get("gdis:points")
+        with pytest.raises(ValueError, match="is not a disaster type"):
+            catalog.normalize_hazard(hazard, row)
+
+    def test_error_names_the_dataset_not_gdis(self) -> None:
+        """The message names the dataset queried, not an unrelated one."""
+        catalog = Catalog()
+        row = catalog.get("emdat:events")
+        with pytest.raises(ValueError, match="'emdat:events'"):
+            catalog.normalize_hazard("definitely not a hazard", row)
 
     def test_unknown_hazard_hints(self) -> None:
         """A near-miss hazard raises with a did-you-mean hint."""
+        catalog = Catalog()
+        row = catalog.get("gdis:points")
         with pytest.raises(ValueError, match="Did you mean 'flood'"):
-            Catalog().normalize_hazard("floods")
+            catalog.normalize_hazard("floods", row)
 
     def test_unknown_hazard_without_close_match(self) -> None:
         """An unrelated hazard still lists the vocabulary."""
-        with pytest.raises(ValueError, match="is not a GDIS disaster type"):
-            Catalog().normalize_hazard("zzzzzzzz")
+        catalog = Catalog()
+        row = catalog.get("gdis:points")
+        with pytest.raises(ValueError, match="is not a disaster type"):
+            catalog.normalize_hazard("zzzzzzzz", row)
+
+    def test_vocabulary_for_returns_the_named_list(self) -> None:
+        """`vocabulary_for` resolves a row to its vocabulary."""
+        catalog = Catalog()
+        assert (
+            catalog.vocabulary_for(catalog.get("gdis:points"))
+            == (catalog.hazard_vocabularies["gdis"])
+        )
 
 
 @pytest.mark.emdat

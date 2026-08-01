@@ -50,6 +50,7 @@ datasets:
     latitude_column: Latitude
     longitude_column: Longitude
     year_column: Start Year
+    hazard_vocabulary: emdat
     start_year: 1900
     end_year: null            # a living archive; re-cut roughly yearly
     licence: CC-BY-NC-ND-4.0
@@ -85,6 +86,7 @@ datasets:
     latitude_column: latitude
     longitude_column: longitude
     type_column: disastertype
+    hazard_vocabulary: gdis
     iso_column: iso3
     id_column: disasterno
     start_year: 1960
@@ -115,6 +117,7 @@ datasets:
     year_column: null
     year_from_id_prefix: true
     type_column: disastertype
+    hazard_vocabulary: gdis
     iso_column: iso3
     id_column: disasterno
     start_year: 1960
@@ -127,18 +130,63 @@ datasets:
       disaster locations. Scientific Data 8, 61. NASA SEDAC,
       doi 10.7927/61jv-th84.
 
-# The GDIS `disastertype` vocabulary, canonical (lower-case, stripped) form.
-# The shipped data is not clean: the GeoPackage spells one value
+# Disaster-type vocabularies, in canonical (lower-case, stripped) form. Every
+# dataset row names the one it validates `hazard=` against, because the two
+# sources do NOT share a vocabulary: GDIS geocoded only a subset of EM-DAT's
+# natural hazards, while the archive additionally carries the whole
+# technological group. Validating an archive request against the GDIS list
+# would reject perfectly valid EM-DAT types.
+#
+# The shipped data is not clean: the GDIS GeoPackage spells one value
 # "extreme temperature " with a trailing space, while the Earth Engine mirror
 # of the same table spells it without. Both the catalog and the backend
 # normalise with str.strip().lower(), so a caller always passes the canonical
 # spelling below.
-hazard_types:
-  - drought
-  - earthquake
-  - extreme temperature
-  - flood
-  - landslide
-  - mass movement (dry)
-  - storm
-  - volcanic activity
+hazard_vocabularies:
+  # The eight `disastertype` values GDIS ships.
+  gdis:
+    - drought
+    - earthquake
+    - extreme temperature
+    - flood
+    - landslide
+    - mass movement (dry)
+    - storm
+    - volcanic activity
+  # EM-DAT's `Disaster Type` column, both disaster groups, as published in the
+  # 2026-04-30 archive.
+  emdat:
+    # Natural
+    - animal incident
+    - drought
+    - earthquake
+    - epidemic
+    - extreme temperature
+    - flood
+    - fog
+    - glacial lake outburst flood
+    - impact
+    - infestation
+    - mass movement (dry)
+    - mass movement (wet)
+    - storm
+    - volcanic activity
+    - wildfire
+    # Technological
+    - air
+    - chemical spill
+    - collapse (industrial)
+    - collapse (miscellaneous)
+    - explosion (industrial)
+    - explosion (miscellaneous)
+    - fire (industrial)
+    - fire (miscellaneous)
+    - gas leak
+    - industrial accident (general)
+    - miscellaneous accident (general)
+    - oil spill
+    - poisoning
+    - radiation
+    - rail
+    - road
+    - water

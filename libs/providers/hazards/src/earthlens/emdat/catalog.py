@@ -7,9 +7,9 @@ transport detail needed to fetch it.
 
 :class:`Catalog` is a thin :class:`earthlens.base.AbstractCatalog` subclass that
 loads the bundled `emdat_data_catalog.yaml` and exposes each row as a
-:class:`Dataset`. The YAML also ships a `hazard_types:` block — the canonical
-GDIS `disastertype` vocabulary — which :meth:`Catalog.normalize_hazard` uses to
-turn a caller's spelling into the canonical one. Resolve one dataset with
+:class:`Dataset`. The YAML also ships a `hazard_vocabularies:` block — one
+canonical disaster-type list per source — which :meth:`Catalog.normalize_hazard`
+uses to turn a caller's spelling into the canonical one for a given dataset. Resolve one dataset with
 :meth:`Catalog.get` (a did-you-mean hint on an unknown id); list the shipped ids
 with :meth:`Catalog.available`.
 
@@ -35,9 +35,9 @@ CATALOG_PATH: Path = Path(__file__).parent / "emdat_data_catalog.yaml"
 #: the YAML's `st_mtime_ns`, so editing the file invalidates the entry without
 #: re-parsing on every `Catalog()`. The value is the `(datasets, hazard_types)`
 #: pair both fields are built from.
-_CATALOG_CACHE: dict[tuple[str, int], tuple[dict[str, Dataset], tuple[str, ...]]] = (
-    CatalogParseCache()
-)
+_CATALOG_CACHE: dict[
+    tuple[str, int], tuple[dict[str, Dataset], dict[str, tuple[str, ...]]]
+] = CatalogParseCache()
 
 #: The two routes a :class:`Dataset` row can name — `dataverse` is the anonymous
 #: UCLouvain archive, `earthdata` is GDIS behind an Earthdata Login.
@@ -61,18 +61,20 @@ def clear_catalog_cache() -> None:
     _CATALOG_CACHE.clear()
 
 
-def _load_catalog_data(path: Path) -> tuple[dict[str, Dataset], tuple[str, ...]]:
+def _load_catalog_data(
+    path: Path,
+) -> tuple[dict[str, Dataset], dict[str, tuple[str, ...]]]:
     """Parse, validate, and cache the catalog at `path`.
 
-    Reads the `datasets:` and `hazard_types:` blocks and validates each dataset
-    row as a :class:`Dataset`.
+    Reads the `datasets:` and `hazard_vocabularies:` blocks and validates each
+    dataset row as a :class:`Dataset`.
 
     Args:
         path: Path to the catalog YAML (default :data:`CATALOG_PATH`).
 
     Returns:
-        A `(datasets, hazard_types)` pair: the dataset map keyed by id, and the
-        canonical GDIS hazard vocabulary.
+        A `(datasets, hazard_vocabularies)` pair: the dataset map keyed by id,
+        and each named disaster-type vocabulary in canonical form.
 
     Raises:
         ValueError: If the file has no `datasets:` block, or a row fails
@@ -98,11 +100,19 @@ def _load_catalog_data(path: Path) -> tuple[dict[str, Dataset], tuple[str, ...]]
             raise ValueError(
                 f"{path} dataset {dataset_id!r} failed validation:\n{exc}"
             ) from exc
-    hazards = tuple(
-        str(name).strip().lower() for name in (data.get("hazard_types") or [])
-    )
+    vocabularies = {
+        str(name): tuple(str(entry).strip().lower() for entry in (entries or []))
+        for name, entries in (data.get("hazard_vocabularies") or {}).items()
+    }
+    for dataset_id, row in rows.items():
+        if row.hazard_vocabulary not in vocabularies:
+            raise ValueError(
+                f"{path} dataset {dataset_id!r} names hazard_vocabulary "
+                f"{row.hazard_vocabulary!r}, which is not in the "
+                f"'hazard_vocabularies:' block. Known: {sorted(vocabularies)}."
+            )
 
-    value = (rows, hazards)
+    value = (rows, vocabularies)
     _CATALOG_CACHE[key] = value
     return value
 
@@ -141,6 +151,10 @@ class Dataset(BaseModel):
             warning.
         id_column: Column holding the per-event identifier.
         type_column: Column holding the disaster type.
+        hazard_vocabulary: Name of the `hazard_vocabularies:` entry this
+            dataset validates `hazard=` against. The two sources do not
+            share a vocabulary — GDIS geocoded a subset of EM-DAT's natural
+            hazards, while the archive also carries the technological group.
         iso_column: Column holding the ISO3 country code, when present.
         year_column: Column holding the event year (`"year"` for the GDIS CSV,
             `"Start Year"` for the EM-DAT archive). `None` for the GDIS
@@ -181,6 +195,7 @@ class Dataset(BaseModel):
 
     id_column: str | None = None
     type_column: str | None = None
+    hazard_vocabulary: str = "gdis"
     iso_column: str | None = None
     year_column: str | None = None
     year_from_id_prefix: bool = False
@@ -263,8 +278,10 @@ class Catalog(AbstractCatalog):
 
     Attributes:
         datasets: Map from dataset id to its :class:`Dataset` row.
-        hazard_types: The canonical GDIS `disastertype` vocabulary, lower-case
-            and stripped.
+        hazard_vocabularies: Each named disaster-type vocabulary, lower-case and
+            stripped. `gdis` holds the eight values GDIS ships; `emdat` holds
+            EM-DAT's fuller `Disaster Type` list including technological
+            hazards.
 
     Examples:
         - Resolve a row and normalise a hazard name:
@@ -275,8 +292,10 @@ class Catalog(AbstractCatalog):
             'dataverse'
             >>> cat.get("gdis:points").output_kind
             'vector'
-            >>> cat.normalize_hazard("Flood")
+            >>> cat.normalize_hazard("Flood", cat.get("gdis:points"))
             'flood'
+            >>> cat.normalize_hazard("Wildfire", cat.get("emdat:events"))
+            'wildfire'
 
             ```
         - An unknown but close id raises with a did-you-mean hint:
@@ -298,8 +317,8 @@ class Catalog(AbstractCatalog):
     #: did-you-mean hint work unchanged.
     datasets: dict[str, Dataset] = Field(default_factory=dict)
 
-    #: Canonical GDIS `disastertype` values, lower-case and stripped.
-    hazard_types: tuple[str, ...] = ()
+    #: Named disaster-type vocabularies, lower-case and stripped.
+    hazard_vocabularies: dict[str, tuple[str, ...]] = Field(default_factory=dict)
 
     @classmethod
     def _autoload(cls) -> dict[str, Any]:
@@ -312,7 +331,7 @@ class Catalog(AbstractCatalog):
         loaded = Catalog.load()
         return {
             "datasets": loaded.datasets,
-            "hazard_types": loaded.hazard_types,
+            "hazard_vocabularies": loaded.hazard_vocabularies,
         }
 
     @classmethod
@@ -331,8 +350,8 @@ class Catalog(AbstractCatalog):
                 validation.
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
-        datasets, hazards = _load_catalog_data(catalog_path)
-        return cls(datasets=dict(datasets), hazard_types=hazards)
+        datasets, vocabularies = _load_catalog_data(catalog_path)
+        return cls(datasets=dict(datasets), hazard_vocabularies=dict(vocabularies))
 
     def get_catalog(self) -> dict[str, Dataset]:
         """Return the dataset map (satisfies the abstract contract).
@@ -369,32 +388,51 @@ class Catalog(AbstractCatalog):
         """
         return sorted(self.datasets)
 
-    def normalize_hazard(self, hazard: str) -> str:
-        """Turn a caller's hazard spelling into the canonical one.
+    def vocabulary_for(self, dataset: Dataset) -> tuple[str, ...]:
+        """Return the disaster-type vocabulary `dataset` validates against.
 
-        The shipped GDIS data is not internally consistent — the GeoPackage
-        spells one value `"extreme temperature "` with a trailing space while
-        the same table published on Earth Engine spells it without — so both
-        sides are compared stripped and lower-cased.
+        Args:
+            dataset: A resolved catalog row.
+
+        Returns:
+            tuple[str, ...]: The canonical hazard names that row accepts.
+        """
+        return self.hazard_vocabularies.get(dataset.hazard_vocabulary, ())
+
+    def normalize_hazard(self, hazard: str, dataset: Dataset) -> str:
+        """Turn a caller's hazard spelling into the canonical one for `dataset`.
+
+        Validation is per dataset, because the two sources do not share a
+        vocabulary: GDIS geocoded only a subset of EM-DAT's natural hazards,
+        while the archive also carries the whole technological group. Checking
+        an archive request against the GDIS list would reject valid EM-DAT
+        types such as `"wildfire"` or `"industrial accident (general)"`.
+
+        The shipped GDIS data is also not internally consistent — the
+        GeoPackage spells one value `"extreme temperature "` with a trailing
+        space while the same table published on Earth Engine spells it without
+        — so both sides are compared stripped and lower-cased.
 
         Args:
             hazard: A hazard name in any casing, with or without surrounding
                 whitespace (`"Flood"`, `"extreme temperature "`).
+            dataset: The row whose vocabulary applies.
 
         Returns:
             str: The canonical vocabulary entry (`"flood"`).
 
         Raises:
-            ValueError: If `hazard` is not a known GDIS disaster type; the
-                message lists the vocabulary and, when a close match exists,
-                adds a did-you-mean hint.
+            ValueError: If `hazard` is not a disaster type of `dataset`; the
+                message names the dataset, lists its vocabulary and, when a
+                close match exists, adds a did-you-mean hint.
         """
+        vocabulary = self.vocabulary_for(dataset)
         canonical = hazard.strip().lower()
-        if canonical in self.hazard_types:
+        if canonical in vocabulary:
             return canonical
-        close = difflib.get_close_matches(canonical, self.hazard_types, n=1)
+        close = difflib.get_close_matches(canonical, vocabulary, n=1)
         hint = f" Did you mean {close[0]!r}?" if close else ""
         raise ValueError(
-            f"{hazard!r} is not a GDIS disaster type. Known types: "
-            f"{list(self.hazard_types)}.{hint}"
+            f"{hazard!r} is not a disaster type of {dataset.id!r}. Known types: "
+            f"{list(vocabulary)}.{hint}"
         )
