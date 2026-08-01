@@ -210,6 +210,47 @@ class TestPathShapes:
             build(product="nope")
 
 
+class TestForecastVariants:
+    """A forecast stream is refused with its own explanation."""
+
+    def test_forecast_variant_raises_not_implemented(self, build):
+        """Requesting the medium-range ensemble is refused, not attempted."""
+        source = build(
+            start="2026-01-01",
+            end="2026-01-01",
+            product="mswx",
+            variables=["Temp"],
+            variant="Medium Range Forecast",
+        )
+        with pytest.raises(NotImplementedError, match="ensemble forecast"):
+            _quiet_download(source)
+
+    def test_message_names_the_ensemble_shape(self, build):
+        """The error explains why the analysis template cannot address it."""
+        source = build(
+            start="2026-01-01",
+            end="2026-01-01",
+            product="mswx",
+            variables=["Temp"],
+            variant="Seasonal Forecast",
+        )
+        with pytest.raises(NotImplementedError, match="51 members from SEAS5"):
+            _quiet_download(source)
+
+    def test_message_is_not_the_generic_provisional_one(self, build):
+        """A forecast gets its own refusal, not 'confirm this value'."""
+        source = build(
+            start="2026-01-01",
+            end="2026-01-01",
+            product="mswx",
+            variables=["Temp"],
+            variant="Medium Range Forecast",
+        )
+        with pytest.raises(NotImplementedError) as excinfo:
+            _quiet_download(source)
+        assert "initialisation time, lead time and member" in str(excinfo.value)
+
+
 class TestVariantRouting:
     """Date-determined variant selection (`G10`)."""
 

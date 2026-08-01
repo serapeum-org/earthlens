@@ -44,6 +44,35 @@ rest are `provisional` in the catalog and refused until verified against a real 
 | Downward shortwave radiation | `SWd` | no |
 | Downward longwave radiation | `LWd` | no |
 
+## MSWX forecast streams
+
+MSWX publishes two ensemble forecast streams alongside `Past` and `NRT`. They are catalogued with everything
+that is publicly documented, but **cannot be downloaded yet**:
+
+| Stream | Base model | Members | Horizon | Re-initialised |
+|---|---|---|---|---|
+| `Medium Range Forecast` | NOAA GEFS | 30 | 10 days | daily |
+| `Seasonal Forecast` (MSWX-Long) | ECMWF SEAS5 | 51 | 7 months | monthly |
+
+Requesting one raises `NotImplementedError` explaining why, rather than silently returning nothing.
+
+The blocker is structural, not a missing string. An analysis granule is addressed by
+`<root>/<variant>/<variable>/<temporal>/<valid-time>.nc`, but a **forecast** granule is identified by an
+initialisation time, a lead time *and* an ensemble member — three coordinates that template does not carry. It
+is also unpublished whether members are sub-folders or a file-name component, and whether the stem encodes the
+initialisation time, the valid time, or both.
+
+Pinning that layout needs an approved share, and is part of task `A1`. Once known, the catalog needs a
+forecast-aware path template rather than a new row.
+
+```python
+from earthlens.mswep import Catalog
+
+seasonal = Catalog().get_product("mswx").variants["Seasonal Forecast"]
+seasonal.members, seasonal.base_model, seasonal.horizon   # (51, 'SEAS5', '7 months')
+print(seasonal.notes)                                     # exactly what is unpinned
+```
+
 ## Provisional values
 
 A row marked `provisional: true` could not be verified without an approved share. `Catalog.check_not_provisional`

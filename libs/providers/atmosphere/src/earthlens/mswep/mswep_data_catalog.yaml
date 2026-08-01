@@ -126,6 +126,40 @@ products:
         start: null
         end: null
         provisional: true
+      # The two forecast streams. Member counts, horizons, base models and
+      # update cadence are from the MSWX paper (Beck et al., BAMS 2022) and the
+      # GloH2O product page. Their Drive LAYOUT is not published anywhere: a
+      # forecast granule is keyed by initialisation time + lead time + ensemble
+      # member, which the analysis `path_template` above cannot express, and it
+      # is unknown whether members are folders or a file-name component. Rather
+      # than guess a shape, these stay provisional and the backend refuses them
+      # with that explanation. Pinning them is part of task `A1`.
+      Medium Range Forecast:
+        kind: forecast
+        description: >-
+          Bias-corrected medium-range ensemble forecast, derived from NOAA GEFS.
+        members: 30
+        horizon: 10 days
+        base_model: GEFS
+        update_cadence: daily
+        notes: >-
+          Unpinned: the folder name, whether the 30 members are sub-folders or a
+          file-name component, and whether the stem encodes the initialisation
+          time, the valid time, or both.
+        provisional: true
+      Seasonal Forecast:
+        kind: forecast
+        description: >-
+          Bias-corrected long-range ensemble forecast (MSWX-Long), derived from
+          ECMWF SEAS5.
+        members: 51
+        horizon: 7 months
+        base_model: SEAS5
+        update_cadence: monthly
+        notes: >-
+          Unpinned: as for the medium-range stream, plus whether the seasonal
+          stream keeps the same 3-hourly/daily/monthly resolutions.
+        provisional: true
     resolutions:
       3hourly:
         folder: 3hourly

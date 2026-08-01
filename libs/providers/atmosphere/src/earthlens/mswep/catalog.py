@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -94,18 +94,38 @@ class MswepVersion(BaseModel):
 
 
 class MswepVariant(BaseModel):
-    """One data variant (`Past`, `Past_nogauge`, `NRT`) and its window.
+    """One data variant and its window.
 
-    The variant is date-constrained: MSWEP's `Past` variants end
-    2024-12-31 and `NRT` starts 2025-01-01, so the requested window
+    Two kinds exist. An **analysis** variant (`Past`, `Past_nogauge`,
+    `NRT`) is one granule per valid time, addressed by the product's
+    `path_template`, and is date-constrained: MSWEP's `Past` variants
+    end 2024-12-31 and `NRT` starts 2025-01-01, so the requested window
     decides which variant can serve it.
+
+    A **forecast** variant (MSWX's medium-range and seasonal ensembles)
+    is not addressable by that template at all: a forecast granule is
+    identified by an initialisation time, a lead time **and** an
+    ensemble member, none of which the analysis template carries. Those
+    variants therefore record what is known about the stream —
+    :attr:`members`, :attr:`horizon`, :attr:`base_model`,
+    :attr:`update_cadence` — and stay `provisional` until the real
+    layout is read off an approved share, rather than shipping a guessed
+    path shape that would resolve to nothing.
 
     Attributes:
         variant: The variant key, which is also its Drive folder name.
+        kind: `"analysis"` (one granule per valid time) or `"forecast"`
+            (ensemble, addressed by init time + lead + member).
         description: Human-readable summary.
         start: First date the variant covers, or `None` if unbounded.
         end: Last date the variant covers, or `None` for "to real time".
-        provisional: `True` when the window is unverified.
+        members: Ensemble size for a forecast variant; `0` for analysis.
+        horizon: Human-readable forecast length (`"10 days"`).
+        base_model: The NWP system the stream is bias-corrected from
+            (`"GEFS"`, `"SEAS5"`).
+        update_cadence: How often the stream is re-initialised.
+        notes: What still has to be pinned before the variant is usable.
+        provisional: `True` when the window or layout is unverified.
 
     Examples:
         - MSWEP's gauge-corrected history ends with 2024:
@@ -115,15 +135,34 @@ class MswepVariant(BaseModel):
             datetime.date(2024, 12, 31)
 
             ```
+        - MSWX's seasonal stream records its ensemble size:
+            ```python
+            >>> from earthlens.mswep import Catalog
+            >>> seasonal = Catalog().get_product("mswx").variants["Seasonal Forecast"]
+            >>> seasonal.kind, seasonal.members, seasonal.base_model
+            ('forecast', 51, 'SEAS5')
+
+            ```
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     variant: str = ""
+    kind: Literal["analysis", "forecast"] = "analysis"
     description: str = ""
     start: dt.date | None = None
     end: dt.date | None = None
+    members: int = 0
+    horizon: str = ""
+    base_model: str = ""
+    update_cadence: str = ""
+    notes: str = ""
     provisional: bool = False
+
+    @property
+    def is_forecast(self) -> bool:
+        """Return whether this variant is an ensemble forecast stream."""
+        return self.kind == "forecast"
 
     def covers(self, day: dt.date) -> bool:
         """Return whether `day` falls inside the variant's window.

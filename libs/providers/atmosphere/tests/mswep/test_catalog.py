@@ -236,6 +236,54 @@ class TestVariables:
         assert confirmed == ["Temp"]
 
 
+class TestForecastStreams:
+    """MSWX's ensemble forecast streams are catalogued but not addressable."""
+
+    def test_both_streams_present(self):
+        """The medium-range and seasonal ensembles are registered."""
+        variants = Catalog().get_product("mswx").variants
+        assert "Medium Range Forecast" in variants
+        assert "Seasonal Forecast" in variants
+
+    @pytest.mark.parametrize(
+        ("name", "members", "base", "horizon", "cadence"),
+        [
+            ("Medium Range Forecast", 30, "GEFS", "10 days", "daily"),
+            ("Seasonal Forecast", 51, "SEAS5", "7 months", "monthly"),
+        ],
+    )
+    def test_stream_metadata(self, name, members, base, horizon, cadence):
+        """Each stream records its ensemble size, source model and horizon."""
+        row = Catalog().get_product("mswx").variants[name]
+        assert (row.members, row.base_model, row.horizon, row.update_cadence) == (
+            members,
+            base,
+            horizon,
+            cadence,
+        )
+
+    def test_streams_are_forecast_kind(self):
+        """Forecast variants are distinguishable from analysis ones."""
+        product = Catalog().get_product("mswx")
+        assert product.variants["Medium Range Forecast"].is_forecast
+        assert not product.variants["Past"].is_forecast
+
+    def test_streams_stay_provisional(self):
+        """Their Drive layout is unpinned, so they must not resolve."""
+        variants = Catalog().get_product("mswx").variants
+        assert variants["Medium Range Forecast"].provisional
+        assert variants["Seasonal Forecast"].provisional
+
+    def test_notes_say_what_is_unpinned(self):
+        """Each carries the specific unknowns, not just a flag."""
+        row = Catalog().get_product("mswx").variants["Medium Range Forecast"]
+        assert "members" in row.notes and "folder name" in row.notes
+
+    def test_analysis_variants_have_no_members(self):
+        """An analysis variant is not an ensemble."""
+        assert Catalog().get_product("mswep").variants["Past"].members == 0
+
+
 class TestProvisionalGuard:
     """Unverified values must fail loudly, not resolve to a missing path."""
 

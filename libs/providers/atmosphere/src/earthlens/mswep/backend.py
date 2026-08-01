@@ -372,9 +372,24 @@ class MSWEP(AbstractDataSource):
         for stamp in self.time.dates:
             day = stamp.date() if hasattr(stamp, "date") else stamp
             variant = self._variant_for(day)
+            row = self._product.variants[variant]
+            # A forecast stream is not addressable by the analysis template at
+            # all, so it gets its own refusal rather than the generic
+            # provisional one -- otherwise the message would suggest the value
+            # merely needs confirming, when the whole path shape is unknown.
+            if row.is_forecast:
+                raise NotImplementedError(
+                    f"{self._product_key} {variant!r} is an ensemble forecast "
+                    f"stream ({row.members} members from {row.base_model}, "
+                    f"{row.horizon}, re-initialised {row.update_cadence}), which "
+                    "this backend cannot address yet: a forecast granule is keyed "
+                    "by initialisation time, lead time and member, none of which "
+                    f"the analysis path template carries. {row.notes} "
+                    "Confirm the layout inside an approved share, then extend the "
+                    "catalog."
+                )
             self._catalog.check_not_provisional(
-                self._product.variants[variant],
-                f"the {self._product_key} {variant!r} variant window",
+                row, f"the {self._product_key} {variant!r} variant window"
             )
             for variable in variables:
                 segments = [root.name, variant]
