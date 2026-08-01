@@ -1,22 +1,25 @@
 """Variable-catalog loader for the CDS-backed ECMWF data source.
 
 Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
-CDS catalog. The catalog ships as a directory of per-family YAML files
-under `src/earthlens/ecmwf/catalog/` (`era5.yaml`, `carra.yaml`,
-`cerra.yaml`, `cmip5.yaml`, `cordex.yaml`, `seasonal.yaml`,
-`other.yaml`) plus a single `_index.yaml` carrying the schema header
-and the informational `available_datasets:` list. The loader unions
-every file's `datasets:` block into one :class:`Catalog` at
-construction time (a dataset key declared in two files is a load-time
-error), the same way the GEE / CMEMS catalogs merge. Split out of
+Copernicus Data Store catalog spanning all three stores. The catalog
+ships as a directory of per-family YAML files under
+`src/earthlens/ecmwf/catalog/` — one `<family>.yaml` per product
+family (CDS: `era5.yaml`, `carra.yaml`, `cerra.yaml`, `cmip5.yaml`,
+`cordex.yaml`, `seasonal.yaml`, `satellite.yaml`, `other.yaml`; ADS:
+`ads.yaml`; EWDS: `ewds.yaml`, `efas.yaml`, `fire.yaml`) plus a single
+`_index.yaml` carrying the schema header and the informational
+per-store `available_datasets:` index. The loader unions every file's
+`datasets:` block into one :class:`Catalog` at construction time (a
+dataset key declared in two files is a load-time error), the same way
+the GEE / CMEMS catalogs merge. Split out of
 :mod:`earthlens.ecmwf.backend` so the request / download machinery and
 the catalog file-IO live in separate modules.
 
 The two consumed top-level sections each map to a typed field on
 :class:`Catalog`:
 
-* `available_datasets` (informational list of CDS dataset names)
-  → :attr:`Catalog.available_datasets`
+* `available_datasets` (informational per-store index of dataset
+  names across CDS / ADS / EWDS) → :attr:`Catalog.available_datasets`
 * `datasets` (structural map of CDS datasets, each carrying a
   monthly variant and a per-variable map) → :attr:`Catalog.datasets`,
   with each value a :class:`Dataset`
