@@ -83,3 +83,59 @@ class TestSatelliteRequestShape:
     def test_precipitation_keeps_area(self):
         """satellite-precipitation has an `area` widget, so it keeps the bbox."""
         assert "area" in _request("satellite-precipitation")
+
+
+#: Newly curated CDRs whose extras were derived from live `constraints.json`.
+_CURATED = (
+    "satellite-aerosol-properties",
+    "satellite-albedo",
+    "satellite-carbon-dioxide",
+    "satellite-cloud-properties",
+    "satellite-sea-ice-drift",
+    "satellite-total-column-water-vapour-ocean",
+)
+
+
+class TestCuratedSatelliteRows:
+    """The constraints-derived CDRs carry their family selectors + shape."""
+
+    @pytest.mark.parametrize("dataset", _CURATED)
+    def test_extras_reach_the_request(self, dataset):
+        """Each curated row forwards non-empty catalog extras into the request."""
+        extras = Catalog().datasets[dataset].extras
+        assert extras, f"{dataset} has no curated extras"
+        request = _request(dataset)
+        # Every non-null extras selector lands in the built request; a
+        # `None` opt-out drops its key instead.
+        for key, value in extras.items():
+            if value is None:
+                assert key not in request, f"{dataset}: {key} should be dropped"
+            else:
+                assert key in request, f"{dataset}: {key} missing from request"
+
+    @pytest.mark.parametrize("dataset", _CURATED)
+    def test_no_time_no_data_format(self, dataset):
+        """A curated CDR strips the time-of-day and the data_format choice."""
+        request = _request(dataset)
+        assert "time" not in request
+        assert "data_format" not in request
+
+    def test_carbon_dioxide_strips_all_dates(self):
+        """The obs4mips CO2 record is not date-partitioned: no year/month/day."""
+        request = _request("satellite-carbon-dioxide")
+        assert not {"year", "month", "day"} & set(request)
+        assert request["sensor_and_algorithm"] == ["merged_obs4mips"]
+        assert request["version"] == ["3"]
+
+    def test_albedo_uses_nominal_day(self):
+        """satellite-albedo keys on `nominal_day`, not the template `day`."""
+        request = _request("satellite-albedo")
+        assert request["nominal_day"] == ["03"]
+        assert "day" not in request
+
+    def test_aerosol_pins_monthly_nominal_day(self):
+        """A monthly aerosol request pins `day` to the nominal 01, no bbox."""
+        request = _request("satellite-aerosol-properties")
+        assert request["day"] == ["01"]
+        assert request["time_aggregation"] == ["monthly_average"]
+        assert "area" not in request

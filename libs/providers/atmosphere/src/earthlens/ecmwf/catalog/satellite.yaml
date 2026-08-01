@@ -60,6 +60,14 @@ datasets:
   satellite-aerosol-properties:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      algorithm: [adv]
+      sensor_on_satellite: [aatsr_on_envisat]
+      time_aggregation: [monthly_average]
+      version: [v2_30]
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       aerosol-optical-depth:
         cds_variable: aerosol_optical_depth
@@ -92,6 +100,14 @@ datasets:
   satellite-albedo:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      horizontal_resolution: [1km]
+      product_version: [v0]
+      satellite: [spot]
+      sensor: [vgt]
+      nominal_day: ['03']
+      day: null  # product keys on nominal_day, not day
+      data_format: null
     variables:
       albb-bh:
         cds_variable: albb_bh
@@ -112,6 +128,15 @@ datasets:
   satellite-carbon-dioxide:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      processing_level: [level_3]
+      sensor_and_algorithm: [merged_obs4mips]
+      version: ['3']
+      day: null  # no day selector on this product
+      year: null  # product is not year-partitioned
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       co2:
         cds_variable: co2
@@ -124,6 +149,13 @@ datasets:
   satellite-cloud-properties:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [interim_climate_data_record]
+      origin: [eumetsat]
+      product_family: [clara_a3]
+      time_aggregation: [monthly_mean]
+      day: ["01"]
+      data_format: null
     variables:
       cloud-fraction:
         cds_variable: cloud_fraction
@@ -156,6 +188,14 @@ datasets:
   satellite-earth-radiation-budget:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [interim_climate_data_record]
+      origin: [c3s]
+      product_family: [cci]
+      sensor_on_satellite: [slstr_on_sentinel_3a]
+      time_aggregation: [monthly_mean]
+      day: ["01"]
+      data_format: null
     variables:
       incoming-shortwave-radiation:
         cds_variable: incoming_shortwave_radiation
@@ -184,6 +224,14 @@ datasets:
   satellite-fire-burned-area:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      origin: [c3s]
+      sensor: [olci]
+      version: ['1_0']
+      nominal_day: ['01']
+      day: null  # product keys on nominal_day, not day
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       grid-variables:
         cds_variable: grid_variables
@@ -196,6 +244,13 @@ datasets:
   satellite-fire-radiative-power:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      product_type: [table_summary]
+      time_aggregation: [month]
+      version: ['1_0']
+      day: ['01']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -204,6 +259,15 @@ datasets:
   satellite-greenland-ice-sheet-velocity:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      domain: [antarctic_ice_sheet]
+      period: ['2021_2022']
+      version: ['1_5']
+      day: null  # no day selector on this product
+      year: null  # product is not year-partitioned
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -212,6 +276,11 @@ datasets:
   satellite-humidity-profiles:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      product_type: [radio_occultation_data]
+      day: null  # no day selector on this product
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -220,6 +289,15 @@ datasets:
   satellite-ice-sheet-elevation-change:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [tcdr]
+      domain: [antarctica]
+      version: ['2_0']
+      day: null  # no day selector on this product
+      year: null  # product is not year-partitioned
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -236,6 +314,13 @@ datasets:
   satellite-ist-sst-global:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [cdr]
+      temporal_resolution: [monthly]
+      version: ['1_0']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -244,6 +329,13 @@ datasets:
   satellite-ist-sst-polar:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      region: [northern_hemisphere]
+      temporal_aggregation: [monthly]
+      version: ['1_1']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -252,6 +344,14 @@ datasets:
   satellite-lai-fapar:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      horizontal_resolution: [1km]
+      product_version: [v0]
+      satellite: [spot]
+      sensor: [vgt]
+      nominal_day: ['03']
+      day: null  # product keys on nominal_day, not day
+      data_format: null
     variables:
       fapar:
         cds_variable: fapar
@@ -264,6 +364,14 @@ datasets:
   satellite-lake-water-level:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      lake: [achit]
+      region: [southeastern_asia]
+      day: null  # no day selector on this product
+      year: null  # product is not year-partitioned
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -272,6 +380,10 @@ datasets:
   satellite-lake-water-temperature:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      version: ['4_0']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -280,6 +392,11 @@ datasets:
   satellite-land-cover:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      version: [v2_0_7cds]
+      day: null  # no day selector on this product
+      month: null  # product is not month-partitioned
+      data_format: null
     variables:
       all:
         cds_variable: all
@@ -288,6 +405,11 @@ datasets:
   satellite-land-surface-temperature:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      observation_time: [day]
+      version: [v3_00]
+      day: null  # no day selector on this product
+      data_format: null
     variables:
       land-surface-temperature:
         cds_variable: land_surface_temperature
@@ -296,6 +418,15 @@ datasets:
   satellite-methane:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      processing_level: [level_3]
+      sensor_and_algorithm: [merged_obs4mips]
+      version: ['3']
+      day: null  # no day selector on this product
+      year: null  # product is not year-partitioned
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       ch4:
         cds_variable: ch4
@@ -308,6 +439,13 @@ datasets:
   satellite-ocean-colour:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      projection: [regular_latitude_longitude_grid]
+      temporal_resolution: [monthly]
+      version: ['6_0']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       mass-concentration-of-chlorophyll-a:
         cds_variable: mass_concentration_of_chlorophyll_a
@@ -320,6 +458,14 @@ datasets:
   satellite-ozone-v1:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      processing_level: [level_3]
+      sensor: [ace]
+      version: [v0001]
+      vertical_aggregation: [vertical_profiles_from_limb_sensors]
+      day: null  # no day selector on this product
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       mole-concentration-of-ozone-in-air:
         cds_variable: mole_concentration_of_ozone_in_air
@@ -344,6 +490,12 @@ datasets:
   satellite-precipitation-microwave:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      time_aggregation: [monthly]
+      version: [v1_0]
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -352,6 +504,11 @@ datasets:
   satellite-precipitation-microwave-infrared:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      time_aggregation: [monthly]
+      day: ['01']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -360,6 +517,15 @@ datasets:
   satellite-sea-ice-concentration:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      cdr_type: [cdr]
+      region: [northern_hemisphere]
+      sensor: [amsr]
+      temporal_aggregation: [monthly]
+      version: ['3_0']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -368,6 +534,11 @@ datasets:
   satellite-sea-ice-drift:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      region: [northern_hemisphere]
+      version: ['1_0']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -376,6 +547,12 @@ datasets:
   satellite-sea-ice-edge-type:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      cdr_type: [cdr]
+      region: [northern_hemisphere]
+      version: ['1_0']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       sea-ice-edge:
         cds_variable: sea_ice_edge
@@ -388,6 +565,14 @@ datasets:
   satellite-sea-ice-thickness:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      processing_level: [level_3]
+      satellite_mission: [cryosat_2]
+      temporal_resolution: [monthly]
+      version: ['1_0']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       sea-ice-thickness:
         cds_variable: sea_ice_thickness
@@ -396,6 +581,11 @@ datasets:
   satellite-sea-level-global:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      version: [vdt2021]
+      day: null  # no day selector on this product
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       daily:
         cds_variable: daily
@@ -408,6 +598,9 @@ datasets:
   satellite-sea-surface-temperature-ensemble-product:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -416,6 +609,11 @@ datasets:
   satellite-snow-cover-extent:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [cdr]
+      version: ['1_0']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       snow-cover-fraction-viewable:
         cds_variable: snow_cover_fraction_viewable
@@ -428,6 +626,13 @@ datasets:
   satellite-snow-water-equivalent:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [cdr]
+      temporal_aggregation: [monthly]
+      version: ['1_0']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -436,6 +641,14 @@ datasets:
   satellite-surface-radiation-budget:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [interim_climate_data_record]
+      origin: [c3s]
+      product_family: [cci]
+      sensor_on_satellite: [slstr_on_sentinel_3a]
+      time_aggregation: [monthly_mean]
+      day: ["01"]
+      data_format: null
     variables:
       surface-upwelling-shortwave-flux:
         cds_variable: surface_upwelling_shortwave_flux
@@ -480,6 +693,13 @@ datasets:
   satellite-total-column-water-vapour-land-ocean:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      horizontal_aggregation: [0_05_x_0_05]
+      product: [c3s_meris_and_ssm_i]
+      temporal_aggregation: [monthly]
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -488,6 +708,14 @@ datasets:
   satellite-total-column-water-vapour-ocean:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [icdr]
+      origin: [c3s]
+      temporal_aggregation: [monthly]
+      day: null  # no day selector on this product
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
     variables:
       all:
         cds_variable: all
@@ -496,6 +724,11 @@ datasets:
   satellite-upper-troposphere-humidity:
     endpoint: cds
     request_kind: satellite_cdr
+    extras:
+      origin: [c3s]
+      sensor_on_satellite: [mhs_on_noaa_18]
+      version: [v1]
+      data_format: null
     variables:
       mean-uth:
         cds_variable: mean_uth
