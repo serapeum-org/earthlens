@@ -69,8 +69,8 @@ made today is reproducible tomorrow.
 
 Each archive is 0.3–9 GB, and `base` is 25–29 GB. The backend does not download them.
 
-Every extension ships as a **ZIP**, which stores its file directory at the tail, so the archive is read in place
-over HTTP **Range** requests. Measured against the 8.84 GB GRDC archive:
+Every extension **except `base` at its current version** ships as a **ZIP**, which stores its file directory at
+the tail, so the archive is read in place over HTTP **Range** requests. Measured against the 8.84 GB GRDC archive:
 
 | operation | requests | transferred |
 |---|---|---|

@@ -1406,3 +1406,123 @@ class TestBiodiversityRefreshers:
 
         grouped = refresh_mod._iucn_grouped(I())
         assert "KE" in grouped["iucn"] and "NO" in grouped["iucn"], "Norway preserved"
+
+
+class TestCaravanRefresher:
+    """The Caravan drift refresher, which watches pinned Zenodo records."""
+
+    def _catalog(self):
+        """Build a Caravan catalog with one pinned release and one exclusion."""
+        from earthlens.caravan.catalog import (
+            ArchiveFile,
+            Catalog,
+            Extension,
+            Version,
+        )
+
+        release = Version(
+            doi="10.5281/zenodo.1",
+            release_date="2025-01-01",
+            files={
+                "csv": ArchiveFile(
+                    record=111, name="a.zip", size=1, md5="x", archive_format="zip"
+                )
+            },
+        )
+        return Catalog(
+            datasets={
+                "demo": Extension(
+                    key="demo",
+                    concept_doi="10.5281/zenodo.999",
+                    default_version="1.0",
+                    versions={"1.0": release},
+                )
+            },
+            variables={},
+            extension_index=[
+                {"key": "demo", "supported": True},
+                {"key": "multimet", "supported": False, "records": [777]},
+            ],
+        )
+
+    def _patch(self, monkeypatch, versions, search):
+        """Route the refresher's two endpoint shapes to canned payloads."""
+
+        def _fake(url, **kwargs):
+            return versions if "/versions" in url else search
+
+        monkeypatch.setattr(refresh_mod, "_get_json", _fake)
+
+    def test_a_newer_release_is_reported_as_drift(self, monkeypatch):
+        """A release published after the pin is exactly what this watches for."""
+        self._patch(
+            monkeypatch,
+            {
+                "hits": {
+                    "hits": [
+                        {"id": 222, "metadata": {"publication_date": "2026-01-01"}}
+                    ]
+                }
+            },
+            {"hits": {"hits": []}},
+        )
+
+        grouped = refresh_mod._caravan_grouped(self._catalog())
+
+        assert grouped["demo"] == ["222 (2026-01-01)"]
+
+    def test_an_older_release_is_not_drift(self, monkeypatch):
+        """Earlier links in the version chain are history, not news."""
+        self._patch(
+            monkeypatch,
+            {
+                "hits": {
+                    "hits": [{"id": 99, "metadata": {"publication_date": "2020-01-01"}}]
+                }
+            },
+            {"hits": {"hits": []}},
+        )
+
+        assert refresh_mod._caravan_grouped(self._catalog())["demo"] == []
+
+    def test_a_deliberately_unsupported_record_is_not_discovered(self, monkeypatch):
+        """Reporting a known exclusion every run trains the reader to ignore it."""
+        self._patch(
+            monkeypatch,
+            {"hits": {"hits": []}},
+            {
+                "hits": {
+                    "hits": [
+                        {
+                            "id": 777,
+                            "conceptrecid": "776",
+                            "metadata": {"title": "MultiMet"},
+                        }
+                    ]
+                }
+            },
+        )
+
+        assert refresh_mod._caravan_grouped(self._catalog())["discovered"] == []
+
+    def test_an_unknown_record_is_discovered(self, monkeypatch):
+        """A new community extension appears as its own record, not in any chain."""
+        self._patch(
+            monkeypatch,
+            {"hits": {"hits": []}},
+            {
+                "hits": {
+                    "hits": [
+                        {
+                            "id": 555,
+                            "conceptrecid": "554",
+                            "metadata": {"title": "Caravan extension Narnia"},
+                        }
+                    ]
+                }
+            },
+        )
+
+        assert refresh_mod._caravan_grouped(self._catalog())["discovered"] == [
+            "555 (Caravan extension Narnia)"
+        ]

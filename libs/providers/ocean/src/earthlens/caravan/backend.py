@@ -431,9 +431,9 @@ class Caravan(AbstractDataSource):
             else:
                 missing.append(gauge_id)
         if missing:
-            # `sources` is empty when nothing matched the timeseries pattern, so
-            # the sample lookup - inside the error path - used to raise
-            # IndexError and hide the real problem.
+            # `sources` is empty when nothing matched the timeseries pattern,
+            # so the sample lookup - which runs inside this error path - must
+            # tolerate that rather than raising over the real problem.
             sample = (
                 archive.gauge_ids(archive.sources[0], self._timeseries_format)[:3]
                 if archive.sources
@@ -470,7 +470,13 @@ class Caravan(AbstractDataSource):
         """
         pairs: list[tuple[str, str]] = []
         for source in archive.sources:
-            index = _helpers.attribute_index(archive, source)
+            try:
+                index = _helpers.attribute_index(archive, source)
+            except ValueError as exc:
+                # One source without a centroid table must not abort a
+                # multi-source request; the others can still be resolved.
+                logger.warning(f"caravan {self._dataset}: skipping {source} - {exc}")
+                continue
             selected = index
             if self._has_bbox:
                 selected = selected[
@@ -547,8 +553,8 @@ class Caravan(AbstractDataSource):
                 data this extension does not contain.
         """
         # The ABC advertises `dict[str, list[str]] | list[str]`. `list(a_dict)`
-        # yields its KEYS, so the dict form resolved a dataset key as a variable
-        # name and always raised; flatten the grouped values instead.
+        # would yield its KEYS, resolving a dataset key as a variable name, so
+        # the grouped values are flattened instead.
         if isinstance(self.vars, dict):
             names: list[Any] = [name for group in self.vars.values() for name in group]
         else:
@@ -749,8 +755,10 @@ class Caravan(AbstractDataSource):
         from pyramids.feature.collection import FeatureCollection
 
         archive = self._open_archive()
+        wanted = {source for source, _ in self._selected}
+        sources = [s for s in archive.sources if not wanted or s in wanted]
         collections = []
-        for source in archive.sources:
+        for source in sources:
             members = archive.shapefile_members(source)
             if not members:
                 continue
@@ -768,9 +776,9 @@ class Caravan(AbstractDataSource):
             return None
         if len(collections) > 1:
             logger.warning(
-                f"caravan {self._dataset}: {len(collections)} sources ship basin "
-                f"shapes; returning the first ({archive.sources[0]}). Request one "
-                f"extension at a time for a single-source geometry."
+                f"caravan {self._dataset}: {len(collections)} of the selected "
+                f"sources ship basin shapes; returning the first ({sources[0]}). "
+                f"Narrow the selection for a single-source geometry."
             )
         return collections[0]
 

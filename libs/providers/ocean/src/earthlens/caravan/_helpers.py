@@ -260,6 +260,10 @@ def ensure_archive(
     if actual == archive.md5:
         stamp.write_text(archive.md5, encoding="utf-8")
     else:
+        # Leaving it behind means the next call finds a cached file, re-hashes
+        # it, fails again, and re-downloads - forever.
+        destination.unlink(missing_ok=True)
+        stamp.unlink(missing_ok=True)
         raise ValueError(
             f"{archive.name} failed its checksum: expected md5 {archive.md5}, "
             f"got {actual}. The download is corrupt or the catalog is stale."
@@ -295,9 +299,8 @@ def extract_tar_members(
     extracted: dict[str, Path] = {}
     if not members:
         return extracted
-    # Anything already extracted by an earlier pass is reused. Without this, a
-    # second read of the same member costs another full decompression of the
-    # archive - ~29 GB for base.
+    # Anything already extracted is reused: without it, a second read of the
+    # same member costs another full decompression - ~29 GB for base.
     wanted: set[str] = set()
     for name in members:
         _assert_safe_member(name, dest_dir)
@@ -321,11 +324,12 @@ def extract_tar_members(
     return extracted
 
 
-#: Member prefixes worth extracting during the index scan. They are small
-#: (a few MB against a 29 GB archive) and every metadata-shaped request -
-#: a bounding box, `country=`, `with_attributes`, `with_geometry` - needs them.
-#: Pulling them out while the stream is already decompressing turns each of
-#: those from a full re-scan into a local file read.
+#: Member prefixes extracted during the index scan. Every metadata-shaped
+#: request - a bounding box, `country=`, `with_attributes`, `with_geometry` -
+#: needs them, and pulling them out while the stream is already decompressing
+#: turns each of those from a full re-scan into a local file read. They are
+#: small relative to the archive, though not trivially so: base's basin
+#: shapefiles run to hundreds of MB across its seven sources.
 _METADATA_DIRS = ("attributes/", "licenses/", "shapefiles/")
 
 
@@ -363,8 +367,8 @@ def _extract_entry(
     source = archive.extractfile(entry)
     if source is None:  # pragma: no cover - callers already filter to files
         return None
-    # Staged then renamed, so an interrupted extraction cannot leave a truncated
-    # member that a later read would treat as complete.
+    # Staged then renamed, so an interrupted extraction cannot leave a
+    # truncated member that a later read would treat as complete.
     tmp = target.with_name(target.name + ".part")
     with tmp.open("wb") as handle:
         while block := source.read(_BLOCK):
