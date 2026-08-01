@@ -71,16 +71,21 @@ class TestGlofasHindcast:
         request = _backend()._build_request(
             _variable("glofas_hindcast", extras={"leadtime_hour": ["24"]})
         )
-        assert "hyear" in request and "year" not in request
-        assert "hmonth" in request and "month" not in request
-        assert "hday" in request and "day" not in request
+        assert "hyear" in request
+        assert "year" not in request
+        assert "hmonth" in request
+        assert "month" not in request
+        assert "hday" in request
+        assert "day" not in request
         assert "time" not in request
         assert request["leadtime_hour"] == ["24"]
 
     def test_monthly_is_rejected(self):
         """A monthly hindcast request is rejected (needs the hday selector)."""
+        backend = _backend("monthly")
+        var = _variable("glofas_hindcast")
         with pytest.raises(ValueError, match="temporal_resolution='daily'"):
-            _backend("monthly")._build_request(_variable("glofas_hindcast"))
+            backend._build_request(var)
 
 
 class TestSeasonal:
@@ -98,8 +103,10 @@ class TestSeasonal:
                 },
             )
         )
-        assert "year" in request and "month" in request
-        assert "day" not in request and "time" not in request
+        assert "year" in request
+        assert "month" in request
+        assert "day" not in request
+        assert "time" not in request
         assert request["originating_centre"] == "ecmwf"
         assert request["leadtime_month"] == ["1", "2", "3"]
 

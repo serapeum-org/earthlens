@@ -72,7 +72,8 @@ class TestCamsDateShape:
     def test_gfas_drops_time_and_area(self):
         """GFAS is date-only; its form has no `area` widget, so the bbox is stripped."""
         request = _request("cams-global-fire-emissions-gfas")
-        assert "date" in request and "time" not in request
+        assert "date" in request
+        assert "time" not in request
         assert "area" not in request
 
 

@@ -167,12 +167,14 @@ class TestCuratedApiMultiMemberZip:
         member = member_dir / "2020.nc"
         member.write_bytes(b"CDF")
         backend._download_dataset = lambda var_info, progress_bar=True: member
+        catalog = Catalog()
+        aggregate = AggregationConfig(freq="1D")
         with pytest.raises(ValueError, match="multi-member"):
             backend._download_pair(
                 ("satellite-soil-moisture", "surface-soil-moisture-volumetric"),
-                catalog=Catalog(),
+                catalog=catalog,
                 progress_bar=True,
-                aggregate=AggregationConfig(freq="1D"),
+                aggregate=aggregate,
             )
 
 

@@ -150,8 +150,9 @@ class TestPassthroughRetrieve:
 
         backend = _passthrough(tmp_path)
         backend._client_for = lambda endpoint: _RecordingClient()
+        aggregate = AggregationConfig(freq="1D")
         with pytest.raises(ValueError, match="aggregate"):
-            backend.download(aggregate=AggregationConfig(freq="1D"))
+            backend.download(aggregate=aggregate)
 
     def test_licence_error_maps_to_permission_error(self, tmp_path):
         """An unaccepted licence surfaces as a PermissionError naming the page."""

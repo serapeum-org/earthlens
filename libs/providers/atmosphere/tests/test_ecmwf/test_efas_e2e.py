@@ -29,4 +29,6 @@ class TestEfasE2E:
             path=str(tmp_path),
         )
         out = lens.download()
-        assert out and out[0].exists() and out[0].stat().st_size > 0
+        assert out
+        assert out[0].exists()
+        assert out[0].stat().st_size > 0

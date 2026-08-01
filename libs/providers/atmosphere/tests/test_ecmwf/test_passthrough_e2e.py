@@ -36,7 +36,8 @@ class TestPassthroughE2E:
         out = lens.download()
         assert len(out) == 1, "one file written"
         target = out[0]
-        assert target.exists() and target.stat().st_size > 0, "non-empty file"
+        assert target.exists()
+        assert target.stat().st_size > 0, "non-empty file"
 
         from pyramids.netcdf import NetCDF
 
