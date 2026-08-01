@@ -1096,3 +1096,187 @@ datasets:
         nc_variable: swvl4
         types: state
         units: m**3 m**-3
+  reanalysis-era5-complete:
+    endpoint: cds
+    request_kind: form
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  reanalysis-era5-land-timeseries:
+    endpoint: cds
+    request_kind: cams_date
+    variables:
+      2m-dewpoint-temperature:
+        cds_variable: 2m_dewpoint_temperature
+        nc_variable: 2m_dewpoint_temperature
+        units: unknown
+      2m-temperature:
+        cds_variable: 2m_temperature
+        nc_variable: 2m_temperature
+        units: unknown
+      surface-pressure:
+        cds_variable: surface_pressure
+        nc_variable: surface_pressure
+        units: unknown
+      total-precipitation:
+        cds_variable: total_precipitation
+        nc_variable: total_precipitation
+        units: unknown
+      surface-solar-radiation-downwards:
+        cds_variable: surface_solar_radiation_downwards
+        nc_variable: surface_solar_radiation_downwards
+        units: unknown
+      surface-thermal-radiation-downwards:
+        cds_variable: surface_thermal_radiation_downwards
+        nc_variable: surface_thermal_radiation_downwards
+        units: unknown
+      skin-temperature:
+        cds_variable: skin_temperature
+        nc_variable: skin_temperature
+        units: unknown
+      snow-cover:
+        cds_variable: snow_cover
+        nc_variable: snow_cover
+        units: unknown
+      snow-depth:
+        cds_variable: snow_depth
+        nc_variable: snow_depth
+        units: unknown
+      soil-temperature-level-1:
+        cds_variable: soil_temperature_level_1
+        nc_variable: soil_temperature_level_1
+        units: unknown
+      soil-temperature-level-2:
+        cds_variable: soil_temperature_level_2
+        nc_variable: soil_temperature_level_2
+        units: unknown
+      soil-temperature-level-3:
+        cds_variable: soil_temperature_level_3
+        nc_variable: soil_temperature_level_3
+        units: unknown
+      soil-temperature-level-4:
+        cds_variable: soil_temperature_level_4
+        nc_variable: soil_temperature_level_4
+        units: unknown
+      volumetric-soil-water-level-1:
+        cds_variable: volumetric_soil_water_level_1
+        nc_variable: volumetric_soil_water_level_1
+        units: unknown
+      volumetric-soil-water-level-2:
+        cds_variable: volumetric_soil_water_level_2
+        nc_variable: volumetric_soil_water_level_2
+        units: unknown
+      volumetric-soil-water-level-3:
+        cds_variable: volumetric_soil_water_level_3
+        nc_variable: volumetric_soil_water_level_3
+        units: unknown
+      volumetric-soil-water-level-4:
+        cds_variable: volumetric_soil_water_level_4
+        nc_variable: volumetric_soil_water_level_4
+        units: unknown
+      10m-u-component-of-wind:
+        cds_variable: 10m_u_component_of_wind
+        nc_variable: 10m_u_component_of_wind
+        units: unknown
+      10m-v-component-of-wind:
+        cds_variable: 10m_v_component_of_wind
+        nc_variable: 10m_v_component_of_wind
+        units: unknown
+  reanalysis-era5-single-levels-timeseries:
+    endpoint: cds
+    request_kind: cams_date
+    variables:
+      100m-u-component-of-wind:
+        cds_variable: 100m_u_component_of_wind
+        nc_variable: 100m_u_component_of_wind
+        units: unknown
+      100m-v-component-of-wind:
+        cds_variable: 100m_v_component_of_wind
+        nc_variable: 100m_v_component_of_wind
+        units: unknown
+      10m-u-component-of-wind:
+        cds_variable: 10m_u_component_of_wind
+        nc_variable: 10m_u_component_of_wind
+        units: unknown
+      10m-v-component-of-wind:
+        cds_variable: 10m_v_component_of_wind
+        nc_variable: 10m_v_component_of_wind
+        units: unknown
+      10m-wind-gust-since-previous-post-processing:
+        cds_variable: 10m_wind_gust_since_previous_post_processing
+        nc_variable: 10m_wind_gust_since_previous_post_processing
+        units: unknown
+      2m-dewpoint-temperature:
+        cds_variable: 2m_dewpoint_temperature
+        nc_variable: 2m_dewpoint_temperature
+        units: unknown
+      2m-temperature:
+        cds_variable: 2m_temperature
+        nc_variable: 2m_temperature
+        units: unknown
+      boundary-layer-height:
+        cds_variable: boundary_layer_height
+        nc_variable: boundary_layer_height
+        units: unknown
+      cloud-base-height:
+        cds_variable: cloud_base_height
+        nc_variable: cloud_base_height
+        units: unknown
+      mean-sea-level-pressure:
+        cds_variable: mean_sea_level_pressure
+        nc_variable: mean_sea_level_pressure
+        units: unknown
+      mean-wave-direction:
+        cds_variable: mean_wave_direction
+        nc_variable: mean_wave_direction
+        units: unknown
+      mean-wave-period:
+        cds_variable: mean_wave_period
+        nc_variable: mean_wave_period
+        units: unknown
+      sea-surface-temperature:
+        cds_variable: sea_surface_temperature
+        nc_variable: sea_surface_temperature
+        units: unknown
+      significant-height-of-combined-wind-waves-and-swell:
+        cds_variable: significant_height_of_combined_wind_waves_and_swell
+        nc_variable: significant_height_of_combined_wind_waves_and_swell
+        units: unknown
+      skin-temperature:
+        cds_variable: skin_temperature
+        nc_variable: skin_temperature
+        units: unknown
+      surface-latent-heat-flux:
+        cds_variable: surface_latent_heat_flux
+        nc_variable: surface_latent_heat_flux
+        units: unknown
+      surface-pressure:
+        cds_variable: surface_pressure
+        nc_variable: surface_pressure
+        units: unknown
+      surface-sensible-heat-flux:
+        cds_variable: surface_sensible_heat_flux
+        nc_variable: surface_sensible_heat_flux
+        units: unknown
+      surface-solar-radiation-downwards:
+        cds_variable: surface_solar_radiation_downwards
+        nc_variable: surface_solar_radiation_downwards
+        units: unknown
+      surface-thermal-radiation-downwards:
+        cds_variable: surface_thermal_radiation_downwards
+        nc_variable: surface_thermal_radiation_downwards
+        units: unknown
+      total-cloud-cover:
+        cds_variable: total_cloud_cover
+        nc_variable: total_cloud_cover
+        units: unknown
+      total-precipitation:
+        cds_variable: total_precipitation
+        nc_variable: total_precipitation
+        units: unknown
+      total-sky-direct-solar-radiation-at-surface:
+        cds_variable: total_sky_direct_solar_radiation_at_surface
+        nc_variable: total_sky_direct_solar_radiation_at_surface
+        units: unknown
