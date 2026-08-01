@@ -59,6 +59,9 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # (`leadtime_month`/`leadtime_hour`) + `originating_centre`/`system` from
     # `extras`; no `day`, no time-of-day.
     "seasonal": ("day", "time"),
+    # Seasonal hindcast (EFAS seasonal-reforecast): `hyear`/`hmonth` (remapped)
+    # + `leadtime_hour`; no `hday`, no time-of-day.
+    "seasonal_hindcast": ("day", "time"),
     # CAMS grid datasets (ADS): a single `date` range string replaces
     # year/month/day and `product_type` (see the `cams_date` branch); nothing
     # extra to strip here.
@@ -1326,6 +1329,11 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 ("month", "hmonth"),
                 ("day", "hday"),
             ):
+                if src_key in request:
+                    request[dst_key] = request.pop(src_key)
+        elif var_info.request_kind == "seasonal_hindcast":
+            # Seasonal reforecast: hindcast year/month, no day (stripped below).
+            for src_key, dst_key in (("year", "hyear"), ("month", "hmonth")):
                 if src_key in request:
                     request[dst_key] = request.pop(src_key)
 
