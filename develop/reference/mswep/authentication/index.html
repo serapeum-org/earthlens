@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/caravan/datasets/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/mswep/authentication/">
       
       
-        <link rel="prev" href="../usage/">
+        <link rel="prev" href="../introduction/">
       
       
-        <link rel="next" href="../caravan/">
+        <link rel="next" href="../usage/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Available extensions - earthlens</title>
+        <title>Authentication - earthlens</title>
       
     
     
@@ -87,20 +87,20 @@
     
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="earthlens">
-    <meta property="og:title" content="Available extensions">
+    <meta property="og:title" content="Authentication">
     <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
-    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/reference/caravan/datasets/">
+    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/reference/mswep/authentication/">
     <meta property="og:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Available extensions">
+    <meta name="twitter:title" content="Authentication">
     <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
     <meta name="twitter:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -119,7 +119,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#caravan-available-extensions" class="md-skip">
+        <a href="#mswep-mswx-getting-access-and-configuring-credentials" class="md-skip">
           Skip to content
         </a>
       
@@ -158,7 +158,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Available extensions
+              Authentication
             
           </span>
         </div>
@@ -6697,6 +6697,358 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_36" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_36" id="__nav_3_36_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MSWEP / MSWX (GloH2O)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_36_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_36">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MSWEP / MSWX (GloH2O)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-request-access-one-form-per-product" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Request access (one form per product)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-configure-a-credential" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Configure a credential
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Configure a credential">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-service-account-will-not-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A service account will not work
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-a-reuse-your-rclone-remote-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A — reuse your rclone remote (recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-an-authorized-user-tokenjson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B — an authorized-user token.json
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#finding-the-folder-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Finding the folder id
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Verify
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Products & catalog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mswep/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     
@@ -6711,10 +7063,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_36" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_37" >
         
           
-          <label class="md-nav__link" for="__nav_3_36" id="__nav_3_36_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_37" id="__nav_3_37_label" tabindex="0">
             
   
   
@@ -6732,8 +7084,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_36_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_36">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_37_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_37">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6881,10 +7233,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_37" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_38" >
         
           
-          <label class="md-nav__link" for="__nav_3_37" id="__nav_3_37_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_38" id="__nav_3_38_label" tabindex="0">
             
   
   
@@ -6902,8 +7254,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_37_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_37">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_38_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_38">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7051,10 +7403,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_38" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_39" >
         
           
-          <label class="md-nav__link" for="__nav_3_38" id="__nav_3_38_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_39" id="__nav_3_39_label" tabindex="0">
             
   
   
@@ -7072,8 +7424,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_38_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_38">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_39_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_39">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7249,10 +7601,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_39" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_40" >
         
           
-          <label class="md-nav__link" for="__nav_3_39" id="__nav_3_39_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_40" id="__nav_3_40_label" tabindex="0">
             
   
   
@@ -7270,8 +7622,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_39_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_39">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_40_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_40">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7419,10 +7771,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_40" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_41" >
         
           
-          <label class="md-nav__link" for="__nav_3_40" id="__nav_3_40_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_41" id="__nav_3_41_label" tabindex="0">
             
   
   
@@ -7440,8 +7792,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_40_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_40">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_41_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_41">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7589,10 +7941,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_41" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_42" >
         
           
-          <label class="md-nav__link" for="__nav_3_41" id="__nav_3_41_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_42" id="__nav_3_42_label" tabindex="0">
             
   
   
@@ -7610,8 +7962,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_41_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_41">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_42_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_42">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7713,258 +8065,6 @@
   
     <li class="md-nav__item">
       <a href="../../goes/goes/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_42" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_42" id="__nav_3_42_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Caravan (large-sample hydrology)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_42_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_42">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Caravan (large-sample hydrology)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available extensions
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Available extensions
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#base-source-datasets" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        base source datasets
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#known-but-not-wrapped" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Known but not wrapped
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#archive-layout" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Archive layout
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../caravan/" class="md-nav__link">
         
   
   
@@ -16766,7 +16866,7 @@
   <span class="md-ellipsis">
     
   
-    National Water Model (NWM)
+    MSWEP / MSWX (GloH2O)
   
 
     
@@ -16779,6 +16879,92 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_40_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_40">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MSWEP / MSWX (GloH2O)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/mswep/catalog_explorer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MSWEP / MSWX catalog explorer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_41" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_41" id="__nav_4_41_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    National Water Model (NWM)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_41_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_41">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16954,10 +17140,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_41" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_42" >
         
           
-          <label class="md-nav__link" for="__nav_4_41" id="__nav_4_41_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_42" id="__nav_4_42_label" tabindex="0">
             
   
   
@@ -16975,8 +17161,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_41_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_41">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_42_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_42">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17152,10 +17338,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_42" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_43" >
         
           
-          <label class="md-nav__link" for="__nav_4_42" id="__nav_4_42_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_43" id="__nav_4_43_label" tabindex="0">
             
   
   
@@ -17173,8 +17359,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_42_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_42">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_43_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_43">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17406,10 +17592,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_43" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_44" >
         
           
-          <label class="md-nav__link" for="__nav_4_43" id="__nav_4_43_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_44" id="__nav_4_44_label" tabindex="0">
             
   
   
@@ -17427,8 +17613,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_43_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_43">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_44_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_44">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17632,10 +17818,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_44" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_45" >
         
           
-          <label class="md-nav__link" for="__nav_4_44" id="__nav_4_44_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_45" id="__nav_4_45_label" tabindex="0">
             
   
   
@@ -17653,8 +17839,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_44_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_44">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_45_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_45">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17746,10 +17932,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_45" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_46" >
         
           
-          <label class="md-nav__link" for="__nav_4_45" id="__nav_4_45_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_46" id="__nav_4_46_label" tabindex="0">
             
   
   
@@ -17767,8 +17953,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_45_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_45">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_46_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_46">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17832,10 +18018,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_46" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_47" >
         
           
-          <label class="md-nav__link" for="__nav_4_46" id="__nav_4_46_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_47" id="__nav_4_47_label" tabindex="0">
             
   
   
@@ -17853,8 +18039,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_46_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_46">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_47_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_47">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18002,10 +18188,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_47" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_48" >
         
           
-          <label class="md-nav__link" for="__nav_4_47" id="__nav_4_47_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_48" id="__nav_4_48_label" tabindex="0">
             
   
   
@@ -18023,8 +18209,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_47_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_47">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_48_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_48">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18256,10 +18442,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_48" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_49" >
         
           
-          <label class="md-nav__link" for="__nav_4_48" id="__nav_4_48_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_49" id="__nav_4_49_label" tabindex="0">
             
   
   
@@ -18277,8 +18463,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_48_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_48">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_49_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_49">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18566,10 +18752,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_49" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_50" >
         
           
-          <label class="md-nav__link" for="__nav_4_49" id="__nav_4_49_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_50" id="__nav_4_50_label" tabindex="0">
             
   
   
@@ -18587,8 +18773,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_49_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_49">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_50_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_50">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18652,10 +18838,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_50" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_51" >
         
           
-          <label class="md-nav__link" for="__nav_4_50" id="__nav_4_50_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_51" id="__nav_4_51_label" tabindex="0">
             
   
   
@@ -18673,8 +18859,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_50_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_50">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_51_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_51">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18738,10 +18924,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_51" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_52" >
         
           
-          <label class="md-nav__link" for="__nav_4_51" id="__nav_4_51_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_52" id="__nav_4_52_label" tabindex="0">
             
   
   
@@ -18759,8 +18945,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_51_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_51">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_52_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_52">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18880,10 +19066,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_52" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_53" >
         
           
-          <label class="md-nav__link" for="__nav_4_52" id="__nav_4_52_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_53" id="__nav_4_53_label" tabindex="0">
             
   
   
@@ -18901,8 +19087,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_52_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_52">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_53_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_53">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18983,120 +19169,6 @@
     
   
     IUCN — a country's Red List breakdown
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_53" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_53" id="__nav_4_53_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Caravan (large-sample hydrology)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_53_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_53">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Caravan (large-sample hydrology)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/caravan/quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Caravan quickstart — an open GRDC hydrograph
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/caravan/attributes_geometry_and_base/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Catchment attributes, basin polygons, and the extension
   
 
     
@@ -19744,10 +19816,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#base-source-datasets" class="md-nav__link">
+  <a href="#1-request-access-one-form-per-product" class="md-nav__link">
     <span class="md-ellipsis">
       
-        base source datasets
+        1. Request access (one form per product)
       
     </span>
   </a>
@@ -19755,10 +19827,71 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#known-but-not-wrapped" class="md-nav__link">
+  <a href="#2-configure-a-credential" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Known but not wrapped
+        2. Configure a credential
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Configure a credential">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-service-account-will-not-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A service account will not work
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-a-reuse-your-rclone-remote-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option A — reuse your rclone remote (recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-b-an-authorized-user-tokenjson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option B — an authorized-user token.json
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#finding-the-folder-id" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Finding the folder id
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-verify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Verify
       
     </span>
   </a>
@@ -19766,10 +19899,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#archive-layout" class="md-nav__link">
+  <a href="#configuration-reference" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Archive layout
+        Configuration reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
       
     </span>
   </a>
@@ -19793,7 +19937,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/caravan/datasets.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/mswep/authentication.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -19802,210 +19946,153 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/caravan/datasets.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/mswep/authentication.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="caravan-available-extensions"><a class="toclink" href="#caravan-available-extensions">Caravan — available extensions</a><a class="headerlink" href="#caravan-available-extensions" title="Permanent link">#</a></h1>
-<p>Every row pins a <strong>specific Zenodo version record</strong>, never the moving concept DOI, so a request is reproducible.
-Sizes and checksums were read from the Zenodo REST API on 2026-08-01; re-check with
-<code>earthlens datasets refresh caravan</code>.</p>
-<p>All seven extensions are <strong>CC-BY-4.0</strong>.</p>
-<table>
-<thead>
-<tr>
-<th><code>dataset=</code></th>
-<th>Catchments</th>
-<th>Period</th>
-<th>Record</th>
-<th>Archive</th>
-<th>Size</th>
-<th>Range-readable</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>grdc</code></td>
-<td>5,356</td>
-<td>1950–2023</td>
-<td><a href="https://doi.org/10.5281/zenodo.15349031">15349031</a> (v0.6)</td>
-<td><code>GRDC_Caravan_extension_csv.zip</code></td>
-<td>8.84 GB</td>
-<td>✅</td>
-</tr>
-<tr>
-<td><code>germany</code></td>
-<td>1,887</td>
-<td>1951–2020</td>
-<td><a href="https://doi.org/10.5281/zenodo.14755229">14755229</a> (v1.1.1)</td>
-<td><code>caravan_de.zip</code></td>
-<td>6.09 GB</td>
-<td>✅</td>
-</tr>
-<tr>
-<td><code>spain</code></td>
-<td>269</td>
-<td>1990–2020</td>
-<td><a href="https://doi.org/10.5281/zenodo.15040948">15040948</a> (v1.1.0)</td>
-<td><code>CAMELS-ES_v110.zip</code></td>
-<td>0.40 GB</td>
-<td>✅</td>
-</tr>
-<tr>
-<td><code>czechia</code></td>
-<td>249</td>
-<td>1950–<strong>2025</strong></td>
-<td><a href="https://doi.org/10.5281/zenodo.17769325">17769325</a></td>
-<td><code>Caravan-Extension-CZ.zip</code></td>
-<td>0.91 GB</td>
-<td>✅</td>
-</tr>
-<tr>
-<td><code>denmark</code></td>
-<td>308</td>
-<td>1981–2020</td>
-<td><a href="https://doi.org/10.5281/zenodo.15200118">15200118</a></td>
-<td><code>Caravan_extension_DK.zip</code></td>
-<td>0.52 GB</td>
-<td>✅</td>
-</tr>
-<tr>
-<td><code>israel</code></td>
-<td>95</td>
-<td>1950–2024</td>
-<td><a href="https://doi.org/10.5281/zenodo.15181680">15181680</a></td>
-<td><code>Caravan_extension_Israel_Ver4.zip</code></td>
-<td>0.29 GB</td>
-<td>✅</td>
-</tr>
-<tr>
-<td><code>base</code></td>
-<td>≈16,300</td>
-<td>1950–2023</td>
-<td><a href="https://doi.org/10.5281/zenodo.15530022">15530022</a> (v1.6)</td>
-<td><code>Caravan-csv.tar.gz</code></td>
-<td>28.95 GB</td>
-<td>❌ opt-in</td>
-</tr>
-<tr>
-<td><code>base</code> (<code>version="1.2"</code>)</td>
-<td>6,830</td>
-<td>1981–2020</td>
-<td><a href="https://doi.org/10.5281/zenodo.7944025">7944025</a></td>
-<td><code>Caravan.zip</code></td>
-<td>12.52 GB</td>
-<td>✅</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition note">
-<p class="admonition-title">The <code>base</code> catchment count is arithmetic, not measured</p>
-<p>A <code>.tar.gz</code> cannot be indexed without downloading it, so ≈16,300 comes from the Zenodo changelog: v0.4 reached
-6,830, v1.4 added 9,130 gauges previously excluded by the 100–2,000 km² area thresholds, and v1.6 moved
-CAMELS-AUS to v2 (+≈339). Every other row's count was measured from the archive index.</p>
-</div>
-<h2 id="base-source-datasets"><a class="toclink" href="#base-source-datasets"><code>base</code> source datasets</a><a class="headerlink" href="#base-source-datasets" title="Permanent link">#</a></h2>
-<p><code>base</code> is one archive bundling seven source datasets. They are <strong>not</strong> separately downloadable and are <strong>not</strong>
-valid <code>dataset=</code> values — request <code>base</code> and select their catchments by id or bbox.</p>
-<table>
-<thead>
-<tr>
-<th>Source directory</th>
-<th>Dataset</th>
-<th>Catchments</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>camels</code></td>
-<td>CAMELS-US</td>
-<td>482</td>
-</tr>
-<tr>
-<td><code>camelsaus</code></td>
-<td>CAMELS-AUS v2</td>
-<td>561</td>
-</tr>
-<tr>
-<td><code>camelsbr</code></td>
-<td>CAMELS-BR</td>
-<td>376</td>
-</tr>
-<tr>
-<td><code>camelscl</code></td>
-<td>CAMELS-CL</td>
-<td>314</td>
-</tr>
-<tr>
-<td><code>camelsgb</code></td>
-<td>CAMELS-GB</td>
-<td>408</td>
-</tr>
-<tr>
-<td><code>hysets</code></td>
-<td>HYSETS</td>
-<td>4,621</td>
-</tr>
-<tr>
-<td><code>lamah</code></td>
-<td>LamaH-CE</td>
-<td>479</td>
-</tr>
-</tbody>
-</table>
-<p>(Counts measured from the v1.2 index — the newest base release that can be read without downloading it.)</p>
-<div class="admonition note">
-<p class="admonition-title">Two extensions are published under their source dataset's name</p>
-<p><code>czechia</code> and <code>spain</code> are titled <em>CAMELS-CZ</em> and <em>CAMELS-ES</em> — the word "Caravan" never appears in either
-title, only inside the record. A title-based search misses them entirely, which is why
-<code>earthlens datasets refresh caravan</code> searches record <strong>content</strong>. <code>czechia</code> also carries the most recent
-series of any extension, running to mid-2025.</p>
-</div>
-<h2 id="known-but-not-wrapped"><a class="toclink" href="#known-but-not-wrapped">Known but not wrapped</a><a class="headerlink" href="#known-but-not-wrapped" title="Permanent link">#</a></h2>
-<p><strong>CAMELS-CH</strong> (<a href="https://doi.org/10.5281/zenodo.15025258">15025258</a>) is published in the native CAMELS layout
-rather than Caravan's — verified by opening it — so it is not reachable through this backend.</p>
-<p><strong>Caravan MultiMet</strong> (<a href="https://doi.org/10.5281/zenodo.14196771">14196771</a> /
-<a href="https://doi.org/10.5281/zenodo.14196772">14196772</a>) adds nowcast and forecast weather products — CPC, IMERG v07,
-CHIRPS, ECMWF IFS-HRES, GraphCast, CHIRPS-GEFS — for every Caravan basin. It ships <strong>zarr cubes with lead-time
-bands on a UTC-0 time base</strong>, which is a gridded shape rather than the per-catchment daily table this backend
-returns, so it needs its own backend and is deliberately out of scope here.</p>
-<h2 id="archive-layout"><a class="toclink" href="#archive-layout">Archive layout</a><a class="headerlink" href="#archive-layout" title="Permanent link">#</a></h2>
-<p>Each archive holds the same inner structure, but <strong>the directory it sits under differs per record and is absent
-in two of them</strong> — which is why member paths are resolved from the archive's own index rather than a template.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>[&lt;root&gt;/]timeseries/csv/&lt;source&gt;/&lt;gauge_id&gt;.csv
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>[&lt;root&gt;/]timeseries/netcdf/&lt;source&gt;/&lt;gauge_id&gt;.nc
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>[&lt;root&gt;/]attributes/&lt;source&gt;/attributes_other_&lt;source&gt;.csv       # gauge lat/lon, country, area, name
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>[&lt;root&gt;/]attributes/&lt;source&gt;/attributes_caravan_&lt;source&gt;.csv     # climate indices
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>[&lt;root&gt;/]attributes/&lt;source&gt;/attributes_hydroatlas_&lt;source&gt;.csv
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>[&lt;root&gt;/]shapefiles/&lt;source&gt;/&lt;source&gt;_basin_shapes.shp           # + .shx .dbf .prj .cpg
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>[&lt;root&gt;/]licenses/&lt;source&gt;/license_&lt;source&gt;.md
+<h1 id="mswep-mswx-getting-access-and-configuring-credentials"><a class="toclink" href="#mswep-mswx-getting-access-and-configuring-credentials">MSWEP / MSWX — getting access and configuring credentials</a><a class="headerlink" href="#mswep-mswx-getting-access-and-configuring-credentials" title="Permanent link">#</a></h1>
+<p><strong>Read this page first.</strong> Unlike most earthlens backends, <code>mswep</code> cannot work out of the box: GloH2O publishes
+MSWEP and MSWX with <strong>no anonymous download</strong>, so earthlens automates <em>your own</em> approved download rather than
+fetching on your behalf. There are two prerequisites, and both are one-off human steps.</p>
+<h2 id="1-request-access-one-form-per-product"><a class="toclink" href="#1-request-access-one-form-per-product">1. Request access (one form per product)</a><a class="headerlink" href="#1-request-access-one-form-per-product" title="Permanent link">#</a></h2>
+<p>Non-commercial access is granted by a human reviewing a request form. Submit one for each product you want:</p>
+<ul>
+<li><strong>MSWEP</strong> (precipitation) — <a href="https://www.gloh2o.org/mswep/">https://www.gloh2o.org/mswep/</a></li>
+<li><strong>MSWX</strong> (meteorological forcing) — <a href="https://www.gloh2o.org/mswx/">https://www.gloh2o.org/mswx/</a></li>
+</ul>
+<p>Each asks for your name, organisation, intended use, and an academic or work email. On approval you receive an
+email containing a <strong>Google-Drive share link</strong> and <code>rclone</code> download instructions. The two products are shared
+separately, so approval for one does not grant the other.</p>
+<p>Note the licence before you start: <strong>CC BY-NC 4.0</strong>. Academic, nonprofit, personal and non-revenue
+government/NGO use is free; any for-profit, consulting, contract-research, paywalled or product-integration use
+needs a separate licence from GloH2O. Every <code>download()</code> emits a <code>LicenseWarning</code> saying so.</p>
+<h2 id="2-configure-a-credential"><a class="toclink" href="#2-configure-a-credential">2. Configure a credential</a><a class="headerlink" href="#2-configure-a-credential" title="Permanent link">#</a></h2>
+<h3 id="a-service-account-will-not-work"><a class="toclink" href="#a-service-account-will-not-work">A service account will not work</a><a class="headerlink" href="#a-service-account-will-not-work" title="Permanent link">#</a></h3>
+<p>This is the single most common way to get stuck. A Google <strong>service account</strong> is a separate principal with its
+own empty Drive; GloH2O shares the folder with <strong>your personal Google account</strong>, and a service account has no
+view of anyone else's "Shared with me". Pointed at the share it does not raise — <code>files.list</code> simply returns
+nothing, which would look like an empty date range.</p>
+<p><code>MswepAuth</code> therefore detects a service-account key at load time and refuses it with an explanation rather than
+letting the request degrade. You need a <strong>user</strong> credential: a refresh token for the account the share was
+granted to.</p>
+<h3 id="option-a-reuse-your-rclone-remote-recommended"><a class="toclink" href="#option-a-reuse-your-rclone-remote-recommended">Option A — reuse your <code>rclone</code> remote (recommended)</a><a class="headerlink" href="#option-a-reuse-your-rclone-remote-recommended" title="Permanent link">#</a></h3>
+<p>GloH2O's approval email already tells you to download via <code>rclone</code>, so this route needs no second consent flow.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># One-off: create a personal OAuth client (rclone&#39;s built-in one cannot be</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># refreshed outside rclone, so earthlens will refuse a remote without one).</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">#   1. Google Cloud Console -&gt; APIs &amp; Services -&gt; enable the Google Drive API</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1">#   2. OAuth consent screen -&gt; External -&gt; add yourself as a Test user</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1">#   3. Credentials -&gt; Create credentials -&gt; OAuth client ID -&gt; Desktop app</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>rclone<span class="w"> </span>config<span class="w">          </span><span class="c1"># new remote -&gt; drive -&gt; paste client_id/secret</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">                       </span><span class="c1"># -&gt; scope: drive.readonly -&gt; browser consent</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>rclone<span class="w"> </span>lsd<span class="w"> </span>--drive-shared-with-me<span class="w"> </span>GoogleDrive:<span class="w">   </span><span class="c1"># confirms the share is visible</span>
 </code></pre></div>
+<p>Then point earthlens at that remote:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">MSWEP_RCLONE_REMOTE</span><span class="o">=</span>GoogleDrive<span class="w">          </span><span class="c1"># the remote name you chose</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">MSWEP_DRIVE_FOLDER</span><span class="o">=</span>&lt;folder-id&gt;<span class="w">           </span><span class="c1"># from the approval email&#39;s link</span>
+</code></pre></div>
+<p><code>rclone.conf</code> is found automatically (<code>$RCLONE_CONFIG</code>, <code>%APPDATA%\rclone</code> on Windows, <code>$XDG_CONFIG_HOME</code> or
+<code>~/.config</code> on POSIX, and legacy <code>~/.rclone.conf</code>); set <code>MSWEP_RCLONE_CONFIG</code> to override.</p>
+<div class="admonition warning">
+<p class="admonition-title">Leave the consent screen in <em>Testing</em> and your token expires weekly</p>
+<p>Google expires refresh tokens after <strong>7 days</strong> for apps in <code>Testing</code> publishing status. Set the OAuth
+consent screen to <strong>In production</strong> for a token that persists. Drive is a sensitive scope, so Google offers
+verification — for personal use you can publish unverified and click through the warning.</p>
+</div>
+<h3 id="option-b-an-authorized-user-tokenjson"><a class="toclink" href="#option-b-an-authorized-user-tokenjson">Option B — an authorized-user <code>token.json</code></a><a class="headerlink" href="#option-b-an-authorized-user-tokenjson" title="Permanent link">#</a></h3>
+<p>If you would rather not use <code>rclone</code>, mint a token once with <code>google-auth-oauthlib</code>'s <code>InstalledAppFlow</code> and
+point earthlens at the file:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">MSWEP_TOKEN_FILE</span><span class="o">=</span>/path/to/token.json
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">MSWEP_DRIVE_FOLDER</span><span class="o">=</span>&lt;folder-id&gt;
+</code></pre></div>
+<p>The file must be an <strong>authorized-user</strong> JSON carrying <code>client_id</code>, <code>client_secret</code> and <code>refresh_token</code>. A token
+without a refresh token is refused — it would expire within the hour with no way to renew.</p>
+<h3 id="finding-the-folder-id"><a class="toclink" href="#finding-the-folder-id">Finding the folder id</a><a class="headerlink" href="#finding-the-folder-id" title="Permanent link">#</a></h3>
+<p>The approval email links something like
+<code>https://drive.google.com/drive/folders/1AbCdEfGhIjKlMnOpQrStUvWxYz</code>. The trailing segment is the folder id.</p>
+<h2 id="3-verify"><a class="toclink" href="#3-verify">3. Verify</a><a class="headerlink" href="#3-verify" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="s2">&quot;mswep&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-04-25&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-04-25&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;precipitation&quot;</span><span class="p">],</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">)</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">())</span>   <span class="c1"># -&gt; [PosixPath(&#39;out/MSWEP_V315/Past/Daily/2020116.nc&#39;)]</span>
+</code></pre></div>
+<p>Or run the gated live tests, which skip cleanly when nothing is configured:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;e2e and mswep&quot;</span>
+</code></pre></div>
+<h2 id="configuration-reference"><a class="toclink" href="#configuration-reference">Configuration reference</a><a class="headerlink" href="#configuration-reference" title="Permanent link">#</a></h2>
 <table>
 <thead>
 <tr>
-<th>Extension</th>
-<th>Root directory</th>
+<th>Setting</th>
+<th>Environment variable</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>grdc</code></td>
-<td><code>GRDC_Caravan_extension_csv/</code> (and <code>..._nc/</code> for the netCDF archive)</td>
+<td><code>folder_id=</code></td>
+<td><code>MSWEP_DRIVE_FOLDER</code></td>
+<td>Drive id of the shared folder (required)</td>
 </tr>
 <tr>
-<td><code>israel</code></td>
-<td><code>Caravan_extension_Israel_Ver4/</code></td>
+<td><code>credentials=MswepCredentials(token_path=…)</code></td>
+<td><code>MSWEP_TOKEN_FILE</code></td>
+<td>Authorized-user <code>token.json</code></td>
 </tr>
 <tr>
-<td><code>base</code> (1.2)</td>
-<td><code>Caravan/</code></td>
+<td><code>credentials=MswepCredentials(rclone_remote=…)</code></td>
+<td><code>MSWEP_RCLONE_REMOTE</code></td>
+<td>Name of your Drive remote</td>
 </tr>
 <tr>
-<td><code>denmark</code>, <code>germany</code></td>
-<td><em>(none — members start at the archive root)</em></td>
+<td><code>credentials=MswepCredentials(rclone_config=…)</code></td>
+<td><code>MSWEP_RCLONE_CONFIG</code> / <code>RCLONE_CONFIG</code></td>
+<td>Path to <code>rclone.conf</code></td>
+</tr>
+</tbody>
+</table>
+<p>Resolution order is: an explicit <code>token_path</code>, then an <code>rclone</code> remote, then the same two from the environment.</p>
+<h2 id="troubleshooting"><a class="toclink" href="#troubleshooting">Troubleshooting</a><a class="headerlink" href="#troubleshooting" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>"is a Google </em><em>service-account</em><em> key"</em></td>
+<td>See above — use a user credential.</td>
+</tr>
+<tr>
+<td><em>"has no <code>client_id</code> / <code>client_secret</code>"</em></td>
+<td>Your <code>rclone</code> remote uses rclone's built-in OAuth client, which it never writes to the config, so the token cannot be refreshed outside rclone. Create a personal client and re-run <code>rclone config</code>.</td>
+</tr>
+<tr>
+<td><em>"root folder … is not in the shared folder"</em></td>
+<td>GloH2O stamps the version into the folder name and renames it between releases. The error lists the roots actually present — pick a matching <code>version=</code>.</td>
+</tr>
+<tr>
+<td><em>"marked provisional in the MSWEP catalog"</em></td>
+<td>The value could not be verified without a live share, so earthlens refuses to guess. Confirm the real name inside your share and drop the flag from <code>mswep_data_catalog.yaml</code>.</td>
+</tr>
+<tr>
+<td><em>"per-file download quota is exhausted"</em></td>
+<td>Drive caps downloads per file across everyone holding the share. Retrying does not help; it clears after ~24 h. Use <code>rclone sync</code> for bulk.</td>
+</tr>
+<tr>
+<td>Empty result, only "absent from the share" warnings</td>
+<td>The window may predate the variant, or you named a <code>variant=</code> that does not cover it.</td>
 </tr>
 </tbody>
 </table>
@@ -20044,7 +20131,7 @@ in two of them</strong> — which is why member paths are resolved from the arch
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Usage">
+          <a href="../introduction/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -20054,20 +20141,20 @@ in two of them</strong> — which is why member paths are resolved from the arch
                 Previous
               </span>
               <div class="md-ellipsis">
-                Usage
+                Introduction
               </div>
             </div>
           </a>
         
         
           
-          <a href="../caravan/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
+          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Reference
+                Usage
               </div>
             </div>
             <div class="md-footer__button md-icon">
