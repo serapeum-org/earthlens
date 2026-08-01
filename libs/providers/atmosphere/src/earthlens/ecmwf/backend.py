@@ -69,6 +69,11 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # CEMS fire danger (EWDS): daily year/month/day + a `grid` selector, no
     # time-of-day; drop the template's `time` slots.
     "fire": ("time",),
+    # CAMS year/month datasets (ADS): GHG inversion + European air-quality
+    # reanalyses key on year/month (no day), no time-of-day, and reject the
+    # `area` bbox (global-gridded); `data_format`/`product_type` are dropped
+    # per-row via `extras: {…: null}`.
+    "cams_inversion": ("day", "time", "area"),
 }
 
 
@@ -1304,8 +1309,11 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 self.space.south,
                 self.space.east,
             ],
-            "product_type": var_info.product_type,
         }
+        # `product_type` only for datasets that declare one — CAMS keys on
+        # `type`/`quantity` instead and rejects an empty `product_type`.
+        if var_info.product_type:
+            request["product_type"] = var_info.product_type
 
         if self.temporal_resolution == "monthly":
             request["time"] = ["00:00"]

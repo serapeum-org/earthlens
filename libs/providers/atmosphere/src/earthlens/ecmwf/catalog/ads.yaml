@@ -1,0 +1,99 @@
+# CAMS atmosphere datasets — ADS (Atmosphere Data Store) endpoint.
+#
+# The greenfield ADS store: global/European air quality, greenhouse gases, and
+# atmospheric composition, operated by ECMWF under Copernicus CAMS. Request
+# shapes + enum values are pinned from the live form.json
+# (`planning/ecmwf/captures/a1_form_cams-*.json`, 2026-08-01).
+#
+# Two request families: `cams_date` (a single `date` range string + `time`, for
+# EAC4 / composition forecasts / GFAS / air-quality forecasts) and
+# `cams_inversion` (year/month, no day/time/area, for GHG inversion + European
+# air-quality reanalyses). `data_format`/`product_type` that a dataset does not
+# accept are dropped per-row via `extras: {…: null}`.
+#
+# Live retrieves need BOTH the ADS account-level site policies accepted AND each
+# dataset's licence (G5) — until then every ADS retrieve 403s. `nc_variable` is
+# best-effort; the gated live e2e confirms it.
+
+datasets:
+  cams-global-reanalysis-eac4:
+    endpoint: ads
+    request_kind: cams_date
+    extras:
+      data_format: netcdf_zip
+    variables:
+      2m-temperature:
+        cds_variable: 2m_temperature
+        nc_variable: t2m
+        units: K
+
+  cams-global-atmospheric-composition-forecasts:
+    endpoint: ads
+    request_kind: cams_date
+    extras:
+      type: [forecast]
+      leadtime_hour: ["0"]
+      data_format: netcdf_zip
+    variables:
+      total-column-ozone:
+        cds_variable: total_column_ozone
+        nc_variable: gtco3
+        units: kg m-2
+
+  cams-global-fire-emissions-gfas:
+    endpoint: ads
+    request_kind: cams_date
+    extras:
+      time: null
+      data_format: netcdf
+    variables:
+      wildfire-flux-of-carbon-dioxide:
+        cds_variable: wildfire_flux_of_carbon_dioxide
+        nc_variable: co2fire
+        units: kg m-2 s-1
+
+  cams-global-greenhouse-gas-inversion:
+    endpoint: ads
+    request_kind: cams_inversion
+    extras:
+      quantity: [surface_flux]
+      input_observations: [surface]
+      time_aggregation: [instantaneous]
+      version: [latest]
+      product_type: null
+      data_format: null
+    variables:
+      carbon-dioxide:
+        cds_variable: carbon_dioxide
+        nc_variable: co2
+        units: kg m-2 s-1
+
+  cams-europe-air-quality-forecasts:
+    endpoint: ads
+    request_kind: cams_date
+    extras:
+      model: [ensemble]
+      level: ["0"]
+      type: [forecast]
+      leadtime_hour: ["0"]
+      data_format: netcdf_zip
+    variables:
+      carbon-monoxide:
+        cds_variable: carbon_monoxide
+        nc_variable: co_conc
+        units: µg m-3
+
+  cams-europe-air-quality-reanalyses:
+    endpoint: ads
+    request_kind: cams_inversion
+    extras:
+      model: [ensemble]
+      level: ["0"]
+      type: [validated_reanalysis]
+      product_type: null
+      data_format: null
+    variables:
+      carbon-monoxide:
+        cds_variable: carbon_monoxide
+        nc_variable: co_conc
+        units: µg m-3

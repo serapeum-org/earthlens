@@ -207,6 +207,8 @@ def _provider_for_dataset(ds_name: str) -> str:
         return "cmip5-modelling-centres"
     if ds_name.startswith("projections-cordex"):
         return "cordex-consortium"
+    if ds_name.startswith("cams-"):
+        return "copernicus-cams"
     if ds_name.startswith(("cems-", "efas-")):
         return "copernicus-cems"
     return "ecmwf"
@@ -451,7 +453,7 @@ class Variable(FluxableLeaf):
     cds_variable: str
     nc_variable: str
     units: str
-    product_type: list[str]
+    product_type: list[str] = Field(default_factory=list)
     cds_pressure_level: list[str] | None = None
     extras: dict[str, Any] = Field(default_factory=dict)
     request_kind: str = "form"
