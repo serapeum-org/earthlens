@@ -1,0 +1,142 @@
+# emdat_data_catalog.yaml
+#
+# Curated catalog for the earthlens.emdat backend (flood-risk L5): disaster
+# event/impact records from CRED's EM-DAT, via its two sanctioned programmatic
+# routes. Each dataset row pins its provider, its output_kind (tabular ->
+# DataFrame, vector -> FeatureCollection), the transport detail needed to fetch
+# it, and its licence. Routes live-verified 2026-08-01 (see
+# planning/flood-risk/captures/emdat-a1-routes-2026-08-01.json).
+#
+# Two providers:
+#
+#   dataverse  The EM-DAT Archive on the UCLouvain Dataverse — anonymous, the
+#              full public table (1900 onwards, natural AND technological),
+#              CC-BY-NC-ND-4.0 plus an eligibility-restricted Terms of Use.
+#              EM-DAT's own documentation calls this "the preferred choice for
+#              conducting research with EM-DAT".
+#
+#   earthdata  GDIS (Geocoded Disasters), the CC-BY-4.0 geocoded derivative of
+#              EM-DAT natural disasters, 1960-2018. Migrated off the (now dead)
+#              sedac.ciesin.columbia.edu host into NASA Earthdata Cloud, so it
+#              needs an Earthdata Login.
+#
+# Deliberately NOT in this catalog:
+#
+#   * The public.emdat.be portal — manual XLSX behind a login, superseded by
+#     the Dataverse archive.
+#   * The api.emdat.be GraphQL endpoint — live, but absent from the current
+#     EM-DAT documentation and with no documented way for a new user to obtain
+#     a key. See docs/reference/emdat/ for the note.
+#   * The HDX country profiles — already reachable through the shipped `hdx`
+#     backend: EarthLens("hdx", hdx_id="emdat-country-profiles").
+
+datasets:
+  emdat:events:
+    provider: dataverse
+    output_kind: tabular
+    long_name: EM-DAT Emergency Events Database Archive (event-level impacts)
+    # Dataverse native REST API. The file id changes with every archive
+    # version, so the backend resolves the file by matching `file_pattern`
+    # against the `:latest` version listing — never by a hard-coded id.
+    dataverse_base: https://dataverse.uclouvain.be
+    doi: doi:10.14428/DVN/I0LTPH
+    file_pattern: "*_emdat_archive.xlsx"
+    sheet: EM-DAT Data
+    # Column carrying the per-event identifier, shared with GDIS's `disasterno`
+    # once the trailing ISO3 segment is dropped (1900-0006-JAM -> 1900-0006).
+    id_column: "DisNo."
+    type_column: Disaster Type
+    iso_column: ISO
+    latitude_column: Latitude
+    longitude_column: Longitude
+    year_column: Start Year
+    start_year: 1900
+    end_year: null            # a living archive; re-cut roughly yearly
+    licence: CC-BY-NC-ND-4.0
+    licence_url: https://creativecommons.org/licenses/by-nc-nd/4.0/
+    # Free use is limited to academic organisations, universities, non-profit
+    # research institutions, international public organisations (UN agencies,
+    # multilateral banks, national governments) and media agencies, for
+    # research, teaching or information purposes. Any other use is Commercial
+    # Use and needs a separate paid agreement with CRED/UCLouvain. The Terms of
+    # Use also forbid redistributing EM-DAT or a substantial part of it, and
+    # forbid creating derivative databases — so earthlens fetches for the user
+    # and never caches or repacks the table.
+    restricted_use: true
+    terms_url: https://doc.emdat.be/docs/legal/terms-of-use/
+    citation: >-
+      EM-DAT, CRED / UCLouvain, Brussels, Belgium — www.emdat.be. Archive DOI
+      10.14428/DVN/I0LTPH.
+
+  gdis:points:
+    provider: earthdata
+    output_kind: vector
+    long_name: GDIS geocoded disaster locations (centroids, 1960-2018)
+    short_name: CIESIN_SEDAC_PEND_GDIS
+    granule: pend-gdis-1960-2018-disasterlocations-csv.zip
+    member: pend-gdis-1960-2018-disasterlocations.csv
+    format: csv
+    encoding: latin-1
+    download_mb: 1.09
+    # The CSV is NOT a column-subset of the GeoPackage: it alone carries
+    # `year`, `latitude` and `longitude`, so a date filter is a direct
+    # comparison and the geometry is built from the coordinate pair.
+    year_column: year
+    latitude_column: latitude
+    longitude_column: longitude
+    type_column: disastertype
+    id_column: disasterno
+    start_year: 1960
+    end_year: 2018
+    licence: CC-BY-4.0
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    restricted_use: false
+    citation: >-
+      Rosvold, E.L. & Buhaug, H. (2021). GDIS, a global dataset of geocoded
+      disaster locations. Scientific Data 8, 61. NASA SEDAC,
+      doi 10.7927/61jv-th84.
+
+  gdis:polygons:
+    provider: earthdata
+    output_kind: vector
+    long_name: GDIS geocoded disaster footprints (polygons, 1960-2018)
+    short_name: CIESIN_SEDAC_PEND_GDIS
+    granule: pend-gdis-1960-2018-disasterlocations-gpkg.zip
+    member: pend-gdis-1960-2018-disasterlocations.gpkg
+    format: gpkg
+    layer: GPKG
+    # 2.2 GB compressed, 6.3 GB on disk. Opt-in only: the backend warns before
+    # starting the download. Prefer gdis:points unless real footprints are
+    # needed.
+    download_mb: 2195.79
+    # The GeoPackage has NO date column — the only temporal handle is the
+    # 4-digit year prefix of `disasterno` (e.g. "2009-0631").
+    year_column: null
+    year_from_id_prefix: true
+    type_column: disastertype
+    id_column: disasterno
+    start_year: 1960
+    end_year: 2018
+    licence: CC-BY-4.0
+    licence_url: https://creativecommons.org/licenses/by/4.0/
+    restricted_use: false
+    citation: >-
+      Rosvold, E.L. & Buhaug, H. (2021). GDIS, a global dataset of geocoded
+      disaster locations. Scientific Data 8, 61. NASA SEDAC,
+      doi 10.7927/61jv-th84.
+
+# The GDIS `disastertype` vocabulary, canonical (lower-case, stripped) form.
+# The shipped data is not clean: the GeoPackage spells one value
+# "extreme temperature " with a trailing space, while the Earth Engine mirror
+# of the same table spells it without. Both the catalog and the backend
+# normalise with str.strip().lower(), so a caller always passes the canonical
+# spelling below.
+hazard_types:
+  - drought
+  - earthquake
+  - extreme temperature
+  - flood
+  - landslide
+  - mass movement (dry)
+  - storm
+  - volcanic activity
