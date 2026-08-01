@@ -25,6 +25,7 @@ the roots that are actually present.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -222,6 +223,40 @@ def find_children_by_name(
         for entry in _paged_entries(service, query):
             found[entry.name] = entry
     return found
+
+
+def download_media(service: Any, file_id: str, destination: Path) -> Path:
+    """Download one Drive file to `destination`, atomically.
+
+    Streams through `MediaIoBaseDownload` so a multi-hundred-megabyte
+    granule never lands in memory, and writes to a `.part` sibling that
+    is renamed only once the transfer completes. An interrupted download
+    therefore leaves no truncated file that a later run would mistake
+    for a cached granule.
+
+    Args:
+        service: The Drive v3 client.
+        file_id: Drive id of the file to fetch.
+        destination: Final path to write.
+
+    Returns:
+        Path: `destination`.
+    """
+    from googleapiclient.http import MediaIoBaseDownload
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    partial = destination.with_name(destination.name + ".part")
+    request = service.files().get_media(fileId=file_id, supportsAllDrives=True)
+    try:
+        with partial.open("wb") as handle:
+            downloader = MediaIoBaseDownload(handle, request)
+            done = False
+            while not done:
+                _, done = downloader.next_chunk()
+        partial.replace(destination)
+    finally:
+        partial.unlink(missing_ok=True)
+    return destination
 
 
 class RootResolver:

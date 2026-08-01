@@ -40,6 +40,53 @@ class FakeRequest:
         return self._payload
 
 
+class FakeResponse(dict):
+    """An httplib2-shaped response: a header dict carrying a `.status`."""
+
+    def __init__(self, status, headers=None):
+        """Build a response with `status` and optional headers."""
+        super().__init__(headers or {})
+        self.status = status
+
+
+class FakeHttp:
+    """The httplib2-like transport `MediaIoBaseDownload` drives."""
+
+    def __init__(self, data, error=None):
+        """Serve `data` in range slices, or raise `error` on first call."""
+        self._data = data
+        self._error = error
+
+    def request(self, uri, method="GET", headers=None, **kwargs):
+        """Answer one ranged GET, honouring the `range` header."""
+        if self._error is not None:
+            raise self._error
+        span = (headers or {}).get("range", "")
+        start, end = 0, len(self._data) - 1
+        if span.startswith("bytes="):
+            raw_start, _, raw_end = span[len("bytes=") :].partition("-")
+            start = int(raw_start)
+            end = min(int(raw_end), len(self._data) - 1)
+        chunk = self._data[start : end + 1]
+        return (
+            FakeResponse(
+                206 if start else 200,
+                {"content-range": f"bytes {start}-{end}/{len(self._data)}"},
+            ),
+            chunk,
+        )
+
+
+class FakeMediaRequest:
+    """A `get_media` request with the attributes the downloader reads."""
+
+    def __init__(self, data, error=None):
+        """Bind the payload (and optional transport error) to serve."""
+        self.uri = "https://fake.drive/get_media"
+        self.headers = {}
+        self.http = FakeHttp(data, error=error)
+
+
 class FakeFiles:
     """The `files()` collection of the fake Drive service."""
 
@@ -82,9 +129,16 @@ class FakeFiles:
         return FakeRequest(payload)
 
     def get_media(self, *, fileId, **kwargs):  # noqa: N803
-        """Return a request carrying the stored bytes for `fileId`."""
+        """Return a media request the real `MediaIoBaseDownload` can drive.
+
+        Deliberately not a canned payload: production code uses
+        googleapiclient's own chunked downloader, so the fake models the
+        httplib2-shaped transport underneath it instead. That keeps the
+        real chunk loop, range headers and completion logic under test.
+        """
         self._store.media_calls.append(fileId)
-        return FakeRequest(self._store.contents.get(fileId, b""))
+        error = self._store.media_errors.get(fileId)
+        return FakeMediaRequest(self._store.contents.get(fileId, b""), error=error)
 
 
 class FakeDrive:
@@ -109,6 +163,7 @@ class FakeDrive:
         self.contents = {}
         self.list_calls = []
         self.media_calls = []
+        self.media_errors = {}
         self.page_size = page_size
         self._next = 0
 
@@ -169,6 +224,17 @@ class FakeDrive:
                 for filename in children:
                     self.add_file(filename, folder_id)
         return ids
+
+
+@pytest.fixture
+def loguru_messages():
+    """Collect WARNING+ loguru messages into a list (loguru bypasses caplog)."""
+    from loguru import logger
+
+    messages = []
+    sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+    yield messages
+    logger.remove(sink_id)
 
 
 @pytest.fixture
