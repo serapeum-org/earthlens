@@ -51,6 +51,20 @@ _REGISTER_URL = "https://urs.earthdata.nasa.gov"
 _DOCS_URL = "https://earthaccess.readthedocs.io"
 
 
+def _restore_env(previous: dict[str, str | None]) -> None:
+    """Put environment variables back to the values in `previous`.
+
+    Args:
+        previous: Variable name to its value before it was overwritten, or
+            `None` when it was unset.
+    """
+    for name, value in previous.items():
+        if value is None:
+            os.environ.pop(name, None)
+        else:
+            os.environ[name] = value
+
+
 class AuthenticationError(_BaseAuthenticationError):
     """Raised when `earthaccess` cannot authenticate against EDL.
 
@@ -222,6 +236,13 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
         logs in with `persist=True` and keeps the returned
         `earthaccess.Auth` handle on :attr:`_auth`.
 
+        An explicit credential also has to *win*. `earthaccess` prefers
+        `EARTHDATA_TOKEN` over a username/password pair, so an unrelated token
+        already in the environment is cleared for the duration of the login.
+        Everything this touches is restored afterwards, so a credential never
+        lingers in the process environment where a later subprocess would
+        inherit it.
+
         Raises:
             AuthenticationError: When `earthaccess.login` returns an
                 unauthenticated handle (bad / missing credentials) or
@@ -236,9 +257,10 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
         # EARTHDATA_TOKEN as a real token and fails with "Token does not exist",
         # masking valid username/password env vars. Drop any empty EDL env var so
         # the strategy resolves to the credential that is actually set.
+        emptied: dict[str, str | None] = {}
         for _var in ("EARTHDATA_TOKEN", "EARTHDATA_USERNAME", "EARTHDATA_PASSWORD"):
             if os.environ.get(_var) == "":
-                os.environ.pop(_var, None)
+                emptied[_var] = os.environ.pop(_var)
 
         try:
             import earthaccess  # lazy — only needed when actually logging in
@@ -251,24 +273,32 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
             ) from exc
 
         strategy = self._resolve_strategy()
+        previous: dict[str, str | None] = dict(emptied)
         if strategy == "environment":
             # earthaccess has no direct token / username-password argument;
             # its environment strategy reads EARTHDATA_TOKEN (preferred) or
             # EARTHDATA_USERNAME / EARTHDATA_PASSWORD. Export whichever
             # explicit credential was supplied so it reaches the login.
-            if self._has_explicit_token():
-                assert (
-                    self._creds.token is not None
-                )  # _has_explicit_token guarantees it
-                os.environ["EARTHDATA_TOKEN"] = self._creds.token.get_secret_value()
-            elif self._has_explicit_credentials():
-                # _has_explicit_credentials guarantees both are non-None
-                assert self._creds.username is not None
-                assert self._creds.password is not None
-                os.environ["EARTHDATA_USERNAME"] = self._creds.username
-                os.environ["EARTHDATA_PASSWORD"] = (
-                    self._creds.password.get_secret_value()
-                )
+            wanted: dict[str, str] = {}
+            clear: list[str] = []
+            if self._has_explicit_token() and self._creds.token is not None:
+                wanted["EARTHDATA_TOKEN"] = self._creds.token.get_secret_value()
+            elif (
+                self._has_explicit_credentials()
+                and self._creds.username is not None
+                and self._creds.password is not None
+            ):
+                wanted["EARTHDATA_USERNAME"] = self._creds.username
+                wanted["EARTHDATA_PASSWORD"] = self._creds.password.get_secret_value()
+                # earthaccess prefers EARTHDATA_TOKEN over a username/password
+                # pair, so an unrelated token already in the environment would
+                # silently beat the credentials the caller passed explicitly.
+                clear.append("EARTHDATA_TOKEN")
+            for _name in list(wanted) + clear:
+                previous.setdefault(_name, os.environ.get(_name))
+            os.environ.update(wanted)
+            for _name in clear:
+                os.environ.pop(_name, None)
         try:
             auth = earthaccess.login(strategy=strategy, persist=True)
         except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
@@ -279,6 +309,11 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
                 f"'machine urs.earthdata.nasa.gov' entry to ~/.netrc, or "
                 f"register a free account at {_REGISTER_URL}."
             ) from exc
+        finally:
+            # An explicit credential is put in the environment only because
+            # earthaccess has no argument for one. Leaving it there would make
+            # it process-global and inherit into any later subprocess.
+            _restore_env(previous)
 
         if not getattr(auth, "authenticated", False):
             raise AuthenticationError(
