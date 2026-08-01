@@ -376,10 +376,10 @@ class MSWEP(AbstractDataSource):
                 self._product.variants[variant],
                 f"the {self._product_key} {variant!r} variant window",
             )
-            for name in variables:
+            for variable in variables:
                 segments = [root.name, variant]
-                if name is not None:
-                    segments.append(name)
+                if variable is not None:
+                    segments.append(variable)
                 segments.append(resolution.folder)
                 filename = f"{stamp.strftime(resolution.stem)}.nc"
                 grouped.setdefault(tuple(segments), []).append((filename, stamp))
