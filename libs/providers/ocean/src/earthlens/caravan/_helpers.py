@@ -373,7 +373,7 @@ def _extract_entry(
     return target
 
 
-def _tar_index(tarball: Path, extract_dir: Path) -> list[str]:
+def _tar_index(tarball: Path, extract_dir: Path, fingerprint: str) -> list[str]:
     """Index a tarball, extracting its metadata members in the same pass.
 
     A gzip stream has no directory, so listing it decompresses the whole
@@ -385,11 +385,15 @@ def _tar_index(tarball: Path, extract_dir: Path) -> list[str]:
     Args:
         tarball: The local `.tar.gz`.
         extract_dir: Directory metadata members are extracted into.
+        fingerprint: Identity of the archive these artifacts belong to (its
+            md5). Both the index and the extracted members are keyed on it, so
+            a re-downloaded archive at the same path can never be served from
+            the previous one's cache.
 
     Returns:
         list[str]: Every file member name in the archive.
     """
-    index_path = tarball.with_suffix(tarball.suffix + ".index.json")
+    index_path = tarball.with_suffix(f"{tarball.suffix}.{fingerprint}.index.json")
     if index_path.exists():
         return list(json.loads(index_path.read_text(encoding="utf-8")))
     logger.warning(
@@ -489,22 +493,32 @@ class CaravanArchive:
 
     @classmethod
     def open_local_tar(
-        cls, tarball: Path, *, extract_dir: Path | None = None, label: str = ""
+        cls,
+        tarball: Path,
+        *,
+        extract_dir: Path | None = None,
+        label: str = "",
+        fingerprint: str = "",
     ) -> CaravanArchive:
         """Open a downloaded `.tar.gz`, using (and caching) its member listing.
 
         Args:
             tarball: The local archive, already verified by
                 :func:`ensure_archive`.
-            extract_dir: Directory members are extracted into; a `members`
-                sibling of the tarball when `None`.
+            extract_dir: Directory members are extracted into; a
+                fingerprint-scoped `members-*` sibling of the tarball when
+                `None`.
             label: Short name for log messages; the file name when empty.
+            fingerprint: The archive's md5. Scopes the cached index and the
+                extracted members, so re-downloading a changed archive to the
+                same path cannot serve the previous one's data.
 
         Returns:
             CaravanArchive: The opened archive.
         """
-        destination = extract_dir or tarball.parent / "members"
-        names = tuple(_tar_index(tarball, destination))
+        stamp = fingerprint or _file_md5(tarball)
+        destination = extract_dir or tarball.parent / f"members-{stamp}"
+        names = tuple(_tar_index(tarball, destination, stamp))
         return cls(
             members=names,
             label=label or tarball.name,
@@ -650,9 +664,23 @@ class CaravanArchive:
         return {name: path.read_bytes() for name, path in extracted.items()}
 
     def close(self) -> None:
-        """Release the underlying handle, if any."""
+        """Release the ZIP handle and the range reader underneath it.
+
+        `zipfile.ZipFile` does not close a file object it was handed, so the
+        reader - and the HTTP session it may own - has to be closed explicitly.
+        """
         if self._zip is not None:
             self._zip.close()
+        if self._range_file is not None:
+            self._range_file.close()
+
+    def __enter__(self) -> CaravanArchive:
+        """Return self, so an archive can be used as a context manager."""
+        return self
+
+    def __exit__(self, *exc_info: object) -> None:
+        """Close the archive on leaving the block."""
+        self.close()
 
 
 def attribute_index(archive: CaravanArchive, source: str) -> pd.DataFrame:

@@ -26,6 +26,7 @@ current discharge is what is needed.
 
 from __future__ import annotations
 
+import hashlib
 import zipfile
 from io import BytesIO
 from pathlib import Path
@@ -41,7 +42,7 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
 )
-from earthlens.base.http import HttpClient
+from earthlens.base.http import HttpClient, RangeReadError
 from earthlens.caravan import _helpers
 from earthlens.caravan.catalog import (
     ArchiveFile,
@@ -207,6 +208,7 @@ class Caravan(AbstractDataSource):
         self._write_table_enabled = write_table
         # A shared, throttled client — one per instance, so the interval is
         # enforced across every ranged read of the archive rather than per call.
+        self._owns_client = client is None
         self._client = (
             client if client is not None else HttpClient(min_interval=min_interval)
         )
@@ -349,6 +351,10 @@ class Caravan(AbstractDataSource):
                     size=archive_file.size or None,
                     label=f"caravan/{self._dataset}",
                 )
+            except RangeReadError:
+                # A live HTTP failure is not a catalog problem; let it
+                # surface with its own message and status.
+                raise
             except zipfile.BadZipFile as exc:
                 # Almost always a stale pin: the catalogued size no longer
                 # matches what Zenodo serves, so the central directory is not
@@ -366,7 +372,9 @@ class Caravan(AbstractDataSource):
                 archive_file, cache_root=self._cache_root, client=self._client
             )
             self._archive = _helpers.CaravanArchive.open_local_tar(
-                tarball, label=f"caravan/{self._dataset}"
+                tarball,
+                label=f"caravan/{self._dataset}",
+                fingerprint=archive_file.md5,
             )
         return self._archive
 
@@ -774,12 +782,23 @@ class Caravan(AbstractDataSource):
         """
         version = self._version or self.extension.default_version
         safe_version = version.replace(".", "-")
-        # The selection and window are part of the identity: without them two
-        # different requests against one extension overwrite each other.
+        # The window AND the selection are part of the identity: with only the
+        # window, two requests for different catchments over the same dates
+        # still overwrite each other. The selection is hashed because an
+        # explicit id list can be thousands of entries long.
         window = f"{self.time.start_date:%Y%m%d}-{self.time.end_date:%Y%m%d}"
+        selector = "|".join(
+            [
+                ",".join(sorted(self._gauge_ids)),
+                str(self._country or ""),
+                f"{self.space.south},{self.space.north}",
+                f"{self.space.west},{self.space.east}",
+            ]
+        )
+        digest = hashlib.sha1(selector.encode()).hexdigest()[:8]  # noqa: S324
         return (
             self._ensure_root_dir()
-            / f"caravan_{self._dataset}_{safe_version}_{window}.csv"
+            / f"caravan_{self._dataset}_{safe_version}_{window}_{digest}.csv"
         )
 
     def download(
@@ -825,6 +844,29 @@ class Caravan(AbstractDataSource):
                 f"caravan {self._dataset}: {len(table)} row(s) written to {out_path}"
             )
         return table
+
+    def close(self) -> None:
+        """Release the opened archive and the HTTP session behind it.
+
+        `download()` deliberately does not call this: the archive carries the
+        transfer statistics a caller may want to inspect afterwards. Use the
+        backend as a context manager, or call this when done.
+        """
+        if self._archive is not None:
+            self._archive.close()
+            self._archive = None
+        if self._owns_client:
+            closer = getattr(self._client.session, "close", None)
+            if callable(closer):
+                closer()
+
+    def __enter__(self) -> Caravan:
+        """Return self, so a request can be used as a context manager."""
+        return self
+
+    def __exit__(self, *exc_info: object) -> None:
+        """Close the archive and session on leaving the block."""
+        self.close()
 
     def _api(self) -> list[pd.DataFrame]:
         """Run the search then fetch steps.

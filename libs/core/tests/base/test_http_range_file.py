@@ -325,11 +325,11 @@ class TestHostileServer:
 class TestSeekBounds:
     """Seeking outside the object."""
 
-    def test_a_negative_absolute_offset_raises(self):
-        """Flooring it would silently hand back the wrong bytes."""
+    def test_a_negative_absolute_offset_raises_oserror(self):
+        """`zipfile` probes small archives with `except OSError`, so it must be one."""
         handle = _range_file(_RangeSession(b"0123456789"))
 
-        with pytest.raises(ValueError, match="negative offset"):
+        with pytest.raises(OSError, match="negative offset"):
             handle.seek(-100, io.SEEK_END)
 
     def test_seeking_past_the_end_is_allowed(self):

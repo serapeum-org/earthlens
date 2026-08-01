@@ -32,6 +32,7 @@ module adds none. The public imports are
 from __future__ import annotations
 
 import datetime as dt
+import errno
 import io
 import re
 import threading
@@ -943,6 +944,16 @@ class HttpClient:
         return self._session.request(method, url, **kwargs)
 
 
+class RangeReadError(Exception):
+    """A ranged read failed at the transport level.
+
+    Deliberately **not** an `OSError`. Container readers probe a file with
+    `except OSError` around their structural reads, so a `requests` error -
+    which does derive from `OSError` - would be swallowed and reported as a
+    malformed container rather than as the HTTP failure it is.
+    """
+
+
 class HttpRangeFile(io.RawIOBase):
     """A seekable, read-only binary file over an HTTP URL, backed by `Range`.
 
@@ -1155,9 +1166,14 @@ class HttpRangeFile(io.RawIOBase):
         else:
             raise ValueError(f"invalid whence {whence!r}; expected 0, 1 or 2.")
         if target < 0:
-            raise ValueError(
+            # `OSError`, not `ValueError`: `zipfile` probes a small archive by
+            # seeking back further than its length and guards that with
+            # `except OSError`. A `ValueError` escapes the guard and surfaces as
+            # a confusing seek error instead of "this is not a ZIP".
+            raise OSError(
+                errno.EINVAL,
                 f"cannot seek to a negative offset ({target}); "
-                f"whence={whence} offset={offset} against size {self.size}."
+                f"whence={whence} offset={offset} against size {self.size}.",
             )
         self._pos = target
         return self._pos
@@ -1187,16 +1203,25 @@ class HttpRangeFile(io.RawIOBase):
         if want <= 0 or self._pos >= self.size:
             return 0
         last = min(self._pos + want, self.size) - 1
-        response = self._client.get(
-            self.url,
-            headers={
-                "Range": f"bytes={self._pos}-{last}",
-                # The client's default `gzip, deflate` would make the body
-                # length unrelated to the requested window.
-                "Accept-Encoding": "identity",
-            },
-            timeout=self._timeout,
-        )
+        try:
+            response = self._client.get(
+                self.url,
+                headers={
+                    "Range": f"bytes={self._pos}-{last}",
+                    # The client's default `gzip, deflate` would make the body
+                    # length unrelated to the requested window.
+                    "Accept-Encoding": "identity",
+                },
+                timeout=self._timeout,
+            )
+        except requests.RequestException as exc:
+            # `requests` errors derive from `OSError`, and container readers
+            # such as `zipfile` swallow `OSError` while probing - which turns a
+            # live 404 or 503 into "this file is not a ZIP". Re-raised as a
+            # non-`OSError` so the real status reaches the caller.
+            raise RangeReadError(
+                f"range read of {redact_url(self.url)} failed: {exc}"
+            ) from exc
         if response.status_code != 206:
             raise ValueError(
                 f"{redact_url(self.url)} ignored the Range header "

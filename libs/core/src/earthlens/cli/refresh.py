@@ -1669,9 +1669,9 @@ def _caravan_grouped(catalog: Any) -> dict[str, list[str]]:
     # Records the catalog deliberately does not wrap. Without this they surface
     # as "discovered" on every run, which trains the reader to ignore the signal.
     known_unsupported = {
-        str(entry.get("records") or []) and str(record)
-        for entry in (catalog.available_datasets or [])
-        if isinstance(entry, dict)
+        str(record)
+        for entry in getattr(catalog, "extension_index", []) or []
+        if isinstance(entry, dict) and not entry.get("supported", True)
         for record in (entry.get("records") or [])
     }
     discovered: set[str] = set()

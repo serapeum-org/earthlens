@@ -11,11 +11,11 @@ from typing import Any
 import pytest
 import requests
 
-from earthlens.base.http import HttpClient
+from earthlens.base.http import HttpClient, HttpRangeFile, RangeReadError
 from earthlens.caravan import _helpers
 from earthlens.caravan.catalog import ArchiveFile
 
-from .conftest import FakeRangeSession, build_tar, build_zip
+from .conftest import CURRENT_HEADER, FakeRangeSession, build_tar, build_zip
 
 pytestmark = pytest.mark.caravan
 
@@ -226,7 +226,7 @@ class TestTarArchive:
         tarball.write_bytes(build_tar())
         _helpers.CaravanArchive.open_local_tar(tarball)
 
-        assert (tmp_path / "a.tar.gz.index.json").is_file()
+        assert list(tmp_path.glob("a.tar.gz.*.index.json"))
 
     def test_reading_many_members_takes_one_pass(self, tmp_path):
         """Re-scanning a 29 GB stream per catchment would be pathological."""
@@ -453,5 +453,160 @@ class TestTarScanCost:
         tarball, _ = self._counting_tarball(tmp_path, monkeypatch)
         _helpers.CaravanArchive.open_local_tar(tarball, extract_dir=tmp_path / "m")
 
-        assert (tmp_path / "a.tar.gz.index.json").is_file()
+        assert list(tmp_path.glob("a.tar.gz.*.index.json"))
         assert not list(tmp_path.glob("*.part"))
+
+
+class TestArchiveIdentity:
+    """A re-downloaded archive must never be served from the old one's cache."""
+
+    def test_a_replaced_archive_is_not_served_from_the_old_index(self, tmp_path):
+        """Round 1's path-keyed cache silently returned the previous archive."""
+        tarball = tmp_path / "a.tar.gz"
+        tarball.write_bytes(build_tar())
+        first = _helpers.CaravanArchive.open_local_tar(tarball, fingerprint="aaa")
+        original = first.read(first.timeseries_member("dk", "dk_1"))
+
+        tarball.write_bytes(build_tar(header=CURRENT_HEADER))
+        second = _helpers.CaravanArchive.open_local_tar(tarball, fingerprint="bbb")
+        replaced = second.read(second.timeseries_member("dk", "dk_1"))
+
+        assert replaced != original, (
+            "the replaced archive was served from the previous archive's cache"
+        )
+
+    def test_the_index_is_scoped_by_the_fingerprint(self, tmp_path):
+        """Two identities cannot share one cached member listing."""
+        tarball = tmp_path / "a.tar.gz"
+        tarball.write_bytes(build_tar())
+
+        _helpers.CaravanArchive.open_local_tar(tarball, fingerprint="aaa")
+        _helpers.CaravanArchive.open_local_tar(tarball, fingerprint="bbb")
+
+        assert len(list(tmp_path.glob("a.tar.gz.*.index.json"))) == 2
+
+    def test_the_fingerprint_defaults_to_the_archive_md5(self, tmp_path):
+        """An omitted fingerprint must still be identity-derived, not shared."""
+        tarball = tmp_path / "a.tar.gz"
+        blob = build_tar()
+        tarball.write_bytes(blob)
+
+        _helpers.CaravanArchive.open_local_tar(tarball)
+
+        digest = hashlib.md5(blob).hexdigest()
+        assert (tmp_path / f"a.tar.gz.{digest}.index.json").is_file()
+
+
+class TestCachedArchiveStamp:
+    """The md5 stamp that lets a cached archive skip a full re-hash."""
+
+    def test_a_stamped_cache_is_reused_without_rehashing(self, tmp_path):
+        """The fast path was added in round 1 and had no coverage at all."""
+        blob = build_tar()
+        cached = tmp_path / "1" / "a.tar.gz"
+        cached.parent.mkdir(parents=True)
+        cached.write_bytes(blob)
+        digest = hashlib.md5(blob).hexdigest()
+        cached.with_name(cached.name + ".md5").write_text(digest, encoding="utf-8")
+        descriptor = ArchiveFile(
+            record=1,
+            name="a.tar.gz",
+            size=len(blob),
+            md5=digest,
+            archive_format="tar.gz",
+        )
+        calls: list[Path] = []
+        original = _helpers._file_md5
+
+        def _counted(path: Path) -> str:
+            calls.append(path)
+            return original(path)
+
+        _helpers._file_md5 = _counted  # type: ignore[assignment]
+        try:
+            result = _helpers.ensure_archive(
+                descriptor,
+                cache_root=tmp_path,
+                client=HttpClient(session=_ExplodingSession()),
+            )
+        finally:
+            _helpers._file_md5 = original  # type: ignore[assignment]
+
+        assert result == cached
+        assert calls == [], "a stamped cache must not be re-hashed"
+
+    def test_a_stamp_for_a_different_checksum_is_not_trusted(self, tmp_path):
+        """A stamp left by another release must not authorise this one."""
+        blob = build_tar()
+        cached = tmp_path / "1" / "a.tar.gz"
+        cached.parent.mkdir(parents=True)
+        cached.write_bytes(blob)
+        cached.with_name(cached.name + ".md5").write_text("stale", encoding="utf-8")
+        descriptor = ArchiveFile(
+            record=1,
+            name="a.tar.gz",
+            size=len(blob),
+            md5=hashlib.md5(blob).hexdigest(),
+            archive_format="tar.gz",
+        )
+
+        result = _helpers.ensure_archive(
+            descriptor,
+            cache_root=tmp_path,
+            client=HttpClient(session=_ExplodingSession()),
+        )
+
+        assert result == cached, "it should fall back to hashing, not re-download"
+        assert cached.with_name(cached.name + ".md5").read_text() == descriptor.md5
+
+    def test_a_size_mismatch_defeats_the_stamp(self, tmp_path):
+        """A truncated archive with a stale stamp must not be trusted."""
+        blob = build_tar()
+        digest = hashlib.md5(blob).hexdigest()
+        cached = tmp_path / "1" / "a.tar.gz"
+        cached.parent.mkdir(parents=True)
+        cached.write_bytes(blob)
+        cached.with_name(cached.name + ".md5").write_text(digest, encoding="utf-8")
+        descriptor = ArchiveFile(
+            record=1,
+            name="a.tar.gz",
+            size=len(blob) + 999,
+            md5=digest,
+            archive_format="tar.gz",
+        )
+
+        result = _helpers.ensure_archive(
+            descriptor,
+            cache_root=tmp_path,
+            client=HttpClient(session=_ExplodingSession()),
+        )
+
+        assert result == cached
+
+
+class TestTransportErrorsAreNotBadZips:
+    """A live HTTP failure must not be reported as a malformed archive."""
+
+    def test_an_http_error_surfaces_as_a_range_read_error(self):
+        """`requests` errors are `OSError`s, which `zipfile` would swallow."""
+        session = _FailingSession()
+        handle = HttpRangeFile(
+            "https://example.org/a.zip", client=HttpClient(session=session), size=4096
+        )
+
+        with pytest.raises(RangeReadError, match="range read of"):
+            handle.read(16)
+
+
+class _FailingSession:
+    """Raises a transport error on every request."""
+
+    def head(self, url: str, **kwargs: Any) -> Any:
+        response = requests.Response()
+        response.status_code = 200
+        response.url = url
+        response.headers["Content-Length"] = "4096"
+        return response
+
+    def get(self, url: str, **kwargs: Any) -> Any:
+        raise requests.ConnectionError("connection reset")

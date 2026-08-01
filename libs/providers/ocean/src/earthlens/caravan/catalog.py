@@ -122,6 +122,10 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
         "datasets": extensions,
         "variables": variables,
         "available_datasets": sorted(extensions),
+        # The informational index, including the records deliberately not
+        # wrapped. The drift refresher reads it so a known exclusion is not
+        # reported as a new discovery on every run.
+        "extension_index": list(data.get("available_extensions") or []),
     }
     _CATALOG_CACHE[key] = parsed
     return parsed
@@ -457,6 +461,10 @@ class Catalog(AbstractCatalog):
     #: :meth:`get_dataset`'s did-you-mean hint work unchanged.
     datasets: dict[str, Extension] = Field(default_factory=dict)
     variables: dict[str, Variable] = Field(default_factory=dict)
+    #: The YAML's informational `available_extensions:` block, including the
+    #: records deliberately not wrapped. Named apart from the
+    #: :attr:`available_extensions` property, which lists the supported keys.
+    extension_index: list[dict[str, Any]] = Field(default_factory=list)
 
     @property
     def extensions(self) -> dict[str, Extension]:
