@@ -121,9 +121,8 @@ class EMDAT(AbstractDataSource):
             hazard: One disaster type or a list of them (`"flood"`,
                 `["flood", "storm"]`). Matched case- and whitespace
                 -insensitively. `None` keeps every type.
-            country: ISO3 country code to keep (`"BGD"`). `None` keeps every
-                country. Ignored for `gdis:polygons`, whose GeoPackage carries
-                no usable ISO3 column.
+            country: ISO3 country code to keep (`"BGD"`), matched
+                case-insensitively. `None` keeps every country.
             username: Earthdata Login username for the `gdis:*` sources. Falls
                 back to `EARTHDATA_USERNAME`.
             password: Earthdata Login password. Falls back to
@@ -476,10 +475,13 @@ class EMDAT(AbstractDataSource):
         from pyramids.feature.collection import FeatureCollection
 
         dataset = self._dataset
-        where = (
+        where = _helpers.combine_filters(
             _helpers.hazard_filter_sql(cast("str", dataset.type_column), self._hazards)
             if self._hazards
-            else None
+            else None,
+            _helpers.country_filter_sql(cast("str", dataset.iso_column), self._country)
+            if self._country and dataset.iso_column
+            else None,
         )
         collection = FeatureCollection.read_file(
             path, layer=dataset.layer, where=where, bbox=self._bbox

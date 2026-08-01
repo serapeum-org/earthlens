@@ -163,6 +163,39 @@ def hazard_filter_sql(column: str, hazards: list[str]) -> str:
     return f"{column} IN ({', '.join(literals)})"
 
 
+def country_filter_sql(column: str, country: str) -> str:
+    """Build an OGR attribute filter matching one ISO3 code.
+
+    GDIS stores upper-case ISO3 codes; the caller may pass any casing, so the
+    code is normalised here rather than relying on a SQL function.
+
+    Args:
+        column: The attribute column holding the ISO3 code.
+        country: The ISO3 code to keep.
+
+    Returns:
+        str: A `WHERE`-clause fragment.
+    """
+    escaped = country.strip().upper().replace("'", "''")
+    return f"{column} = '{escaped}'"
+
+
+def combine_filters(*clauses: str | None) -> str | None:
+    """Join the supplied `WHERE` fragments with `AND`.
+
+    Args:
+        *clauses: Fragments, any of which may be `None` when that filter was
+            not requested.
+
+    Returns:
+        str | None: The combined clause, or `None` when nothing was requested.
+    """
+    present = [clause for clause in clauses if clause]
+    if not present:
+        return None
+    return " AND ".join(f"({clause})" for clause in present)
+
+
 def event_years(frame: pd.DataFrame, dataset: Dataset) -> pd.Series:
     """Return the event year for every row as a nullable integer series.
 

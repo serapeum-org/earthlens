@@ -85,6 +85,7 @@ datasets:
     latitude_column: latitude
     longitude_column: longitude
     type_column: disastertype
+    iso_column: iso3
     id_column: disasterno
     start_year: 1960
     end_year: 2018
@@ -114,6 +115,7 @@ datasets:
     year_column: null
     year_from_id_prefix: true
     type_column: disastertype
+    iso_column: iso3
     id_column: disasterno
     start_year: 1960
     end_year: 2018
