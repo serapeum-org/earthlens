@@ -499,12 +499,32 @@ class TestCurate:
         result = runner.invoke(app, ["datasets", "curate", "gee", "--fill-empty"])
         assert result.exit_code == 2, "fill-empty without --write -> exit 2"
 
-    def test_fill_empty_gee_only(self):
-        """--fill-empty on a non-gee provider is rejected."""
+    def test_fill_empty_ecmwf_runs_bulk_hydrate(self, monkeypatch):
+        """ecmwf --fill-empty --write drives the ecmwf hydrate and reports a summary."""
+        from earthlens.cli import _ecmwf_hydrate as ecmwf_hydrate_mod
+
+        monkeypatch.setattr(
+            ecmwf_hydrate_mod,
+            "bulk_hydrate_empty",
+            lambda limit=None: {
+                "candidates": 4,
+                "hydrated": 3,
+                "skipped": 1,
+                "filled": ["a", "b", "c"],
+            },
+        )
+        result = runner.invoke(
+            app, ["datasets", "curate", "ecmwf", "--fill-empty", "--write"]
+        )
+        assert result.exit_code == 0, f"ecmwf fill-empty failed: {result.output}"
+        assert "hydrated 3" in result.output and "/ 4" in result.output
+
+    def test_fill_empty_unsupported_provider(self):
+        """--fill-empty on a provider that is neither gee nor ecmwf is rejected."""
         result = runner.invoke(
             app, ["datasets", "curate", "usgs_water", "--fill-empty", "--write"]
         )
-        assert result.exit_code == 2, "fill-empty non-gee -> exit 2"
+        assert result.exit_code == 2, "fill-empty unsupported -> exit 2"
 
     def test_missing_upstream_id_rejected(self):
         """curate without an upstream id (and no --fill-empty) is a usage error."""

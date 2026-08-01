@@ -754,23 +754,26 @@ def _curate_all(info, *, write: bool, limit: int | None) -> None:
 
 
 def _curate_fill_empty(info, *, write: bool, limit: int | None) -> None:
-    """Run `curate gee --fill-empty`: bulk-hydrate empty-band rows in place.
+    """Run `curate gee/ecmwf --fill-empty`: bulk-hydrate placeholder rows in place.
 
     Args:
-        info: The backend (must be gee).
+        info: The backend (gee or ecmwf).
         write: `--fill-empty` mutates the catalog, so `--write` is required.
-        limit: Only hydrate the first N empty rows (None = all).
+        limit: Only hydrate the first N placeholder rows (None = all).
     """
-    if info.provider != "gee":
-        raise typer.BadParameter("--fill-empty is only supported for gee")
     if not write:
         raise typer.BadParameter("--fill-empty rewrites the catalog; pass --write")
-    from earthlens.cli._gee_hydrate import bulk_hydrate_empty
+    if info.provider == "gee":
+        from earthlens.cli._gee_hydrate import bulk_hydrate_empty as hydrate
+    elif info.provider == "ecmwf":
+        from earthlens.cli._ecmwf_hydrate import bulk_hydrate_empty as hydrate
+    else:
+        raise typer.BadParameter("--fill-empty is only supported for gee / ecmwf")
 
-    summary = bulk_hydrate_empty(limit=limit)
+    summary = hydrate(limit=limit)
     out_console().print(
         f"[green]hydrated {summary['hydrated']}[/green] / "
-        f"{summary['candidates']} empty-band rows "
+        f"{summary['candidates']} placeholder rows "
         f"(skipped {summary['skipped']})"
     )
 
