@@ -240,11 +240,50 @@ class TestConfigure:
         """An empty EDL var is removed so it cannot mask a real credential."""
         monkeypatch.setenv("EARTHDATA_TOKEN", "")
         _install_fake(monkeypatch, _FakeEarthaccess(_FakeAuth()))
+        seen: list[str | None] = []
         auth = EmdatAuth(EmdatCredentials(netrc_path=missing_netrc))
+        monkeypatch.setattr(
+            auth,
+            "_resolve_strategy",
+            lambda: (seen.append(os.environ.get("EARTHDATA_TOKEN")), "netrc")[1],
+        )
         auth.configure()
-        import os
+        assert seen == [None]
 
-        assert os.environ.get("EARTHDATA_TOKEN") != ""
+    def test_explicit_pair_beats_an_ambient_token(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
+    ) -> None:
+        """An unrelated EARTHDATA_TOKEN must not override explicit credentials."""
+        monkeypatch.setenv("EARTHDATA_TOKEN", "someone-elses-token")
+        seen: list[str | None] = []
+        fake = _FakeEarthaccess(_FakeAuth())
+        original = fake.login
+
+        def record(**kwargs: object) -> object:
+            seen.append(os.environ.get("EARTHDATA_TOKEN"))
+            return original(**kwargs)
+
+        fake.login = record  # type: ignore[method-assign]
+        _install_fake(monkeypatch, fake)
+        EmdatAuth(
+            EmdatCredentials(
+                username="u", password=SecretStr("p"), netrc_path=missing_netrc
+            )
+        ).configure()
+        assert seen == [None]
+
+    def test_the_ambient_token_is_put_back(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
+    ) -> None:
+        """Clearing the ambient token for the login does not lose it."""
+        monkeypatch.setenv("EARTHDATA_TOKEN", "someone-elses-token")
+        _install_fake(monkeypatch, _FakeEarthaccess(_FakeAuth()))
+        EmdatAuth(
+            EmdatCredentials(
+                username="u", password=SecretStr("p"), netrc_path=missing_netrc
+            )
+        ).configure()
+        assert os.environ["EARTHDATA_TOKEN"] == "someone-elses-token"
 
     def test_unauthenticated_handle_raises(
         self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path

@@ -22,6 +22,17 @@ A first download will also fail with a `401` and *"Be sure to agree to the
 EULA"* until the account has accepted the SEDAC data licence once, in the
 Earthdata profile — authentication alone is not enough. :meth:`EmdatAuth.configure`
 surfaces that in its error text.
+
+Two consequences of `earthaccess` keeping its authenticated handle in a
+module-level global are worth knowing, and are not things this class can fix:
+
+* Once any login has succeeded in the process, a later `configure()` with
+  *different* credentials is a no-op — `earthaccess.login` hands back the
+  existing handle. One set of Earthdata credentials per process.
+* `configure()` briefly writes to `os.environ`, because `earthaccess.login`
+  accepts no credential argument. It restores what it changed, but the window
+  is process-global, so concurrent logins with different credentials in
+  separate threads are not safe. Authenticate once, up front.
 """
 
 from __future__ import annotations
@@ -177,6 +188,11 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
         `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` — so whichever explicit
         credential was supplied is exported before the login call.
 
+        An explicit credential also has to *win*: `earthaccess` prefers
+        `EARTHDATA_TOKEN` over a username/password pair, so an unrelated token
+        already in the environment would otherwise silently override what the
+        caller passed to the constructor.
+
         Returns:
             dict[str, str | None]: The previous value of every variable this
                 touched, so the caller can put the environment back. Leaving a
@@ -184,6 +200,7 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
                 inherit into any subprocess the caller later spawns.
         """
         wanted: dict[str, str] = {}
+        clear: list[str] = []
         if self._has_explicit_token() and self._creds.token is not None:
             wanted["EARTHDATA_TOKEN"] = self._creds.token.get_secret_value()
         elif (
@@ -193,8 +210,16 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
         ):
             wanted["EARTHDATA_USERNAME"] = self._creds.username
             wanted["EARTHDATA_PASSWORD"] = self._creds.password.get_secret_value()
-        previous = {name: os.environ.get(name) for name in wanted}
+            # earthaccess prefers EARTHDATA_TOKEN over a username/password pair,
+            # so an ambient token in the environment would silently beat the
+            # credentials the caller passed explicitly. Clear it for the login.
+            clear.append("EARTHDATA_TOKEN")
+
+        touched = list(wanted) + clear
+        previous = {name: os.environ.get(name) for name in touched}
         os.environ.update(wanted)
+        for name in clear:
+            os.environ.pop(name, None)
         return previous
 
     def configure(self) -> None:
@@ -218,9 +243,10 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
         # EARTHDATA_TOKEN as a real token and fails with "Token does not
         # exist", masking valid username/password env vars. Drop any empty EDL
         # env var so the strategy resolves to the credential actually set.
+        emptied: dict[str, str | None] = {}
         for var in ("EARTHDATA_TOKEN", "EARTHDATA_USERNAME", "EARTHDATA_PASSWORD"):
             if os.environ.get(var) == "":
-                os.environ.pop(var, None)
+                emptied[var] = os.environ.pop(var)
 
         try:
             import earthaccess  # lazy — only needed when actually logging in
@@ -232,9 +258,9 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
             ) from exc
 
         strategy = self._resolve_strategy()
-        previous: dict[str, str | None] = {}
+        previous: dict[str, str | None] = dict(emptied)
         if strategy == "environment":
-            previous = self._export_explicit_credentials()
+            previous.update(self._export_explicit_credentials())
 
         try:
             auth = earthaccess.login(strategy=strategy, persist=True)
