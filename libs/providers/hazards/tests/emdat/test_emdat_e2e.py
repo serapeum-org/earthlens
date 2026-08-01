@@ -7,8 +7,9 @@ them that way:
   **anonymous**, so this half needs nothing but network.
 * `gdis:points` reads a granule from NASA Earthdata Cloud, so it needs an
   Earthdata Login *and* an account that has accepted the SEDAC data-use
-  agreement. Those tests skip themselves when no credential resolves, rather
-  than failing on a machine that simply has none.
+  agreement. They carry an extra `gdis` marker, so a machine without
+  credentials deselects them on the command line rather than through an
+  environment check — this repo gates test categories with markers only.
 
 `gdis:polygons` is deliberately **not** exercised here — it is a 2.2 GB
 download, which does not belong in a routine live run. Its parsing is covered
@@ -16,12 +17,15 @@ by the unit tests against a synthetic GeoPackage.
 
 Run with:
 
+    # both halves (needs an Earthdata Login for the gdis one)
     pytest -m "e2e and emdat" libs/providers/hazards/tests/emdat
+
+    # only the anonymous half, on a machine with no credentials
+    pytest -m "e2e and emdat and not gdis" libs/providers/hazards/tests/emdat
 """
 
 from __future__ import annotations
 
-import os
 import warnings
 from pathlib import Path
 
@@ -39,34 +43,6 @@ _END = "2018-12-31"
 #: Bangladesh — reliably flood-prone, so neither source comes back empty.
 _LAT = [20.5, 26.7]
 _LON = [88.0, 92.7]
-
-
-def _netrc_has_edl() -> bool:
-    """Report whether `~/.netrc` actually holds an Earthdata entry.
-
-    Merely having a `.netrc` is not enough — plenty of machines have one for
-    unrelated hosts, and treating that as a credential would turn a skip into
-    a confusing failure.
-    """
-    netrc = Path.home() / ".netrc"
-    if not netrc.exists():
-        return False
-    return "urs.earthdata.nasa.gov" in netrc.read_text(
-        encoding="utf-8", errors="ignore"
-    )
-
-
-_HAS_EDL = bool(
-    os.getenv("EARTHDATA_TOKEN")
-    or (os.getenv("EARTHDATA_USERNAME") and os.getenv("EARTHDATA_PASSWORD"))
-    or _netrc_has_edl()
-)
-
-_needs_edl = pytest.mark.skipif(
-    not _HAS_EDL,
-    reason="no Earthdata Login credential resolved (EARTHDATA_TOKEN, "
-    "EARTHDATA_USERNAME/PASSWORD, or ~/.netrc)",
-)
 
 
 @pytest.mark.e2e
@@ -145,7 +121,7 @@ class TestEventsLive:
 
 @pytest.mark.e2e
 @pytest.mark.emdat
-@_needs_edl
+@pytest.mark.gdis
 class TestGdisPointsLive:
     """The GDIS centroid granule — needs an Earthdata Login."""
 
