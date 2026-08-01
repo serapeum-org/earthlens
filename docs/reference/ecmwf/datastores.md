@@ -71,8 +71,26 @@ shapes the request for its schema family:
 ## Curation tooling
 
 `earthlens datasets curate ecmwf <id>` seeds a loader-valid row from the live `form.json`: it resolves the store,
-guesses the `request_kind`, and enumerates the first variable. Fill in the `nc_variable` / `units` from a live
-retrieve and paste it into the right `catalog/*.yaml` shard.
+guesses the `request_kind`, and enumerates **every** variable the form exposes (each `nc_variable` / `units` seeded
+as an `unknown` placeholder). With `--write` the row is spliced into the correct `catalog/*.yaml` shard automatically
+(auto-categorised from the id prefix — `reanalysis-era5-*` → `era5.yaml`, `cams-*` → `ads.yaml`, `cems-fire-*` →
+`fire.yaml`, and so on; pass `--target <stem>` to override).
+
+Two bulk modes drive the whole catalog at once (both require `--write`, and both are idempotent — safe to re-run):
+
+- **`earthlens datasets curate ecmwf --all --write [--limit N]`** — bulk-seed every *uncurated* dataset. The uncurated
+  set is `available_datasets − datasets` (the reachable-but-unmodelled ids from `audit ecmwf --coverage`); each is
+  seeded from its live `form.json` and filed into its family shard. A dataset already curated, or whose form fetch
+  fails, is skipped. Run `refresh ecmwf --write` first so the `available_datasets:` index is populated.
+- **`earthlens datasets curate ecmwf --fill-empty --write [--limit N]`** — bulk-hydrate the placeholders. For every
+  curated row still carrying a `units: unknown` variable, it retrieves a tiny NetCDF via `cdsapi` (`~/.cdsapirc`) and
+  splices the real `nc_variable` / `units` into the stanza in place, leaving the surrounding rows untouched. It is
+  licence-gated and best-effort: a dataset whose licence is unaccepted (or whose retrieve fails) is skipped, not fatal,
+  so the fill is partial by design — re-run it as you accept more per-dataset licences.
+
+The end-to-end flow for onboarding the full inventory is therefore: `refresh ecmwf --write` (index the stores) →
+`curate ecmwf --all --write` (seed every uncurated id) → `curate ecmwf --fill-empty --write` (hydrate the placeholders
+from live retrieves).
 
 See [EWDS (GloFAS / floods)](ewds.md) for the flood-specific walkthrough and
 [Catalog & tooling](catalog.md) for the catalog layout.

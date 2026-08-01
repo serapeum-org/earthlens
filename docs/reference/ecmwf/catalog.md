@@ -19,6 +19,9 @@ support catalog work.
 | `tools/ecmwf/audit_cds_datasets.py` | Walks `available_datasets:` and reports each dataset's `constraints.json` shape — coverage planning |
 | `earthlens datasets validate ecmwf --live` | Builds a `constraints.json`-valid minimal request per dataset and runs the pre-flight `RequestValidator` (no CDS submission) |
 | `earthlens datasets probe ecmwf <id> --deep` | Submits a real tiny retrieve for one dataset and extracts its NetCDF short names and units |
+| `earthlens datasets curate ecmwf <id> [--write]` | Seeds a loader-valid row from the live `form.json` (every variable, `unknown` placeholders); `--write` auto-files it into the family shard |
+| `earthlens datasets curate ecmwf --all --write` | Bulk-seeds **every** uncurated dataset (`available_datasets − datasets`) into its family shard from live forms |
+| `earthlens datasets curate ecmwf --fill-empty --write` | Bulk-hydrates the `units: unknown` placeholders in place from live tiny retrieves (licence-gated, best-effort) |
 | `tools/ecmwf/bulk_add_remaining.py` / `bulk_apply.py` / `bulk_inject.py` | Bulk-emit and inject YAML rows for the gated-dataset families (CARRA-means, ORAS5, etc.) |
 
 ## Catalog structure
