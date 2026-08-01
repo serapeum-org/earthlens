@@ -1146,6 +1146,18 @@ def _ecmwf_per_store_get_json(url, **kw):
     return {"collections": [{"id": cid}], "links": []}
 
 
+def _ecmwf_paginated_get_json(url, **kw):
+    """Two pages per Copernicus store — page 1 links to page 2 via `rel=next`."""
+    store = "ads" if "ads.atmosphere" in url else "ewds" if "ewds" in url else "cds"
+    prefix = {"cds": "reanalysis", "ads": "cams", "ewds": "cems"}[store]
+    if "page2" in url:
+        return {"collections": [{"id": f"{prefix}-two"}], "links": []}
+    return {
+        "collections": [{"id": f"{prefix}-one"}],
+        "links": [{"rel": "next", "href": url + "?page2"}],
+    }
+
+
 class TestWriteEcmwfThroughRefreshOne:
     """Tests for refresh_one(write=True) on a generic-writer provider."""
 
@@ -1171,6 +1183,20 @@ class TestWriteEcmwfThroughRefreshOne:
             "cems-glofas-forecast",
         ):
             assert expected in catalog.available_datasets, f"{expected} unioned"
+
+    def test_pagination_follows_rel_next_across_pages(self, tmp_path, monkeypatch):
+        """`rel=next` is followed, so every page's ids land in the per-store index."""
+        info, module, dst = _catalog_copy("ecmwf", tmp_path, monkeypatch)
+        monkeypatch.setattr(refresh_mod, "_get_json", _ecmwf_paginated_get_json)
+        outcome = refresh_one(info, write=True)
+        assert outcome.status == "ok", "write succeeded"
+        module.clear_catalog_cache()
+        data = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
+        assert data["available_datasets"] == {
+            "cds": ["reanalysis-one", "reanalysis-two"],
+            "ads": ["cams-one", "cams-two"],
+            "ewds": ["cems-one", "cems-two"],
+        }, "both pages' ids per store persisted"
 
 
 class TestCuratedCollectionIds:
