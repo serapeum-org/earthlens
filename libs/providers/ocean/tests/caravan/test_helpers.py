@@ -51,11 +51,19 @@ class TestCacheDir:
         assert _helpers.cache_dir() == tmp_path / "caravan"
 
     def test_it_falls_back_to_the_platform_cache(self, monkeypatch):
-        """A hard-coded `~/.cache` would be wrong on Windows."""
+        """The fallback is delegated to platformdirs, not hard-coded.
+
+        Asserting the *absence* of a literal `~/.cache` would be wrong: that is
+        exactly what platformdirs returns on Linux, and only wrong when it is
+        hard-coded on Windows. Comparing against platformdirs itself states the
+        intent and holds on every platform.
+        """
+        import platformdirs
+
         monkeypatch.delenv("EARTHLENS_CACHE", raising=False)
 
-        assert _helpers.cache_dir().name == "caravan"
-        assert ".cache/earthlens" not in _helpers.cache_dir().as_posix()
+        expected = Path(platformdirs.user_cache_dir("earthlens")) / "caravan"
+        assert _helpers.cache_dir() == expected
 
 
 class TestResolveRecord:

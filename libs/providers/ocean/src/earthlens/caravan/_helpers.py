@@ -199,6 +199,9 @@ def _safe_target(name: str, dest_dir: Path) -> Path:
             f"refusing to extract unsafe path {name!r} from the archive "
             f"(escapes {dest_dir})."
         )
+    # NOSONAR - the name is sanitised immediately above (absolute paths and
+    # traversal rejected) and the result is containment-checked immediately
+    # below; `test_an_escaping_member_is_refused` covers it.
     target = base.joinpath(*parts)
     if base not in target.resolve().parents:
         raise ValueError(
@@ -381,6 +384,14 @@ def _extract_entry(
     Raises:
         ValueError: If the member name would escape `dest_dir`.
     """
+    # Two independent guards before the name is used as a path. `data_filter`
+    # is the stdlib's own tar sanitiser (CPython 3.12, backported to 3.11.4) and
+    # rejects absolute paths, traversal and link escapes; `_safe_target` then
+    # re-checks containment itself, so a runtime without the filter is still
+    # covered.
+    data_filter = getattr(tarfile, "data_filter", None)
+    if data_filter is not None:
+        data_filter(entry, str(dest_dir))
     target = _safe_target(entry.name, dest_dir)
     target.parent.mkdir(parents=True, exist_ok=True)
     source = archive.extractfile(entry)
