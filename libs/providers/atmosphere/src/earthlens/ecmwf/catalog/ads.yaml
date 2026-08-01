@@ -61,7 +61,6 @@ datasets:
       input_observations: [surface]
       time_aggregation: [instantaneous]
       version: [latest]
-      product_type: null
       data_format: null
     variables:
       carbon-dioxide:
@@ -91,7 +90,6 @@ datasets:
       model: [ensemble]
       level: ["0"]
       type: [validated_reanalysis]
-      product_type: null
       data_format: null
     variables:
       carbon-monoxide:

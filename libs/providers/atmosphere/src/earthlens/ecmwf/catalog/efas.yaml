@@ -55,6 +55,10 @@ datasets:
     extras:
       system_version: [version_5_0]
       model_levels: surface_level
+      # This row pairs the 6-hour discharge product (dis06) with leadtime_hour
+      # 24. 24 is a valid multiple of the 6-hour step, but whether dis06 accepts
+      # a 24-hour lead is LIVE-UNVERIFIED — confirm against the live form.json
+      # when the EFAS licence is accepted (the other rows pair dis24 with 24).
       leadtime_hour: ["24"]
       time: ["00:00"]
       download_format: unarchived
