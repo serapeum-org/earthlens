@@ -71,32 +71,32 @@ datasets:
     variables:
       aerosol-optical-depth:
         cds_variable: aerosol_optical_depth
-        nc_variable: aerosol_optical_depth
-        units: unknown
+        nc_variable: FM_AOD550_mean
+        units: '1'
       fine-mode-aerosol-optical-depth:
         cds_variable: fine_mode_aerosol_optical_depth
-        nc_variable: fine_mode_aerosol_optical_depth
-        units: unknown
+        nc_variable: FM_AOD550_median
+        units: '1'
       dust-aerosol-optical-depth:
         cds_variable: dust_aerosol_optical_depth
-        nc_variable: dust_aerosol_optical_depth
-        units: unknown
+        nc_variable: AOD550_mean
+        units: '1'
       single-scattering-albedo:
         cds_variable: single_scattering_albedo
-        nc_variable: single_scattering_albedo
-        units: unknown
+        nc_variable: AOD670_mean
+        units: '1'
       aerosol-layer-height:
         cds_variable: aerosol_layer_height
-        nc_variable: aerosol_layer_height
-        units: unknown
+        nc_variable: AOD1600_mean
+        units: '1'
       dust-aerosol-layer-height:
         cds_variable: dust_aerosol_layer_height
-        nc_variable: dust_aerosol_layer_height
-        units: unknown
+        nc_variable: AOD550_median
+        units: '1'
       aerosol-extinction-coefficient:
         cds_variable: aerosol_extinction_coefficient
-        nc_variable: aerosol_extinction_coefficient
-        units: unknown
+        nc_variable: AOD670_median
+        units: '1'
   satellite-albedo:
     endpoint: cds
     request_kind: satellite_cdr
@@ -111,20 +111,20 @@ datasets:
     variables:
       albb-bh:
         cds_variable: albb_bh
-        nc_variable: albb_bh
-        units: unknown
+        nc_variable: AL_BH_BB
+        units: '1'
       albb-dh:
         cds_variable: albb_dh
-        nc_variable: albb_dh
-        units: unknown
+        nc_variable: AL_BH_BB_ERR
+        units: '1'
       alsp-bh:
         cds_variable: alsp_bh
-        nc_variable: alsp_bh
-        units: unknown
+        nc_variable: AL_BH_NI
+        units: '1'
       alsp-dh:
         cds_variable: alsp_dh
-        nc_variable: alsp_dh
-        units: unknown
+        nc_variable: AL_BH_NI_ERR
+        units: '1'
   satellite-carbon-dioxide:
     endpoint: cds
     request_kind: satellite_cdr
@@ -140,12 +140,12 @@ datasets:
     variables:
       co2:
         cds_variable: co2
-        nc_variable: co2
-        units: unknown
+        nc_variable: lat_bnds
+        units: degrees_north
       xco2:
         cds_variable: xco2
-        nc_variable: xco2
-        units: unknown
+        nc_variable: lon_bnds
+        units: degrees_east
   satellite-cloud-properties:
     endpoint: cds
     request_kind: satellite_cdr
@@ -159,32 +159,32 @@ datasets:
     variables:
       cloud-fraction:
         cds_variable: cloud_fraction
-        nc_variable: cloud_fraction
-        units: unknown
+        nc_variable: lat_bnds
+        units: ''
       cloud-top-level:
         cds_variable: cloud_top_level
-        nc_variable: cloud_top_level
-        units: unknown
+        nc_variable: lon_bnds
+        units: ''
       cloud-physical-properties-of-the-ice-phase:
         cds_variable: cloud_physical_properties_of_the_ice_phase
-        nc_variable: cloud_physical_properties_of_the_ice_phase
-        units: unknown
+        nc_variable: nobs_ice_cot
+        units: counts
       cloud-physical-properties-of-the-liquid-phase:
         cds_variable: cloud_physical_properties_of_the_liquid_phase
-        nc_variable: cloud_physical_properties_of_the_liquid_phase
-        units: unknown
+        nc_variable: nobs_ice_cre
+        units: counts
       cloud-phase:
         cds_variable: cloud_phase
-        nc_variable: cloud_phase
-        units: unknown
+        nc_variable: SZA
+        units: degrees
       joint-cloud-property-histogram:
         cds_variable: joint_cloud_property_histogram
-        nc_variable: joint_cloud_property_histogram
-        units: unknown
+        nc_variable: SZA_std
+        units: degrees
       all-variables:
         cds_variable: all_variables
-        nc_variable: all_variables
-        units: unknown
+        nc_variable: iwp
+        units: kg/m2
   satellite-earth-radiation-budget:
     endpoint: cds
     request_kind: satellite_cdr
@@ -199,20 +199,20 @@ datasets:
     variables:
       incoming-shortwave-radiation:
         cds_variable: incoming_shortwave_radiation
-        nc_variable: incoming_shortwave_radiation
-        units: unknown
+        nc_variable: pixel_count
+        units: '1'
       outgoing-longwave-radiation:
         cds_variable: outgoing_longwave_radiation
-        nc_variable: outgoing_longwave_radiation
-        units: unknown
+        nc_variable: olr
+        units: W m-2
       outgoing-shortwave-radiation:
         cds_variable: outgoing_shortwave_radiation
-        nc_variable: outgoing_shortwave_radiation
-        units: unknown
+        nc_variable: cloud_count
+        units: '1'
       total-solar-irradiance:
         cds_variable: total_solar_irradiance
-        nc_variable: total_solar_irradiance
-        units: unknown
+        nc_variable: rsf
+        units: W m-2
       spectral-solar-irradiance:
         cds_variable: spectral_solar_irradiance
         nc_variable: spectral_solar_irradiance
