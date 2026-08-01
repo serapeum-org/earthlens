@@ -185,6 +185,23 @@ class TestCuratedApiMultiMemberZip:
         assert out.parent == member_dir, "returns a member under the sibling dir"
         assert sorted(p.name for p in member_dir.glob("*.nc")) == ["2020.nc", "2021.nc"]
 
+    def test_masks_every_member(self, tmp_path):
+        """`_api` masks each extracted member, not only the first."""
+        backend = _curated_backend(tmp_path)
+        backend._client_for = lambda endpoint: _ZipClient(["2020.nc", "2021.nc"])
+        masked: list[str] = []
+        backend._mask_netcdf_to_geometry = lambda p: masked.append(p.name)
+        var = Variable(
+            cds_dataset="satellite-soil-moisture",
+            cds_variable="volumetric_surface_soil_moisture",
+            nc_variable="sm",
+            units="m3 m-3",
+            request_kind="satellite_cdr",
+            extras={"data_format": "zip"},
+        )
+        backend._api(var)
+        assert sorted(masked) == ["2020.nc", "2021.nc"], "each member masked once"
+
     def test_non_aggregate_returns_all_members(self, tmp_path):
         """A multi-member curated retrieve returns every member, not just one."""
         from earthlens.ecmwf import Catalog
