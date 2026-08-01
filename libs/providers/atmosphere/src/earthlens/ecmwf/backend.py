@@ -241,6 +241,35 @@ def _detect_output_format(target: Path) -> str:
     return "unknown"
 
 
+def _unique_dest(out_dir: Path, basename: str, taken: list[Path]) -> Path:
+    """Return a collision-free destination under `out_dir` for a member basename.
+
+    Two zip members flattened to the same basename (from different in-zip
+    subdirectories) would overwrite each other; suffix `_1`, `_2`, … on collision
+    and log, so no member is silently lost.
+
+    Args:
+        out_dir: The directory members are extracted into.
+        basename: The member's flattened (basename-only) filename.
+        taken: The destinations already used in this extraction.
+
+    Returns:
+        Path: A path under `out_dir` present in neither `taken` nor on disk.
+    """
+    dest = out_dir / basename
+    if dest not in taken and not dest.exists():
+        return dest
+    stem, suffix = dest.stem, dest.suffix
+    n = 1
+    while (candidate := out_dir / f"{stem}_{n}{suffix}") in taken or candidate.exists():
+        n += 1
+    logger.warning(
+        f"zip member basename {basename!r} collided in {out_dir.name}/; wrote "
+        f"{candidate.name} instead of overwriting an already-extracted member"
+    )
+    return candidate
+
+
 def _unpack_netcdf_archive(target: Path) -> list[Path]:
     r"""Unpack a zip-of-NetCDF response into its member NetCDFs.
 
@@ -277,7 +306,10 @@ def _unpack_netcdf_archive(target: Path) -> list[Path]:
     extracted: list[Path] = []
     with zipfile.ZipFile(target) as archive:
         for name in members:
-            dest = out_dir / Path(name).name
+            # Flatten to the basename to defeat path traversal, then de-collide:
+            # two members from different in-zip subdirs (`2020/d.nc`, `2021/d.nc`)
+            # share a basename, and writing both to it would silently drop one.
+            dest = _unique_dest(out_dir, Path(name).name, extracted)
             with archive.open(name) as src, dest.open("wb") as dst:
                 shutil.copyfileobj(src, dst)
             extracted.append(dest)

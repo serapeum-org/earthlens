@@ -105,6 +105,17 @@ class TestUnpackArchive:
         assert all((tmp_path / "evil") in p.parents for p in out), "no escape"
         assert not (tmp_path.parent.parent / "escape.nc").exists()
 
+    def test_basename_collision_de_duplicated(self, tmp_path):
+        """Two members sharing a basename both extract (no silent overwrite)."""
+        target = tmp_path / "cdr.zip"
+        with zipfile.ZipFile(target, "w") as archive:
+            archive.writestr("2020/data.nc", b"CDF2020")
+            archive.writestr("2021/data.nc", b"CDF2021")
+        out = _unpack_netcdf_archive(target)
+        assert len(out) == 2, "both members kept"
+        assert {p.read_bytes() for p in out} == {b"CDF2020", b"CDF2021"}
+        assert sorted(p.name for p in out) == ["data.nc", "data_1.nc"]
+
 
 class _ZipClient:
     """Fake cdsapi client whose retrieve writes a multi-member zip to `target`."""
