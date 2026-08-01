@@ -76,6 +76,28 @@ class TestEcmwfEmitter:
         assert result.row["endpoint"] == "ads"
         assert result.row["request_kind"] == "cams_date"
 
+    def test_fire_form_seeds_fire_not_satellite(self, monkeypatch):
+        """A grid + `dataset_type` form (no leadtime_hour) seeds a `fire` row."""
+        form = [
+            {"name": "dataset_type", "details": {}},
+            {"name": "grid", "details": {}},
+            {"name": "variable", "details": {"values": ["fire_weather_index"]}},
+        ]
+        monkeypatch.setattr(stanza_mod, "_get_json", lambda url, **kw: form)
+        result = emit_stanza(_info("ecmwf"), "cems-fire-historical-v1")
+        assert result.status == "ok"
+        assert result.row["request_kind"] == "fire"
+
+    def test_grid_form_without_dataset_type_seeds_satellite_cdr(self, monkeypatch):
+        """A grid form with no `dataset_type` / leadtime_hour seeds satellite_cdr."""
+        form = [
+            {"name": "grid", "details": {}},
+            {"name": "variable", "details": {"values": ["surface_soil_moisture"]}},
+        ]
+        monkeypatch.setattr(stanza_mod, "_get_json", lambda url, **kw: form)
+        result = emit_stanza(_info("ecmwf"), "satellite-soil-moisture")
+        assert result.row["request_kind"] == "satellite_cdr"
+
 
 class TestErddapEmitter:
     """Tests for the ERDDAP emitter (seeds from `/info`, network mocked)."""

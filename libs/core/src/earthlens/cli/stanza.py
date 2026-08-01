@@ -775,7 +775,9 @@ def _ecmwf_request_kind(form: list[Any]) -> str:
     if "year" in fields and "day" not in fields:
         return "seasonal"
     if "grid" in fields and "leadtime_hour" not in fields:
-        return "satellite_cdr"
+        # CEMS fire-danger forms carry a `dataset_type` selector alongside the
+        # grid; satellite CDRs carry the grid but no `dataset_type`.
+        return "fire" if "dataset_type" in fields else "satellite_cdr"
     return "form"
 
 
