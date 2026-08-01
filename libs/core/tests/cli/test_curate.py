@@ -1055,24 +1055,33 @@ class TestDeepSamplers:
         cdsapi.Client = lambda: types.SimpleNamespace(
             retrieve=lambda ds, req, target: open(target, "w").close()
         )
-        netcdf = types.ModuleType("netCDF4")
-
-        class _Handle:
-            variables = {
-                "t2m": types.SimpleNamespace(long_name="2 metre temperature", units="K")
-            }
-
-            def __enter__(self):
-                return self
-
-            def __exit__(self, *a):
-                return False
-
-        netcdf.Dataset = lambda path: _Handle()
         monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
-        monkeypatch.setitem(sys.modules, "netCDF4", netcdf)
+        monkeypatch.setattr(
+            curate_mod,
+            "_read_netcdf_var_meta",
+            lambda path: {"t2m": {"long_name": "2 metre temperature", "units": "K"}},
+        )
         out = curate_mod._ecmwf_deep_sample("reanalysis-era5-single-levels")
         assert out["t2m"]["units"] == "K", "retrieved var units read"
+
+    def test_read_netcdf_var_meta_via_gdal(self, tmp_path):
+        """_read_netcdf_var_meta reads long_name/units from a NetCDF via GDAL."""
+        import numpy as np
+        import xarray as xr
+
+        path = tmp_path / "probe.nc"
+        xr.Dataset(
+            {
+                "t2m": (
+                    ("lat", "lon"),
+                    np.ones((2, 2), "f4"),
+                    {"units": "K", "long_name": "2 metre temperature"},
+                )
+            },
+            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
+        ).to_netcdf(path)
+        meta = curate_mod._read_netcdf_var_meta(str(path))
+        assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
 
     def test_ecmwf_deep_sample_no_constraints(self, monkeypatch):
         """No constraints rows yields an empty schema (after the SDK imports)."""

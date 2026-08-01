@@ -1073,6 +1073,46 @@ def _earthdata_deep_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any
     )
 
 
+def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
+    """Read each NetCDF variable's `long_name` / `units` via GDAL.
+
+    Uses the GDAL vendored by `pyramids` (no hard `netCDF4` dependency): GDAL
+    surfaces the CF attributes as band metadata, exposing a multi-variable file
+    as one subdataset per variable.
+
+    Args:
+        path: Path to a NetCDF file written by a `cdsapi` retrieve.
+
+    Returns:
+        A `{variable_name: {"long_name": ..., "units": ...}}` mapping for every
+        variable that carries a `long_name` or `units` attribute.
+    """
+    from osgeo import gdal
+
+    gdal.UseExceptions()
+
+    def _from_info(info: dict[str, Any]) -> dict[str, dict[str, Any]]:
+        """Extract per-band `NETCDF_VARNAME` / long_name / units from gdal.Info."""
+        out: dict[str, dict[str, Any]] = {}
+        for band in info.get("bands", []) or []:
+            meta = band.get("metadata", {}).get("", {})
+            name = meta.get("NETCDF_VARNAME")
+            long_name, units = meta.get("long_name", ""), meta.get("units", "")
+            if name and (long_name or units):
+                out[str(name)] = {"long_name": long_name, "units": units}
+        return out
+
+    top = gdal.Info(path, format="json")
+    subs = top.get("metadata", {}).get("SUBDATASETS", {})
+    if not subs:
+        return _from_info(top)
+    schema: dict[str, dict[str, Any]] = {}
+    for key, sub_path in subs.items():
+        if key.endswith("_NAME"):
+            schema.update(_from_info(gdal.Info(sub_path, format="json")))
+    return schema
+
+
 def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     """Retrieve a tiny CDS NetCDF and read each variable's long_name/units.
 
@@ -1083,7 +1123,6 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     from pathlib import Path
 
     import cdsapi
-    import netCDF4  # noqa: F401 — the reader below
 
     rows = _ecmwf_constraints(dataset)
     if not rows:
@@ -1105,14 +1144,7 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     }
     target = Path(tempfile.mkdtemp()) / "probe.nc"
     cdsapi.Client().retrieve(dataset, request, str(target))
-    with netCDF4.Dataset(str(target)) as handle:  # noqa: F821 — imported above
-        schema: dict[str, dict[str, Any]] = {}
-        for name, variable in handle.variables.items():
-            long_name = getattr(variable, "long_name", "")
-            units = getattr(variable, "units", "")
-            if long_name or units:
-                schema[str(name)] = {"long_name": long_name, "units": units}
-    return schema
+    return _read_netcdf_var_meta(str(target))
 
 
 def _ecmwf_deep_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
