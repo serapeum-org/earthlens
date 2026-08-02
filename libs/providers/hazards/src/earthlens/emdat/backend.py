@@ -161,8 +161,11 @@ class EMDAT(AbstractDataSource):
 
         self._catalog = Catalog()
         self._dataset: Dataset = self._catalog.get(ids[0])
-        if country is not None and not (
-            len(country.strip()) == 3 and country.strip().isalpha()
+        # `isascii()` as well as `isalpha()`: the latter alone accepts letters
+        # like 'Ð', which no ISO3 code contains.
+        stripped = country.strip() if country is not None else None
+        if stripped is not None and not (
+            len(stripped) == 3 and stripped.isalpha() and stripped.isascii()
         ):
             raise ValueError(
                 f"country= must be a 3-letter ISO3 code (e.g. 'BGD'); got "
@@ -463,6 +466,13 @@ class EMDAT(AbstractDataSource):
         # Reuse whatever a previous run left behind. earthaccess does not
         # guarantee the catalogued file name, so fall back to the extracted
         # member before deciding a re-download is needed.
+        # The already-unpacked member is checked first: when it is present the
+        # granule is not needed at all, so a truncated archive next to it is
+        # nothing to act on.
+        extracted = self.root_dir / Path(cast("str", dataset.member)).name
+        if extracted.exists():
+            return extracted
+
         local = self.root_dir / Path(cast("str", dataset.granule)).name
         if local.exists():
             # earthaccess offers no atomicity guarantee, unlike HttpClient's
@@ -473,12 +483,9 @@ class EMDAT(AbstractDataSource):
                 return local
             logger.warning(
                 f"EMDAT {dataset.id}: {local.name} is not a readable zip "
-                "(a previous download was probably interrupted); re-fetching."
+                "(a previous download was probably interrupted); re-fetching it."
             )
             local.unlink()
-        extracted = self.root_dir / Path(cast("str", dataset.member)).name
-        if extracted.exists():
-            return extracted
 
         self._warn_if_large()
         self.authenticate()
@@ -648,7 +655,14 @@ class EMDAT(AbstractDataSource):
         )
         if not any(applied):
             return f"{stem}.csv"
-        request = (tuple(self._hazards), self._country, self._year_range, self._bbox)
+        # Sorted: hazard=['flood', 'storm'] and ['storm', 'flood'] are the same
+        # request and must resolve to the same file.
+        request = (
+            tuple(sorted(self._hazards)),
+            self._country,
+            self._year_range,
+            self._bbox,
+        )
         digest = hashlib.sha1(
             repr(request).encode(), usedforsecurity=False
         ).hexdigest()[:8]

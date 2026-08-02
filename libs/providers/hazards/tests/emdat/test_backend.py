@@ -120,7 +120,7 @@ class TestConstruction:
         with pytest.raises(ValueError, match="gdis:points"):
             EMDAT(variables=["gdis:points"], hazard=hazard, path=str(tmp_path))
 
-    @pytest.mark.parametrize("country", ["BG", "BANGLA", "B1D", ""])
+    @pytest.mark.parametrize("country", ["BG", "BANGLA", "B1D", "", "BGÐ", "ÅÅÅ"])
     def test_bad_country_code_rejected(self, tmp_path: Path, country: str) -> None:
         """A malformed ISO3 fails loudly rather than filtering everything away."""
         with pytest.raises(ValueError, match="3-letter ISO3"):
@@ -268,6 +268,26 @@ class TestEventsRoute:
         _events_backend(tmp_path, http).download()
         assert (tmp_path / "emdat_events.csv").is_file()
 
+    def test_hazard_order_does_not_change_the_filename(self, tmp_path: Path) -> None:
+        """The same request written two ways resolves to one output file."""
+        forward = EMDAT(
+            variables=["emdat:events"],
+            hazard=["flood", "storm"],
+            path=str(tmp_path),
+        )
+        reverse = EMDAT(
+            variables=["emdat:events"],
+            hazard=["storm", "flood"],
+            path=str(tmp_path),
+        )
+        assert forward._result_filename() == reverse._result_filename()
+
+    def test_a_different_filter_changes_the_filename(self, tmp_path: Path) -> None:
+        """A genuinely different request gets its own file."""
+        one = EMDAT(variables=["emdat:events"], country="BGD", path=str(tmp_path))
+        two = EMDAT(variables=["emdat:events"], country="PAK", path=str(tmp_path))
+        assert one._result_filename() != two._result_filename()
+
     def test_differently_filtered_requests_do_not_overwrite(
         self, tmp_path: Path, dataverse_listing: dict[str, Any], events_workbook: Path
     ) -> None:
@@ -277,18 +297,6 @@ class TestEventsRoute:
         _events_backend(tmp_path, http, country="OTH").download()
         written = sorted(p.name for p in tmp_path.glob("emdat_events*.csv"))
         assert len(written) == 2, written
-
-    def test_a_truncated_cached_granule_is_refetched(
-        self, tmp_path: Path, gdis_csv_zip: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """A corrupt granule left by an interrupted fetch is replaced, not reused."""
-        corrupt = tmp_path / "pend-gdis-1960-2018-disasterlocations-csv.zip"
-        corrupt.write_bytes(b"PK truncated")
-        fake = FakeEarthaccess([FakeGranule(_GDIS_LINK)], gdis_csv_zip)
-        monkeypatch.setitem(sys.modules, "earthaccess", fake)
-        result = _points_backend(tmp_path).download()
-        assert len(result) > 0
-        assert len(fake.searched) == 1
 
     def test_source_file_is_reused(
         self, tmp_path: Path, dataverse_listing: dict[str, Any], events_workbook: Path
@@ -443,6 +451,32 @@ class TestGdisPointsRoute:
         result = _points_backend(tmp_path).download()
         assert len(result) > 0
         assert fake.searched == []
+
+    def test_a_truncated_cached_granule_is_refetched(
+        self, tmp_path: Path, gdis_csv_zip: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A corrupt granule left by an interrupted fetch is replaced, not reused."""
+        corrupt = tmp_path / "pend-gdis-1960-2018-disasterlocations-csv.zip"
+        corrupt.write_bytes(b"PK truncated")
+        fake = FakeEarthaccess([FakeGranule(_GDIS_LINK)], gdis_csv_zip)
+        monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        result = _points_backend(tmp_path).download()
+        assert len(result) > 0
+        assert len(fake.searched) == 1
+
+    def test_an_extracted_member_wins_over_a_corrupt_granule(
+        self, tmp_path: Path, gdis_csv_frame, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A usable unpacked member means the granule is never inspected."""
+        member = tmp_path / "pend-gdis-1960-2018-disasterlocations.csv"
+        gdis_csv_frame.to_csv(member, index=False, encoding="latin-1")
+        corrupt = tmp_path / "pend-gdis-1960-2018-disasterlocations-csv.zip"
+        corrupt.write_bytes(b"not a zip at all")
+        fake = FakeEarthaccess([FakeGranule(_GDIS_LINK)])
+        monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        result = _points_backend(tmp_path).download()
+        assert len(result) > 0
+        assert corrupt.exists(), "an unread granule must not be deleted"
 
     def test_missing_granule_is_reported(
         self, tmp_path: Path, gdis_csv_zip: Path, monkeypatch: pytest.MonkeyPatch
