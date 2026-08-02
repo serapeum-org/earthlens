@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20618,7 +20618,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </style>
 <!-- End of mermaid configuration --><div class="jupyter-wrapper">
 <div class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7b18c830">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20636,7 +20636,7 @@ shows the download call without running it.</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0d8eaeb0">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20649,7 +20649,7 @@ do not share a path shape.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=bf1842e8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20675,15 +20675,14 @@ do not share a path shape.</p>
 <div class="clipboard-copy-txt" id="cell-1">from earthlens.mswep import Catalog
 
 catalog = Catalog()
-catalog.products()
-</div>
+catalog.products()</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=68fe76fd">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20707,15 +20706,14 @@ catalog.products()
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">for key in catalog.products():
     product = catalog.get_product(key)
-    print(f'{key:6} {product.path_template}')
+    print(f'{key:6} {product.path_template}')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=93ad5182">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20730,7 +20728,7 @@ instead of failing.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1d0ea16d">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20754,15 +20752,14 @@ instead of failing.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">mswep, mswx = catalog.get_product('mswep'), catalog.get_product('mswx')
 print('mswep needs a variable folder:', mswep.needs_variable_folder)
-print('mswx  needs a variable folder:', mswx.needs_variable_folder)
+print('mswx  needs a variable folder:', mswx.needs_variable_folder)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=403b9827">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20775,7 +20772,7 @@ than tidiness: GloH2O reports that V3.15/V3.16 read artificially low over
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fda14007">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20803,15 +20800,14 @@ than tidiness: GloH2O reports that V3.15/V3.16 read artificially low over
     flag = ' (provisional)' if row.provisional else ''
     print(f'{version:5} -&gt; {row.root}{flag}')
     if row.description:
-        print(f'        {row.description.strip()[:90]}')
+        print(f'        {row.description.strip()[:90]}')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8fd287f4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20825,7 +20821,7 @@ catalog refuses it.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d4bcd3a9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20855,15 +20851,14 @@ catalog refuses it.</p>
 try:
     Catalog.check_not_provisional(mswep.versions['3.16'], 'the V3.16 root')
 except ProvisionalValueError as exc:
-    print(str(exc)[:220], '...')
+    print(str(exc)[:220], '...')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8ef899ac">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20876,7 +20871,7 @@ itself, so a window crossing the boundary spans both.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1702bdd9">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=11">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20898,15 +20893,14 @@ itself, so a window crossing the boundary spans both.</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">name</span><span class="si">:</span><span class="s1">13</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">start</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">end</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">"now"</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-6">for name, row in mswep.variants.items():
-    print(f'{name:13} {row.start} -&gt; {row.end or "now"}')
-</div>
+    print(f'{name:13} {row.start} -&gt; {row.end or "now"}')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=d4353abb">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20934,15 +20928,14 @@ itself, so a window crossing the boundary spans both.</p>
 
 for day in ['2020-04-25', '2024-12-31', '2025-01-01', '2026-06-01']:
     date = dt.date.fromisoformat(day)
-    print(f'{day}  -&gt;  {mswep.variant_for(date)}')
+    print(f'{day}  -&gt;  {mswep.variant_for(date)}')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3a013755">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=13">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20956,7 +20949,7 @@ preserves verbatim rather than normalising.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0a753f4f">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=14">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -20984,15 +20977,14 @@ preserves verbatim rather than normalising.</p>
 
 for key, row in mswep.resolutions.items():
     name = f'{stamp.strftime(row.stem)}.nc'
-    print(f'{key:9} {row.folder:8} {name:16} {row.units}')
+    print(f'{key:9} {row.folder:8} {name:16} {row.units}')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ddfe9831">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=15">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21004,7 +20996,7 @@ example straight out of the MSWEP V3.16 documentation:</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=fb984a51">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=16">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21026,27 +21018,34 @@ example straight out of the MSWEP V3.16 documentation:</p>
 <span class="n">hourly</span> <span class="o">=</span> <span class="n">mswep</span><span class="o">.</span><span class="n">resolutions</span><span class="p">[</span><span class="s1">'hourly'</span><span class="p">]</span>
 <span class="n">root</span> <span class="o">=</span> <span class="n">mswep</span><span class="o">.</span><span class="n">versions</span><span class="p">[</span><span class="s1">'3.15'</span><span class="p">]</span><span class="o">.</span><span class="n">root</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">mswep</span><span class="o">.</span><span class="n">path_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-    <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span> <span class="n">variant</span><span class="o">=</span><span class="n">variant</span><span class="p">,</span> <span class="n">temporal</span><span class="o">=</span><span class="n">hourly</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span>
-    <span class="n">stem</span><span class="o">=</span><span class="n">stamp</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">hourly</span><span class="o">.</span><span class="n">stem</span><span class="p">),</span>
-<span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="n">mswep</span><span class="o">.</span><span class="n">path_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">root</span><span class="o">=</span><span class="n">root</span><span class="p">,</span>
+        <span class="n">variant</span><span class="o">=</span><span class="n">variant</span><span class="p">,</span>
+        <span class="n">temporal</span><span class="o">=</span><span class="n">hourly</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span>
+        <span class="n">stem</span><span class="o">=</span><span class="n">stamp</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">hourly</span><span class="o">.</span><span class="n">stem</span><span class="p">),</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-9">variant = mswep.variant_for(stamp.date())
 hourly = mswep.resolutions['hourly']
 root = mswep.versions['3.15'].root
 
-print(mswep.path_template.format(
-    root=root, variant=variant, temporal=hourly.folder,
-    stem=stamp.strftime(hourly.stem),
-))
+print(
+    mswep.path_template.format(
+        root=root,
+        variant=variant,
+        temporal=hourly.folder,
+        stem=stamp.strftime(hourly.stem),
+    )
+)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=070e9128">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=17">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21059,7 +21058,7 @@ be refused until someone with access verifies them.</p>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1fb13815">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=18">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21083,15 +21082,14 @@ be refused until someone with access verifies them.</p>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-10">for name, row in mswx.variables.items():
     mark = 'provisional' if row.provisional else 'confirmed'
-    print(f'{name:8} {mark:12} {row.long_name}')
+    print(f'{name:8} {mark:12} {row.long_name}')</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=85afdee5">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=19">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21103,7 +21101,7 @@ required. Every <code>download()</code> emits a <code>LicenseWarning</code> carr
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=58db7092">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=20">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -21127,15 +21125,14 @@ required. Every <code>download()</code> emits a <code>LicenseWarning</code> carr
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-11">print(catalog.license_id)
 print()
-print(catalog.attribution)
+print(catalog.attribution)</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=38317a05">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=21">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
