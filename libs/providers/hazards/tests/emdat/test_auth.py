@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 import pytest
+import requests
 from pydantic import SecretStr, ValidationError
 
 from earthlens.base import AuthenticationError
@@ -37,6 +38,29 @@ class _FakeEarthaccess:
         if isinstance(self.result, Exception):
             raise self.result
         return self.result
+
+
+class _FlakyEarthaccess:
+    """A login that fails with a transport error before it succeeds."""
+
+    def __init__(self, failures: int, error: Exception) -> None:
+        """Fail the first `failures` calls with `error`, then return a handle."""
+        self.failures = failures
+        self.error = error
+        self.calls: list[dict[str, object]] = []
+
+    def login(self, **kwargs: object) -> object:
+        """Record the call and fail until the failure budget is spent."""
+        self.calls.append(kwargs)
+        if len(self.calls) <= self.failures:
+            raise self.error
+        return _FakeAuth()
+
+
+@pytest.fixture(autouse=True)
+def _no_login_backoff(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Collapse the retry back-off so the retry tests do not really wait."""
+    monkeypatch.setattr("time.sleep", lambda seconds: None)
 
 
 @pytest.fixture(autouse=True)
@@ -348,6 +372,45 @@ class TestConfigure:
         )
         with pytest.raises(AuthenticationError, match="unaccepted_eulas"):
             auth.configure()
+
+    def test_a_dropped_connection_is_retried(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
+    ) -> None:
+        """EDL is a remote service, so one unreachable moment is not fatal."""
+        fake = _FlakyEarthaccess(2, requests.ConnectionError("network unreachable"))
+        _install_fake(monkeypatch, fake)
+        auth = EmdatAuth(
+            EmdatCredentials(token=SecretStr("t"), netrc_path=missing_netrc)
+        )
+        auth.configure()
+        assert auth.is_authenticated()
+        assert len(fake.calls) == 3
+
+    def test_an_unreachable_edl_is_reported_as_a_network_failure(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
+    ) -> None:
+        """When every attempt fails the error says so, not "bad credential"."""
+        fake = _FlakyEarthaccess(99, requests.ConnectTimeout("timed out"))
+        _install_fake(monkeypatch, fake)
+        auth = EmdatAuth(
+            EmdatCredentials(token=SecretStr("t"), netrc_path=missing_netrc)
+        )
+        with pytest.raises(AuthenticationError, match="network failure"):
+            auth.configure()
+        assert len(fake.calls) == 3
+
+    def test_a_refused_credential_is_not_retried(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
+    ) -> None:
+        """A rejected login is final, so retrying it would only waste time."""
+        fake = _FlakyEarthaccess(99, RuntimeError("bad credential"))
+        _install_fake(monkeypatch, fake)
+        auth = EmdatAuth(
+            EmdatCredentials(token=SecretStr("t"), netrc_path=missing_netrc)
+        )
+        with pytest.raises(AuthenticationError, match="bad credential"):
+            auth.configure()
+        assert len(fake.calls) == 1
 
     def test_login_exception_is_wrapped(
         self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path

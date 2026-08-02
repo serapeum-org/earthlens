@@ -38,13 +38,23 @@ module-level global are worth knowing, and are not things this class can fix:
 from __future__ import annotations
 
 import os
+import time
 from pathlib import Path
 from typing import Any
 
+import requests
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 from earthlens.base import AbstractAuth, AuthenticationError
+
+#: Attempts at `earthaccess.login` before a transport failure is fatal. EDL is
+#: a remote identity provider reached over the network, so a dropped connection
+#: says nothing about whether the credential is valid.
+_LOGIN_ATTEMPTS = 3
+
+#: Base seconds for the back-off between login attempts (wait = base * 2**n).
+_LOGIN_BACKOFF = 1.0
 
 #: Where a user without an Earthdata account registers (free).
 _REGISTER_URL = "https://urs.earthdata.nasa.gov/users/new"
@@ -252,6 +262,54 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
             os.environ.pop(name, None)
         return previous
 
+    def _login(self, earthaccess: Any, strategy: str) -> Any:
+        """Call `earthaccess.login`, retrying a transport failure.
+
+        A refused credential is final and raises on the first attempt. A
+        dropped connection to `urs.earthdata.nasa.gov` is not evidence about
+        the credential at all, so it is retried with exponential back-off
+        before the request is given up on.
+
+        Args:
+            earthaccess: The imported `earthaccess` module.
+            strategy: The login strategy resolved for this call.
+
+        Returns:
+            Any: The `earthaccess.Auth` handle the login returned.
+
+        Raises:
+            AuthenticationError: When the login is refused, or when every
+                attempt failed to reach EDL.
+        """
+        for attempt in range(_LOGIN_ATTEMPTS):
+            try:
+                return earthaccess.login(strategy=strategy, persist=True)
+            except (requests.ConnectionError, requests.Timeout) as exc:
+                if attempt == _LOGIN_ATTEMPTS - 1:
+                    raise AuthenticationError(
+                        f"Earthdata Login could not reach EDL in "
+                        f"{_LOGIN_ATTEMPTS} attempts (strategy={strategy!r}): "
+                        f"{type(exc).__name__}: {exc}. This is a network "
+                        "failure rather than a rejected credential; check "
+                        "connectivity to urs.earthdata.nasa.gov and retry."
+                    ) from exc
+                wait = _LOGIN_BACKOFF * 2**attempt
+                logger.warning(
+                    f"EMDAT: Earthdata Login could not reach EDL "
+                    f"({type(exc).__name__}); retrying in {wait:.0f}s "
+                    f"({attempt + 1}/{_LOGIN_ATTEMPTS})."
+                )
+                time.sleep(wait)
+            except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
+                raise AuthenticationError(
+                    "Earthdata Login failed while contacting EDL "
+                    f"(strategy={strategy!r}): {type(exc).__name__}: {exc}. Set "
+                    "EARTHDATA_USERNAME / EARTHDATA_PASSWORD, add a 'machine "
+                    "urs.earthdata.nasa.gov' entry to ~/.netrc, or register a "
+                    f"free account at {_REGISTER_URL}."
+                ) from exc
+        raise AssertionError("unreachable")  # pragma: no cover
+
     def configure(self) -> None:
         """Authenticate against EDL via `earthaccess.login`.
 
@@ -300,16 +358,7 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
                 for name, value in self._export_explicit_credentials().items():
                     previous.setdefault(name, value)
 
-            try:
-                auth = earthaccess.login(strategy=strategy, persist=True)
-            except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
-                raise AuthenticationError(
-                    "Earthdata Login failed while contacting EDL "
-                    f"(strategy={strategy!r}): {type(exc).__name__}: {exc}. Set "
-                    "EARTHDATA_USERNAME / EARTHDATA_PASSWORD, add a 'machine "
-                    "urs.earthdata.nasa.gov' entry to ~/.netrc, or register a "
-                    f"free account at {_REGISTER_URL}."
-                ) from exc
+            auth = self._login(earthaccess, strategy)
         finally:
             # An explicit credential is put in the environment only because
             # earthaccess has no argument for one. Leaving it there would make
