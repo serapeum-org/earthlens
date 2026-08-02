@@ -96,49 +96,91 @@ def _yaml_value(value: str) -> str:
     return dumped[len("x: ") :].rstrip("\n")
 
 
+def _is_auxiliary(name: str) -> bool:
+    """Return True for a coordinate / cell-bounds / auxiliary NetCDF variable.
+
+    These are never a data variable, so they must not be matched to a catalog
+    slug. Covers the explicit :data:`_COORD_NAMES` plus any `*_bnds` / `*_bounds`
+    cell-bounds variable (e.g. `lat_bnds`, `time_bounds`).
+    """
+    lower = name.lower()
+    return lower in _COORD_NAMES or lower.endswith(("_bnds", "_bounds"))
+
+
 def _match_variables(
     placeholders: list[str], nc_meta: dict[str, dict[str, Any]]
 ) -> dict[str, tuple[str, str]]:
-    """Best-effort map each placeholder slug to a retrieved `(nc_name, units)`.
+    """Confidently map each placeholder slug to a retrieved `(nc_name, units)`.
 
-    Coordinate / auxiliary NetCDF variables are dropped first. Each remaining
-    data variable is matched to a placeholder whose slug tokens are a subset of
-    the variable's `long_name` tokens (the confident case); any leftover
-    placeholders are then paired to leftover variables in catalog / NetCDF order
-    (the deep sample confirms the variable it sampled — usually the first).
+    A slug is hydrated only when it **confidently** identifies a data variable —
+    a wrong `nc_variable` is worse than the `unknown` placeholder (it silently
+    mis-extracts at `aggregate=` time). In order:
+
+    1. Coordinate / bounds / auxiliary variables (see :func:`_is_auxiliary`) are
+       dropped from the candidate set.
+    2. Exact short-name equality — the slug's `cds_variable` form
+       (`-`→`_`) equals a NetCDF variable name.
+    3. Token-subset — the slug's tokens are a subset of a variable's
+       `long_name` tokens.
+    4. The **unambiguous** leftover case only: exactly one unmatched slug and
+       exactly one unused data variable (the single-variable retrieve).
+
+    Any slug that stays unmatched keeps its placeholder — there is no arbitrary
+    order-based pairing among multiple candidates.
 
     Args:
         placeholders: The still-`unknown` variable slugs, in catalog order.
         nc_meta: The retrieved `{nc_name: {long_name, units}}` mapping.
 
     Returns:
-        Mapping of slug to the `(nc_variable, units)` to write.
+        Mapping of slug to the `(nc_variable, units)` to write — only for the
+        slugs that matched confidently.
     """
-    candidates = [
-        (name, meta) for name, meta in nc_meta.items() if name not in _COORD_NAMES
-    ]
-    assignments: dict[str, tuple[str, str]] = {}
-    remaining = list(candidates)
-    unmatched: list[str] = []
+    candidates = {
+        name: meta for name, meta in nc_meta.items() if not _is_auxiliary(name)
+    }
+    chosen: dict[str, str] = {}
+    used: set[str] = set()
+
     for slug in placeholders:
-        slug_tokens = _tokens(slug)
-        hit = next(
-            (
-                cand
-                for cand in remaining
-                if slug_tokens
-                and slug_tokens <= _tokens(str(cand[1].get("long_name") or ""))
-            ),
-            None,
-        )
-        if hit is not None:
-            assignments[slug] = (hit[0], str(hit[1].get("units") or ""))
-            remaining.remove(hit)
-        else:
-            unmatched.append(slug)
-    for slug, cand in zip(unmatched, remaining):
-        assignments[slug] = (cand[0], str(cand[1].get("units") or ""))
-    return assignments
+        cds = slug.replace("-", "_")
+        if cds in candidates and cds not in used:
+            chosen[slug] = cds
+            used.add(cds)
+
+    # Token-subset, but only when the slug matches EXACTLY ONE unused candidate,
+    # iterated to a fixpoint: assigning a specific slug (`sea-surface-temperature`
+    # → `sst`) frees a shorter one (`temperature`) to become unique (→ `t`). A
+    # slug that stays ambiguous is never guessed.
+    progress = True
+    while progress:
+        progress = False
+        for slug in placeholders:
+            if slug in chosen:
+                continue
+            slug_tokens = _tokens(slug)
+            if not slug_tokens:
+                continue
+            matches = [
+                name
+                for name, meta in candidates.items()
+                if name not in used
+                and slug_tokens <= _tokens(str(meta.get("long_name") or ""))
+            ]
+            if len(matches) == 1:
+                chosen[slug] = matches[0]
+                used.add(matches[0])
+                progress = True
+
+    unmatched = [slug for slug in placeholders if slug not in chosen]
+    unused = [name for name in candidates if name not in used]
+    if len(unmatched) == 1 and len(unused) == 1:
+        chosen[unmatched[0]] = unused[0]
+
+    return {
+        slug: (name, str(candidates[name].get("units") or ""))
+        for slug, name in chosen.items()
+    }
 
 
 def _placeholder_slugs(block: str) -> list[str]:
