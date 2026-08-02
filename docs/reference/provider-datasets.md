@@ -10,8 +10,10 @@ or station — not a dataset id), noted as such.
 
 - The **Example keys** are concrete values you pass as `variables=`, `dataset=`, or the request key — verbatim from
   the catalog.
-- For the full enumeration of any backend, see its provider page (linked from
-  [Supported providers](providers.md)) or run the CLI: `earthlens datasets`, `earthlens find`, `earthlens search`.
+- To find a dataset from the CLI: `earthlens datasets where <name>` (which provider exposes it),
+  `earthlens datasets search <query>` (free-text + `--filter facet=value`), or `earthlens datasets list -p <provider>`
+  (enumerate one backend). Add `--include-available` to reach past the curated keys into a backend's full upstream
+  index. See the [command-line interface](cli.md) page for the full command set.
 - Which **extra** (if any) each backend needs is on the companion [Provider extras](provider-extras.md) page.
 
 ## Atmosphere (`earthlens-atmosphere`)
