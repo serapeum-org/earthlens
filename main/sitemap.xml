@@ -125,6 +125,14 @@
          <lastmod>2026-08-02</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/caravan/attributes_geometry_and_base/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/caravan/quickstart/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/chc/catalog_explorer/</loc>
          <lastmod>2026-08-02</lastmod>
     </url>
@@ -1130,6 +1138,26 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/biodiversity/usage/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/caravan/archive-contents/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/caravan/caravan/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/caravan/datasets/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/caravan/introduction/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/caravan/usage/</loc>
          <lastmod>2026-08-02</lastmod>
     </url>
     <url>
