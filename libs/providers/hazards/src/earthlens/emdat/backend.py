@@ -649,7 +649,9 @@ class EMDAT(AbstractDataSource):
         if not any(applied):
             return f"{stem}.csv"
         request = (tuple(self._hazards), self._country, self._year_range, self._bbox)
-        digest = hashlib.sha1(repr(request).encode()).hexdigest()[:8]
+        digest = hashlib.sha1(
+            repr(request).encode(), usedforsecurity=False
+        ).hexdigest()[:8]
         return f"{stem}-{digest}.csv"
 
     def _warn_license(self) -> None:
@@ -659,6 +661,14 @@ class EMDAT(AbstractDataSource):
         nothing. The EM-DAT archive is CC-BY-NC-ND under terms that also limit
         *who* may use it for free, which is the part a user is most likely to
         miss.
+
+        The `stacklevel` targets a call through
+        :class:`earthlens.earthlens.EarthLens`, which is what every doc
+        example, both notebooks and the e2e tests use: `_warn_license` ->
+        `download` -> the `_wrap_download` wrapper -> the facade -> the caller.
+        A direct `EMDAT(...).download()` is one frame shorter, so the warning
+        is attributed to earthlens rather than to that caller. No single value
+        suits both paths, and the facade is the documented one.
         """
         dataset = self._dataset
         if not dataset.restricted_use:
@@ -673,7 +683,7 @@ class EMDAT(AbstractDataSource):
             "derivative database from it, so treat this result as fetched for "
             f"you alone. See {dataset.terms_url}.",
             LicenseWarning,
-            stacklevel=4,
+            stacklevel=5,
         )
 
     def _log_citation(self) -> None:
