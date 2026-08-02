@@ -65,7 +65,8 @@ class TestBulkSeedUncurated:
 
         summary = bulk_seed_uncurated()
         assert summary["candidates"] == 2, "uncurated = available - datasets"
-        assert summary["seeded"] == 2 and summary["skipped"] == 0
+        assert summary["seeded"] == 2
+        assert summary["skipped"] == 0
         era5 = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"]
         ads = yaml.safe_load((tmp_path / "ads.yaml").read_text())["datasets"]
         assert "reanalysis-era5-complete" in era5, "era5 id routed to era5.yaml"
@@ -88,7 +89,8 @@ class TestBulkSeedUncurated:
         monkeypatch.setattr(seed_mod, "emit_stanza", fake_emit)
 
         summary = bulk_seed_uncurated()
-        assert summary["seeded"] == 1 and summary["skipped"] == 1
+        assert summary["seeded"] == 1
+        assert summary["skipped"] == 1
         assert summary["failed"] == [("cams-broken", "boom")]
 
     def test_duplicate_key_is_skipped(self, tmp_path, monkeypatch):
@@ -106,7 +108,8 @@ class TestBulkSeedUncurated:
         monkeypatch.setattr(seed_mod, "emit_stanza", _ok_result)
 
         summary = bulk_seed_uncurated()
-        assert summary["seeded"] == 0 and summary["skipped"] == 1
+        assert summary["seeded"] == 0
+        assert summary["skipped"] == 1
 
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the uncurated worklist."""

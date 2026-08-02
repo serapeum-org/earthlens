@@ -524,7 +524,8 @@ class TestCurate:
             app, ["datasets", "curate", "ecmwf", "--fill-empty", "--write"]
         )
         assert result.exit_code == 0, f"ecmwf fill-empty failed: {result.output}"
-        assert "hydrated 3" in result.output and "/ 4" in result.output
+        assert "hydrated 3" in result.output
+        assert "/ 4" in result.output
 
     def test_fill_empty_unsupported_provider(self):
         """--fill-empty on a provider that is neither gee nor ecmwf is rejected."""
@@ -554,7 +555,8 @@ class TestCurate:
         )
         result = runner.invoke(app, ["datasets", "curate", "ecmwf", "--all", "--write"])
         assert result.exit_code == 0, f"--all failed: {result.output}"
-        assert "seeded 4" in result.output and "/ 5" in result.output
+        assert "seeded 4" in result.output
+        assert "/ 5" in result.output
 
     def test_all_requires_write(self):
         """--all without --write is a usage error (it mutates the catalog)."""

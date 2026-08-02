@@ -276,7 +276,8 @@ class TestBulkHydrateEmpty:
 
         monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", _boom)
         summary = bulk_hydrate_empty()
-        assert summary["hydrated"] == 0 and summary["skipped"] == 1
+        assert summary["hydrated"] == 0
+        assert summary["skipped"] == 1
 
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the placeholder worklist."""
