@@ -77,14 +77,15 @@ _AUXILIARY_SUFFIXES = (
 
 #: One curated variable sub-block: a 6-space slug line + its 8-space body.
 _VARIABLE_BLOCK = re.compile(
-    r"(?m)^      (?P<slug>[A-Za-z0-9][^\s:]*):[ \t]*\n"
-    r"(?P<body>(?:^        [^\n]*\n?)*)"
+    r"(?m)^ {6}(?P<slug>[A-Za-z0-9][^\s:]*):[ \t]*\n"
+    r"(?P<body>(?:^ {8}[^\n]*\n)*)"
 )
 #: The placeholder sentinel a seed writes for an un-hydrated variable.
-_UNKNOWN_UNITS = re.compile(r"(?m)^        units:[ \t]*unknown[ \t]*$")
-#: The 8-space `nc_variable:` / `units:` lines rewritten inside a var sub-block.
-_NC_VARIABLE_LINE = re.compile(r"(?m)^(        nc_variable:[ \t]*).*$")
-_UNITS_LINE = re.compile(r"(?m)^(        units:[ \t]*).*$")
+_UNKNOWN_UNITS = re.compile(r"(?m)^ {8}units:[ \t]*unknown[ \t]*$")
+#: The 8-space `nc_variable:` / `units:` keys rewritten inside a var sub-block
+#: (the value after the key is replaced, a single space re-inserted).
+_NC_VARIABLE_LINE = re.compile(r"(?m)^( {8}nc_variable:)[^\n]*$")
+_UNITS_LINE = re.compile(r"(?m)^( {8}units:)[^\n]*$")
 
 
 def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
@@ -138,6 +139,45 @@ def _is_auxiliary(name: str) -> bool:
     )
 
 
+def _assign_unique_subset(
+    placeholders: list[str],
+    candidates: dict[str, dict[str, Any]],
+    chosen: dict[str, str],
+    used: set[str],
+) -> None:
+    """Assign each slug that token-subset-matches EXACTLY ONE unused candidate.
+
+    Iterated to a fixpoint: assigning a specific slug (`sea-surface-temperature`
+    → `sst`) frees a shorter one (`temperature`) to become unique (→ `t`). A slug
+    that stays ambiguous is never guessed. Mutates `chosen` / `used` in place.
+
+    Args:
+        placeholders: The still-`unknown` variable slugs, in catalog order.
+        candidates: The `{nc_name: meta}` data variables (aux already dropped).
+        chosen: The `slug -> nc_name` map so far (mutated in place).
+        used: The set of already-claimed NetCDF names (mutated in place).
+    """
+    progress = True
+    while progress:
+        progress = False
+        for slug in placeholders:
+            if slug in chosen:
+                continue
+            slug_tokens = _tokens(slug)
+            if not slug_tokens:
+                continue
+            matches = [
+                name
+                for name, meta in candidates.items()
+                if name not in used
+                and slug_tokens <= _tokens(str(meta.get("long_name") or ""))
+            ]
+            if len(matches) == 1:
+                chosen[slug] = matches[0]
+                used.add(matches[0])
+                progress = True
+
+
 def _match_variables(
     placeholders: list[str], nc_meta: dict[str, dict[str, Any]]
 ) -> dict[str, tuple[str, str]]:
@@ -179,29 +219,7 @@ def _match_variables(
             chosen[slug] = cds
             used.add(cds)
 
-    # Token-subset, but only when the slug matches EXACTLY ONE unused candidate,
-    # iterated to a fixpoint: assigning a specific slug (`sea-surface-temperature`
-    # → `sst`) frees a shorter one (`temperature`) to become unique (→ `t`). A
-    # slug that stays ambiguous is never guessed.
-    progress = True
-    while progress:
-        progress = False
-        for slug in placeholders:
-            if slug in chosen:
-                continue
-            slug_tokens = _tokens(slug)
-            if not slug_tokens:
-                continue
-            matches = [
-                name
-                for name, meta in candidates.items()
-                if name not in used
-                and slug_tokens <= _tokens(str(meta.get("long_name") or ""))
-            ]
-            if len(matches) == 1:
-                chosen[slug] = matches[0]
-                used.add(matches[0])
-                progress = True
+    _assign_unique_subset(placeholders, candidates, chosen, used)
 
     unmatched = [slug for slug in placeholders if slug not in chosen]
     unused = [name for name in candidates if name not in used]
@@ -226,14 +244,16 @@ def _placeholder_slugs(block: str) -> list[str]:
 def _fill_variable(block: str, slug: str, nc_name: str, units: str) -> str:
     """Rewrite one variable sub-block's `nc_variable:` / `units:` lines in place."""
     var_pat = re.compile(
-        rf"(?m)(^      {re.escape(slug)}:[ \t]*\n(?:^        [^\n]*\n?)*)"
+        rf"(?m)(^ {{6}}{re.escape(slug)}:[ \t]*\n(?:^ {{8}}[^\n]*\n)*)"
     )
     match = var_pat.search(block)
     if not match:
         return block
     sub = match.group(1)
-    sub = _NC_VARIABLE_LINE.sub(lambda mo: mo.group(1) + nc_name, sub, count=1)
-    sub = _UNITS_LINE.sub(lambda mo: mo.group(1) + _yaml_value(units), sub, count=1)
+    sub = _NC_VARIABLE_LINE.sub(lambda mo: f"{mo.group(1)} {nc_name}", sub, count=1)
+    sub = _UNITS_LINE.sub(
+        lambda mo: f"{mo.group(1)} {_yaml_value(units)}", sub, count=1
+    )
     return block[: match.start()] + sub + block[match.end() :]
 
 
