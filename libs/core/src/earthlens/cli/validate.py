@@ -285,6 +285,18 @@ def _validate_tropycal(catalog: Any) -> tuple[int, list[str]]:
     return checked, issues
 
 
+def _validate_emdat(catalog: Any) -> tuple[int, list[str]]:
+    """Each EM-DAT dataset needs the prose its row model does not already force.
+
+    `long_name` and `licence` are required by the pydantic row model, and
+    `hazard_vocabulary` has a default the loader then checks against the
+    `hazard_vocabularies:` block — so a catalog missing any of them never loads
+    far enough to reach validation. `description` and `citation` are the
+    genuinely optional fields worth insisting on.
+    """
+    return _lint(catalog, lambda k, r: _require(k, r, ("description", "citation")))
+
+
 def _validate_gdacs(catalog: Any) -> tuple[int, list[str]]:
     """Each GDACS hazard type needs a name and a description."""
     return _lint(catalog, lambda k, r: _require(k, r, ("name", "description")))
@@ -798,6 +810,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "wdpa": _validate_wdpa,
     "iucn": _validate_iucn,
     "jaxa": _validate_jaxa,
+    "emdat": _validate_emdat,
     "erddap": _validate_erddap,
     "bathymetry": _validate_bathymetry,
     "pvgis": _validate_pvgis,

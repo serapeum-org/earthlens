@@ -21,6 +21,26 @@ on:
     branches: [main]
   pull_request:
 
+# Supersede a pull request's in-flight run when a new commit lands on it — the
+# older result is about to be stale, and a busy PR would otherwise queue several
+# full matrices for commits nobody will look at again. For a `pull_request`
+# event `github.ref` is `refs/pull/<n>/merge`, unique per PR, so each PR
+# supersedes only itself.
+#
+# A push or merge to `main` gets a group of its own, keyed on the run id, so it
+# never shares one with another main run. `cancel-in-progress: false` alone
+# would NOT be enough: it protects the run that is *in progress*, but GitHub
+# cancels any *pending* run in the group when a newer one queues, regardless of
+# that setting. Three merges in quick succession would leave the middle
+# commit's run cancelled and `main` with no test result for it — worse than
+# having no concurrency block at all. A unique group per run sidesteps the
+# question entirely, and keeps main runs parallel rather than serialised.
+concurrency:
+  group: >-
+    ${{ github.workflow }}-${{ github.event_name == 'pull_request'
+    && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   # One lane per distribution (#785): each member's tests run against its own
   # `pyproject.toml` config and report coverage only for its own `src`, tagged
@@ -45,12 +65,12 @@ jobs:
           - { name: hazards, dir: libs/providers/hazards }
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
+        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
         with:
           python-version: ${{ matrix.python-version }}
           install-groups: "groups: dev, extras: all"
@@ -59,7 +79,7 @@ jobs:
 
       - name: Run ${{ matrix.member.name }} unit + integration suite
         run: >
-          uv run pytest
+          uv run --locked pytest
           -c ${{ matrix.member.dir }}/pyproject.toml
           ${{ matrix.member.dir }}/tests
           -m "not e2e"
@@ -67,6 +87,6 @@ jobs:
           --cov-report=xml
 
       - name: Upload coverage reports to Codecov with GitHub Action
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           flags: ${{ matrix.member.name }}

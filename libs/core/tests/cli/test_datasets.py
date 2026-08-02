@@ -533,6 +533,13 @@ class TestValidate:
         payload = json.loads(result.output)
         assert payload[0]["status"] == "ok" and payload[0]["issues"] == []
 
+    def test_emdat_validates_clean(self):
+        """The emdat offline validator passes for the bundled catalog."""
+        result = runner.invoke(app, ["datasets", "validate", "emdat", "--json"])
+        payload = json.loads(result.output)
+        assert payload[0]["status"] == "ok", "emdat validated"
+        assert payload[0]["issues"] == [], "no structural issues"
+
     def test_live_flag_runs_live_validator(self, monkeypatch):
         """--live routes through the reachability validator (mocked)."""
         from earthlens.cli import validate as validate_mod
