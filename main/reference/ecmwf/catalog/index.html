@@ -2078,6 +2078,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../datastores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data stores (CDS + ADS + EWDS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../ewds/" class="md-nav__link">
         
   
@@ -20420,6 +20448,18 @@ support catalog work.</p>
 <tr>
 <td><code>earthlens datasets probe ecmwf &lt;id&gt; --deep</code></td>
 <td>Submits a real tiny retrieve for one dataset and extracts its NetCDF short names and units</td>
+</tr>
+<tr>
+<td><code>earthlens datasets curate ecmwf &lt;id&gt; [--write]</code></td>
+<td>Seeds a loader-valid row from the live <code>form.json</code> (every variable, <code>unknown</code> placeholders); <code>--write</code> auto-files it into the family shard</td>
+</tr>
+<tr>
+<td><code>earthlens datasets curate ecmwf --all --write</code></td>
+<td>Bulk-seeds <strong>every</strong> uncurated dataset (<code>available_datasets − datasets</code>) into its family shard from live forms</td>
+</tr>
+<tr>
+<td><code>earthlens datasets curate ecmwf --fill-empty --write</code></td>
+<td>Bulk-hydrates the <code>units: unknown</code> placeholders in place from live tiny retrieves (licence-gated, best-effort)</td>
 </tr>
 <tr>
 <td><code>tools/ecmwf/bulk_add_remaining.py</code> / <code>bulk_apply.py</code> / <code>bulk_inject.py</code></td>
