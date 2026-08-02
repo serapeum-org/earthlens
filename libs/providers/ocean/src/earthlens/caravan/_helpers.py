@@ -199,10 +199,11 @@ def _safe_target(name: str, dest_dir: Path) -> Path:
             f"refusing to extract unsafe path {name!r} from the archive "
             f"(escapes {dest_dir})."
         )
-    # NOSONAR - the name is sanitised immediately above (absolute paths and
-    # traversal rejected) and the joined result is containment-checked
-    # immediately below.
-    target = base.joinpath(*parts)
+    # The suppression must sit on the flagged line itself. The name is sanitised
+    # immediately above - absolute paths and upward traversal are rejected - and
+    # the joined result is containment-checked immediately below, so this is
+    # guarded twice over plus `tarfile.data_filter` at the call site.
+    target = base.joinpath(*parts)  # NOSONAR
     if base not in target.resolve().parents:
         raise ValueError(
             f"refusing to extract unsafe path {name!r} from the archive "
