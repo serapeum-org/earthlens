@@ -169,6 +169,8 @@ nav:
     - Troubleshooting: troubleshooting.md
     - Migration guide: migration.md
     - Contributing: contributing.md
+  - Installation:
+    - Provider extras: reference/provider-extras.md
   - Data Sources:
     - Supported providers: reference/providers.md
     - Deferred providers: reference/deferred-providers.md
