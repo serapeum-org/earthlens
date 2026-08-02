@@ -13,10 +13,15 @@ from __future__ import annotations
 __all__ = ["BACKENDS"]
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 19 data-source keys.
+#: distribution's 21 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
+    # The extras hint covers the gdis:* sources, which need earthaccess. The
+    # emdat:events source is anonymous HTTP and needs no extra; the hint is
+    # per key, not per dataset, so it is stated once here.
+    'emdat': ('earthlens.emdat', 'EMDAT', 'emdat', {}),
+    'gdis': ('earthlens.emdat', 'EMDAT', 'emdat', {}),
     'hdx': ('earthlens.hdx', 'HDX', 'hdx', {}),
     'overture': ('earthlens.overture', 'Overture', 'overture', {}),
     'firms': ('earthlens.firms', 'FIRMS', '', {}),

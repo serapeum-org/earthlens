@@ -238,6 +238,10 @@ nav:
       - Introduction: reference/gdacs/introduction.md
       - Usage: reference/gdacs/usage.md
       - Reference: reference/gdacs/gdacs.md
+    - EM-DAT (disaster impacts):
+      - Introduction: reference/emdat/introduction.md
+      - Usage: reference/emdat/usage.md
+      - Reference: reference/emdat/emdat.md
     - JAXA (Earth-observation archive):
       - Introduction: reference/jaxa/introduction.md
       - Usage: reference/jaxa/usage.md
@@ -545,6 +549,9 @@ nav:
       - Global hazard dashboard: examples/gdacs/global_hazard_dashboard.ipynb
       - Earthquakes + cyclones overlay: examples/gdacs/eq_tc_overlay.ipynb
       - Country hazard profile: examples/gdacs/country_hazard_profile.ipynb
+    - Disaster impacts (EM-DAT):
+      - Flood events and where they happened: examples/emdat/flood_events_and_footprints.ipynb
+      - Real footprints and flooded area: examples/emdat/flood_footprints_and_area.ipynb
     - OpenStreetMap (Overpass / ohsome):
       - Quickstart — current-state features (Overpass): examples/osm/quickstart.ipynb
       - History — building footprints over time (ohsome): examples/osm/ohsome_history.ipynb

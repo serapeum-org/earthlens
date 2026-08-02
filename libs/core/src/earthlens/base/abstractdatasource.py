@@ -644,7 +644,8 @@ class AbstractDataSource(ABC):
             dataset(s) are resolved set it **per instance** in
             `__init__` instead — a sanctioned override: earthdata and
             eumetsat copy the resolved dataset's `output_kind` onto
-            `self.OUTPUT_KIND`, and tropycal sets `"tabular"` for its
+            `self.OUTPUT_KIND`, emdat copies it from the resolved EM-DAT /
+            GDIS row, and tropycal sets `"tabular"` for its
             `ships` product (else `"vector"`). The facade reads the
             instance attribute, so both forms work.
         REQUIRES_TIME_WINDOW: Whether this backend needs both `start` and
@@ -910,7 +911,7 @@ class AbstractDataSource(ABC):
             # Both conditions have to permit it, and they answer different
             # questions. `SUPPORTS_AGGREGATE` is per class — does this backend
             # wire the reducer at all. `OUTPUT_KIND` is per *instance* for a few
-            # backends (earthdata, eumetsat, tropycal, cmems) whose shape is
+            # backends (earthdata, eumetsat, tropycal, cmems, emdat) whose shape is
             # only known once the dataset resolves: cmems supports aggregation
             # for its gridded datasets and must still refuse it for a vector
             # one.

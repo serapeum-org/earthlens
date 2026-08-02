@@ -233,7 +233,7 @@ class TestRefresh:
         )
         result = runner.invoke(app, ["datasets", "refresh", "all", "--json"])
         payload = json.loads(result.output)
-        assert len(payload) == 48, "one outcome per backend"
+        assert len(payload) == 49, "one outcome per backend"
         assert any(o["provider"] == "stac" for o in payload), "stac included"
 
     def test_stac_json_reports_new_ids(self, monkeypatch):
@@ -627,6 +627,13 @@ class TestValidate:
         result = runner.invoke(app, ["datasets", "validate", "usgs_water", "--json"])
         payload = json.loads(result.output)
         assert payload[0]["status"] == "ok" and payload[0]["issues"] == []
+
+    def test_emdat_validates_clean(self):
+        """The emdat offline validator passes for the bundled catalog."""
+        result = runner.invoke(app, ["datasets", "validate", "emdat", "--json"])
+        payload = json.loads(result.output)
+        assert payload[0]["status"] == "ok", "emdat validated"
+        assert payload[0]["issues"] == [], "no structural issues"
 
     def test_live_flag_runs_live_validator(self, monkeypatch):
         """--live routes through the reachability validator (mocked)."""

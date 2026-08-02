@@ -453,8 +453,8 @@ class EarthLens:
              'cop-dem', 'copernicus-dem', 'dea',
              'deafrica', 'dem', 'digital-earth-africa', 'digital-earth-australia',
              'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo',
-             'eea-aq', 'elevation', 'erddap', 'etopo', 'eumetsat', 'fdsn', 'firms', 'g-portal',
-             'gbif', 'gdacs', 'gdo', 'gebco', 'gee', 'geoboundaries',
+             'eea-aq', 'elevation', 'emdat', 'erddap', 'etopo', 'eumetsat', 'fdsn', 'firms',
+             'g-portal', 'gbif', 'gdacs', 'gdis', 'gdo', 'gebco', 'gee', 'geoboundaries',
              'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
              'global-forest-watch', 'global-solar-atlas',
              'global-wind-atlas', 'goes', 'google-earth-engine', 'gsa', 'gwa',
@@ -515,6 +515,13 @@ class EarthLens:
             (`earthengine-api`); keys `"gee"` / `"google-earth-engine"`.
         :class:`earthlens.gdacs.GDACS`: GDACS multi-hazard disaster
             alerts (public feed, no credentials); key `"gdacs"`.
+        :class:`earthlens.emdat.EMDAT`: CRED EM-DAT disaster events and
+            their geocoded locations — the UCLouvain Dataverse archive
+            (`emdat:events`, anonymous, `tabular`, 1900 onwards, natural
+            and technological) and GDIS (`gdis:points` / `gdis:polygons`,
+            Earthdata Login, `vector`, 1960-2018). Per-instance
+            `OUTPUT_KIND`; the archive carries a restricted-use
+            `LicenseWarning`; keys `"emdat"` / `"gdis"`.
         :class:`earthlens.openaq.OpenAQ`: ground-station air-quality
             measurements from OpenAQ v3 (tabular `DataFrame`).
         :class:`earthlens.openeo.OpenEO`: server-side openEO process graphs

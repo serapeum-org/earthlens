@@ -98,7 +98,9 @@ class TestEarthdataAuth:
         assert fake_earthaccess.login_calls == [
             {"strategy": "environment", "persist": True}
         ]
-        assert os.environ["EARTHDATA_TOKEN"] == "jwt-token"
+        assert fake_earthaccess.login_env[0]["EARTHDATA_TOKEN"] == "jwt-token"
+        # Restored afterwards, so the token does not linger process-globally.
+        assert "EARTHDATA_TOKEN" not in os.environ
         assert "jwt-token" not in repr(auth._creds)
 
     def test_explicit_credentials_authenticate(self, fake_earthaccess, monkeypatch):
@@ -117,8 +119,37 @@ class TestEarthdataAuth:
         assert fake_earthaccess.login_calls == [
             {"strategy": "environment", "persist": True}
         ]
-        assert os.environ["EARTHDATA_USERNAME"] == "explicit-user"
-        assert os.environ["EARTHDATA_PASSWORD"] == "explicit-pass"
+        seen = fake_earthaccess.login_env[0]
+        assert seen["EARTHDATA_USERNAME"] == "explicit-user"
+        assert seen["EARTHDATA_PASSWORD"] == "explicit-pass"
+        # Restored afterwards, so the credentials do not linger.
+        assert "EARTHDATA_USERNAME" not in os.environ
+        assert "EARTHDATA_PASSWORD" not in os.environ
+
+    def test_explicit_credentials_beat_an_ambient_token(
+        self, fake_earthaccess, monkeypatch
+    ):
+        """An unrelated EARTHDATA_TOKEN must not override explicit credentials.
+
+        earthaccess prefers the token over a username/password pair, so without
+        clearing it the caller's explicit credentials would be silently ignored.
+        """
+        monkeypatch.setenv("EARTHDATA_TOKEN", "someone-elses-token")
+        monkeypatch.delenv("EARTHDATA_USERNAME", raising=False)
+        monkeypatch.delenv("EARTHDATA_PASSWORD", raising=False)
+        auth = EarthdataAuth(
+            EarthdataCredentials(
+                username="explicit-user",
+                password="explicit-pass",
+                netrc_path=Path("/no/such/netrc"),
+            )
+        )
+        auth.configure()
+        seen = fake_earthaccess.login_env[0]
+        assert seen["EARTHDATA_TOKEN"] is None
+        assert seen["EARTHDATA_USERNAME"] == "explicit-user"
+        # The caller's own token is put back once the login is done.
+        assert os.environ["EARTHDATA_TOKEN"] == "someone-elses-token"
 
     def test_empty_token_env_is_dropped(self, fake_earthaccess, monkeypatch):
         """An empty EARTHDATA_TOKEN (undefined CI secret) is dropped, not used."""
@@ -128,7 +159,7 @@ class TestEarthdataAuth:
         auth = EarthdataAuth(EarthdataCredentials())
         auth.configure()
         assert auth.is_authenticated() is True
-        assert "EARTHDATA_TOKEN" not in os.environ
+        assert fake_earthaccess.login_env[0]["EARTHDATA_TOKEN"] is None
         assert fake_earthaccess.login_calls == [
             {"strategy": "environment", "persist": True}
         ]
