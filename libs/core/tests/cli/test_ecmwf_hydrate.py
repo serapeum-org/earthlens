@@ -155,6 +155,27 @@ class TestMatchVariables:
         )
         assert assignments == {}, "ambiguous slugs must keep their placeholders"
 
+    def test_non_bounds_aux_variable_is_never_matched(self):
+        """A viewing-angle aux var is not the sole 1:1 candidate (SZA)."""
+        assignments = _match_variables(
+            ["cloud-phase"],
+            {"SZA": {"long_name": "Solar zenith angle", "units": "degree"}},
+        )
+        assert assignments == {}, "cloud-phase must not be mapped to SZA"
+
+    def test_count_aux_variable_is_not_zipped(self):
+        """A leftover slug is not paired to an observation-count aux var (nobs)."""
+        assignments = _match_variables(
+            ["temperature", "quality-flag"],
+            {
+                "t": {"long_name": "temperature", "units": "K"},
+                "nobs": {"long_name": "number of observations", "units": "1"},
+            },
+        )
+        assert assignments == {"temperature": ("t", "K")}, (
+            "quality-flag stays unhydrated"
+        )
+
 
 class TestYamlValue:
     """Tests for the scalar renderer."""

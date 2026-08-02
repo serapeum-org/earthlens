@@ -47,9 +47,32 @@ _COORD_NAMES = frozenset(
         "y",
         "spatial_ref",
         "crs",
-        "bnds",
-        "time_bnds",
     }
+)
+
+#: Non-bounds auxiliary variable names (exact) — viewing angles, status flags.
+_AUXILIARY_NAMES = frozenset(
+    {
+        "sza",
+        "vza",
+        "saa",
+        "vaa",
+        "record_status",
+        "pixel_count",
+        "quality_flag",
+        "quality_flags",
+    }
+)
+#: Auxiliary variable name suffixes: cell bounds, counts, flags, viewing angles.
+_AUXILIARY_SUFFIXES = (
+    "_bnds",
+    "_bounds",
+    "_count",
+    "_status",
+    "_flag",
+    "_flags",
+    "_zenith_angle",
+    "_azimuth_angle",
 )
 
 #: One curated variable sub-block: a 6-space slug line + its 8-space body.
@@ -97,14 +120,22 @@ def _yaml_value(value: str) -> str:
 
 
 def _is_auxiliary(name: str) -> bool:
-    """Return True for a coordinate / cell-bounds / auxiliary NetCDF variable.
+    """Return True for a coordinate / bounds / auxiliary NetCDF variable.
 
     These are never a data variable, so they must not be matched to a catalog
-    slug. Covers the explicit :data:`_COORD_NAMES` plus any `*_bnds` / `*_bounds`
-    cell-bounds variable (e.g. `lat_bnds`, `time_bounds`).
+    slug (a wrong `nc_variable` silently mis-extracts at `aggregate=` time).
+    Covers the explicit :data:`_COORD_NAMES` and :data:`_AUXILIARY_NAMES`, the
+    observation-count prefix `nobs` / `n_obs`, and every :data:`_AUXILIARY_SUFFIXES`
+    tail — cell bounds (`lat_bnds`), counts (`pixel_count`), status/quality flags,
+    and solar/sensor viewing angles (`SZA`, `sensor_zenith_angle`).
     """
     lower = name.lower()
-    return lower in _COORD_NAMES or lower.endswith(("_bnds", "_bounds"))
+    return (
+        lower in _COORD_NAMES
+        or lower in _AUXILIARY_NAMES
+        or lower.startswith(("nobs", "n_obs"))
+        or lower.endswith(_AUXILIARY_SUFFIXES)
+    )
 
 
 def _match_variables(
