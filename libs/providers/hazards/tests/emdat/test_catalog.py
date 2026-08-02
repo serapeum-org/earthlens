@@ -103,8 +103,9 @@ class TestShippedCatalog:
 
     def test_unknown_id_hints(self) -> None:
         """A near-miss id raises with a did-you-mean hint."""
+        catalog = Catalog()
         with pytest.raises(ValueError, match="Did you mean 'gdis:points'"):
-            Catalog().get("gdis:point")
+            catalog.get("gdis:point")
 
 
 @pytest.mark.emdat

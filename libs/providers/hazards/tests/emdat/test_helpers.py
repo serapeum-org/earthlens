@@ -392,10 +392,9 @@ class TestPointsToFeatureCollection:
 
     def test_missing_coordinate_columns_is_an_error(self, points_row) -> None:
         """A table without the named coordinates cannot become points."""
+        frame = pd.DataFrame({"other": [1]})
         with pytest.raises(ValueError, match="cannot build point features"):
-            _helpers.points_to_feature_collection(
-                pd.DataFrame({"other": [1]}), points_row
-            )
+            _helpers.points_to_feature_collection(frame, points_row)
 
     def test_empty_input_yields_empty_collection(
         self, gdis_csv_frame, points_row

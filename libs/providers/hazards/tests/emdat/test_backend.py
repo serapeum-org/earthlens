@@ -437,8 +437,9 @@ class TestGdisPointsRoute:
         fake = FakeEarthaccess([FakeGranule(_GDIS_LINK)], gdis_csv_zip)
         monkeypatch.setattr(fake, "download", lambda *a, **k: [])
         monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        backend = _points_backend(tmp_path)
         with pytest.raises(OSError, match="unaccepted_eulas"):
-            _points_backend(tmp_path).download()
+            backend.download()
 
     def test_extracted_member_is_reused_without_the_granule(
         self, tmp_path: Path, gdis_csv_frame, monkeypatch: pytest.MonkeyPatch
@@ -496,8 +497,9 @@ class TestGdisPointsRoute:
         """A collection without the catalogued granule names what it did have."""
         fake = FakeEarthaccess([FakeGranule("https://example.invalid/other.zip")])
         monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        backend = _points_backend(tmp_path)
         with pytest.raises(ValueError, match="is not in CMR collection"):
-            _points_backend(tmp_path).download()
+            backend.download()
 
 
 @pytest.mark.emdat

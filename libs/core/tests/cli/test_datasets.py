@@ -537,7 +537,8 @@ class TestValidate:
         """The emdat offline validator passes for the bundled catalog."""
         result = runner.invoke(app, ["datasets", "validate", "emdat", "--json"])
         payload = json.loads(result.output)
-        assert payload[0]["status"] == "ok" and payload[0]["issues"] == []
+        assert payload[0]["status"] == "ok", "emdat validated"
+        assert payload[0]["issues"] == [], "no structural issues"
 
     def test_live_flag_runs_live_validator(self, monkeypatch):
         """--live routes through the reachability validator (mocked)."""
