@@ -28,10 +28,15 @@ on:
 # and a manual dispatch, and neither may be killed — a cancelled scheduled run
 # means a week with no live-service coverage.
 #
-# The group deliberately omits the ref. What these jobs contend for is the
+# The group deliberately omits the ref. What these runs contend for is the
 # shared upstream account (one CDS / Earthdata / EE identity per repo), not the
-# branch, so a manual dispatch on a feature branch must still wait behind the
-# Sunday cron rather than hit the same quota alongside it.
+# branch, so a manual dispatch on a feature branch waits behind the Sunday cron
+# rather than starting alongside it.
+#
+# Note the scope: this serialises whole *runs*, not the jobs inside one. The
+# jobs in a single run still execute in parallel and can still meet each other
+# at the same provider — a job-level `concurrency:` would be needed to prevent
+# that, and is not worth it while the suites hit different services.
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}

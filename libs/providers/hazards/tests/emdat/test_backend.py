@@ -593,35 +593,24 @@ class TestLargeDownloadWarning:
 class TestCitation:
     """The source citation is logged when the row carries one."""
 
-    def test_citation_is_logged(self, tmp_path: Path) -> None:
+    def test_citation_is_logged(self, tmp_path: Path, info_messages: list[str]) -> None:
         """A row with a citation logs it."""
-        from loguru import logger
-
-        messages: list[str] = []
-        sink = logger.add(messages.append, level="INFO", format="{message}")
-        try:
-            EMDAT(variables=["gdis:points"], path=str(tmp_path))._log_citation()
-        finally:
-            logger.remove(sink)
-        assert any("Rosvold" in message for message in messages)
+        EMDAT(variables=["gdis:points"], path=str(tmp_path))._log_citation()
+        assert any("Rosvold" in message for message in info_messages)
 
     def test_missing_citation_logs_nothing(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        info_messages: list[str],
     ) -> None:
         """A row without a citation stays silent."""
-        from loguru import logger
-
         backend = EMDAT(variables=["gdis:points"], path=str(tmp_path))
         monkeypatch.setattr(
             backend, "_dataset", backend._dataset.model_copy(update={"citation": None})
         )
-        messages: list[str] = []
-        sink = logger.add(messages.append, level="INFO", format="{message}")
-        try:
-            backend._log_citation()
-        finally:
-            logger.remove(sink)
-        assert messages == []
+        backend._log_citation()
+        assert info_messages == []
 
 
 @pytest.mark.emdat
@@ -642,10 +631,14 @@ class TestNoGriddedDependency:
         ]
 
     def test_xarray_is_not_imported_by_a_download(
-        self, tmp_path: Path, dataverse_listing: dict[str, Any], events_workbook: Path
+        self,
+        tmp_path: Path,
+        dataverse_listing: dict[str, Any],
+        events_workbook: Path,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """A completed events download leaves no xarray import behind it."""
-        sys.modules.pop("xarray", None)
+        monkeypatch.delitem(sys.modules, "xarray", raising=False)
         http = FakeHttp(dataverse_listing, events_workbook)
         _events_backend(tmp_path, http).download()
         assert "xarray" not in sys.modules

@@ -113,11 +113,25 @@ in memory after the read.
 
 ## Joining the two sources
 
-EM-DAT's `DisNo.` (`2009-0631-BGD`) is GDIS's `disasterno` (`2009-0631`) with the ISO3 suffix dropped:
+EM-DAT's `DisNo.` (`2009-0631-BGD`) is GDIS's `disasterno` (`2009-0631`) with the ISO3 suffix dropped.
+
+Use the **same window** for both requests, or the join returns nothing — the two snippets above deliberately
+used different ones to show each filter independently:
 
 ```python
+locations = EarthLens(
+    "emdat",
+    variables=["gdis:points"],
+    start="2000-01-01",
+    end="2010-12-31",
+    hazard="flood",
+    lat_lim=[20.5, 26.7],
+    lon_lim=[88.0, 92.7],
+    path="out",
+).download()
+
 events["disasterno"] = events["DisNo."].str.rsplit("-", n=1).str[0]
-joined = footprints.merge(events, on="disasterno", how="inner")
+joined = locations.merge(events, on="disasterno", how="inner")
 ```
 
 The [example notebook](../../examples/emdat/flood_events_and_footprints.ipynb) works this through end to end.

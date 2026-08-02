@@ -146,6 +146,19 @@ def warning_messages():
         logger.remove(sink_id)
 
 
+@pytest.fixture
+def info_messages():
+    """Collect INFO-level loguru messages for the test's duration."""
+    from loguru import logger
+
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="INFO", format="{message}")
+    try:
+        yield messages
+    finally:
+        logger.remove(sink_id)
+
+
 class FakeHttp:
     """Stand-in for `HttpClient` that serves a canned listing and a local file.
 

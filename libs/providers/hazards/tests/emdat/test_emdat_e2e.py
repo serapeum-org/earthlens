@@ -45,12 +45,23 @@ _LAT = [20.5, 26.7]
 _LON = [88.0, 92.7]
 
 
+@pytest.fixture(scope="module")
+def live_output(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """One output directory shared by every live test in this module.
+
+    The backend reuses an already-fetched source file, so sharing the directory
+    downloads the 8 MB archive and the 1 MB granule once for the module instead
+    of once per test.
+    """
+    return tmp_path_factory.mktemp("emdat_e2e")
+
+
 @pytest.mark.e2e
 @pytest.mark.emdat
 class TestEventsLive:
     """The anonymous Dataverse archive — no credentials needed."""
 
-    def test_fetches_the_archive(self, tmp_path: Path) -> None:
+    def test_fetches_the_archive(self, live_output: Path) -> None:
         """A filtered request returns real EM-DAT event rows."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
@@ -61,12 +72,12 @@ class TestEventsLive:
                 end=_END,
                 hazard="flood",
                 country="BGD",
-                path=str(tmp_path),
+                path=str(live_output),
             ).download()
         assert isinstance(events, pd.DataFrame)
         assert not events.empty
 
-    def test_schema_is_the_documented_public_table(self, tmp_path: Path) -> None:
+    def test_schema_is_the_documented_public_table(self, live_output: Path) -> None:
         """The archive still ships the columns the backend keys on."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
@@ -77,7 +88,7 @@ class TestEventsLive:
                 end="2005-12-31",
                 hazard="flood",
                 country="BGD",
-                path=str(tmp_path),
+                path=str(live_output),
             ).download()
         assert {
             "DisNo.",
@@ -88,7 +99,7 @@ class TestEventsLive:
             "Total Affected",
         } <= set(events.columns)
 
-    def test_filters_are_honoured(self, tmp_path: Path) -> None:
+    def test_filters_are_honoured(self, live_output: Path) -> None:
         """The returned rows really are the requested hazard, country and years."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
@@ -99,13 +110,13 @@ class TestEventsLive:
                 end="2010-12-31",
                 hazard="flood",
                 country="BGD",
-                path=str(tmp_path),
+                path=str(live_output),
             ).download()
         assert set(events["Disaster Type"].str.lower()) == {"flood"}
         assert set(events["ISO"]) == {"BGD"}
         assert events["Start Year"].between(2000, 2010).all()
 
-    def test_license_warning_is_raised(self, tmp_path: Path) -> None:
+    def test_license_warning_is_raised(self, live_output: Path) -> None:
         """The restricted-use archive warns on a real download."""
         with pytest.warns(LicenseWarning):
             EarthLens(
@@ -115,7 +126,7 @@ class TestEventsLive:
                 end="2010-12-31",
                 hazard="flood",
                 country="BGD",
-                path=str(tmp_path),
+                path=str(live_output),
             ).download()
 
 
@@ -125,7 +136,7 @@ class TestEventsLive:
 class TestGdisPointsLive:
     """The GDIS centroid granule — needs an Earthdata Login."""
 
-    def test_fetches_flood_locations(self, tmp_path: Path) -> None:
+    def test_fetches_flood_locations(self, live_output: Path) -> None:
         """A regional flood request returns real point features."""
         locations = EarthLens(
             "emdat",
@@ -135,13 +146,13 @@ class TestGdisPointsLive:
             hazard="flood",
             lat_lim=_LAT,
             lon_lim=_LON,
-            path=str(tmp_path),
+            path=str(live_output),
         ).download()
         assert len(locations) > 0
         assert set(locations.geometry.geom_type) == {"Point"}
         assert locations.crs == "EPSG:4326"
 
-    def test_filters_are_honoured(self, tmp_path: Path) -> None:
+    def test_filters_are_honoured(self, live_output: Path) -> None:
         """The features really are floods inside the requested window."""
         locations = EarthLens(
             "emdat",
@@ -151,12 +162,12 @@ class TestGdisPointsLive:
             hazard="flood",
             lat_lim=_LAT,
             lon_lim=_LON,
-            path=str(tmp_path),
+            path=str(live_output),
         ).download()
         assert set(locations["disastertype"].str.strip()) == {"flood"}
         assert locations["year"].between(1990, 2018).all()
 
-    def test_joins_to_the_event_table(self, tmp_path: Path) -> None:
+    def test_joins_to_the_event_table(self, live_output: Path) -> None:
         """GDIS `disasterno` matches EM-DAT `DisNo.` with the ISO3 suffix dropped."""
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", LicenseWarning)
@@ -167,7 +178,7 @@ class TestGdisPointsLive:
                 end=_END,
                 hazard="flood",
                 country="BGD",
-                path=str(tmp_path),
+                path=str(live_output),
             ).download()
         locations = EarthLens(
             "emdat",
@@ -177,7 +188,7 @@ class TestGdisPointsLive:
             hazard="flood",
             lat_lim=_LAT,
             lon_lim=_LON,
-            path=str(tmp_path),
+            path=str(live_output),
         ).download()
         keys = set(events["DisNo."].str.rsplit("-", n=1).str[0])
         assert keys & set(locations["disasterno"])
