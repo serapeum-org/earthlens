@@ -59,6 +59,12 @@ datasets_app = typer.Typer(
     help="Find and inspect datasets across all earthlens providers.",
 )
 
+#: Help strings reused across several commands (single source of truth).
+_PROVIDER_ARG_HELP = "Provider id (or alias)."
+_PROVIDER_OPT_HELP = "Restrict to these providers (repeatable / comma-separated)."
+_JSON_ARRAY_HELP = "Emit a JSON array (for piping)."
+_IDS_ONLY_HELP = "Emit bare `provider<TAB>id` lines (for piping)."
+
 
 @datasets_app.callback()
 def datasets() -> None:
@@ -118,7 +124,7 @@ def where(
         None,
         "--provider",
         "-p",
-        help="Restrict to these providers (repeatable / comma-separated).",
+        help=_PROVIDER_OPT_HELP,
     ),
     exact: bool = typer.Option(
         False, "--exact", help="Match the dataset id exactly (no substring search)."
@@ -128,12 +134,8 @@ def where(
         "--include-available",
         help="Also search each backend's full upstream id index (slower).",
     ),
-    json_output: bool = typer.Option(
-        False, "--json", "-j", help="Emit a JSON array (for piping)."
-    ),
-    ids_only: bool = typer.Option(
-        False, "--ids-only", help="Emit bare `provider<TAB>id` lines (for piping)."
-    ),
+    json_output: bool = typer.Option(False, "--json", "-j", help=_JSON_ARRAY_HELP),
+    ids_only: bool = typer.Option(False, "--ids-only", help=_IDS_ONLY_HELP),
 ) -> None:
     """Show which provider(s) expose a dataset.
 
@@ -170,7 +172,7 @@ def search(
         None,
         "--provider",
         "-p",
-        help="Restrict to these providers (repeatable / comma-separated).",
+        help=_PROVIDER_OPT_HELP,
     ),
     filter_: list[str] = typer.Option(
         None,
@@ -196,12 +198,8 @@ def search(
         "--include-available",
         help="Also search each backend's full upstream id index (slower).",
     ),
-    json_output: bool = typer.Option(
-        False, "--json", "-j", help="Emit a JSON array (for piping)."
-    ),
-    ids_only: bool = typer.Option(
-        False, "--ids-only", help="Emit bare `provider<TAB>id` lines (for piping)."
-    ),
+    json_output: bool = typer.Option(False, "--json", "-j", help=_JSON_ARRAY_HELP),
+    ids_only: bool = typer.Option(False, "--ids-only", help=_IDS_ONLY_HELP),
 ) -> None:
     """Free-text + faceted search across every provider's catalog.
 
@@ -258,7 +256,7 @@ def list_datasets(
         None,
         "--provider",
         "-p",
-        help="Restrict to these providers (repeatable / comma-separated).",
+        help=_PROVIDER_OPT_HELP,
     ),
     full: bool = typer.Option(
         False,
@@ -271,12 +269,8 @@ def list_datasets(
         "--include-available",
         help="Also include each backend's full upstream id index (slower).",
     ),
-    json_output: bool = typer.Option(
-        False, "--json", "-j", help="Emit a JSON array (for piping)."
-    ),
-    ids_only: bool = typer.Option(
-        False, "--ids-only", help="Emit bare `provider<TAB>id` lines (for piping)."
-    ),
+    json_output: bool = typer.Option(False, "--json", "-j", help=_JSON_ARRAY_HELP),
+    ids_only: bool = typer.Option(False, "--ids-only", help=_IDS_ONLY_HELP),
 ) -> None:
     """List datasets across providers (offline; reads the bundled catalogs).
 
@@ -306,7 +300,7 @@ def list_datasets(
 
 @datasets_app.command()
 def show(
-    provider: str = typer.Argument(..., help="Provider id (or alias)."),
+    provider: str = typer.Argument(..., help=_PROVIDER_ARG_HELP),
     dataset: str = typer.Argument(..., help="Dataset id within that provider."),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit the full record as JSON."
@@ -353,7 +347,7 @@ def facets(
         None,
         "--provider",
         "-p",
-        help="Restrict to these providers (repeatable / comma-separated).",
+        help=_PROVIDER_OPT_HELP,
     ),
     json_output: bool = typer.Option(
         False, "--json", "-j", help="Emit JSON (for piping)."
@@ -446,7 +440,8 @@ def _refresh_tiles(selected: list[BackendInfo], *, json_output: bool) -> None:
                     "written": path,
                 }
             )
-        except Exception as exc:  # noqa: BLE001 — surfaced, not raised
+        # A failed regen is surfaced in the result row, never re-raised.
+        except Exception as exc:  # noqa: BLE001
             results.append(
                 {"provider": info.provider, "status": "error", "detail": str(exc)}
             )
@@ -464,6 +459,31 @@ def _refresh_tiles(selected: list[BackendInfo], *, json_output: bool) -> None:
             err_console().print(
                 f"[red]{result['status']}:[/red] {result['provider']} "
                 f"{result.get('detail', 'no tile artefact for this provider')}"
+            )
+
+
+def _report_refresh(outcomes, *, show_ids: bool) -> None:
+    """Print the refresh table plus the optional new-id and written lines.
+
+    Args:
+        outcomes: The per-provider refresh outcomes to render.
+        show_ids: When true, also list each provider's new upstream ids.
+    """
+    out_console().print(refresh_table(outcomes))
+    if show_ids:
+        for outcome in outcomes:
+            if outcome.status == "ok" and outcome.new_ids:
+                out_console().print(
+                    f"[bold]new upstream ids ({outcome.provider}):[/bold]"
+                )
+                for ident in outcome.new_ids:
+                    out_console().print(f"  {ident}")
+    for outcome in outcomes:
+        if outcome.written:
+            out_console().print(
+                f"[green]wrote {outcome.live_count} ids[/green] "
+                f"({outcome.provider}) -> {outcome.written}",
+                soft_wrap=True,
             )
 
 
@@ -526,27 +546,12 @@ def refresh(
         typer.echo(json.dumps([o.to_dict() for o in outcomes], indent=2))
         return
 
-    out_console().print(refresh_table(outcomes))
-    if show_ids:
-        for outcome in outcomes:
-            if outcome.status == "ok" and outcome.new_ids:
-                out_console().print(
-                    f"[bold]new upstream ids ({outcome.provider}):[/bold]"
-                )
-                for ident in outcome.new_ids:
-                    out_console().print(f"  {ident}")
-    for outcome in outcomes:
-        if outcome.written:
-            out_console().print(
-                f"[green]wrote {outcome.live_count} ids[/green] "
-                f"({outcome.provider}) -> {outcome.written}",
-                soft_wrap=True,
-            )
+    _report_refresh(outcomes, show_ids=show_ids)
 
 
 @datasets_app.command()
 def probe(
-    provider: str = typer.Argument(..., help="Provider id (or alias)."),
+    provider: str = typer.Argument(..., help=_PROVIDER_ARG_HELP),
     dataset: str = typer.Argument(
         ..., help="Dataset / collection id to sample for its band-asset schema."
     ),
@@ -588,7 +593,7 @@ def probe(
 
 @datasets_app.command()
 def curate(
-    provider: str = typer.Argument(..., help="Provider id (or alias)."),
+    provider: str = typer.Argument(..., help=_PROVIDER_ARG_HELP),
     upstream_id: str = typer.Argument(
         "",
         help="Upstream id to seed a curated row from (short name / id / code). "
@@ -680,19 +685,16 @@ def curate(
     backends = _select_refresh_backends(provider)
     if len(backends) != 1:
         raise typer.BadParameter("curate takes exactly one provider")
+    info = backends[0]
 
-    if all_ and fill_empty:
-        raise typer.BadParameter(
-            "--all (bulk-seed) and --fill-empty (bulk-hydrate) are separate "
-            "passes — run them one at a time, seed first"
-        )
-    if all_:
-        _curate_all(backends[0], write=write, limit=limit or None)
-        return
-    if fill_empty:
-        _curate_fill_empty(
-            backends[0], write=write, limit=limit or None, timeout=timeout
-        )
+    if _run_bulk_curation(
+        info,
+        all_=all_,
+        fill_empty=fill_empty,
+        write=write,
+        limit=limit,
+        timeout=timeout,
+    ):
         return
     if not upstream_id:
         raise typer.BadParameter(
@@ -700,7 +702,7 @@ def curate(
         )
 
     result = emit_stanza(
-        backends[0],
+        info,
         upstream_id,
         key=key or None,
         minimal=minimal,
@@ -715,7 +717,70 @@ def curate(
         services=service or None,
         server=server or None,
     )
+    _report_stanza(
+        info,
+        result,
+        write=write,
+        target=target or daac or group or None,
+        json_output=json_output,
+    )
 
+
+def _run_bulk_curation(
+    info,
+    *,
+    all_: bool,
+    fill_empty: bool,
+    write: bool,
+    limit: int,
+    timeout: int,
+) -> bool:
+    """Dispatch the `--all` / `--fill-empty` bulk passes; return whether handled.
+
+    Args:
+        info: The single selected backend.
+        all_: Run the bulk-seed pass (`curate ecmwf --all`).
+        fill_empty: Run the bulk-hydrate pass (`curate gee/ecmwf --fill-empty`).
+        write: Whether the mutating `--write` flag was given.
+        limit: Cap on rows processed (0 = all).
+        timeout: Per-dataset retrieve deadline for `--fill-empty` (0 = none).
+
+    Returns:
+        True when a bulk pass ran (the caller should return), else False.
+
+    Raises:
+        typer.BadParameter: If both `--all` and `--fill-empty` are given.
+    """
+    if all_ and fill_empty:
+        raise typer.BadParameter(
+            "--all (bulk-seed) and --fill-empty (bulk-hydrate) are separate "
+            "passes — run them one at a time, seed first"
+        )
+    if all_:
+        _curate_all(info, write=write, limit=limit or None)
+        return True
+    if fill_empty:
+        _curate_fill_empty(info, write=write, limit=limit or None, timeout=timeout)
+        return True
+    return False
+
+
+def _report_stanza(
+    info, result, *, write: bool, target: str | None, json_output: bool
+) -> None:
+    """Emit a seeded stanza's result: error-exit, write in place, or print it.
+
+    Args:
+        info: The backend the stanza was seeded for.
+        result: The `StanzaResult` returned by `emit_stanza`.
+        write: When true, insert the row into the catalog file.
+        target: Per-family shard stem to write into (sharded providers).
+        json_output: When true, render as JSON rather than YAML / Rich text.
+
+    Raises:
+        typer.Exit: With code 1 when the seed did not succeed.
+        typer.BadParameter: If `write_stanza` rejects the target.
+    """
     if result.status != "ok":
         if json_output:
             typer.echo(json.dumps(result.to_dict(), indent=2))
@@ -724,9 +789,8 @@ def curate(
         raise typer.Exit(code=1)
 
     if write:
-        target_stem = target or daac or group or None
         try:
-            written = write_stanza(backends[0], result, target_stem)
+            written = write_stanza(info, result, target)
         except ValueError as exc:
             raise typer.BadParameter(str(exc)) from exc
         out_console().print(
