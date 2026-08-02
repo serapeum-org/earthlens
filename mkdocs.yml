@@ -171,6 +171,7 @@ nav:
     - Contributing: contributing.md
   - Installation:
     - Provider extras: reference/provider-extras.md
+    - Datasets by provider: reference/provider-datasets.md
   - Data Sources:
     - Supported providers: reference/providers.md
     - Deferred providers: reference/deferred-providers.md
