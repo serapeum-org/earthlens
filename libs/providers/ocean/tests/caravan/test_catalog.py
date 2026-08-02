@@ -309,11 +309,22 @@ class TestCommunityExtensions:
         with pytest.raises(ValueError, match="exists only in"):
             catalog.get_variable("grdc", "discharge_efas")
 
-    def test_both_have_a_versioned_root_prefix_recorded(self):
-        """Neither uses a Caravan-ish root, which templating would have missed."""
+    def test_neither_uses_a_caravan_shaped_root_prefix(self):
+        """Templating a root from the extension name would miss both."""
         catalog = Catalog()
 
         assert (
             catalog.get_extension("spain").resolve_version().file_for("csv").root_prefix
             == "v110/"
         )
+        assert (
+            catalog.get_extension("czechia")
+            .resolve_version()
+            .file_for("csv")
+            .root_prefix
+            == "Caravan-Extension-CZ/"
+        )
+
+    def test_czechia_ships_a_singular_license_directory(self):
+        """Every other archive uses `licenses/`; this one does not."""
+        assert Catalog().get_extension("czechia").license_file.startswith("license/")

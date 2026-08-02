@@ -151,11 +151,7 @@ def test_base_1_2_is_readable_without_downloading_12_gb(tmp_path):
 
 
 def test_the_community_extensions_published_under_a_camels_name_fetch(tmp_path):
-    """czechia and spain are titled CAMELS-CZ / CAMELS-ES, not "Caravan ...".
-
-    They were absent from the catalog until a title-based census missed them, so
-    this pins that both are reachable and Caravan-shaped.
-    """
+    """Extensions titled CAMELS-CZ / CAMELS-ES are still reachable and Caravan-shaped."""
     for dataset, gauge_id in (
         ("czechia", "camelscz_24042409"),
         ("spain", "camelses_1080"),

@@ -171,9 +171,23 @@ def fake_client(zip_blob: bytes) -> HttpClient:
 
 
 @pytest.fixture
-def catalog(tmp_path: Path) -> Catalog:
+def catalog() -> Catalog:
     """A catalog whose rows point at a local fixture archive."""
     return Catalog(**_fixture_catalog())
+
+
+def _zip_file(name: str, prefix: str | None) -> Any:
+    """Build a zip `ArchiveFile` descriptor for the fixture catalog."""
+    from earthlens.caravan.catalog import ArchiveFile
+
+    return ArchiveFile(
+        record=1,
+        name=name,
+        size=0,
+        md5="d41d8cd98f00b204e9800998ecf8427e",
+        archive_format="zip",
+        root_prefix=prefix,
+    )
 
 
 def _fixture_catalog() -> dict[str, Any]:
@@ -185,16 +199,6 @@ def _fixture_catalog() -> dict[str, Any]:
         Variable,
         Version,
     )
-
-    def _zip_file(name: str, prefix: str | None) -> ArchiveFile:
-        return ArchiveFile(
-            record=1,
-            name=name,
-            size=0,
-            md5="d41d8cd98f00b204e9800998ecf8427e",
-            archive_format="zip",
-            root_prefix=prefix,
-        )
 
     versions = {
         "1.0": Version(
