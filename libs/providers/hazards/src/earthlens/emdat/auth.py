@@ -41,6 +41,7 @@ import os
 from pathlib import Path
 from typing import Any
 
+from loguru import logger
 from pydantic import BaseModel, ConfigDict, SecretStr
 
 from earthlens.base import AbstractAuth, AuthenticationError
@@ -164,6 +165,26 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
         """
         return self._creds.token is not None
 
+    def _warn_half_credential(self) -> None:
+        """Warn when only one half of a username/password pair was supplied.
+
+        A lone `username=` leaves :meth:`_has_explicit_credentials` false, so
+        resolution falls through to the `EARTHDATA_*` variables or `~/.netrc`
+        and may authenticate as an entirely different account. Silently
+        ignoring what the caller passed is the worst of the options.
+        """
+        username, password = self._creds.username, self._creds.password
+        if (username is None) == (password is None):
+            return
+        supplied = "username" if username is not None else "password"
+        missing = "password" if username is not None else "username"
+        logger.warning(
+            f"EmdatAuth: a {supplied} was given without a {missing}, so it "
+            "cannot be used. Falling back to EARTHDATA_TOKEN / "
+            "EARTHDATA_USERNAME+PASSWORD / ~/.netrc, which may authenticate "
+            "as a different account. Pass both, or neither."
+        )
+
     def _resolve_strategy(self) -> str:
         """Pick the `earthaccess.login` strategy.
 
@@ -177,6 +198,7 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
         Returns:
             str: One of `"environment"`, `"netrc"`, `"interactive"`.
         """
+        self._warn_half_credential()
         if self._has_explicit_token() or self._has_explicit_credentials():
             return "environment"
         if os.getenv("EARTHDATA_TOKEN"):

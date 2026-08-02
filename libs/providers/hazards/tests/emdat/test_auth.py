@@ -108,6 +108,38 @@ class TestStrategyResolution:
         auth = EmdatAuth(EmdatCredentials(username="u", netrc_path=missing_netrc))
         assert auth._resolve_strategy() == "interactive"
 
+    def test_half_credential_warns(
+        self, missing_netrc: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """A username with no password says so instead of silently falling back."""
+        from loguru import logger
+
+        messages: list[str] = []
+        sink = logger.add(messages.append, level="WARNING", format="{message}")
+        try:
+            EmdatAuth(
+                EmdatCredentials(username="alice", netrc_path=missing_netrc)
+            )._resolve_strategy()
+        finally:
+            logger.remove(sink)
+        assert any("without a password" in m for m in messages)
+
+    def test_a_complete_pair_does_not_warn(self, missing_netrc: Path) -> None:
+        """Both halves supplied is the normal case and stays quiet."""
+        from loguru import logger
+
+        messages: list[str] = []
+        sink = logger.add(messages.append, level="WARNING", format="{message}")
+        try:
+            EmdatAuth(
+                EmdatCredentials(
+                    username="alice", password=SecretStr("p"), netrc_path=missing_netrc
+                )
+            )._resolve_strategy()
+        finally:
+            logger.remove(sink)
+        assert messages == []
+
     def test_env_token_uses_environment(
         self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
     ) -> None:
