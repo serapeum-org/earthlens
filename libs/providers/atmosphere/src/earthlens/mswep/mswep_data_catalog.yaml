@@ -31,6 +31,41 @@ nrt_revision_days: 10
 # rclone (an hourly year is ~8760 files).
 granule_warn_threshold: 500
 
+# Auxiliary CSVs describing the rain gauges used in MSWEP's gauge-correction
+# step. Folder and file names are verbatim from the MSWEP V3.16 Documentation,
+# section 7. What that section does NOT say is which folder holds it -- it
+# reads "included in the Gauge_metadata folder" with no parent -- so the
+# backend looks under the version root first, then the share root, rather than
+# assuming one.
+gauge_metadata:
+  folder: Gauge_metadata
+  files:
+    daily_station_locations.csv:
+      description: >-
+        Latitude/longitude of each daily gauge that passed quality control and
+        deduplication. Identifiers are the original source station codes
+        (e.g. GHCND_GME00010350).
+    monthly_station_locations.csv:
+      description: >-
+        Latitude/longitude of each monthly gauge. Identifiers
+        (e.g. gridcell_00042230) are 0.25 degree GPCC grid cells; the numeric
+        suffix is the cell's flattened index in a global 720x1440 grid, in
+        row-major order from the top-left.
+    daily_station_date_ranges.csv:
+      description: >-
+        First and last valid observation per daily gauge. Bounds the temporal
+        span only - it does not imply continuous coverage, and many gauges have
+        gaps of days, months or years.
+    monthly_station_date_ranges.csv:
+      description: >-
+        First and last valid observation per monthly gauge. Same caveat about
+        gaps as the daily file.
+    daily_station_reporting_times.csv:
+      description: >-
+        Inferred reporting time per daily gauge, as an integer hour offset from
+        00:00 UTC. -5 means totals likely end 19:00 UTC; 0 means aligned with
+        the UTC calendar day; +3 means 03:00 UTC the following day.
+
 products:
 
   mswep:

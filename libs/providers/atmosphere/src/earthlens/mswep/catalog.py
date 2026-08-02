@@ -247,6 +247,59 @@ class MswepVariable(BaseModel):
     provisional: bool = False
 
 
+class GaugeMetadataFile(BaseModel):
+    """One auxiliary gauge-metadata CSV.
+
+    Attributes:
+        name: The file name, as it appears in the share.
+        description: What the file contains, from the MSWEP documentation.
+
+    Examples:
+        - Read what a file holds:
+            ```python
+            >>> from earthlens.mswep import Catalog
+            >>> row = Catalog().gauge_metadata.files["daily_station_locations.csv"]
+            >>> "Latitude" in row.description
+            True
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    name: str = ""
+    description: str = ""
+
+
+class GaugeMetadata(BaseModel):
+    """The `Gauge_metadata` folder and the CSVs inside it.
+
+    Describes the rain gauges behind MSWEP's gauge-correction step. The
+    documentation names the folder and every file, but not the folder's
+    **parent** — it reads "included in the `Gauge_metadata` folder" — so
+    the backend probes the version root and then the share root instead
+    of assuming one.
+
+    Attributes:
+        folder: The folder name (`"Gauge_metadata"`).
+        files: File name to its :class:`GaugeMetadataFile` row.
+
+    Examples:
+        - The five documented files are registered:
+            ```python
+            >>> from earthlens.mswep import Catalog
+            >>> len(Catalog().gauge_metadata.files)
+            5
+
+            ```
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    folder: str = "Gauge_metadata"
+    files: dict[str, GaugeMetadataFile] = Field(default_factory=dict)
+
+
 class MswepProduct(BaseModel):
     """One product (`mswep` or `mswx`) and everything needed to path it.
 
@@ -391,7 +444,20 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
                 f"{path} product {key!r} failed validation:\n{exc}"
             ) from exc
 
+    gauge_yaml = dict(data.get("gauge_metadata") or {})
+    gauge_files: dict[str, GaugeMetadataFile] = {}
+    for name, row in (gauge_yaml.get("files") or {}).items():
+        try:
+            gauge_files[name] = GaugeMetadataFile(name=name, **dict(row or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} gauge_metadata file {name!r} failed validation:\n{exc}"
+            ) from exc
+
     return {
+        "gauge_metadata": GaugeMetadata(
+            folder=gauge_yaml.get("folder", "Gauge_metadata"), files=gauge_files
+        ),
         "datasets": products,
         "license_id": data.get("license", ""),
         "attribution": data.get("attribution", ""),
@@ -450,6 +516,7 @@ class Catalog(AbstractCatalog):
     _catalog_kind: str = "MSWEP catalog"
 
     datasets: dict[str, MswepProduct] = Field(default_factory=dict)
+    gauge_metadata: GaugeMetadata = Field(default_factory=GaugeMetadata)
     license_id: str = ""
     attribution: str = ""
     nrt_revision_days: int = 0
@@ -468,6 +535,7 @@ class Catalog(AbstractCatalog):
         if not self.datasets:
             loaded = Catalog.load()
             self.datasets = loaded.datasets
+            self.gauge_metadata = loaded.gauge_metadata
             self.license_id = loaded.license_id
             self.attribution = loaded.attribution
             self.nrt_revision_days = loaded.nrt_revision_days

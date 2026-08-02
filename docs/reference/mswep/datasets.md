@@ -83,7 +83,34 @@ an error.
 Still provisional: the live V3.16 root folder name, nine MSWX variable folders, MSWX's `NRT` window and its
 `3hourly` folder.
 
-## Sidecar data
+## Gauge metadata
 
-The share also carries a `Gauge_metadata/` folder of station CSVs (locations, date ranges, reporting-time
-offsets) used in the gauge-correction step. Fetching those is not yet wired into this backend.
+The share carries a `Gauge_metadata/` folder of auxiliary CSVs describing the rain gauges behind MSWEP's
+gauge-correction step. Fetch them with `fetch_gauge_metadata()` — a separate method, because they are static
+reference data rather than a time series, so pushing them through `download()`'s date window would be
+meaningless:
+
+```python
+from earthlens.mswep import MSWEP
+
+src = MSWEP(start="2020-04-25", end="2020-04-25", temporal_resolution="daily", path="out")
+paths = src.fetch_gauge_metadata()            # all five
+paths = src.fetch_gauge_metadata(["daily_station_locations.csv"])   # or a subset
+```
+
+They land under `out/Gauge_metadata/` and are shipped raw — read them with pandas.
+
+| File | Contents |
+|---|---|
+| `daily_station_locations.csv` | Lat/lon per daily gauge that passed QC and deduplication. Ids are source station codes (`GHCND_GME00010350`). |
+| `monthly_station_locations.csv` | Lat/lon per monthly gauge. Ids (`gridcell_00042230`) are 0.25° GPCC cells; the suffix is the flattened index in a 720×1440 grid, row-major from top-left. |
+| `daily_station_date_ranges.csv` | First/last valid observation per daily gauge. |
+| `monthly_station_date_ranges.csv` | Same, for monthly gauges. |
+| `daily_station_reporting_times.csv` | Inferred reporting time as an hour offset from 00:00 UTC. `-5` means totals likely end 19:00 UTC; `0` aligns with the UTC day; `+3` means 03:00 UTC next day. |
+
+!!! warning "A date range is not continuous coverage"
+    The range files bound the temporal span only. Many gauges have gaps — missing days, months or whole years.
+
+!!! note "Where the folder lives"
+    The documentation names the folder and every file but not its **parent**. The backend therefore probes the
+    version root (alongside `Past` / `NRT`) first, then the share root, and reports both if neither has it.

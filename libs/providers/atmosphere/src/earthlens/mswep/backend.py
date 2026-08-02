@@ -532,6 +532,101 @@ class MSWEP(AbstractDataSource):
             written.append(destination)
         return written
 
+    def gauge_metadata_folder(self) -> str:
+        """Locate the `Gauge_metadata` folder, returning its Drive id.
+
+        The MSWEP documentation names the folder and every CSV in it but
+        not its **parent** — it reads "included in the `Gauge_metadata`
+        folder" — so both plausible parents are probed rather than one
+        being assumed: under the version root first (alongside `Past` /
+        `NRT`), then at the share root.
+
+        Returns:
+            str: Drive id of the folder.
+
+        Raises:
+            FileNotFoundError: When neither parent holds it, naming both
+                places that were searched.
+        """
+        folder = self._catalog.gauge_metadata.folder
+        root = self.resolver.resolve(self._product_key, self._version)
+
+        for parent_id, where in (
+            (root.id, f"{root.name}/{folder}"),
+            (self._auth.folder_id, folder),
+        ):
+            entry = find_folder(self._auth.service, parent_id, folder)
+            if entry is not None:
+                logger.debug(f"mswep: gauge metadata found at {where}")
+                return entry.id
+
+        raise FileNotFoundError(
+            f"{folder!r} is not in the share, under either {root.name!r} or the "
+            "share root. The MSWEP documentation names the folder but not its "
+            "parent, so both are searched; if yours lives somewhere else, "
+            "report the real location so the catalog can record it."
+        )
+
+    def fetch_gauge_metadata(self, names: list[str] | None = None) -> list[Path]:
+        """Download the auxiliary gauge-metadata CSVs.
+
+        These describe the rain gauges behind MSWEP's gauge-correction
+        step — station coordinates, per-gauge date ranges, and the
+        inferred reporting-time offsets. They are static and not part of
+        any time series, which is why they have their own method rather
+        than riding `download()`: forcing them through the date-window
+        machinery would be meaningless, and `OUTPUT_KIND` stays `raster`
+        for the granules.
+
+        Files are shipped raw, like the granules. Read them with pandas.
+
+        Args:
+            names: File names to fetch; `None` fetches all five. Names
+                are validated against the catalog.
+
+        Returns:
+            list[Path]: The CSVs written, under
+                `<path>/Gauge_metadata/`.
+
+        Raises:
+            ValueError: When a requested name is not a catalog entry, or
+                the product is not `mswep` (gauge correction is MSWEP's).
+            FileNotFoundError: When the folder is not in the share.
+        """
+        if self._product_key != "mswep":
+            raise ValueError(
+                "gauge metadata describes MSWEP's gauge-correction step and is "
+                f"published under MSWEP, not {self._product_key!r}."
+            )
+
+        catalogued = self._catalog.gauge_metadata.files
+        wanted = list(catalogued) if names is None else list(names)
+        unknown = [n for n in wanted if n not in catalogued]
+        if unknown:
+            raise ValueError(
+                f"{unknown!r} are not gauge-metadata files. Known: "
+                f"{sorted(catalogued)}."
+            )
+
+        self._auth.configure()
+        folder_id = self.gauge_metadata_folder()
+        found = find_children_by_name(self._auth.service, folder_id, wanted)
+
+        destination_root = self._ensure_root_dir() / self._catalog.gauge_metadata.folder
+        written: list[Path] = []
+        for name in wanted:
+            entry = found.get(name)
+            if entry is None:
+                logger.warning(
+                    f"mswep: gauge-metadata file {name} is absent from the share; "
+                    "skipping."
+                )
+                continue
+            written.append(
+                download_media(self._auth.service, entry.id, destination_root / name)
+            )
+        return written
+
     def _api(self) -> list[Path]:
         """Compose `_search` + `_fetch`.
 

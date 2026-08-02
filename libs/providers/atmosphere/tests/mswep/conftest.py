@@ -257,6 +257,13 @@ def share(drive):
                     "Monthly": ["202004.nc"],
                 },
                 "NRT": {"Daily": ["2025001.nc"]},
+                "Gauge_metadata": [
+                    "daily_station_locations.csv",
+                    "monthly_station_locations.csv",
+                    "daily_station_date_ranges.csv",
+                    "monthly_station_date_ranges.csv",
+                    "daily_station_reporting_times.csv",
+                ],
             },
             "MSWX_V100": {"Past": {"Temp": {"Daily": ["2007133.nc"]}}},
             "Gauge_metadata": {},

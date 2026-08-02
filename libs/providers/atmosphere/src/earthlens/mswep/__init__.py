@@ -71,6 +71,8 @@ from earthlens.mswep.backend import CADENCES, MSWEP
 from earthlens.mswep.catalog import (
     CATALOG_PATH,
     Catalog,
+    GaugeMetadata,
+    GaugeMetadataFile,
     MswepProduct,
     MswepResolution,
     MswepVariable,
@@ -93,6 +95,8 @@ __all__ = [
     "DRIVE_SCOPE",
     "DownloadQuotaExceededError",
     "DriveTransportError",
+    "GaugeMetadata",
+    "GaugeMetadataFile",
     "MSWEP",
     "MswepAuth",
     "MswepCredentials",
