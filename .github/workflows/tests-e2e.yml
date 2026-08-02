@@ -58,9 +58,37 @@ jobs:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
-          # Also picks up the credential-free live suites - caravan reads
-          # anonymous Zenodo archives - which is intended, not incidental.
-          uv run pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp" -v
+          # Also picks up the credential-free live suites that have no lane of
+          # their own. `caravan` is excluded because it now has one: this job
+          # runs 30-odd suites in a single pytest process, so one native crash
+          # takes down every suite behind it, and a backend whose e2e budget
+          # assertions are the point deserves to fail on its own merits.
+          uv run pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not caravan" -v
+
+  e2e-caravan:
+    runs-on: ubuntu-latest
+    if: github.repository == 'serapeum-org/earthlens'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
+        with:
+          python-version: "3.12"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          version: "0.11.29"
+
+      - name: Run live Caravan e2e tests
+        # Anonymous static Zenodo archives, so no secrets and nothing to skip.
+        # The suite asserts a transferred-byte budget - that one catchment
+        # costs ~3 MB out of an 8.84 GB archive - so it is the regression gate
+        # for the range-read design, not a smoke test.
+        run: |
+          uv run pytest -m "e2e and caravan" -v
 
   e2e-gee:
     runs-on: ubuntu-latest
