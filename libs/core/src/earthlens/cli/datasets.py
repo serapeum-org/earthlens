@@ -592,7 +592,10 @@ def probe(
 
 
 @datasets_app.command()
-def curate(
+# curate's parameters are its CLI options — the many provider-specific seed
+# flags (earthdata / usgs_water / erddap / ecmwf) are the command's public
+# surface, so the count is inherent to the interface, not a refactorable smell.
+def curate(  # NOSONAR
     provider: str = typer.Argument(..., help=_PROVIDER_ARG_HELP),
     upstream_id: str = typer.Argument(
         "",
