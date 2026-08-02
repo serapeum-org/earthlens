@@ -49,12 +49,15 @@ id,country,iso3,gwno,year,geo_id,geolocation,level,adm1,adm2,adm3,location,histo
 
 #: Invented GDIS footprint rows under the real GeoPackage field names — no
 #: `year`, no coordinates. Row 3 quotes `"extreme temperature "` to preserve the
-#: trailing space the shipped file really carries.
+#: trailing space the shipped file really carries, and row 5 spells its hazard
+#: `Flood` so the driver push-down's case-insensitivity is actually exercised —
+#: with every value lower-case, `LIKE` and `=` are indistinguishable.
 GDIS_GPKG_CSV = """\
 id,country,iso3,gwno,geo_id,geolocation,level,adm1,adm2,adm3,location,historical,hist_country,disastertype,disasterno
 1,Testland,TST,1,10,Alpha,1,A1,A2,A3,Alpha,0,NA,flood,2009-0001
 2,Testland,TST,1,11,Beta,1,B1,B2,B3,Beta,0,NA,flood,1995-0002
 3,Otherland,OTH,2,12,Gamma,1,C1,C2,C3,Gamma,0,NA,"extreme temperature ",2009-0004
+5,Mixedland,MIX,3,15,Zeta,1,Z1,Z2,Z3,Zeta,0,NA,Flood,2013-0009
 4,Testland,TST,1,13,Delta,1,D1,D2,D3,Delta,0,NA,storm,2009-0006
 """
 
@@ -113,7 +116,13 @@ def gdis_csv_zip(source_dir: Path, gdis_csv_frame: pd.DataFrame) -> Path:
 @pytest.fixture
 def gdis_gpkg(source_dir: Path) -> Path:
     """An invented GDIS footprint GeoPackage on the real `GPKG` layer."""
-    geometries = [box(0, 0, 1, 1), box(2, 2, 3, 3), box(0, 0, 1, 1), box(0, 0, 1, 1)]
+    geometries = [
+        box(0, 0, 1, 1),
+        box(2, 2, 3, 3),
+        box(0, 0, 1, 1),
+        box(0, 0, 1, 1),
+        box(0, 0, 1, 1),
+    ]
     gdf = gpd.GeoDataFrame(_read(GDIS_GPKG_CSV), geometry=geometries, crs="EPSG:4326")
     path = source_dir / "pend-gdis-1960-2018-disasterlocations.gpkg"
     gdf.to_file(path, layer="GPKG", driver="GPKG")

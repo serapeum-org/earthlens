@@ -463,12 +463,24 @@ class TestGdisPolygonsRoute:
         backend = EMDAT(variables=["gdis:polygons"], path=str(tmp_path))
         result = backend._read_gdis_gpkg(gdis_gpkg)
         assert set(result.geometry.geom_type) == {"Polygon"}
-        assert len(result) == 4
+        assert len(result) == 5
 
     def test_hazard_push_down(self, tmp_path: Path, gdis_gpkg: Path) -> None:
-        """The hazard filter is applied by the driver."""
+        """The hazard filter is applied by the driver, ignoring case.
+
+        The fixture spells one row `Flood`, so an exact-match push-down would
+        return two rather than three.
+        """
         backend = EMDAT(variables=["gdis:polygons"], hazard="flood", path=str(tmp_path))
-        assert len(backend._read_gdis_gpkg(gdis_gpkg)) == 2
+        result = backend._read_gdis_gpkg(gdis_gpkg)
+        assert sorted(result["disastertype"]) == ["Flood", "flood", "flood"]
+
+    def test_country_push_down_ignores_case(
+        self, tmp_path: Path, gdis_gpkg: Path
+    ) -> None:
+        """The ISO3 filter is case-insensitive at the driver too."""
+        backend = EMDAT(variables=["gdis:polygons"], country="mix", path=str(tmp_path))
+        assert backend._read_gdis_gpkg(gdis_gpkg)["iso3"].tolist() == ["MIX"]
 
     def test_trailing_space_value_is_matched(
         self, tmp_path: Path, gdis_gpkg: Path
@@ -491,7 +503,12 @@ class TestGdisPolygonsRoute:
     def test_year_comes_from_the_id_prefix(
         self, tmp_path: Path, gdis_gpkg: Path
     ) -> None:
-        """With no year column the window is applied via the disasterno prefix."""
+        """With no year column the window is applied via the disasterno prefix.
+
+        Both survivors are floods inside 2005-2015, and one of them is the
+        mixed-case `Flood` row — so this also pins the case-insensitive
+        push-down.
+        """
         backend = EMDAT(
             variables=["gdis:polygons"],
             hazard="flood",
@@ -500,14 +517,14 @@ class TestGdisPolygonsRoute:
             path=str(tmp_path),
         )
         result = backend._read_gdis_gpkg(gdis_gpkg)
-        assert result["disasterno"].tolist() == ["2009-0001"]
+        assert sorted(result["disasterno"]) == ["2009-0001", "2013-0009"]
 
     def test_open_ended_window_skips_the_year_filter(
         self, tmp_path: Path, gdis_gpkg: Path
     ) -> None:
         """No window means no year filtering at all."""
         backend = EMDAT(variables=["gdis:polygons"], path=str(tmp_path))
-        assert len(backend._read_gdis_gpkg(gdis_gpkg)) == 4
+        assert len(backend._read_gdis_gpkg(gdis_gpkg)) == 5
 
     def test_open_start_window(self, tmp_path: Path, gdis_gpkg: Path) -> None:
         """A `None` lower bound keeps everything up to the upper bound."""
@@ -529,7 +546,7 @@ class TestGdisPolygonsRoute:
             path=str(tmp_path),
         )
         result = backend._read_gdis_gpkg(gdis_gpkg)
-        assert result["disasterno"].tolist() == ["2009-0001"]
+        assert sorted(result["disasterno"]) == ["2009-0001", "2013-0009"]
 
     def test_bbox_push_down(self, tmp_path: Path, gdis_gpkg: Path) -> None:
         """The spatial filter is applied by the driver."""
