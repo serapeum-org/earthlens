@@ -547,3 +547,85 @@ class TestReviewRegressions:
         ).download()
 
         assert len(list(tmp_path.glob("caravan_demo_*.csv"))) == 2
+
+
+class TestMergedGeometry:
+    """Basin polygons when a selection spans more than one source."""
+
+    def _frames(self, monkeypatch, source_crs):
+        """Patch `_load_geometry`'s reader to return one frame per source."""
+        import geopandas as gpd
+        from shapely.geometry import Polygon
+
+        made = []
+        for index, crs in enumerate(source_crs):
+            made.append(
+                gpd.GeoDataFrame(
+                    {"gauge_id": [f"g{index}a", f"g{index}b"]},
+                    geometry=[
+                        Polygon([(0, 0), (1, 0), (1, 1)]),
+                        Polygon([(1, 1), (2, 1), (2, 2)]),
+                    ],
+                    crs=crs,
+                )
+            )
+        queue = list(made)
+        monkeypatch.setitem(
+            __import__("sys").modules,
+            "pyramids.feature.collection",
+            type(
+                "M",
+                (),
+                {
+                    "FeatureCollection": type(
+                        "F", (), {"read_file": staticmethod(lambda p: queue.pop(0))}
+                    )
+                },
+            ),
+        )
+        return made
+
+    def test_two_sources_are_merged_not_discarded(self, catalog, tmp_path, monkeypatch):
+        """Returning one source's polygons would silently lose the others."""
+        self._frames(monkeypatch, ["EPSG:4326", "EPSG:4326"])
+        source = _source(
+            catalog, tmp_path, gauge_ids=["dk_1", "xx_9"], with_geometry=True
+        )
+
+        source.download()
+
+        assert len(source.geometry) == 4
+
+    def test_the_merged_index_is_unique(self, catalog, tmp_path, monkeypatch):
+        """Each source frame starts at 0, so a plain concat repeats labels."""
+        self._frames(monkeypatch, ["EPSG:4326", "EPSG:4326"])
+        source = _source(
+            catalog, tmp_path, gauge_ids=["dk_1", "xx_9"], with_geometry=True
+        )
+
+        source.download()
+
+        assert list(source.geometry.index) == [0, 1, 2, 3]
+
+    def test_mixed_crs_raises_rather_than_misplacing_geometry(
+        self, catalog, tmp_path, monkeypatch
+    ):
+        """Concatenating across CRSs would put polygons in the wrong place."""
+        self._frames(monkeypatch, ["EPSG:4326", "EPSG:3857"])
+        source = _source(
+            catalog, tmp_path, gauge_ids=["dk_1", "xx_9"], with_geometry=True
+        )
+
+        with pytest.raises(ValueError, match="more than one CRS"):
+            source.download()
+
+    def test_a_single_source_is_returned_unwrapped(
+        self, catalog, tmp_path, monkeypatch
+    ):
+        """The one-source path must not change shape just because merging exists."""
+        made = self._frames(monkeypatch, ["EPSG:4326"])
+        source = _source(catalog, tmp_path, gauge_ids=["dk_1"], with_geometry=True)
+
+        source.download()
+
+        assert source.geometry is made[0]

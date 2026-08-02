@@ -785,12 +785,21 @@ class Caravan(AbstractDataSource):
         # for a multi-source selection loses the rest with no signal, and `base`
         # spans seven sources.
         import pandas as pd
-        from pyramids.feature.collection import FeatureCollection
 
         names = [name for name, _ in collections]
+        frames = [collection for _, collection in collections]
+        crs_values = {str(frame.crs) for frame in frames if frame.crs is not None}
+        if len(crs_values) > 1:
+            raise ValueError(
+                f"caravan {self._dataset}: basin shapes span more than one CRS "
+                f"({sorted(crs_values)}); merging them would misplace geometries. "
+                f"Request one source at a time."
+            )
         logger.info(f"caravan {self._dataset}: merging basin shapes from {names}")
-        merged = pd.concat([collection for _, collection in collections])
-        return FeatureCollection(merged)
+        # `ignore_index` because each source's frame is indexed from 0; a plain
+        # concat repeats those labels and breaks `.loc` on the result. A
+        # `FeatureCollection` is already a `GeoDataFrame`, so no re-wrap.
+        return pd.concat(frames, ignore_index=True)
 
     def _create_output_path(self) -> Path:
         """Return the path the assembled table is written to.

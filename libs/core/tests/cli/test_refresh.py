@@ -1486,24 +1486,36 @@ class TestCaravanRefresher:
         assert refresh_mod._caravan_grouped(self._catalog())["demo"] == []
 
     def test_a_deliberately_unsupported_record_is_not_discovered(self, monkeypatch):
-        """Reporting a known exclusion every run trains the reader to ignore it."""
-        self._patch(
-            monkeypatch,
-            {"hits": {"hits": []}},
-            {
-                "hits": {
-                    "hits": [
-                        {
-                            "id": 777,
-                            "conceptrecid": "776",
-                            "metadata": {"title": "MultiMet"},
-                        }
-                    ]
-                }
-            },
-        )
+        """Reporting a known exclusion every run trains the reader to ignore it.
 
+        The hit deliberately passes the hydrology filter, so only the
+        `available_extensions` suppression can keep it out.
+        """
+        hit = {
+            "id": 777,
+            "conceptrecid": "776",
+            "metadata": {
+                "title": "Caravan MultiMet",
+                "keywords": ["hydrology", "streamflow"],
+            },
+        }
+        self._patch(monkeypatch, {"hits": {"hits": []}}, {"hits": {"hits": [hit]}})
+
+        assert refresh_mod._is_hydrological(hit), "the fixture must reach the filter"
         assert refresh_mod._caravan_grouped(self._catalog())["discovered"] == []
+
+    def test_the_suppression_is_what_keeps_it_out(self, monkeypatch):
+        """An unsuppressed hit must surface, or the test above proves nothing."""
+        hit = {
+            "id": 999,
+            "conceptrecid": "998",
+            "metadata": {"title": "Caravan MultiMet", "keywords": ["hydrology"]},
+        }
+        self._patch(monkeypatch, {"hits": {"hits": []}}, {"hits": {"hits": [hit]}})
+
+        discovered = refresh_mod._caravan_grouped(self._catalog())["discovered"]
+
+        assert discovered == ["999 (Caravan MultiMet)"]
 
     def test_an_unknown_record_is_discovered(self, monkeypatch):
         """A new community extension appears as its own record, not in any chain."""

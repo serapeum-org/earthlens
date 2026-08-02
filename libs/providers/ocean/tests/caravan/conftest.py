@@ -116,6 +116,10 @@ def _archive_members(header: str) -> dict[str, str]:
         "shapefiles/dk/dk_basin_shapes.shp": "shp",
         "shapefiles/dk/dk_basin_shapes.shx": "shx",
         "shapefiles/dk/dk_basin_shapes.dbf": "dbf",
+        # A second source's shapes, so the multi-source merge path is reachable.
+        "shapefiles/xx/xx_basin_shapes.shp": "shp",
+        "shapefiles/xx/xx_basin_shapes.shx": "shx",
+        "shapefiles/xx/xx_basin_shapes.dbf": "dbf",
         "licenses/dk/license_dk.md": "CC-BY-4.0",
     }
 
