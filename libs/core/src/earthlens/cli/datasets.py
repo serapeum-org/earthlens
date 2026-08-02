@@ -592,10 +592,11 @@ def probe(
 
 
 @datasets_app.command()
-# curate's parameters are its CLI options — the many provider-specific seed
+# curate's parameters are its CLI options: the many provider-specific seed
 # flags (earthdata / usgs_water / erddap / ecmwf) are the command's public
-# surface, so the count is inherent to the interface, not a refactorable smell.
-def curate(  # NOSONAR
+# surface, so the high count is inherent to the interface. Sonar S107 here is
+# a false positive for a Typer command and is resolved as won't-fix in the UI.
+def curate(
     provider: str = typer.Argument(..., help=_PROVIDER_ARG_HELP),
     upstream_id: str = typer.Argument(
         "",
