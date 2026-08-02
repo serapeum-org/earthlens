@@ -18,6 +18,7 @@ discharge use `earthlens.usgs_water` (US near-real-time) or GloFAS via
 
 Public surface:
 
+* :class:`Caravan` — the backend itself.
 * :class:`Catalog` — the bundled extension / variable catalog, plus
   :class:`Extension`, :class:`Version`, :class:`ArchiveFile`, :class:`Source`
   and :class:`Variable` rows.

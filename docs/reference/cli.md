@@ -266,10 +266,10 @@ earthlens datasets probe nwp icon-global          # which band tokens are in the
 The authoring companion to `probe`: fetches one upstream id's metadata and emits a paste-ready
 `datasets:` YAML row (inferring `output_kind` / `format` / bands where it can). By default it prints the
 row to vet and paste; `--write` appends it into the catalog file. Supported providers: `earthdata`,
-`hdx`, `usgs_water`, `eumetsat`, `gee`, `jaxa`, `erddap`, `caravan`.
-`caravan` supports `refresh` / `validate` but not `curate`: its rows are
-pinned Zenodo records that a human has to check an archive's layout to
-bump, so there is no stanza emitter to seed one from.
+`hdx`, `usgs_water`, `eumetsat`, `gee`, `jaxa`, `erddap`.
+`caravan` is deliberately absent: its rows are pinned Zenodo records whose
+archive layout a human has to inspect before bumping, so there is nothing to
+seed a stanza from. It supports `refresh` and `validate`.
 
 | Option | Meaning |
 |--------|---------|

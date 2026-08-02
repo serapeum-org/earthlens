@@ -1097,8 +1097,11 @@ class HttpRangeFile(io.RawIOBase):
                 raise_for_status=False,
             )
         except requests.RequestException:
+            # A HEAD that fails still cost a round trip; count it so the stats
+            # do not depend on whether the server answered.
+            self.request_count += 1
             response = None
-        if response is not None:
+        else:
             self.request_count += 1
         if response is not None and response.ok:
             # Trust the redirect chain HEAD walked, so the reads skip it.
@@ -1241,10 +1244,13 @@ class HttpRangeFile(io.RawIOBase):
         # with more bytes than the range asked for would otherwise grow a
         # `bytearray` caller's buffer (assigning past its length is legal) and
         # advance `_pos` by the wrong amount, desyncing every later read.
-        data = response.content[:want]
+        received = response.content
+        data = received[:want]
         buffer[: len(data)] = data
         self.request_count += 1
-        self.bytes_read += len(data)
+        # The bytes that crossed the wire, not the window kept: an over-sending
+        # server costs the full body and the stats should say so.
+        self.bytes_read += len(received)
         self._pos += len(data)
         return len(data)
 

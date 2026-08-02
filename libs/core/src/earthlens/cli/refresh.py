@@ -1641,13 +1641,10 @@ _CARAVAN_DISCOVERY_QUERIES = (
 _CARAVAN_HYDROLOGY_TERMS = (
     "hydrolog",
     "streamflow",
-    "rainfall-runoff",
-    "rainfall–runoff",
     "runoff",
     "catchment",
     "discharge",
     "caravan extension",
-    "caravan-extension",
     "caravan_extension",
     "caravan-",
 )
@@ -1721,7 +1718,7 @@ def _caravan_discovered(
         list[str]: `"<record> (<title>)"` for each untracked record, sorted.
     """
     discovered: set[str] = set()
-    filtered: list[str] = []
+    filtered: set[str] = set()
     for query in _CARAVAN_DISCOVERY_QUERIES:
         payload = _get_json(
             _ZENODO_SEARCH, params={"q": query, "size": 25, "sort": "newest"}
@@ -1737,14 +1734,14 @@ def _caravan_discovered(
             if not _is_hydrological(hit):
                 # Never drop a search hit silently: a false negative here is
                 # exactly how an extension stays invisible.
-                filtered.append(record)
+                filtered.add(record)
                 continue
             title = str((hit.get("metadata") or {}).get("title", ""))[:60]
             discovered.add(f"{record} ({title})")
     if filtered:
         logger.debug(
-            f"caravan: {len(filtered)} search hit(s) filtered as non-hydrological "
-            f"({', '.join(sorted(filtered)[:10])})"
+            f"caravan: {len(filtered)} record(s) filtered as non-hydrological "
+            f"({', '.join(sorted(filtered))})"
         )
     return sorted(discovered)
 
@@ -1784,7 +1781,10 @@ def _caravan_grouped(catalog: Any) -> dict[str, list[str]]:
     concepts = {
         str(doi).rsplit(".", 1)[-1]
         for extension in catalog.datasets.values()
-        for doi in (extension.concept_doi, extension.concept_doi_csv)
+        for doi in (
+            extension.concept_doi,
+            getattr(extension, "concept_doi_csv", ""),
+        )
         if doi
     }
     # Records the catalog deliberately does not wrap. Without this they surface

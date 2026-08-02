@@ -353,7 +353,8 @@ def extract_tar_members(
 #: turns each of those from a full re-scan into a local file read. They are
 #: small relative to the archive, though not trivially so: base's basin
 #: shapefiles run to hundreds of MB across its seven sources.
-_METADATA_DIRS = ("attributes/", "licenses/", "shapefiles/")
+#: `license/` as well as `licenses/`: czechia ships the singular form.
+_METADATA_DIRS = ("attributes/", "licenses/", "license/", "shapefiles/")
 
 
 def _is_metadata(name: str) -> bool:

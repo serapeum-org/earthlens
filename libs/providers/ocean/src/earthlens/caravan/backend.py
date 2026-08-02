@@ -784,8 +784,6 @@ class Caravan(AbstractDataSource):
         # Concatenate rather than pick: silently returning one source's polygons
         # for a multi-source selection loses the rest with no signal, and `base`
         # spans seven sources.
-        import pandas as pd
-
         names = [name for name, _ in collections]
         frames = [collection for _, collection in collections]
         crs_values = {str(frame.crs) for frame in frames if frame.crs is not None}
@@ -852,6 +850,9 @@ class Caravan(AbstractDataSource):
                 unknown variable, or a release needing `allow_full_download`.
         """
         self._limit = self.check_limit(limit)
+        # Re-resolved per download so a caller who reassigns `vars` between
+        # calls is not served the previous request's columns.
+        self._columns = None
         # Drop the empty fragments a skipped catchment or an out-of-window
         # member leaves behind: concatenating them makes pandas infer dtypes
         # from all-NA columns, which it warns about and will change.

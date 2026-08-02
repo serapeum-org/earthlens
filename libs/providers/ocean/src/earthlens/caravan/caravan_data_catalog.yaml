@@ -446,7 +446,7 @@ extensions:
       "1.1.0":
         doi: 10.5281/zenodo.15040948
         release_date: "2025-03-17"
-        # Hydrological years: the series starts and ends on 1 October.
+        # Hydrological years: the series runs 1990-10-01 to 2020-09-30.
         data_period: [1990, 2020]
         n_catchments: 269
         n_catchments_verified: true

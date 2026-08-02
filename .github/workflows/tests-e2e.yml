@@ -58,6 +58,8 @@ jobs:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
+          # Also picks up the credential-free live suites - caravan reads
+          # anonymous Zenodo archives - which is intended, not incidental.
           uv run pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp" -v
 
   e2e-gee:

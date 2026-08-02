@@ -96,22 +96,6 @@ def test_a_bounding_box_resolves_against_the_real_centroids(tmp_path):
     assert frame["gauge_id"].str.startswith("camelsdk_").all()
 
 
-def test_the_pinned_grdc_record_still_matches_zenodo():
-    """The catalog's pinned file must still exist with the recorded checksum."""
-    from earthlens.caravan._helpers import resolve_record
-
-    archive = Catalog().get_extension("grdc").resolve_version().file_for("csv")
-
-    published = resolve_record(archive.record)
-
-    assert archive.name in published, (
-        f"record {archive.record} no longer publishes {archive.name}; "
-        f"run `earthlens datasets refresh caravan`"
-    )
-    assert published[archive.name].md5 == archive.md5
-    assert published[archive.name].size == archive.size
-
-
 def test_base_at_its_default_version_refuses_without_the_opt_in(tmp_path):
     """The 29 GB row stays gated even against the live catalog."""
     with pytest.raises(ValueError, match="allow_full_download=True"):
@@ -173,7 +157,7 @@ def test_the_community_extensions_published_under_a_camels_name_fetch(tmp_path):
 
 
 def test_the_spanish_efas_columns_come_back(tmp_path):
-    """Caravan-ES carries four EFAS/EMO-1 fields no other extension has."""
+    """Caravan-ES carries EFAS/EMO-1 fields no other extension has."""
     frame = Caravan(
         start="2019-01-01",
         end="2019-01-03",
@@ -195,15 +179,26 @@ def test_the_spanish_efas_columns_come_back(tmp_path):
     assert frame["dis_efas5"].notna().all()
 
 
-def test_every_pinned_extension_still_matches_zenodo():
+def test_every_pinned_file_still_matches_zenodo_including_base_and_netcdf():
     """A stale pin anywhere in the catalog should fail here, not for a user."""
     from earthlens.caravan._helpers import resolve_record
 
     catalog = Catalog()
+    seen = 0
     for key in sorted(catalog.extensions):
-        archive = catalog.get_extension(key).resolve_version().file_for("csv")
-        published = resolve_record(archive.record)
+        extension = catalog.get_extension(key)
+        # Every version and every format, not just the default CSV: base pins a
+        # second release and splits its formats across two Zenodo records.
+        for version in sorted(extension.versions):
+            release = extension.resolve_version(version)
+            for fmt in sorted(release.files):
+                archive = release.file_for(fmt)  # type: ignore[arg-type]
+                published = resolve_record(archive.record)
+                where = f"{key}/{version}[{fmt}]"
 
-        assert archive.name in published, f"{key}: {archive.name} is gone"
-        assert published[archive.name].md5 == archive.md5, f"{key}: md5 drift"
-        assert published[archive.name].size == archive.size, f"{key}: size drift"
+                assert archive.name in published, f"{where}: {archive.name} is gone"
+                assert published[archive.name].md5 == archive.md5, f"{where}: md5 drift"
+                assert published[archive.name].size == archive.size, f"{where}: size"
+                seen += 1
+
+    assert seen >= 14, f"only {seen} pinned files checked"
