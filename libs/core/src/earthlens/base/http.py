@@ -1021,8 +1021,8 @@ class HttpRangeFile(io.RawIOBase):
             252
             >>> handle.read(4)
             b'\\xfc\\xfd\\xfe\\xff'
-            >>> handle.request_count
-            1
+            >>> handle.request_count  # the HEAD that sized it, plus the read
+            2
 
             ```
     """
@@ -1098,6 +1098,8 @@ class HttpRangeFile(io.RawIOBase):
             )
         except requests.RequestException:
             response = None
+        if response is not None:
+            self.request_count += 1
         if response is not None and response.ok:
             # Trust the redirect chain HEAD walked, so the reads skip it.
             self.url = response.url or url
@@ -1153,9 +1155,12 @@ class HttpRangeFile(io.RawIOBase):
                 for a local file); the next read simply returns nothing.
 
         Raises:
-            ValueError: On an unknown `whence`, or when the result would be a
-                negative offset - that is caller arithmetic gone wrong, and
-                silently flooring it to `0` would hand back the wrong bytes.
+            ValueError: On an unknown `whence`.
+            OSError: When the result would be a negative offset. That is caller
+                arithmetic gone wrong, and silently flooring it to `0` would
+                hand back the wrong bytes. `OSError` specifically, because
+                container readers guard their structural probes with
+                `except OSError` and a `ValueError` would escape that guard.
         """
         if whence == io.SEEK_SET:
             target = offset

@@ -215,6 +215,7 @@ class Caravan(AbstractDataSource):
         self._cache_root = cache_root
         self._archive: _helpers.CaravanArchive | None = None
         self._selected: list[tuple[str, str]] = []
+        self._columns: list[str] | None = None
 
         #: Basin polygons, populated by `download()` when `with_geometry`.
         self.geometry: Any = None
@@ -609,6 +610,10 @@ class Caravan(AbstractDataSource):
         """
         archive = self._open_archive()
         member = str(product.metadata["member"])
+        # Resolved once per request rather than per catchment: it depends only
+        # on the request, and a bbox selection can run to hundreds of members.
+        if self._columns is None:
+            self._columns = self._requested_columns()
         try:
             blob = archive.read(member)
         except KeyError:
@@ -616,8 +621,8 @@ class Caravan(AbstractDataSource):
                 f"caravan {self._dataset}: {product.id} is listed but its member "
                 f"{member} could not be read; skipping."
             )
-            return pd.DataFrame(columns=[*INDEX_COLUMNS, *self._requested_columns()])
-        return self._to_frame(product.id, blob, self._requested_columns())
+            return pd.DataFrame(columns=[*INDEX_COLUMNS, *self._columns])
+        return self._to_frame(product.id, blob, self._columns)
 
     def _fetch_sequential(
         self, archive: _helpers.CaravanArchive, products: list[RemoteProduct]
@@ -757,7 +762,7 @@ class Caravan(AbstractDataSource):
         archive = self._open_archive()
         wanted = {source for source, _ in self._selected}
         sources = [s for s in archive.sources if not wanted or s in wanted]
-        collections = []
+        collections: list[tuple[str, Any]] = []
         for source in sources:
             members = archive.shapefile_members(source)
             if not members:
@@ -771,16 +776,21 @@ class Caravan(AbstractDataSource):
                     if target.suffix == ".shp":
                         shp = target
                 if shp is not None:
-                    collections.append(FeatureCollection.read_file(str(shp)))
+                    collections.append((source, FeatureCollection.read_file(str(shp))))
         if not collections:
             return None
-        if len(collections) > 1:
-            logger.warning(
-                f"caravan {self._dataset}: {len(collections)} of the selected "
-                f"sources ship basin shapes; returning the first ({sources[0]}). "
-                f"Narrow the selection for a single-source geometry."
-            )
-        return collections[0]
+        if len(collections) == 1:
+            return collections[0][1]
+        # Concatenate rather than pick: silently returning one source's polygons
+        # for a multi-source selection loses the rest with no signal, and `base`
+        # spans seven sources.
+        import pandas as pd
+        from pyramids.feature.collection import FeatureCollection
+
+        names = [name for name, _ in collections]
+        logger.info(f"caravan {self._dataset}: merging basin shapes from {names}")
+        merged = pd.concat([collection for _, collection in collections])
+        return FeatureCollection(merged)
 
     def _create_output_path(self) -> Path:
         """Return the path the assembled table is written to.
@@ -854,6 +864,21 @@ class Caravan(AbstractDataSource):
                 f"caravan {self._dataset}: {len(table)} row(s) written to {out_path}"
             )
         return table
+
+    @property
+    def transfer_stats(self) -> tuple[int, float]:
+        """Requests issued and megabytes transferred for this request.
+
+        The public way to check what a fetch actually cost, which is the whole
+        premise of the range-read design. `(0, 0.0)` before anything is read,
+        and for the tar transport, which transfers nothing at read time.
+
+        Returns:
+            tuple[int, float]: `(request_count, megabytes)`.
+        """
+        if self._archive is None:
+            return (0, 0.0)
+        return self._archive.transfer_stats
 
     def close(self) -> None:
         """Release the opened archive and the HTTP session behind it.

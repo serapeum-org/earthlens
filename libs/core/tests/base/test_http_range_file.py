@@ -236,13 +236,15 @@ class TestRead:
         assert session.get_calls[0][1]["headers"]["Accept-Encoding"] == "identity"
 
     def test_counters_track_requests_and_bytes(self):
-        """The cost of a range-read session is observable."""
+        """The cost of a range-read session is observable, probe included."""
         handle = _range_file(_RangeSession(b"0123456789"))
 
         handle.read(4)
         handle.read(3)
 
-        assert handle.request_count == 2
+        # One HEAD to size the object, then the two ranged reads. The HEAD
+        # carries no body, so it costs a request but no bytes.
+        assert handle.request_count == 3
         assert handle.bytes_read == 7
 
     def test_the_file_is_readable_and_seekable_but_not_writable(self):
@@ -318,7 +320,9 @@ class TestHostileServer:
 
         handle = _range_file(session)
 
-        assert handle.request_count == 1
+        # The HEAD that returned no length, plus the one-byte Content-Range
+        # probe that recovered it.
+        assert handle.request_count == 2
         assert handle.bytes_read == 1
 
 
