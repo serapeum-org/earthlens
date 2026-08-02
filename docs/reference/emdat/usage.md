@@ -97,8 +97,10 @@ All four filters are optional. They work the same way on every source, with one 
       mass movement.
 
   An unknown value fails at construction with a did-you-mean hint naming the dataset, rather than silently
-  returning nothing. (The shipped GeoPackage spells one value `"extreme temperature "` with a trailing space; you
-  never have to care — pass the canonical name.)
+  returning nothing. Matching ignores case everywhere. Trailing whitespace in the *stored* data is handled
+  only for the one spelling GDIS actually ships — the GeoPackage writes `"extreme temperature "` with a
+  trailing space, and the filter looks for both that and the bare form — so pass the canonical name and you
+  never have to think about it.
 - **`country=`** — an ISO3 code, any casing. A value that is not three letters is rejected, so a typo fails
   loudly instead of looking like an empty result.
 - **`start=` / `end=`** — only the *year* is significant; both sources are indexed by event year. Either bound may
