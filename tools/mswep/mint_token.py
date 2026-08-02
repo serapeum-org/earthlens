@@ -45,6 +45,42 @@ from pathlib import Path
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
 
+def validated_path(raw: Path, *, must_exist: bool, suffix: str = ".json") -> Path:
+    """Canonicalise a command-line path and check it before touching disk.
+
+    Both paths this script handles come straight off the command line, so
+    they are canonicalised first — `resolve()` collapses `..` segments and
+    symlinks, so a traversal cannot reach somewhere the literal string did
+    not appear to point — and then checked for the shape this script
+    actually supports.
+
+    Args:
+        raw: The path as given on the command line.
+        must_exist: Require an existing **regular** file. A directory, a
+            device node or a FIFO is rejected either way: this script only
+            ever reads and writes ordinary JSON files.
+        suffix: Required file extension, case-insensitive.
+
+    Returns:
+        Path: The resolved, validated path.
+
+    Raises:
+        SystemExit: When the path is not a plain JSON file, does not exist
+            while `must_exist`, or resolves to something that is not a
+            regular file.
+    """
+    resolved = raw.expanduser().resolve()
+
+    if resolved.suffix.lower() != suffix:
+        raise SystemExit(f"{raw} must be a {suffix} file (got {resolved.suffix!r}).")
+    if resolved.exists() and not resolved.is_file():
+        raise SystemExit(f"{raw} is not a regular file.")
+    if must_exist and not resolved.is_file():
+        raise SystemExit(f"{raw} does not exist.")
+
+    return resolved
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse the command line.
 
@@ -76,7 +112,7 @@ def check_not_service_account(path: Path) -> None:
     """Reject a service-account key supplied in place of an OAuth client.
 
     Args:
-        path: The JSON file the caller passed.
+        path: The validated JSON file the caller passed.
 
     Raises:
         SystemExit: When the file is a service-account key, or is not the
@@ -108,8 +144,8 @@ def mint(client_secrets: Path, output: Path) -> Path:
     """Run the installed-app consent flow and write the authorized-user file.
 
     Args:
-        client_secrets: The OAuth client-ID JSON.
-        output: Where to write the token.
+        client_secrets: The validated OAuth client-ID JSON.
+        output: Validated destination for the token.
 
     Returns:
         Path: `output`.
@@ -148,11 +184,11 @@ def main(argv: list[str] | None = None) -> int:
         int: Process exit status.
     """
     args = parse_args(argv)
-    if not args.client_secrets.exists():
-        raise SystemExit(f"{args.client_secrets} does not exist.")
+    client_secrets = validated_path(args.client_secrets, must_exist=True)
+    output = validated_path(args.output, must_exist=False)
 
-    check_not_service_account(args.client_secrets)
-    written = mint(args.client_secrets, args.output)
+    check_not_service_account(client_secrets)
+    written = mint(client_secrets, output)
 
     payload = json.loads(written.read_text(encoding="utf-8"))
     if not payload.get("refresh_token"):
