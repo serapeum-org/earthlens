@@ -43,6 +43,7 @@ from typing import Any, cast
 
 import requests
 import yaml
+from loguru import logger
 
 from earthlens.cli.adapter import BackendInfo, load_catalog
 
@@ -1623,14 +1624,20 @@ _CARAVAN_DISCOVERY_QUERIES = (
     "caravan AND keywords:Hydrology",
 )
 
-#: Terms that mark a hit as hydrology rather than something else called a
-#: caravan. Full-text search for "caravan"/"camels" also returns camel-trade
-#: archaeology and animal taxonomy, and a discovery list that is mostly noise
-#: gets ignored - which defeats the point of running it. Deliberately excludes
-#: the bare words "caravan" and "camels": both are ambiguous (the animal, the
-#: trade route), and every real extension carries one of the terms below in its
-#: title or keywords anyway - including Denmark, whose keyword list is empty but
-#: whose title ends "for large-sample hydrology".
+#: Terms that mark a hit as a plausible Caravan extension rather than something
+#: else called a caravan. Full-text search for "caravan"/"camels" also returns
+#: camel-trade archaeology and animal taxonomy.
+#:
+#: Two families, because neither alone is sufficient. The hydrology terms catch
+#: records published under a source dataset's name (CAMELS-CZ, CAMELS-ES never
+#: say "Caravan" in their titles). The Caravan-specific phrases catch extensions
+#: whose titles are hydrological only by implication - "Caravan extension
+#: Iceland" and "Caravan-AUS-VIC (Maribyrnong River, Victoria)" contain no
+#: hydrology word at all, and an earlier version of this filter would have
+#: dropped both without a trace.
+#:
+#: The bare words "caravan" and "camels" are deliberately absent: both are
+#: ambiguous (the animal, the trade route), which is the noise this filters.
 _CARAVAN_HYDROLOGY_TERMS = (
     "hydrolog",
     "streamflow",
@@ -1639,6 +1646,10 @@ _CARAVAN_HYDROLOGY_TERMS = (
     "runoff",
     "catchment",
     "discharge",
+    "caravan extension",
+    "caravan-extension",
+    "caravan_extension",
+    "caravan-",
 )
 
 
@@ -1710,6 +1721,7 @@ def _caravan_discovered(
         list[str]: `"<record> (<title>)"` for each untracked record, sorted.
     """
     discovered: set[str] = set()
+    filtered: list[str] = []
     for query in _CARAVAN_DISCOVERY_QUERIES:
         payload = _get_json(
             _ZENODO_SEARCH, params={"q": query, "size": 25, "sort": "newest"}
@@ -1720,11 +1732,20 @@ def _caravan_discovered(
                 record in pinned
                 or str(hit.get("conceptrecid")) in concepts
                 or record in unsupported
-                or not _is_hydrological(hit)
             ):
+                continue
+            if not _is_hydrological(hit):
+                # Never drop a search hit silently: a false negative here is
+                # exactly how an extension stays invisible.
+                filtered.append(record)
                 continue
             title = str((hit.get("metadata") or {}).get("title", ""))[:60]
             discovered.add(f"{record} ({title})")
+    if filtered:
+        logger.debug(
+            f"caravan: {len(filtered)} search hit(s) filtered as non-hydrological "
+            f"({', '.join(sorted(filtered)[:10])})"
+        )
     return sorted(discovered)
 
 
@@ -1757,10 +1778,14 @@ def _caravan_grouped(catalog: Any) -> dict[str, list[str]]:
         for version in extension.versions.values()
         for archive in version.files.values()
     }
+    # Both concepts per row: since v1.6 `base` publishes its CSV and NetCDF
+    # timeseries under different Zenodo concepts, and tracking only the first
+    # left the other looking like an undiscovered extension.
     concepts = {
-        str(extension.concept_doi).rsplit(".", 1)[-1]
+        str(doi).rsplit(".", 1)[-1]
         for extension in catalog.datasets.values()
-        if extension.concept_doi
+        for doi in (extension.concept_doi, extension.concept_doi_csv)
+        if doi
     }
     # Records the catalog deliberately does not wrap. Without this they surface
     # as "discovered" on every run, which trains the reader to ignore the signal.

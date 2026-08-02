@@ -382,12 +382,16 @@ extensions:
     attribution: >-
       CAMELS-CZ / Caravan-Extension-CZ. Cite Caravan and CAMELS-CZ alongside
       this extension.
-    license_file: licenses/camelscz/license_caravan_cz.md
+    # Note the singular directory: this archive uses `license/`, unlike the
+    # `licenses/` every other extension ships.
+    license_file: license/camelscz/license_caravan_cz.md
     # The record also publishes CAMELS-CZ.zip and CAMELS-CZ-Hourly.zip, which are
     # the native CAMELS format rather than Caravan's - only the file below is
     # Caravan-shaped, so only it is pinned.
     sources:
       camelscz: {n_catchments: 249, name: CAMELS-CZ}
+    # The attribute table carries 250 rows against 249 timeseries members; the
+    # extra row simply has no series and is skipped by the id resolution.
     default_version: "2025-11-30"
     versions:
       "2025-11-30":
@@ -425,6 +429,11 @@ extensions:
       CAMELS-ES. Includes EFAS v5 and EMO-1 fields from the Copernicus Emergency
       Management Service. Cite Caravan and CAMELS-ES alongside this extension.
     license_file: licenses/camelses/license_camelses.txt
+    # Caravan-ES ships three EFAS attribute tables beyond the standard three.
+    # `attributes_efas_model_parameters_camelses.csv` is reachable; the other two
+    # are named `atributes_...` upstream (missing a `b`) and so match no pattern.
+    # None is needed by this backend - `with_attributes` merges the `other` and
+    # `caravan` tables - so they are recorded rather than worked around.
     sources:
       camelses: {n_catchments: 269, name: CAMELS-ES}
     default_version: "1.1.0"
@@ -581,6 +590,25 @@ available_extensions:
       Caravan-AUS-VIC (Maribyrnong River, Victoria) was published to Zenodo and
       then DELETED by its author on 2026-03-01 - the record now returns HTTP 410
       with a tombstone. There is nothing to fetch.
+  - key: camels-de-native
+    supported: false
+    records: [16755906]
+    reason: >-
+      The native CAMELS-DE dataset, a different Zenodo concept from the
+      Caravan-DE extension already wrapped as `germany`. Not in the Caravan
+      layout.
+  - key: deep-learning-in-hydrology
+    supported: false
+    records: [13975174]
+    reason: >-
+      A paper's supporting data, not a Caravan extension. Matches the discovery
+      search only because it is hydrological.
+  - key: floodnarrator
+    supported: false
+    records: [19657154]
+    reason: >-
+      A language-model paper, not a dataset. Matches the discovery search only
+      because it is hydrological.
   - key: camels-ch
     supported: false
     records: [15025258]

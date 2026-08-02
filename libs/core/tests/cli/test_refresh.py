@@ -1554,10 +1554,10 @@ class TestCaravanRefresher:
         assert refresh_mod._is_hydrological(hit)
 
     def test_a_hydrology_keyword_alone_is_enough(self):
-        """CAMELS-ES says nothing about Caravan in its title."""
+        """The title carries no qualifying term, so only the keywords can match."""
         hit = {
             "metadata": {
-                "title": "CAMELS-ES: Catchment Attributes for Spain",
+                "title": "CAMELS-ES: Attributes and Meteorology for Spain",
                 "keywords": ["CAMELS; CARAVAN; large sample hydrology; Spain"],
             }
         }
@@ -1648,3 +1648,25 @@ class TestCaravanValidator:
 
         assert issues == []
         assert checked == 7
+
+
+class TestDiscoveryFilterEdges:
+    """Titles the filter must accept even though they read as non-hydrological."""
+
+    def test_an_extension_named_only_for_its_region_is_kept(self):
+        """ "Caravan extension Iceland" carries no hydrology word at all."""
+        hit = {"metadata": {"title": "Caravan extension Iceland", "keywords": []}}
+
+        assert refresh_mod._is_hydrological(hit)
+
+    def test_a_hyphenated_caravan_name_is_kept(self):
+        """Caravan-AUS-VIC names a river, not a hydrological concept."""
+        hit = {
+            "metadata": {
+                "title": "New dataset extension: Caravan-AUS-VIC (Maribyrnong "
+                "River, Victoria, Australia)",
+                "keywords": [],
+            }
+        }
+
+        assert refresh_mod._is_hydrological(hit)
