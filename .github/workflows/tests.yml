@@ -11,15 +11,22 @@ on:
 
 # Supersede a pull request's in-flight run when a new commit lands on it — the
 # older result is about to be stale, and a busy PR would otherwise queue several
-# full matrices for commits nobody will look at again.
+# full matrices for commits nobody will look at again. For a `pull_request`
+# event `github.ref` is `refs/pull/<n>/merge`, unique per PR, so each PR
+# supersedes only itself.
 #
-# A push or merge to `main` is never cancelled. That run is the record for a
-# commit that is now the branch tip, so it has to finish even if another merge
-# lands while it is going; killing it would leave `main` with no test result for
-# that commit. The condition keys on the event because this workflow's only push
-# trigger is `branches: [main]`, so "not a pull request" is exactly "main".
+# A push or merge to `main` gets a group of its own, keyed on the run id, so it
+# never shares one with another main run. `cancel-in-progress: false` alone
+# would NOT be enough: it protects the run that is *in progress*, but GitHub
+# cancels any *pending* run in the group when a newer one queues, regardless of
+# that setting. Three merges in quick succession would leave the middle
+# commit's run cancelled and `main` with no test result for it — worse than
+# having no concurrency block at all. A unique group per run sidesteps the
+# question entirely, and keeps main runs parallel rather than serialised.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: >-
+    ${{ github.workflow }}-${{ github.event_name == 'pull_request'
+    && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
