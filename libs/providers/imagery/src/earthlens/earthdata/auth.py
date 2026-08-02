@@ -239,6 +239,37 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
             return "netrc"
         return "interactive"
 
+    def _explicit_env_overrides(self) -> tuple[dict[str, str], list[str]]:
+        """Return the EDL environment variables an explicit credential needs.
+
+        `earthaccess` has no direct token or username/password argument; its
+        `"environment"` strategy reads `EARTHDATA_TOKEN` (preferred) or
+        `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD`. Whichever explicit
+        credential was supplied is exported so it reaches the login, and
+        anything that would outrank it is named for removal.
+
+        Returns:
+            tuple[dict[str, str], list[str]]: The variables to set, and the
+                variables to unset for the duration of the login. Both are
+                empty when no explicit credential was given.
+        """
+        if self._has_explicit_token() and self._creds.token is not None:
+            return {"EARTHDATA_TOKEN": self._creds.token.get_secret_value()}, []
+        if (
+            self._has_explicit_credentials()
+            and self._creds.username is not None
+            and self._creds.password is not None
+        ):
+            wanted = {
+                "EARTHDATA_USERNAME": self._creds.username,
+                "EARTHDATA_PASSWORD": self._creds.password.get_secret_value(),
+            }
+            # earthaccess prefers EARTHDATA_TOKEN over a username/password pair,
+            # so an unrelated token already in the environment would silently
+            # beat the credentials the caller passed explicitly.
+            return wanted, ["EARTHDATA_TOKEN"]
+        return {}, []
+
     def configure(self) -> None:
         """Authenticate against EDL via `earthaccess.login`.
 
@@ -294,27 +325,7 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
 
             strategy = self._resolve_strategy()
             if strategy == "environment":
-                # earthaccess has no direct token / username-password argument;
-                # its environment strategy reads EARTHDATA_TOKEN (preferred) or
-                # EARTHDATA_USERNAME / EARTHDATA_PASSWORD. Export whichever
-                # explicit credential was supplied so it reaches the login.
-                wanted: dict[str, str] = {}
-                clear: list[str] = []
-                if self._has_explicit_token() and self._creds.token is not None:
-                    wanted["EARTHDATA_TOKEN"] = self._creds.token.get_secret_value()
-                elif (
-                    self._has_explicit_credentials()
-                    and self._creds.username is not None
-                    and self._creds.password is not None
-                ):
-                    wanted["EARTHDATA_USERNAME"] = self._creds.username
-                    wanted["EARTHDATA_PASSWORD"] = (
-                        self._creds.password.get_secret_value()
-                    )
-                    # earthaccess prefers EARTHDATA_TOKEN over a username/password
-                    # pair, so an unrelated token already in the environment would
-                    # silently beat the credentials the caller passed explicitly.
-                    clear.append("EARTHDATA_TOKEN")
+                wanted, clear = self._explicit_env_overrides()
                 for _name in list(wanted) + clear:
                     previous.setdefault(_name, os.environ.get(_name))
                 os.environ.update(wanted)
