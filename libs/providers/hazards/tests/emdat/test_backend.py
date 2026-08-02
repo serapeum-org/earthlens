@@ -244,6 +244,22 @@ class TestEventsRoute:
         result = backend.download()
         assert result["DisNo."].tolist() == ["2009-0001-TST"]
 
+    def test_archive_download_guards_the_body(
+        self, tmp_path: Path, dataverse_listing: dict[str, Any], events_workbook: Path
+    ) -> None:
+        """The fetch demands a zip magic, so an HTML error page is not cached."""
+        http = FakeHttp(dataverse_listing, events_workbook)
+        _events_backend(tmp_path, http).download()
+        assert http.download_kwargs[0]["expect_magic"] == b"PK"
+
+    def test_progress_flag_reaches_the_http_client(
+        self, tmp_path: Path, dataverse_listing: dict[str, Any], events_workbook: Path
+    ) -> None:
+        """`progress_bar=False` is passed through to the transport."""
+        http = FakeHttp(dataverse_listing, events_workbook)
+        _events_backend(tmp_path, http).download(progress_bar=False)
+        assert http.download_kwargs[0]["progress"] is False
+
     def test_result_is_written_to_the_output_directory(
         self, tmp_path: Path, dataverse_listing: dict[str, Any], events_workbook: Path
     ) -> None:
@@ -303,6 +319,43 @@ class TestGdisPointsRoute:
         result = _points_backend(tmp_path).download()
         assert set(result.geometry.geom_type) == {"Point"}
         assert result.crs == "EPSG:4326"
+
+    def test_the_route_authenticates_before_downloading(
+        self, tmp_path: Path, gdis_csv_zip: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """GDIS logs in before it fetches — deleting the call must fail a test."""
+        fake = FakeEarthaccess([FakeGranule(_GDIS_LINK)], gdis_csv_zip)
+        monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        backend = EMDAT(variables=["gdis:points"], path=str(tmp_path))
+        order: list[str] = []
+        monkeypatch.setattr(
+            backend._auth, "configure", lambda: order.append("configure")
+        )
+        monkeypatch.setattr(
+            fake,
+            "search_data",
+            lambda **kw: (order.append("search"), [FakeGranule(_GDIS_LINK)])[1],
+        )
+        backend.download()
+        assert order == ["configure", "search"]
+
+    def test_events_route_never_authenticates(
+        self, tmp_path: Path, dataverse_listing: dict[str, Any], events_workbook: Path
+    ) -> None:
+        """The anonymous route builds no auth object to configure."""
+        http = FakeHttp(dataverse_listing, events_workbook)
+        backend = _events_backend(tmp_path, http)
+        backend.download()
+        assert backend._auth is None
+
+    def test_progress_flag_reaches_earthaccess(
+        self, tmp_path: Path, gdis_csv_zip: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """`progress_bar=False` is passed through, not merely accepted."""
+        fake = FakeEarthaccess([FakeGranule(_GDIS_LINK)], gdis_csv_zip)
+        monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        _points_backend(tmp_path).download(progress_bar=False)
+        assert fake.download_kwargs[0]["show_progress"] is False
 
     def test_searches_the_catalogued_collection(
         self, tmp_path: Path, gdis_csv_zip: Path, monkeypatch: pytest.MonkeyPatch

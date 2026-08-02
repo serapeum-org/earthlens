@@ -160,6 +160,9 @@ class FakeHttp:
         self.json_payload = json_payload
         self.source = source
         self.calls: list[tuple[str, str]] = []
+        #: Keyword arguments each `download` was given, so a test can assert the
+        #: guards actually reach the transport rather than trusting the docstring.
+        self.download_kwargs: list[dict[str, Any]] = []
 
     def get_json(self, url: str, **kwargs: Any) -> Any:
         """Record the call and return the canned payload."""
@@ -167,8 +170,9 @@ class FakeHttp:
         return self.json_payload
 
     def download(self, url: str, dest: Path, **kwargs: Any) -> Path:
-        """Record the call and copy the fixture file to `dest`."""
+        """Record the call, its keyword arguments, and copy the fixture to `dest`."""
         self.calls.append(("download", url))
+        self.download_kwargs.append(dict(kwargs))
         dest.write_bytes(Path(self.source).read_bytes())
         return dest
 
@@ -199,6 +203,8 @@ class FakeEarthaccess:
         self.granules = granules
         self.source = source
         self.searched: list[dict[str, Any]] = []
+        #: Keyword arguments each `download` was given.
+        self.download_kwargs: list[dict[str, Any]] = []
 
     def search_data(self, **kwargs: Any) -> list[FakeGranule]:
         """Record the query and return the canned granules."""
@@ -206,7 +212,8 @@ class FakeEarthaccess:
         return self.granules
 
     def download(self, granules: list[FakeGranule], local_path: str, **kwargs: Any):
-        """Copy the fixture archive into `local_path`."""
+        """Record the keyword arguments and copy the fixture into `local_path`."""
+        self.download_kwargs.append(dict(kwargs))
         source = Path(self.source)
         target = Path(local_path) / source.name
         target.write_bytes(source.read_bytes())
