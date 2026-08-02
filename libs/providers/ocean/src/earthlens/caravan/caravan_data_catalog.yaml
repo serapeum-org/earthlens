@@ -256,10 +256,11 @@ extensions:
         doi: 10.5281/zenodo.15529786
         release_date: "2025-05-27"
         data_period: [1950, 2023]
-        # Changelog arithmetic (v0.4 6830 + v1.4 9130 + v1.6 CAMELS-AUS v2 ~339),
-        # not measured - the tar.gz cannot be indexed without downloading it.
-        n_catchments: 16300
-        n_catchments_verified: false
+        # Measured by downloading and indexing the archive (2026-08-02): 16,299
+        # across camels 671, camelsaus 561, camelsbr 870, camelscl 505,
+        # camelsgb 671, hysets 12162, lamah 859.
+        n_catchments: 16299
+        n_catchments_verified: true
         column_set: current
         files:
           csv:
@@ -268,13 +269,16 @@ extensions:
             size: 28951089034
             md5: ede5b507bd7e7ab9558d8ab1cedf65b1
             archive_format: tar.gz
-            root_prefix: null
+            root_prefix: Caravan-csv/
           netcdf:
             record: 15529786
             name: Caravan-nc.tar.gz
             size: 24775734275
             md5: ad3a7767db059f218380e9cce5f72452
             archive_format: tar.gz
+            # Not probed - the netcdf archive is a separate 24.8 GB download and
+            # this backend reads csv only. Members resolve from the index either
+            # way, so the prefix is documentation, not a lookup key.
             root_prefix: null
       # The newest range-readable base: a zip, so one catchment costs ~3 MB.
       # A materially different dataset, not merely an older cut - 6,830 of the

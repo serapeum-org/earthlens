@@ -67,14 +67,25 @@ class TestBundledCatalog:
         assert base.resolve_version("1.6").n_catchments > 6830
         assert base.resolve_version("1.2").data_period == (1981, 2020)
 
-    def test_base_1_6_count_is_marked_unverified(self):
-        """A tar.gz cannot be indexed without downloading it, so the count is arithmetic."""
-        assert (
-            not Catalog()
-            .get_extension("base")
-            .resolve_version("1.6")
-            .n_catchments_verified
-        )
+    def test_every_catchment_count_is_measured(self):
+        """An inferred count is a guess; the catalog should carry none."""
+        catalog = Catalog()
+
+        unverified = [
+            f"{key}/{version}"
+            for key, extension in catalog.extensions.items()
+            for version, release in extension.versions.items()
+            if not release.n_catchments_verified
+        ]
+
+        assert unverified == []
+
+    def test_base_1_6_carries_the_measured_count(self):
+        """16,299 was established by downloading and indexing the 29 GB archive."""
+        release = Catalog().get_extension("base").resolve_version("1.6")
+
+        assert release.n_catchments == 16299
+        assert release.file_for("csv").root_prefix == "Caravan-csv/"
 
     def test_source_datasets_are_not_top_level_rows(self):
         """camels / hysets / lamah live inside base, not beside it."""

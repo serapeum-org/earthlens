@@ -14,13 +14,15 @@ All seven extensions are **CC-BY-4.0**.
 | `czechia` | 249 | 1950–**2025** | [17769325](https://doi.org/10.5281/zenodo.17769325) | `Caravan-Extension-CZ.zip` | 0.91 GB | ✅ |
 | `denmark` | 308 | 1981–2020 | [15200118](https://doi.org/10.5281/zenodo.15200118) | `Caravan_extension_DK.zip` | 0.52 GB | ✅ |
 | `israel` | 95 | 1950–2024 | [15181680](https://doi.org/10.5281/zenodo.15181680) | `Caravan_extension_Israel_Ver4.zip` | 0.29 GB | ✅ |
-| `base` | ≈16,300 | 1950–2023 | [15530022](https://doi.org/10.5281/zenodo.15530022) (v1.6) | `Caravan-csv.tar.gz` | 28.95 GB | ❌ opt-in |
+| `base` | 16,299 | 1950–2023 | [15530022](https://doi.org/10.5281/zenodo.15530022) (v1.6) | `Caravan-csv.tar.gz` | 28.95 GB | ❌ opt-in |
 | `base` (`version="1.2"`) | 6,830 | 1981–2020 | [7944025](https://doi.org/10.5281/zenodo.7944025) | `Caravan.zip` | 12.52 GB | ✅ |
 
-!!! note "The `base` catchment count is arithmetic, not measured"
-    A `.tar.gz` cannot be indexed without downloading it, so ≈16,300 comes from the Zenodo changelog: v0.4 reached
-    6,830, v1.4 added 9,130 gauges previously excluded by the 100–2,000 km² area thresholds, and v1.6 moved
-    CAMELS-AUS to v2 (+≈339). Every other row's count was measured from the archive index.
+!!! note "Every count here is measured, `base` included"
+    `base` is the expensive one: a `.tar.gz` cannot be indexed without downloading it, so its 16,299 was
+    established by pulling the full 28.95 GB archive and indexing it (2026-08-02) — `hysets` 12,162,
+    `camelsbr` 870, `lamah` 859, `camels` 671, `camelsgb` 671, `camelsaus` 561, `camelscl` 505. The Zenodo
+    changelog implies ≈16,300 (6,830 at v0.4, +9,130 at v1.4, +CAMELS-AUS v2 at v1.6); the measurement lands
+    one below that.
 
 ## `base` source datasets
 

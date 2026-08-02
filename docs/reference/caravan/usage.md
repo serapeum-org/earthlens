@@ -134,7 +134,7 @@ EarthLens("caravan", dataset="base", version="1.2", gauge_ids=["camels_01022500"
 ```
 
 !!! danger "`version="1.2"` is not merely an older cut of the same data"
-    It holds **6,830** catchments against 1.6's ≈16,300, its forcing **stops in 2020** rather than 2023, and it
+    It holds **6,830** catchments against 1.6's 16,299, its forcing **stops in 2020** rather than 2023, and it
     predates the PET split — you get one `potential_evaporation_sum` instead of the ERA5-Land/FAO pair. Use it for
     cheap exploration, not as a drop-in substitute.
 
