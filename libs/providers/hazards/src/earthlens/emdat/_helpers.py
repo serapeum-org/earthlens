@@ -308,13 +308,18 @@ def filter_frame(
         # carries coordinates for about one event in ten. A bbox can only ever
         # match a located row, so an unqualified spatial filter silently drops
         # the rest. Say so, rather than returning a suspiciously small table.
-        ungeocoded = int((~located).sum())
+        #
+        # Counted against the rows the hazard/country/year filters already kept,
+        # not the whole source table, so the number matches what the caller
+        # would otherwise have received.
+        candidates = int(mask.sum())
+        ungeocoded = int((mask & ~located).sum())
         if ungeocoded:
             warnings.warn(
-                f"{dataset.id}: {ungeocoded} of {len(frame)} row(s) carry no "
-                f"coordinates in {lat_col!r}/{lon_col!r} and cannot satisfy a "
-                "bounding box, so they were dropped. Omit lat_lim/lon_lim to "
-                "keep them, or filter by country= instead.",
+                f"{dataset.id}: {ungeocoded} of {candidates} matching row(s) "
+                f"carry no coordinates in {lat_col!r}/{lon_col!r} and cannot "
+                "satisfy a bounding box, so they were dropped. Omit "
+                "lat_lim/lon_lim to keep them, or filter by country= instead.",
                 UngeocodedRowsWarning,
                 stacklevel=2,
             )

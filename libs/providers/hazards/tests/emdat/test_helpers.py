@@ -179,9 +179,9 @@ class TestHazardFilterSql:
         assert "LIKE" in sql
 
     def test_wildcards_are_escaped(self) -> None:
-        """A `%` or `_` in a hazard name is escaped, not treated as a wildcard."""
+        """A `%` or `_` in a hazard name is escaped, not left as a wildcard."""
         sql = _helpers.hazard_filter_sql("t", ["a%b_c"])
-        assert "%" in sql and "\%" in sql
+        assert r"a\%b\_c" in sql
 
     def test_multiple_hazards(self) -> None:
         """Every requested hazard contributes both spellings."""
@@ -313,6 +313,19 @@ class TestFilterFrame:
             _helpers.filter_frame(
                 gdis_csv_frame, points_row, bbox=(-180.0, -90.0, 180.0, 90.0)
             )
+
+    def test_the_warning_counts_only_matching_rows(
+        self, gdis_csv_frame, points_row
+    ) -> None:
+        """The count reflects the rows the other filters kept, not the table."""
+        with pytest.warns(_helpers.UngeocodedRowsWarning) as caught:
+            _helpers.filter_frame(
+                gdis_csv_frame,
+                points_row,
+                hazards=["flood"],
+                bbox=(-180.0, -90.0, 180.0, 90.0),
+            )
+        assert "1 of 3 matching row(s)" in str(caught[0].message)
 
     def test_bbox_does_not_warn_when_every_row_is_located(
         self, gdis_csv_frame, points_row
