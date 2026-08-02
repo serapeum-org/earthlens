@@ -300,8 +300,8 @@ def _build_dataset_map(
             if "cds_pressure_level" not in merged and pressure_level is not None:
                 merged["cds_pressure_level"] = pressure_level
             # Same parent-default / per-row-override pattern for
-            # product_type. Parent unset → Variable's own default
-            # (`["reanalysis"]`) applies.
+            # product_type. Parent unset → Variable's own default (an empty
+            # list), which the request builder omits unless a row sets it.
             if "product_type" not in merged and ds_product_type is not None:
                 merged["product_type"] = ds_product_type
             # Merge parent-level extras under per-row overrides:
@@ -455,9 +455,11 @@ class Variable(FluxableLeaf):
         product_type: CDS `product_type` request parameter. Picks
             the data flavor within a dataset (e.g. `["reanalysis"]`
             vs `["ensemble_mean"]` for ERA5; `["analysis"]` vs
-            `["forecast_based"]` for CARRA). Default
-            `["reanalysis"]` matches vanilla ERA5; auto-synthesized
-            monthly-means entries override to
+            `["forecast_based"]` for CARRA). Defaults to an empty
+            list, which the request builder omits from the request
+            (CAMS and other families that key on `type`/`quantity`
+            carry none); ERA5 rows set `["reanalysis"]` explicitly and
+            auto-synthesized monthly-means entries override to
             `["monthly_averaged_reanalysis"]`. Per-dataset and
             per-variable overrides land here via the catalog
             loader's merge.
