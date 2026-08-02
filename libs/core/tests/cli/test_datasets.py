@@ -499,6 +499,13 @@ class TestCurate:
         result = runner.invoke(app, ["datasets", "curate", "gee", "--fill-empty"])
         assert result.exit_code == 2, "fill-empty without --write -> exit 2"
 
+    def test_all_and_fill_empty_together_is_rejected(self):
+        """--all + --fill-empty is a usage error (separate passes, not combinable)."""
+        result = runner.invoke(
+            app, ["datasets", "curate", "ecmwf", "--all", "--fill-empty", "--write"]
+        )
+        assert result.exit_code == 2, "--all + --fill-empty -> exit 2"
+
     def test_fill_empty_ecmwf_runs_bulk_hydrate(self, monkeypatch):
         """ecmwf --fill-empty --write drives the ecmwf hydrate and reports a summary."""
         from earthlens.cli import _ecmwf_hydrate as ecmwf_hydrate_mod

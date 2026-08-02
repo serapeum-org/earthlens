@@ -675,6 +675,11 @@ def curate(
     if len(backends) != 1:
         raise typer.BadParameter("curate takes exactly one provider")
 
+    if all_ and fill_empty:
+        raise typer.BadParameter(
+            "--all (bulk-seed) and --fill-empty (bulk-hydrate) are separate "
+            "passes — run them one at a time, seed first"
+        )
     if all_:
         _curate_all(backends[0], write=write, limit=limit or None)
         return
