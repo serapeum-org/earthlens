@@ -368,6 +368,55 @@ def _find_file_for_dataset(catalog_dir: Path, dataset_id: str) -> Path | None:
     return None
 
 
+def _hydrate_one(
+    dataset_id: str,
+    prefix: str,
+    catalog_dir: Path,
+    file_text: dict[Path, str],
+    timeout: float | None,
+) -> str:
+    """Hydrate one placeholder dataset in place; return its outcome tag.
+
+    Retrieves the dataset under `timeout`, matches the sampled variables into
+    its shard, and — on a real change — updates `file_text` and writes the shard
+    to disk immediately. Progress is echoed. Never raises for a licence-gated,
+    unreachable, timed-out, or unmatchable dataset: those return a skip tag.
+
+    Args:
+        dataset_id: The Copernicus dataset id to hydrate.
+        prefix: The `[k/total] id` label echoed with the outcome.
+        catalog_dir: The `catalog/` shard directory to locate the stanza in.
+        file_text: The per-shard text cache, updated in place on a hydration.
+        timeout: Per-dataset retrieve deadline; `None` / `0` waits without one.
+
+    Returns:
+        One of `"hydrated"`, `"timed_out"`, or `"skipped"`.
+    """
+    try:
+        nc_meta: dict[str, dict[str, Any]] | None = _retrieve_with_timeout(
+            dataset_id, timeout
+        )
+    except TimeoutError:
+        typer.echo(f"{prefix}: timed out, skipped")
+        return "timed_out"
+    except Exception:  # noqa: BLE001 — a licence-gated / unreachable dataset is skipped
+        nc_meta = None
+    path = _find_file_for_dataset(catalog_dir, dataset_id) if nc_meta else None
+    if not nc_meta or path is None:
+        typer.echo(f"{prefix}: skipped")
+        return "skipped"
+    if path not in file_text:
+        file_text[path] = path.read_text(encoding="utf-8")
+    new_text = _rewrite_stanza(file_text[path], dataset_id, nc_meta)
+    if new_text == file_text[path]:
+        typer.echo(f"{prefix}: skipped")
+        return "skipped"
+    file_text[path] = new_text
+    path.write_text(new_text, encoding="utf-8")
+    typer.echo(f"{prefix}: hydrated -> {path.name}")
+    return "hydrated"
+
+
 def bulk_hydrate_empty(
     limit: int | None = None,
     timeout: float | None = _DEFAULT_RETRIEVE_TIMEOUT,
@@ -412,33 +461,14 @@ def bulk_hydrate_empty(
     filled: list[str] = []
     for index, dataset_id in enumerate(empty, start=1):
         prefix = f"[{index}/{total}] {dataset_id}"
-        try:
-            nc_meta: dict[str, dict[str, Any]] | None = _retrieve_with_timeout(
-                dataset_id, timeout
-            )
-        except TimeoutError:
-            typer.echo(f"{prefix}: timed out, skipped")
-            timed_out += 1
-            skipped += 1
-            continue
-        except Exception:  # noqa: BLE001 — a licence-gated / unreachable dataset is skipped
-            nc_meta = None
-        path = _find_file_for_dataset(catalog_dir, dataset_id) if nc_meta else None
-        if not nc_meta or path is None:
-            typer.echo(f"{prefix}: skipped")
-            skipped += 1
-            continue
-        if path not in file_text:
-            file_text[path] = path.read_text(encoding="utf-8")
-        new_text = _rewrite_stanza(file_text[path], dataset_id, nc_meta)
-        if new_text != file_text[path]:
-            file_text[path] = new_text
-            path.write_text(new_text, encoding="utf-8")
+        outcome = _hydrate_one(dataset_id, prefix, catalog_dir, file_text, timeout)
+        if outcome == "hydrated":
             hydrated += 1
             filled.append(dataset_id)
-            typer.echo(f"{prefix}: hydrated -> {path.name}")
+        elif outcome == "timed_out":
+            timed_out += 1
+            skipped += 1
         else:
-            typer.echo(f"{prefix}: skipped")
             skipped += 1
 
     clear_catalog_cache()
