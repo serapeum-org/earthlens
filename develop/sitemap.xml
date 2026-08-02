@@ -125,6 +125,14 @@
          <lastmod>2026-08-02</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/caravan/attributes_geometry_and_base/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/caravan/quickstart/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/chc/catalog_explorer/</loc>
          <lastmod>2026-08-02</lastmod>
     </url>
@@ -274,14 +282,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/eea-aq/quickstart/</loc>
-         <lastmod>2026-08-02</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/emdat/flood_events_and_footprints/</loc>
-         <lastmod>2026-08-02</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/emdat/flood_footprints_and_area/</loc>
          <lastmod>2026-08-02</lastmod>
     </url>
     <url>
@@ -1133,6 +1133,22 @@
          <lastmod>2026-08-02</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/caravan/caravan/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/caravan/datasets/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/caravan/introduction/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/caravan/usage/</loc>
+         <lastmod>2026-08-02</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/chc/catalog/</loc>
          <lastmod>2026-08-02</lastmod>
     </url>
@@ -1274,18 +1290,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/eea-aq/usage/</loc>
-         <lastmod>2026-08-02</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/emdat/emdat/</loc>
-         <lastmod>2026-08-02</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/emdat/introduction/</loc>
-         <lastmod>2026-08-02</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/emdat/usage/</loc>
          <lastmod>2026-08-02</lastmod>
     </url>
     <url>
