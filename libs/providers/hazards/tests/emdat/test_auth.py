@@ -328,6 +328,45 @@ class TestConfigure:
         with pytest.raises(AuthenticationError, match="boom"):
             auth.configure()
 
+    def test_empty_vars_are_restored_when_the_import_fails(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
+    ) -> None:
+        """A failed SDK import still puts the emptied EDL variables back."""
+        monkeypatch.setenv("EARTHDATA_TOKEN", "")
+        monkeypatch.setitem(sys.modules, "earthaccess", None)
+        auth = EmdatAuth(EmdatCredentials(netrc_path=missing_netrc))
+        with pytest.raises(ImportError):
+            auth.configure()
+        assert os.environ["EARTHDATA_TOKEN"] == ""
+
+    def test_empty_vars_are_restored_when_the_login_fails(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
+    ) -> None:
+        """A failed login also puts the emptied EDL variables back."""
+        monkeypatch.setenv("EARTHDATA_TOKEN", "")
+        _install_fake(monkeypatch, _FakeEarthaccess(RuntimeError("boom")))
+        auth = EmdatAuth(
+            EmdatCredentials(
+                username="u", password=SecretStr("p"), netrc_path=missing_netrc
+            )
+        )
+        with pytest.raises(AuthenticationError):
+            auth.configure()
+        assert os.environ["EARTHDATA_TOKEN"] == ""
+
+    def test_an_empty_var_is_restored_as_empty_not_dropped(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
+    ) -> None:
+        """An empty token comes back as '' — the exporter must not shadow it."""
+        monkeypatch.setenv("EARTHDATA_TOKEN", "")
+        _install_fake(monkeypatch, _FakeEarthaccess(_FakeAuth()))
+        EmdatAuth(
+            EmdatCredentials(
+                username="u", password=SecretStr("p"), netrc_path=missing_netrc
+            )
+        ).configure()
+        assert os.environ.get("EARTHDATA_TOKEN") == ""
+
     def test_missing_earthaccess_names_the_extra(
         self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path
     ) -> None:

@@ -251,35 +251,43 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
         # EARTHDATA_TOKEN as a real token and fails with "Token does not
         # exist", masking valid username/password env vars. Drop any empty EDL
         # env var so the strategy resolves to the credential actually set.
-        emptied: dict[str, str | None] = {}
+        previous: dict[str, str | None] = {}
         for var in ("EARTHDATA_TOKEN", "EARTHDATA_USERNAME", "EARTHDATA_PASSWORD"):
             if os.environ.get(var) == "":
-                emptied[var] = os.environ.pop(var)
+                previous[var] = os.environ.pop(var)
 
+        # Everything from here restores the environment on the way out, however
+        # it leaves — a failed import and a failed login included.
         try:
-            import earthaccess  # lazy — only needed when actually logging in
-        except ImportError as exc:
-            raise ImportError(
-                "the GDIS sources need `earthaccess`, which is not installed. "
-                "Install the extra with `pip install earthlens[emdat]`. The "
-                "`emdat:events` source needs no credentials and no extra."
-            ) from exc
+            try:
+                import earthaccess  # lazy — only needed when actually logging in
+            except ImportError as exc:
+                raise ImportError(
+                    "the GDIS sources need `earthaccess`, which is not "
+                    "installed. Install the extra with `pip install "
+                    "earthlens[emdat]`. The `emdat:events` source needs no "
+                    "credentials and no extra."
+                ) from exc
 
-        strategy = self._resolve_strategy()
-        previous: dict[str, str | None] = dict(emptied)
-        if strategy == "environment":
-            previous.update(self._export_explicit_credentials())
+            strategy = self._resolve_strategy()
+            if strategy == "environment":
+                # `setdefault`, not `update`: the empty-var pop above already
+                # recorded the true prior value, and the exporter re-samples
+                # `os.environ` afterwards, so it would report `None` for a
+                # variable that was really `""`.
+                for name, value in self._export_explicit_credentials().items():
+                    previous.setdefault(name, value)
 
-        try:
-            auth = earthaccess.login(strategy=strategy, persist=True)
-        except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
-            raise AuthenticationError(
-                "Earthdata Login failed while contacting EDL "
-                f"(strategy={strategy!r}): {type(exc).__name__}: {exc}. Set "
-                "EARTHDATA_USERNAME / EARTHDATA_PASSWORD, add a 'machine "
-                "urs.earthdata.nasa.gov' entry to ~/.netrc, or register a free "
-                f"account at {_REGISTER_URL}."
-            ) from exc
+            try:
+                auth = earthaccess.login(strategy=strategy, persist=True)
+            except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
+                raise AuthenticationError(
+                    "Earthdata Login failed while contacting EDL "
+                    f"(strategy={strategy!r}): {type(exc).__name__}: {exc}. Set "
+                    "EARTHDATA_USERNAME / EARTHDATA_PASSWORD, add a 'machine "
+                    "urs.earthdata.nasa.gov' entry to ~/.netrc, or register a "
+                    f"free account at {_REGISTER_URL}."
+                ) from exc
         finally:
             # An explicit credential is put in the environment only because
             # earthaccess has no argument for one. Leaving it there would make
