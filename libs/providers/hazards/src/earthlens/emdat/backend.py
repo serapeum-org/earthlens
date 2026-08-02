@@ -63,6 +63,63 @@ _GLOBAL_LON: list[float] = [-180.0, 180.0]
 LARGE_DOWNLOAD_MB: float = 100.0
 
 
+def _resolve_dataset_id(variables: list[str] | dict[str, Any] | None) -> str:
+    """Return the single dataset id named by a `variables=` argument.
+
+    Args:
+        variables: The constructor's `variables=` argument.
+
+    Returns:
+        str: The one requested dataset id, with a repeat of the same id
+            collapsed.
+
+    Raises:
+        TypeError: If `variables` is a mapping, which is another backend's
+            shape.
+        ValueError: If it does not name exactly one dataset.
+    """
+    if isinstance(variables, dict):
+        raise TypeError(
+            "EMDAT `variables` must be a one-element list naming the "
+            "dataset id (e.g. ['emdat:events']), not a mapping."
+        )
+    ids = list(dict.fromkeys(variables)) if variables else []
+    if len(ids) != 1:
+        raise ValueError(
+            "EMDAT needs exactly one dataset id in variables= (OUTPUT_KIND "
+            f"is per instance); got {ids!r}. Available: "
+            f"{Catalog().available()}."
+        )
+    return ids[0]
+
+
+def _validated_iso3(country: str | None) -> str | None:
+    """Return `country` unchanged once it looks like an ISO3 code.
+
+    Args:
+        country: The requested ISO3 code, or `None` to keep every country.
+
+    Returns:
+        str | None: The argument as given, so the caller's spelling is what
+            reaches the filter.
+
+    Raises:
+        ValueError: If `country` is not three ASCII letters.
+    """
+    if country is None:
+        return None
+    # `isascii()` as well as `isalpha()`: the latter alone accepts letters
+    # like 'Ð', which no ISO3 code contains.
+    code = country.strip()
+    if not (len(code) == 3 and code.isalpha() and code.isascii()):
+        raise ValueError(
+            f"country= must be a 3-letter ISO3 code (e.g. 'BGD'); got "
+            f"{country!r}. An unrecognised code would otherwise filter every "
+            "row away and look like an empty result."
+        )
+    return country
+
+
 class EMDAT(AbstractDataSource):
     """EM-DAT disaster event / location backend (per-instance output kind).
 
@@ -146,33 +203,10 @@ class EMDAT(AbstractDataSource):
                 dataset (the two sources have different vocabularies), or if
                 `country` is not a 3-letter ISO3 code.
         """
-        if isinstance(variables, dict):
-            raise TypeError(
-                "EMDAT `variables` must be a one-element list naming the "
-                "dataset id (e.g. ['emdat:events']), not a mapping."
-            )
-        ids = list(dict.fromkeys(variables)) if variables else []
-        if len(ids) != 1:
-            raise ValueError(
-                "EMDAT needs exactly one dataset id in variables= (OUTPUT_KIND "
-                f"is per instance); got {ids!r}. Available: "
-                f"{Catalog().available()}."
-            )
-
+        dataset_id = _resolve_dataset_id(variables)
         self._catalog = Catalog()
-        self._dataset: Dataset = self._catalog.get(ids[0])
-        # `isascii()` as well as `isalpha()`: the latter alone accepts letters
-        # like 'Ð', which no ISO3 code contains.
-        stripped = country.strip() if country is not None else None
-        if stripped is not None and not (
-            len(stripped) == 3 and stripped.isalpha() and stripped.isascii()
-        ):
-            raise ValueError(
-                f"country= must be a 3-letter ISO3 code (e.g. 'BGD'); got "
-                f"{country!r}. An unrecognised code would otherwise filter every "
-                "row away and look like an empty result."
-            )
-        self._country = country
+        self._dataset: Dataset = self._catalog.get(dataset_id)
+        self._country = _validated_iso3(country)
 
         requested = [hazard] if isinstance(hazard, str) else list(hazard or [])
         self._hazards = [
@@ -196,7 +230,7 @@ class EMDAT(AbstractDataSource):
         super().__init__(
             start=cast("str", start),
             end=cast("str", end),
-            variables=ids,
+            variables=[dataset_id],
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim if lat_lim is not None else _GLOBAL_LAT,
             lon_lim=lon_lim if lon_lim is not None else _GLOBAL_LON,
