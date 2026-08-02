@@ -103,12 +103,57 @@ class TestMatchVariables:
         assert assignments == {}
 
     def test_order_fallback_pairs_leftovers(self):
-        """A slug with no long-name hit is paired to the leftover variable in order."""
+        """One unmatched slug + one leftover variable is the unambiguous 1:1 case."""
         assignments = _match_variables(
             ["mystery-variable"],
             {"xx": {"long_name": "totally different", "units": "1"}},
         )
         assert assignments == {"mystery-variable": ("xx", "1")}
+
+    def test_exact_short_name_never_swaps(self):
+        """Multiple data vars map by exact short name, never zipped/swapped."""
+        assignments = _match_variables(
+            ["co2", "xco2"],
+            {
+                "xco2": {"long_name": "column CO2", "units": "ppm"},
+                "co2": {"long_name": "CO2", "units": "ppm"},
+                "lat_bnds": {"long_name": "", "units": "degrees_north"},
+            },
+        )
+        assert assignments == {"co2": ("co2", "ppm"), "xco2": ("xco2", "ppm")}
+
+    def test_bounds_variables_are_never_matched(self):
+        """A `*_bnds` cell-bounds variable is excluded from matching (H1)."""
+        assignments = _match_variables(
+            ["co2"],
+            {"lat_bnds": {"long_name": "", "units": "degrees_north"}},
+        )
+        assert assignments == {}, "co2 must not be mapped to lat_bnds"
+
+    def test_specific_slug_wins_over_generic(self):
+        """The more specific slug claims its variable; the generic gets the rest."""
+        assignments = _match_variables(
+            ["temperature", "sea-surface-temperature"],
+            {
+                "sst": {"long_name": "sea surface temperature", "units": "K"},
+                "t": {"long_name": "temperature", "units": "K"},
+            },
+        )
+        assert assignments == {
+            "sea-surface-temperature": ("sst", "K"),
+            "temperature": ("t", "K"),
+        }
+
+    def test_ambiguous_multi_placeholder_is_not_guessed(self):
+        """Two unmatched slugs + two unnamed vars are left unhydrated, not zipped."""
+        assignments = _match_variables(
+            ["alpha", "beta"],
+            {
+                "v1": {"long_name": "", "units": "1"},
+                "v2": {"long_name": "", "units": "1"},
+            },
+        )
+        assert assignments == {}, "ambiguous slugs must keep their placeholders"
 
 
 class TestYamlValue:

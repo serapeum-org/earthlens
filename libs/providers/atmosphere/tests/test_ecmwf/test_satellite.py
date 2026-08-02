@@ -139,3 +139,28 @@ class TestCuratedSatelliteRows:
         assert request["day"] == ["01"]
         assert request["time_aggregation"] == ["monthly_average"]
         assert "area" not in request
+
+
+class TestSatelliteHydrationSanity:
+    """No hydrated satellite row maps a data variable to a coordinate/bounds field."""
+
+    def test_no_coordinate_or_bounds_metadata(self):
+        """A real-units satellite variable is never a bounds var / coordinate unit."""
+        coordinate_units = {
+            "degrees_north",
+            "degrees_east",
+            "degree_north",
+            "degree_east",
+        }
+        for dataset, record in Catalog().datasets.items():
+            if not dataset.startswith("satellite-"):
+                continue
+            for slug, var in record.variables.items():
+                if var.units == "unknown":
+                    continue
+                assert not var.nc_variable.endswith(("_bnds", "_bounds")), (
+                    f"{dataset}/{slug}: nc_variable {var.nc_variable!r} is a bounds var"
+                )
+                assert var.units not in coordinate_units, (
+                    f"{dataset}/{slug}: coordinate unit {var.units!r} on a data var"
+                )
