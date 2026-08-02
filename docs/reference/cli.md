@@ -267,6 +267,9 @@ The authoring companion to `probe`: fetches one upstream id's metadata and emits
 `datasets:` YAML row (inferring `output_kind` / `format` / bands where it can). By default it prints the
 row to vet and paste; `--write` appends it into the catalog file. Supported providers: `earthdata`,
 `hdx`, `usgs_water`, `eumetsat`, `gee`, `jaxa`, `erddap`, `caravan`.
+`caravan` supports `refresh` / `validate` but not `curate`: its rows are
+pinned Zenodo records that a human has to check an archive's layout to
+bump, so there is no stanza emitter to seed one from.
 
 | Option | Meaning |
 |--------|---------|

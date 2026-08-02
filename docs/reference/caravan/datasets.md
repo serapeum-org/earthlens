@@ -82,5 +82,11 @@ in two of them** — which is why member paths are resolved from the archive's o
 |---|---|
 | `grdc` | `GRDC_Caravan_extension_csv/` (and `..._nc/` for the netCDF archive) |
 | `israel` | `Caravan_extension_Israel_Ver4/` |
+| `czechia` | `Caravan-Extension-CZ/` |
+| `spain` | `v110/` — a bare version directory |
 | `base` (1.2) | `Caravan/` |
 | `denmark`, `germany` | *(none — members start at the archive root)* |
+
+Six shapes across seven extensions, no two derivable from the extension name. `czechia` also uses a **singular**
+`license/` directory where every other archive ships `licenses/`. This is why member paths are resolved from the
+archive's own index rather than composed from a template.

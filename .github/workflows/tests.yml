@@ -5,9 +5,13 @@ permissions:
   id-token: write
 
 # A new push to a pull request cancels that PR's in-flight run - the older
-# result is already obsolete. Runs on `main` are never cancelled: every commit
-# that lands has to get a full, recorded result, so a merge arriving while an
-# earlier one is still running queues behind it rather than killing it.
+# result is already obsolete. A run on `main` is never cancelled while it is
+# RUNNING, so a merge arriving mid-run queues rather than killing it.
+#
+# Note the limit: GitHub keeps only one run PENDING per group, so if a third
+# merge arrives while one is running and one is queued, the queued one is
+# cancelled. Merges to `main` are rare enough here that this has not bitten,
+# but it is not the same as "every commit gets a recorded result".
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}

@@ -9,5 +9,3 @@ pages in this section; this page is the rendered API.
 ::: earthlens.caravan.backend
 
 ::: earthlens.caravan.catalog
-
-::: earthlens.caravan._helpers

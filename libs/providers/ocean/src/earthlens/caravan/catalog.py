@@ -55,6 +55,12 @@ TimeseriesFormat = Literal["csv", "netcdf"]
 #: earlier with a single `potential_evaporation_sum`. `camelsde` and
 #: `camelses` are `current` plus that extension's own extra columns -
 #: Caravan-DE's two observed ones, Caravan-ES's four EFAS/EMO-1 ones.
+#:
+#: Only `legacy` changes how a column is resolved (see `Variable.column_for`);
+#: the other two are descriptive, because their extra columns are reached
+#: through per-variable `sources` restrictions rather than the column set.
+#: They are still declared so a row states which shape it ships, and so the
+#: validator rejects a typo.
 ColumnSet = Literal["current", "legacy", "camelsde", "camelses"]
 
 
