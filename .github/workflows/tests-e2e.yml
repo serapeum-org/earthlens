@@ -34,11 +34,36 @@ on:
   workflow_dispatch:
 
 jobs:
-  e2e-cds:
+  # Every suite without a dedicated lane below, CDS included - but split one
+  # job per distribution instead of one job for all of them.
+  #
+  # Why: pytest runs a suite in ONE process, and a native crash kills that
+  # process rather than failing a test. Until 2026-08-02 this was a single job
+  # covering ~38 suites, and it had been dying since at least 2026-07-19 on a
+  # segfault in `hazards/tests/admin` (issue #925). `hazards` sorts 16th of 47,
+  # so the 23 suites behind it silently never ran while the job reported one
+  # generic failure that read like ordinary live-service flakiness.
+  #
+  # Splitting bounds the blast radius to one distribution, and `fail-fast:
+  # false` stops one crash cancelling the others mid-flight.
+  e2e-shared:
     runs-on: ubuntu-latest
     # Only run when credentials are available (the main repo). Forks
     # have no secrets and would 401 immediately.
     if: github.repository == 'serapeum-org/earthlens'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - libs/core
+          - libs/providers/atmosphere
+          - libs/providers/hazards
+          - libs/providers/imagery
+          - libs/providers/land
+          - libs/providers/ocean
+
+    name: e2e-shared (${{ matrix.package }})
 
     steps:
       - uses: actions/checkout@v5
@@ -53,17 +78,25 @@ jobs:
           verify-lock: true
           version: "0.11.29"
 
-      - name: Run live CDS e2e tests
+      - name: Run live e2e tests
         env:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
-          # Also picks up the credential-free live suites that have no lane of
-          # their own. `caravan` is excluded because it now has one: this job
-          # runs 30-odd suites in a single pytest process, so one native crash
-          # takes down every suite behind it, and a backend whose e2e budget
-          # assertions are the point deserves to fail on its own merits.
-          uv run --locked pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not caravan" -v
+          # The marker exclusions drop the suites that have their own lane
+          # below; the deselect drops the one test that segfaults the
+          # interpreter on Linux (issue #925) - it passes locally in ~6 s, so
+          # it is dropped here rather than skipped in the test file. Removing
+          # this line once #925 is fixed also brings back the three admin
+          # tests that sit behind it in the same file.
+          #
+          # The node id is relative to the PACKAGE, not the repo: each package
+          # ships its own [tool.pytest.ini_options], so passing a package path
+          # moves pytest's rootdir there. A repo-relative id silently matches
+          # nothing.
+          uv run --locked pytest ${{ matrix.package }} -v \
+            -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not caravan" \
+            --deselect "tests/admin/test_admin_e2e.py::TestAdminLiveFetch::test_geoboundaries_country_adm1"
 
   e2e-caravan:
     runs-on: ubuntu-latest
