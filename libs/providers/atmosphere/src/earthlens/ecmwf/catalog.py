@@ -1,22 +1,25 @@
 """Variable-catalog loader for the CDS-backed ECMWF data source.
 
 Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
-CDS catalog. The catalog ships as a directory of per-family YAML files
-under `src/earthlens/ecmwf/catalog/` (`era5.yaml`, `carra.yaml`,
-`cerra.yaml`, `cmip5.yaml`, `cordex.yaml`, `seasonal.yaml`,
-`other.yaml`) plus a single `_index.yaml` carrying the schema header
-and the informational `available_datasets:` list. The loader unions
-every file's `datasets:` block into one :class:`Catalog` at
-construction time (a dataset key declared in two files is a load-time
-error), the same way the GEE / CMEMS catalogs merge. Split out of
+Copernicus Data Store catalog spanning all three stores. The catalog
+ships as a directory of per-family YAML files under
+`src/earthlens/ecmwf/catalog/` — one `<family>.yaml` per product
+family (CDS: `era5.yaml`, `carra.yaml`, `cerra.yaml`, `cmip5.yaml`,
+`cordex.yaml`, `seasonal.yaml`, `satellite.yaml`, `other.yaml`; ADS:
+`ads.yaml`; EWDS: `ewds.yaml`, `efas.yaml`, `fire.yaml`) plus a single
+`_index.yaml` carrying the schema header and the informational
+per-store `available_datasets:` index. The loader unions every file's
+`datasets:` block into one :class:`Catalog` at construction time (a
+dataset key declared in two files is a load-time error), the same way
+the GEE / CMEMS catalogs merge. Split out of
 :mod:`earthlens.ecmwf.backend` so the request / download machinery and
 the catalog file-IO live in separate modules.
 
 The two consumed top-level sections each map to a typed field on
 :class:`Catalog`:
 
-* `available_datasets` (informational list of CDS dataset names)
-  → :attr:`Catalog.available_datasets`
+* `available_datasets` (informational per-store index of dataset
+  names across CDS / ADS / EWDS) → :attr:`Catalog.available_datasets`
 * `datasets` (structural map of CDS datasets, each carrying a
   monthly variant and a per-variable map) → :attr:`Catalog.datasets`,
   with each value a :class:`Dataset`
@@ -91,7 +94,9 @@ PROVIDERS_PATH: Path = Path(__file__).parent / "providers.yaml"
 # script append) invalidates the entry naturally. Mirrors the GEE
 # pattern (H1 / M2) so repeated `Catalog()` construction is ~1 ms
 # instead of paying the YAML parse + pydantic validation each time.
-_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCache()
+_CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset], dict[str, str]]] = (
+    CatalogParseCache()
+)
 
 
 def clear_catalog_cache() -> None:
@@ -115,16 +120,71 @@ def _yaml_files_for(path: Path) -> list[Path]:
     return yaml_files_for(path, provider='CDS', shard_noun='per-family')
 
 
-def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
+def _merge_available(
+    block: Any, available: list[str], by_store: dict[str, str]
+) -> None:
+    """Union one file's `available_datasets` block into the flat list + store map.
+
+    Args:
+        block: A file's `available_datasets` value — a flat list of ids, or a
+            per-store `{cds: [...], ads: [...], ewds: [...]}` mapping (in which
+            case each id is also recorded against its store for endpoint
+            auto-resolution).
+        available: Accumulator for the flat id list (mutated in place).
+        by_store: Accumulator mapping each id to its store slug (mutated).
+    """
+    if isinstance(block, dict):
+        for store, ids in block.items():
+            for ident in ids or []:
+                available.append(ident)
+                by_store[str(ident)] = str(store)
+    else:
+        available += list(block)
+
+
+def _merge_datasets(
+    data: dict[str, Any],
+    yaml_path: Path,
+    datasets_yaml: dict[str, Any],
+    seen_in: dict[str, str],
+) -> None:
+    """Union one file's `datasets:` map, rejecting a key declared twice.
+
+    Args:
+        data: The parsed YAML mapping for one catalog file.
+        yaml_path: That file's path (named in the duplicate-key error).
+        datasets_yaml: Accumulator of `dataset_key -> body` (mutated in place).
+        seen_in: Accumulator of `dataset_key -> filename` for the error message.
+
+    Raises:
+        ValueError: If a dataset key already appears in `datasets_yaml`.
+    """
+    for ds_key, ds_body in (data.get("datasets") or {}).items():
+        if ds_key in datasets_yaml:
+            raise ValueError(
+                f"duplicate dataset key {ds_key!r}: declared in both "
+                f"`{seen_in[ds_key]}` and `{yaml_path.name}`. Each CDS "
+                "dataset key must live in exactly one file."
+            )
+        seen_in[ds_key] = yaml_path.name
+        datasets_yaml[ds_key] = ds_body
+
+
+def _load_catalog_data(
+    path: Path,
+) -> tuple[list[str], dict[str, Dataset], dict[str, str]]:
     """Parse, validate, and cache the CDS catalog at `path`.
 
     Returns a `(available_datasets, datasets)` tuple of the same shape
     :class:`Catalog` exposes. When `path` is a directory, every `*.yaml`
-    is merged: `available_datasets:` lists are concatenated and
+    is merged: `available_datasets:` entries are concatenated and
     `datasets:` maps are unioned (a dataset key declared in two files is
-    an error). Cached on the resolved path plus every contributing
-    file's `mtime_ns` so a second `Catalog()` on an unchanged catalog
-    skips both YAML parsing and pydantic validation.
+    an error). `available_datasets:` may be either a flat list of ids or a
+    per-store mapping (`{cds: [...], ads: [...], ewds: [...]}`, written by
+    `earthlens datasets refresh ecmwf`); both are unioned into the flat
+    list. Cached on the resolved path plus every contributing file's
+    `mtime_ns` so a second `Catalog()` on an unchanged catalog skips both
+    YAML parsing and pydantic validation.
 
     Raises:
         ValueError: If the catalog is missing, has no `datasets:` block,
@@ -138,20 +198,13 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
         return cached
 
     available: list[str] = []
+    by_store: dict[str, str] = {}
     datasets_yaml: dict[str, Any] = {}
     seen_in: dict[str, str] = {}
     for yaml_path in files:
         data = load_yaml_strict(yaml_path) or {}
-        available += list(data.get("available_datasets") or [])
-        for ds_key, ds_body in (data.get("datasets") or {}).items():
-            if ds_key in datasets_yaml:
-                raise ValueError(
-                    f"duplicate dataset key {ds_key!r}: declared in both "
-                    f"`{seen_in[ds_key]}` and `{yaml_path.name}`. Each CDS "
-                    "dataset key must live in exactly one file."
-                )
-            seen_in[ds_key] = yaml_path.name
-            datasets_yaml[ds_key] = ds_body
+        _merge_available(data.get("available_datasets") or [], available, by_store)
+        _merge_datasets(data, yaml_path, datasets_yaml, seen_in)
 
     if not datasets_yaml:
         raise ValueError(
@@ -171,7 +224,7 @@ def _load_catalog_data(path: Path) -> tuple[list[str], dict[str, Dataset]]:
             "See the schema header in `_index.yaml`."
         )
 
-    _CATALOG_CACHE[key] = (available, structural)
+    _CATALOG_CACHE[key] = (available, structural, by_store)
     return _CATALOG_CACHE[key]
 
 
@@ -191,6 +244,8 @@ def _provider_for_dataset(ds_name: str) -> str:
         return "cmip5-modelling-centres"
     if ds_name.startswith("projections-cordex"):
         return "cordex-consortium"
+    if ds_name.startswith("cams-"):
+        return "copernicus-cams"
     if ds_name.startswith(("cems-", "efas-")):
         return "copernicus-cems"
     return "ecmwf"
@@ -245,8 +300,8 @@ def _build_dataset_map(
             if "cds_pressure_level" not in merged and pressure_level is not None:
                 merged["cds_pressure_level"] = pressure_level
             # Same parent-default / per-row-override pattern for
-            # product_type. Parent unset → Variable's own default
-            # (`["reanalysis"]`) applies.
+            # product_type. Parent unset → Variable's own default (an empty
+            # list), which the request builder omits unless a row sets it.
             if "product_type" not in merged and ds_product_type is not None:
                 merged["product_type"] = ds_product_type
             # Merge parent-level extras under per-row overrides:
@@ -400,9 +455,11 @@ class Variable(FluxableLeaf):
         product_type: CDS `product_type` request parameter. Picks
             the data flavor within a dataset (e.g. `["reanalysis"]`
             vs `["ensemble_mean"]` for ERA5; `["analysis"]` vs
-            `["forecast_based"]` for CARRA). Default
-            `["reanalysis"]` matches vanilla ERA5; auto-synthesized
-            monthly-means entries override to
+            `["forecast_based"]` for CARRA). Defaults to an empty
+            list, which the request builder omits from the request
+            (CAMS and other families that key on `type`/`quantity`
+            carry none); ERA5 rows set `["reanalysis"]` explicitly and
+            auto-synthesized monthly-means entries override to
             `["monthly_averaged_reanalysis"]`. Per-dataset and
             per-variable overrides land here via the catalog
             loader's merge.
@@ -435,7 +492,7 @@ class Variable(FluxableLeaf):
     cds_variable: str
     nc_variable: str
     units: str
-    product_type: list[str]
+    product_type: list[str] = Field(default_factory=list)
     cds_pressure_level: list[str] | None = None
     extras: dict[str, Any] = Field(default_factory=dict)
     request_kind: str = "form"
@@ -583,9 +640,10 @@ class Catalog(AbstractCatalog):
     the dataset name is part of the identity.
 
     Attributes:
-        available_datasets: Informational list of every CDS dataset
-            short name. Mirrors the `available_datasets:` block in
-            the YAML; runtime code does not consume it.
+        available_datasets: Informational list of every dataset id across
+            the three Copernicus stores (CDS + ADS + EWDS), unioned from the
+            per-store `available_datasets:` block in `_index.yaml`; runtime
+            code does not consume it.
         datasets: Structural map keyed by CDS dataset short name. Each
             value is a :class:`Dataset` carrying that dataset's
             monthly-aggregate variant and its per-variable map. The
@@ -633,7 +691,7 @@ class Catalog(AbstractCatalog):
             ```python
             >>> from earthlens.ecmwf import Catalog
             >>> len(Catalog().available_datasets)
-            134
+            169
 
             ```
     """
@@ -641,8 +699,41 @@ class Catalog(AbstractCatalog):
     _catalog_kind: str = "CDS catalog"
 
     available_datasets: list[str] = Field(default_factory=list)
+    available_by_store: dict[str, str] = Field(default_factory=dict)
     datasets: dict[str, Dataset] = Field(default_factory=dict)
     providers: dict[str, Provider] = Field(default_factory=dict)
+
+    def store_for(self, dataset_id: str) -> str | None:
+        """Return the Copernicus store (`cds` / `ads` / `ewds`) hosting a dataset.
+
+        Reads the per-store availability index. Used to auto-resolve the
+        `endpoint` for a raw-request passthrough when the caller omits it.
+
+        Args:
+            dataset_id: A Copernicus dataset id (e.g. `"cams-global-reanalysis-eac4"`).
+
+        Returns:
+            str | None: The store slug, or `None` if the id is not in the index.
+
+        Examples:
+            - An ADS (CAMS) dataset resolves to the `ads` store:
+
+                ```python
+                >>> from earthlens.ecmwf import Catalog
+                >>> Catalog().store_for("cams-global-reanalysis-eac4")
+                'ads'
+
+                ```
+            - An id absent from every store's index returns `None`:
+
+                ```python
+                >>> from earthlens.ecmwf import Catalog
+                >>> Catalog().store_for("not-a-real-dataset") is None
+                True
+
+                ```
+        """
+        return self.available_by_store.get(dataset_id)
 
     @classmethod
     def _autoload(cls) -> dict[str, Any]:
@@ -655,6 +746,7 @@ class Catalog(AbstractCatalog):
         loaded = Catalog.load()
         return {
             "available_datasets": loaded.available_datasets,
+            "available_by_store": loaded.available_by_store,
             "datasets": loaded.datasets,
             "providers": loaded.providers,
         }
@@ -691,7 +783,9 @@ class Catalog(AbstractCatalog):
         providers_path = (
             providers_path if providers_path is not None else PROVIDERS_PATH
         )
-        available_datasets, datasets = _load_catalog_data(catalog_path)
+        available_datasets, datasets, available_by_store = _load_catalog_data(
+            catalog_path
+        )
         providers = load_providers(providers_path)
         unknown = sorted(
             {
@@ -708,6 +802,7 @@ class Catalog(AbstractCatalog):
             )
         return cls(
             available_datasets=list(available_datasets),
+            available_by_store=dict(available_by_store),
             datasets=dict(datasets),
             providers=dict(providers),
         )

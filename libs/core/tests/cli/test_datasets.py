@@ -499,17 +499,112 @@ class TestCurate:
         result = runner.invoke(app, ["datasets", "curate", "gee", "--fill-empty"])
         assert result.exit_code == 2, "fill-empty without --write -> exit 2"
 
-    def test_fill_empty_gee_only(self):
-        """--fill-empty on a non-gee provider is rejected."""
+    def test_all_and_fill_empty_together_is_rejected(self):
+        """--all + --fill-empty is a usage error (separate passes, not combinable)."""
+        result = runner.invoke(
+            app, ["datasets", "curate", "ecmwf", "--all", "--fill-empty", "--write"]
+        )
+        assert result.exit_code == 2, "--all + --fill-empty -> exit 2"
+
+    def test_fill_empty_ecmwf_runs_bulk_hydrate(self, monkeypatch):
+        """ecmwf --fill-empty --write drives the ecmwf hydrate and reports a summary."""
+        from earthlens.cli import _ecmwf_hydrate as ecmwf_hydrate_mod
+
+        calls = {}
+
+        def fake_hydrate(limit=None, timeout=None):
+            calls["limit"] = limit
+            calls["timeout"] = timeout
+            return {
+                "candidates": 4,
+                "hydrated": 3,
+                "skipped": 1,
+                "timed_out": 0,
+                "filled": ["a", "b", "c"],
+            }
+
+        monkeypatch.setattr(ecmwf_hydrate_mod, "bulk_hydrate_empty", fake_hydrate)
+        result = runner.invoke(
+            app, ["datasets", "curate", "ecmwf", "--fill-empty", "--write"]
+        )
+        assert result.exit_code == 0, f"ecmwf fill-empty failed: {result.output}"
+        assert "hydrated 3" in result.output
+        assert "/ 4" in result.output
+        assert calls["timeout"] == 180, "the default --timeout is threaded through"
+
+    def test_fill_empty_ecmwf_threads_custom_timeout(self, monkeypatch):
+        """A custom --timeout is passed to the ecmwf hydrate; 0 means no deadline."""
+        from earthlens.cli import _ecmwf_hydrate as ecmwf_hydrate_mod
+
+        calls = {}
+
+        def fake_hydrate(limit=None, timeout=None):
+            calls["timeout"] = timeout
+            return {
+                "candidates": 1,
+                "hydrated": 0,
+                "skipped": 1,
+                "timed_out": 1,
+                "filled": [],
+            }
+
+        monkeypatch.setattr(ecmwf_hydrate_mod, "bulk_hydrate_empty", fake_hydrate)
+        result = runner.invoke(
+            app,
+            [
+                "datasets",
+                "curate",
+                "ecmwf",
+                "--fill-empty",
+                "--write",
+                "--timeout",
+                "0",
+            ],
+        )
+        assert result.exit_code == 0, f"ecmwf fill-empty failed: {result.output}"
+        assert calls["timeout"] is None, "--timeout 0 becomes no deadline (None)"
+        assert "1 timed out" in result.output, "timed-out count is surfaced"
+
+    def test_fill_empty_unsupported_provider(self):
+        """--fill-empty on a provider that is neither gee nor ecmwf is rejected."""
         result = runner.invoke(
             app, ["datasets", "curate", "usgs_water", "--fill-empty", "--write"]
         )
-        assert result.exit_code == 2, "fill-empty non-gee -> exit 2"
+        assert result.exit_code == 2, "fill-empty unsupported -> exit 2"
 
     def test_missing_upstream_id_rejected(self):
         """curate without an upstream id (and no --fill-empty) is a usage error."""
         result = runner.invoke(app, ["datasets", "curate", "usgs_water"])
         assert result.exit_code == 2, "missing id -> exit 2"
+
+    def test_all_runs_bulk_seed(self, monkeypatch):
+        """ecmwf --all --write drives the bulk seed and reports a summary."""
+        from earthlens.cli import _ecmwf_seed as seed_mod
+
+        monkeypatch.setattr(
+            seed_mod,
+            "bulk_seed_uncurated",
+            lambda limit=None: {
+                "candidates": 5,
+                "seeded": 4,
+                "skipped": 1,
+                "failed": [("x", "boom")],
+            },
+        )
+        result = runner.invoke(app, ["datasets", "curate", "ecmwf", "--all", "--write"])
+        assert result.exit_code == 0, f"--all failed: {result.output}"
+        assert "seeded 4" in result.output
+        assert "/ 5" in result.output
+
+    def test_all_requires_write(self):
+        """--all without --write is a usage error (it mutates the catalog)."""
+        result = runner.invoke(app, ["datasets", "curate", "ecmwf", "--all"])
+        assert result.exit_code == 2, "--all without --write -> exit 2"
+
+    def test_all_ecmwf_only(self):
+        """--all on a non-ecmwf provider is rejected."""
+        result = runner.invoke(app, ["datasets", "curate", "gee", "--all", "--write"])
+        assert result.exit_code == 2, "--all non-ecmwf -> exit 2"
 
 
 class TestValidate:

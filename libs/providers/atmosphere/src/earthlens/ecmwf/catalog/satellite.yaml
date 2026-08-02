@@ -1,0 +1,736 @@
+# Satellite Climate Data Records (CDRs) — CDS endpoint.
+#
+# High-value drought / hydrology satellite CDRs. Request shapes + valid combos
+# are pinned from the live constraints.json
+# (`planning/ecmwf/captures/a1_form_satellite-*.json`, 2026-08-01). The `type`
+# axis is the ESA-CCI sensor/record/version selector, carried in `extras`. The
+# response is a zip-of-NetCDF (unpacked by the C3 output-format handler); there
+# is no `data_format` choice (dropped per-row). No time-of-day (`satellite_cdr`
+# drops the template `time` slots). `nc_variable` is best-effort — the gated
+# live e2e confirms it; each CDR needs its licence accepted per account (G5).
+
+datasets:
+  satellite-soil-moisture:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      type_of_sensor: [passive]
+      time_aggregation: [month_average]
+      type_of_record: [icdr]
+      version: [v202212]
+      day: ["01"]
+      data_format: null
+      area: null  # no `area` widget on this form — strip the template bbox
+    variables:
+      surface-soil-moisture-volumetric:
+        cds_variable: surface_soil_moisture_volumetric
+        nc_variable: sm
+        units: m3 m-3
+
+  satellite-precipitation:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      time_aggregation: [monthly_mean]
+      version: [v2_3_and_v1_3]
+      day: ["01"]
+      data_format: null
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: precip
+        units: mm
+
+  satellite-sea-surface-temperature:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      processinglevel: [level_4]
+      sensor_on_satellite: [combined_product]
+      version: ["3_0"]
+      temporal_resolution: [monthly]
+      day: ["01"]
+      data_format: null
+      area: null  # no `area` widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: analysed_sst
+        units: K
+  satellite-aerosol-properties:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      algorithm: [adv]
+      sensor_on_satellite: [aatsr_on_envisat]
+      time_aggregation: [monthly_average]
+      version: [v2_30]
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      aerosol-optical-depth:
+        cds_variable: aerosol_optical_depth
+        nc_variable: aerosol_optical_depth
+        units: unknown
+      fine-mode-aerosol-optical-depth:
+        cds_variable: fine_mode_aerosol_optical_depth
+        nc_variable: fine_mode_aerosol_optical_depth
+        units: unknown
+      dust-aerosol-optical-depth:
+        cds_variable: dust_aerosol_optical_depth
+        nc_variable: dust_aerosol_optical_depth
+        units: unknown
+      single-scattering-albedo:
+        cds_variable: single_scattering_albedo
+        nc_variable: single_scattering_albedo
+        units: unknown
+      aerosol-layer-height:
+        cds_variable: aerosol_layer_height
+        nc_variable: aerosol_layer_height
+        units: unknown
+      dust-aerosol-layer-height:
+        cds_variable: dust_aerosol_layer_height
+        nc_variable: dust_aerosol_layer_height
+        units: unknown
+      aerosol-extinction-coefficient:
+        cds_variable: aerosol_extinction_coefficient
+        nc_variable: aerosol_extinction_coefficient
+        units: unknown
+  satellite-albedo:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      horizontal_resolution: [1km]
+      product_version: [v0]
+      satellite: [spot]
+      sensor: [vgt]
+      nominal_day: ['03']
+      day: null  # product keys on nominal_day, not day
+      data_format: null
+    variables:
+      albb-bh:
+        cds_variable: albb_bh
+        nc_variable: albb_bh
+        units: unknown
+      albb-dh:
+        cds_variable: albb_dh
+        nc_variable: albb_dh
+        units: unknown
+      alsp-bh:
+        cds_variable: alsp_bh
+        nc_variable: alsp_bh
+        units: unknown
+      alsp-dh:
+        cds_variable: alsp_dh
+        nc_variable: alsp_dh
+        units: unknown
+  satellite-carbon-dioxide:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      processing_level: [level_3]
+      sensor_and_algorithm: [merged_obs4mips]
+      version: ['3']
+      day: null  # no day selector on this product
+      year: null  # product is not year-partitioned
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      co2:
+        cds_variable: co2
+        nc_variable: co2
+        units: unknown
+      xco2:
+        cds_variable: xco2
+        nc_variable: xco2
+        units: unknown
+  satellite-cloud-properties:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [interim_climate_data_record]
+      origin: [eumetsat]
+      product_family: [clara_a3]
+      time_aggregation: [monthly_mean]
+      day: ["01"]
+      data_format: null
+    variables:
+      cloud-fraction:
+        cds_variable: cloud_fraction
+        nc_variable: cloud_fraction
+        units: unknown
+      cloud-top-level:
+        cds_variable: cloud_top_level
+        nc_variable: cloud_top_level
+        units: unknown
+      cloud-physical-properties-of-the-ice-phase:
+        cds_variable: cloud_physical_properties_of_the_ice_phase
+        nc_variable: cloud_physical_properties_of_the_ice_phase
+        units: unknown
+      cloud-physical-properties-of-the-liquid-phase:
+        cds_variable: cloud_physical_properties_of_the_liquid_phase
+        nc_variable: cloud_physical_properties_of_the_liquid_phase
+        units: unknown
+      cloud-phase:
+        cds_variable: cloud_phase
+        nc_variable: cloud_phase
+        units: unknown
+      joint-cloud-property-histogram:
+        cds_variable: joint_cloud_property_histogram
+        nc_variable: joint_cloud_property_histogram
+        units: unknown
+      all-variables:
+        cds_variable: all_variables
+        nc_variable: all_variables
+        units: unknown
+  satellite-earth-radiation-budget:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [interim_climate_data_record]
+      origin: [c3s]
+      product_family: [cci]
+      sensor_on_satellite: [slstr_on_sentinel_3a]
+      time_aggregation: [monthly_mean]
+      day: ["01"]
+      data_format: null
+    variables:
+      incoming-shortwave-radiation:
+        cds_variable: incoming_shortwave_radiation
+        nc_variable: incoming_shortwave_radiation
+        units: unknown
+      outgoing-longwave-radiation:
+        cds_variable: outgoing_longwave_radiation
+        nc_variable: outgoing_longwave_radiation
+        units: unknown
+      outgoing-shortwave-radiation:
+        cds_variable: outgoing_shortwave_radiation
+        nc_variable: outgoing_shortwave_radiation
+        units: unknown
+      total-solar-irradiance:
+        cds_variable: total_solar_irradiance
+        nc_variable: total_solar_irradiance
+        units: unknown
+      spectral-solar-irradiance:
+        cds_variable: spectral_solar_irradiance
+        nc_variable: spectral_solar_irradiance
+        units: unknown
+      all-variables:
+        cds_variable: all_variables
+        nc_variable: all_variables
+        units: unknown
+  satellite-fire-burned-area:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      origin: [c3s]
+      sensor: [olci]
+      version: ['1_0']
+      nominal_day: ['01']
+      day: null  # product keys on nominal_day, not day
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      grid-variables:
+        cds_variable: grid_variables
+        nc_variable: grid_variables
+        units: unknown
+      pixel-variables:
+        cds_variable: pixel_variables
+        nc_variable: pixel_variables
+        units: unknown
+  satellite-fire-radiative-power:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      product_type: [table_summary]
+      time_aggregation: [month]
+      version: ['1_0']
+      day: ['01']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-greenland-ice-sheet-velocity:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      domain: [antarctic_ice_sheet]
+      period: ['2021_2022']
+      version: ['1_5']
+      day: null  # no day selector on this product
+      year: null  # product is not year-partitioned
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-humidity-profiles:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      product_type: [radio_occultation_data]
+      day: null  # no day selector on this product
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-ice-sheet-elevation-change:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [tcdr]
+      domain: [antarctica]
+      version: ['2_0']
+      day: null  # no day selector on this product
+      year: null  # product is not year-partitioned
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-ice-sheet-mass-balance:
+    endpoint: cds
+    request_kind: satellite_cdr
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-ist-sst-global:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [cdr]
+      temporal_resolution: [monthly]
+      version: ['1_0']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-ist-sst-polar:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      region: [northern_hemisphere]
+      temporal_aggregation: [monthly]
+      version: ['1_1']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-lai-fapar:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      horizontal_resolution: [1km]
+      product_version: [v0]
+      satellite: [spot]
+      sensor: [vgt]
+      nominal_day: ['03']
+      day: null  # product keys on nominal_day, not day
+      data_format: null
+    variables:
+      fapar:
+        cds_variable: fapar
+        nc_variable: fapar
+        units: unknown
+      lai:
+        cds_variable: lai
+        nc_variable: lai
+        units: unknown
+  satellite-lake-water-level:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      lake: [achit]
+      region: [southeastern_asia]
+      day: null  # no day selector on this product
+      year: null  # product is not year-partitioned
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-lake-water-temperature:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      version: ['4_0']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-land-cover:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      version: [v2_0_7cds]
+      day: null  # no day selector on this product
+      month: null  # product is not month-partitioned
+      data_format: null
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-land-surface-temperature:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      observation_time: [day]
+      version: [v3_00]
+      day: null  # no day selector on this product
+      data_format: null
+    variables:
+      land-surface-temperature:
+        cds_variable: land_surface_temperature
+        nc_variable: land_surface_temperature
+        units: unknown
+  satellite-methane:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      processing_level: [level_3]
+      sensor_and_algorithm: [merged_obs4mips]
+      version: ['3']
+      day: null  # no day selector on this product
+      year: null  # product is not year-partitioned
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      ch4:
+        cds_variable: ch4
+        nc_variable: ch4
+        units: unknown
+      xch4:
+        cds_variable: xch4
+        nc_variable: xch4
+        units: unknown
+  satellite-ocean-colour:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      projection: [regular_latitude_longitude_grid]
+      temporal_resolution: [monthly]
+      version: ['6_0']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      mass-concentration-of-chlorophyll-a:
+        cds_variable: mass_concentration_of_chlorophyll_a
+        nc_variable: mass_concentration_of_chlorophyll_a
+        units: unknown
+      remote-sensing-reflectance:
+        cds_variable: remote_sensing_reflectance
+        nc_variable: remote_sensing_reflectance
+        units: unknown
+  satellite-ozone-v1:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      processing_level: [level_3]
+      sensor: [ace]
+      version: [v0001]
+      vertical_aggregation: [vertical_profiles_from_limb_sensors]
+      day: null  # no day selector on this product
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      mole-concentration-of-ozone-in-air:
+        cds_variable: mole_concentration_of_ozone_in_air
+        nc_variable: mole_concentration_of_ozone_in_air
+        units: unknown
+      mole-fraction-of-ozone-in-air:
+        cds_variable: mole_fraction_of_ozone_in_air
+        nc_variable: mole_fraction_of_ozone_in_air
+        units: unknown
+      anomaly-of-mole-concentration-of-ozone-in-air:
+        cds_variable: anomaly_of_mole_concentration_of_ozone_in_air
+        nc_variable: anomaly_of_mole_concentration_of_ozone_in_air
+        units: unknown
+      mole-content-of-ozone-in-atmosphere-layer:
+        cds_variable: mole_content_of_ozone_in_atmosphere_layer
+        nc_variable: mole_content_of_ozone_in_atmosphere_layer
+        units: unknown
+      atmosphere-mole-content-of-ozone:
+        cds_variable: atmosphere_mole_content_of_ozone
+        nc_variable: atmosphere_mole_content_of_ozone
+        units: unknown
+  satellite-precipitation-microwave:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      time_aggregation: [monthly]
+      version: [v1_0]
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-precipitation-microwave-infrared:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      time_aggregation: [monthly]
+      day: ['01']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-sea-ice-concentration:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      cdr_type: [cdr]
+      region: [northern_hemisphere]
+      sensor: [amsr]
+      temporal_aggregation: [monthly]
+      version: ['3_0']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-sea-ice-drift:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      region: [northern_hemisphere]
+      version: ['1_0']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-sea-ice-edge-type:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      cdr_type: [cdr]
+      region: [northern_hemisphere]
+      version: ['1_0']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      sea-ice-edge:
+        cds_variable: sea_ice_edge
+        nc_variable: sea_ice_edge
+        units: unknown
+      sea-ice-type:
+        cds_variable: sea_ice_type
+        nc_variable: sea_ice_type
+        units: unknown
+  satellite-sea-ice-thickness:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      processing_level: [level_3]
+      satellite_mission: [cryosat_2]
+      temporal_resolution: [monthly]
+      version: ['1_0']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      sea-ice-thickness:
+        cds_variable: sea_ice_thickness
+        nc_variable: sea_ice_thickness
+        units: unknown
+  satellite-sea-level-global:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      version: [vdt2021]
+      day: null  # no day selector on this product
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      daily:
+        cds_variable: daily
+        nc_variable: daily
+        units: unknown
+      monthly-mean:
+        cds_variable: monthly_mean
+        nc_variable: monthly_mean
+        units: unknown
+  satellite-sea-surface-temperature-ensemble-product:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-snow-cover-extent:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [cdr]
+      version: ['1_0']
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      snow-cover-fraction-viewable:
+        cds_variable: snow_cover_fraction_viewable
+        nc_variable: snow_cover_fraction_viewable
+        units: unknown
+      snow-cover-fraction-on-ground:
+        cds_variable: snow_cover_fraction_on_ground
+        nc_variable: snow_cover_fraction_on_ground
+        units: unknown
+  satellite-snow-water-equivalent:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [cdr]
+      temporal_aggregation: [monthly]
+      version: ['1_0']
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-surface-radiation-budget:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [interim_climate_data_record]
+      origin: [c3s]
+      product_family: [cci]
+      sensor_on_satellite: [slstr_on_sentinel_3a]
+      time_aggregation: [monthly_mean]
+      day: ["01"]
+      data_format: null
+    variables:
+      surface-upwelling-shortwave-flux:
+        cds_variable: surface_upwelling_shortwave_flux
+        nc_variable: surface_upwelling_shortwave_flux
+        units: unknown
+      surface-upwelling-longwave-flux:
+        cds_variable: surface_upwelling_longwave_flux
+        nc_variable: surface_upwelling_longwave_flux
+        units: unknown
+      surface-downwelling-shortwave-flux:
+        cds_variable: surface_downwelling_shortwave_flux
+        nc_variable: surface_downwelling_shortwave_flux
+        units: unknown
+      surface-downwelling-longwave-flux:
+        cds_variable: surface_downwelling_longwave_flux
+        nc_variable: surface_downwelling_longwave_flux
+        units: unknown
+      surface-net-downward-shortwave-flux:
+        cds_variable: surface_net_downward_shortwave_flux
+        nc_variable: surface_net_downward_shortwave_flux
+        units: unknown
+      surface-net-downward-longwave-flux:
+        cds_variable: surface_net_downward_longwave_flux
+        nc_variable: surface_net_downward_longwave_flux
+        units: unknown
+      surface-net-downward-radiative-flux:
+        cds_variable: surface_net_downward_radiative_flux
+        nc_variable: surface_net_downward_radiative_flux
+        units: unknown
+      all-variables:
+        cds_variable: all_variables
+        nc_variable: all_variables
+        units: unknown
+  satellite-terrestrial-water-storage:
+    endpoint: cds
+    request_kind: satellite_cdr
+    variables:
+      terrestrial-water-storage-anomaly:
+        cds_variable: terrestrial_water_storage_anomaly
+        nc_variable: terrestrial_water_storage_anomaly
+        units: unknown
+  satellite-total-column-water-vapour-land-ocean:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      horizontal_aggregation: [0_05_x_0_05]
+      product: [c3s_meris_and_ssm_i]
+      temporal_aggregation: [monthly]
+      day: ["01"]
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-total-column-water-vapour-ocean:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      climate_data_record_type: [icdr]
+      origin: [c3s]
+      temporal_aggregation: [monthly]
+      day: null  # no day selector on this product
+      month: null  # product is not month-partitioned
+      data_format: null
+      area: null  # no area widget on this form — strip the template bbox
+    variables:
+      all:
+        cds_variable: all
+        nc_variable: all
+        units: unknown
+  satellite-upper-troposphere-humidity:
+    endpoint: cds
+    request_kind: satellite_cdr
+    extras:
+      origin: [c3s]
+      sensor_on_satellite: [mhs_on_noaa_18]
+      version: [v1]
+      data_format: null
+    variables:
+      mean-uth:
+        cds_variable: mean_uth
+        nc_variable: mean_uth
+        units: unknown

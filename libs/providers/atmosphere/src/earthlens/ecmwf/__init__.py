@@ -1,18 +1,25 @@
-"""ECMWF / Copernicus Climate Data Store backend.
+"""ECMWF / Copernicus Data Store backend (CDS + ADS + EWDS).
 
-Thin wrapper over :mod:`cdsapi` that downloads ERA5 reanalyses from
-the Climate Data Store and slices the resulting NetCDF into per-date
-arrays.
+Reaches all three Copernicus Data Store instances through one
+:mod:`cdsapi` client and one Personal Access Token, routing each
+dataset to its store via the catalog `endpoint`: the Climate Data
+Store (C3S — ERA5, CARRA / CERRA, seasonal, CMIP5 / CORDEX, satellite
+CDRs), the Atmosphere Data Store (CAMS — air quality, greenhouse
+gases, composition), and the Early Warning Data Store (CEMS — GloFAS /
+EFAS river discharge, fire danger). Downloads the store's NetCDF
+(GRIB and zip-of-NetCDF are handled) and can aggregate it per window;
+any dataset is also reachable by a raw request through the passthrough.
 
 Public surface (re-exported from this package):
 
 * :class:`ECMWF` — the backend itself; instantiate with a date range,
   a bbox, and a list of variable short codes, then call
   :meth:`ECMWF.download` to fetch every variable.
-* :class:`Catalog` — pydantic-backed loader for the bundled CDS catalog
-  (the `catalog/` directory). Exposes the catalog's structure as three
-  fields: :attr:`Catalog.available_datasets`, :attr:`Catalog.datasets`,
-  and :attr:`Catalog.catalog` (flat per-variable map).
+* :class:`Catalog` — pydantic-backed loader for the bundled multi-store
+  catalog (the `catalog/` directory). Variables are addressed by the
+  `(dataset, variable)` pair via :meth:`Catalog.get_variable`;
+  :attr:`Catalog.available_datasets` is the per-store availability
+  index and :meth:`Catalog.store_for` resolves a dataset's store.
 * :class:`Dataset` — one CDS dataset's section inside the catalog
   (monthly variant + variables map).
 * :class:`Variable` — one variable's metadata (CDS request name,

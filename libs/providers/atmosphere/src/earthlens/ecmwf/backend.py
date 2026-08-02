@@ -52,6 +52,33 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # (carried in `extras`), not a time-of-day; the dataset rejects the
     # four 6-hourly `time` slots the daily template adds, so drop `time`.
     "glofas": ("time",),
+    # GloFAS/EFAS hindcast (reforecast): keys on `hyear`/`hmonth`/`hday`
+    # (remapped in `_build_request`) + `leadtime_hour`; drop `time`.
+    "glofas_hindcast": ("time",),
+    # Seasonal (GloFAS/EFAS/CDS seasonal): keyed by `year`/`month` + a lead
+    # (`leadtime_month`/`leadtime_hour`) + `originating_centre`/`system` from
+    # `extras`; no `day`, no time-of-day.
+    "seasonal": ("day", "time"),
+    # Seasonal hindcast (EFAS seasonal-reforecast): `hyear`/`hmonth` (remapped)
+    # + `leadtime_hour`; no `hday`, no time-of-day.
+    "seasonal_hindcast": ("day", "time"),
+    # CAMS grid datasets (ADS): a single `date` range string replaces
+    # year/month/day and `product_type` (see the `cams_date` branch); nothing
+    # extra to strip here.
+    "cams_date": (),
+    # CEMS fire danger (EWDS): daily year/month/day + a `grid` selector, no
+    # time-of-day; drop the template's `time` slots.
+    "fire": ("time",),
+    # CAMS year/month datasets (ADS): GHG inversion + European air-quality
+    # reanalyses key on year/month (no day), no time-of-day, and reject the
+    # `area` bbox (global-gridded); `data_format`/`product_type` are dropped
+    # per-row via `extras: {…: null}`.
+    "cams_inversion": ("day", "time", "area"),
+    # Satellite Climate Data Records (CDS): year/month/day + per-CDR selectors
+    # (sensor/version/…) from `extras`, no time-of-day; the response is a
+    # zip-of-NetCDF (unpacked by the C3 handler) with no `data_format` choice
+    # (dropped per-row via `extras: {data_format: null}`).
+    "satellite_cdr": ("time",),
 }
 
 
@@ -187,6 +214,119 @@ def _unwrap_zipped_netcdf(target: Path) -> None:
             tmp.unlink(missing_ok=True)
 
 
+def _detect_output_format(target: Path) -> str:
+    """Classify a retrieved file by its magic bytes.
+
+    The store's `data_format` is a request hint, not a guarantee (CDS zips a
+    NetCDF even when `netcdf` is asked for). Sniffing the leading bytes is the
+    reliable signal for the format handler.
+
+    Args:
+        target: The file a retrieve wrote.
+
+    Returns:
+        str: `"zip"`, `"netcdf"`, `"grib"`, or `"unknown"`.
+    """
+    try:
+        with target.open("rb") as handle:
+            head = handle.read(8)
+    except OSError:
+        return "unknown"
+    if head[:4] == b"PK\x03\x04":
+        return "zip"
+    if head[:4] == b"GRIB":
+        return "grib"
+    if head[:3] == b"CDF" or head[:4] == b"\x89HDF":
+        return "netcdf"
+    return "unknown"
+
+
+def _unique_dest(out_dir: Path, basename: str, taken: list[Path]) -> Path:
+    """Return a collision-free destination under `out_dir` for a member basename.
+
+    Two zip members flattened to the same basename (from different in-zip
+    subdirectories) would overwrite each other; suffix `_1`, `_2`, … on collision
+    and log, so no member is silently lost.
+
+    Args:
+        out_dir: The directory members are extracted into.
+        basename: The member's flattened (basename-only) filename.
+        taken: The destinations already used in this extraction.
+
+    Returns:
+        Path: A path under `out_dir` present in neither `taken` nor on disk.
+    """
+    dest = out_dir / basename
+    if dest not in taken and not dest.exists():
+        return dest
+    stem, suffix = dest.stem, dest.suffix
+    n = 1
+    while (candidate := out_dir / f"{stem}_{n}{suffix}") in taken or candidate.exists():
+        n += 1
+    logger.warning(
+        f"zip member basename {basename!r} collided in {out_dir.name}/; wrote "
+        f"{candidate.name} instead of overwriting an already-extracted member"
+    )
+    return candidate
+
+
+def _unpack_netcdf_archive(target: Path) -> list[Path]:
+    r"""Unpack a zip-of-NetCDF response into its member NetCDFs.
+
+    Many `satellite-*` CDRs and the ADS `netcdf_zip` format return a zip whose
+    members are per-timestep / per-variable NetCDFs. A single-member zip is
+    unwrapped in place (the file keeps its name); a multi-member zip is
+    extracted into a sibling `<stem>/` directory and the original archive is
+    removed, so downstream code sees real NetCDFs, not a blob. Member names are
+    flattened to their basename to defeat zip path-traversal. Non-zip inputs
+    and zips with no `.nc` member are returned unchanged.
+
+    Args:
+        target: The file a retrieve wrote.
+
+    Returns:
+        list[Path]: The resulting NetCDF path(s) — `[target]` for a plain file
+        or single-member zip, or the extracted members for a multi-member zip.
+    """
+    if not zipfile.is_zipfile(target):
+        return [target]
+    with zipfile.ZipFile(target) as archive:
+        all_names = archive.namelist()
+    members = [name for name in all_names if name.endswith(".nc")]
+    if not members:
+        logger.warning(f"{target.name}: zip has no .nc member; left raw {all_names}")
+        return [target]
+    if len(members) == 1:
+        # Single-member — unwrap in place (the archive is already closed, so the
+        # atomic swap won't hit a Windows file lock).
+        _unwrap_zipped_netcdf(target)
+        return [target]
+    out_dir = target.parent / target.stem
+    # Start clean: a prior multi-member retrieve to the same path left its members
+    # here, and `_unique_dest` would otherwise treat them as collisions and suffix
+    # this retrieve's members (`_1`/`_2`), so the caller's `glob("*.nc")` would
+    # return a stale + fresh (possibly foreign-window) union. Reset the dir so it
+    # holds exactly this retrieve's members.
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    extracted: list[Path] = []
+    with zipfile.ZipFile(target) as archive:
+        for name in members:
+            # Flatten to the basename to defeat path traversal, then de-collide:
+            # two members from different in-zip subdirs (`2020/d.nc`, `2021/d.nc`)
+            # share a basename, and writing both to it would silently drop one.
+            dest = _unique_dest(out_dir, Path(name).name, extracted)
+            with archive.open(name) as src, dest.open("wb") as dst:
+                shutil.copyfileobj(src, dst)
+            extracted.append(dest)
+    target.unlink(missing_ok=True)
+    logger.debug(
+        f"Unpacked {len(extracted)} NetCDF member(s) from {target.name} → {out_dir}"
+    )
+    return sorted(extracted)
+
+
 def _describe_pair(pair: tuple[str, str]) -> str:
     """Render a `(dataset, variable)` pair for the `_run_items` log lines.
 
@@ -197,6 +337,72 @@ def _describe_pair(pair: tuple[str, str]) -> str:
         str: `"<dataset>/<variable>"`.
     """
     return f"{pair[0]}/{pair[1]}"
+
+
+def _remap_date_keys(
+    request: dict[str, Any], pairs: tuple[tuple[str, str], ...]
+) -> None:
+    """Rename request date keys in place (e.g. `year`→`hyear` for hindcasts).
+
+    Args:
+        request: The request dict being assembled (mutated in place).
+        pairs: `(source_key, destination_key)` renames to apply when the
+            source key is present.
+    """
+    for src_key, dst_key in pairs:
+        if src_key in request:
+            request[dst_key] = request.pop(src_key)
+
+
+def _apply_request_kind_dates(
+    request: dict[str, Any], var_info: Variable, start_date: Any, end_date: Any
+) -> None:
+    """Rewrite the request's date keys for the date-representation kinds (G11).
+
+    `cams_date` replaces year/month/day with a single `date` range string;
+    `glofas_hindcast` / `seasonal_hindcast` remap year/month(/day) to the
+    `hyear`/`hmonth`(/`hday`) hindcast-reference keys. Any other kind is a no-op.
+
+    Args:
+        request: The request dict assembled so far (mutated in place).
+        var_info: The catalog row whose `request_kind` selects the rewrite.
+        start_date: The window start (used for the `cams_date` range).
+        end_date: The window end (used for the `cams_date` range).
+    """
+    if var_info.request_kind == "cams_date":
+        for key in ("year", "month", "day", "product_type"):
+            request.pop(key, None)
+        request["date"] = f"{start_date:%Y-%m-%d}/{end_date:%Y-%m-%d}"
+        # Reset the daily template's 6-hourly slots to a single default
+        # (a per-row `extras: {time: [...]}` overrides it later).
+        request["time"] = ["00:00"]
+    elif var_info.request_kind == "glofas_hindcast":
+        _remap_date_keys(
+            request, (("year", "hyear"), ("month", "hmonth"), ("day", "hday"))
+        )
+    elif var_info.request_kind == "seasonal_hindcast":
+        # Seasonal reforecast: hindcast year/month, no day (stripped elsewhere).
+        _remap_date_keys(request, (("year", "hyear"), ("month", "hmonth")))
+
+
+def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> None:
+    """Merge per-row extras, drop the request-kind strips, apply None opt-outs.
+
+    The strip runs after the extras merge so a user can re-introduce a stripped
+    key by setting it in `extras`; the `None` opt-out then drops any `extras`
+    key explicitly set to `None`.
+
+    Args:
+        request: The request dict assembled so far (mutated in place).
+        var_info: The catalog row supplying `extras` and `request_kind`.
+    """
+    request.update(var_info.extras)
+    for stripped in _REQUEST_KIND_STRIPS.get(var_info.request_kind, ()):
+        if stripped not in var_info.extras:
+            request.pop(stripped, None)
+    for key, value in list(var_info.extras.items()):
+        if value is None:
+            request.pop(key, None)
 
 
 class ECMWF(LazyClientMixin, AbstractDataSource):
@@ -239,15 +445,17 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
 
     def __init__(
         self,
-        start: str,
-        end: str,
-        variables: dict[str, list[str]],
-        lat_lim: list[float],
-        lon_lim: list[float],
+        start: str | None = None,
+        end: str | None = None,
+        variables: dict[str, list[str]] | None = None,
+        lat_lim: list[float] | None = None,
+        lon_lim: list[float] | None = None,
         temporal_resolution: str = "daily",
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
         skip_constraints: bool = False,
+        request: dict[str, Any] | None = None,
+        endpoint: str | None = None,
     ):
         """Initialize an ECMWF backend instance.
 
@@ -294,6 +502,58 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # poison endpoint routing.
         self._clients: dict[str, Any] = {}
         self._injected_client: Any = None
+        # Raw-request passthrough (the coverage lever): when `request=` is
+        # given, skip the typed catalog / date / grid machinery and forward
+        # the raw request to the resolved store's client (see `download`). The
+        # dataset id arrives as the single key of `variables` — the facade
+        # composes `dataset=<id>` into `variables={<id>: []}`, so a passthrough
+        # is `EarthLens('ecmwf', dataset=<id>, request=<dict>)`.
+        self._passthrough: dict[str, Any] | None = None
+        if request is not None:
+            dataset = (
+                next(iter(variables))
+                if isinstance(variables, dict) and len(variables) == 1
+                else None
+            )
+            if not dataset:
+                raise ValueError(
+                    "ECMWF raw passthrough needs the dataset id alongside "
+                    "`request=<dict>` — pass `dataset=<id>` (facade) or "
+                    "`variables={<id>: []}`."
+                )
+            self._passthrough = {
+                "dataset": str(dataset),
+                "request": dict(request),
+                "endpoint": endpoint,
+            }
+            # Construction stays read-only: the base `download` wrapper's
+            # `_ensure_root_dir` creates (and unwinds on failure) the output
+            # directory at download time, exactly as the typed path relies on.
+            self.root_dir = Path(path).absolute()
+            self.path = self.root_dir
+            return
+
+        missing = [
+            name
+            for name, value in (
+                ("start", start),
+                ("end", end),
+                ("variables", variables),
+                ("lat_lim", lat_lim),
+                ("lon_lim", lon_lim),
+            )
+            if value is None
+        ]
+        if missing:
+            raise ValueError(
+                f"ECMWF requires {missing} — or pass `dataset=`+`request=` "
+                "for a raw-request passthrough."
+            )
+        # The `missing` guard above already rejects a None in any of these, but
+        # mypy cannot narrow through the comprehension — assert so the typed
+        # `super().__init__` call sees the non-optional types (B101 is skipped).
+        assert start is not None and end is not None and variables is not None
+        assert lat_lim is not None and lon_lim is not None
         super().__init__(
             start=start,
             end=end,
@@ -644,8 +904,13 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             NetCDF at `<self.root_dir>/<cds_variable>_<cds_dataset>.nc`,
             or, when `aggregate` is set, the per-window GeoTIFFs at
             `<aggregate.out_dir or self.root_dir/aggregated>/<cds_variable>_<freq>_<window>.tif`.
-            Under the default `errors="warn"`, variables whose download
-            (or aggregate) failed are logged and omitted from the returned
+            A zip-of-NetCDF response (satellite CDRs, CAMS `netcdf_zip`)
+            that unpacks to more than one member is returned as every
+            member under a sibling `<cds_variable>_<cds_dataset>/`
+            directory (all masked to a polygon `aoi=` if one was given);
+            such a multi-member response cannot be aggregated. Under the
+            default `errors="warn"`, variables whose download (or
+            aggregate) failed are logged and omitted from the returned
             list rather than aborting the batch.
 
         Raises:
@@ -690,6 +955,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             :class:`Catalog`: Resolves `(dataset, code)` pairs to
                 per-variable metadata.
         """
+        if getattr(self, "_passthrough", None) is not None:
+            return self._download_passthrough(aggregate=aggregate)
         self._errors = self.check_errors_policy(errors)
         catalog = Catalog()
         effective_aggregate: AggregationConfig | None = None
@@ -758,10 +1025,158 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         )
         var_info = catalog.get_variable(dataset_name, var)
         nc_path = self._download_dataset(var_info, progress_bar=progress_bar)
+        # A multi-member zip-of-NetCDF (satellite CDR / CAMS `netcdf_zip` over
+        # several timesteps) is unpacked by `_api` into this sibling
+        # `<cds_variable>_<cds_dataset>/` directory; the returned member's parent
+        # equals it exactly (a single-file retrieve returns the file at
+        # `root_dir` itself).
+        member_dir = self.root_dir / f"{var_info.cds_variable}_{var_info.cds_dataset}"
+        is_multi_member = member_dir.is_dir() and nc_path.parent == member_dir
         if aggregate is None:
+            # Return every member (already masked in `_api`) so `download()`'s
+            # list is complete, not just the first.
+            if is_multi_member:
+                return sorted(member_dir.glob("*.nc"))
             return [nc_path]
+        # `aggregate_netcdf` reduces a single cube — reducing only the first
+        # member would return a plausible-looking but partial result, so refuse.
+        if is_multi_member:
+            raise ValueError(
+                f"{dataset_name}/{var}: the retrieve returned a multi-member "
+                "zip-of-NetCDF (one file per timestep); aggregating across "
+                "members is not supported. Re-run without `aggregate=` and "
+                f"reduce the member directory ({member_dir}) yourself, or "
+                "request a single window."
+            )
         agg = aggregate_netcdf(nc_path, var_info, aggregate)
         return [path for _, _, path in agg if path is not None]
+
+    def _resolve_endpoint(self, dataset: str) -> str:
+        """Resolve which store hosts `dataset` for a passthrough retrieve.
+
+        A curated row's `endpoint` wins; otherwise the per-store availability
+        index (`Catalog.store_for`) decides; falling back to `"cds"`.
+
+        Args:
+            dataset: The Copernicus dataset id being retrieved.
+
+        Returns:
+            str: The store slug (`"cds"` / `"ads"` / `"ewds"`).
+        """
+        catalog = Catalog()
+        row = catalog.datasets.get(dataset)
+        if row is not None:
+            return row.endpoint
+        return catalog.store_for(dataset) or "cds"
+
+    def _passthrough_target(self, dataset: str, request: dict[str, Any]) -> str:
+        """Pick an output filename for a raw retrieve from the request format.
+
+        Args:
+            dataset: The dataset id (becomes the filename stem).
+            request: The raw request dict (its format hint picks the suffix).
+
+        Returns:
+            str: `<dataset><suffix>` — `.nc` / `.zip` / `.grib` / `.bin`.
+        """
+        fmt = str(request.get("data_format") or request.get("format") or "").lower()
+        download_fmt = str(request.get("download_format") or "").lower()
+        if download_fmt == "zip" or fmt == "netcdf_zip":
+            suffix = ".zip"
+        elif fmt == "netcdf":
+            suffix = ".nc"
+        elif fmt in ("grib", "grib2"):
+            suffix = ".grib"
+        else:
+            suffix = ".bin"
+        return f"{dataset}{suffix}"
+
+    def _download_passthrough(
+        self, aggregate: AggregationConfig | None = None
+    ) -> list[Path]:
+        """Retrieve a raw `dataset` + `request` from the resolved store.
+
+        The coverage lever (`G3`): forwards a raw request to the endpoint
+        router with no curated row, typed variable resolution, grid snap, or
+        constraint pre-validation. NetCDF (incl. single-member `netcdf_zip`)
+        is unwrapped in place; other formats (GRIB, multi-member zips, CSV) are
+        written raw with a clear log for the caller / the C3 format handler.
+
+        Args:
+            aggregate: Rejected — aggregation needs a curated `Variable`.
+
+        Returns:
+            list[Path]: The written file(s) — one for a plain retrieve, or the
+            member NetCDFs for a multi-member zip-of-NetCDF response.
+
+        Raises:
+            ValueError: If `aggregate` is set (it needs a curated `Variable`).
+            PermissionError: If the store rejects the dataset for an unaccepted
+                licence (mapped to name the dataset page).
+        """
+        if aggregate is not None:
+            raise ValueError(
+                "aggregate= needs a curated dataset row; it is not available "
+                "for a raw-request passthrough."
+            )
+        spec = self._passthrough
+        assert spec is not None
+        dataset = spec["dataset"]
+        request = spec["request"]
+        endpoint = spec["endpoint"] or self._resolve_endpoint(dataset)
+        target = self.root_dir / self._passthrough_target(dataset, request)
+        client = self._client_for(endpoint)
+        logger.info(
+            f"Passthrough retrieve {dataset!r} via {endpoint.upper()}; "
+            "this may take several minutes"
+        )
+        try:
+            client.retrieve(dataset, request, str(target))
+        except Exception as exc:  # noqa: BLE001
+            # Broad catch on purpose: classify a licence rejection into a clear
+            # PermissionError and re-raise everything else unchanged.
+            if _looks_like_licence_not_accepted(exc):
+                base = endpoint_url(endpoint).rsplit("/api", 1)[0]
+                raise PermissionError(
+                    f"{endpoint.upper()} rejected {dataset!r}: licence not "
+                    f"accepted. Open {base}/datasets/{dataset} and tick the "
+                    "licence at the bottom of the 'Download' tab."
+                ) from exc
+            raise
+        return self._passthrough_postprocess(target)
+
+    def _passthrough_postprocess(self, target: Path) -> list[Path]:
+        """Normalise a raw-retrieve output by its detected format.
+
+        A zip-of-NetCDF is unpacked to its member NetCDF(s) (single-member in
+        place, multi-member into a sibling directory); GRIB and plain NetCDF are
+        left as written (pyramids reads both); an unrecognised blob (CSV/point)
+        is left raw with a clear log for the tabular path (`C9`). Never raises on
+        the archive shape — passthrough must not fail after a successful
+        retrieve.
+
+        Args:
+            target: The file the retrieve wrote.
+
+        Returns:
+            list[Path]: The resulting file path(s).
+        """
+        output_format = _detect_output_format(target)
+        if output_format == "zip":
+            return _unpack_netcdf_archive(target)
+        if output_format == "grib":
+            logger.info(f"{target.name}: GRIB written (readable via pyramids/GDAL).")
+        elif output_format == "unknown":
+            logger.info(
+                f"{target.name}: non-raster format (CSV/point observations) "
+                "written raw. In-situ / point datasets stay passthrough-only — "
+                "read the file directly (e.g. with pandas)."
+            )
+        else:
+            logger.info(
+                f"{target.name}: NetCDF written ({target.stat().st_size} bytes)."
+            )
+        return [target]
 
     def _download_dataset(
         self,
@@ -930,9 +1345,22 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                     "and tied to your Copernicus account."
                 ) from exc
             raise
-        _unwrap_zipped_netcdf(target)
-        self._mask_netcdf_to_geometry(target)
-        return target
+        # A zip-of-NetCDF response (satellite CDRs, CAMS netcdf_zip) is unpacked
+        # by the C3 handler — single-member in place, multi-member into a
+        # sibling dir — so a multi-timestep curated retrieve does not crash.
+        members = _unpack_netcdf_archive(target)
+        if len(members) > 1:
+            logger.warning(
+                f"{dataset}: retrieve returned {len(members)} NetCDF members "
+                f"(unpacked to {members[0].parent}). A plain download returns "
+                "every member; a multi-member curated aggregate is not supported."
+            )
+        # Mask every member (not just the first) so a polygon `aoi=` trims the
+        # whole time series, and return the primary — `_download_pair` fans the
+        # sibling dir out into the full member list for a plain download.
+        for member in members:
+            self._mask_netcdf_to_geometry(member)
+        return members[0]
 
     def _mask_netcdf_to_geometry(self, target: Path) -> None:
         """Mask a written NetCDF cube to a polygon `aoi=`, if one was given.
@@ -1017,7 +1445,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             second positional argument to
             :meth:`cdsapi.Client.retrieve`.
         """
-        if var_info.request_kind == "glofas" and self.temporal_resolution == "monthly":
+        if (
+            var_info.request_kind in ("glofas", "glofas_hindcast")
+            and self.temporal_resolution == "monthly"
+        ):
             raise ValueError(
                 f"{var_info.cds_dataset!r} (GloFAS) must be requested with "
                 "temporal_resolution='daily': the monthly branch omits the "
@@ -1036,8 +1467,11 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 self.space.south,
                 self.space.east,
             ],
-            "product_type": var_info.product_type,
         }
+        # `product_type` only for datasets that declare one — CAMS keys on
+        # `type`/`quantity` instead and rejects an empty `product_type`.
+        if var_info.product_type:
+            request["product_type"] = var_info.product_type
 
         if self.temporal_resolution == "monthly":
             request["time"] = ["00:00"]
@@ -1045,17 +1479,16 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             request["day"] = sorted({f"{d.day:02d}" for d in dates})
             request["time"] = ["00:00", "06:00", "12:00", "18:00"]
 
+        # Request-kind date representation (G11): cams_date → a single `date`
+        # range string; the hindcast families remap year/month/day →
+        # hyear/hmonth/hday (G7).
+        _apply_request_kind_dates(
+            request, var_info, self.time.start_date, self.time.end_date
+        )
+
         if var_info.cds_pressure_level is not None:
             request["pressure_level"] = var_info.cds_pressure_level
 
-        request.update(var_info.extras)
-
-        for stripped in _REQUEST_KIND_STRIPS.get(var_info.request_kind, ()):
-            if stripped not in var_info.extras:
-                request.pop(stripped, None)
-
-        for key, value in list(var_info.extras.items()):
-            if value is None:
-                request.pop(key, None)
+        _apply_extras_and_strips(request, var_info)
 
         return request
