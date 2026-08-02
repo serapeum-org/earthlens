@@ -286,13 +286,14 @@ def _validate_tropycal(catalog: Any) -> tuple[int, list[str]]:
 
 
 def _validate_emdat(catalog: Any) -> tuple[int, list[str]]:
-    """Each EM-DAT dataset needs a label, prose, a licence and a vocabulary."""
-    return _lint(
-        catalog,
-        lambda k, r: _require(
-            k, r, ("long_name", "description", "licence", "hazard_vocabulary")
-        ),
-    )
+    """Each EM-DAT dataset needs the prose its row model does not already force.
+
+    `long_name`, `licence` and `hazard_vocabulary` are required by the pydantic
+    row model, so a catalog missing any of them never loads far enough to reach
+    validation. `description` and `citation` are the optional fields worth
+    insisting on.
+    """
+    return _lint(catalog, lambda k, r: _require(k, r, ("description", "citation")))
 
 
 def _validate_gdacs(catalog: Any) -> tuple[int, list[str]]:

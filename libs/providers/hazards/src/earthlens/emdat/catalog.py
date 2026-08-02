@@ -134,9 +134,11 @@ class Dataset(BaseModel):
             `FeatureCollection`). Copied onto the backend's `OUTPUT_KIND` per
             instance.
         long_name: Human-readable label for the dataset.
-        description: Longer prose describing what the dataset covers. Indexed
-            by `earthlens datasets search`, so it names the hazards a caller
-            would search for.
+        description: Longer prose describing what the dataset covers, shown
+            by `earthlens datasets show`. It is *not* what
+            `earthlens datasets search` matches on — that covers provider, id
+            and title, and `record_title` prefers `long_name` — which is why
+            the hazard names live in :attr:`long_name` as well.
         dataverse_base: Base URL of the Dataverse installation
             (`provider="dataverse"` only).
         doi: The archive's persistent id (`provider="dataverse"` only).
