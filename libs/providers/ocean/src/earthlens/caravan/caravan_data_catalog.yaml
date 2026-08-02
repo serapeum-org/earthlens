@@ -550,3 +550,47 @@ available_extensions:
       IMERG v07, CHIRPS, IFS-HRES, GraphCast, CHIRPS-GEFS) with lead-time bands
       on a UTC-0 time base. That is a gridded/cube shape, not the per-catchment
       daily table this backend returns, so it needs its own backend.
+  - key: mswep4caravan
+    supported: false
+    records: [19199860]
+    reason: >-
+      MSWEP4Caravan is a Caravan-shaped rainfall-runoff dataset, but it is
+      CC-BY-NC-4.0. earthlens makes no assumption about a user's commercial
+      status, so non-commercial sources stay out of the default integration
+      path - the same rule applied to the NC providers in
+      docs/reference/deferred-providers.md.
+  - key: caravan-qual
+    supported: false
+    records: [21337532]
+    reason: >-
+      Caravan-Qual (lite) is CC-BY-4.0 but is not in the Caravan timeseries
+      layout: its tables are per-PARAMETER water-quality files
+      (`wqms-csv/BOD7.csv`, `pH.csv`, ...) plus zarr cubes, not per-catchment
+      daily series. Verified by opening the archive - it exposes no
+      `timeseries/<fmt>/<source>/` members at all.
+  - key: iceland
+    supported: false
+    reason: >-
+      The Caravan extension Iceland (lamahice) is published on HydroShare
+      rather than Zenodo, and is CC-BY-NC-4.0. Both put it outside what this
+      backend fetches; see the project's data-contribution thread #27.
+  - key: aus-vic
+    supported: false
+    records: [18736844]
+    reason: >-
+      Caravan-AUS-VIC (Maribyrnong River, Victoria) was published to Zenodo and
+      then DELETED by its author on 2026-03-01 - the record now returns HTTP 410
+      with a tombstone. There is nothing to fetch.
+  - key: camels-ch
+    supported: false
+    records: [15025258]
+    reason: >-
+      CAMELS-CH is published in the native CAMELS layout rather than Caravan's -
+      verified by opening the archive, which exposes no
+      `timeseries/<fmt>/<source>/` members. Not reachable through this backend.
+  - key: gages-ii
+    supported: false
+    reason: >-
+      Announced in the project's data-contribution thread #24 but never
+      published with a DOI; the thread points at an earlier discussion with no
+      dataset attached. Nothing to pin.

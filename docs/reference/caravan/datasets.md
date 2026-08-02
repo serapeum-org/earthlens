@@ -47,14 +47,21 @@ valid `dataset=` values — request `base` and select their catchments by id or 
 
 ## Known but not wrapped
 
-**CAMELS-CH** ([15025258](https://doi.org/10.5281/zenodo.15025258)) is published in the native CAMELS layout
-rather than Caravan's — verified by opening it — so it is not reachable through this backend.
+Every Caravan-related record the project announces or that a content search surfaces has been checked. These are
+the ones deliberately **not** wrapped, each with the reason:
 
-**Caravan MultiMet** ([14196771](https://doi.org/10.5281/zenodo.14196771) /
-[14196772](https://doi.org/10.5281/zenodo.14196772)) adds nowcast and forecast weather products — CPC, IMERG v07,
-CHIRPS, ECMWF IFS-HRES, GraphCast, CHIRPS-GEFS — for every Caravan basin. It ships **zarr cubes with lead-time
-bands on a UTC-0 time base**, which is a gridded shape rather than the per-catchment daily table this backend
-returns, so it needs its own backend and is deliberately out of scope here.
+| Record | Why not |
+|---|---|
+| **Caravan MultiMet** ([14196771](https://doi.org/10.5281/zenodo.14196771) / [14196772](https://doi.org/10.5281/zenodo.14196772)) | zarr cubes with lead-time bands on a UTC-0 base — a gridded shape, not a per-catchment table |
+| **Caravan-Qual (lite)** ([21337532](https://doi.org/10.5281/zenodo.21337532)) | CC-BY-4.0, but per-*parameter* water-quality tables (`wqms-csv/pH.csv`, …) plus zarr — verified to expose no `timeseries/` members |
+| **MSWEP4Caravan** ([19199860](https://doi.org/10.5281/zenodo.19199860)) | Caravan-shaped, but **CC-BY-NC-4.0** — non-commercial sources stay out of the default path |
+| **Caravan extension Iceland** (`lamahice`) | published on **HydroShare**, not Zenodo, and CC-BY-NC-4.0 |
+| **Caravan-AUS-VIC** ([18736844](https://doi.org/10.5281/zenodo.18736844)) | **deleted by its author** on 2026-03-01; the record returns HTTP 410 |
+| **GAGES II** | announced in the project's thread #24 but never published with a DOI |
+| **CAMELS-CH** ([15025258](https://doi.org/10.5281/zenodo.15025258)) | native CAMELS layout, not Caravan's — verified by opening it |
+
+`earthlens datasets refresh caravan` re-checks this list on every run, so a record that later gains a Caravan
+archive, or a new extension entirely, shows up as `discovered` rather than staying invisible.
 
 ## Archive layout
 
