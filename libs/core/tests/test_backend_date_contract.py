@@ -118,6 +118,7 @@ _NO_WINDOW_REQUIRED = {
     "AdminBoundaries",
     "Bathymetry",
     "DEM",
+    "EMDAT",
     "Glaciers",
     "OSM",
     "Overture",

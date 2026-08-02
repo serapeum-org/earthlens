@@ -51,6 +51,20 @@ _REGISTER_URL = "https://urs.earthdata.nasa.gov"
 _DOCS_URL = "https://earthaccess.readthedocs.io"
 
 
+def _restore_env(previous: dict[str, str | None]) -> None:
+    """Put environment variables back to the values in `previous`.
+
+    Args:
+        previous: Variable name to its value before it was overwritten, or
+            `None` when it was unset.
+    """
+    for name, value in previous.items():
+        if value is None:
+            os.environ.pop(name, None)
+        else:
+            os.environ[name] = value
+
+
 class AuthenticationError(_BaseAuthenticationError):
     """Raised when `earthaccess` cannot authenticate against EDL.
 
@@ -120,6 +134,23 @@ class EarthdataCredentials(BaseModel):
     password: SecretStr | None = None
     token: SecretStr | None = None
     netrc_path: Path | None = None
+
+
+#: Two consequences of `earthaccess` keeping its authenticated handle in a
+#: module-level global, and of `configure()` having to route credentials through
+#: `os.environ` because `earthaccess.login` accepts no credential argument:
+#:
+#: * Once any login has succeeded in the process, a later `configure()` with
+#:   *different* credentials is a no-op — one credential set per process.
+#: * `configure()` briefly writes to `os.environ` and restores it afterwards, so
+#:   concurrent logins with different credentials in separate threads are not
+#:   safe. Authenticate once, up front.
+#:
+#: Note also that the restore is a deliberate behaviour change: an explicit
+#: `token=` / `username=`+`password=` used to be left in `os.environ`
+#: permanently, and other backends that read those variables directly (`stac`'s
+#: EDL signer, `asf`) picked them up by that leak. They must now be given the
+#: credential explicitly, or find it in the caller's own environment.
 
 
 class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
@@ -208,6 +239,37 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
             return "netrc"
         return "interactive"
 
+    def _explicit_env_overrides(self) -> tuple[dict[str, str], list[str]]:
+        """Return the EDL environment variables an explicit credential needs.
+
+        `earthaccess` has no direct token or username/password argument; its
+        `"environment"` strategy reads `EARTHDATA_TOKEN` (preferred) or
+        `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD`. Whichever explicit
+        credential was supplied is exported so it reaches the login, and
+        anything that would outrank it is named for removal.
+
+        Returns:
+            tuple[dict[str, str], list[str]]: The variables to set, and the
+                variables to unset for the duration of the login. Both are
+                empty when no explicit credential was given.
+        """
+        if self._has_explicit_token() and self._creds.token is not None:
+            return {"EARTHDATA_TOKEN": self._creds.token.get_secret_value()}, []
+        if (
+            self._has_explicit_credentials()
+            and self._creds.username is not None
+            and self._creds.password is not None
+        ):
+            wanted = {
+                "EARTHDATA_USERNAME": self._creds.username,
+                "EARTHDATA_PASSWORD": self._creds.password.get_secret_value(),
+            }
+            # earthaccess prefers EARTHDATA_TOKEN over a username/password pair,
+            # so an unrelated token already in the environment would silently
+            # beat the credentials the caller passed explicitly.
+            return wanted, ["EARTHDATA_TOKEN"]
+        return {}, []
+
     def configure(self) -> None:
         """Authenticate against EDL via `earthaccess.login`.
 
@@ -221,6 +283,13 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
         `EARTHDATA_PASSWORD` for a username/password — before login. Then
         logs in with `persist=True` and keeps the returned
         `earthaccess.Auth` handle on :attr:`_auth`.
+
+        An explicit credential also has to *win*. `earthaccess` prefers
+        `EARTHDATA_TOKEN` over a username/password pair, so an unrelated token
+        already in the environment is cleared for the duration of the login.
+        Everything this touches is restored afterwards, so a credential never
+        lingers in the process environment where a later subprocess would
+        inherit it.
 
         Raises:
             AuthenticationError: When `earthaccess.login` returns an
@@ -236,49 +305,47 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
         # EARTHDATA_TOKEN as a real token and fails with "Token does not exist",
         # masking valid username/password env vars. Drop any empty EDL env var so
         # the strategy resolves to the credential that is actually set.
+        previous: dict[str, str | None] = {}
         for _var in ("EARTHDATA_TOKEN", "EARTHDATA_USERNAME", "EARTHDATA_PASSWORD"):
             if os.environ.get(_var) == "":
-                os.environ.pop(_var, None)
+                previous[_var] = os.environ.pop(_var)
 
+        # Everything from here restores the environment on the way out, however
+        # it leaves — a failed import and a failed login included.
         try:
-            import earthaccess  # lazy — only needed when actually logging in
-        except ImportError as exc:
-            raise ImportError(
-                "the NASA Earthdata backend needs `earthaccess`, which is "
-                "not installed. Install the extra with "
-                "`pip install earthlens[earthdata]` (earthaccess >=0.18 "
-                "requires Python >=3.12)."
-            ) from exc
+            try:
+                import earthaccess  # lazy — only needed when actually logging in
+            except ImportError as exc:
+                raise ImportError(
+                    "the NASA Earthdata backend needs `earthaccess`, which is "
+                    "not installed. Install the extra with "
+                    "`pip install earthlens[earthdata]` (earthaccess >=0.18 "
+                    "requires Python >=3.12)."
+                ) from exc
 
-        strategy = self._resolve_strategy()
-        if strategy == "environment":
-            # earthaccess has no direct token / username-password argument;
-            # its environment strategy reads EARTHDATA_TOKEN (preferred) or
-            # EARTHDATA_USERNAME / EARTHDATA_PASSWORD. Export whichever
-            # explicit credential was supplied so it reaches the login.
-            if self._has_explicit_token():
-                assert (
-                    self._creds.token is not None
-                )  # _has_explicit_token guarantees it
-                os.environ["EARTHDATA_TOKEN"] = self._creds.token.get_secret_value()
-            elif self._has_explicit_credentials():
-                # _has_explicit_credentials guarantees both are non-None
-                assert self._creds.username is not None
-                assert self._creds.password is not None
-                os.environ["EARTHDATA_USERNAME"] = self._creds.username
-                os.environ["EARTHDATA_PASSWORD"] = (
-                    self._creds.password.get_secret_value()
-                )
-        try:
-            auth = earthaccess.login(strategy=strategy, persist=True)
-        except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
-            raise AuthenticationError(
-                "Earthdata Login failed while contacting EDL "
-                f"(strategy={strategy!r}): {type(exc).__name__}: {exc}. "
-                "Set EARTHDATA_USERNAME / EARTHDATA_PASSWORD, add a "
-                f"'machine urs.earthdata.nasa.gov' entry to ~/.netrc, or "
-                f"register a free account at {_REGISTER_URL}."
-            ) from exc
+            strategy = self._resolve_strategy()
+            if strategy == "environment":
+                wanted, clear = self._explicit_env_overrides()
+                for _name in list(wanted) + clear:
+                    previous.setdefault(_name, os.environ.get(_name))
+                os.environ.update(wanted)
+                for _name in clear:
+                    os.environ.pop(_name, None)
+            try:
+                auth = earthaccess.login(strategy=strategy, persist=True)
+            except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
+                raise AuthenticationError(
+                    "Earthdata Login failed while contacting EDL "
+                    f"(strategy={strategy!r}): {type(exc).__name__}: {exc}. "
+                    "Set EARTHDATA_USERNAME / EARTHDATA_PASSWORD, add a "
+                    f"'machine urs.earthdata.nasa.gov' entry to ~/.netrc, or "
+                    f"register a free account at {_REGISTER_URL}."
+                ) from exc
+        finally:
+            # An explicit credential is put in the environment only because
+            # earthaccess has no argument for one. Leaving it there would make
+            # it process-global and inherit into any later subprocess.
+            _restore_env(previous)
 
         if not getattr(auth, "authenticated", False):
             raise AuthenticationError(
