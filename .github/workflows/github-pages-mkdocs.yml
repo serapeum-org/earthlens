@@ -41,7 +41,7 @@ jobs:
     # and it is the merge commit on a pull_request rather than the fork's head.
     # Naming a ref from the event payload would put fork-controlled code into
     # this job.
-    - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
         persist-credentials: false
@@ -50,7 +50,7 @@ jobs:
     # internally with these inputs, so reusing it here keeps the gate and the
     # deploy on one environment; installing the toolchain by hand would let the
     # two drift and defeat the point of gating.
-    - uses: serapeum-org/github-actions/actions/python-setup/uv@bc6c376c15ffbfe4d9f46fe7e39b0c2e56302ca8  # uv/v1.2.0
+    - uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
       with:
         python-version: "3.12"
         install-groups: "groups: docs"
@@ -68,11 +68,11 @@ jobs:
       needs: build-strict
       runs-on: ubuntu-latest
       steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
-      - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1.3.0
+      - uses: serapeum-org/github-actions/actions/mkdocs-deploy@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # mkdocs/v1.3.1
         with:
           trigger: 'pull_request'
           package-manager: 'uv'
@@ -85,10 +85,10 @@ jobs:
     needs: build-strict
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
-    - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1.3.0
+    - uses: serapeum-org/github-actions/actions/mkdocs-deploy@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # mkdocs/v1.3.1
       with:
         trigger: 'main'
         package-manager: 'uv'
@@ -103,7 +103,7 @@ jobs:
     needs: build-strict
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0
         ref: ${{ github.event.workflow_run.head_branch || github.ref }}
@@ -114,7 +114,7 @@ jobs:
         VERSION=$(grep -m1 '^version' pyproject.toml | sed 's/.*"\(.*\)"/\1/')
         echo "tag=$VERSION" >> $GITHUB_OUTPUT
 
-    - uses: serapeum-org/github-actions/actions/mkdocs-deploy@mkdocs/v1.3.0
+    - uses: serapeum-org/github-actions/actions/mkdocs-deploy@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # mkdocs/v1.3.1
       with:
         trigger: 'release'
         package-manager: 'uv'

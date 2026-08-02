@@ -36,15 +36,15 @@ jobs:
     timeout-minutes: 10
     steps:
       # No fetch-depth: `pre-commit run --all-files` scans the working tree, not history.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
 
       # Cache the hook toolchains (each hook repo builds an isolated env on first run).
       # Keyed on the config so a hook or rev bump rebuilds; restore-keys reuse the rest.
-      - uses: actions/cache@v4
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
@@ -71,12 +71,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
+        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
         with:
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
@@ -112,7 +112,7 @@ jobs:
       # persist-credentials: false — `gitleaks dir .` scans the .git directory, and
       # actions/checkout otherwise writes the runner's auth token into .git/config
       # (an `AUTHORIZATION: basic …` header), which gitleaks would flag as a leak.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
