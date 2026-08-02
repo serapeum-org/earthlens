@@ -51,7 +51,15 @@ datasets:
         units: m3 s-1
   cems-glofas-historical:
     endpoint: ewds
-    request_kind: form
+    grid_resolution: 0.05
+    request_kind: glofas
+    product_type: [consolidated]
+    extras:
+      system_version: [version_4_0]
+      hydrological_model: [lisflood]
+      timespan: [time_mean]  # serves the river-discharge / runoff outputs (the
+      # snow-depth / soil-wetness state variables need timespan: instantaneous)
+      download_format: unarchived
     variables:
       average-river-discharge-in-the-last-24-hours:
         cds_variable: average_river_discharge_in_the_last_24_hours
@@ -71,7 +79,14 @@ datasets:
         units: unknown
   cems-glofas-reforecast:
     endpoint: ewds
+    grid_resolution: 0.05
     request_kind: glofas_hindcast
+    product_type: [control_reforecast]
+    extras:
+      system_version: [version_2_2]
+      hydrological_model: [htessel_lisflood]
+      leadtime_hour: ["24"]
+      download_format: unarchived
     variables:
       river-discharge-in-the-last-24-hours:
         cds_variable: river_discharge_in_the_last_24_hours
@@ -79,7 +94,13 @@ datasets:
         units: unknown
   cems-glofas-seasonal:
     endpoint: ewds
-    request_kind: form
+    grid_resolution: 0.05
+    request_kind: seasonal
+    extras:
+      system_version: [operational]
+      hydrological_model: [lisflood]
+      leadtime_hour: ["24"]
+      download_format: unarchived
     variables:
       river-discharge-in-the-last-24-hours:
         cds_variable: river_discharge_in_the_last_24_hours
@@ -99,7 +120,13 @@ datasets:
         units: unknown
   cems-glofas-seasonal-reforecast:
     endpoint: ewds
+    grid_resolution: 0.05
     request_kind: seasonal_hindcast
+    extras:
+      system_version: [version_2_2]
+      hydrological_model: [htessel_lisflood]
+      leadtime_hour: ["24"]
+      download_format: unarchived
     variables:
       river-discharge-in-the-last-24-hours:
         cds_variable: river_discharge_in_the_last_24_hours

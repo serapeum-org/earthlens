@@ -94,6 +94,11 @@ datasets:
   projections-cmip5-daily-pressure-levels:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: historical
+      model: ec_earth
+      ensemble_member: r12i1p1
+      period: 19250101-19741231
     variables:
       geopotential-height:
         cds_variable: geopotential_height
@@ -114,6 +119,11 @@ datasets:
   projections-cmip5-daily-single-levels:
     endpoint: cds
     request_kind: form
+    extras:
+      experiment: historical
+      model: gfdl_esm2g
+      ensemble_member: r1i1p1
+      period: 18610101-18651231
     variables:
       10m-wind-speed:
         cds_variable: 10m_wind_speed

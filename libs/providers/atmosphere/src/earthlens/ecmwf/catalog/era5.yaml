@@ -1107,6 +1107,8 @@ datasets:
   reanalysis-era5-land-timeseries:
     endpoint: cds
     request_kind: cams_date
+    extras:
+      time: null  # timeseries form keys on `date` only — no time-of-day widget
     variables:
       2m-dewpoint-temperature:
         cds_variable: 2m_dewpoint_temperature
@@ -1187,6 +1189,8 @@ datasets:
   reanalysis-era5-single-levels-timeseries:
     endpoint: cds
     request_kind: cams_date
+    extras:
+      time: null  # timeseries form keys on `date` only — no time-of-day widget
     variables:
       100m-u-component-of-wind:
         cds_variable: 100m_u_component_of_wind

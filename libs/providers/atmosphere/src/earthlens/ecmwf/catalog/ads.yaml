@@ -99,6 +99,13 @@ datasets:
   cams-europe-air-quality-forecasts-optimised-at-observation-sites:
     endpoint: ads
     request_kind: form
+    extras:
+      country: [albania]
+      type: [mos_optimised]
+      leadtime_hour: ["0-23"]
+      time: null  # station product keys on `leadtime_hour`, not time-of-day
+      data_format: null  # no `data_format` widget on this form
+      area: null  # observation-site product — no `area` widget
     variables:
       nitrogen-dioxide:
         cds_variable: nitrogen_dioxide
@@ -119,6 +126,14 @@ datasets:
   cams-global-emission-inventories:
     endpoint: ads
     request_kind: form
+    extras:
+      source: [anthropogenic]  # widest single source (38/64 vars); others per-source
+      version: ["v5.3"]
+      month: null  # annual inventory — keyed by `year` only
+      day: null
+      time: null
+      data_format: null  # no `data_format` widget on this form
+      area: null  # no `area` widget on this form
     variables:
       acetaldehyde:
         cds_variable: acetaldehyde
@@ -379,6 +394,10 @@ datasets:
   cams-global-ghg-reanalysis-egg4:
     endpoint: ads
     request_kind: cams_date
+    extras:
+      step: ["0"]  # `step: 0` alone serves all 82 surface + level variables
+      time: null  # keyed by forecast `step`, not time-of-day
+      data_format: netcdf_zip  # form offers grib / netcdf_zip only
     variables:
       downward-uv-radiation-at-the-surface:
         cds_variable: downward_uv_radiation_at_the_surface
@@ -711,6 +730,11 @@ datasets:
   cams-global-ghg-reanalysis-egg4-monthly:
     endpoint: ads
     request_kind: form
+    extras:
+      product_type: [monthly_mean]  # `monthly_mean` alone serves all 23 variables
+      day: null  # monthly means — keyed by year / month only
+      time: null
+      data_format: netcdf_zip  # form offers grib / netcdf_zip only
     variables:
       snow-albedo:
         cds_variable: snow_albedo
@@ -807,6 +831,10 @@ datasets:
   cams-global-greenhouse-gas-forecasts:
     endpoint: ads
     request_kind: cams_date
+    extras:
+      leadtime_hour: ["0"]  # `leadtime_hour: 0` alone serves all 71 variables
+      time: null  # keyed by `leadtime_hour`, not time-of-day
+      data_format: netcdf_zip  # form offers grib / netcdf_zip only
     variables:
       ch4-column-mean-molar-fraction:
         cds_variable: ch4_column_mean_molar_fraction
@@ -1095,6 +1123,13 @@ datasets:
   cams-global-radiative-forcing-auxilliary-variables:
     endpoint: ads
     request_kind: form
+    extras:
+      aerosol_type: [anthropogenic]
+      version: ["1.5"]
+      day: null  # monthly product — keyed by year / month only
+      time: null
+      data_format: null  # no `data_format` widget on this form
+      area: null  # no `area` widget on this form
     variables:
       aerosol-radiation-effect:
         cds_variable: aerosol_radiation_effect
@@ -1111,6 +1146,17 @@ datasets:
   cams-global-radiative-forcings:
     endpoint: ads
     request_kind: form
+    extras:
+      band: [long_wave]
+      forcing_type: [instantaneous]
+      level: [surface]
+      sky_type: [all_sky]
+      version: ["2"]
+      month: null  # annual forcings — keyed by `year` only
+      day: null
+      time: null
+      data_format: null  # no `data_format` widget on this form
+      area: null  # no `area` widget on this form
     variables:
       radiative-forcing-of-carbon-dioxide:
         cds_variable: radiative_forcing_of_carbon_dioxide
@@ -1139,6 +1185,11 @@ datasets:
   cams-global-reanalysis-eac4-monthly:
     endpoint: ads
     request_kind: form
+    extras:
+      product_type: [monthly_mean]  # `monthly_mean` alone serves all 81 variables
+      day: null  # monthly means — keyed by year / month only
+      time: null
+      data_format: netcdf_zip  # form offers grib / netcdf_zip only
     variables:
       2m-dewpoint-temperature:
         cds_variable: 2m_dewpoint_temperature
@@ -1467,6 +1518,12 @@ datasets:
   cams-gridded-solar-radiation:
     endpoint: ads
     request_kind: form
+    extras:
+      sky_type: [clear]
+      version: ["4.5"]
+      day: null  # monthly product — keyed by year / month only
+      time: null
+      data_format: null  # no `data_format` widget on this form
     variables:
       global-horizontal-irradiation:
         cds_variable: global_horizontal_irradiation
@@ -1487,6 +1544,12 @@ datasets:
   cams-solar-radiation-timeseries:
     endpoint: ads
     request_kind: cams_date
+    extras:
+      sky_type: [clear]
+      time_reference: [true_solar_time]
+      time_step: [15minute]
+      time: null  # point timeseries keys on `time_step`, not time-of-day
+      area: null  # point timeseries — `location` widget, no `area` bbox
     variables:
       all:
         cds_variable: all
