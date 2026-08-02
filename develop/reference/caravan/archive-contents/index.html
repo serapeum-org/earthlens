@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/mswep/usage/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/caravan/archive-contents/">
       
       
-        <link rel="prev" href="../authentication/">
+        <link rel="prev" href="../datasets/">
       
       
-        <link rel="next" href="../datasets/">
+        <link rel="next" href="../caravan/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Usage - earthlens</title>
+        <title>Inside an archive (CSV & NetCDF) - earthlens</title>
       
     
     
@@ -87,20 +87,20 @@
     
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="earthlens">
-    <meta property="og:title" content="Usage">
+    <meta property="og:title" content="Inside an archive (CSV &amp; NetCDF)">
     <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
-    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/reference/mswep/usage/">
+    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/reference/caravan/archive-contents/">
     <meta property="og:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Usage">
+    <meta name="twitter:title" content="Inside an archive (CSV &amp; NetCDF)">
     <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
     <meta name="twitter:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -119,7 +119,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#mswep-mswx-usage" class="md-skip">
+        <a href="#caravan-inside-a-grdc-caravan-archive" class="md-skip">
           Skip to content
         </a>
       
@@ -158,7 +158,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Usage
+              Inside an archive (CSV & NetCDF)
             
           </span>
         </div>
@@ -6867,341 +6867,6 @@
                 
   
   
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_37" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_37" id="__nav_3_37_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MSWEP / MSWX (GloH2O)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_37_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_37">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    MSWEP / MSWX (GloH2O)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../authentication/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-request-shape" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The request shape
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#daily-precipitation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Daily precipitation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mswx-forcing-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        MSWX forcing variables
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#variants-are-chosen-by-date" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Variants are chosen by date
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nrt-latency-and-revisions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        NRT: latency and revisions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-the-files-land" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where the files land
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#spatial-subsetting-is-downstream" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Spatial subsetting is downstream
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#errors-worth-catching" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Errors worth catching
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../datasets/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Products & catalog
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../mswep/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     
@@ -7216,10 +6881,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_38" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_37" >
         
           
-          <label class="md-nav__link" for="__nav_3_38" id="__nav_3_38_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_37" id="__nav_3_37_label" tabindex="0">
             
   
   
@@ -7237,8 +6902,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_38_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_38">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_37_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_37">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7386,10 +7051,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_39" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_38" >
         
           
-          <label class="md-nav__link" for="__nav_3_39" id="__nav_3_39_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_38" id="__nav_3_38_label" tabindex="0">
             
   
   
@@ -7407,8 +7072,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_39_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_39">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_38_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_38">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7556,10 +7221,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_40" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_39" >
         
           
-          <label class="md-nav__link" for="__nav_3_40" id="__nav_3_40_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_39" id="__nav_3_39_label" tabindex="0">
             
   
   
@@ -7577,8 +7242,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_40_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_40">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_39_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_39">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7754,10 +7419,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_41" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_40" >
         
           
-          <label class="md-nav__link" for="__nav_3_41" id="__nav_3_41_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_40" id="__nav_3_40_label" tabindex="0">
             
   
   
@@ -7775,8 +7440,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_41_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_41">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_40_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_40">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7924,10 +7589,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_42" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_41" >
         
           
-          <label class="md-nav__link" for="__nav_3_42" id="__nav_3_42_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_41" id="__nav_3_41_label" tabindex="0">
             
   
   
@@ -7945,8 +7610,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_42_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_42">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_41_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_41">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8094,10 +7759,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_43" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_42" >
         
           
-          <label class="md-nav__link" for="__nav_3_43" id="__nav_3_43_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_42" id="__nav_3_42_label" tabindex="0">
             
   
   
@@ -8115,8 +7780,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_43_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_43">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_42_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_42">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8218,6 +7883,363 @@
   
     <li class="md-nav__item">
       <a href="../../goes/goes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_43" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_43" id="__nav_3_43_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Caravan (large-sample hydrology)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_43_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_43">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Caravan (large-sample hydrology)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Available extensions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inside an archive (CSV & NetCDF)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inside an archive (CSV & NetCDF)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-two-publications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The two publications
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-in-the-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is in the box
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-per-catchment-series-csv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The per-catchment series — CSV
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-per-catchment-series-netcdf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The per-catchment series — NetCDF
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#units-and-where-they-are-documented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Units, and where they are documented
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-four-attribute-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The four attribute tables
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basin-polygons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basin polygons
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#licensing-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Licensing files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#which-parts-earthlens-uses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which parts earthlens uses
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-extensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other extensions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../caravan/" class="md-nav__link">
         
   
   
@@ -17133,7 +17155,7 @@
   <span class="md-ellipsis">
     
   
-    MSWEP / MSWX (GloH2O)
+    National Water Model (NWM)
   
 
     
@@ -17146,92 +17168,6 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_41_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_41">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    MSWEP / MSWX (GloH2O)
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/mswep/catalog_explorer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MSWEP / MSWX catalog explorer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_42" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_42" id="__nav_4_42_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    National Water Model (NWM)
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_42_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_42">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17407,10 +17343,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_43" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_42" >
         
           
-          <label class="md-nav__link" for="__nav_4_43" id="__nav_4_43_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_42" id="__nav_4_42_label" tabindex="0">
             
   
   
@@ -17428,8 +17364,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_43_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_43">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_42_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_42">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17605,10 +17541,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_44" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_43" >
         
           
-          <label class="md-nav__link" for="__nav_4_44" id="__nav_4_44_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_43" id="__nav_4_43_label" tabindex="0">
             
   
   
@@ -17626,8 +17562,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_44_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_44">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_43_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_43">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17859,10 +17795,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_45" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_44" >
         
           
-          <label class="md-nav__link" for="__nav_4_45" id="__nav_4_45_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_44" id="__nav_4_44_label" tabindex="0">
             
   
   
@@ -17880,8 +17816,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_45_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_45">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_44_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_44">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18085,10 +18021,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_46" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_45" >
         
           
-          <label class="md-nav__link" for="__nav_4_46" id="__nav_4_46_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_45" id="__nav_4_45_label" tabindex="0">
             
   
   
@@ -18106,8 +18042,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_46_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_46">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_45_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_45">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18199,10 +18135,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_47" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_46" >
         
           
-          <label class="md-nav__link" for="__nav_4_47" id="__nav_4_47_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_46" id="__nav_4_46_label" tabindex="0">
             
   
   
@@ -18220,8 +18156,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_47_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_47">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_46_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_46">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18285,10 +18221,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_48" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_47" >
         
           
-          <label class="md-nav__link" for="__nav_4_48" id="__nav_4_48_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_47" id="__nav_4_47_label" tabindex="0">
             
   
   
@@ -18306,8 +18242,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_48_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_48">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_47_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_47">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18455,10 +18391,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_49" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_48" >
         
           
-          <label class="md-nav__link" for="__nav_4_49" id="__nav_4_49_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_48" id="__nav_4_48_label" tabindex="0">
             
   
   
@@ -18476,8 +18412,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_49_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_49">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_48_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_48">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18709,10 +18645,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_50" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_49" >
         
           
-          <label class="md-nav__link" for="__nav_4_50" id="__nav_4_50_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_49" id="__nav_4_49_label" tabindex="0">
             
   
   
@@ -18730,8 +18666,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_50_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_50">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_49_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_49">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19019,10 +18955,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_51" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_50" >
         
           
-          <label class="md-nav__link" for="__nav_4_51" id="__nav_4_51_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_50" id="__nav_4_50_label" tabindex="0">
             
   
   
@@ -19040,8 +18976,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_51_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_51">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_50_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_50">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19105,10 +19041,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_52" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_51" >
         
           
-          <label class="md-nav__link" for="__nav_4_52" id="__nav_4_52_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_51" id="__nav_4_51_label" tabindex="0">
             
   
   
@@ -19126,8 +19062,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_52_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_52">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_51_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_51">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19191,10 +19127,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_53" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_52" >
         
           
-          <label class="md-nav__link" for="__nav_4_53" id="__nav_4_53_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_52" id="__nav_4_52_label" tabindex="0">
             
   
   
@@ -19212,8 +19148,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_53_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_53">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_52_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_52">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19333,10 +19269,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_54" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_53" >
         
           
-          <label class="md-nav__link" for="__nav_4_54" id="__nav_4_54_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_53" id="__nav_4_53_label" tabindex="0">
             
   
   
@@ -19354,8 +19290,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_54_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_54">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_53_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_53">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19436,6 +19372,120 @@
     
   
     IUCN — a country's Red List breakdown
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_54" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_54" id="__nav_4_54_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Caravan (large-sample hydrology)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_54_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_54">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Caravan (large-sample hydrology)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/caravan/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Caravan quickstart — an open GRDC hydrograph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/caravan/attributes_geometry_and_base/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catchment attributes, basin polygons, and the extension
   
 
     
@@ -20083,10 +20133,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-request-shape" class="md-nav__link">
+  <a href="#the-two-publications" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The request shape
+        The two publications
       
     </span>
   </a>
@@ -20094,10 +20144,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#daily-precipitation" class="md-nav__link">
+  <a href="#what-is-in-the-box" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Daily precipitation
+        What is in the box
       
     </span>
   </a>
@@ -20105,10 +20155,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mswx-forcing-variables" class="md-nav__link">
+  <a href="#the-per-catchment-series-csv" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MSWX forcing variables
+        The per-catchment series — CSV
       
     </span>
   </a>
@@ -20116,10 +20166,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#variants-are-chosen-by-date" class="md-nav__link">
+  <a href="#the-per-catchment-series-netcdf" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Variants are chosen by date
+        The per-catchment series — NetCDF
       
     </span>
   </a>
@@ -20127,10 +20177,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#nrt-latency-and-revisions" class="md-nav__link">
+  <a href="#units-and-where-they-are-documented" class="md-nav__link">
     <span class="md-ellipsis">
       
-        NRT: latency and revisions
+        Units, and where they are documented
       
     </span>
   </a>
@@ -20138,10 +20188,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-the-files-land" class="md-nav__link">
+  <a href="#the-four-attribute-tables" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where the files land
+        The four attribute tables
       
     </span>
   </a>
@@ -20149,10 +20199,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#spatial-subsetting-is-downstream" class="md-nav__link">
+  <a href="#basin-polygons" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Spatial subsetting is downstream
+        Basin polygons
       
     </span>
   </a>
@@ -20160,10 +20210,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#errors-worth-catching" class="md-nav__link">
+  <a href="#licensing-files" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Errors worth catching
+        Licensing files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#which-parts-earthlens-uses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which parts earthlens uses
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-extensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other extensions
       
     </span>
   </a>
@@ -20187,7 +20259,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/mswep/usage.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/caravan/archive-contents.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -20196,122 +20268,384 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/mswep/usage.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/caravan/archive-contents.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="mswep-mswx-usage"><a class="toclink" href="#mswep-mswx-usage">MSWEP / MSWX — usage</a><a class="headerlink" href="#mswep-mswx-usage" title="Permanent link">#</a></h1>
-<p>Every example assumes access is configured — see <a href="../authentication/">Authentication</a>.</p>
-<h2 id="the-request-shape"><a class="toclink" href="#the-request-shape">The request shape</a><a class="headerlink" href="#the-request-shape" title="Permanent link">#</a></h2>
-<p>A granule is addressed by four coordinates, plus a fifth for MSWX:</p>
+<h1 id="caravan-inside-a-grdc-caravan-archive"><a class="toclink" href="#caravan-inside-a-grdc-caravan-archive">Caravan — inside a GRDC-Caravan archive</a><a class="headerlink" href="#caravan-inside-a-grdc-caravan-archive" title="Permanent link">#</a></h1>
+<p>GRDC-Caravan publishes the <strong>same data twice</strong>: once with the per-catchment series as CSV, once as NetCDF. They
+are separate Zenodo files on the same record, and they differ in exactly one thing — how a catchment's daily
+series is encoded. Everything else, down to the attribute tables and the basin shapefile, is byte-for-byte the
+same content under a differently-named root directory.</p>
+<p>This page describes what is actually in each of them. Every number below was <strong>measured on 2026-08-02</strong> by
+reading both archives in place over HTTP Range: the NetCDF inventory cost 6 requests / 2.91 MB, the CSV one
+11 requests / 12.35 MB including all four attribute tables. Neither archive was downloaded.</p>
+<p>The worked example throughout is <strong><code>GRDC_1159100</code></strong> — Orange River at Vioolsdrif, South Africa.</p>
+<h2 id="the-two-publications"><a class="toclink" href="#the-two-publications">The two publications</a><a class="headerlink" href="#the-two-publications" title="Permanent link">#</a></h2>
 <table>
 <thead>
 <tr>
-<th>Coordinate</th>
-<th>Argument</th>
-<th>Values</th>
+<th></th>
+<th>CSV</th>
+<th>NetCDF</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Product</td>
-<td><code>product=</code> / the facade key</td>
-<td><code>mswep</code>, <code>mswx</code></td>
+<td>File</td>
+<td><code>GRDC_Caravan_extension_csv.zip</code></td>
+<td><code>GRDC_Caravan_extension_nc.zip</code></td>
 </tr>
 <tr>
-<td>Version</td>
-<td><code>version=</code></td>
-<td><code>2.80</code>, <code>3.15</code> (MSWEP); <code>1.00</code> (MSWX)</td>
+<td>Size</td>
+<td>8.84 GB</td>
+<td>7.58 GB</td>
 </tr>
 <tr>
-<td>Variant</td>
-<td><code>variant=</code></td>
-<td><code>Past</code>, <code>Past_nogauge</code>, <code>NRT</code></td>
+<td>Record</td>
+<td><a href="https://doi.org/10.5281/zenodo.15349031">15349031</a> (v0.6)</td>
+<td>same record</td>
 </tr>
 <tr>
-<td>Resolution</td>
-<td><code>temporal_resolution=</code></td>
-<td><code>hourly</code>, <code>3hourly</code>, <code>daily</code>, <code>monthly</code></td>
+<td>Root directory</td>
+<td><code>GRDC_Caravan_extension_csv/</code></td>
+<td><code>GRDC_Caravan_extension_nc/</code></td>
 </tr>
 <tr>
-<td>Variable</td>
-<td><code>variables=</code></td>
-<td><code>precipitation</code> (MSWEP); a <strong>folder name</strong> for MSWX</td>
+<td>Members</td>
+<td>5,367</td>
+<td>5,367</td>
+</tr>
+<tr>
+<td>Series member</td>
+<td><code>timeseries/csv/grdc/&lt;gauge_id&gt;.csv</code></td>
+<td><code>timeseries/netcdf/grdc/&lt;gauge_id&gt;.nc</code></td>
+</tr>
+<tr>
+<td><code>dataset=</code></td>
+<td><code>"grdc"</code> (the default)</td>
+<td>not readable — see <a href="#which-parts-earthlens-uses">below</a></td>
 </tr>
 </tbody>
 </table>
-<p>That last row is the one to watch: MSWX shards by variable <em>above</em> the temporal folder, so the two products have
-different Drive path shapes.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>MSWEP   MSWEP_V315/Past/Hourly/2020116.18.nc
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>MSWX    MSWX_V100/Past/Temp/Daily/2007133.nc
+<p>Both are ZIPs, so both are range-readable: one catchment costs ~6 requests and ~3 MB.</p>
+<h2 id="what-is-in-the-box"><a class="toclink" href="#what-is-in-the-box">What is in the box</a><a class="headerlink" href="#what-is-in-the-box" title="Permanent link">#</a></h2>
+<p>Identical in both archives — 5,367 members, of which 5,356 are the per-catchment series:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>GRDC_Caravan_extension_{csv,nc}/
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── timeseries/{csv,netcdf}/grdc/      5356 files   one per catchment
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── attributes/grdc/                      4 files   other, caravan, hydroatlas, additional
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├── shapefiles/grdc/                      5 files   grdc_basin_shapes.{shp,shx,dbf,prj,cpg}
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>└── licenses/grdc/                        2 files   license_grdc.md, LicensesCaravan.xlsx
 </code></pre></div>
-<p>File names follow <code>YYYYDOY.HH</code> (hourly and 3-hourly, <code>HH</code> being the accumulation's starting hour), <code>YYYYDOY</code>
-(daily) and <code>YYYYMM</code> (monthly).</p>
-<h2 id="daily-precipitation"><a class="toclink" href="#daily-precipitation">Daily precipitation</a><a class="headerlink" href="#daily-precipitation" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="s2">&quot;mswep&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2020-04-25&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2020-04-30&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;precipitation&quot;</span><span class="p">],</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<h2 id="mswx-forcing-variables"><a class="toclink" href="#mswx-forcing-variables">MSWX forcing variables</a><a class="headerlink" href="#mswx-forcing-variables" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">&quot;mswx&quot;</span><span class="p">,</span>                       <span class="c1"># the alias already selects product=&quot;mswx&quot;</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2007-05-13&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2007-05-20&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Temp&quot;</span><span class="p">],</span>           <span class="c1"># a Drive folder name, not a netCDF field</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Only <code>Temp</code> is confirmed today</p>
-<p>Nine of MSWX's ten variable folder spellings could not be verified without a live share, so they are marked
-<code>provisional</code> in the catalog and <strong>refused</strong> rather than guessed at. If you have access, confirm the real
-names inside your share and drop the flags from <code>mswep_data_catalog.yaml</code>.</p>
-</div>
-<h2 id="variants-are-chosen-by-date"><a class="toclink" href="#variants-are-chosen-by-date">Variants are chosen by date</a><a class="headerlink" href="#variants-are-chosen-by-date" title="Permanent link">#</a></h2>
-<p><code>Past</code> and <code>Past_nogauge</code> cover <strong>1979–2024</strong>; <code>NRT</code> picks up at <strong>2025</strong> and runs to about two hours from real
-time. Omit <code>variant=</code> and each timestep routes itself, so a window crossing the boundary spans both:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="s2">&quot;mswep&quot;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2024-12-30&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2025-01-02&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># -&gt; granules from Past *and* NRT</span>
-</code></pre></div>
-<p>Name a variant explicitly and a window it cannot cover raises, pointing at the one that can.</p>
-<h2 id="nrt-latency-and-revisions"><a class="toclink" href="#nrt-latency-and-revisions">NRT: latency and revisions</a><a class="headerlink" href="#nrt-latency-and-revisions" title="Permanent link">#</a></h2>
-<p>NRT publishes at roughly <strong>2 hours</strong> latency, so the newest granules may not exist yet — those are logged and
-skipped rather than raising. GloH2O then <strong>rewrites NRT granules for about ten days</strong> as better inputs land
-("Users should redownload upgraded files"), so a local copy inside that window is stale, not cached: the backend
-re-downloads it automatically. Older granules already on disk are reused.</p>
-<h2 id="where-the-files-land"><a class="toclink" href="#where-the-files-land">Where the files land</a><a class="headerlink" href="#where-the-files-land" title="Permanent link">#</a></h2>
-<p>Granules mirror the share's own layout under <code>path=</code>, because a granule name is only unique <strong>within its
-folder</strong> — MSWEP and MSWX share the <code>YYYYDOY.nc</code> stem, and all ten MSWX variables repeat it:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>out/MSWEP_V315/Past/Daily/2020116.nc
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>out/MSWX_V100/Past/Temp/Daily/2007133.nc
-</code></pre></div>
-<p>This is the same tree <code>rclone sync</code> produces, so a bulk pull and a targeted one can share a directory.</p>
-<h2 id="spatial-subsetting-is-downstream"><a class="toclink" href="#spatial-subsetting-is-downstream">Spatial subsetting is downstream</a><a class="headerlink" href="#spatial-subsetting-is-downstream" title="Permanent link">#</a></h2>
-<p><code>lat_lim</code> / <code>lon_lim</code> are recorded for provenance but <strong>do not shape the request</strong> — GloH2O serves whole-globe
-granules with no server-side crop. Clip after download with pyramids:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">subset</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
-</code></pre></div>
-<h2 id="errors-worth-catching"><a class="toclink" href="#errors-worth-catching">Errors worth catching</a><a class="headerlink" href="#errors-worth-catching" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.mswep</span><span class="w"> </span><span class="kn">import</span> <span class="n">DownloadQuotaExceededError</span><span class="p">,</span> <span class="n">RateLimitedError</span>
-</code></pre></div>
+<p>The 5,356 timeseries files are the <em>only</em> thing that differs between the two archives. The four attribute tables
+are <strong>CSV in both</strong> — the NetCDF archive does not convert them.</p>
+<h2 id="the-per-catchment-series-csv"><a class="toclink" href="#the-per-catchment-series-csv">The per-catchment series — CSV</a><a class="headerlink" href="#the-per-catchment-series-csv" title="Permanent link">#</a></h2>
+<p><code>GRDC_1159100.csv</code> is <strong>26,801 rows × 41 columns</strong>, covering <strong>1950-01-02 → 2023-05-19</strong>. It inflates to 6.07 MB
+from 2.10 MB on the wire.</p>
 <ul>
-<li><code>DownloadQuotaExceededError</code> — Drive's <strong>per-file</strong> cap, counted across everyone holding the share. Not
-  cleared by retrying; wait ~24 h or use <code>rclone</code>.</li>
-<li><code>RateLimitedError</code> — throttling or a transient 5xx, already retried with back-off before it surfaces.</li>
-<li><code>ProvisionalValueError</code> — the request resolved onto a catalog value that has not been verified.</li>
+<li><strong>One row per day</strong>, no gaps in the date index — a missing observation is an <strong>empty field</strong>, not a missing
+  row. This catchment has 369 empty <code>streamflow</code> values scattered between 1961-08-18 and 2021-04-13; the series
+  still ends with real data on 2023-05-19.</li>
+<li><strong><code>date</code> is a plain <code>YYYY-MM-DD</code> string.</strong> Everything else parses as <code>float64</code>.</li>
+<li><strong>Columns are alphabetical</strong> in this extension — but that is not a property of Caravan. <code>israel</code> and
+  <code>base</code> v1.2 group theirs by statistic instead, which is why the backend selects columns <strong>by name</strong> and never
+  by position.</li>
+<li><strong>No units, anywhere.</strong> The CSV carries no header metadata; the unit list lives only in the NetCDF variant
+  (see <a href="#units-and-where-they-are-documented">Units</a>).</li>
+</ul>
+<p>The 41 columns are <code>date</code>, four standalone series, and twelve ERA5-Land families in <code>{max, mean, min}</code> triples:</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Columns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Index</td>
+<td><code>date</code></td>
+</tr>
+<tr>
+<td>Observed discharge</td>
+<td><code>streamflow</code></td>
+</tr>
+<tr>
+<td>Precipitation</td>
+<td><code>total_precipitation_sum</code></td>
+</tr>
+<tr>
+<td>Potential evaporation</td>
+<td><code>potential_evaporation_sum_ERA5_LAND</code>, <code>potential_evaporation_sum_FAO_PENMAN_MONTEITH</code></td>
+</tr>
+<tr>
+<td>×3 (<code>_max</code>, <code>_mean</code>, <code>_min</code>)</td>
+<td><code>temperature_2m</code>, <code>dewpoint_temperature_2m</code>, <code>snow_depth_water_equivalent</code>, <code>surface_net_solar_radiation</code>, <code>surface_net_thermal_radiation</code>, <code>surface_pressure</code>, <code>u_component_of_wind_10m</code>, <code>v_component_of_wind_10m</code>, <code>volumetric_soil_water_layer_1</code> … <code>_4</code></td>
+</tr>
+</tbody>
+</table>
+<p>That is 1 + 1 + 1 + 2 + (12 × 3) = <strong>41</strong>. <code>streamflow</code> is the only observed quantity; every other column is
+ERA5-Land reanalysis aggregated to the catchment.</p>
+<h2 id="the-per-catchment-series-netcdf"><a class="toclink" href="#the-per-catchment-series-netcdf">The per-catchment series — NetCDF</a><a class="headerlink" href="#the-per-catchment-series-netcdf" title="Permanent link">#</a></h2>
+<p><code>GRDC_1159100.nc</code> is <strong>netCDF-4/HDF5</strong> (magic <code>\x89HDF</code>) and inflates to 4.53 MB — about 25 % smaller than the
+CSV, because values are stored as binary <code>float32</code> rather than decimal text.</p>
+<p>It holds <strong>41 variables</strong>, one per CSV column, each 1-D along a single <code>date</code> dimension of length 26,801:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>date</code></td>
+<td><code>int64</code>, <code>units = "days since 1950-01-02 00:00:00"</code>, <code>calendar = "proleptic_gregorian"</code></td>
+</tr>
+<tr>
+<td>the other 40</td>
+<td><code>float32</code>, <code>_FillValue = NaN</code></td>
+</tr>
+</tbody>
+</table>
+<p>There are <strong>no per-variable attributes</strong> beyond <code>_FillValue</code> — no <code>units</code>, no <code>long_name</code>. Instead the file
+carries three <strong>global</strong> attributes:</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Value for this catchment</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Units</code></td>
+<td>a text block naming the unit of each variable family</td>
+<td>The only place Caravan documents its units</td>
+</tr>
+<tr>
+<td><code>Timezone</code></td>
+<td><code>Africa/Johannesburg</code></td>
+<td>The <strong>local</strong> timezone the daily aggregation is defined in — it is per catchment, and the CSV does not carry it</td>
+</tr>
+<tr>
+<td><code>_NCProperties</code></td>
+<td><code>version=2,netcdf=4.8.1,hdf5=1.12.1</code></td>
+<td>The writer's library versions</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">The timezone is a real difference, not a formality</p>
+<p>Caravan's daily windows are local-time, and the NetCDF is where that is recorded — per gauge. Two catchments
+in different countries do not share a day boundary. (Caravan <strong>MultiMet</strong>, by contrast, is deliberately
+UTC-0, which is one of several reasons it is <a href="../datasets/#known-but-not-wrapped">not wrapped by this backend</a>.)</p>
+</div>
+<h2 id="units-and-where-they-are-documented"><a class="toclink" href="#units-and-where-they-are-documented">Units, and where they are documented</a><a class="headerlink" href="#units-and-where-they-are-documented" title="Permanent link">#</a></h2>
+<p>Transcribed from the NetCDF <code>Units</code> global attribute — this is the authoritative list, and it exists <strong>only</strong>
+there:</p>
+<table>
+<thead>
+<tr>
+<th>Variable family</th>
+<th>Unit</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>streamflow</code></td>
+<td><strong>mm/d</strong></td>
+<td>Observed streamflow — depth, not m³/s</td>
+</tr>
+<tr>
+<td><code>total_precipitation</code></td>
+<td>mm</td>
+<td></td>
+</tr>
+<tr>
+<td><code>potential_evaporation_sum_ERA5_LAND</code></td>
+<td>mm</td>
+<td>ERA5-Land's own <code>potential_evaporation</code></td>
+</tr>
+<tr>
+<td><code>potential_evaporation_sum_FAO_PENMAN_MONTEITH</code></td>
+<td>mm</td>
+<td>FAO Penman-Monteith, computed from ERA5-Land inputs</td>
+</tr>
+<tr>
+<td><code>temperature_2m</code></td>
+<td>°C</td>
+<td></td>
+</tr>
+<tr>
+<td><code>snow_depth_water_equivalent</code></td>
+<td>mm</td>
+<td></td>
+</tr>
+<tr>
+<td><code>surface_net_solar_radiation</code></td>
+<td>W/m²</td>
+<td></td>
+</tr>
+<tr>
+<td><code>surface_net_thermal_radiation</code></td>
+<td>W/m²</td>
+<td></td>
+</tr>
+<tr>
+<td><code>surface_pressure</code></td>
+<td><strong>kPa</strong></td>
+<td>Not Pa — ERA5's native unit is divided by 1000</td>
+</tr>
+<tr>
+<td><code>u_component_of_wind_10m</code>, <code>v_component_of_wind_10m</code></td>
+<td>m/s</td>
+<td></td>
+</tr>
+<tr>
+<td><code>volumetric_soil_water_layer_1</code> … <code>_4</code></td>
+<td>m³/m³</td>
+<td>Depths 0–7, 7–28, 28–100, 100–289 cm</td>
+</tr>
+</tbody>
+</table>
+<p>Two things to know about that block:</p>
+<ul>
+<li><strong>The keys are family names</strong>, without the <code>_max</code> / <code>_mean</code> / <code>_min</code> or <code>_sum</code> suffix the columns carry. The
+  unit applies to all three statistics of a family.</li>
+<li><strong><code>dewpoint_temperature_2m</code> is missing from it</strong> — the only family Caravan leaves undocumented. Its values sit
+  on the same scale as <code>temperature_2m</code> and below it, as dewpoint physically must: for this catchment
+  −21.03 … 18.03 against 2.37 … 31.78 °C.</li>
+</ul>
+<p><code>streamflow</code> being <strong>mm/d</strong> is the unit that most often trips people up: it is a depth over the catchment, so
+converting to volume needs the <code>area</code> column from <code>attributes_other_grdc.csv</code>. For <code>GRDC_1159100</code>, 0.04 mm/d
+over 786,037 km² ≈ 364 m³/s, against the <code>lta_discharge</code> of 231 m³/s recorded in the additional table — the same
+order, as it should be.</p>
+<h2 id="the-four-attribute-tables"><a class="toclink" href="#the-four-attribute-tables">The four attribute tables</a><a class="headerlink" href="#the-four-attribute-tables" title="Permanent link">#</a></h2>
+<p>All four are CSV in both archives, keyed by <code>gauge_id</code>, one row per catchment:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Shape</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>attributes_other_grdc.csv</code></td>
+<td>5,356 × 6</td>
+<td><code>gauge_id</code>, <code>area</code>, <code>country</code>, <code>gauge_lat</code>, <code>gauge_lon</code>, <code>gauge_name</code> — the location index</td>
+</tr>
+<tr>
+<td><code>attributes_caravan_grdc.csv</code></td>
+<td>5,356 × 15</td>
+<td>Climate indices: <code>aridity_*</code>, <code>moisture_index_*</code>, <code>pet_mean_*</code>, <code>seasonality_*</code> (each for ERA5-Land and FAO-PM), <code>p_mean</code>, <code>frac_snow</code>, <code>high_prec_dur/freq</code>, <code>low_prec_dur/freq</code></td>
+</tr>
+<tr>
+<td><code>attributes_hydroatlas_grdc.csv</code></td>
+<td>5,356 × 197</td>
+<td>The HydroATLAS block — land cover, soil, climate, topography, socio-economic; 14 MB</td>
+</tr>
+<tr>
+<td><code>attributes_additional_grdc.csv</code></td>
+<td>5,356 × 21</td>
+<td><strong>GRDC-only</strong>: <code>d_start</code>, <code>d_end</code>, <code>d_yrs</code>, <code>d_miss</code>, <code>quality</code>, <code>lta_discharge</code>, <code>altitude</code>, <code>nat_id</code>, <code>wmo_reg</code>, <code>sub_reg</code>, <code>lat_pp</code>, <code>long_pp</code>, <code>dist_km</code>, <code>area_shp</code>, <code>type</code>, <code>source</code>, <code>comment</code>, ISO2 <code>country</code></td>
+</tr>
+</tbody>
+</table>
+<p>A real row from <code>attributes_other_grdc.csv</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>gauge_id     GRDC_1159100
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>area         786037.24                              # km²
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>country      South Africa                           # full English name, not ISO2
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>gauge_lat    -28.7563
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>gauge_lon    17.7188
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>gauge_name   ORANGE RIVER, VIOOLSDRIF (27811003)
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title"><code>country</code> is a name here and a code there</p>
+<p><code>attributes_other_*</code> spells the country out (<code>South Africa</code>); the GRDC-only <code>attributes_additional_grdc.csv</code>
+uses ISO2 (<code>ZA</code>). Only GRDC ships the second file, so <code>country=</code> matches full names everywhere and
+additionally accepts ISO2 for this extension. See <a href="../usage/#by-country">usage</a>.</p>
+</div>
+<p>The additional table is also where GRDC's own record-keeping lives: <code>d_start</code> 1950, <code>d_end</code> 2023, <code>d_yrs</code> 73,
+<code>d_miss</code> 1.38 % and <code>quality</code> <code>Medium</code> for this gauge — plus <code>comment</code>, which explains how the Caravan catchment
+boundary was matched to the GRDC station (<em>"Area difference 5-10% and distance &lt;= 5 km"</em>).</p>
+<h2 id="basin-polygons"><a class="toclink" href="#basin-polygons">Basin polygons</a><a class="headerlink" href="#basin-polygons" title="Permanent link">#</a></h2>
+<p>One shapefile covers all 5,356 catchments, shipped as the five sidecars a shapefile needs:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>shapefiles/grdc/grdc_basin_shapes.shp   .shx   .dbf   .prj   .cpg
+</code></pre></div>
+<p><code>with_geometry=True</code> extracts <strong>all five</strong> — a <code>.shp</code> alone will not open.</p>
+<h2 id="licensing-files"><a class="toclink" href="#licensing-files">Licensing files</a><a class="headerlink" href="#licensing-files" title="Permanent link">#</a></h2>
+<ul>
+<li><strong><code>license_grdc.md</code></strong> (928 characters) states the grant explicitly. It covers the streamflow series under
+  <code>timeseries/{csv,netcdf}/grdc</code>, the catchment boundaries under <code>shapefiles/grdc/</code>, and the gauge latitude,
+  longitude and name in <code>attributes_other_grdc.csv</code>, published under <strong>CC-BY-4.0</strong>. It also notes that "all
+  hydrological data remain property of the owner" and that the per-country terms are listed separately.</li>
+<li><strong><code>LicensesCaravan.xlsx</code></strong> is that per-country list — the upstream licence of each national service whose
+  stations are included.</li>
+</ul>
+<p>This file is the reason GRDC-Caravan is usable here at all: the raw GRDC portal prohibits redistribution, while
+this subset is explicitly CC-BY. See <a href="../introduction/#why-this-backend-exists-the-grdc-route">the GRDC route</a>.</p>
+<h2 id="which-parts-earthlens-uses"><a class="toclink" href="#which-parts-earthlens-uses">Which parts earthlens uses</a><a class="headerlink" href="#which-parts-earthlens-uses" title="Permanent link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Archive member</th>
+<th>Used by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>timeseries/csv/grdc/&lt;gauge_id&gt;.csv</code></td>
+<td>every <code>download()</code> — parsed, column-selected by name, date-filtered</td>
+</tr>
+<tr>
+<td><code>attributes/grdc/attributes_other_grdc.csv</code></td>
+<td><code>lat_lim</code> / <code>lon_lim</code> and <code>country=</code> resolution, and <code>with_attributes=True</code></td>
+</tr>
+<tr>
+<td><code>attributes/grdc/attributes_caravan_grdc.csv</code></td>
+<td><code>with_attributes=True</code> (joined onto the <code>other</code> table)</td>
+</tr>
+<tr>
+<td><code>shapefiles/grdc/grdc_basin_shapes.*</code></td>
+<td><code>with_geometry=True</code></td>
+</tr>
+<tr>
+<td><code>attributes/grdc/attributes_hydroatlas_grdc.csv</code></td>
+<td><strong>not merged</strong> — 197 columns is a different kind of request; reachable through <code>CaravanArchive.attribute_member(source, kind="hydroatlas")</code></td>
+</tr>
+<tr>
+<td><code>attributes/grdc/attributes_additional_grdc.csv</code></td>
+<td><strong>not merged</strong> — same, <code>kind="additional"</code></td>
+</tr>
+<tr>
+<td><code>timeseries/netcdf/grdc/&lt;gauge_id&gt;.nc</code></td>
+<td><strong>not read</strong> — <code>timeseries_format="netcdf"</code> raises <code>NotImplementedError</code>; see <a href="../usage/#why-there-is-no-netcdf-option">why</a></td>
+</tr>
+<tr>
+<td><code>licenses/grdc/*</code></td>
+<td>not read — the licence is carried in the catalog row instead</td>
+</tr>
+</tbody>
+</table>
+<p>Since the two archives hold the same values, and the CSV variant is what the backend reads, the NetCDF file is
+documented here for people who want to work with the raw archive directly — not because the backend needs it.</p>
+<h2 id="other-extensions"><a class="toclink" href="#other-extensions">Other extensions</a><a class="headerlink" href="#other-extensions" title="Permanent link">#</a></h2>
+<p>The structure above is Caravan's, not GRDC's, so every extension follows it — with three variations worth
+knowing:</p>
+<ul>
+<li><strong>The root directory differs per record</strong>, and denmark and germany have none at all. See
+  <a href="../datasets/#archive-layout">archive layout</a>.</li>
+<li><strong><code>germany</code> adds two columns</strong>, <code>streamflow_vol</code> and <code>water_level</code> (43 rather than 41), and <strong><code>base</code> v1.2 has
+  40</strong>, with a single <code>potential_evaporation_sum</code> instead of the ERA5-Land/FAO-PM pair.</li>
+<li><strong>Only GRDC ships <code>attributes_additional_*</code></strong> and the per-country licence workbook.</li>
 </ul>
 
 
@@ -20348,7 +20682,7 @@ granules with no server-side crop. Clip after download with pyramids:</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../authentication/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Authentication">
+          <a href="../datasets/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Available extensions">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -20358,20 +20692,20 @@ granules with no server-side crop. Clip after download with pyramids:</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Authentication
+                Available extensions
               </div>
             </div>
           </a>
         
         
           
-          <a href="../datasets/" class="md-footer__link md-footer__link--next" aria-label="Next: Products &amp; catalog">
+          <a href="../caravan/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Products & catalog
+                Reference
               </div>
             </div>
             <div class="md-footer__button md-icon">
