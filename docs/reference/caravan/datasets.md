@@ -92,3 +92,7 @@ in two of them** — which is why member paths are resolved from the archive's o
 Six shapes across seven extensions, no two derivable from the extension name. `czechia` also uses a **singular**
 `license/` directory where every other archive ships `licenses/`. This is why member paths are resolved from the
 archive's own index rather than composed from a template.
+
+For a member-by-member account of what those files actually contain — the 41 timeseries columns and their units,
+the four attribute tables, the NetCDF variant's variables and global attributes — see
+[Inside a GRDC-Caravan archive](archive-contents.md).

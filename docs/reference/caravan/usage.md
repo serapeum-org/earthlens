@@ -118,6 +118,10 @@ opens them as an empty zero-band grid. Decoding them properly would need `h5py` 
 which earthlens depends on, and adding one to duplicate data the CSV path already returns is not a trade worth
 making. The catalog still records the `.nc` files, because they are real and a future backend may want them.
 
+If you want to work with the `.nc` archive directly, [Inside a GRDC-Caravan archive](archive-contents.md)
+documents its variables, dtypes and global attributes — including the two things the CSV variant does **not**
+carry: the unit list and the catchment's local timezone.
+
 ## The `base` extension is opt-in
 
 `base` at its current version (1.6) is a **24.8 GB** (netCDF) / **29.0 GB** (CSV) `.tar.gz`. A gzip stream has no

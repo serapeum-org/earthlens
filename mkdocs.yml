@@ -379,6 +379,7 @@ nav:
       - Introduction: reference/caravan/introduction.md
       - Usage: reference/caravan/usage.md
       - Available extensions: reference/caravan/datasets.md
+      - Inside an archive (CSV & NetCDF): reference/caravan/archive-contents.md
       - Reference: reference/caravan/caravan.md
     - USGS Water (NWIS):
       - Introduction: reference/usgs-water/introduction.md
