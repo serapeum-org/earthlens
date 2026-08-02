@@ -142,10 +142,18 @@ class TestCuratedSatelliteRows:
 
 
 class TestSatelliteHydrationSanity:
-    """No hydrated satellite row maps a data variable to a coordinate/bounds field."""
+    """No hydrated satellite row maps a data variable to a coordinate/auxiliary field."""
 
-    def test_no_coordinate_or_bounds_metadata(self):
-        """A real-units satellite variable is never a bounds var / coordinate unit."""
+    def test_no_coordinate_or_auxiliary_metadata(self):
+        """A real-units satellite variable is never an auxiliary NetCDF variable.
+
+        Shares the hydration matcher's own `_is_auxiliary` predicate so the guard
+        and the matcher can't drift — a bounds / count / flag / viewing-angle
+        (`lat_bnds`, `nobs`, `SZA`) or a coordinate unit must never survive as a
+        hydrated `nc_variable`.
+        """
+        from earthlens.cli._ecmwf_hydrate import _is_auxiliary
+
         coordinate_units = {
             "degrees_north",
             "degrees_east",
@@ -158,8 +166,8 @@ class TestSatelliteHydrationSanity:
             for slug, var in record.variables.items():
                 if var.units == "unknown":
                     continue
-                assert not var.nc_variable.endswith(("_bnds", "_bounds")), (
-                    f"{dataset}/{slug}: nc_variable {var.nc_variable!r} is a bounds var"
+                assert not _is_auxiliary(var.nc_variable), (
+                    f"{dataset}/{slug}: nc_variable {var.nc_variable!r} is auxiliary"
                 )
                 assert var.units not in coordinate_units, (
                     f"{dataset}/{slug}: coordinate unit {var.units!r} on a data var"
