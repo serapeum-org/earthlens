@@ -464,8 +464,14 @@ def _tar_index(tarball: Path, extract_dir: Path, fingerprint: str) -> list[str]:
                 _extract_entry(archive, entry, extract_dir)
     # Staged then renamed: a half-written index read back on the next run would
     # silently hide members from every lookup.
+    #
+    # The analyser taints this write because the loop above reads archive entry
+    # names. Only the file's CONTENT is member-derived; its PATH comes from
+    # `tarball`, which the caller already resolved inside the cache directory,
+    # and no member name reaches it. Member names only ever become paths through
+    # `_safe_target`.
     tmp_index = index_path.with_name(index_path.name + ".part")
-    tmp_index.write_text(json.dumps(names), encoding="utf-8")
+    tmp_index.write_text(json.dumps(names), encoding="utf-8")  # NOSONAR
     tmp_index.replace(index_path)
     return names
 
