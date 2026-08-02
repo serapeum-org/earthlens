@@ -127,6 +127,20 @@ jobs:
           verify-lock: true
           version: "0.11.29"
 
+      # dataverse.uclouvain.be is a single university host with no CDN. When it
+      # is unreachable from the runner the suite spends four 60-second connect
+      # timeouts saying nothing useful, so resolve and dial it first and print
+      # the outcome. Never fails the job: the tests below are the gate, and this
+      # only exists to tell an unreachable host apart from a real regression.
+      - name: Probe the Dataverse host
+        continue-on-error: true
+        run: |
+          getent hosts dataverse.uclouvain.be || echo "DNS: no answer"
+          curl -sS -o /dev/null --max-time 30 \
+            -w 'connect=%{time_connect}s tls=%{time_appconnect}s http=%{http_code}\n' \
+            'https://dataverse.uclouvain.be/api/info/version' \
+            || echo "unreachable from this runner"
+
       # The EM-DAT Archive on the UCLouvain Dataverse is anonymous, so this
       # half needs nothing but network and always runs.
       - name: Run live EM-DAT Dataverse e2e tests

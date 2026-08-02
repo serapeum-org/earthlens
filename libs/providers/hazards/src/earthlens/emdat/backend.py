@@ -34,6 +34,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
+import requests
 from loguru import logger
 from pydantic import SecretStr
 
@@ -335,12 +336,21 @@ class EMDAT(AbstractDataSource):
     def _client(self) -> HttpClient:
         """Return this instance's pooled client, building it on first use.
 
+        `HttpClient` retries retryable *statuses* out of the box but not
+        transport failures, and the UCLouvain Dataverse is a single university
+        host with no CDN in front of it — a dropped connection there is a
+        normal event, not a signal to give up. Connection and timeout errors
+        are therefore retried too, matching the `climate_indices` and
+        `worldpop` backends, which fetch from comparable single-host origins.
+
         Returns:
             HttpClient: The same instance on every later call, so the pooled
                 connection is reused rather than rebuilt per request.
         """
         if self._http is None:
-            self._http = HttpClient()
+            self._http = HttpClient(
+                retry_on_exceptions=(requests.ConnectionError, requests.Timeout),
+            )
         return self._http
 
     def authenticate(self) -> EMDAT:

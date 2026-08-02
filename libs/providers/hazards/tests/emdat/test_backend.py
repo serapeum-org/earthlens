@@ -9,6 +9,7 @@ from typing import Any
 
 import pandas as pd
 import pytest
+import requests
 
 from earthlens.biodiversity import LicenseWarning
 from earthlens.emdat import EMDAT
@@ -160,6 +161,13 @@ class TestConstruction:
         assert backend._http is None
         first = backend._client()
         assert backend._client() is first
+
+    def test_http_client_retries_dropped_connections(self, tmp_path: Path) -> None:
+        """A dropped connection to the single Dataverse host is retried."""
+        backend = EMDAT(variables=["emdat:events"], path=str(tmp_path))
+        retried = backend._client().retry_on_exceptions
+        assert issubclass(requests.ConnectTimeout, tuple(retried))
+        assert issubclass(requests.ConnectionError, tuple(retried))
 
 
 @pytest.mark.emdat
