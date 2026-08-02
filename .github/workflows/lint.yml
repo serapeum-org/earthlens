@@ -83,7 +83,7 @@ jobs:
           version: "0.11.29"
 
       - name: Type check with mypy
-        run: uv run mypy
+        run: uv run --locked mypy
 
       - name: Doctests (src)
         # The same check as the `doctest` pre-commit hook: run the shipped `>>>` examples
@@ -92,7 +92,7 @@ jobs:
         env:
           MPLBACKEND: Agg
         run: >
-          uv run pytest --doctest-modules
+          uv run --locked pytest --doctest-modules
           libs/core/src
           libs/providers/atmosphere/src
           libs/providers/ocean/src

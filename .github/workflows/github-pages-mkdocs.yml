@@ -97,9 +97,14 @@ jobs:
         deploy-token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
 
   deploy-release:
+    # Same-repository guard: the workflow_run branch checks out the triggering
+    # run's head while holding ACTIONS_DEPLOY_TOKEN, so a head from anywhere but
+    # this repository must not reach the checkout.
     if: >-
       github.event_name == 'release' ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+      (github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository)
     needs: build-strict
     runs-on: ubuntu-latest
     steps:

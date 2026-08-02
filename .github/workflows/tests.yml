@@ -67,7 +67,7 @@ jobs:
 
       - name: Run ${{ matrix.member.name }} unit + integration suite
         run: >
-          uv run pytest
+          uv run --locked pytest
           -c ${{ matrix.member.dir }}/pyproject.toml
           ${{ matrix.member.dir }}/tests
           -m "not e2e"

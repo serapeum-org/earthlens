@@ -45,7 +45,7 @@ jobs:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
-          uv run pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat" -v
+          uv run --locked pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat" -v
 
   e2e-gee:
     runs-on: ubuntu-latest
@@ -71,7 +71,7 @@ jobs:
           GEE_SERVICE_ACCOUNT: ${{ secrets.GEE_SERVICE_ACCOUNT }}
           GEE_SERVICE_KEY: ${{ secrets.GEE_SERVICE_KEY }}
         run: |
-          uv run pytest -m "e2e and gee" -v
+          uv run --locked pytest -m "e2e and gee" -v
 
   e2e-earthdata:
     runs-on: ubuntu-latest
@@ -101,7 +101,7 @@ jobs:
           # Alternative to username/password: a single EDL bearer token.
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
-          uv run pytest -m "e2e and earthdata" -v
+          uv run --locked pytest -m "e2e and earthdata" -v
 
   e2e-emdat:
     runs-on: ubuntu-latest
@@ -131,7 +131,7 @@ jobs:
       # half needs nothing but network and always runs.
       - name: Run live EM-DAT Dataverse e2e tests
         run: |
-          uv run pytest -m "e2e and emdat and not gdis" -v
+          uv run --locked pytest -m "e2e and emdat and not gdis" -v
 
       # GDIS rides NASA Earthdata Cloud, so it needs an Earthdata Login whose
       # account has also accepted the SEDAC data-use agreement. These tests are
@@ -143,7 +143,7 @@ jobs:
           env.EARTHDATA_TOKEN != '' ||
           (env.EARTHDATA_USERNAME != '' && env.EARTHDATA_PASSWORD != '')
         run: |
-          uv run pytest -m "e2e and emdat and gdis" -v
+          uv run --locked pytest -m "e2e and emdat and gdis" -v
 
   e2e-eumetsat:
     runs-on: ubuntu-latest
@@ -170,7 +170,7 @@ jobs:
           EUMETSAT_CONSUMER_KEY: ${{ secrets.EUMETSAT_CONSUMER_KEY }}
           EUMETSAT_CONSUMER_SECRET: ${{ secrets.EUMETSAT_CONSUMER_SECRET }}
         run: |
-          uv run pytest -m "e2e and eumetsat" -v
+          uv run --locked pytest -m "e2e and eumetsat" -v
 
   e2e-stac:
     runs-on: ubuntu-latest
@@ -197,7 +197,7 @@ jobs:
           CDSE_S3_ACCESS_KEY: ${{ secrets.CDSE_S3_ACCESS_KEY }}
           CDSE_S3_SECRET_KEY: ${{ secrets.CDSE_S3_SECRET_KEY }}
         run: |
-          uv run pytest -m "stac and e2e" -v
+          uv run --locked pytest -m "stac and e2e" -v
 
   e2e-sentinel-hub:
     runs-on: ubuntu-latest
@@ -224,7 +224,7 @@ jobs:
           SENTINELHUB_CLIENT_ID: ${{ secrets.SENTINELHUB_CLIENT_ID }}
           SENTINELHUB_CLIENT_SECRET: ${{ secrets.SENTINELHUB_CLIENT_SECRET }}
         run: |
-          uv run pytest -m "sentinel_hub and e2e" -v
+          uv run --locked pytest -m "sentinel_hub and e2e" -v
 
   e2e-nwp:
     runs-on: ubuntu-latest
@@ -251,7 +251,7 @@ jobs:
         # Open Data are anonymous (no secrets); the suite skips anything that is
         # transiently unavailable.
         run: |
-          uv run pytest -m "e2e and nwp" -v
+          uv run --locked pytest -m "e2e and nwp" -v
 
   e2e-asf:
     runs-on: ubuntu-latest
@@ -282,7 +282,7 @@ jobs:
           EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
-          uv run pytest -m "e2e and asf" -v
+          uv run --locked pytest -m "e2e and asf" -v
 
   e2e-iucn:
     runs-on: ubuntu-latest
@@ -308,7 +308,7 @@ jobs:
         env:
           IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
         run: |
-          uv run pytest -m "e2e and iucn" -v
+          uv run --locked pytest -m "e2e and iucn" -v
 
   e2e-wdpa:
     runs-on: ubuntu-latest
@@ -334,4 +334,4 @@ jobs:
         env:
           WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
         run: |
-          uv run pytest -m "e2e and wdpa" -v
+          uv run --locked pytest -m "e2e and wdpa" -v

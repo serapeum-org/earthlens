@@ -12,9 +12,15 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # The workflow_run branch checks out github.event.workflow_run.head_branch
+    # while holding PYPI_PUBLISH, so it must never run for a head this
+    # repository does not own. `github-release` is workflow_dispatch-only today,
+    # which already makes that impossible; this keeps it impossible if that ever
+    # changes.
     if: >-
       ${{ github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success' }}
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository) }}
 
     strategy:
       # One distribution at a time, dependencies before dependents: a member is
