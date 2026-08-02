@@ -234,9 +234,14 @@ extensions:
       large-sample hydrology, Scientific Data 10, 61. Cite the source datasets
       (CAMELS-US/AUS/BR/CL/GB, HYSETS, LamaH-CE) alongside Caravan itself.
     license_file: licenses/<source>/license_<source>.md
+    # Per-source counts are MEASURED from the v1.2 archive - the newest base
+    # release that can be indexed without a 25 GB download - and therefore sum
+    # to 6,830, that release's total. v1.4 added 9,130 gauges and v1.6 moved
+    # CAMELS-AUS to v2 (150 -> 561), so they do NOT describe the default 1.6
+    # release; its total is on the version row.
     sources:
       camels: {n_catchments: 482, name: CAMELS-US}
-      camelsaus: {n_catchments: 561, name: CAMELS-AUS v2}
+      camelsaus: {n_catchments: 150, name: CAMELS-AUS}
       camelsbr: {n_catchments: 376, name: CAMELS-BR}
       camelscl: {n_catchments: 314, name: CAMELS-CL}
       camelsgb: {n_catchments: 408, name: CAMELS-GB}

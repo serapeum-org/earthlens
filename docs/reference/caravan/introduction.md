@@ -84,6 +84,9 @@ and `version="1.2"` offers a range-readable alternative. See [usage](usage.md#th
 
 ## Licensing
 
-Every wrapped extension is **CC-BY-4.0**. Cite Caravan itself plus the source datasets you used; each archive
-ships its own `licenses/<source>/license_<source>.md`, and GRDC additionally ships a per-country
-`LicensesCaravan.xlsx`. The catalog carries the attribution string for each row.
+Every wrapped extension is **CC-BY-4.0**. Cite Caravan itself plus the source datasets you used.
+
+Each archive ships its own licence text, but **not under a common path** — `czechia` uses a singular
+`license/` directory, `spain` a `.txt` rather than a `.md`, and GRDC additionally ships a per-country
+`LicensesCaravan.xlsx`. The catalog records the exact `license_file` for each row rather than assuming a
+template.

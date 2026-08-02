@@ -460,8 +460,6 @@ def _tar_index(tarball: Path, extract_dir: Path, fingerprint: str) -> list[str]:
             names.append(entry.name)
             if _is_metadata(entry.name):
                 _extract_entry(archive, entry, extract_dir)
-            # `_extract_entry` guards its own write; nothing else in this loop
-            # turns a member name into a path.
     # Staged then renamed: a half-written index read back on the next run would
     # silently hide members from every lookup.
     tmp_index = index_path.with_name(index_path.name + ".part")

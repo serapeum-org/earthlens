@@ -1203,6 +1203,10 @@ class HttpRangeFile(io.RawIOBase):
                 `206 Partial Content` — it ignored the `Range` header, so
                 the returned bytes are not the requested window and every
                 subsequent offset would be wrong.
+            RangeReadError: When the transport itself fails. Deliberately
+                not an `OSError`, so a container reader's `except OSError`
+                probe cannot swallow a live HTTP failure and report it as a
+                malformed archive.
         """
         want = len(buffer)
         if want <= 0 or self._pos >= self.size:
