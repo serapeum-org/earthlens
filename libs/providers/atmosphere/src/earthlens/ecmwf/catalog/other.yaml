@@ -1848,8 +1848,8 @@ datasets:
         units: unknown
       precipitation:
         cds_variable: precipitation
-        nc_variable: precipitation
-        units: unknown
+        nc_variable: pr
+        units: mm/day
   insitu-gridded-observations-nordic:
     endpoint: cds
     request_kind: form
@@ -1870,8 +1870,8 @@ datasets:
         units: unknown
       maximum-temperature:
         cds_variable: maximum_temperature
-        nc_variable: maximum_temperature
-        units: unknown
+        nc_variable: TX
+        units: K
       minimum-temperature:
         cds_variable: minimum_temperature
         nc_variable: minimum_temperature
