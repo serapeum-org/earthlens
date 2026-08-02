@@ -12,9 +12,15 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # The workflow_run branch checks out github.event.workflow_run.head_branch
+    # while holding PYPI_PUBLISH, so it must never run for a head this
+    # repository does not own. `github-release` is workflow_dispatch-only today,
+    # which already makes that impossible; this keeps it impossible if that ever
+    # changes.
     if: >-
       ${{ github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success' }}
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository) }}
 
     strategy:
       # One distribution at a time, dependencies before dependents: a member is
@@ -38,7 +44,7 @@ jobs:
 
     name: publish ${{ matrix.package }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           ref: ${{ github.event.workflow_run.head_branch || github.ref }}
@@ -47,7 +53,7 @@ jobs:
       # (the other lanes pin 0.11.29); wheel-test.yml separately validates the
       # wheels under the pinned uv. uv build output is insensitive to the patch.
       - name: Build and publish to PyPI
-        uses: serapeum-org/github-actions/actions/release/pypi@pypi-release/v1.0.2
+        uses: serapeum-org/github-actions/actions/release/pypi@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # pypi-release/v1.0.3
         with:
           pypi-username: __token__
           pypi-password: ${{ secrets.PYPI_PUBLISH }}

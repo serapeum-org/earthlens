@@ -1055,24 +1055,92 @@ class TestDeepSamplers:
         cdsapi.Client = lambda: types.SimpleNamespace(
             retrieve=lambda ds, req, target: open(target, "w").close()
         )
-        netcdf = types.ModuleType("netCDF4")
-
-        class _Handle:
-            variables = {
-                "t2m": types.SimpleNamespace(long_name="2 metre temperature", units="K")
-            }
-
-            def __enter__(self):
-                return self
-
-            def __exit__(self, *a):
-                return False
-
-        netcdf.Dataset = lambda path: _Handle()
         monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
-        monkeypatch.setitem(sys.modules, "netCDF4", netcdf)
+        monkeypatch.setattr(
+            curate_mod,
+            "_read_netcdf_var_meta",
+            lambda path: {"t2m": {"long_name": "2 metre temperature", "units": "K"}},
+        )
         out = curate_mod._ecmwf_deep_sample("reanalysis-era5-single-levels")
         assert out["t2m"]["units"] == "K", "retrieved var units read"
+
+    def test_ecmwf_deep_sample_carries_family_selectors(self, monkeypatch):
+        """The sampled request forwards every selector of the chosen entry.
+
+        A satellite CDR needs its sensor / version / aggregation selectors, not
+        just year/month/day, or CDS rejects the combination. The sampler pins
+        one value per enumerated selector and fabricates no key the entry omits.
+        """
+        import sys
+        import types
+
+        entry = {
+            "variable": ["surface_soil_moisture"],
+            "type_of_sensor": ["passive"],
+            "time_aggregation": ["month_average"],
+            "version": ["v202212"],
+            "year": ["2023"],
+            "month": ["01"],
+            "day": ["01"],
+        }
+        monkeypatch.setattr(curate_mod, "_ecmwf_constraints", lambda d: [entry])
+        captured: dict[str, object] = {}
+        cdsapi = types.ModuleType("cdsapi")
+        cdsapi.Client = lambda: types.SimpleNamespace(
+            retrieve=lambda ds, req, target: (
+                captured.update(req),
+                open(target, "w").close(),
+            )
+        )
+        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        monkeypatch.setattr(curate_mod, "_read_netcdf_var_meta", lambda path: {})
+        curate_mod._ecmwf_deep_sample("satellite-soil-moisture")
+        assert captured["type_of_sensor"] == ["passive"]
+        assert captured["version"] == ["v202212"]
+        assert captured["time_aggregation"] == ["month_average"]
+        assert captured["data_format"] == "netcdf"
+        assert "time" not in captured  # the entry enumerates none — fabricate none
+
+    def test_ecmwf_deep_sample_defaults_variable_when_absent(self, monkeypatch):
+        """An entry with no variable dimension still sends the widget's `all`."""
+        import sys
+        import types
+
+        monkeypatch.setattr(
+            curate_mod, "_ecmwf_constraints", lambda d: [{"lake": ["achit"]}]
+        )
+        captured: dict[str, object] = {}
+        cdsapi = types.ModuleType("cdsapi")
+        cdsapi.Client = lambda: types.SimpleNamespace(
+            retrieve=lambda ds, req, target: (
+                captured.update(req),
+                open(target, "w").close(),
+            )
+        )
+        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        monkeypatch.setattr(curate_mod, "_read_netcdf_var_meta", lambda path: {})
+        curate_mod._ecmwf_deep_sample("satellite-lake-water-level")
+        assert captured["variable"] == ["all"]
+        assert captured["lake"] == ["achit"]
+
+    def test_read_netcdf_var_meta_via_gdal(self, tmp_path):
+        """_read_netcdf_var_meta reads long_name/units from a NetCDF via GDAL."""
+        import numpy as np
+        import xarray as xr
+
+        path = tmp_path / "probe.nc"
+        xr.Dataset(
+            {
+                "t2m": (
+                    ("lat", "lon"),
+                    np.ones((2, 2), "f4"),
+                    {"units": "K", "long_name": "2 metre temperature"},
+                )
+            },
+            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
+        ).to_netcdf(path)
+        meta = curate_mod._read_netcdf_var_meta(str(path))
+        assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
 
     def test_ecmwf_deep_sample_no_constraints(self, monkeypatch):
         """No constraints rows yields an empty schema (after the SDK imports)."""

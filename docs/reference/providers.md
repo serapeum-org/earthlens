@@ -25,6 +25,7 @@ plain HTTP and pull in no additional SDK.
 | Copernicus Marine (CMEMS) | `cmems` | raster | Copernicus Marine login | `cmems` | [CMEMS](cmems/introduction.md) |
 | FDSN seismic events (USGS / EMSC / INGV / …) | `fdsn` | vector | none | `fdsn` | [FDSN](fdsn/introduction.md) |
 | GDACS disaster alerts | `gdacs` | vector | none | — | [GDACS](gdacs/introduction.md) |
+| EM-DAT disaster impacts | `emdat`, `gdis` | tabular | registered account (token) | `emdat` | [EM-DAT](emdat/introduction.md) |
 | OpenAQ air quality (global aggregator) | `openaq` | tabular | API key (`X-API-Key`) | — | [OpenAQ](openaq/introduction.md) |
 | AirNow air quality (US / Canada EPA) | `airnow` | tabular | API key (`API_KEY`) | — | [AirNow](airnow/introduction.md) |
 | EEA air quality (Europe) | `eea-aq` | tabular | none (public) | `eea_aq` | [EEA](eea-aq/introduction.md) |

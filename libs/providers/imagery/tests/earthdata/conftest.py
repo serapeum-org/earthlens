@@ -7,6 +7,7 @@ The whole suite runs without `earthaccess` installed or any network:
 
 from __future__ import annotations
 
+import os
 import sys
 import types
 from pathlib import Path
@@ -41,6 +42,10 @@ class _FakeEarthaccess(types.ModuleType):
     def __init__(self) -> None:
         super().__init__("earthaccess")
         self.login_calls: list[dict[str, Any]] = []
+        #: The EDL environment variables as they stood inside each `login`
+        #: call. `configure` restores them afterwards, so this is the only
+        #: place a test can see what the credential resolution actually did.
+        self.login_env: list[dict[str, str | None]] = []
         self.search_calls: list[dict[str, Any]] = []
         self.download_calls: list[dict[str, Any]] = []
         self.open_calls: list[list[Any]] = []
@@ -55,6 +60,16 @@ class _FakeEarthaccess(types.ModuleType):
     def login(self, strategy: str = "all", persist: bool = False, **kwargs: Any):
         """Record the login and return the fake auth handle."""
         self.login_calls.append({"strategy": strategy, "persist": persist})
+        self.login_env.append(
+            {
+                name: os.environ.get(name)
+                for name in (
+                    "EARTHDATA_TOKEN",
+                    "EARTHDATA_USERNAME",
+                    "EARTHDATA_PASSWORD",
+                )
+            }
+        )
         if self.login_raises is not None:
             raise self.login_raises
         self._auth.authenticated = self.authenticated

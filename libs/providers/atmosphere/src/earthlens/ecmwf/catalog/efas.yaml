@@ -1,0 +1,98 @@
+# CEMS European Flood Awareness System (EFAS) — EWDS endpoint.
+#
+# The higher-resolution European companion to GloFAS (Rhine / Danube / Elbe),
+# on the EWDS store. Request shapes are derived from the live `form.json`
+# (field names + allowed values are authoritative; see
+# `planning/ecmwf/captures/a1_form_efas-*.json`, pinned 2026-08-01). Each family
+# keeps `time` (unlike GloFAS) so the hindcast rows carry `time` in `extras`,
+# which skips the request-kind `time` strip. `nc_variable` follows the GloFAS
+# convention (`dis24`/`dis06`) and the exact time/leadtime combos are confirmed
+# by the gated live e2e — every EFAS dataset needs its licence accepted per
+# account before a retrieve works (G5).
+#
+# EFAS is a ~5 km European grid; `grid_resolution: 0.05` keeps the bbox snap
+# loose (server delivers the native grid).
+
+datasets:
+  efas-forecast:
+    endpoint: ewds
+    grid_resolution: 0.05
+    request_kind: form
+    product_type: [control_forecast]
+    extras:
+      system_version: [operational]
+      originating_centre: ecmwf
+      model_levels: surface_level
+      leadtime_hour: ["24"]
+      time: ["00:00"]
+      download_format: unarchived
+    variables:
+      river-discharge-in-the-last-24-hours:
+        cds_variable: river_discharge_in_the_last_24_hours
+        nc_variable: dis24
+        units: m3 s-1
+
+  efas-historical:
+    endpoint: ewds
+    grid_resolution: 0.05
+    request_kind: glofas_hindcast
+    extras:
+      system_version: [version_5_0]
+      model_levels: surface_level
+      time: ["00:00"]
+      download_format: unarchived
+    variables:
+      river-discharge-in-the-last-24-hours:
+        cds_variable: river_discharge_in_the_last_24_hours
+        nc_variable: dis24
+        units: m3 s-1
+
+  efas-reforecast:
+    endpoint: ewds
+    grid_resolution: 0.05
+    request_kind: glofas_hindcast
+    product_type: [control_forecast]
+    extras:
+      system_version: [version_5_0]
+      model_levels: surface_level
+      # This row pairs the 6-hour discharge product (dis06) with leadtime_hour
+      # 24. 24 is a valid multiple of the 6-hour step, but whether dis06 accepts
+      # a 24-hour lead is LIVE-UNVERIFIED — confirm against the live form.json
+      # when the EFAS licence is accepted (the other rows pair dis24 with 24).
+      leadtime_hour: ["24"]
+      time: ["00:00"]
+      download_format: unarchived
+    variables:
+      river-discharge-in-the-last-6-hours:
+        cds_variable: river_discharge_in_the_last_6_hours
+        nc_variable: dis06
+        units: m3 s-1
+
+  efas-seasonal:
+    endpoint: ewds
+    grid_resolution: 0.05
+    request_kind: seasonal
+    extras:
+      model_levels: surface_level
+      leadtime_hour: ["24"]
+      download_format: unarchived
+    variables:
+      river-discharge-in-the-last-24-hours:
+        cds_variable: river_discharge_in_the_last_24_hours
+        nc_variable: dis24
+        units: m3 s-1
+
+  efas-seasonal-reforecast:
+    endpoint: ewds
+    grid_resolution: 0.05
+    request_kind: seasonal_hindcast
+    extras:
+      system_version: [version_5_0]
+      model_levels: surface_level
+      leadtime_hour: ["24"]
+      download_format: unarchived
+    variables:
+      river-discharge-in-the-last-24-hours:
+        cds_variable: river_discharge_in_the_last_24_hours
+        nc_variable: dis24
+        units: m3 s-1

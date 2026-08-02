@@ -22,3 +22,6 @@ providers:
   copernicus-cems:
     display_name: "Copernicus Emergency Management Service (CEMS — GloFAS / EFAS / fire danger, operated by ECMWF)"
     parent: ecmwf
+  copernicus-cams:
+    display_name: "Copernicus Atmosphere Monitoring Service (CAMS — air quality / GHG / composition, operated by ECMWF)"
+    parent: ecmwf

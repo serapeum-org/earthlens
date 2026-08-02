@@ -1,0 +1,40 @@
+# CEMS fire danger (Fire Weather Index system) — EWDS endpoint.
+#
+# Historical reanalysis + seasonal forecast of the Canadian FWI components on
+# the EWDS store. Request shapes + valid combos are pinned from the live
+# `constraints.json` (`planning/ecmwf/captures/a1_constraints_cems-fire-*.json`,
+# 2026-08-01): fire-historical requires `dataset_type: intermediate_dataset`
+# and a `grid` selector (`0.25/0.25`) — a naive request without them 400s.
+# `nc_variable` (`fwinx`) is best-effort; the gated live e2e confirms it (every
+# fire dataset needs its licence accepted per account, G5). No time-of-day —
+# the `fire` request kind drops the template `time` slots.
+
+datasets:
+  cems-fire-historical-v1:
+    endpoint: ewds
+    grid_resolution: 0.25
+    request_kind: fire
+    product_type: [reanalysis]
+    extras:
+      dataset_type: intermediate_dataset
+      system_version: ["4_1"]
+      grid: 0.25/0.25
+    variables:
+      fire-weather-index:
+        cds_variable: fire_weather_index
+        nc_variable: fwinx
+        units: "1"
+
+  cems-fire-seasonal:
+    endpoint: ewds
+    grid_resolution: 0.25
+    request_kind: fire
+    extras:
+      release_version: ["5"]
+      leadtime_hour: ["1020"]
+      day: ["01"]
+    variables:
+      fire-weather-index:
+        cds_variable: fire_weather_index
+        nc_variable: fwinx
+        units: "1"
