@@ -288,7 +288,13 @@ def _build_dataset_map(
         ds_vars: dict[str, Variable] = {}
         for code, entry in (ds_body.get("variables") or {}).items():
             merged = dict(entry)
-            merged["cds_dataset"] = ds_name
+            # The catalog key is the CDS dataset short name by default, but a row
+            # may set `cds_dataset:` explicitly to curate two configs of ONE CDS
+            # dataset under distinct catalog ids — e.g. the GloFAS historical
+            # `consolidated` vs `intermediate` streams both retrieve from
+            # `cems-glofas-historical`. setdefault (not assignment) so the explicit
+            # override wins; no existing row sets it, so this is backward-compatible.
+            merged.setdefault("cds_dataset", ds_name)
             # Default cds_variable to the slug-with-underscores form
             # of the YAML key (e.g. "2m-temperature" -> "2m_temperature").
             # A per-variable row may set `cds_variable` explicitly

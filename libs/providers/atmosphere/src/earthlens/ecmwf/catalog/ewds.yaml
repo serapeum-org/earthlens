@@ -63,8 +63,11 @@ datasets:
     variables:
       average-river-discharge-in-the-last-24-hours:
         cds_variable: average_river_discharge_in_the_last_24_hours
-        nc_variable: average_river_discharge_in_the_last_24_hours
-        units: unknown
+        # Verified live 2026-07-31: the NetCDF variable is `avg_dis` (m3 s-1),
+        # NOT the full cds_variable name. (runoff / snow-depth / soil-wetness
+        # below keep placeholder nc_variable / units — not yet live-verified.)
+        nc_variable: avg_dis
+        units: m3 s-1
       runoff-water-equivalent:
         cds_variable: runoff_water_equivalent
         nc_variable: runoff_water_equivalent
@@ -77,6 +80,33 @@ datasets:
         cds_variable: soil_wetness_index
         nc_variable: soil_wetness_index
         units: unknown
+
+  # GloFAS historical — INTERMEDIATE stream (ERA5T-driven, ~2-5 days behind real
+  # time). Same CDS dataset as cems-glofas-historical (see the explicit
+  # `cds_dataset:` below — a second curated config of one dataset, differing only
+  # by product_type), but `product_type: intermediate`, which covers the most
+  # recent weeks/months the final `consolidated` reanalysis has not caught up to
+  # yet. Verified live 2026-07-31/08-01: intermediate + this discharge variable +
+  # timespan=time_mean spans 2024-2026 through the current month, NetCDF variable
+  # `avg_dis` (m3 s-1). Only the discharge variable is curated here (the one
+  # verified live); mirror the consolidated row above to add runoff / snow-depth /
+  # soil-wetness. Requires the per-row `cds_dataset` override (catalog.py).
+  cems-glofas-historical-intermediate:
+    endpoint: ewds
+    grid_resolution: 0.05
+    request_kind: glofas
+    product_type: [intermediate]
+    extras:
+      system_version: [version_4_0]
+      hydrological_model: [lisflood]
+      timespan: [time_mean]
+      download_format: unarchived
+    variables:
+      average-river-discharge-in-the-last-24-hours:
+        cds_dataset: cems-glofas-historical
+        cds_variable: average_river_discharge_in_the_last_24_hours
+        nc_variable: avg_dis
+        units: m3 s-1
   cems-glofas-reforecast:
     endpoint: ewds
     grid_resolution: 0.05
