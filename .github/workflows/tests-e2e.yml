@@ -45,7 +45,7 @@ jobs:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
-          uv run pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not gdis" -v
+          uv run pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat" -v
 
   e2e-gee:
     runs-on: ubuntu-latest
@@ -102,6 +102,48 @@ jobs:
           EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
         run: |
           uv run pytest -m "e2e and earthdata" -v
+
+  e2e-emdat:
+    runs-on: ubuntu-latest
+    if: github.repository == 'serapeum-org/earthlens'
+
+    # Job-level so the GDIS step can branch on whether a credential exists:
+    # the `secrets` context is not readable from a step's `if:`, but `env` is.
+    env:
+      EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
+      EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
+      EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
+        with:
+          python-version: "3.12"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          version: "0.11.29"
+
+      # The EM-DAT Archive on the UCLouvain Dataverse is anonymous, so this
+      # half needs nothing but network and always runs.
+      - name: Run live EM-DAT Dataverse e2e tests
+        run: |
+          uv run pytest -m "e2e and emdat and not gdis" -v
+
+      # GDIS rides NASA Earthdata Cloud, so it needs an Earthdata Login whose
+      # account has also accepted the SEDAC data-use agreement. These tests are
+      # marker-gated rather than self-skipping (this repo selects categories
+      # with -m, never an env check), so the step itself is skipped when no
+      # credential is configured instead of failing at login.
+      - name: Run live GDIS (Earthdata Cloud) e2e tests
+        if: >-
+          env.EARTHDATA_TOKEN != '' ||
+          (env.EARTHDATA_USERNAME != '' && env.EARTHDATA_PASSWORD != '')
+        run: |
+          uv run pytest -m "e2e and emdat and gdis" -v
 
   e2e-eumetsat:
     runs-on: ubuntu-latest
