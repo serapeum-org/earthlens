@@ -162,11 +162,17 @@ def extract_member(archive: Path, member: str, dest_dir: Path) -> Path:
 def hazard_filter_sql(column: str, hazards: list[str]) -> str:
     """Build an OGR attribute filter matching any of `hazards`.
 
-    The shipped GDIS GeoPackage spells one value with a trailing space
-    (`"extreme temperature "`), so each canonical name is matched both bare and
-    space-suffixed. An `IN (...)` list is used rather than `TRIM(...)` because
-    the available SQL functions vary by driver and dialect, while an equality
-    list works everywhere.
+    The shipped GDIS data is not internally consistent — the GeoPackage spells
+    one value `"extreme temperature "` with a trailing space while the same
+    table on Earth Engine spells it without — so each canonical name is matched
+    both bare and space-suffixed.
+
+    `LIKE` rather than `=`: with no wildcards it is an equality test, but one
+    that ignores ASCII case in both the SQLite and OGR SQL dialects. A re-issued
+    file that capitalised the value differently would silently return nothing
+    under `=`, while the in-memory path (which compares stripped and lowered)
+    would still match — the two halves of the same filter disagreeing. `TRIM()`
+    is avoided because the available SQL functions vary by driver.
 
     Args:
         column: The attribute column holding the disaster type.
@@ -175,19 +181,20 @@ def hazard_filter_sql(column: str, hazards: list[str]) -> str:
     Returns:
         str: A `WHERE`-clause fragment.
     """
-    literals = []
+    terms = []
     for hazard in hazards:
-        escaped = hazard.replace("'", "''")
-        literals.append(f"'{escaped}'")
-        literals.append(f"'{escaped} '")
-    return f"{column} IN ({', '.join(literals)})"
+        escaped = hazard.replace("'", "''").replace("%", r"\%").replace("_", r"\_")
+        terms.append(f"{column} LIKE '{escaped}'")
+        terms.append(f"{column} LIKE '{escaped} '")
+    return " OR ".join(terms)
 
 
 def country_filter_sql(column: str, country: str) -> str:
     """Build an OGR attribute filter matching one ISO3 code.
 
-    GDIS stores upper-case ISO3 codes; the caller may pass any casing, so the
-    code is normalised here rather than relying on a SQL function.
+    GDIS stores upper-case ISO3 codes, but `LIKE` is used rather than `=` so a
+    re-issued file that changed the casing still matches — the in-memory path
+    compares case-insensitively, and the two must not disagree.
 
     Args:
         column: The attribute column holding the ISO3 code.
@@ -197,7 +204,7 @@ def country_filter_sql(column: str, country: str) -> str:
         str: A `WHERE`-clause fragment.
     """
     escaped = country.strip().upper().replace("'", "''")
-    return f"{column} = '{escaped}'"
+    return f"{column} LIKE '{escaped}'"
 
 
 def combine_filters(*clauses: str | None) -> str | None:

@@ -27,7 +27,9 @@ These are event records and pre-geocoded locations, not gridded rasters, so
 
 from __future__ import annotations
 
+import hashlib
 import warnings
+import zipfile
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
@@ -463,7 +465,17 @@ class EMDAT(AbstractDataSource):
         # member before deciding a re-download is needed.
         local = self.root_dir / Path(cast("str", dataset.granule)).name
         if local.exists():
-            return local
+            # earthaccess offers no atomicity guarantee, unlike HttpClient's
+            # atomic download, so an interrupted 2.2 GB fetch can leave a
+            # truncated zip here. Reusing it would fail forever with a bare
+            # BadZipFile naming neither the file nor the remedy.
+            if zipfile.is_zipfile(local):
+                return local
+            logger.warning(
+                f"EMDAT {dataset.id}: {local.name} is not a readable zip "
+                "(a previous download was probably interrupted); re-fetching."
+            )
+            local.unlink()
         extracted = self.root_dir / Path(cast("str", dataset.member)).name
         if extracted.exists():
             return extracted
@@ -601,12 +613,44 @@ class EMDAT(AbstractDataSource):
                 f"({len(result)} feature(s))."
             )
             return result
-        out_path = self.root_dir / f"{self._dataset.id.replace(':', '_')}.csv"
+        out_path = self.root_dir / self._result_filename()
         result.to_csv(out_path, index=False)
         logger.info(
             f"EMDAT {self._dataset.id}: {len(result)} row(s) written to {out_path}."
         )
         return result
+
+    def _result_filename(self) -> str:
+        """Return the output CSV name, which encodes the request's filters.
+
+        The workbook cache is shared across requests by design, so two
+        differently-filtered queries into one `path=` are a normal pattern. A
+        name carrying only the dataset id would let the second silently
+        overwrite the first, and the docs advertise that file by name. An
+        unfiltered request keeps the plain name; any filter adds a short digest
+        of the whole request.
+
+        Returns:
+            str: `emdat_events.csv`, or `emdat_events-<digest>.csv` when the
+                request is filtered.
+        """
+        stem = self._dataset.id.replace(":", "_")
+        first_year, last_year = self._year_range
+        # Each filter listed separately: a `(None, None)` year range is a
+        # non-empty tuple and therefore truthy, so testing the tuple itself
+        # would make every request look filtered.
+        applied = (
+            bool(self._hazards),
+            self._country is not None,
+            first_year is not None,
+            last_year is not None,
+            self._bbox is not None,
+        )
+        if not any(applied):
+            return f"{stem}.csv"
+        request = (tuple(self._hazards), self._country, self._year_range, self._bbox)
+        digest = hashlib.sha1(repr(request).encode()).hexdigest()[:8]
+        return f"{stem}-{digest}.csv"
 
     def _warn_license(self) -> None:
         """Emit a :class:`LicenseWarning` when the dataset's use is restricted.
@@ -629,7 +673,7 @@ class EMDAT(AbstractDataSource):
             "derivative database from it, so treat this result as fetched for "
             f"you alone. See {dataset.terms_url}.",
             LicenseWarning,
-            stacklevel=3,
+            stacklevel=4,
         )
 
     def _log_citation(self) -> None:

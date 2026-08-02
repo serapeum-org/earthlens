@@ -170,12 +170,23 @@ class TestHazardFilterSql:
     def test_matches_bare_and_padded(self) -> None:
         """Each hazard is matched both bare and space-suffixed."""
         sql = _helpers.hazard_filter_sql("disastertype", ["flood"])
-        assert sql == "disastertype IN ('flood', 'flood ')"
+        assert sql == "disastertype LIKE 'flood' OR disastertype LIKE 'flood '"
+
+    def test_uses_like_so_the_match_ignores_case(self) -> None:
+        """LIKE, not `=` — a re-issued file may capitalise the value differently."""
+        sql = _helpers.hazard_filter_sql("disastertype", ["flood"])
+        assert " = " not in sql
+        assert "LIKE" in sql
+
+    def test_wildcards_are_escaped(self) -> None:
+        """A `%` or `_` in a hazard name is escaped, not treated as a wildcard."""
+        sql = _helpers.hazard_filter_sql("t", ["a%b_c"])
+        assert "%" in sql and "\%" in sql
 
     def test_multiple_hazards(self) -> None:
         """Every requested hazard contributes both spellings."""
         sql = _helpers.hazard_filter_sql("disastertype", ["flood", "storm"])
-        assert sql.count("'") == 8
+        assert sql.count("LIKE") == 4
 
     def test_quotes_are_escaped(self) -> None:
         """A quote in a hazard name is doubled, not left to break the SQL."""
@@ -189,7 +200,7 @@ class TestCountryAndCombinedFilters:
 
     def test_country_is_upper_cased(self) -> None:
         """A lower-case ISO3 is normalised to the stored spelling."""
-        assert _helpers.country_filter_sql("iso3", " tst ") == "iso3 = 'TST'"
+        assert _helpers.country_filter_sql("iso3", " tst ") == "iso3 LIKE 'TST'"
 
     def test_country_quotes_are_escaped(self) -> None:
         """A quote in the code is doubled rather than breaking the SQL."""

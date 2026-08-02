@@ -44,8 +44,13 @@ events[["DisNo.", "Start Year", "Total Deaths", "Total Affected"]].head()
 ```
 
 That returns every flood EM-DAT recorded in Bangladesh over those eleven years — a couple of dozen rows, though
-the exact count moves as CRED re-cuts the archive — and writes them to `out/emdat_events.csv`. The fetched archive workbook also lands in `out/`, and a second call reuses it
-rather than re-downloading.
+the exact count moves as CRED re-cuts the archive — and writes them to `out/`. The fetched archive workbook
+lands there too, and a second call reuses it rather than re-downloading.
+
+The result file is `emdat_events.csv` for an unfiltered request, and `emdat_events-<digest>.csv` when any filter
+is set, where the digest covers the hazard, country, window and bbox. That is deliberate: the workbook cache is
+shared across requests, so running a Bangladesh query and then a Pakistan query into the same `path=` is the
+natural pattern — and a single fixed name would let the second silently overwrite the first.
 
 Every `emdat:events` download raises a `LicenseWarning`. That is deliberate: it names the eligibility restriction
 in the Terms of Use, which is easy to miss and is stricter than "CC-BY-NC-ND" implies. Read it once, then filter

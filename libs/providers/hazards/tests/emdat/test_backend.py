@@ -263,10 +263,32 @@ class TestEventsRoute:
     def test_result_is_written_to_the_output_directory(
         self, tmp_path: Path, dataverse_listing: dict[str, Any], events_workbook: Path
     ) -> None:
-        """A tabular result is also written as CSV for the caller."""
+        """An unfiltered tabular result is written under the plain name."""
         http = FakeHttp(dataverse_listing, events_workbook)
         _events_backend(tmp_path, http).download()
         assert (tmp_path / "emdat_events.csv").is_file()
+
+    def test_differently_filtered_requests_do_not_overwrite(
+        self, tmp_path: Path, dataverse_listing: dict[str, Any], events_workbook: Path
+    ) -> None:
+        """Two filtered queries into one directory keep both results."""
+        http = FakeHttp(dataverse_listing, events_workbook)
+        _events_backend(tmp_path, http, country="TST").download()
+        _events_backend(tmp_path, http, country="OTH").download()
+        written = sorted(p.name for p in tmp_path.glob("emdat_events*.csv"))
+        assert len(written) == 2, written
+
+    def test_a_truncated_cached_granule_is_refetched(
+        self, tmp_path: Path, gdis_csv_zip: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A corrupt granule left by an interrupted fetch is replaced, not reused."""
+        corrupt = tmp_path / "pend-gdis-1960-2018-disasterlocations-csv.zip"
+        corrupt.write_bytes(b"PK truncated")
+        fake = FakeEarthaccess([FakeGranule(_GDIS_LINK)], gdis_csv_zip)
+        monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        result = _points_backend(tmp_path).download()
+        assert len(result) > 0
+        assert len(fake.searched) == 1
 
     def test_source_file_is_reused(
         self, tmp_path: Path, dataverse_listing: dict[str, Any], events_workbook: Path
