@@ -225,7 +225,9 @@ class ArchiveFile(BaseModel):
         archive_format: `"zip"` (range-readable in place) or `"tar.gz"`
             (must be downloaded whole).
         root_prefix: The directory every member sits under inside the archive,
-            or `None` when members start at the archive root. Recorded for
+            or `None` when members start at the archive root. Every value is
+            measured from the archive itself, so `None` means "this archive has
+            no root directory", never "nobody looked". Recorded for
             documentation and as a cross-check only — member paths are resolved
             from the archive's own index, because this prefix varies per record
             and is absent in several.

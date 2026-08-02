@@ -87,6 +87,12 @@ class TestBundledCatalog:
         assert release.n_catchments == 16299
         assert release.file_for("csv").root_prefix == "Caravan-csv/"
 
+    def test_base_1_6_carries_a_root_prefix_for_both_formats(self):
+        """Both base archives were opened, so neither prefix is a `None` standing in for unknown."""
+        release = Catalog().get_extension("base").resolve_version("1.6")
+
+        assert release.file_for("netcdf").root_prefix == "Caravan-nc/"
+
     def test_source_datasets_are_not_top_level_rows(self):
         """camels / hysets / lamah live inside base, not beside it."""
         base = Catalog().get_extension("base")

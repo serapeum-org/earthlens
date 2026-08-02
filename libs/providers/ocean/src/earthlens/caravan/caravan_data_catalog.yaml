@@ -276,10 +276,11 @@ extensions:
             size: 24775734275
             md5: ad3a7767db059f218380e9cce5f72452
             archive_format: tar.gz
-            # Not probed - the netcdf archive is a separate 24.8 GB download and
-            # this backend reads csv only. Members resolve from the index either
-            # way, so the prefix is documentation, not a lookup key.
-            root_prefix: null
+            # Measured 2026-08-02 without downloading the 24.8 GB archive: a
+            # gzip stream cannot be seeked, but it decodes from its start, and
+            # the first tar header sits in the first 512 bytes of the inflated
+            # stream - so 0.52 MB of range-read reveals the root directory.
+            root_prefix: Caravan-nc/
       # The newest range-readable base: a zip, so one catchment costs ~3 MB.
       # A materially different dataset, not merely an older cut - 6,830 of the
       # ~16,300 catchments, forcing stops in 2020, and a single PET column.
