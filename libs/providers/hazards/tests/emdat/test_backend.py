@@ -464,6 +464,18 @@ class TestGdisPointsRoute:
         assert len(result) > 0
         assert len(fake.searched) == 1
 
+    def test_a_readable_cached_granule_is_unpacked_without_searching(
+        self, tmp_path: Path, gdis_csv_zip: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """An intact archive already on disk is reused rather than re-fetched."""
+        cached = tmp_path / gdis_csv_zip.name
+        cached.write_bytes(gdis_csv_zip.read_bytes())
+        fake = FakeEarthaccess([FakeGranule(_GDIS_LINK)])
+        monkeypatch.setitem(sys.modules, "earthaccess", fake)
+        result = _points_backend(tmp_path).download()
+        assert len(result) > 0
+        assert fake.searched == []
+
     def test_an_extracted_member_wins_over_a_corrupt_granule(
         self, tmp_path: Path, gdis_csv_frame, monkeypatch: pytest.MonkeyPatch
     ) -> None:
