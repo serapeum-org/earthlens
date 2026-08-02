@@ -455,20 +455,22 @@ class EMDAT(AbstractDataSource):
     def _download_granule(self) -> Path:
         """Authenticate, locate the granule on CMR, and download it.
 
+        Anything a previous run left in `root_dir` is reused, so a repeated
+        request costs nothing.
+
         Returns:
-            Path: The downloaded granule archive in `root_dir`.
+            Path: The granule archive in `root_dir`, or the member a previous
+                run already unpacked from it.
 
         Raises:
             ImportError: If `earthaccess` is not installed.
             ValueError: If the named granule is not in the CMR collection.
         """
         dataset = self._dataset
-        # Reuse whatever a previous run left behind. earthaccess does not
-        # guarantee the catalogued file name, so fall back to the extracted
-        # member before deciding a re-download is needed.
         # The already-unpacked member is checked first: when it is present the
         # granule is not needed at all, so a truncated archive next to it is
-        # nothing to act on.
+        # nothing to act on. earthaccess also does not guarantee the catalogued
+        # file name, which is the other reason not to lead with the archive.
         extracted = self.root_dir / Path(cast("str", dataset.member)).name
         if extracted.exists():
             return extracted
@@ -635,7 +637,8 @@ class EMDAT(AbstractDataSource):
         name carrying only the dataset id would let the second silently
         overwrite the first, and the docs advertise that file by name. An
         unfiltered request keeps the plain name; any filter adds a short digest
-        of the whole request.
+        of the whole request. The digest is order-insensitive in `hazard=`, so
+        the same set of hazards always resolves to the same file.
 
         Returns:
             str: `emdat_events.csv`, or `emdat_events-<digest>.csv` when the

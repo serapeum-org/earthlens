@@ -277,7 +277,8 @@ def filter_frame(
 
     Warns:
         UngeocodedRowsWarning: When a `bbox` discards rows that carry no
-            coordinates at all.
+            coordinates at all. The count is taken over the rows the other
+            filters kept, not over the whole table.
     """
     mask = pd.Series(True, index=frame.index)
 
