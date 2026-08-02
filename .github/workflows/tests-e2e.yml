@@ -63,7 +63,7 @@ jobs:
           # runs 30-odd suites in a single pytest process, so one native crash
           # takes down every suite behind it, and a backend whose e2e budget
           # assertions are the point deserves to fail on its own merits.
-          uv run pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not caravan" -v
+          uv run --locked pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not caravan" -v
 
   e2e-caravan:
     runs-on: ubuntu-latest
@@ -75,7 +75,10 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: serapeum-org/github-actions/actions/python-setup/uv@uv/v1.2.0
+        # Pinned to the commit the `uv/v1.2.0` tag points at: a tag can be
+        # moved, a commit cannot. The other lanes in this file still track the
+        # tag - see the note on the pytest call below.
+        uses: serapeum-org/github-actions/actions/python-setup/uv@bc6c376c15ffbfe4d9f46fe7e39b0c2e56302ca8 # uv/v1.2.0
         with:
           python-version: "3.12"
           install-groups: "groups: dev, extras: all"
@@ -87,8 +90,11 @@ jobs:
         # The suite asserts a transferred-byte budget - that one catchment
         # costs ~3 MB out of an 8.84 GB archive - so it is the regression gate
         # for the range-read design, not a smoke test.
+        #
+        # `--locked` makes the run fail rather than silently re-resolve if
+        # uv.lock has drifted, so the versions under test are the locked ones.
         run: |
-          uv run pytest -m "e2e and caravan" -v
+          uv run --locked pytest -m "e2e and caravan" -v
 
   e2e-gee:
     runs-on: ubuntu-latest
