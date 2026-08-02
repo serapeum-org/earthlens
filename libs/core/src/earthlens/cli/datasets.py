@@ -623,6 +623,12 @@ def curate(
         help="ecmwf --all / gee|ecmwf --fill-empty: only process the first N "
         "rows (0=all).",
     ),
+    timeout: int = typer.Option(
+        180,
+        "--timeout",
+        help="ecmwf --fill-empty: seconds to wait for each dataset's live "
+        "retrieve before skipping it (0 = no deadline).",
+    ),
     version: str = typer.Option("", "--version", help="earthdata: collection version."),
     cmr_provider: str = typer.Option(
         "", "--cmr-provider", help="earthdata: CMR provider code (e.g. GES_DISC)."
@@ -684,7 +690,9 @@ def curate(
         _curate_all(backends[0], write=write, limit=limit or None)
         return
     if fill_empty:
-        _curate_fill_empty(backends[0], write=write, limit=limit or None)
+        _curate_fill_empty(
+            backends[0], write=write, limit=limit or None, timeout=timeout
+        )
         return
     if not upstream_id:
         raise typer.BadParameter(
@@ -758,28 +766,36 @@ def _curate_all(info, *, write: bool, limit: int | None) -> None:
     )
 
 
-def _curate_fill_empty(info, *, write: bool, limit: int | None) -> None:
+def _curate_fill_empty(
+    info, *, write: bool, limit: int | None, timeout: int = 180
+) -> None:
     """Run `curate gee/ecmwf --fill-empty`: bulk-hydrate placeholder rows in place.
 
     Args:
         info: The backend (gee or ecmwf).
         write: `--fill-empty` mutates the catalog, so `--write` is required.
         limit: Only hydrate the first N placeholder rows (None = all).
+        timeout: Per-dataset retrieve deadline in seconds (ecmwf only; 0 = none).
     """
     if not write:
         raise typer.BadParameter("--fill-empty rewrites the catalog; pass --write")
     if info.provider == "gee":
-        from earthlens.cli._gee_hydrate import bulk_hydrate_empty as hydrate
+        from earthlens.cli._gee_hydrate import bulk_hydrate_empty as gee_hydrate
+
+        summary = gee_hydrate(limit=limit)
     elif info.provider == "ecmwf":
-        from earthlens.cli._ecmwf_hydrate import bulk_hydrate_empty as hydrate
+        from earthlens.cli._ecmwf_hydrate import bulk_hydrate_empty as ecmwf_hydrate
+
+        summary = ecmwf_hydrate(limit=limit, timeout=timeout or None)
     else:
         raise typer.BadParameter("--fill-empty is only supported for gee / ecmwf")
 
-    summary = hydrate(limit=limit)
+    timed_out = summary.get("timed_out") or 0
+    tail = f", {timed_out} timed out" if timed_out else ""
     out_console().print(
         f"[green]hydrated {summary['hydrated']}[/green] / "
         f"{summary['candidates']} placeholder rows "
-        f"(skipped {summary['skipped']})"
+        f"(skipped {summary['skipped']}{tail})"
     )
 
 

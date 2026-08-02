@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from types import SimpleNamespace
 
 import pytest
@@ -11,6 +12,7 @@ from earthlens.cli import _ecmwf_hydrate as hydrate_mod
 from earthlens.cli._ecmwf_hydrate import (
     _find_file_for_dataset,
     _match_variables,
+    _retrieve_with_timeout,
     _rewrite_stanza,
     _yaml_value,
     bulk_hydrate_empty,
@@ -47,6 +49,25 @@ _NC_META = {
     "sst": {"long_name": "Sea surface temperature", "units": "K"},
     "t2m": {"long_name": "2 metre temperature", "units": "K"},
 }
+
+_TWO_STANZA = """datasets:
+  a-dataset:
+    endpoint: cds
+    request_kind: form
+    variables:
+      sea-surface-temperature:
+        cds_variable: sea_surface_temperature
+        nc_variable: sea_surface_temperature
+        units: unknown
+  z-dataset:
+    endpoint: cds
+    request_kind: form
+    variables:
+      sea-surface-temperature:
+        cds_variable: sea_surface_temperature
+        nc_variable: sea_surface_temperature
+        units: unknown
+"""
 
 
 class TestRewriteStanza:
@@ -177,6 +198,40 @@ class TestMatchVariables:
         )
 
 
+class TestRetrieveWithTimeout:
+    """Tests for the per-retrieve timeout wrapper."""
+
+    def test_zero_timeout_calls_synchronously(self, monkeypatch):
+        """A falsy timeout bypasses the thread and returns the retrieve verbatim."""
+        meta = {"t2m": {"long_name": "2 metre temperature", "units": "K"}}
+        monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", lambda ds: meta)
+        assert _retrieve_with_timeout("x", timeout=0) == meta
+
+    def test_result_is_returned_within_deadline(self, monkeypatch):
+        """A fast retrieve completes inside the deadline and its meta is returned."""
+        meta = {"sst": {"long_name": "Sea surface temperature", "units": "K"}}
+        monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", lambda ds: meta)
+        assert _retrieve_with_timeout("x", timeout=5) == meta
+
+    def test_hung_retrieve_raises_timeout(self, monkeypatch):
+        """A retrieve that outlasts the deadline is abandoned with TimeoutError."""
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_netcdf_vars", lambda ds: time.sleep(2) or {}
+        )
+        with pytest.raises(TimeoutError, match="exceeded"):
+            _retrieve_with_timeout("stuck-dataset", timeout=0.05)
+
+    def test_retrieve_error_is_reraised(self, monkeypatch):
+        """An exception raised inside the worker thread surfaces to the caller."""
+
+        def _boom(dataset_id):
+            raise RuntimeError("licence not accepted")
+
+        monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", _boom)
+        with pytest.raises(RuntimeError, match="licence not accepted"):
+            _retrieve_with_timeout("x", timeout=5)
+
+
 class TestYamlValue:
     """Tests for the scalar renderer."""
 
@@ -255,6 +310,7 @@ class TestBulkHydrateEmpty:
             "candidates": 1,
             "hydrated": 1,
             "skipped": 0,
+            "timed_out": 0,
             "filled": ["reanalysis-era5-single-levels"],
         }
         variables = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"][
@@ -293,3 +349,50 @@ class TestBulkHydrateEmpty:
         monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", lambda ds: {})
         summary = bulk_hydrate_empty(limit=1)
         assert summary["candidates"] == 1, "limit applied to the worklist"
+
+    def test_earlier_hydration_persists_when_a_later_one_aborts(
+        self, tmp_path, monkeypatch
+    ):
+        """An abrupt stop keeps the shard writes already made (incremental writes)."""
+        (tmp_path / "era5.yaml").write_text(_TWO_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {
+                "a-dataset": _placeholder_dataset("sea-surface-temperature"),
+                "z-dataset": _placeholder_dataset("sea-surface-temperature"),
+            },
+        )
+
+        def _hydrate_then_abort(dataset_id):
+            if dataset_id == "z-dataset":
+                raise KeyboardInterrupt
+            return dict(_NC_META)
+
+        monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", _hydrate_then_abort)
+        with pytest.raises(KeyboardInterrupt):
+            bulk_hydrate_empty(timeout=0)
+        on_disk = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"]
+        assert on_disk["a-dataset"]["variables"]["sea-surface-temperature"] == {
+            "cds_variable": "sea_surface_temperature",
+            "nc_variable": "sst",
+            "units": "K",
+        }, "the first dataset's hydration was written before the abort"
+
+    def test_timed_out_dataset_is_counted_and_skipped(self, tmp_path, monkeypatch):
+        """A retrieve that hits the deadline increments timed_out and skipped."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+
+        def _stall(dataset_id, timeout):
+            raise TimeoutError("stuck in the CDS queue")
+
+        monkeypatch.setattr(hydrate_mod, "_retrieve_with_timeout", _stall)
+        summary = bulk_hydrate_empty()
+        assert summary["timed_out"] == 1, "the timed-out dataset is counted"
+        assert summary["skipped"] == 1, "a timeout also counts as skipped"
+        assert summary["hydrated"] == 0

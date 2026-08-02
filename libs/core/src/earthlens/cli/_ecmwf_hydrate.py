@@ -18,10 +18,17 @@ variable it sampled).
 from __future__ import annotations
 
 import re
+import threading
 from pathlib import Path
 from typing import Any
 
+import typer
 import yaml
+
+#: Seconds to wait for one dataset's live retrieve before abandoning it. A
+#: single request stuck in the CDS queue would otherwise wedge the whole pass,
+#: so each retrieve runs under this deadline and a slow one is skipped.
+_DEFAULT_RETRIEVE_TIMEOUT = 180.0
 
 #: NetCDF coordinate / auxiliary variable names never matched to a data row.
 _COORD_NAMES = frozenset(
@@ -105,6 +112,61 @@ def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
     from earthlens.cli.curate import _ecmwf_deep_sample
 
     return _ecmwf_deep_sample(dataset_id)
+
+
+def _retrieve_into(dataset_id: str, box: dict[str, Any]) -> None:
+    """Thread body: run the retrieve, storing its result or error in `box`.
+
+    Stores the variable-metadata mapping under `box["meta"]` on success, or the
+    raised exception under `box["error"]` — read back by :func:`_retrieve_with_timeout`
+    on the calling thread. Kept module-level (no closure) so the worker is
+    picklable-simple and the no-nested-functions rule holds.
+
+    Args:
+        dataset_id: The Copernicus dataset id to sample.
+        box: Mutable result cell shared with the caller thread.
+    """
+    try:
+        box["meta"] = _retrieve_netcdf_vars(dataset_id)
+    except Exception as exc:  # noqa: BLE001 — surfaced to the caller thread verbatim
+        box["error"] = exc
+
+
+def _retrieve_with_timeout(
+    dataset_id: str, timeout: float | None
+) -> dict[str, dict[str, Any]]:
+    """Retrieve `dataset_id`'s variable metadata, abandoning it past `timeout`.
+
+    Runs the blocking `cdsapi` retrieve in a daemon thread and waits at most
+    `timeout` seconds. A request stuck in the CDS queue is abandoned — its
+    daemon thread is left to die at process exit — instead of wedging the whole
+    bulk pass; the retrieve builds its own `cdsapi.Client` and temp dir, so an
+    abandoned one never clashes with the next. A falsy `timeout` waits with no
+    deadline (the original un-bounded behaviour, used by the offline tests).
+
+    Args:
+        dataset_id: The Copernicus dataset id to sample.
+        timeout: Seconds to wait, or `None` / `0` to wait without a deadline.
+
+    Returns:
+        Mapping of NetCDF short name to `{long_name, units}`.
+
+    Raises:
+        TimeoutError: If the retrieve does not finish within `timeout` seconds.
+    """
+    if not timeout:
+        return _retrieve_netcdf_vars(dataset_id)
+    box: dict[str, Any] = {}
+    thread = threading.Thread(
+        target=_retrieve_into, args=(dataset_id, box), daemon=True
+    )
+    thread.start()
+    thread.join(timeout)
+    if thread.is_alive():
+        raise TimeoutError(f"retrieve for {dataset_id!r} exceeded {timeout:.0f}s")
+    if "error" in box:
+        raise box["error"]
+    return box.get("meta") or {}
 
 
 def _tokens(text: str) -> set[str]:
@@ -306,19 +368,28 @@ def _find_file_for_dataset(catalog_dir: Path, dataset_id: str) -> Path | None:
     return None
 
 
-def bulk_hydrate_empty(limit: int | None = None) -> dict[str, Any]:
+def bulk_hydrate_empty(
+    limit: int | None = None,
+    timeout: float | None = _DEFAULT_RETRIEVE_TIMEOUT,
+) -> dict[str, Any]:
     """Fill every placeholder curated ECMWF row from a live retrieve, in place.
 
     Loads the curated catalog, finds datasets with any `units: unknown`
     variable, retrieves a tiny NetCDF per dataset, and rewrites the stanza in
-    its per-family shard (preserving the rest). A dataset whose retrieve fails
-    or whose stanza cannot be matched is skipped — never fatal.
+    its per-family shard (preserving the rest). Hardened for the full-catalog
+    sweep: each retrieve runs under `timeout` so one request stuck in the CDS
+    queue is skipped rather than wedging the pass, and each hydrated shard is
+    **written the moment it changes** so an interrupted run keeps the progress
+    it already made. A dataset whose retrieve fails, times out, or whose stanza
+    cannot be matched is skipped — never fatal. Progress is echoed per dataset.
 
     Args:
         limit: Only hydrate the first `limit` placeholder datasets (alphabetical).
+        timeout: Per-dataset retrieve deadline in seconds; `None` / `0` waits
+            without a deadline (the offline-test path).
 
     Returns:
-        A summary `{candidates, hydrated, skipped, filled}` mapping.
+        A summary `{candidates, hydrated, skipped, timed_out, filled}` mapping.
     """
     from earthlens.ecmwf import Catalog
     from earthlens.ecmwf.catalog import CATALOG_PATH, clear_catalog_cache
@@ -333,18 +404,28 @@ def bulk_hydrate_empty(limit: int | None = None) -> dict[str, Any]:
     if limit:
         empty = empty[:limit]
 
+    total = len(empty)
     file_text: dict[Path, str] = {}
-    dirty: set[Path] = set()
     hydrated = 0
     skipped = 0
+    timed_out = 0
     filled: list[str] = []
-    for dataset_id in empty:
+    for index, dataset_id in enumerate(empty, start=1):
+        prefix = f"[{index}/{total}] {dataset_id}"
         try:
-            nc_meta = _retrieve_netcdf_vars(dataset_id)
+            nc_meta: dict[str, dict[str, Any]] | None = _retrieve_with_timeout(
+                dataset_id, timeout
+            )
+        except TimeoutError:
+            typer.echo(f"{prefix}: timed out, skipped")
+            timed_out += 1
+            skipped += 1
+            continue
         except Exception:  # noqa: BLE001 — a licence-gated / unreachable dataset is skipped
             nc_meta = None
         path = _find_file_for_dataset(catalog_dir, dataset_id) if nc_meta else None
         if not nc_meta or path is None:
+            typer.echo(f"{prefix}: skipped")
             skipped += 1
             continue
         if path not in file_text:
@@ -352,18 +433,19 @@ def bulk_hydrate_empty(limit: int | None = None) -> dict[str, Any]:
         new_text = _rewrite_stanza(file_text[path], dataset_id, nc_meta)
         if new_text != file_text[path]:
             file_text[path] = new_text
-            dirty.add(path)
+            path.write_text(new_text, encoding="utf-8")
             hydrated += 1
             filled.append(dataset_id)
+            typer.echo(f"{prefix}: hydrated -> {path.name}")
         else:
+            typer.echo(f"{prefix}: skipped")
             skipped += 1
 
-    for path in dirty:
-        path.write_text(file_text[path], encoding="utf-8")
     clear_catalog_cache()
     return {
-        "candidates": len(empty),
+        "candidates": total,
         "hydrated": hydrated,
         "skipped": skipped,
+        "timed_out": timed_out,
         "filled": filled,
     }

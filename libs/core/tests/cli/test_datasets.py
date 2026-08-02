@@ -510,22 +510,60 @@ class TestCurate:
         """ecmwf --fill-empty --write drives the ecmwf hydrate and reports a summary."""
         from earthlens.cli import _ecmwf_hydrate as ecmwf_hydrate_mod
 
-        monkeypatch.setattr(
-            ecmwf_hydrate_mod,
-            "bulk_hydrate_empty",
-            lambda limit=None: {
+        calls = {}
+
+        def fake_hydrate(limit=None, timeout=None):
+            calls["limit"] = limit
+            calls["timeout"] = timeout
+            return {
                 "candidates": 4,
                 "hydrated": 3,
                 "skipped": 1,
+                "timed_out": 0,
                 "filled": ["a", "b", "c"],
-            },
-        )
+            }
+
+        monkeypatch.setattr(ecmwf_hydrate_mod, "bulk_hydrate_empty", fake_hydrate)
         result = runner.invoke(
             app, ["datasets", "curate", "ecmwf", "--fill-empty", "--write"]
         )
         assert result.exit_code == 0, f"ecmwf fill-empty failed: {result.output}"
         assert "hydrated 3" in result.output
         assert "/ 4" in result.output
+        assert calls["timeout"] == 180, "the default --timeout is threaded through"
+
+    def test_fill_empty_ecmwf_threads_custom_timeout(self, monkeypatch):
+        """A custom --timeout is passed to the ecmwf hydrate; 0 means no deadline."""
+        from earthlens.cli import _ecmwf_hydrate as ecmwf_hydrate_mod
+
+        calls = {}
+
+        def fake_hydrate(limit=None, timeout=None):
+            calls["timeout"] = timeout
+            return {
+                "candidates": 1,
+                "hydrated": 0,
+                "skipped": 1,
+                "timed_out": 1,
+                "filled": [],
+            }
+
+        monkeypatch.setattr(ecmwf_hydrate_mod, "bulk_hydrate_empty", fake_hydrate)
+        result = runner.invoke(
+            app,
+            [
+                "datasets",
+                "curate",
+                "ecmwf",
+                "--fill-empty",
+                "--write",
+                "--timeout",
+                "0",
+            ],
+        )
+        assert result.exit_code == 0, f"ecmwf fill-empty failed: {result.output}"
+        assert calls["timeout"] is None, "--timeout 0 becomes no deadline (None)"
+        assert "1 timed out" in result.output, "timed-out count is surfaced"
 
     def test_fill_empty_unsupported_provider(self):
         """--fill-empty on a provider that is neither gee nor ecmwf is rejected."""
