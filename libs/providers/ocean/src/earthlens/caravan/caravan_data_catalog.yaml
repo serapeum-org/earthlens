@@ -1,0 +1,634 @@
+# Caravan large-sample hydrology catalog.
+#
+# Caravan (Kratzert et al., Sci Data 10, 61 (2023)) publishes per-catchment daily
+# streamflow plus ERA5-Land meteorological forcing, static attributes and basin
+# polygons as static archives on Zenodo. One `extensions:` row = one Zenodo
+# record set; a `sources:` entry = one directory *inside* an archive.
+#
+# Every row pins a SPECIFIC Zenodo version record, never the moving concept DOI,
+# so a request is reproducible. Caravan is a versioned historical archive, not a
+# live feed — see `data_period` on each row, and use `usgs_water` (US
+# near-real-time) or GloFAS for current discharge.
+#
+# `archive_format` drives the transport: `zip` archives are read in place over
+# HTTP Range requests (a member costs ~2 MB against a multi-GB archive), while
+# `tar.gz` is a single gzip stream that cannot be seeked and must be downloaded
+# whole. Sizes and md5 checksums below come from the Zenodo REST API on
+# 2026-08-01; check them for drift with `earthlens datasets refresh caravan`.
+
+# Friendly variable name -> the real Caravan column name.
+#
+# Column ORDER differs between archives (some alphabetical, some grouped by
+# statistic), so selection is always by name. Three column-set variants exist:
+#   * current (v1.5+): the split ERA5-Land / FAO Penman-Monteith PET pair.
+#   * legacy (base v1.2 and earlier): one `potential_evaporation_sum`, named
+#     here as `legacy_column` on `potential_evaporation`.
+#   * Caravan-DE only: two extra observed columns, flagged via `sources`.
+variables:
+  streamflow:
+    column: streamflow
+    units: mm/d
+    description: Observed daily discharge, normalised by catchment area.
+  total_precipitation:
+    column: total_precipitation_sum
+    units: mm/d
+    description: Daily total precipitation (ERA5-Land).
+  potential_evaporation:
+    column: potential_evaporation_sum_ERA5_LAND
+    legacy_column: potential_evaporation_sum
+    units: mm/d
+    description: Daily potential evaporation as provided by ERA5-Land.
+  potential_evaporation_fao:
+    column: potential_evaporation_sum_FAO_PENMAN_MONTEITH
+    units: mm/d
+    description: Daily potential evaporation from FAO Penman-Monteith (v1.5+).
+  temperature_2m_min:
+    column: temperature_2m_min
+    units: degC
+    description: Daily minimum air temperature 2 m above ground.
+  temperature_2m_mean:
+    column: temperature_2m_mean
+    units: degC
+    description: Daily mean air temperature 2 m above ground.
+  temperature_2m_max:
+    column: temperature_2m_max
+    units: degC
+    description: Daily maximum air temperature 2 m above ground.
+  dewpoint_temperature_2m_min:
+    column: dewpoint_temperature_2m_min
+    units: degC
+    description: Daily minimum dewpoint temperature 2 m above ground.
+  dewpoint_temperature_2m_mean:
+    column: dewpoint_temperature_2m_mean
+    units: degC
+    description: Daily mean dewpoint temperature 2 m above ground.
+  dewpoint_temperature_2m_max:
+    column: dewpoint_temperature_2m_max
+    units: degC
+    description: Daily maximum dewpoint temperature 2 m above ground.
+  snow_depth_water_equivalent_min:
+    column: snow_depth_water_equivalent_min
+    units: mm
+    description: Daily minimum snow water equivalent.
+  snow_depth_water_equivalent_mean:
+    column: snow_depth_water_equivalent_mean
+    units: mm
+    description: Daily mean snow water equivalent.
+  snow_depth_water_equivalent_max:
+    column: snow_depth_water_equivalent_max
+    units: mm
+    description: Daily maximum snow water equivalent.
+  surface_net_solar_radiation_min:
+    column: surface_net_solar_radiation_min
+    units: W/m2
+    description: Daily minimum net shortwave radiation at the surface.
+  surface_net_solar_radiation_mean:
+    column: surface_net_solar_radiation_mean
+    units: W/m2
+    description: Daily mean net shortwave radiation at the surface.
+  surface_net_solar_radiation_max:
+    column: surface_net_solar_radiation_max
+    units: W/m2
+    description: Daily maximum net shortwave radiation at the surface.
+  surface_net_thermal_radiation_min:
+    column: surface_net_thermal_radiation_min
+    units: W/m2
+    description: Daily minimum net longwave radiation at the surface.
+  surface_net_thermal_radiation_mean:
+    column: surface_net_thermal_radiation_mean
+    units: W/m2
+    description: Daily mean net longwave radiation at the surface.
+  surface_net_thermal_radiation_max:
+    column: surface_net_thermal_radiation_max
+    units: W/m2
+    description: Daily maximum net longwave radiation at the surface.
+  surface_pressure_min:
+    column: surface_pressure_min
+    units: kPa
+    description: Daily minimum surface air pressure.
+  surface_pressure_mean:
+    column: surface_pressure_mean
+    units: kPa
+    description: Daily mean surface air pressure.
+  surface_pressure_max:
+    column: surface_pressure_max
+    units: kPa
+    description: Daily maximum surface air pressure.
+  u_component_of_wind_10m_min:
+    column: u_component_of_wind_10m_min
+    units: m/s
+    description: Daily minimum eastward wind component 10 m above ground.
+  u_component_of_wind_10m_mean:
+    column: u_component_of_wind_10m_mean
+    units: m/s
+    description: Daily mean eastward wind component 10 m above ground.
+  u_component_of_wind_10m_max:
+    column: u_component_of_wind_10m_max
+    units: m/s
+    description: Daily maximum eastward wind component 10 m above ground.
+  v_component_of_wind_10m_min:
+    column: v_component_of_wind_10m_min
+    units: m/s
+    description: Daily minimum northward wind component 10 m above ground.
+  v_component_of_wind_10m_mean:
+    column: v_component_of_wind_10m_mean
+    units: m/s
+    description: Daily mean northward wind component 10 m above ground.
+  v_component_of_wind_10m_max:
+    column: v_component_of_wind_10m_max
+    units: m/s
+    description: Daily maximum northward wind component 10 m above ground.
+  volumetric_soil_water_layer_1_min:
+    column: volumetric_soil_water_layer_1_min
+    units: m3/m3
+    description: Daily minimum soil moisture, layer 1 (0-7 cm).
+  volumetric_soil_water_layer_1_mean:
+    column: volumetric_soil_water_layer_1_mean
+    units: m3/m3
+    description: Daily mean soil moisture, layer 1 (0-7 cm).
+  volumetric_soil_water_layer_1_max:
+    column: volumetric_soil_water_layer_1_max
+    units: m3/m3
+    description: Daily maximum soil moisture, layer 1 (0-7 cm).
+  volumetric_soil_water_layer_2_min:
+    column: volumetric_soil_water_layer_2_min
+    units: m3/m3
+    description: Daily minimum soil moisture, layer 2 (7-28 cm).
+  volumetric_soil_water_layer_2_mean:
+    column: volumetric_soil_water_layer_2_mean
+    units: m3/m3
+    description: Daily mean soil moisture, layer 2 (7-28 cm).
+  volumetric_soil_water_layer_2_max:
+    column: volumetric_soil_water_layer_2_max
+    units: m3/m3
+    description: Daily maximum soil moisture, layer 2 (7-28 cm).
+  volumetric_soil_water_layer_3_min:
+    column: volumetric_soil_water_layer_3_min
+    units: m3/m3
+    description: Daily minimum soil moisture, layer 3 (28-100 cm).
+  volumetric_soil_water_layer_3_mean:
+    column: volumetric_soil_water_layer_3_mean
+    units: m3/m3
+    description: Daily mean soil moisture, layer 3 (28-100 cm).
+  volumetric_soil_water_layer_3_max:
+    column: volumetric_soil_water_layer_3_max
+    units: m3/m3
+    description: Daily maximum soil moisture, layer 3 (28-100 cm).
+  volumetric_soil_water_layer_4_min:
+    column: volumetric_soil_water_layer_4_min
+    units: m3/m3
+    description: Daily minimum soil moisture, layer 4 (100-289 cm).
+  volumetric_soil_water_layer_4_mean:
+    column: volumetric_soil_water_layer_4_mean
+    units: m3/m3
+    description: Daily mean soil moisture, layer 4 (100-289 cm).
+  volumetric_soil_water_layer_4_max:
+    column: volumetric_soil_water_layer_4_max
+    units: m3/m3
+    description: Daily maximum soil moisture, layer 4 (100-289 cm).
+  discharge_efas:
+    column: dis_efas5
+    units: mm/d
+    sources: [camelses]
+    description: >-
+      EFAS v5 simulated discharge, normalised like `streamflow` so the two are
+      directly comparable (Caravan-ES only).
+  precipitation_emo1:
+    column: pr_emo1
+    units: mm/d
+    sources: [camelses]
+    description: Daily precipitation from the EMO-1 1 km grid (Caravan-ES only).
+  potential_evaporation_emo1:
+    column: e0_emo1
+    units: mm/d
+    sources: [camelses]
+    description: Daily potential evaporation from EMO-1 (Caravan-ES only).
+  temperature_emo1:
+    column: ta_emo1
+    units: degC
+    sources: [camelses]
+    description: Daily mean air temperature from EMO-1 (Caravan-ES only).
+  streamflow_vol:
+    column: streamflow_vol
+    units: m3/s
+    sources: [camelsde]
+    description: Observed discharge as a volumetric rate (Caravan-DE only).
+  water_level:
+    column: water_level
+    units: m
+    sources: [camelsde]
+    description: Observed gauge water level (Caravan-DE only).
+
+extensions:
+  base:
+    title: Caravan - a global community dataset for large-sample hydrology
+    # Since v1.6 base spans TWO Zenodo concepts, one per timeseries filetype.
+    # This is the netCDF concept; the CSV concept is 10.5281/zenodo.15530021.
+    # The authoritative pointer for a fetch is `files.<fmt>.record`, which is
+    # per-format; `doi` below names the netCDF record for the same reason.
+    concept_doi: 10.5281/zenodo.6522634
+    concept_doi_csv: 10.5281/zenodo.15530021
+    license: CC-BY-4.0
+    attribution: >-
+      Kratzert et al. (2023), Caravan - A global community dataset for
+      large-sample hydrology, Scientific Data 10, 61. Cite the source datasets
+      (CAMELS-US/AUS/BR/CL/GB, HYSETS, LamaH-CE) alongside Caravan itself.
+    license_file: licenses/<source>/license_<source>.md
+    # Per-source counts are MEASURED from the v1.2 archive - the newest base
+    # release that can be indexed without a 25 GB download - and therefore sum
+    # to 6,830, that release's total. v1.4 added 9,130 gauges and v1.6 moved
+    # CAMELS-AUS to v2 (150 -> 561), so they do NOT describe the default 1.6
+    # release; its total is on the version row.
+    sources:
+      camels: {n_catchments: 482, name: CAMELS-US}
+      camelsaus: {n_catchments: 150, name: CAMELS-AUS}
+      camelsbr: {n_catchments: 376, name: CAMELS-BR}
+      camelscl: {n_catchments: 314, name: CAMELS-CL}
+      camelsgb: {n_catchments: 408, name: CAMELS-GB}
+      hysets: {n_catchments: 4621, name: HYSETS}
+      lamah: {n_catchments: 479, name: LamaH-CE}
+    default_version: "1.6"
+    versions:
+      # The current release. Both formats are `tar.gz` - a single gzip stream
+      # that cannot be seeked - so reaching one catchment means downloading the
+      # whole archive. Guarded behind `allow_full_download=True`.
+      "1.6":
+        doi: 10.5281/zenodo.15529786
+        release_date: "2025-05-27"
+        data_period: [1950, 2023]
+        # Measured by downloading and indexing the archive (2026-08-02): 16,299
+        # across camels 671, camelsaus 561, camelsbr 870, camelscl 505,
+        # camelsgb 671, hysets 12162, lamah 859.
+        n_catchments: 16299
+        n_catchments_verified: true
+        column_set: current
+        files:
+          csv:
+            record: 15530022
+            name: Caravan-csv.tar.gz
+            size: 28951089034
+            md5: ede5b507bd7e7ab9558d8ab1cedf65b1
+            archive_format: tar.gz
+            root_prefix: Caravan-csv/
+          netcdf:
+            record: 15529786
+            name: Caravan-nc.tar.gz
+            size: 24775734275
+            md5: ad3a7767db059f218380e9cce5f72452
+            archive_format: tar.gz
+            # Measured 2026-08-02 without downloading the 24.8 GB archive: a
+            # gzip stream cannot be seeked, but it decodes from its start, and
+            # the first tar header sits in the first 512 bytes of the inflated
+            # stream - so 0.52 MB of range-read reveals the root directory.
+            root_prefix: Caravan-nc/
+      # The newest range-readable base: a zip, so one catchment costs ~3 MB.
+      # A materially different dataset, not merely an older cut - 6,830 of the
+      # ~16,300 catchments, forcing stops in 2020, and a single PET column.
+      "1.2":
+        doi: 10.5281/zenodo.7944025
+        release_date: "2023-05-17"
+        data_period: [1981, 2020]
+        n_catchments: 6830
+        n_catchments_verified: true
+        column_set: legacy
+        files:
+          csv:
+            record: 7944025
+            name: Caravan.zip
+            size: 12515557400
+            md5: bd9d6e9dd1d0da0731b53678f551f8f9
+            archive_format: zip
+            root_prefix: Caravan/
+          netcdf:
+            record: 7944025
+            name: Caravan.zip
+            size: 12515557400
+            md5: bd9d6e9dd1d0da0731b53678f551f8f9
+            archive_format: zip
+            root_prefix: Caravan/
+
+  grdc:
+    title: >-
+      GRDC-Caravan - extending the original dataset with data from the Global
+      Runoff Data Centre
+    concept_doi: 10.5281/zenodo.8425586
+    license: CC-BY-4.0
+    attribution: >-
+      Faerber, C., Bertola, M., et al. GRDC-Caravan. Data provided by the Global
+      Runoff Data Centre (GRDC), Koblenz, Germany. Per-country upstream licences
+      are listed in `licenses/grdc/LicensesCaravan.xlsx` inside the archive.
+    license_file: licenses/grdc/license_grdc.md
+    # The open, redistributable subset of GRDC. The restricted GRDC stations
+    # are portal-only and out of scope - see docs/reference/deferred-providers.md.
+    sources:
+      grdc: {n_catchments: 5356, name: Global Runoff Data Centre (open subset)}
+    default_version: "0.6"
+    versions:
+      "0.6":
+        doi: 10.5281/zenodo.15349031
+        release_date: "2025-05-06"
+        data_period: [1950, 2023]
+        n_catchments: 5356
+        n_catchments_verified: true
+        column_set: current
+        files:
+          csv:
+            record: 15349031
+            name: GRDC_Caravan_extension_csv.zip
+            size: 8842746230
+            md5: 2689c2bff8807f53c3de127827a3cd16
+            archive_format: zip
+            root_prefix: GRDC_Caravan_extension_csv/
+          netcdf:
+            record: 15349031
+            name: GRDC_Caravan_extension_nc.zip
+            size: 7575685313
+            md5: c88a29fe7c90b5248a03d35d92b2815d
+            archive_format: zip
+            root_prefix: GRDC_Caravan_extension_nc/
+
+  germany:
+    title: Caravan-DE - Caravan extension Germany
+    concept_doi: 10.5281/zenodo.13320514
+    license: CC-BY-4.0
+    attribution: >-
+      Loritz, R. et al., Caravan-DE - Caravan extension Germany, derived from
+      CAMELS-DE. Cite Caravan and CAMELS-DE alongside this extension.
+    license_file: licenses/camelsde/license_camelsde.md
+    sources:
+      camelsde: {n_catchments: 1887, name: CAMELS-DE}
+    default_version: "1.1.1"
+    versions:
+      "1.1.1":
+        doi: 10.5281/zenodo.14755229
+        release_date: "2025-01-28"
+        data_period: [1951, 2020]
+        n_catchments: 1887
+        n_catchments_verified: true
+        # Adds two observed columns absent from every other archive.
+        column_set: camelsde
+        files:
+          csv:
+            record: 14755229
+            name: caravan_de.zip
+            size: 6085830462
+            md5: 33a5a0cb3136c7c8bed5a484725faf37
+            archive_format: zip
+            root_prefix: null
+          netcdf:
+            record: 14755229
+            name: caravan_de.zip
+            size: 6085830462
+            md5: 33a5a0cb3136c7c8bed5a484725faf37
+            archive_format: zip
+            root_prefix: null
+
+  czechia:
+    title: >-
+      CAMELS-CZ: Catchment Attributes and Meteorology for Large-Sample Studies -
+      Czechia (Caravan extension)
+    concept_doi: 10.5281/zenodo.17338510
+    license: CC-BY-4.0
+    attribution: >-
+      CAMELS-CZ / Caravan-Extension-CZ. Cite Caravan and CAMELS-CZ alongside
+      this extension.
+    # Note the singular directory: this archive uses `license/`, unlike the
+    # `licenses/` every other extension ships.
+    license_file: license/camelscz/license_caravan_cz.md
+    # The record also publishes CAMELS-CZ.zip and CAMELS-CZ-Hourly.zip, which are
+    # the native CAMELS format rather than Caravan's - only the file below is
+    # Caravan-shaped, so only it is pinned.
+    sources:
+      camelscz: {n_catchments: 249, name: CAMELS-CZ}
+    # The attribute table carries 250 rows against 249 timeseries members; the
+    # extra row simply has no series and is skipped by the id resolution.
+    default_version: "2025-11-30"
+    versions:
+      "2025-11-30":
+        doi: 10.5281/zenodo.17769325
+        release_date: "2025-11-30"
+        # The most recent series of any extension - it runs to mid-2025 where
+        # GRDC stops in 2023.
+        data_period: [1950, 2025]
+        n_catchments: 249
+        n_catchments_verified: true
+        column_set: current
+        files:
+          csv:
+            record: 17769325
+            name: Caravan-Extension-CZ.zip
+            size: 913172886
+            md5: 201ca7897c52adca3ca32811c0f6d457
+            archive_format: zip
+            root_prefix: Caravan-Extension-CZ/
+          netcdf:
+            record: 17769325
+            name: Caravan-Extension-CZ.zip
+            size: 913172886
+            md5: 201ca7897c52adca3ca32811c0f6d457
+            archive_format: zip
+            root_prefix: Caravan-Extension-CZ/
+
+  spain:
+    title: >-
+      CAMELS-ES: Catchment Attributes and Meteorology for Large-Sample Studies -
+      Spain (Caravan extension)
+    concept_doi: 10.5281/zenodo.8373020
+    license: CC-BY-4.0
+    attribution: >-
+      CAMELS-ES. Includes EFAS v5 and EMO-1 fields from the Copernicus Emergency
+      Management Service. Cite Caravan and CAMELS-ES alongside this extension.
+    license_file: licenses/camelses/license_camelses.txt
+    # Caravan-ES ships three EFAS attribute tables beyond the standard three.
+    # `attributes_efas_model_parameters_camelses.csv` is reachable; the other two
+    # are named `atributes_...` upstream (missing a `b`) and so match no pattern.
+    # None is needed by this backend - `with_attributes` merges the `other` and
+    # `caravan` tables - so they are recorded rather than worked around.
+    sources:
+      camelses: {n_catchments: 269, name: CAMELS-ES}
+    default_version: "1.1.0"
+    versions:
+      "1.1.0":
+        doi: 10.5281/zenodo.15040948
+        release_date: "2025-03-17"
+        # Hydrological years: the series runs 1990-10-01 to 2020-09-30.
+        data_period: [1990, 2020]
+        n_catchments: 269
+        n_catchments_verified: true
+        # `current` plus four EFAS/EMO-1 columns, flagged on their variables.
+        column_set: camelses
+        files:
+          csv:
+            record: 15040948
+            name: CAMELS-ES_v110.zip
+            size: 402788602
+            md5: 7c61bcd8d33a34b094997e651b8d4c85
+            archive_format: zip
+            root_prefix: v110/
+          netcdf:
+            record: 15040948
+            name: CAMELS-ES_v110.zip
+            size: 402788602
+            md5: 7c61bcd8d33a34b094997e651b8d4c85
+            archive_format: zip
+            root_prefix: v110/
+
+  denmark:
+    title: Caravan extension Denmark - Danish dataset for large-sample hydrology
+    concept_doi: 10.5281/zenodo.6645861
+    license: CC-BY-4.0
+    attribution: >-
+      Koch, J., Caravan extension Denmark, derived from CAMELS-DK. Cite Caravan
+      and CAMELS-DK alongside this extension.
+    license_file: licenses/camelsdk/license_camelsdk.md
+    sources:
+      camelsdk: {n_catchments: 308, name: CAMELS-DK}
+    default_version: "2025-04-11"
+    versions:
+      "2025-04-11":
+        doi: 10.5281/zenodo.15200118
+        release_date: "2025-04-11"
+        data_period: [1981, 2020]
+        n_catchments: 308
+        n_catchments_verified: true
+        column_set: current
+        files:
+          csv:
+            record: 15200118
+            name: Caravan_extension_DK.zip
+            size: 521600377
+            md5: 81c5c27be1337a6df49c785dc5b24a24
+            archive_format: zip
+            root_prefix: null
+          netcdf:
+            record: 15200118
+            name: Caravan_extension_DK.zip
+            size: 521600377
+            md5: 81c5c27be1337a6df49c785dc5b24a24
+            archive_format: zip
+            root_prefix: null
+
+  israel:
+    title: Caravan extension Israel - Israel dataset for large-sample hydrology
+    concept_doi: 10.5281/zenodo.7758515
+    license: CC-BY-4.0
+    attribution: >-
+      Caravan extension Israel. Streamflow data provided by the Israeli
+      Hydrological Service. Cite Caravan alongside this extension.
+    license_file: licenses/il/license_caravan_il.md
+    sources:
+      il: {n_catchments: 95, name: Israeli Hydrological Service}
+    default_version: "4"
+    versions:
+      "4":
+        doi: 10.5281/zenodo.15181680
+        release_date: "2025-04-09"
+        data_period: [1950, 2024]
+        n_catchments: 95
+        n_catchments_verified: true
+        column_set: current
+        files:
+          csv:
+            record: 15181680
+            name: Caravan_extension_Israel_Ver4.zip
+            size: 294290689
+            md5: 4b591229905677413ec5d305a84de127
+            archive_format: zip
+            root_prefix: Caravan_extension_Israel_Ver4/
+          netcdf:
+            record: 15181680
+            name: Caravan_extension_Israel_Ver4.zip
+            size: 294290689
+            md5: 4b591229905677413ec5d305a84de127
+            archive_format: zip
+            root_prefix: Caravan_extension_Israel_Ver4/
+
+# Informational index of every Caravan record known on Zenodo, including the
+# ones this backend deliberately does not wrap. Regenerated by
+# `earthlens datasets refresh caravan`; nothing reads it at runtime.
+available_extensions:
+  - key: base
+    supported: true
+  - key: grdc
+    supported: true
+  - key: germany
+    supported: true
+  - key: czechia
+    supported: true
+  - key: spain
+    supported: true
+  - key: denmark
+    supported: true
+  - key: israel
+    supported: true
+  - key: multimet
+    supported: false
+    records: [14196771, 14196772]
+    reason: >-
+      Caravan MultiMet ships zarr cubes of nowcast/forecast products (CPC,
+      IMERG v07, CHIRPS, IFS-HRES, GraphCast, CHIRPS-GEFS) with lead-time bands
+      on a UTC-0 time base. That is a gridded/cube shape, not the per-catchment
+      daily table this backend returns, so it needs its own backend.
+  - key: mswep4caravan
+    supported: false
+    records: [19199860]
+    reason: >-
+      MSWEP4Caravan is a Caravan-shaped rainfall-runoff dataset, but it is
+      CC-BY-NC-4.0. earthlens makes no assumption about a user's commercial
+      status, so non-commercial sources stay out of the default integration
+      path - the same rule applied to the NC providers in
+      docs/reference/deferred-providers.md.
+  - key: caravan-qual
+    supported: false
+    records: [21337532]
+    reason: >-
+      Caravan-Qual (lite) is CC-BY-4.0 but is not in the Caravan timeseries
+      layout: its tables are per-PARAMETER water-quality files
+      (`wqms-csv/BOD7.csv`, `pH.csv`, ...) plus zarr cubes, not per-catchment
+      daily series. Verified by opening the archive - it exposes no
+      `timeseries/<fmt>/<source>/` members at all.
+  - key: iceland
+    supported: false
+    reason: >-
+      The Caravan extension Iceland (lamahice) is published on HydroShare
+      rather than Zenodo, and is CC-BY-NC-4.0. Both put it outside what this
+      backend fetches; see the project's data-contribution thread #27.
+  - key: aus-vic
+    supported: false
+    records: [18736844]
+    reason: >-
+      Caravan-AUS-VIC (Maribyrnong River, Victoria) was published to Zenodo and
+      then DELETED by its author on 2026-03-01 - the record now returns HTTP 410
+      with a tombstone. There is nothing to fetch.
+  - key: camels-de-native
+    supported: false
+    records: [16755906]
+    reason: >-
+      The native CAMELS-DE dataset, a different Zenodo concept from the
+      Caravan-DE extension already wrapped as `germany`. Not in the Caravan
+      layout.
+  - key: deep-learning-in-hydrology
+    supported: false
+    records: [13975174]
+    reason: >-
+      A paper's supporting data, not a Caravan extension. Matches the discovery
+      search only because it is hydrological.
+  - key: floodnarrator
+    supported: false
+    records: [19657154]
+    reason: >-
+      A language-model paper, not a dataset. Matches the discovery search only
+      because it is hydrological.
+  - key: camels-ch
+    supported: false
+    records: [15025258]
+    reason: >-
+      CAMELS-CH is published in the native CAMELS layout rather than Caravan's -
+      verified by opening the archive, which exposes no
+      `timeseries/<fmt>/<source>/` members. Not reachable through this backend.
+  - key: gages-ii
+    supported: false
+    reason: >-
+      Announced in the project's data-contribution thread #24 but never
+      published with a DOI; the thread points at an earlier discussion with no
+      dataset attached. Nothing to pin.

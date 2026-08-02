@@ -33,7 +33,12 @@ from earthlens.base.catalog_source import (
     load_catalog,
     yaml_files_for,
 )
-from earthlens.base.http import HttpClient, redact_url
+from earthlens.base.http import (
+    HttpClient,
+    HttpRangeFile,
+    RangeReadError,
+    redact_url,
+)
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.naming import safe_filename
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
@@ -69,6 +74,7 @@ __all__ = [
     "estimate_pixel_dims",
     "FluxableLeaf",
     "HttpClient",
+    "HttpRangeFile",
     "LazyClientMixin",
     "load_catalog",
     "load_providers",
@@ -78,6 +84,7 @@ __all__ = [
     "OutputKind",
     "PolygonAoiWarning",
     "Provider",
+    "RangeReadError",
     "redact_url",
     "region_affinity",
     "RemoteProduct",

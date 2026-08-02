@@ -15,16 +15,91 @@ name: Tests - E2E (live CDS + GEE + STAC)
 permissions:
   contents: read
 
+# This workflow has no `pull_request` trigger, so the expression below is
+# always false and the block only SERIALISES: two dispatches on the same ref
+# queue instead of burning CDS quota twice over, which is what you want
+# against rate- and quota-limited services.
+#
+# The expression is kept rather than hard-coded `false` so the PR-cancel half
+# switches on by itself if a `pull_request` trigger is ever added - at which
+# point re-read it, because cancelling a half-finished live run mid-flight is
+# not obviously right for this suite.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 on:
   schedule:
     - cron: '0 4 * * 0'
   workflow_dispatch:
 
 jobs:
-  e2e-cds:
+  # Every suite without a dedicated lane below, CDS included - but split one
+  # job per distribution instead of one job for all of them.
+  #
+  # Why: pytest runs a suite in ONE process, and a native crash kills that
+  # process rather than failing a test. Until 2026-08-02 this was a single job
+  # covering ~38 suites, and it had been dying since at least 2026-07-19 on a
+  # segfault in `hazards/tests/admin` (issue #925). `hazards` sorts 16th of 47,
+  # so the 23 suites behind it silently never ran while the job reported one
+  # generic failure that read like ordinary live-service flakiness.
+  #
+  # Splitting bounds the blast radius to one distribution, and `fail-fast:
+  # false` stops one crash cancelling the others mid-flight.
+  e2e-shared:
     runs-on: ubuntu-latest
     # Only run when credentials are available (the main repo). Forks
     # have no secrets and would 401 immediately.
+    if: github.repository == 'serapeum-org/earthlens'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - libs/core
+          - libs/providers/atmosphere
+          - libs/providers/hazards
+          - libs/providers/imagery
+          - libs/providers/land
+          - libs/providers/ocean
+
+    name: e2e-shared (${{ matrix.package }})
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
+        with:
+          python-version: "3.12"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          version: "0.11.29"
+
+      - name: Run live e2e tests
+        env:
+          CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
+          CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
+        run: |
+          # The marker exclusions drop the suites that have their own lane
+          # below; the deselect drops the one test that segfaults the
+          # interpreter on Linux (issue #925) - it passes locally in ~6 s, so
+          # it is dropped here rather than skipped in the test file. Removing
+          # this line once #925 is fixed also brings back the three admin
+          # tests that sit behind it in the same file.
+          #
+          # The node id is relative to the PACKAGE, not the repo: each package
+          # ships its own [tool.pytest.ini_options], so passing a package path
+          # moves pytest's rootdir there. A repo-relative id silently matches
+          # nothing.
+          uv run --locked pytest ${{ matrix.package }} -v \
+            -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat and not caravan" \
+            --deselect "tests/admin/test_admin_e2e.py::TestAdminLiveFetch::test_geoboundaries_country_adm1"
+
+  e2e-caravan:
+    runs-on: ubuntu-latest
     if: github.repository == 'serapeum-org/earthlens'
 
     steps:
@@ -40,12 +115,16 @@ jobs:
           verify-lock: true
           version: "0.11.29"
 
-      - name: Run live CDS e2e tests
-        env:
-          CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
-          CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
+      - name: Run live Caravan e2e tests
+        # Anonymous static Zenodo archives, so no secrets and nothing to skip.
+        # The suite asserts a transferred-byte budget - that one catchment
+        # costs ~3 MB out of an 8.84 GB archive - so it is the regression gate
+        # for the range-read design, not a smoke test.
+        #
+        # `--locked` makes the run fail rather than silently re-resolve if
+        # uv.lock has drifted, so the versions under test are the locked ones.
         run: |
-          uv run --locked pytest -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat" -v
+          uv run --locked pytest -m "e2e and caravan" -v
 
   e2e-gee:
     runs-on: ubuntu-latest

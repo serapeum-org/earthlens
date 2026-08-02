@@ -2510,6 +2510,7 @@ version = "0.12.0"
 source = { editable = "libs/providers/ocean" }
 dependencies = [
     { name = "earthlens-core" },
+    { name = "platformdirs" },
 ]
 
 [package.optional-dependencies]
@@ -2541,6 +2542,7 @@ requires-dist = [
     { name = "earthlens-core", editable = "libs/core" },
     { name = "earthlens-core", extras = ["s3"], marker = "extra == 'nwm'", editable = "libs/core" },
     { name = "erddapy", marker = "extra == 'erddap'", specifier = ">=3.0" },
+    { name = "platformdirs", specifier = ">=3.0.0" },
     { name = "pyobis", marker = "extra == 'obis'", specifier = ">=1.6.1" },
     { name = "pyramids-gis", extras = ["parquet"], marker = "extra == 'nwm'", specifier = ">=0.46.0" },
 ]

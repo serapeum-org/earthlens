@@ -44,7 +44,8 @@ earthlens datasets refresh stac,openeo         # a comma list
 earthlens datasets validate all                # every provider
 ```
 
-Canonical ids: `airnow`, `argo`, `asf`, `bathymetry`, `chc`, `climate-indices`, `cmems`, `dem`, `earthdata`, `ecmwf`,
+Canonical ids: `airnow`, `argo`, `asf`, `bathymetry`, `caravan`, `chc`, `climate-indices`, `cmems`, `dem`, `earthdata`,
+`ecmwf`,
 `eea-aq`, `erddap`, `eumetsat`, `fdsn`, `firms`, `gbif`, `gdacs`, `gee`, `ghsl`, `glaciers`, `goes`, `hdx`, `iucn`, `jaxa`, `nwm`, `nwp`,
 `obis`, `openaq`, `openeo`, `overture`, `pvgis`, `radar`, `risk-indicators`, `s3`, `sensor-community`, `sentinel_hub`, `soilgrids`,
 `stac`, `tropycal`, `usgs_water`, `wdpa`, `worldpop`. Common aliases include `amazon-s3`, `chirps`,
@@ -54,6 +55,7 @@ Canonical ids: `airnow`, `argo`, `asf`, `bathymetry`, `chc`, `climate-indices`, 
 `nwis`/`usgs-water`, `world-pop`, `human-settlement`/`ghs`, `solar-pv` (pvgis),
 `thinkhazard`/`inform`/`gfw`/`global-forest-watch` (risk indicators),
 `rgi`/`glims`/`wgms` (glaciers), `isric` (soilgrids),
+`caravan-grdc`/`grdc-caravan` (caravan - the open GRDC discharge route),
 `earth-search`/`planetary-computer`/`cdse` (STAC endpoints). An unknown selector is a **usage error**
 (exit code `2`).
 
@@ -265,6 +267,9 @@ The authoring companion to `probe`: fetches one upstream id's metadata and emits
 `datasets:` YAML row (inferring `output_kind` / `format` / bands where it can). By default it prints the
 row to vet and paste; `--write` appends it into the catalog file. Supported providers: `earthdata`,
 `hdx`, `usgs_water`, `eumetsat`, `gee`, `jaxa`, `erddap`.
+`caravan` is deliberately absent: its rows are pinned Zenodo records whose
+archive layout a human has to inspect before bumping, so there is nothing to
+seed a stanza from. It supports `refresh` and `validate`.
 
 | Option | Meaning |
 |--------|---------|
