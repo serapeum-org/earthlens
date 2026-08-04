@@ -9,31 +9,33 @@ Two properties of the upstream shape the whole module:
 * **The data is not public.** MSWEP / MSWX carry no anonymous download.
   A non-commercial user submits a request form per product
   (`gloh2o.org/mswep`, `gloh2o.org/mswx`); on approval GloH2O shares a
-  Google-Drive folder with **that person's Google account** and emails
-  `rclone` instructions. earthlens automates *their* approved download —
-  it never obtains access on their behalf.
-* **The identity must be a human account, never a service account.**
-  Drive authorises per principal. A service account is a separate
-  principal owning its own (empty) Drive, so a folder shared with
-  `someone@gmail.com` is invisible to it: `files.list` returns an empty
-  result rather than an error, which would silently yield a partial time
-  series. Only the folder's **owner** can grant a service account
-  access, and a share recipient is a viewer who cannot re-share. So
-  :meth:`MswepAuth.configure` **rejects a service-account key up front**
-  with an explanation instead of failing opaquely later.
+  Google-Drive folder and emails `rclone` instructions. earthlens
+  automates *their* approved download — it never obtains access on their
+  behalf.
+* **A service account works — GloH2O link-shares.** The share is granted
+  *"anyone with the link"*, so any authenticated principal that knows the
+  folder id can read it (`shared: True`, but it is **not** in the
+  account's *"Shared with me"*). Verified live against the shared folders:
+  a service account listed and downloaded them fine. This overturns the
+  earlier assumption that only a human account could read the share — that
+  is true for a folder shared *directly to a user account*, which is not
+  how GloH2O shares. So any of the credential kinds below works, and the
+  simplest setup is often the machine's existing Application Default
+  Credentials.
 
 The credential-resolution ladder used by :meth:`MswepAuth.configure` is:
 
-1. An explicit `token_path` — a Google **authorized-user** JSON file
-   (`client_id` / `client_secret` / `refresh_token`), as written by
-   `google_auth_oauthlib`'s `InstalledAppFlow`.
-2. An **`rclone` remote** (`rclone_config` + `rclone_remote`). This is
-   the recommended default: GloH2O's approval email tells the user to
-   configure `rclone`, so the OAuth token usually already exists on
-   their machine and needs no second consent flow.
-3. The same two, discovered from the environment
-   (`MSWEP_TOKEN_FILE`, `MSWEP_RCLONE_CONFIG` / `RCLONE_CONFIG` /
-   `MSWEP_RCLONE_REMOTE`) and `rclone`'s default config locations.
+1. An explicit `token_path` / `service_key` file — dispatched on its
+   `type`: a Google **authorized-user** token.json (`client_id` /
+   `client_secret` / `refresh_token`), or a **service-account** key.
+2. An **`rclone` remote** (`rclone_config` + `rclone_remote`) — GloH2O's
+   approval email tells the user to configure `rclone`, so the OAuth
+   token usually already exists on their machine.
+3. The same, discovered from the environment (`MSWEP_TOKEN_FILE`,
+   `MSWEP_RCLONE_CONFIG` / `RCLONE_CONFIG` / `MSWEP_RCLONE_REMOTE`).
+4. **Application Default Credentials** (`google.auth.default`) — the
+   final fallback, so a machine already logged in via `gcloud` or a
+   `GOOGLE_APPLICATION_CREDENTIALS` key just works with no configuration.
 
 Note:
     `rclone` writes its built-in OAuth client id / secret **nowhere** —
@@ -147,76 +149,101 @@ def _import_google_modules() -> tuple[Any, Any]:
     return Credentials, build
 
 
-def reject_service_account(payload: dict[str, Any], source: str) -> None:
-    """Raise when a credential file is a service-account key.
+def credentials_from_service_account(path: Path) -> Any:
+    """Build a Drive credential from a service-account key file.
 
-    A service account cannot see a folder shared with a human account —
-    it is a distinct principal with its own Drive, and `files.list`
-    returns an empty result rather than a permission error. Catching it
-    at credential-load time converts a silent wrong answer into an
-    actionable message.
+    GloH2O link-shares its folders, so a service account reads them fine
+    (verified live) — no user consent flow needed. This is often the
+    simplest credential to supply.
 
     Args:
-        payload: The parsed JSON credential file.
-        source: Path or description of the file, quoted in the message.
-
-    Raises:
-        AuthenticationError: When `payload["type"]` is
-            `"service_account"`.
-    """
-    if payload.get("type") != "service_account":
-        return
-    email = payload.get("client_email", "<unknown>")
-    raise AuthenticationError(
-        f"{source} is a Google **service-account** key ({email}), which "
-        "cannot read the GloH2O share. Drive authorises per principal: "
-        "GloH2O shares the folder with your personal Google account, and a "
-        "service account is a separate identity whose 'Shared with me' is "
-        "empty - listing the folder would silently return nothing rather "
-        "than raise. Supply a user credential instead: an rclone remote "
-        f"(see {RCLONE_CLIENT_ID_URL}) or an authorized-user token.json."
-    )
-
-
-def credentials_from_token_file(path: Path) -> Any:
-    """Build a Drive credential from an authorized-user JSON file.
-
-    Args:
-        path: Path to a Google authorized-user file carrying
-            `client_id`, `client_secret` and `refresh_token`.
+        path: Path to a Google service-account JSON key.
 
     Returns:
-        Any: A `google.oauth2.credentials.Credentials` scoped to
+        Any: A `google.oauth2.service_account.Credentials` scoped to
             :data:`DRIVE_SCOPE`.
 
     Raises:
-        AuthenticationError: When the file is missing, is not valid
-            JSON, is a service-account key, or lacks a refresh token.
+        ImportError: When the `mswep` extra is not installed.
+    """
+    from google.oauth2 import service_account
+
+    return service_account.Credentials.from_service_account_file(
+        str(path), scopes=[DRIVE_SCOPE]
+    )
+
+
+def credentials_from_file(path: Path) -> Any:
+    """Build a Drive credential from a JSON file, dispatching on its `type`.
+
+    A service-account key and an authorized-user token.json are both
+    valid — GloH2O link-shares, so either principal can read the folder.
+
+    Args:
+        path: Path to a service-account key or an authorized-user file.
+
+    Returns:
+        Any: A scoped Google credential.
+
+    Raises:
+        AuthenticationError: When the file is missing, is not valid JSON,
+            or is an authorized-user file with no refresh token.
         ImportError: When the `mswep` extra is not installed.
     """
     credentials_cls, _ = _import_google_modules()
     if not path.exists():
         raise AuthenticationError(
-            f"MSWEP token file {path} does not exist. Mint one with "
-            "google-auth-oauthlib's InstalledAppFlow, or point "
-            f"`rclone_config=` / ${RCLONE_CONFIG_ENV} at an rclone remote."
+            f"MSWEP credential file {path} does not exist. Point "
+            f"`token_path=` / ${TOKEN_FILE_ENV} at a service-account key or an "
+            "authorized-user token.json, configure an rclone remote, or rely "
+            "on Application Default Credentials."
         )
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise AuthenticationError(
-            f"MSWEP token file {path} could not be read as JSON: "
+            f"MSWEP credential file {path} could not be read as JSON: "
             f"{type(exc).__name__}: {exc}."
         ) from exc
 
-    reject_service_account(payload, f"MSWEP token file {path}")
+    if payload.get("type") == "service_account":
+        return credentials_from_service_account(path)
+
     if not payload.get("refresh_token"):
         raise AuthenticationError(
             f"MSWEP token file {path} carries no `refresh_token`, so the "
             "credential expires within the hour and cannot renew. Re-run "
-            "the OAuth flow with `access_type='offline'`."
+            "the OAuth flow with `access_type='offline'`, or use a "
+            "service-account key instead."
         )
     return credentials_cls.from_authorized_user_info(payload, scopes=[DRIVE_SCOPE])
+
+
+# Back-compat alias: the authorized-user-or-service-account dispatcher.
+credentials_from_token_file = credentials_from_file
+
+
+def try_application_default() -> Any | None:
+    """Return Application Default Credentials scoped to Drive, or `None`.
+
+    The final fallback: a machine already authenticated via `gcloud auth
+    application-default login` or a `GOOGLE_APPLICATION_CREDENTIALS` key
+    reads the share with no MSWEP-specific configuration. Returns `None`
+    when no ADC are configured, so the caller can raise its own guidance.
+
+    Returns:
+        Any | None: A scoped credential, or `None` when ADC is absent.
+    """
+    try:
+        import google.auth
+        from google.auth.exceptions import DefaultCredentialsError
+    except ImportError:
+        return None
+    try:
+        creds, _ = google.auth.default(scopes=[DRIVE_SCOPE])
+    except DefaultCredentialsError:
+        return None
+    return creds
 
 
 def credentials_from_rclone_remote(config_path: Path, remote: str) -> Any:
@@ -496,7 +523,7 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
         """
         token_path = self._creds.resolved_token_path()
         if token_path is not None:
-            return credentials_from_token_file(token_path)
+            return credentials_from_file(token_path)
 
         config_path = self._creds.resolved_rclone_config()
         remote = self._creds.resolved_rclone_remote()
@@ -509,16 +536,21 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
                 f"Pass `rclone_remote=` or set ${RCLONE_REMOTE_ENV} to the "
                 "Drive remote you configured for the GloH2O share."
             )
+
+        adc = try_application_default()
+        if adc is not None:
+            return adc
+
         raise AuthenticationError(
             "no Google Drive credential resolved for MSWEP / MSWX. This "
             "backend automates *your own* approved GloH2O download, so it "
             "needs two things. (1) Approved access: request it at "
             f"{MSWEP_REQUEST_URL} (MSWEP) and {MSWX_REQUEST_URL} (MSWX) - "
-            "GloH2O shares a Drive folder with your Google account. (2) A "
-            "user credential for that account: configure an rclone Drive "
-            f"remote (then set ${RCLONE_REMOTE_ENV}) or point "
-            f"${TOKEN_FILE_ENV} at an authorized-user token.json. A service "
-            "account will not work - see the backend documentation."
+            "GloH2O shares a Drive folder (link-shared, so a service account "
+            "works too). (2) A credential: point "
+            f"${TOKEN_FILE_ENV} at a service-account key or an authorized-user "
+            f"token.json, configure an rclone remote (${RCLONE_REMOTE_ENV}), "
+            "or run `gcloud auth application-default login` so ADC resolves."
         )
 
     def configure(self) -> None:
@@ -529,9 +561,8 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
         credential resolution or SDK import happens in tests.
 
         Raises:
-            AuthenticationError: When the shared-folder id is missing,
-                no credential source resolves, or a resolved credential
-                is a service-account key.
+            AuthenticationError: When the shared-folder id is missing or
+                no credential source resolves.
             ImportError: When the `mswep` extra is not installed.
         """
         if self.is_authenticated():
