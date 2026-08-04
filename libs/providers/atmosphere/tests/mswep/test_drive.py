@@ -134,69 +134,47 @@ class TestFindChildrenByName:
 
 
 class TestRootResolver:
-    """Version to root-folder resolution (`C8` / `G8`)."""
+    """The shared `folder_id` is the version root itself (`C8` / `G8`)."""
 
-    def test_resolves_the_default_version(self, share):
-        """With no version named, the catalog default is used."""
-        resolver = RootResolver(share, "SHARE", Catalog())
-        assert resolver.resolve("mswep").name == "MSWEP_V315"
+    def test_returns_the_shared_folder_as_the_root(self, share):
+        """`resolve` returns the folder pointed at, read from Drive."""
+        root_id = share.path_id("MSWEP_V315")
+        resolver = RootResolver(share, root_id, Catalog())
+        entry = resolver.resolve("mswep")
+        assert entry.id == root_id
+        assert entry.name == "MSWEP_V315"
 
-    def test_resolves_an_explicit_version(self, share):
-        """A named version picks its own coexisting root."""
-        resolver = RootResolver(share, "SHARE", Catalog())
+    def test_the_folder_decides_the_version_not_the_arg(self, share):
+        """Pointing at the v2.80 folder yields it regardless of the version arg."""
+        root_id = share.path_id("MSWEP_V280")
+        resolver = RootResolver(share, root_id, Catalog())
         assert resolver.resolve("mswep", "2.80").name == "MSWEP_V280"
 
     def test_resolves_the_other_product(self, share):
-        """MSWX resolves under its own root."""
-        resolver = RootResolver(share, "SHARE", Catalog())
+        """MSWX's shared folder resolves to its own root."""
+        root_id = share.path_id("MSWX_V100")
+        resolver = RootResolver(share, root_id, Catalog())
         assert resolver.resolve("mswx").name == "MSWX_V100"
 
     def test_unknown_version_lists_the_known_ones(self, share):
         """A version the catalog never heard of names the valid keys."""
-        resolver = RootResolver(share, "SHARE", Catalog())
+        resolver = RootResolver(share, share.path_id("MSWEP_V315"), Catalog())
         with pytest.raises(ValueError, match=r"known mswep version"):
             resolver.resolve("mswep", "9.99")
 
-    def test_provisional_root_is_refused(self, share):
-        """The unverified V3.16 root name will not resolve silently."""
-        resolver = RootResolver(share, "SHARE", Catalog())
-        with pytest.raises(ProvisionalValueError, match="provisional"):
-            resolver.resolve("mswep", "3.16")
-
-    def test_absent_root_lists_what_is_present(self, drive):
-        """A catalog root missing from the share names the roots that exist."""
-        drive.add_folder("MSWEP_V999", "SHARE")
-        resolver = RootResolver(drive, "SHARE", Catalog())
-        with pytest.raises(ValueError, match="MSWEP_V999"):
-            resolver.resolve("mswep")
-
-    def test_absent_root_message_explains_renaming(self, drive):
-        """The error says GloH2O renames the folder between releases."""
-        drive.add_folder("MSWEP_V999", "SHARE")
-        resolver = RootResolver(drive, "SHARE", Catalog())
-        with pytest.raises(ValueError, match="stamps the version"):
-            resolver.resolve("mswep")
-
-    def test_empty_share_reports_none_present(self, drive):
-        """An empty share still produces an actionable message."""
-        resolver = RootResolver(drive, "SHARE", Catalog())
-        with pytest.raises(ValueError, match="<none>"):
-            resolver.resolve("mswep")
-
-    def test_share_roots_are_cached(self, share):
-        """The root listing is fetched once per resolver, not per request."""
-        resolver = RootResolver(share, "SHARE", Catalog())
-        resolver.resolve("mswep")
-        after_first = len(share.list_calls)
-        resolver.resolve("mswep", "2.80")
-        resolver.resolve("mswx")
-        assert len(share.list_calls) == after_first
-
     def test_unknown_product_raises(self, share):
         """An unknown product key is rejected by the catalog."""
-        resolver = RootResolver(share, "SHARE", Catalog())
+        resolver = RootResolver(share, share.path_id("MSWEP_V315"), Catalog())
         with pytest.raises(ValueError, match="not in the MSWEP catalog"):
             resolver.resolve("nope")
+
+    def test_root_metadata_is_fetched_once(self, share):
+        """The folder's metadata is read once per resolver, then cached."""
+        resolver = RootResolver(share, share.path_id("MSWEP_V315"), Catalog())
+        first = resolver.resolve("mswep")
+        again = resolver.resolve("mswep")
+        # The root DriveEntry is cached, not re-fetched per call.
+        assert first is again is resolver.root()
 
 
 class TestDriveEntry:

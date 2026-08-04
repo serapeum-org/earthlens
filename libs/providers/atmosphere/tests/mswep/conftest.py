@@ -128,6 +128,20 @@ class FakeFiles:
             payload["nextPageToken"] = str(start + page)
         return FakeRequest(payload)
 
+    def get(self, *, fileId, fields=None, supportsAllDrives=None, **kwargs):  # noqa: N803
+        """Return one object's metadata by id, as `files.get` does.
+
+        The shared `folder_id` a user is given is the version root itself,
+        so `RootResolver` reads its name through this rather than listing a
+        parent.
+        """
+        for obj in self._store.objects:
+            if obj["id"] == fileId:
+                return FakeRequest(
+                    {"id": obj["id"], "name": obj["name"], "mimeType": obj["mimeType"]}
+                )
+        return FakeRequest({"id": fileId, "name": "", "mimeType": FOLDER_MIME})
+
     def get_media(self, *, fileId, **kwargs):  # noqa: N803
         """Return a media request the real `MediaIoBaseDownload` can drive.
 

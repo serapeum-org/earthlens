@@ -8,9 +8,20 @@ import pytest
 
 from earthlens.biodiversity import LicenseWarning
 from earthlens.mswep.backend import CADENCES, MSWEP
-from earthlens.mswep.catalog import ProvisionalValueError
 
 pytestmark = [pytest.mark.mswep, pytest.mark.unit]
+
+
+def root_folder_id(share, product="mswep", version=None):
+    """Return the fake share's version-root folder id — what a user is given."""
+    name = (
+        "MSWX_V100"
+        if product == "mswx"
+        else "MSWEP_V280"
+        if version == "2.80"
+        else "MSWEP_V315"
+    )
+    return share.path_id(name)
 
 
 @pytest.fixture
@@ -21,7 +32,13 @@ def build(share, tmp_path):
         kwargs.setdefault("start", "2020-04-25")
         kwargs.setdefault("end", "2020-04-26")
         kwargs.setdefault("temporal_resolution", "daily")
-        return MSWEP(folder_id="SHARE", service=share, path=tmp_path, **kwargs)
+        kwargs.setdefault(
+            "folder_id",
+            root_folder_id(
+                share, kwargs.get("product", "mswep"), kwargs.get("version")
+            ),
+        )
+        return MSWEP(service=share, path=tmp_path, **kwargs)
 
     return _build
 
@@ -115,12 +132,6 @@ class TestDownload:
         Granule names repeat across variables, so a flat output directory
         would make the second request reuse the first file.
         """
-        from earthlens.mswep.catalog import Catalog
-
-        share.add_tree("SHARE", {"MSWX_V100_x": {}})
-        catalog = Catalog()
-        pres = catalog.get_product("mswx").variables["Pres"]
-        object.__setattr__(pres, "provisional", False)
         share.add_tree(
             share.path_id("MSWX_V100/Past"), {"Pres": {"Daily": ["2007133.nc"]}}
         )
@@ -130,10 +141,9 @@ class TestDownload:
             product="mswx",
             variables=["Temp", "Pres"],
             temporal_resolution="daily",
-            folder_id="SHARE",
+            folder_id=share.path_id("MSWX_V100"),
             service=share,
             path=tmp_path,
-            catalog=catalog,
         )
         paths = _quiet_download(source)
         assert len(paths) == 2
@@ -182,13 +192,22 @@ class TestPathShapes:
         with pytest.raises(ValueError, match="not a mswx variable"):
             _quiet_download(source)
 
-    def test_provisional_mswx_variable_is_refused(self, build):
-        """An unconfirmed folder spelling will not be guessed at."""
-        source = build(
-            start="2007-05-13", end="2007-05-13", product="mswx", variables=["SWd"]
+    def test_confirmed_mswx_variable_resolves(self, share, tmp_path):
+        """A variable folder confirmed in the share resolves and downloads."""
+        share.add_tree(
+            share.path_id("MSWX_V100/Past"), {"SWd": {"Daily": ["2007133.nc"]}}
         )
-        with pytest.raises(ProvisionalValueError, match="provisional"):
-            _quiet_download(source)
+        source = MSWEP(
+            start="2007-05-13",
+            end="2007-05-13",
+            product="mswx",
+            variables=["SWd"],
+            temporal_resolution="daily",
+            folder_id=share.path_id("MSWX_V100"),
+            service=share,
+            path=tmp_path,
+        )
+        assert [p.name for p in _quiet_download(source)] == ["2007133.nc"]
 
     def test_mswx_without_variables_raises(self, build):
         """MSWX shards by variable, so selecting none is an error, not an empty result."""
@@ -220,7 +239,7 @@ class TestForecastVariants:
             end="2026-01-01",
             product="mswx",
             variables=["Temp"],
-            variant="Medium Range Forecast",
+            variant="Mid",
         )
         with pytest.raises(NotImplementedError, match="ensemble forecast"):
             _quiet_download(source)
@@ -232,7 +251,7 @@ class TestForecastVariants:
             end="2026-01-01",
             product="mswx",
             variables=["Temp"],
-            variant="Seasonal Forecast",
+            variant="Long",
         )
         with pytest.raises(NotImplementedError, match="51 members from SEAS5"):
             _quiet_download(source)
@@ -244,7 +263,7 @@ class TestForecastVariants:
             end="2026-01-01",
             product="mswx",
             variables=["Temp"],
-            variant="Medium Range Forecast",
+            variant="Mid",
         )
         with pytest.raises(NotImplementedError) as excinfo:
             _quiet_download(source)

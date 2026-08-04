@@ -14,12 +14,11 @@ carries. Two rules shape the module:
   the handful of structural levels (the share root, the variant and
   temporal folders) where cardinality is tiny.
 
-:class:`RootResolver` implements the version → root-folder lookup. Roots
-are version-stamped and coexist in the share (`MSWEP_V280` beside
-`MSWEP_V315`), and GloH2O's own examples disagree with the documented
-version, so the resolver **confirms the folder exists** rather than
-trusting the catalog constant — and, when it does not, raises listing
-the roots that are actually present.
+:class:`RootResolver` wraps the shared folder as the product/version
+root. GloH2O shares one folder per product and per version, so the
+`folder_id` a user is given **is** the `MSWEP_V280` / `MSWX_V100` /
+`MSWEP_V316_test` folder — there is no parent to search, and the version
+is chosen by which share you point at.
 """
 
 from __future__ import annotations
@@ -374,30 +373,27 @@ def download_media(
 
 
 class RootResolver:
-    """Resolve a product + version onto its Drive root folder.
+    """Resolve a product + version onto the shared Drive root folder.
 
-    Roots are version-stamped and several coexist in one share
-    (`MSWEP_V280` beside `MSWEP_V315`), and GloH2O's published examples
-    disagree with the documented version — the V3.16 documentation's own
-    worked example still writes `MSWEP_V315`, and the website's rclone
-    example writes `MSWEP_V315_test`. So the catalog constant is treated
-    as a hypothesis to confirm against the share, never as truth.
-
-    The share-root listing is cached for the resolver's lifetime: it is
-    a handful of folders and every granule request needs it.
+    GloH2O shares one folder per product **and** per version, so the
+    `folder_id` handed to a user is the `MSWEP_V280` / `MSWX_V100` /
+    `MSWEP_V316_test` folder itself — its children are the variants
+    (`Past`, `NRT`, …). There is no parent to search: the id you were
+    given is the root. The resolver reads that folder's metadata once,
+    caches it, and validates the requested version against the catalog.
 
     Attributes:
         _service: The Drive v3 client.
-        _folder_id: Drive id of the shared folder GloH2O granted.
-        _catalog: The MSWEP catalog supplying the version → root map.
-        _roots: Cached share-root listing, or `None` before first use.
+        _folder_id: Drive id of the shared root folder GloH2O granted.
+        _catalog: The MSWEP catalog, read for version metadata.
+        _root: The cached root `DriveEntry`, or `None` before first use.
 
     Examples:
-        - Resolution is by folder name within the share:
+        - The root's name comes from the shared folder itself:
             ```python
             >>> from earthlens.mswep.drive import DriveEntry, FOLDER_MIME
-            >>> DriveEntry("1a", "MSWEP_V315", FOLDER_MIME).name
-            'MSWEP_V315'
+            >>> DriveEntry("1a", "MSWEP_V316_test", FOLDER_MIME).name
+            'MSWEP_V316_test'
 
             ```
     """
@@ -407,29 +403,53 @@ class RootResolver:
 
         Args:
             service: The Drive v3 client.
-            folder_id: Drive id of the shared folder.
-            catalog: The MSWEP catalog to read version → root from.
+            folder_id: Drive id of the shared folder — which **is** the
+                product/version root, not a parent to search.
+            catalog: The MSWEP catalog, read for version metadata.
         """
         self._service = service
         self._folder_id = folder_id
         self._catalog = catalog
-        self._roots: dict[str, DriveEntry] | None = None
+        self._root: DriveEntry | None = None
 
-    def share_roots(self) -> dict[str, DriveEntry]:
-        """Return the share's top-level folders, keyed by name (cached).
+    def root(self) -> DriveEntry:
+        """Return the shared folder itself, as the product/version root (cached).
+
+        GloH2O shares one folder per product **and** per version — the id
+        you are given is the `MSWEP_V280` / `MSWX_V100` / `MSWEP_V316_test`
+        folder directly, whose children are the variants (`Past`, `NRT`,
+        …). There is no parent to list, so this just reads the folder's
+        own metadata.
 
         Returns:
-            dict[str, DriveEntry]: Folder name to entry.
+            DriveEntry: The shared folder.
         """
-        if self._roots is None:
-            self._roots = {
-                entry.name: entry
-                for entry in list_folders(self._service, self._folder_id)
-            }
-        return self._roots
+        if self._root is None:
+            meta = (
+                self._service.files()
+                .get(
+                    fileId=self._folder_id,
+                    fields="id, name, mimeType",
+                    supportsAllDrives=True,
+                )
+                .execute()
+            )
+            self._root = DriveEntry(
+                id=meta["id"],
+                name=meta.get("name", ""),
+                mime_type=meta.get("mimeType", ""),
+            )
+        return self._root
 
     def resolve(self, product_key: str, version: str | None = None) -> DriveEntry:
-        """Resolve a product + version onto its root folder in the share.
+        """Resolve a product + version onto the shared root folder.
+
+        The `folder_id` given at construction **is** the root, so this
+        validates the request against the catalog (product exists, version
+        known and not provisional) and returns the folder. The version
+        selects descriptive metadata — units, the trend caveat — not the
+        data itself: which version you get is decided by which per-version
+        share you point `folder_id` at.
 
         Args:
             product_key: Product key (`"mswep"`, `"mswx"`).
@@ -437,37 +457,21 @@ class RootResolver:
                 `default_version`.
 
         Returns:
-            DriveEntry: The root folder.
+            DriveEntry: The shared root folder.
 
         Raises:
-            ValueError: When the version is unknown to the catalog, or
-                the expected root folder is absent from the share — in
-                which case the message lists the roots actually present.
-            ProvisionalValueError: When the version's root name is an
-                unverified placeholder.
+            ValueError: When the product or version is unknown.
+            ProvisionalValueError: When the version row is an unverified
+                placeholder.
         """
         product = self._catalog.get_product(product_key)
         key = version or product.default_version
-        try:
-            row = product.versions[key]
-        except KeyError:
+        if key not in product.versions:
             raise ValueError(
                 f"{key!r} is not a known {product_key} version. Known "
                 f"versions: {sorted(product.versions)}."
-            ) from None
-
+            )
         self._catalog.check_not_provisional(
-            row, f"the {product_key} v{key} root folder name ({row.root!r})"
+            product.versions[key], f"the {product_key} v{key} version"
         )
-
-        roots = self.share_roots()
-        if row.root in roots:
-            return roots[row.root]
-
-        raise ValueError(
-            f"the {product_key} v{key} root folder {row.root!r} is not in the "
-            f"shared folder. Roots present: {sorted(roots) or '<none>'}. "
-            "GloH2O stamps the version into the folder name and renames it "
-            "between releases, so pick a version whose root is listed above, "
-            "or correct the version -> root map in mswep_data_catalog.yaml."
-        )
+        return self.root()

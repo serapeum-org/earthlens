@@ -26,7 +26,7 @@ def source(share, tmp_path):
         start="2020-04-25",
         end="2020-04-25",
         temporal_resolution="daily",
-        folder_id="SHARE",
+        folder_id=share.path_id("MSWEP_V315"),
         service=share,
         path=tmp_path,
     )
@@ -65,44 +65,26 @@ class TestCatalogEntries:
 
 
 class TestFolderLocation:
-    """The folder's parent is undocumented, so both are probed."""
+    """The folder sits directly under the version root (= folder_id)."""
 
     def test_found_under_the_version_root(self, source, share):
-        """The likely location, alongside Past / NRT, resolves."""
+        """It resolves as a direct child of the shared root, beside Past / NRT."""
         expected = share.path_id("MSWEP_V315/Gauge_metadata")
         assert source.gauge_metadata_folder() == expected
 
-    def test_falls_back_to_the_share_root(self, drive, tmp_path):
-        """A share that keeps it at the top level still resolves."""
-        drive.add_tree(
-            "SHARE",
-            {
-                "MSWEP_V315": {"Past": {"Daily": []}},
-                "Gauge_metadata": ["daily_station_locations.csv"],
-            },
-        )
+    def test_absent_folder_names_the_root(self, drive, tmp_path):
+        """A version without gauge metadata (e.g. v2.80) yields a clear error."""
+        drive.add_tree("SHARE", {"MSWEP_V280": {"Past": {"Daily": []}}})
         source = MSWEP(
             start="2020-04-25",
             end="2020-04-25",
             temporal_resolution="daily",
-            folder_id="SHARE",
+            version="2.80",
+            folder_id=drive.path_id("MSWEP_V280"),
             service=drive,
             path=tmp_path,
         )
-        assert source.gauge_metadata_folder() == drive.path_id("Gauge_metadata")
-
-    def test_absent_folder_names_both_places_searched(self, drive, tmp_path):
-        """When neither parent has it, the error says where it looked."""
-        drive.add_tree("SHARE", {"MSWEP_V315": {"Past": {"Daily": []}}})
-        source = MSWEP(
-            start="2020-04-25",
-            end="2020-04-25",
-            temporal_resolution="daily",
-            folder_id="SHARE",
-            service=drive,
-            path=tmp_path,
-        )
-        with pytest.raises(FileNotFoundError, match="MSWEP_V315.*share root"):
+        with pytest.raises(FileNotFoundError, match="MSWEP_V280"):
             source.gauge_metadata_folder()
 
 
@@ -147,7 +129,7 @@ class TestFetch:
             start="2020-04-25",
             end="2020-04-25",
             temporal_resolution="daily",
-            folder_id="SHARE",
+            folder_id=drive.path_id("MSWEP_V315"),
             service=drive,
             path=tmp_path,
         )
@@ -169,7 +151,7 @@ class TestFetch:
             start="2020-04-25",
             end="2020-04-25",
             temporal_resolution="daily",
-            folder_id="SHARE",
+            folder_id=drive.path_id("MSWEP_V315"),
             service=drive,
             path=tmp_path,
         ).fetch_gauge_metadata()
@@ -194,7 +176,7 @@ class TestFetch:
             product="mswx",
             variables=["Temp"],
             temporal_resolution="daily",
-            folder_id="SHARE",
+            folder_id=share.path_id("MSWX_V100"),
             service=share,
             path=tmp_path,
         )

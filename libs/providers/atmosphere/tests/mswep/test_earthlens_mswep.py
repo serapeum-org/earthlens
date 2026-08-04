@@ -47,7 +47,7 @@ class TestFacadeConstruction:
             variables=["precipitation"],
             temporal_resolution="daily",
             path=tmp_path,
-            folder_id="SHARE",
+            folder_id=share.path_id("MSWEP_V315"),
             service=share,
         )
         assert lens.datasource.OUTPUT_KIND == "raster"
@@ -61,7 +61,7 @@ class TestFacadeConstruction:
             variables=["Temp"],
             temporal_resolution="daily",
             path=tmp_path,
-            folder_id="SHARE",
+            folder_id=share.path_id("MSWX_V100"),
             service=share,
         )
         assert lens.datasource._product_key == "mswx"

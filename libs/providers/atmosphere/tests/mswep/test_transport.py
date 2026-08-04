@@ -154,7 +154,7 @@ class TestDownloadRetries:
             start="2020-04-25",
             end="2020-04-25",
             temporal_resolution="daily",
-            folder_id="SHARE",
+            folder_id=share.path_id("MSWEP_V315"),
             service=share,
             path=tmp_path,
         )
@@ -178,7 +178,7 @@ class TestNrtRevisionWindow:
             end="2025-01-01",
             temporal_resolution="daily",
             variant="NRT",
-            folder_id="SHARE",
+            folder_id=share.path_id("MSWEP_V315"),
             service=share,
             path=tmp_path,
         )
@@ -221,7 +221,7 @@ class TestNrtRevisionWindow:
             end="2025-01-01",
             temporal_resolution="daily",
             variant="NRT",
-            folder_id="SHARE",
+            folder_id=share.path_id("MSWEP_V315"),
             service=share,
             path=tmp_path,
         )

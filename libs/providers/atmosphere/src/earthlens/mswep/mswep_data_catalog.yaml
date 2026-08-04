@@ -77,22 +77,26 @@ products:
     # Verbatim example from the V3.16 documentation, section 6:
     #   MSWEP_V315/Past/Hourly/2020116.18.nc
     path_template: "{root}/{variant}/{temporal}/{stem}.nc"
-    default_version: "3.15"
+    default_version: "3.16"
+    # Roots are the shared folders' own names, confirmed from the share. GloH2O
+    # shares one folder per version, so `folder_id` points straight at one of
+    # these -- the `root` name here is descriptive (and drives the on-disk output
+    # mirror), not a folder to search for.
     versions:
       "2.80":
         root: MSWEP_V280
         description: >-
           Recommended by GloH2O over V3.15/V3.16 for trend analysis over
           1979-2021: V3.15/V3.16 show artificially low precipitation during
-          2000-2015 from an IMERG/GSMaP step change in 2015.
+          2000-2015 from an IMERG/GSMaP step change in 2015. No Hourly
+          resolution in this version.
       "3.15":
         root: MSWEP_V315
       "3.16":
-        root: MSWEP_V316
-        # The V3.16 documentation's own worked example still writes
-        # `MSWEP_V315`, and the website's rclone example writes
-        # `MSWEP_V315_test`, so the live V3.16 folder name is unconfirmed.
-        provisional: true
+        # Confirmed: the shared v3.16 folder is named MSWEP_V316_test (the
+        # `_test` suffix matches GloH2O's MSWEP_V315_test pattern), not the
+        # MSWEP_V316 that the version string would suggest.
+        root: MSWEP_V316_test
     variants:
       Past:
         description: Gauge-corrected historical MSWEP.
@@ -160,16 +164,18 @@ products:
         description: GDAS-based near-real-time MSWX.
         start: null
         end: null
-        provisional: true
-      # The two forecast streams. Member counts, horizons, base models and
-      # update cadence are from the MSWX paper (Beck et al., BAMS 2022) and the
-      # GloH2O product page. Their Drive LAYOUT is not published anywhere: a
-      # forecast granule is keyed by initialisation time + lead time + ensemble
-      # member, which the analysis `path_template` above cannot express, and it
-      # is unknown whether members are folders or a file-name component. Rather
-      # than guess a shape, these stay provisional and the backend refuses them
-      # with that explanation. Pinning them is part of task `A1`.
-      Medium Range Forecast:
+      # The two forecast streams, confirmed present in the share as the folders
+      # `Mid` and `Long`. Their layout is now known:
+      #   <variant>/<variable>/<YYYYMMDD_HH init>/<member NN>/<lead>.nc
+      # -- members are sub-folders (01, 02, ...), not a file-name component, and
+      # granules are keyed by initialisation time + member + lead. The analysis
+      # `path_template` above cannot express that extra init/member/lead depth,
+      # so the backend still refuses a forecast variant with a NotImplementedError.
+      # The archive is also sparse (historical inits carry only a few, empty
+      # member folders; `Long` was empty when surveyed), so implementing the
+      # fetch is deferred rather than blocked. Member counts / horizons are from
+      # the MSWX paper (Beck et al., BAMS 2022).
+      Mid:
         kind: forecast
         description: >-
           Bias-corrected medium-range ensemble forecast, derived from NOAA GEFS.
@@ -178,11 +184,10 @@ products:
         base_model: GEFS
         update_cadence: daily
         notes: >-
-          Unpinned: the folder name, whether the 30 members are sub-folders or a
-          file-name component, and whether the stem encodes the initialisation
-          time, the valid time, or both.
-        provisional: true
-      Seasonal Forecast:
+          Layout <variable>/<YYYYMMDD_HH>/<member>/<lead>.nc; members are
+          sub-folders. Not yet implemented (extra init/member/lead depth; sparse
+          archive).
+      Long:
         kind: forecast
         description: >-
           Bias-corrected long-range ensemble forecast (MSWX-Long), derived from
@@ -192,16 +197,14 @@ products:
         base_model: SEAS5
         update_cadence: monthly
         notes: >-
-          Unpinned: as for the medium-range stream, plus whether the seasonal
-          stream keeps the same 3-hourly/daily/monthly resolutions.
-        provisional: true
+          As for the medium-range stream. Was empty when the share was surveyed.
+          Not yet implemented.
     resolutions:
       3hourly:
         folder: 3hourly
         stem: "%Y%j.%H"
         step: PT3H
         units: varies
-        provisional: true
       daily:
         folder: Daily
         stem: "%Y%j"
@@ -212,9 +215,9 @@ products:
         stem: "%Y%m"
         step: P1M
         units: varies
-    # Only `Temp` is externally confirmed (from a published rclone filter and
-    # a third-party forcing pipeline). The other nine folder names are inferred
-    # from the variable list in the MSWX paper and MUST be confirmed in `A1`.
+    # All ten variable folder names confirmed present in the share's Past tree
+    # (the `variable` key IS the Drive folder name). The `netcdf_field` values
+    # are descriptive; only the folder name affects pathing.
     variables:
       Temp:
         netcdf_field: air_temperature
@@ -222,36 +225,27 @@ products:
       P:
         netcdf_field: precipitation
         long_name: Precipitation
-        provisional: true
       Tmax:
         netcdf_field: air_temperature
         long_name: 2-m daily maximum air temperature
-        provisional: true
       Tmin:
         netcdf_field: air_temperature
         long_name: 2-m daily minimum air temperature
-        provisional: true
       Pres:
         netcdf_field: surface_pressure
         long_name: Surface pressure
-        provisional: true
       RelHum:
         netcdf_field: relative_humidity
         long_name: 2-m relative humidity
-        provisional: true
       SpecHum:
         netcdf_field: specific_humidity
         long_name: 2-m specific humidity
-        provisional: true
       Wind:
         netcdf_field: wind_speed
         long_name: 10-m wind speed
-        provisional: true
       SWd:
         netcdf_field: downward_shortwave_radiation
         long_name: Downward shortwave radiation
-        provisional: true
       LWd:
         netcdf_field: downward_longwave_radiation
         long_name: Downward longwave radiation
-        provisional: true

@@ -9,6 +9,7 @@ import pytest
 from earthlens.mswep.catalog import (
     CATALOG_PATH,
     Catalog,
+    MswepVariable,
     MswepVariant,
     ProvisionalValueError,
     clear_catalog_cache,
@@ -122,9 +123,11 @@ class TestVersions:
         """V2.80 carries the note about the V3.15/V3.16 trend artifact."""
         assert "trend" in Catalog().get_product("mswep").versions["2.80"].description
 
-    def test_v316_root_is_provisional(self):
-        """The live V3.16 folder name is unconfirmed, so it is flagged."""
-        assert Catalog().get_product("mswep").versions["3.16"].provisional
+    def test_v316_root_has_the_test_suffix(self):
+        """The confirmed v3.16 folder is MSWEP_V316_test, not MSWEP_V316."""
+        row = Catalog().get_product("mswep").versions["3.16"]
+        assert row.root == "MSWEP_V316_test"
+        assert not row.provisional
 
     def test_mswx_version_root(self):
         """MSWX ships under its own version-stamped root."""
@@ -229,27 +232,27 @@ class TestVariables:
         """MSWX ships the full meteorological forcing set."""
         assert len(Catalog().get_product("mswx").variables) == 10
 
-    def test_only_temp_is_confirmed(self):
-        """`Temp` is the one externally-verified MSWX folder spelling."""
+    def test_all_ten_variables_confirmed(self):
+        """Every MSWX variable folder was verified in the share; none provisional."""
         variables = Catalog().get_product("mswx").variables
-        confirmed = [k for k, v in variables.items() if not v.provisional]
-        assert confirmed == ["Temp"]
+        assert len(variables) == 10
+        assert not any(v.provisional for v in variables.values())
 
 
 class TestForecastStreams:
     """MSWX's ensemble forecast streams are catalogued but not addressable."""
 
     def test_both_streams_present(self):
-        """The medium-range and seasonal ensembles are registered."""
+        """The medium-range (`Mid`) and seasonal (`Long`) ensembles are registered."""
         variants = Catalog().get_product("mswx").variants
-        assert "Medium Range Forecast" in variants
-        assert "Seasonal Forecast" in variants
+        assert "Mid" in variants
+        assert "Long" in variants
 
     @pytest.mark.parametrize(
         ("name", "members", "base", "horizon", "cadence"),
         [
-            ("Medium Range Forecast", 30, "GEFS", "10 days", "daily"),
-            ("Seasonal Forecast", 51, "SEAS5", "7 months", "monthly"),
+            ("Mid", 30, "GEFS", "10 days", "daily"),
+            ("Long", 51, "SEAS5", "7 months", "monthly"),
         ],
     )
     def test_stream_metadata(self, name, members, base, horizon, cadence):
@@ -265,19 +268,13 @@ class TestForecastStreams:
     def test_streams_are_forecast_kind(self):
         """Forecast variants are distinguishable from analysis ones."""
         product = Catalog().get_product("mswx")
-        assert product.variants["Medium Range Forecast"].is_forecast
+        assert product.variants["Mid"].is_forecast
         assert not product.variants["Past"].is_forecast
 
-    def test_streams_stay_provisional(self):
-        """Their Drive layout is unpinned, so they must not resolve."""
-        variants = Catalog().get_product("mswx").variants
-        assert variants["Medium Range Forecast"].provisional
-        assert variants["Seasonal Forecast"].provisional
-
-    def test_notes_say_what_is_unpinned(self):
-        """Each carries the specific unknowns, not just a flag."""
-        row = Catalog().get_product("mswx").variants["Medium Range Forecast"]
-        assert "members" in row.notes and "folder name" in row.notes
+    def test_notes_describe_the_known_layout(self):
+        """The notes record the confirmed member-foldered layout."""
+        row = Catalog().get_product("mswx").variants["Mid"]
+        assert "member" in row.notes and "implemented" in row.notes
 
     def test_analysis_variants_have_no_members(self):
         """An analysis variant is not an ensemble."""
@@ -288,18 +285,18 @@ class TestProvisionalGuard:
     """Unverified values must fail loudly, not resolve to a missing path."""
 
     def test_provisional_row_raises(self):
-        """A provisional variable is refused."""
-        variables = Catalog().get_product("mswx").variables
+        """A provisional row is refused (none ship now, so use a synthetic one)."""
+        row = MswepVariable(variable="X", provisional=True)
         with pytest.raises(ProvisionalValueError, match="provisional"):
-            Catalog.check_not_provisional(variables["SWd"], "MSWX variable 'SWd'")
+            Catalog.check_not_provisional(row, "MSWX variable 'X'")
 
     def test_message_names_the_row_and_the_fix(self):
         """The error quotes the row and points at the catalog flag."""
-        variables = Catalog().get_product("mswx").variables
+        row = MswepVariable(variable="X", provisional=True)
         with pytest.raises(ProvisionalValueError) as excinfo:
-            Catalog.check_not_provisional(variables["LWd"], "MSWX variable 'LWd'")
+            Catalog.check_not_provisional(row, "MSWX variable 'X'")
         message = str(excinfo.value)
-        assert "MSWX variable 'LWd'" in message
+        assert "MSWX variable 'X'" in message
         assert "mswep_data_catalog.yaml" in message
 
     def test_confirmed_row_passes(self):

@@ -535,36 +535,27 @@ class MSWEP(AbstractDataSource):
     def gauge_metadata_folder(self) -> str:
         """Locate the `Gauge_metadata` folder, returning its Drive id.
 
-        The MSWEP documentation names the folder and every CSV in it but
-        not its **parent** — it reads "included in the `Gauge_metadata`
-        folder" — so both plausible parents are probed rather than one
-        being assumed: under the version root first (alongside `Past` /
-        `NRT`), then at the share root.
+        The folder sits directly under the version root — confirmed in
+        the v3.16 share, alongside `Past` / `NRT`. Since `folder_id` is
+        that root, this is a single child lookup.
 
         Returns:
             str: Drive id of the folder.
 
         Raises:
-            FileNotFoundError: When neither parent holds it, naming both
-                places that were searched.
+            FileNotFoundError: When the root does not hold it (older
+                versions, e.g. v2.80, ship no gauge metadata).
         """
         folder = self._catalog.gauge_metadata.folder
         root = self.resolver.resolve(self._product_key, self._version)
-
-        for parent_id, where in (
-            (root.id, f"{root.name}/{folder}"),
-            (self._auth.folder_id, folder),
-        ):
-            entry = find_folder(self._auth.service, parent_id, folder)
-            if entry is not None:
-                logger.debug(f"mswep: gauge metadata found at {where}")
-                return entry.id
+        entry = find_folder(self._auth.service, root.id, folder)
+        if entry is not None:
+            return entry.id
 
         raise FileNotFoundError(
-            f"{folder!r} is not in the share, under either {root.name!r} or the "
-            "share root. The MSWEP documentation names the folder but not its "
-            "parent, so both are searched; if yours lives somewhere else, "
-            "report the real location so the catalog can record it."
+            f"{folder!r} is not in the shared folder {root.name!r}. Gauge "
+            "metadata ships under the v3.16 root; older versions (e.g. v2.80) "
+            "do not include it."
         )
 
     def fetch_gauge_metadata(self, names: list[str] | None = None) -> list[Path]:
