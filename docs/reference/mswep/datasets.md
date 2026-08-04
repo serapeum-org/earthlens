@@ -46,27 +46,38 @@ spellings are confirmed against the share:
 
 ## MSWX forecast streams
 
-MSWX publishes two ensemble forecast streams alongside `Past` and `NRT`, as the folders **`Mid`** and **`Long`**.
-They are catalogued but **not yet fetchable** — requesting one raises `NotImplementedError`:
+MSWX publishes two ensemble forecast streams alongside `Past` and `NRT`, as the folders **`Mid`** and **`Long`**:
 
 | Stream | Folder | Base model | Members | Horizon | Re-initialised |
 |---|---|---|---|---|---|
 | Medium-range | `Mid` | NOAA GEFS | 30 | 10 days | daily |
 | Seasonal (MSWX-Long) | `Long` | ECMWF SEAS5 | 51 | 7 months | monthly |
 
-The blocker is structural, not a missing string. The confirmed layout is
-`<variant>/<variable>/<YYYYMMDD_HH init>/<member NN>/<lead>.nc` — a forecast granule is keyed by an
-initialisation time, an ensemble member (a **sub-folder**, `01` … `NN`) *and* a lead time, three coordinates the
-analysis `path_template` cannot express. The archive is also sparse: historical inits carry only a few, empty
-member folders, and `Long` was empty when surveyed. Implementing the fetch needs a forecast-aware path template
-and is left as follow-up.
+A forecast granule adds an initialisation-time and an ensemble-member level:
+`<variant>/<variable>/<YYYYMMDD_HH init>/<member NN>/<temporal>/<valid-time>.nc`. Request one with `variant=`,
+`init=` (the initialisation date — GloH2O runs at 00Z) and `members=`; `start` / `end` select which **valid**
+(lead) times to keep:
 
 ```python
-from earthlens.mswep import Catalog
+from earthlens.core import EarthLens
 
-seasonal = Catalog().get_product("mswx").variants["Long"]
-seasonal.members, seasonal.base_model, seasonal.horizon   # (51, 'SEAS5', '7 months')
+paths = EarthLens(
+    "mswx",
+    variant="Mid",
+    init="2026-08-01",           # the run to fetch
+    members=[1, 2, 3],           # ensemble members (omit for all 30)
+    variables=["Temp"],
+    start="2026-08-01",          # valid-time window (10-day horizon)
+    end="2026-08-10",
+    temporal_resolution="daily",
+    path="out",
+).download()
+# -> out/MSWX_V100/Mid/Temp/20260801_00/01/Daily/2026213.nc, ...
 ```
+
+!!! note "The seasonal (`Long`) archive is empty"
+    `Long` held no data when the share was surveyed, so a `Long` request currently returns an empty list. `Mid`
+    is populated (recent inits carry all 30 members; historical inits are sparse).
 
 ## Where the folders live
 

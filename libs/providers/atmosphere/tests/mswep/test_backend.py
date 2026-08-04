@@ -230,44 +230,86 @@ class TestPathShapes:
 
 
 class TestForecastVariants:
-    """A forecast stream is refused with its own explanation."""
+    """Ensemble forecast streams (`Mid` / `Long`)."""
 
-    def test_forecast_variant_raises_not_implemented(self, build):
-        """Requesting the medium-range ensemble is refused, not attempted."""
-        source = build(
-            start="2026-01-01",
-            end="2026-01-01",
+    def _forecast(self, share, tmp_path, **kwargs):
+        """Build an MSWX `Mid` forecast request against the fake share."""
+        kwargs.setdefault("start", "2026-08-01")
+        kwargs.setdefault("end", "2026-08-02")
+        kwargs.setdefault("variant", "Mid")
+        kwargs.setdefault("init", "2026-08-01")
+        kwargs.setdefault("variables", ["Temp"])
+        kwargs.setdefault("temporal_resolution", "daily")
+        return MSWEP(
             product="mswx",
-            variables=["Temp"],
-            variant="Mid",
+            folder_id=share.path_id("MSWX_V100"),
+            service=share,
+            path=tmp_path,
+            **kwargs,
         )
-        with pytest.raises(NotImplementedError, match="ensemble forecast"):
+
+    def test_forecast_downloads_the_members(self, share, tmp_path):
+        """A forecast request fetches one granule per member per valid day."""
+        paths = _quiet_download(self._forecast(share, tmp_path, members=[1, 2]))
+        assert len(paths) == 4  # 2 members x 2 valid days
+        assert len(set(paths)) == 4
+
+    def test_forecast_layout_is_init_member_temporal(self, share, tmp_path):
+        """Granules mirror `<variant>/<variable>/<init>/<member>/<temporal>/`."""
+        paths = _quiet_download(self._forecast(share, tmp_path, members=[1]))
+        assert paths[0].relative_to(tmp_path).as_posix() == (
+            "MSWX_V100/Mid/Temp/20260801_00/01/Daily/2026213.nc"
+        )
+
+    def test_all_members_by_default_skips_the_absent(self, share, tmp_path):
+        """`members=None` enumerates all 30; only the two present are fetched."""
+        paths = _quiet_download(self._forecast(share, tmp_path))
+        # fake share carries members 01 and 02 only, x 2 valid days
+        assert {p.parent.parent.name for p in paths} == {"01", "02"}
+
+    def test_forecast_requires_init(self, share, tmp_path):
+        """A forecast variant with no init= is refused at construction."""
+        with pytest.raises(ValueError, match="requires init="):
+            self._forecast(share, tmp_path, init=None)
+
+    def test_init_on_analysis_variant_raises(self, share, tmp_path):
+        """`init=` on an analysis variant is a mistake, not silently ignored."""
+        with pytest.raises(ValueError, match="applies only to a forecast"):
+            MSWEP(
+                start="2020-04-25",
+                end="2020-04-25",
+                temporal_resolution="daily",
+                variant="Past",
+                init="2020-04-25",
+                folder_id=share.path_id("MSWEP_V315"),
+                service=share,
+                path=tmp_path,
+            )
+
+    def test_member_out_of_range_raises(self, share, tmp_path):
+        """A member beyond the stream's ensemble size is rejected."""
+        source = self._forecast(share, tmp_path, members=[99])
+        with pytest.raises(ValueError, match="out of range 1..30"):
             _quiet_download(source)
 
-    def test_message_names_the_ensemble_shape(self, build):
-        """The error explains why the analysis template cannot address it."""
-        source = build(
-            start="2026-01-01",
-            end="2026-01-01",
-            product="mswx",
-            variables=["Temp"],
-            variant="Long",
+    def test_empty_stream_returns_empty(self, share, tmp_path):
+        """`Long` holds no data in the share, so a request yields `[]`."""
+        source = self._forecast(
+            share, tmp_path, variant="Long", members=[1], variables=["Temp"]
         )
-        with pytest.raises(NotImplementedError, match="51 members from SEAS5"):
-            _quiet_download(source)
+        assert _quiet_download(source) == []
 
-    def test_message_is_not_the_generic_provisional_one(self, build):
-        """A forecast gets its own refusal, not 'confirm this value'."""
-        source = build(
-            start="2026-01-01",
-            end="2026-01-01",
-            product="mswx",
-            variables=["Temp"],
-            variant="Mid",
+    def test_unparseable_init_raises(self, share, tmp_path):
+        """A bad init= string is rejected at construction with a clear message."""
+        with pytest.raises(ValueError, match="could not parse init"):
+            self._forecast(share, tmp_path, init="not-a-date")
+
+    def test_iso_init_is_accepted(self, share, tmp_path):
+        """An ISO date for init resolves to the `YYYYMMDD_00` folder."""
+        paths = _quiet_download(
+            self._forecast(share, tmp_path, init="2026-08-01", members=[1])
         )
-        with pytest.raises(NotImplementedError) as excinfo:
-            _quiet_download(source)
-        assert "initialisation time, lead time and member" in str(excinfo.value)
+        assert "/20260801_00/" in paths[0].as_posix()
 
 
 class TestVariantRouting:

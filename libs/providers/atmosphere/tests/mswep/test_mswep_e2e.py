@@ -111,6 +111,35 @@ def test_output_mirrors_the_version_root(tmp_path):
 
 
 @requires_share
+@pytest.mark.skipif(
+    not os.getenv("MSWX_DRIVE_FOLDER"),
+    reason="set $MSWX_DRIVE_FOLDER to an approved MSWX share to test forecasts",
+)
+def test_downloads_a_forecast_ensemble(tmp_path):
+    """A real MSWX `Mid` forecast fetches one granule per member per valid day."""
+    source = MSWEP(
+        product="mswx",
+        variant="Mid",
+        init=os.getenv("MSWX_E2E_INIT", "2026-08-01"),
+        members=[1, 2],
+        variables=["Temp"],
+        start=os.getenv("MSWX_E2E_INIT", "2026-08-01"),
+        end=os.getenv("MSWX_E2E_END", "2026-08-02"),
+        temporal_resolution="daily",
+        credentials=MswepCredentials(folder_id=os.environ["MSWX_DRIVE_FOLDER"]),
+        path=tmp_path,
+    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", LicenseWarning)
+        paths = source.download(progress_bar=False)
+
+    assert paths, "the forecast returned no granules"
+    members = {p.parent.parent.name for p in paths}
+    assert members == {"01", "02"}
+    assert paths[0].read_bytes()[:4] in (b"\x89HDF", b"CDF\x01", b"CDF\x02")
+
+
+@requires_share
 def test_root_is_the_shared_folder(tmp_path):
     """The shared folder id resolves to a version-stamped root."""
     source = MSWEP(

@@ -151,6 +151,11 @@ products:
     # variable level MSWEP does not have. Confirmed shape:
     #   MSWX_V100/Past/Temp/Daily/2007133.nc
     path_template: "{root}/{variant}/{variable}/{temporal}/{stem}.nc"
+    # The forecast streams (Mid / Long) add an initialisation-time and an
+    # ensemble-member level, and the leaf granule is named by VALID time
+    # (same stem as analysis). Confirmed shape:
+    #   MSWX_V100/Mid/Temp/20260801_00/01/Daily/2026213.nc
+    forecast_path_template: "{root}/{variant}/{variable}/{init}/{member}/{temporal}/{stem}.nc"
     default_version: "1.00"
     versions:
       "1.00":
@@ -164,17 +169,12 @@ products:
         description: GDAS-based near-real-time MSWX.
         start: null
         end: null
-      # The two forecast streams, confirmed present in the share as the folders
-      # `Mid` and `Long`. Their layout is now known:
-      #   <variant>/<variable>/<YYYYMMDD_HH init>/<member NN>/<lead>.nc
-      # -- members are sub-folders (01, 02, ...), not a file-name component, and
-      # granules are keyed by initialisation time + member + lead. The analysis
-      # `path_template` above cannot express that extra init/member/lead depth,
-      # so the backend still refuses a forecast variant with a NotImplementedError.
-      # The archive is also sparse (historical inits carry only a few, empty
-      # member folders; `Long` was empty when surveyed), so implementing the
-      # fetch is deferred rather than blocked. Member counts / horizons are from
-      # the MSWX paper (Beck et al., BAMS 2022).
+      # The two forecast streams, the folders `Mid` and `Long`. Fetchable via
+      # the forecast_path_template above: request with variant=Mid/Long,
+      # init=<YYYY-MM-DD>, members=[...]; start/end select the valid times.
+      # Member counts / horizons are from the MSWX paper (Beck et al., BAMS
+      # 2022). The `Long` (seasonal) archive was empty when the share was
+      # surveyed, so a Long request currently returns nothing.
       Mid:
         kind: forecast
         description: >-
@@ -184,9 +184,9 @@ products:
         base_model: GEFS
         update_cadence: daily
         notes: >-
-          Layout <variable>/<YYYYMMDD_HH>/<member>/<lead>.nc; members are
-          sub-folders. Not yet implemented (extra init/member/lead depth; sparse
-          archive).
+          Layout <variable>/<YYYYMMDD_HH init>/<member NN>/<temporal>/<valid>.nc;
+          members are sub-folders, the leaf named by valid time. Initialised at
+          00Z daily.
       Long:
         kind: forecast
         description: >-
@@ -197,8 +197,8 @@ products:
         base_model: SEAS5
         update_cadence: monthly
         notes: >-
-          As for the medium-range stream. Was empty when the share was surveyed.
-          Not yet implemented.
+          Same layout as the medium-range stream. The seasonal archive was empty
+          when the share was surveyed, so a request currently returns nothing.
     resolutions:
       3hourly:
         folder: 3hourly

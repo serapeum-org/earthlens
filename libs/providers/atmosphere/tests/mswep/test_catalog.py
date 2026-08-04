@@ -271,10 +271,19 @@ class TestForecastStreams:
         assert product.variants["Mid"].is_forecast
         assert not product.variants["Past"].is_forecast
 
-    def test_notes_describe_the_known_layout(self):
+    def test_notes_describe_the_layout(self):
         """The notes record the confirmed member-foldered layout."""
         row = Catalog().get_product("mswx").variants["Mid"]
-        assert "member" in row.notes and "implemented" in row.notes
+        assert "member" in row.notes and "valid" in row.notes
+
+    def test_forecast_path_template_carries_init_and_member(self):
+        """MSWX declares a forecast template with the extra depth."""
+        template = Catalog().get_product("mswx").forecast_path_template
+        assert "{init}" in template and "{member}" in template
+
+    def test_mswep_has_no_forecast_template(self):
+        """MSWEP has no forecast streams, so no forecast template."""
+        assert Catalog().get_product("mswep").forecast_path_template == ""
 
     def test_analysis_variants_have_no_members(self):
         """An analysis variant is not an ensemble."""

@@ -6,18 +6,22 @@ Google-Drive folder GloH2O shares with an approved non-commercial user.
 written — the granules are shipped as-is, and reading or regridding them
 is pyramids' job, so this module never imports `xarray`.
 
-Three properties shape the backend:
+Properties that shape the backend:
 
 * **Two path shapes.** MSWEP is `<root>/<variant>/<temporal>/`; MSWX
   inserts a variable level, `<root>/<variant>/<variable>/<temporal>/`.
   The shape comes from the catalog's per-product `path_template`, never
   from a hard-coded f-string, so an MSWX request cannot silently build
   an MSWEP-shaped path.
-* **The variant is date-determined.** `Past` / `Past_nogauge` end
-  2024-12-31 and `NRT` starts 2025-01-01, so a window is routed to the
-  variant that can serve it — and a window straddling the cut-over spans
-  both rather than half-failing. An explicit `variant=` that cannot
-  cover the window raises, naming the one that can.
+* **Analysis vs forecast.** The `Past` / `Past_nogauge` / `NRT` variants
+  are analysis — one granule per valid time, date-routed (`Past` ends
+  2024-12-31, `NRT` starts 2025-01-01; a window straddling the cut-over
+  spans both). MSWX also has ensemble **forecast** variants (`Mid`,
+  `Long`) addressed by `forecast_path_template`, which adds an
+  initialisation-time and an ensemble-member level:
+  `<variant>/<variable>/<init>/<member>/<temporal>/<valid>.nc`. A
+  forecast is requested with `variant=Mid`, `init=<date>` and
+  `members=[…]`; `start` / `end` then select the valid (lead) times.
 * **Granules are resolved by name, never by listing.** `Past/Hourly/`
   holds roughly 400,000 files; :mod:`earthlens.mswep.drive` asks Drive
   for exactly the names wanted, in chunks.
@@ -62,6 +66,36 @@ CADENCES: dict[str, str] = {
     "daily": "D",
     "monthly": "MS",
 }
+
+
+def _parse_init(value: str, fmt: str) -> dt.datetime:
+    """Parse a forecast initialisation time from a string.
+
+    Accepts the request's own `fmt` first, then ISO-8601 (so a
+    date-only `"2026-08-01"` works). GloH2O initialises at 00Z, so a
+    date with no time defaults to midnight.
+
+    Args:
+        value: The initialisation date/time string.
+        fmt: The `strptime` format the request uses for `start` / `end`.
+
+    Returns:
+        datetime.datetime: The parsed initialisation time.
+
+    Raises:
+        ValueError: When the value parses under neither `fmt` nor ISO.
+    """
+    for parse in (
+        lambda: dt.datetime.strptime(value, fmt),
+        lambda: dt.datetime.fromisoformat(value),
+    ):
+        try:
+            return parse()
+        except ValueError:
+            continue
+    raise ValueError(
+        f"could not parse init={value!r} as a date (tried fmt={fmt!r} and ISO-8601)."
+    )
 
 
 class MSWEP(AbstractDataSource):
@@ -111,6 +145,8 @@ class MSWEP(AbstractDataSource):
         product: str = "mswep",
         variant: str | None = None,
         version: str | None = None,
+        init: str | None = None,
+        members: list[int] | None = None,
         credentials: MswepCredentials | None = None,
         folder_id: str | None = None,
         service: Any = None,
@@ -119,7 +155,9 @@ class MSWEP(AbstractDataSource):
         """Build a request against one product, version, variant and cadence.
 
         Args:
-            start: Inclusive start of the window.
+            start: Inclusive start of the window. For a forecast variant
+                this is the **valid**-time window (which lead times to
+                keep), not the initialisation.
             end: Inclusive end of the window.
             variables: Variables to fetch. Defaults to `precipitation`
                 for MSWEP; for MSWX each entry names a **variable
@@ -130,14 +168,21 @@ class MSWEP(AbstractDataSource):
                 pyramids after download. Defaults to global.
             lon_lim: `[lon_min, lon_max]`. Advisory, as `lat_lim`.
             temporal_resolution: One of `hourly`, `3hourly`, `daily`,
-                `monthly`.
+                `monthly` (forecast streams offer `3hourly` / `daily`).
             fmt: `strptime` format for `start` / `end`.
             path: Output directory.
             product: `"mswep"` or `"mswx"`.
-            variant: `Past`, `Past_nogauge` or `NRT`. `None` routes each
-                date to the variant whose window covers it.
+            variant: `Past`, `Past_nogauge`, `NRT`, or a forecast stream
+                (`Mid` / `Long`). `None` routes each date to the analysis
+                variant whose window covers it; a forecast variant must
+                be named explicitly.
             version: Catalog version key; `None` uses the product
                 default.
+            init: For a forecast variant, the initialisation time
+                (`"2026-08-01"`; GloH2O initialises at 00Z). Required for
+                a forecast, ignored otherwise.
+            members: For a forecast variant, the ensemble members to
+                fetch (`[1, 2, 3]`); `None` fetches all of them.
             credentials: Where to find the Drive credential. `None`
                 resolves everything from the environment.
             folder_id: Drive id of the shared folder; overrides
@@ -155,11 +200,30 @@ class MSWEP(AbstractDataSource):
         self._product = self._catalog.get_product(product)
         self._version = version
         self._variant = variant
+        self._members = members
 
         if variant is not None and variant not in self._product.variants:
             raise ValueError(
                 f"{variant!r} is not a {product} variant. Known variants: "
                 f"{sorted(self._product.variants)}."
+            )
+
+        self._is_forecast = (
+            variant is not None and self._product.variants[variant].is_forecast
+        )
+        self._init: dt.datetime | None = None
+        if self._is_forecast:
+            if init is None:
+                raise ValueError(
+                    f"the forecast variant {variant!r} requires init= (the "
+                    "initialisation time, e.g. '2026-08-01'). start/end then "
+                    "select which valid times of that forecast to fetch."
+                )
+            self._init = _parse_init(init, fmt)
+        elif init is not None:
+            raise ValueError(
+                f"init= applies only to a forecast variant; {variant!r} is an "
+                "analysis variant. Drop init=, or request Mid / Long."
             )
 
         creds = credentials or MswepCredentials()
@@ -323,19 +387,18 @@ class MSWEP(AbstractDataSource):
         self._folder_cache[key] = current
         return current
 
-    def _plan(self) -> dict[tuple[str, ...], list[tuple[str, dt.datetime]]]:
-        """Group the window's granule names by the folder holding them.
+    def _validated_variables(self) -> list[str | None]:
+        """Return the requested variables, validated against the catalog.
 
         Returns:
-            dict: Folder-segment tuple to the `(file name, timestamp)`
-                pairs expected inside it.
-        """
-        resolution = self._resolution_row()
-        self._catalog.check_not_provisional(
-            resolution, f"the {self._product_key} {self.temporal_resolution} folder"
-        )
-        root = self.resolver.resolve(self._product_key, self._version)
+            list[str | None]: The variable folder names, or `[None]` for a
+                product with no variable level (MSWEP).
 
+        Raises:
+            ValueError: On an unknown variable, or (for a variable-sharded
+                product) an empty request — which would otherwise select
+                nothing and read as "not published yet".
+        """
         requested = self._variables()
         unknown = [name for name in requested if name not in self._product.variables]
         if unknown:
@@ -346,50 +409,72 @@ class MSWEP(AbstractDataSource):
             )
             raise ValueError(f"{subject}. Known: {sorted(self._product.variables)}.")
 
-        if self._product.needs_variable_folder:
-            # MSWX shards by variable, so "no variables" selects nothing. Left
-            # unguarded this returns an empty list rather than an error, which
-            # is indistinguishable from "the window is not published yet".
-            if not requested:
-                raise ValueError(
-                    f"{self._product_key} shards its granules by variable, so at "
-                    "least one must be requested. Known variables: "
-                    f"{sorted(self._product.variables)}."
-                )
-            variables: list[str | None] = list(requested)
-            for name in requested:
-                self._catalog.check_not_provisional(
-                    self._product.variables[name],
-                    f"the {self._product_key} variable folder {name!r}",
-                )
-        else:
-            # MSWEP has no variable level; the request still names its single
-            # field, and an unknown name was rejected above rather than
-            # silently downloading precipitation under another label.
-            variables = [None]
+        if not self._product.needs_variable_folder:
+            return [None]
+        if not requested:
+            raise ValueError(
+                f"{self._product_key} shards its granules by variable, so at "
+                "least one must be requested. Known variables: "
+                f"{sorted(self._product.variables)}."
+            )
+        return list(requested)
 
+    def _member_folders(self, count: int) -> list[str]:
+        """Return the member sub-folder names (`01` … `NN`) to fetch.
+
+        Args:
+            count: The stream's ensemble size, from the catalog.
+
+        Returns:
+            list[str]: Zero-padded member folder names.
+
+        Raises:
+            ValueError: When an explicit `members=` entry is out of range.
+        """
+        if self._members is None:
+            numbers: list[int] = list(range(1, count + 1))
+        else:
+            out_of_range = [m for m in self._members if m < 1 or m > count]
+            if out_of_range:
+                raise ValueError(
+                    f"ensemble member(s) {out_of_range} are out of range 1..{count} "
+                    f"for this {self._product_key} forecast stream."
+                )
+            numbers = list(self._members)
+        return [f"{n:02d}" for n in numbers]
+
+    def _plan(self) -> dict[tuple[str, ...], list[tuple[str, dt.datetime]]]:
+        """Group the window's granule names by the folder holding them.
+
+        Routes to the analysis or the forecast layout depending on the
+        requested variant.
+
+        Returns:
+            dict: Folder-segment tuple to the `(file name, timestamp)`
+                pairs expected inside it.
+        """
+        resolution = self._resolution_row()
+        self._catalog.check_not_provisional(
+            resolution, f"the {self._product_key} {self.temporal_resolution} folder"
+        )
+        root = self.resolver.resolve(self._product_key, self._version)
+        variables = self._validated_variables()
+
+        if self._is_forecast:
+            return self._forecast_plan(root, resolution, variables)
+        return self._analysis_plan(root, resolution, variables)
+
+    def _analysis_plan(
+        self, root: Any, resolution: Any, variables: list[str | None]
+    ) -> dict[tuple[str, ...], list[tuple[str, dt.datetime]]]:
+        """Group granules for an analysis variant (`Past` / `NRT`)."""
         grouped: dict[tuple[str, ...], list[tuple[str, dt.datetime]]] = {}
         for stamp in self.time.dates:
             day = stamp.date() if hasattr(stamp, "date") else stamp
             variant = self._variant_for(day)
-            row = self._product.variants[variant]
-            # A forecast stream is not addressable by the analysis template at
-            # all, so it gets its own refusal rather than the generic
-            # provisional one -- otherwise the message would suggest the value
-            # merely needs confirming, when the whole path shape is unknown.
-            if row.is_forecast:
-                raise NotImplementedError(
-                    f"{self._product_key} {variant!r} is an ensemble forecast "
-                    f"stream ({row.members} members from {row.base_model}, "
-                    f"{row.horizon}, re-initialised {row.update_cadence}), which "
-                    "this backend cannot address yet: a forecast granule is keyed "
-                    "by initialisation time, lead time and member, none of which "
-                    f"the analysis path template carries. {row.notes} "
-                    "Confirm the layout inside an approved share, then extend the "
-                    "catalog."
-                )
             self._catalog.check_not_provisional(
-                row, f"the {self._product_key} {variant!r} variant window"
+                self._product.variants[variant],
+                f"the {self._product_key} {variant!r} variant window",
             )
             for variable in variables:
                 segments = [root.name, variant]
@@ -398,6 +483,45 @@ class MSWEP(AbstractDataSource):
                 segments.append(resolution.folder)
                 filename = f"{stamp.strftime(resolution.stem)}.nc"
                 grouped.setdefault(tuple(segments), []).append((filename, stamp))
+        return grouped
+
+    def _forecast_plan(
+        self, root: Any, resolution: Any, variables: list[str | None]
+    ) -> dict[tuple[str, ...], list[tuple[str, dt.datetime]]]:
+        """Group granules for a forecast variant (`Mid` / `Long`).
+
+        A forecast granule adds an initialisation-time and an ensemble-
+        member level: `<variant>/<variable>/<init>/<member>/<temporal>/`,
+        with the leaf still named by **valid** time (the `start` / `end`
+        window). One folder per `(variable, member)`; the window selects
+        the lead times inside it.
+        """
+        variant = self._variant
+        assert variant is not None  # guaranteed by _is_forecast
+        row = self._product.variants[variant]
+        if not self._product.forecast_path_template:
+            raise ValueError(
+                f"{self._product_key} declares no forecast layout, so {variant!r} "
+                "cannot be fetched."
+            )
+        assert self._init is not None  # required for a forecast in __init__
+        init_str = self._init.strftime("%Y%m%d_%H")
+        members = self._member_folders(row.members)
+
+        grouped: dict[tuple[str, ...], list[tuple[str, dt.datetime]]] = {}
+        for variable in variables:
+            for member in members:
+                for stamp in self.time.dates:
+                    segments = (
+                        root.name,
+                        variant,
+                        str(variable),
+                        init_str,
+                        member,
+                        resolution.folder,
+                    )
+                    filename = f"{stamp.strftime(resolution.stem)}.nc"
+                    grouped.setdefault(segments, []).append((filename, stamp))
         return grouped
 
     def _search(self) -> list[RemoteProduct]:

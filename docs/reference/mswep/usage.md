@@ -55,7 +55,8 @@ paths = EarthLens(
 
 !!! note "All ten MSWX variables are available"
     Every variable folder — `Temp` `P` `Tmax` `Tmin` `Pres` `RelHum` `SpecHum` `Wind` `SWd` `LWd` — is confirmed
-    against the share. The forecast streams (`Mid`, `Long`) are catalogued but not yet fetchable.
+    against the share. The forecast streams (`Mid`, `Long`) are fetchable too -- pass `variant=`, `init=` and
+    `members=` (see the datasets page).
 
 ## Variants are chosen by date
 

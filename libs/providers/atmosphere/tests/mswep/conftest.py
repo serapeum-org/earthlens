@@ -279,7 +279,18 @@ def share(drive):
                     "daily_station_reporting_times.csv",
                 ],
             },
-            "MSWX_V100": {"Past": {"Temp": {"Daily": ["2007133.nc"]}}},
+            "MSWX_V100": {
+                "Past": {"Temp": {"Daily": ["2007133.nc"]}},
+                "Mid": {
+                    "Temp": {
+                        "20260801_00": {
+                            "01": {"Daily": ["2026213.nc", "2026214.nc"]},
+                            "02": {"Daily": ["2026213.nc", "2026214.nc"]},
+                        }
+                    }
+                },
+                "Long": {},
+            },
             "Gauge_metadata": {},
         },
     )

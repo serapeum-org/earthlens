@@ -306,8 +306,13 @@ class MswepProduct(BaseModel):
     Attributes:
         product: The product key.
         description: Human-readable summary.
-        path_template: Per-product Drive path shape. MSWX carries a
-            `{variable}` placeholder MSWEP does not.
+        path_template: Per-product **analysis** Drive path shape. MSWX
+            carries a `{variable}` placeholder MSWEP does not.
+        forecast_path_template: The **forecast** path shape, when the
+            product has forecast variants (MSWX). It carries `{init}` and
+            `{member}` levels — a forecast granule is keyed by
+            initialisation time and ensemble member as well as
+            variable / temporal / valid-time.
         default_version: Version used when the caller names none.
         versions: Version key to :class:`MswepVersion`.
         variants: Variant key to :class:`MswepVariant`.
@@ -315,7 +320,7 @@ class MswepProduct(BaseModel):
         variables: Variable key to :class:`MswepVariable`.
 
     Examples:
-        - MSWX's path shape has the extra variable level:
+        - MSWX's analysis path shape has the extra variable level:
             ```python
             >>> from earthlens.mswep import Catalog
             >>> Catalog().get_product("mswx").path_template
@@ -329,6 +334,7 @@ class MswepProduct(BaseModel):
     product: str
     description: str = ""
     path_template: str
+    forecast_path_template: str = ""
     default_version: str
     versions: dict[str, MswepVersion] = Field(default_factory=dict)
     variants: dict[str, MswepVariant] = Field(default_factory=dict)
@@ -337,7 +343,7 @@ class MswepProduct(BaseModel):
 
     @property
     def needs_variable_folder(self) -> bool:
-        """Return whether the path template carries a `{variable}` level."""
+        """Return whether the analysis path template carries a `{variable}` level."""
         return "{variable}" in self.path_template
 
     def variant_for(self, day: dt.date) -> str | None:
@@ -425,6 +431,7 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
                 product=key,
                 description=body.get("description", ""),
                 path_template=body["path_template"],
+                forecast_path_template=body.get("forecast_path_template", ""),
                 default_version=body["default_version"],
                 versions=_rows(body, "versions", MswepVersion, "version", path, key),
                 variants=_rows(body, "variants", MswepVariant, "variant", path, key),
