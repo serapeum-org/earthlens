@@ -18,7 +18,7 @@ That last row is the one to watch: MSWX shards by variable *above* the temporal 
 different Drive path shapes.
 
 ```text
-MSWEP   MSWEP_V315/Past/Hourly/2020116.18.nc
+MSWEP   MSWEP_V316_test/Past/Hourly/2020116.18.nc
 MSWX    MSWX_V100/Past/Temp/Daily/2007133.nc
 ```
 
@@ -53,10 +53,9 @@ paths = EarthLens(
 ).download()
 ```
 
-!!! note "Only `Temp` is confirmed today"
-    Nine of MSWX's ten variable folder spellings could not be verified without a live share, so they are marked
-    `provisional` in the catalog and **refused** rather than guessed at. If you have access, confirm the real
-    names inside your share and drop the flags from `mswep_data_catalog.yaml`.
+!!! note "All ten MSWX variables are available"
+    Every variable folder — `Temp` `P` `Tmax` `Tmin` `Pres` `RelHum` `SpecHum` `Wind` `SWd` `LWd` — is confirmed
+    against the share. The forecast streams (`Mid`, `Long`) are catalogued but not yet fetchable.
 
 ## Variants are chosen by date
 
@@ -83,7 +82,7 @@ Granules mirror the share's own layout under `path=`, because a granule name is 
 folder** — MSWEP and MSWX share the `YYYYDOY.nc` stem, and all ten MSWX variables repeat it:
 
 ```text
-out/MSWEP_V315/Past/Daily/2020116.nc
+out/MSWEP_V316_test/Past/Daily/2020116.nc
 out/MSWX_V100/Past/Temp/Daily/2007133.nc
 ```
 

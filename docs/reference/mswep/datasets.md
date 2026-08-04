@@ -20,7 +20,7 @@ cat.get_product("mswx").path_template           # includes {variable}
 | Units | `mm/hour`, `mm/3-hour`, `mm/day`, `mm/month` by resolution |
 | Resolutions | `Hourly`, `3hourly`, `Daily`, `Monthly` |
 | Variants | `Past` (gauge-corrected), `Past_nogauge` (satellite-reanalysis baseline), `NRT` |
-| Versions | `2.80` → `MSWEP_V280`, `3.15` → `MSWEP_V315` |
+| Versions | `2.80` → `MSWEP_V280` (no `Hourly`), `3.16` → `MSWEP_V316_test` |
 
 Hourly **NRT** granules carry an extra `model_id` field (1800 × 3600, values 1–18) identifying which predictor
 stack produced each grid cell. At low and mid latitudes `model_id == 1` means the estimate is final and
@@ -28,60 +28,55 @@ consistent with the historical record; at high latitudes that is `model_id == 5`
 
 ## MSWX
 
-Ten meteorological variables at 0.1° / 3-hourly. `Temp` is the only folder spelling externally confirmed; the
-rest are `provisional` in the catalog and refused until verified against a real share.
+Ten meteorological variables at 0.1° / 3-hourly (`3hourly`, `Daily`, `Monthly` — no `Hourly`). All ten folder
+spellings are confirmed against the share:
 
-| Variable | Folder | Confirmed |
-|---|---|---|
-| 2-m air temperature | `Temp` | yes |
-| Precipitation | `P` | no |
-| 2-m daily maximum air temperature | `Tmax` | no |
-| 2-m daily minimum air temperature | `Tmin` | no |
-| Surface pressure | `Pres` | no |
-| 2-m relative humidity | `RelHum` | no |
-| 2-m specific humidity | `SpecHum` | no |
-| 10-m wind speed | `Wind` | no |
-| Downward shortwave radiation | `SWd` | no |
-| Downward longwave radiation | `LWd` | no |
+| Variable | Folder |
+|---|---|
+| 2-m air temperature | `Temp` |
+| Precipitation | `P` |
+| 2-m daily maximum air temperature | `Tmax` |
+| 2-m daily minimum air temperature | `Tmin` |
+| Surface pressure | `Pres` |
+| 2-m relative humidity | `RelHum` |
+| 2-m specific humidity | `SpecHum` |
+| 10-m wind speed | `Wind` |
+| Downward shortwave radiation | `SWd` |
+| Downward longwave radiation | `LWd` |
 
 ## MSWX forecast streams
 
-MSWX publishes two ensemble forecast streams alongside `Past` and `NRT`. They are catalogued with everything
-that is publicly documented, but **cannot be downloaded yet**:
+MSWX publishes two ensemble forecast streams alongside `Past` and `NRT`, as the folders **`Mid`** and **`Long`**.
+They are catalogued but **not yet fetchable** — requesting one raises `NotImplementedError`:
 
-| Stream | Base model | Members | Horizon | Re-initialised |
-|---|---|---|---|---|
-| `Medium Range Forecast` | NOAA GEFS | 30 | 10 days | daily |
-| `Seasonal Forecast` (MSWX-Long) | ECMWF SEAS5 | 51 | 7 months | monthly |
+| Stream | Folder | Base model | Members | Horizon | Re-initialised |
+|---|---|---|---|---|---|
+| Medium-range | `Mid` | NOAA GEFS | 30 | 10 days | daily |
+| Seasonal (MSWX-Long) | `Long` | ECMWF SEAS5 | 51 | 7 months | monthly |
 
-Requesting one raises `NotImplementedError` explaining why, rather than silently returning nothing.
-
-The blocker is structural, not a missing string. An analysis granule is addressed by
-`<root>/<variant>/<variable>/<temporal>/<valid-time>.nc`, but a **forecast** granule is identified by an
-initialisation time, a lead time *and* an ensemble member — three coordinates that template does not carry. It
-is also unpublished whether members are sub-folders or a file-name component, and whether the stem encodes the
-initialisation time, the valid time, or both.
-
-Pinning that layout needs an approved share, and is part of task `A1`. Once known, the catalog needs a
-forecast-aware path template rather than a new row.
+The blocker is structural, not a missing string. The confirmed layout is
+`<variant>/<variable>/<YYYYMMDD_HH init>/<member NN>/<lead>.nc` — a forecast granule is keyed by an
+initialisation time, an ensemble member (a **sub-folder**, `01` … `NN`) *and* a lead time, three coordinates the
+analysis `path_template` cannot express. The archive is also sparse: historical inits carry only a few, empty
+member folders, and `Long` was empty when surveyed. Implementing the fetch needs a forecast-aware path template
+and is left as follow-up.
 
 ```python
 from earthlens.mswep import Catalog
 
-seasonal = Catalog().get_product("mswx").variants["Seasonal Forecast"]
+seasonal = Catalog().get_product("mswx").variants["Long"]
 seasonal.members, seasonal.base_model, seasonal.horizon   # (51, 'SEAS5', '7 months')
-print(seasonal.notes)                                     # exactly what is unpinned
 ```
 
-## Provisional values
+## Where the folders live
 
-A row marked `provisional: true` could not be verified without an approved share. `Catalog.check_not_provisional`
-refuses it at request time, because resolving against a guess would build a Drive path that does not exist — and
-since a missing granule is logged and skipped, that would return a **silently partial** time series rather than
-an error.
+`folder_id` **is** the version root. GloH2O shares one folder per product and per version — the id you are given
+is the `MSWEP_V280` / `MSWX_V100` / `MSWEP_V316_test` folder itself, whose children are the variants. There is no
+parent to search, so which version you get is decided by which share you point `folder_id` at; the `version=`
+argument selects catalog metadata (units, the trend caveat), not the data.
 
-Still provisional: the live V3.16 root folder name, nine MSWX variable folders, MSWX's `NRT` window and its
-`3hourly` folder.
+Earlier releases of this backend marked unverified values `provisional` and refused them at request time; with
+the share walked, every provisional flag has been dropped — the catalog now reflects the real layout.
 
 ## Gauge metadata
 

@@ -135,10 +135,10 @@ class MswepVariant(BaseModel):
             datetime.date(2024, 12, 31)
 
             ```
-        - MSWX's seasonal stream records its ensemble size:
+        - MSWX's seasonal stream (`Long`) records its ensemble size:
             ```python
             >>> from earthlens.mswep import Catalog
-            >>> seasonal = Catalog().get_product("mswx").variants["Seasonal Forecast"]
+            >>> seasonal = Catalog().get_product("mswx").variants["Long"]
             >>> seasonal.kind, seasonal.members, seasonal.base_model
             ('forecast', 51, 'SEAS5')
 

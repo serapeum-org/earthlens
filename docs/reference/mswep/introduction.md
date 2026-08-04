@@ -15,8 +15,8 @@ no module under `earthlens.mswep` imports `xarray`.
 ## Access is a prerequisite
 
 There is no anonymous download. You must have your **own** approved GloH2O access before this backend can do
-anything — see [Authentication](authentication.md), which is the page to read first. A **service account will
-not work**; the credential must belong to the human account the folder was shared with.
+anything — see [Authentication](authentication.md), which is the page to read first. GloH2O link-shares its
+folders, so any Google credential works — a service account, or your existing `gcloud` login.
 
 ## Licence
 
@@ -37,7 +37,7 @@ reads artificially low over 2000–2015** relative to the surrounding periods. I
 > "For users who require reliable trend estimates, we recommend using **V2.80** for 1979–2021 until the issue
 > is resolved." — MSWEP V3.16 Documentation
 
-That is why `version=` is a first-class selector: several version-stamped roots coexist in the share.
+GloH2O shares a separate folder per version, so pass the `folder_id` for the version you want (`version=` then selects its catalog metadata):
 
 ```python
 EarthLens("mswep", version="2.80", ...)   # the trend-safe archive
@@ -50,5 +50,5 @@ transfer via `rclone`. This backend is for targeted product / variant / resoluti
 when a request exceeds the catalog's granule threshold.
 
 ```bash
-rclone sync -v --drive-shared-with-me GoogleDrive:/MSWEP_V315/Past/Daily ./mswep
+rclone sync -v --drive-shared-with-me GoogleDrive:/MSWEP_V316_test/Past/Daily ./mswep
 ```
