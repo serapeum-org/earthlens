@@ -2,16 +2,22 @@
 
 Selected with `-m "e2e and mswep"`; the default run deselects them.
 They need access the maintainers cannot provision automatically: a
-GloH2O request form must be approved for **your own** Google account
-(one form per product, `gloh2o.org/mswep` and `gloh2o.org/mswx`), and
-the resulting share id plus a **user** OAuth credential must be
-configured — see `docs/reference/mswep/authentication.md`.
+GloH2O request form must be approved (one form per product,
+`gloh2o.org/mswep` and `gloh2o.org/mswx`), and the resulting share id
+plus a credential must be configured — see
+`docs/reference/mswep/authentication.md`.
 
 The tests `skip` rather than fail when that configuration is absent, so
 a contributor without access still gets a green run. That is a
 deliberate exception to the repo's marker-not-environment rule: the
 marker decides whether the tests are *selected*, and the skip only
 reports that the selected tests cannot run on this machine.
+
+Configure with `$MSWEP_DRIVE_FOLDER` (the shared folder id — which is
+the version root) plus any credential: `$MSWEP_TOKEN_FILE`,
+`$MSWEP_RCLONE_REMOTE`, or Application Default Credentials (`gcloud auth
+application-default login`). `$MSWEP_E2E_VERSION` names the version the
+folder holds (default `3.16`).
 """
 
 from __future__ import annotations
@@ -27,37 +33,72 @@ from earthlens.mswep.auth import (
     FOLDER_ID_ENV,
     RCLONE_REMOTE_ENV,
     TOKEN_FILE_ENV,
+    try_application_default,
 )
 
 pytestmark = [pytest.mark.e2e, pytest.mark.mswep]
 
 
+def _has_credential() -> bool:
+    """Return whether any Drive credential is available (incl. ADC)."""
+    if os.getenv(TOKEN_FILE_ENV) or os.getenv(RCLONE_REMOTE_ENV):
+        return True
+    return try_application_default() is not None
+
+
 def _configured() -> bool:
     """Return whether this machine has an approved share configured."""
-    has_folder = bool(os.getenv(FOLDER_ID_ENV))
-    has_credential = bool(os.getenv(TOKEN_FILE_ENV) or os.getenv(RCLONE_REMOTE_ENV))
-    return has_folder and has_credential
+    return bool(os.getenv(FOLDER_ID_ENV)) and _has_credential()
 
 
 requires_share = pytest.mark.skipif(
     not _configured(),
     reason=(
-        f"no approved GloH2O share configured: set ${FOLDER_ID_ENV} plus "
-        f"${TOKEN_FILE_ENV} or ${RCLONE_REMOTE_ENV}. Access is granted per "
+        f"no approved GloH2O share configured: set ${FOLDER_ID_ENV} plus a "
+        f"credential (${TOKEN_FILE_ENV}, ${RCLONE_REMOTE_ENV}, or ADC via "
+        "`gcloud auth application-default login`). Access is granted per "
         "person via the GloH2O request form."
     ),
 )
 
+VERSION = os.getenv("MSWEP_E2E_VERSION", "3.16")
+
 
 @requires_share
-def test_downloads_one_daily_granule(tmp_path):
-    """One real MSWEP daily granule lands on disk as a NetCDF file."""
+def test_downloads_two_daily_granules(tmp_path):
+    """Two real MSWEP daily granules land on disk as NetCDF files."""
     source = MSWEP(
         start="2020-04-25",
-        end="2020-04-25",
+        end="2020-04-26",
         variables=["precipitation"],
         temporal_resolution="daily",
         variant="Past",
+        version=VERSION,
+        credentials=MswepCredentials(),
+        path=tmp_path,
+    )
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        paths = source.download(progress_bar=False)
+
+    assert [p.name for p in paths] == ["2020116.nc", "2020117.nc"]
+    for granule in paths:
+        assert granule.stat().st_size > 0
+        # netCDF-4 is HDF5-framed; classic netCDF starts "CDF". Accept either.
+        assert granule.read_bytes()[:4] in (b"\x89HDF", b"CDF\x01", b"CDF\x02")
+    # Every request carries the CC-BY-NC obligation.
+    assert any(issubclass(w.category, LicenseWarning) for w in caught)
+
+
+@requires_share
+def test_output_mirrors_the_version_root(tmp_path):
+    """Granules land under `<version-root>/Past/Daily/`, as the share holds them."""
+    source = MSWEP(
+        start="2020-04-25",
+        end="2020-04-25",
+        temporal_resolution="daily",
+        variant="Past",
+        version=VERSION,
         credentials=MswepCredentials(),
         path=tmp_path,
     )
@@ -65,26 +106,21 @@ def test_downloads_one_daily_granule(tmp_path):
         warnings.simplefilter("ignore", LicenseWarning)
         paths = source.download(progress_bar=False)
 
-    assert len(paths) == 1
-    granule = paths[0]
-    assert granule.name == "2020116.nc"
-    assert granule.stat().st_size > 0
-    # netCDF-4 is HDF5-framed; classic netCDF starts "CDF". Accept either
-    # rather than pinning the on-disk format GloH2O happens to ship today.
-    assert granule.read_bytes()[:4] in (b"\x89HDF", b"CDF\x01", b"CDF\x02")
+    relative = paths[0].relative_to(tmp_path).as_posix()
+    assert relative.endswith("/Past/Daily/2020116.nc")
 
 
 @requires_share
-def test_share_lists_the_expected_roots(tmp_path):
-    """The share exposes a version-stamped root the catalog knows about."""
+def test_root_is_the_shared_folder(tmp_path):
+    """The shared folder id resolves to a version-stamped root."""
     source = MSWEP(
         start="2020-04-25",
         end="2020-04-25",
         temporal_resolution="daily",
+        version=VERSION,
         credentials=MswepCredentials(),
         path=tmp_path,
     )
     source._initialize()
-    roots = source.resolver.share_roots()
-    assert roots, "the approved share listed no folders"
-    assert any(name.startswith("MSWEP_V") for name in roots), sorted(roots)
+    root = source.resolver.root()
+    assert root.name.startswith("MSWEP_V"), root.name
