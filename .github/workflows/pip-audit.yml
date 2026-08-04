@@ -45,14 +45,18 @@ jobs:
         # rather than failing the run — the job fails only when a real vulnerability is
         # reported (pip-audit exits non-zero).
         run: |
-          # Ignore known advisories in two TRANSITIVE deps that cannot currently be
-          # remediated and do not apply to earthlens (a client data-download library,
-          # not a server): aiohttp 3.12.15 is capped by a transitive SDK constraint so
-          # it can't reach the fixed 3.13/3.14 line, and all its advisories are
-          # server-side (request smuggling / DoS on an aiohttp server earthlens never
-          # runs); paramiko 3.5.1's PYSEC-2026-2858 (SHA-1) has no released fix and is
-          # not used directly. The gate still fails on any new or direct vulnerability.
-          IGNORED_VULNS="PYSEC-2026-1097 PYSEC-2026-1099 PYSEC-2026-1100 PYSEC-2026-1101 PYSEC-2026-1105 PYSEC-2026-1106 PYSEC-2026-1107 PYSEC-2026-1109 PYSEC-2026-2094 PYSEC-2026-2095 PYSEC-2026-2096 PYSEC-2026-2097 PYSEC-2026-2098 PYSEC-2026-2099 PYSEC-2026-2100 PYSEC-2026-2101 PYSEC-2026-2102 PYSEC-2026-2103 PYSEC-2026-2104 PYSEC-2026-2105 PYSEC-2026-2106 PYSEC-2026-2107 PYSEC-2026-2108 PYSEC-2026-2109 PYSEC-2026-2110 PYSEC-2026-2111 PYSEC-2026-2112 PYSEC-2026-2113 PYSEC-2026-237 PYSEC-2026-2858"
+          # Ignore known advisories in two TRANSITIVE deps whose fix is not currently
+          # reachable and that do not apply to earthlens (a client data-download
+          # library, not a server): aiohttp 3.12.15 is held below the fixed 3.13/3.14
+          # line by a transitive constraint, and its advisories are either server-side
+          # (request smuggling on an aiohttp server earthlens never runs) or a client
+          # DoS reachable only from an attacker-controlled server — earthlens fetches
+          # only from trusted data providers, and the pure-Python parser is unaffected;
+          # paramiko 3.5.1's PYSEC-2026-2858 (SHA-1) has no released fix and is not used
+          # directly. Advisories that DO have a released fix are remediated in uv.lock
+          # instead of ignored (e.g. cryptography 49.0.0 -> 50.0.0 for PYSEC-2026-3552).
+          # The gate still fails on any new or direct vulnerability.
+          IGNORED_VULNS="PYSEC-2026-1097 PYSEC-2026-1099 PYSEC-2026-1100 PYSEC-2026-1101 PYSEC-2026-1105 PYSEC-2026-1106 PYSEC-2026-1107 PYSEC-2026-1109 PYSEC-2026-2094 PYSEC-2026-2095 PYSEC-2026-2096 PYSEC-2026-2097 PYSEC-2026-2098 PYSEC-2026-2099 PYSEC-2026-2100 PYSEC-2026-2101 PYSEC-2026-2102 PYSEC-2026-2103 PYSEC-2026-2104 PYSEC-2026-2105 PYSEC-2026-2106 PYSEC-2026-2107 PYSEC-2026-2108 PYSEC-2026-2109 PYSEC-2026-2110 PYSEC-2026-2111 PYSEC-2026-2112 PYSEC-2026-2113 PYSEC-2026-237 PYSEC-2026-2858 PYSEC-2026-3545 PYSEC-2026-3546 PYSEC-2026-3547"
           IGNORE_FLAGS=""
           for id in $IGNORED_VULNS; do IGNORE_FLAGS="$IGNORE_FLAGS --ignore-vuln $id"; done
           uv run --locked python -m pip freeze --exclude-editable \
