@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20818,8 +20818,9 @@ meaningless:</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Where the folder lives</p>
-<p>The documentation names the folder and every file but not its <strong>parent</strong>. The backend therefore probes the
-version root (alongside <code>Past</code> / <code>NRT</code>) first, then the share root, and reports both if neither has it.</p>
+<p>The documentation names the folder and every file but not its <strong>parent</strong>. The v3.16 share carries it directly
+under the version root (the shared <code>folder_id</code>), alongside <code>Past</code> / <code>NRT</code>, so the backend looks for it there in
+a single lookup and raises if it is absent (older versions such as v2.80 ship none).</p>
 </div>
 
 

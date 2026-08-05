@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -20628,7 +20628,10 @@ is resolved." — MSWEP V3.16 Documentation</p>
 <p>An hourly year is ~8760 granules. The Drive API is not built for that, and GloH2O asks non-commercial users to
 transfer via <code>rclone</code>. This backend is for targeted product / variant / resolution / window requests; it warns
 when a request exceeds the catalog's granule threshold.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>rclone<span class="w"> </span>sync<span class="w"> </span>-v<span class="w"> </span>--drive-shared-with-me<span class="w"> </span>GoogleDrive:/MSWEP_V316_test/Past/Daily<span class="w"> </span>./mswep
+<p>The folder is link-shared, <strong>not</strong> in the account's "Shared with me", so point <code>rclone</code> at it by id — the same
+id you pass earthlens as <code>folder_id</code>. With <code>--drive-root-folder-id</code> set to that id, the remote's root <em>is</em> the
+version folder, so its children (<code>Past</code> / <code>NRT</code> / …) are addressed relative to it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>rclone<span class="w"> </span>sync<span class="w"> </span>-v<span class="w"> </span>--drive-root-folder-id<span class="w"> </span>&lt;folder-id&gt;<span class="w"> </span>GoogleDrive:Past/Daily<span class="w"> </span>./mswep
 </code></pre></div>
 
 
