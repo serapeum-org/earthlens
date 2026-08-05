@@ -150,6 +150,6 @@ def test_root_is_the_shared_folder(tmp_path):
         credentials=MswepCredentials(),
         path=tmp_path,
     )
-    source._initialize()
+    # Auth is lazy: reading `resolver` opens the Drive client on first use.
     root = source.resolver.root()
     assert root.name.startswith("MSWEP_V"), root.name

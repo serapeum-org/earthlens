@@ -58,6 +58,17 @@ def build(share, tmp_path):
     return _build
 
 
+class TestLazyAuth:
+    """Authentication is deferred to first client use, not construction."""
+
+    def test_client_opens_lazily_not_at_construction(self, build, share):
+        """The Drive client opens on first `client` access, then caches."""
+        source = build()
+        assert "_client_obj" not in source.__dict__  # not opened at construction
+        assert source.client is share  # opens now, returns the live service
+        assert "_client_obj" in source.__dict__  # cached thereafter
+
+
 def _quiet_download(source):
     """Download while suppressing the always-emitted licence warning."""
     with warnings.catch_warnings():

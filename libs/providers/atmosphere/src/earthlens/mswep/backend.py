@@ -43,6 +43,7 @@ from tqdm import tqdm
 
 from earthlens.base import (
     AbstractDataSource,
+    LazyClientMixin,
     OutputKind,
     RemoteProduct,
     SpatialExtent,
@@ -138,7 +139,7 @@ def _safe_destination(root: Path, folder: str, name: str) -> Path:
     return destination
 
 
-class MSWEP(AbstractDataSource):
+class MSWEP(LazyClientMixin, AbstractDataSource):
     """Download MSWEP / MSWX NetCDF granules from an approved GloH2O share.
 
     Attributes:
@@ -284,15 +285,29 @@ class MSWEP(AbstractDataSource):
             path=path,
         )
 
-    def _initialize(self) -> Any:
-        """Authenticate and return the Drive v3 client.
+    def _initialize(self) -> None:
+        """Keep construction offline; the Drive client opens lazily.
+
+        `MSWEP` mixes in :class:`~earthlens.base.LazyClientMixin`, so
+        authentication is deferred to first :attr:`client` access (via
+        `download` / `search` / `authenticate`) rather than run here.
+        Returns `None` so the parent binds no eager client and
+        constructing the backend — or a bare `EarthLens("mswep", ...)` —
+        never touches the network.
+        """
+        return None
+
+    def _open_client(self) -> Any:
+        """Authenticate and return the Drive v3 client (opened lazily).
+
+        Called once, on first access to :attr:`client`, and cached by
+        :class:`~earthlens.base.LazyClientMixin`.
 
         Returns:
-            Any: The Drive client, bound by the parent as `self.client`.
+            Any: The authenticated Drive v3 client.
 
         Raises:
-            AuthenticationError: When no credential or folder id
-                resolves.
+            AuthenticationError: When no credential or folder id resolves.
         """
         self._auth.configure()
         return self._auth.service
@@ -340,10 +355,15 @@ class MSWEP(AbstractDataSource):
 
     @property
     def resolver(self) -> RootResolver:
-        """Return the version to root-folder resolver, built on first use."""
+        """Return the version to root-folder resolver, built on first use.
+
+        Reading :attr:`client` first opens the Drive connection lazily
+        (authenticating), so the resolver is always built on a live
+        service.
+        """
         if self._resolver is None:
             self._resolver = RootResolver(
-                self._auth.service, self._auth.folder_id, self._catalog
+                self.client, self._auth.folder_id, self._catalog
             )
         return self._resolver
 
