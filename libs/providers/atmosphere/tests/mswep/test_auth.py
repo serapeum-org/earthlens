@@ -381,3 +381,25 @@ class TestMswepAuth:
         auth = MswepAuth(MswepCredentials(folder_id="1AbC"))
         auth.configure()
         assert built["credentials"] == "adc-creds"
+
+    def test_discovered_default_config_without_remote_falls_through_to_adc(
+        self, tmp_path, monkeypatch
+    ):
+        """An auto-discovered default rclone.conf with no remote must not pre-empt ADC."""
+        conf = _write(tmp_path / "rclone.conf", RCLONE_DRIVE_REMOTE)
+        monkeypatch.setattr(
+            "earthlens.mswep.auth.default_rclone_config_paths", lambda: [conf]
+        )
+        monkeypatch.setattr(auth_module, "try_application_default", lambda: "adc-creds")
+        built = {}
+
+        def _fake_build(name, version, credentials=None, cache_discovery=None):
+            built["credentials"] = credentials
+            return "drive-client"
+
+        monkeypatch.setattr(
+            auth_module, "_import_google_modules", lambda: (object(), _fake_build)
+        )
+        auth = MswepAuth(MswepCredentials(folder_id="1AbC"))
+        auth.configure()
+        assert built["credentials"] == "adc-creds"

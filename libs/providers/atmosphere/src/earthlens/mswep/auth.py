@@ -424,6 +424,18 @@ class MswepCredentials(BaseModel):
                 return candidate
         return None
 
+    def rclone_config_is_explicit(self) -> bool:
+        """Return whether an rclone config was explicitly supplied.
+
+        `True` when `rclone_config` was passed or `$MSWEP_RCLONE_CONFIG`
+        is set, as opposed to an auto-discovered default `rclone.conf`.
+        The credential ladder treats the two differently: an explicit
+        config with no remote name is a misconfiguration worth flagging,
+        but a merely-present default must not pre-empt a later source
+        (Application Default Credentials).
+        """
+        return self.rclone_config is not None or bool(os.getenv(RCLONE_CONFIG_ENV))
+
 
 class MswepAuth(AbstractAuth[MswepCredentials]):
     """Build an authenticated Google Drive v3 client for the GloH2O share.
@@ -530,7 +542,12 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
         if config_path is not None and remote is not None:
             return credentials_from_rclone_remote(config_path, remote)
 
-        if config_path is not None and remote is None:
+        # A remote name is what turns rclone into a credential source. An
+        # *explicit* config with no remote is a misconfiguration worth flagging;
+        # but a merely auto-discovered default rclone.conf — which a GloH2O user
+        # very likely has, since the approval email tells them to install rclone
+        # — must not pre-empt ADC. Fall through to it rather than erroring.
+        if remote is None and self._creds.rclone_config_is_explicit():
             raise AuthenticationError(
                 f"found an rclone config at {config_path} but no remote name. "
                 f"Pass `rclone_remote=` or set ${RCLONE_REMOTE_ENV} to the "
