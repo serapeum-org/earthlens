@@ -88,6 +88,17 @@ class TestLazyAuth:
         assert source.client is share  # opens now, returns the live service
         assert "_client_obj" in source.__dict__  # cached thereafter
 
+    def test_construction_without_folder_id_is_offline(self, share, tmp_path):
+        """Constructing with no folder_id resolves nothing eagerly (auth is lazy)."""
+        source = MSWEP(
+            start="2020-04-25",
+            end="2020-04-26",
+            temporal_resolution="daily",
+            service=share,
+            path=tmp_path,
+        )
+        assert "_client_obj" not in source.__dict__
+
 
 def _quiet_download(source):
     """Download while suppressing the always-emitted licence warning."""
@@ -390,6 +401,16 @@ class TestForecastVariants:
         paths = _quiet_download(self._forecast(share, tmp_path))
         # fake share carries members 01 and 02 only, x 2 valid days
         assert {p.parent.parent.name for p in paths} == {"01", "02"}
+
+    def test_forecast_without_layout_template_raises(self, share, tmp_path):
+        """A forecast variant on a product with no forecast layout is refused."""
+        base = Catalog()
+        product = base.datasets["mswx"].model_copy(
+            update={"forecast_path_template": ""}
+        )
+        cat = base.model_copy(update={"datasets": {**base.datasets, "mswx": product}})
+        with pytest.raises(ValueError, match="declares no forecast layout"):
+            _quiet_download(self._forecast(share, tmp_path, members=[1], catalog=cat))
 
     def test_forecast_requires_init(self, share, tmp_path):
         """A forecast variant with no init= is refused at construction."""

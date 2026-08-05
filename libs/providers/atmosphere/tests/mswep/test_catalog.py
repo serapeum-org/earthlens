@@ -355,6 +355,12 @@ class TestLoading:
         with pytest.raises(ValueError):
             Catalog.load(_write(tmp_path, text))
 
+    def test_malformed_gauge_metadata_file_is_rejected(self, tmp_path):
+        """A gauge-metadata file row with an unknown field fails validation."""
+        text = MINIMAL + "gauge_metadata:\n  files:\n    bad.csv:\n      bogus: 1\n"
+        with pytest.raises(ValueError, match="gauge_metadata file 'bad.csv'"):
+            Catalog.load(_write(tmp_path, text))
+
     def test_injected_datasets_skip_the_disk_read(self):
         """Passing datasets builds a Catalog without touching the YAML."""
         product = Catalog().get_product("mswep")

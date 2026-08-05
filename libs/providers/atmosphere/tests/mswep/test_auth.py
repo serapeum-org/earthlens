@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import pytest
@@ -145,6 +146,11 @@ class TestServiceAccountAndAdc:
         monkeypatch.setattr(google.auth, "default", _raise)
         assert auth_module.try_application_default() is None
 
+    def test_adc_returns_none_without_google_auth(self, monkeypatch):
+        """When google-auth is not importable, `try_application_default` returns None."""
+        monkeypatch.setitem(sys.modules, "google.auth", None)
+        assert auth_module.try_application_default() is None
+
 
 class TestCredentialsFromRcloneRemote:
     """Reusing the OAuth token `rclone config` already minted."""
@@ -247,6 +253,15 @@ class TestCredentialResolution:
         """With nothing set and no default present, resolution yields `None`."""
         monkeypatch.setattr(
             "earthlens.mswep.auth.default_rclone_config_paths", lambda: []
+        )
+        assert MswepCredentials().resolved_rclone_config() is None
+
+    def test_default_that_is_absent_is_skipped(self, monkeypatch):
+        """A default candidate that does not exist on disk is skipped, yielding `None`."""
+        monkeypatch.delenv(RCLONE_CONFIG_ENV, raising=False)
+        monkeypatch.setattr(
+            "earthlens.mswep.auth.default_rclone_config_paths",
+            lambda: [Path("/does/not/exist/rclone.conf")],
         )
         assert MswepCredentials().resolved_rclone_config() is None
 
