@@ -36,7 +36,7 @@ plain HTTP and pull in no additional SDK.
 | Open NWP forecasts (NOAA NODD / ECMWF Open Data / DWD via Herbie) | `nwp` | raster | none (open buckets) | `nwp` | [NWP](nwp/introduction.md) |
 | NEXRAD Level-II radar (real-time chunk feed) | `radar`, `nexrad` | vector | none (anonymous S3) | `radar` | [NEXRAD radar](radar/introduction.md) |
 | openEO server-side processing (defaults to CDSE) | `openeo` | raster | CDSE OIDC (interactive or client-credentials) | `openeo` | [openEO](openeo/introduction.md) |
-| GloH2O MSWEP / MSWX (approved Drive share) | `mswep`, `mswx`, `gloh2o` | raster (NetCDF granules) | user OAuth (Drive) - access granted per person | `mswep` | [MSWEP](mswep/introduction.md) |
+| GloH2O MSWEP / MSWX (approved Drive share) | `mswep`, `mswx`, `gloh2o` | raster (NetCDF granules) | any Drive credential (service account / ADC / OAuth / rclone) - link-shared, access granted per person | `mswep` | [MSWEP](mswep/introduction.md) |
 | NOAA National Water Model (`noaa-nwm-pds`) | `nwm`, `national-water-model` | per-product (`chrtout` tabular / `ldasout` raster) | unsigned AWS (public bucket) | `nwm` | [NWM](nwm/introduction.md) |
 | Humanitarian Data Exchange (UN OCHA, CKAN) | `hdx` | mixed | none (public) | `hdx` | [HDX](hdx/introduction.md) |
 | NASA FIRMS active fire detections | `firms` | vector | `FIRMS_MAP_KEY` | — | [FIRMS](firms/introduction.md) |
