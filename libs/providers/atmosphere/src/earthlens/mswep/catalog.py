@@ -11,15 +11,17 @@ the two shapes stay explicit:
 * MSWEP — `{root}/{variant}/{temporal}/{stem}.nc`
 * MSWX — `{root}/{variant}/{variable}/{temporal}/{stem}.nc`
 
-**Provisional rows.** Some values cannot be verified without an approved
-GloH2O Drive share (the live V3.16 root folder name, nine of the ten
-MSWX variable folder spellings, MSWX's `NRT` window). Those rows carry
-`provisional: true` in the YAML and surface as
-:attr:`MswepVersion.provisional` / :attr:`MswepVariable.provisional` /
-:attr:`MswepVariant.provisional` / :attr:`MswepResolution.provisional`.
-:meth:`Catalog.check_not_provisional` refuses them, so a request built
-on an unverified constant fails loudly instead of resolving to a Drive
-path that does not exist and degrading into an empty download.
+**Provisional rows.** The `provisional` flag guards a value that could
+not be verified without an approved GloH2O Drive share. A flagged row
+surfaces as :attr:`MswepVersion.provisional` /
+:attr:`MswepVariable.provisional` / :attr:`MswepVariant.provisional` /
+:attr:`MswepResolution.provisional`, and
+:meth:`Catalog.check_not_provisional` refuses it, so a request built on
+an unverified constant fails loudly instead of resolving to a Drive path
+that does not exist and degrading into an empty download. The share has
+since been walked, so the shipped `mswep_data_catalog.yaml` currently
+marks **nothing** provisional; the guard stays in place for any value
+added unverified in future.
 
 :data:`CATALOG_PATH` is the path to the bundled YAML;
 :func:`clear_catalog_cache` empties the `(path, mtime)` parse cache.
@@ -50,13 +52,13 @@ def clear_catalog_cache() -> None:
 class ProvisionalValueError(ValueError):
     """Raised when a request resolves onto an unverified catalog value.
 
-    Some MSWEP / MSWX constants — the live V3.16 root folder, nine of the
-    ten MSWX variable folder spellings, MSWX's `NRT` window — could not
-    be confirmed without an approved GloH2O Drive share. Rather than
-    guess and have `files.list` quietly return nothing (which the
+    A value the catalog cannot confirm without an approved GloH2O Drive
+    share is marked `provisional`, and resolving against it raises this
+    rather than letting `files.list` quietly return nothing (which the
     missing-granule path would log and skip, yielding a silently partial
-    time series), the catalog marks them `provisional` and this error
-    stops the request with the reason.
+    time series). The share has since been walked, so the shipped catalog
+    currently marks nothing provisional; this guard remains for any value
+    added unverified later.
     """
 
 
