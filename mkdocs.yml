@@ -463,6 +463,7 @@ nav:
       - Hurricanes Ida & Milton from GOES (sub-daily): examples/showcases/hurricanes_goes_subdaily.ipynb
       - Europe temperature animation, June-July 2026 (ECMWF): examples/showcases/europe_temperature_2026.ipynb
       - Netherlands 2026 water shortage (multi-source): examples/showcases/netherlands_drought_2026.ipynb
+      - MSWEP pre-monsoon precipitation, April 2020 (GloH2O): examples/showcases/mswep_precipitation_2020.ipynb
     - June 2026 European heat wave:
       - Full case study: examples/heatwave/european_heatwave_2026.ipynb
       - True-colour time-lapse: examples/heatwave/european_heatwave_timelapse_2026.ipynb
