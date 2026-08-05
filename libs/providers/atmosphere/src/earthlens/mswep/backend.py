@@ -504,6 +504,12 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
             )
             raise ValueError(f"{subject}. Known: {sorted(self._product.variables)}.")
 
+        for name in requested:
+            self._catalog.check_not_provisional(
+                self._product.variables[name],
+                f"the {self._product_key} {name!r} variable",
+            )
+
         if not self._product.needs_variable_folder:
             return [None]
         if not requested:
@@ -594,6 +600,9 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
         variant = self._variant
         assert variant is not None  # guaranteed by _is_forecast
         row = self._product.variants[variant]
+        self._catalog.check_not_provisional(
+            row, f"the {self._product_key} {variant!r} forecast variant"
+        )
         if not self._product.forecast_path_template:
             raise ValueError(
                 f"{self._product_key} declares no forecast layout, so {variant!r} "

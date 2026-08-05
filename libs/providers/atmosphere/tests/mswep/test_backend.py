@@ -8,8 +8,28 @@ import pytest
 
 from earthlens.biodiversity import LicenseWarning
 from earthlens.mswep.backend import CADENCES, MSWEP, _safe_destination
+from earthlens.mswep.catalog import Catalog, ProvisionalValueError
 
 pytestmark = [pytest.mark.mswep, pytest.mark.unit]
+
+
+def _catalog_marking(product_key, *, variable=None, variant=None):
+    """Return a catalog copy with one variable or variant flagged provisional."""
+    cat = Catalog()
+    product = cat.datasets[product_key]
+    updates = {}
+    if variable is not None:
+        rows = dict(product.variables)
+        rows[variable] = rows[variable].model_copy(update={"provisional": True})
+        updates["variables"] = rows
+    if variant is not None:
+        rows = dict(product.variants)
+        rows[variant] = rows[variant].model_copy(update={"provisional": True})
+        updates["variants"] = rows
+    new_product = product.model_copy(update=updates)
+    return cat.model_copy(
+        update={"datasets": {**cat.datasets, product_key: new_product}}
+    )
 
 
 class TestSafeDestination:
@@ -113,6 +133,45 @@ class TestMswxRealtimeRouting:
     def test_auto_routed_mswep_gap_returns_empty(self, build):
         """A genuinely-absent MSWEP granule still returns [] (no false NRT hint)."""
         assert _quiet_download(build(start="2020-05-01", end="2020-05-01")) == []
+
+
+class TestProvisionalGuards:
+    """A provisional variable or forecast variant is refused before download."""
+
+    def test_provisional_variable_is_refused(self, share, tmp_path):
+        """A variable flagged provisional raises rather than resolving a fake path."""
+        source = MSWEP(
+            start="2007-05-13",
+            end="2007-05-13",
+            product="mswx",
+            variables=["Temp"],
+            temporal_resolution="daily",
+            folder_id=share.path_id("MSWX_V100"),
+            service=share,
+            path=tmp_path,
+            catalog=_catalog_marking("mswx", variable="Temp"),
+        )
+        with pytest.raises(ProvisionalValueError, match="provisional"):
+            _quiet_download(source)
+
+    def test_provisional_forecast_variant_is_refused(self, share, tmp_path):
+        """A forecast variant flagged provisional raises rather than resolving nothing."""
+        source = MSWEP(
+            start="2026-08-01",
+            end="2026-08-01",
+            product="mswx",
+            variables=["Temp"],
+            temporal_resolution="daily",
+            variant="Mid",
+            init="2026-08-01",
+            members=[1],
+            folder_id=share.path_id("MSWX_V100"),
+            service=share,
+            path=tmp_path,
+            catalog=_catalog_marking("mswx", variant="Mid"),
+        )
+        with pytest.raises(ProvisionalValueError, match="provisional"):
+            _quiet_download(source)
 
 
 class TestContract:
