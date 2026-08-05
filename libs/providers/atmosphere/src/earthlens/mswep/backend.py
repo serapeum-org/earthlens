@@ -423,6 +423,41 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
             )
         return resolved
 
+    def _shadowed_realtime_variant(self) -> tuple[str, str] | None:
+        """Return `(chosen, alternative)` when auto-routing shadows a real-time stream.
+
+        Auto-routing (`variant=None`) picks the first analysis variant
+        whose window covers each date. When another analysis variant with
+        an **open end** (`end is None`, i.e. a near-real-time stream) also
+        covers that date, it is never auto-selected — so a request for
+        dates only it serves (recent MSWX, absent from the auto-picked
+        `Past`) resolves to nothing. This returns the auto-chosen variant
+        and that shadowed real-time alternative so the caller can fail
+        loud instead of returning an empty series.
+
+        Returns:
+            tuple[str, str] | None: `(chosen, alternative)`, or `None`
+                when routing is unambiguous — an explicit `variant=`, or
+                MSWEP's dated `Past` / `NRT` split, where no open-ended
+                variant is shadowed.
+        """
+        if self._variant is not None:
+            return None
+        analysis = {
+            key: row
+            for key, row in self._product.variants.items()
+            if not row.is_forecast
+        }
+        for stamp in self.time.dates:
+            day = stamp.date() if hasattr(stamp, "date") else stamp
+            chosen = self._product.variant_for(day)
+            if chosen is None:
+                continue
+            for key, row in analysis.items():
+                if key != chosen and row.end is None and row.covers(day):
+                    return chosen, key
+        return None
+
     def _folder_id_for(self, segments: list[str]) -> str | None:
         """Walk named folders from the share root, memoised per instance.
 
@@ -828,6 +863,10 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
         Raises:
             AuthenticationError: When no credential or folder id
                 resolves.
+            ValueError: When a `variant=None` request auto-routed to an
+                analysis variant that served nothing, while an open-ended
+                near-real-time stream (which auto-routing does not pick)
+                could have — recent MSWX dates need `variant="NRT"`.
         """
         self._progress = progress_bar
         warn_license(
@@ -838,4 +877,17 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
                 f"and every product must cite {self._catalog.attribution}"
             ),
         )
-        return self._api()
+        result = self._api()
+        if not result:
+            shadowed = self._shadowed_realtime_variant()
+            if shadowed is not None:
+                chosen, alt = shadowed
+                raise ValueError(
+                    f"no {self._product_key} granules resolved under the "
+                    f"auto-selected {chosen!r} variant for the requested window. "
+                    f"{self._product_key} serves recent dates from its {alt!r} "
+                    f"stream, which auto-routing does not pick; pass variant={alt!r} "
+                    "for near-real-time dates. If you expected historical data, the "
+                    f"granules are simply absent from {chosen!r}."
+                )
+        return result

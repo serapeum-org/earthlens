@@ -76,6 +76,45 @@ def _quiet_download(source):
         return source.download(progress_bar=False)
 
 
+class TestMswxRealtimeRouting:
+    """Auto-routed MSWX that `Past` cannot serve fails loud, not empty."""
+
+    def test_shadowed_realtime_variant_identifies_nrt_for_mswx(self, build):
+        """MSWX auto-routing shadows the open-ended NRT stream."""
+        source = build(
+            start="2026-08-01", end="2026-08-01", product="mswx", variables=["Temp"]
+        )
+        assert source._shadowed_realtime_variant() == ("Past", "NRT")
+
+    def test_mswep_auto_routing_shadows_nothing(self, build):
+        """MSWEP's dated split shadows no open-ended stream (Past_nogauge is bounded)."""
+        source = build(start="2020-05-01", end="2020-05-01")
+        assert source._shadowed_realtime_variant() is None
+
+    def test_explicit_variant_is_never_flagged(self, build):
+        """Naming a variant opts out of the shadow check."""
+        source = build(
+            start="2026-08-01",
+            end="2026-08-01",
+            product="mswx",
+            variables=["Temp"],
+            variant="NRT",
+        )
+        assert source._shadowed_realtime_variant() is None
+
+    def test_auto_routed_mswx_gap_raises_naming_nrt(self, build):
+        """A variant=None MSWX request Past can't serve raises, pointing at NRT."""
+        source = build(
+            start="2026-08-01", end="2026-08-01", product="mswx", variables=["Temp"]
+        )
+        with pytest.raises(ValueError, match="NRT"):
+            _quiet_download(source)
+
+    def test_auto_routed_mswep_gap_returns_empty(self, build):
+        """A genuinely-absent MSWEP granule still returns [] (no false NRT hint)."""
+        assert _quiet_download(build(start="2020-05-01", end="2020-05-01")) == []
+
+
 class TestContract:
     """The `AbstractDataSource` surface."""
 
