@@ -382,6 +382,18 @@ class TestMswepAuth:
         auth.configure()
         assert built["credentials"] == "adc-creds"
 
+    def test_remote_without_any_config_raises(self, monkeypatch):
+        """Naming a remote with no discoverable config errors, not silent ADC."""
+        monkeypatch.setattr(
+            "earthlens.mswep.auth.default_rclone_config_paths", lambda: []
+        )
+        monkeypatch.setattr(auth_module, "try_application_default", lambda: "adc-creds")
+        auth = MswepAuth(
+            MswepCredentials(folder_id="1AbC", rclone_remote="GoogleDrive")
+        )
+        with pytest.raises(AuthenticationError, match="no rclone config"):
+            auth.configure()
+
     def test_discovered_default_config_without_remote_falls_through_to_adc(
         self, tmp_path, monkeypatch
     ):

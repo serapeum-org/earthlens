@@ -542,6 +542,17 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
         if config_path is not None and remote is not None:
             return credentials_from_rclone_remote(config_path, remote)
 
+        # A named remote with no config anywhere is a dead end: the caller
+        # clearly meant to use rclone, so don't silently fall through to ADC
+        # (which could authenticate as an unintended identity). Symmetric to
+        # the "config but no remote" branch below.
+        if remote is not None and config_path is None:
+            raise AuthenticationError(
+                f"named an rclone remote ({remote!r}) but found no rclone config. "
+                f"Point ${RCLONE_CONFIG_ENV} (or `rclone_config=`) at your "
+                "rclone.conf, or unset the remote to fall back to other credentials."
+            )
+
         # A remote name is what turns rclone into a credential source. An
         # *explicit* config with no remote is a misconfiguration worth flagging;
         # but a merely auto-discovered default rclone.conf — which a GloH2O user
