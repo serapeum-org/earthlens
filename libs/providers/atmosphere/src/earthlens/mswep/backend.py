@@ -857,8 +857,12 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
             progress_bar: Show a per-granule progress bar.
 
         Returns:
-            list[Path]: The granules written. Empty when nothing in the
-                window is published yet.
+            list[Path]: The granules written. For MSWEP and any explicit
+                `variant=`, this is empty when nothing in the window is
+                published yet. An auto-routed MSWX request raises instead
+                of returning empty (see Raises): its `Past` and `NRT`
+                streams overlap, so a bare empty result would hide which
+                one to ask for.
 
         Raises:
             AuthenticationError: When no credential or folder id
@@ -866,7 +870,9 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
             ValueError: When a `variant=None` request auto-routed to an
                 analysis variant that served nothing, while an open-ended
                 near-real-time stream (which auto-routing does not pick)
-                could have — recent MSWX dates need `variant="NRT"`.
+                could also cover the window — the empty result is
+                ambiguous between a historical gap and recent dates that
+                need `variant="NRT"`.
         """
         self._progress = progress_bar
         warn_license(
@@ -883,11 +889,12 @@ class MSWEP(LazyClientMixin, AbstractDataSource):
             if shadowed is not None:
                 chosen, alt = shadowed
                 raise ValueError(
-                    f"no {self._product_key} granules resolved under the "
-                    f"auto-selected {chosen!r} variant for the requested window. "
-                    f"{self._product_key} serves recent dates from its {alt!r} "
-                    f"stream, which auto-routing does not pick; pass variant={alt!r} "
-                    "for near-real-time dates. If you expected historical data, the "
-                    f"granules are simply absent from {chosen!r}."
+                    f"no {self._product_key} granules resolved for the requested "
+                    f"window under the auto-selected {chosen!r} variant. Two "
+                    f"explanations: the dates are absent from {chosen!r} (a "
+                    f"historical gap), or they are recent and served by the "
+                    f"near-real-time {alt!r} stream, which auto-routing does not "
+                    f"pick. Pass variant={alt!r} for recent dates, or "
+                    f"variant={chosen!r} to confirm a historical gap."
                 )
         return result
