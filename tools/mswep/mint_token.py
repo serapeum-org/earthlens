@@ -18,10 +18,12 @@ Usage:
     python tools/mswep/mint_token.py <client-secret.json> [-o token.json]
 
 `<client-secret.json>` is what the Cloud console downloads for an **OAuth client
-ID** of type *Desktop app* — not a service-account key. A service account cannot
-read the GloH2O share at all: it is a separate principal whose "Shared with me"
-is empty, so it returns nothing rather than failing. This script rejects one
-rather than letting you find that out later.
+ID** of type *Desktop app* — not a service-account key. Minting an
+authorized-user token needs an OAuth client ID; a service-account key cannot mint
+one. A service-account key *can* read the share directly, though — GloH2O
+link-shares the folder — so you can skip this script and point `MSWEP_TOKEN_FILE`
+straight at the key. This script rejects a service-account key so you find that
+out up front rather than mid-mint.
 
 The script opens a browser once, you approve read-only Drive access, and it
 writes an authorized-user file containing the refresh token. Point earthlens at
@@ -126,11 +128,11 @@ def check_not_service_account(path: Path) -> None:
     if payload.get("type") == "service_account":
         raise SystemExit(
             f"{path} is a service-account key ({payload.get('client_email')}), not an "
-            "OAuth client ID. A service account cannot read the GloH2O share: Drive "
-            "authorises per principal, and a service account is a separate identity "
-            "whose 'Shared with me' is empty, so listing the folder returns nothing "
-            "rather than raising.\n\n"
-            "Create the right credential instead: Cloud console -> APIs & Services -> "
+            "OAuth client ID. Minting an authorized-user token needs an OAuth client "
+            "ID; a service-account key cannot mint one. It can, however, read the "
+            "GloH2O share directly (the folder is link-shared) -- point "
+            "MSWEP_TOKEN_FILE at this key and you do not need this script at all.\n\n"
+            "To mint a user token instead: Cloud console -> APIs & Services -> "
             "Credentials -> Create credentials -> OAuth client ID -> Desktop app."
         )
     if not ({"installed", "web"} & set(payload)):

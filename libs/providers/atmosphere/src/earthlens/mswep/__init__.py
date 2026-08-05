@@ -12,10 +12,10 @@ NetCDF is **pyramids**' job — this package never imports `xarray`.
 There is no anonymous download: a user submits a request form per
 product (`gloh2o.org/mswep`, `gloh2o.org/mswx`), and on approval GloH2O
 shares a Drive folder with **their own Google account** plus `rclone`
-instructions. earthlens automates *their* approved download. The
-credential must therefore be a **user** OAuth token — a service account
-is a separate principal that cannot see the share (see
-:mod:`earthlens.mswep.auth`).
+instructions. earthlens automates *their* approved download. The folder
+is **link-shared** ("anyone with the link"), so any credential that reads
+Drive works — a user OAuth token, an `rclone` remote, ADC, or a
+service-account key (see :mod:`earthlens.mswep.auth`).
 
 Bulk transfers stay `rclone`'s job: an hourly year is ~8760 granules.
 This backend is for targeted product / variant / resolution / window
