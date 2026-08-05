@@ -7,9 +7,24 @@ import warnings
 import pytest
 
 from earthlens.biodiversity import LicenseWarning
-from earthlens.mswep.backend import CADENCES, MSWEP
+from earthlens.mswep.backend import CADENCES, MSWEP, _safe_destination
 
 pytestmark = [pytest.mark.mswep, pytest.mark.unit]
+
+
+class TestSafeDestination:
+    """The Drive-derived download path is validated against traversal."""
+
+    def test_normal_path_joins_under_root(self, tmp_path):
+        """A well-formed folder chain joins beneath the output root."""
+        dest = _safe_destination(tmp_path, "MSWEP_V315/Past/Daily", "2020116.nc")
+        assert dest == tmp_path / "MSWEP_V315" / "Past" / "Daily" / "2020116.nc"
+
+    @pytest.mark.parametrize("evil", ["..", "MSWEP/../secret", "a\\b"])
+    def test_traversal_component_is_rejected(self, tmp_path, evil):
+        """A `..` or embedded-separator component from Drive is refused."""
+        with pytest.raises(ValueError, match="unsafe path component"):
+            _safe_destination(tmp_path, evil, "2020116.nc")
 
 
 def root_folder_id(share, product="mswep", version=None):

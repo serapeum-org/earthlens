@@ -98,6 +98,46 @@ def _parse_init(value: str, fmt: str) -> dt.datetime:
     )
 
 
+def _safe_destination(root: Path, folder: str, name: str) -> Path:
+    """Join a Drive-derived folder chain and file name under `root`.
+
+    The first folder segment is the share's own root-folder name, read
+    verbatim from Drive metadata; the rest and `name` are catalog-derived.
+    A component of `..`, an absolute part, or one carrying a path
+    separator could otherwise write outside `root`, so each is rejected
+    and the resolved path is confirmed to stay under `root`.
+
+    Args:
+        root: The output directory the granule must land under.
+        folder: The `/`-joined folder chain from the plan.
+        name: The granule file name.
+
+    Returns:
+        Path: `root` joined with the folder chain and name.
+
+    Raises:
+        ValueError: When a component is unsafe or the result escapes
+            `root`.
+    """
+    parts = [*folder.split("/"), name]
+    for part in parts:
+        if (
+            part in ("", ".", "..")
+            or "/" in part
+            or "\\" in part
+            or Path(part).is_absolute()
+        ):
+            raise ValueError(
+                f"refusing unsafe path component {part!r} from the Drive layout."
+            )
+    destination = root.joinpath(*parts)
+    if not destination.resolve().is_relative_to(root.resolve()):
+        raise ValueError(
+            f"refusing a Drive path that escapes the output directory: {destination}."
+        )
+    return destination
+
+
 class MSWEP(AbstractDataSource):
     """Download MSWEP / MSWX NetCDF granules from an approved GloH2O share.
 
@@ -646,7 +686,7 @@ class MSWEP(AbstractDataSource):
         for product in tqdm(products, desc="mswep", disable=not self._progress):
             name = str(product.metadata["name"])
             folder = str(product.metadata["folder"])
-            destination = root.joinpath(*folder.split("/"), name)
+            destination = _safe_destination(root, folder, name)
             stamp = product.metadata["timestamp"]
             if destination.exists() and not self.is_under_revision(stamp, folder):
                 logger.debug(f"mswep: {folder}/{name} already present; skipping.")
