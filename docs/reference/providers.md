@@ -44,6 +44,7 @@ plain HTTP and pull in no additional SDK.
 | Sentinel Hub server-side render (CDSE) | `sentinel-hub`, `sentinelhub` | mixed (raster / tabular per plane) | OAuth client id / secret | `sentinel-hub` | [Sentinel Hub](sentinel-hub/introduction.md) |
 | Overture Maps vector basemap | `overture` | vector | none (public) | `overture` | [Overture](overture/introduction.md) |
 | USGS Water — NWIS / Water Data | `usgs-water`, `usgs-nwis`, `nwis` | tabular | none | `usgs-water` | [USGS Water](usgs-water/introduction.md) |
+| Caravan large-sample hydrology (incl. the open GRDC subset) | `caravan`, `caravan-grdc`, `grdc-caravan` | tabular | none (CC-BY-4.0) | — | [Caravan](caravan/introduction.md) |
 | JRC Global Human Settlement Layer | `ghsl`, `ghs`, `human-settlement` | raster | none (open HTTPS) | — | [GHSL](ghsl/introduction.md) |
 | WorldPop population data hub | `worldpop`, `world-pop` | mixed (rasters + age/sex tables) | none (CC-BY-4.0) | `worldpop` (optional) | [WorldPop](worldpop/introduction.md) |
 | Alaska Satellite Facility (SAR search + InSAR baselines) | `asf`, `alaska-satellite-facility`, `insar` | raster | NASA Earthdata Login (reuses `earthdata`) | `asf` | [ASF](asf/introduction.md) |

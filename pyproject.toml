@@ -1,6 +1,6 @@
 [project]
 name = "earthlens"
-version = "0.12.0"
+version = "0.13.0"
 description = "remote sensing package"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -30,12 +30,12 @@ requires-python = ">=3.11,<4"
 # five is conflict-free — the irreconcilable pins only meet if a user asks for
 # two conflicting extras at once, exactly as before the split.
 dependencies = [
-    "earthlens-core ==0.12.0",
-    "earthlens-atmosphere ==0.12.0",
-    "earthlens-ocean ==0.12.0",
-    "earthlens-imagery ==0.12.0",
-    "earthlens-land ==0.12.0",
-    "earthlens-hazards ==0.12.0",
+    "earthlens-core ==0.13.0",
+    "earthlens-atmosphere ==0.13.0",
+    "earthlens-ocean ==0.13.0",
+    "earthlens-imagery ==0.13.0",
+    "earthlens-land ==0.13.0",
+    "earthlens-hazards ==0.13.0",
 ]
 
 
@@ -361,6 +361,7 @@ markers = [
     "integration: exercises multiple modules together with mocked I/O.",
     "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
     "chc: tests for the Climate Hazards Center (CHC) FTP backend (no extra SDK; covers CHIRPS / CHIRP / CHIRTS / WBGT / SPI / SPEI / CHC_CMIP6 etc.).",
+    "caravan: tests for the Caravan large-sample hydrology backend (no extra SDK; static Zenodo archives read over HTTP Range, includes the open GRDC-Caravan subset).",
     "s3: tests for the S3 backend (requires the `s3` extra: boto3).",
     "ecmwf: tests for the ECMWF/CDS backend (requires the `ecmwf` extra: cdsapi).",
     "gee: tests for the Google Earth Engine backend (requires the `gee` extra: earthengine-api).",

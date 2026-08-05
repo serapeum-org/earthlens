@@ -1,5 +1,26 @@
 # Change Log
 
+## 0.13.0 (2026-08-02)
+
+### BREAKING CHANGE
+
+- a backend subclassing another backend now raises
+TypeError unless it declares ergonomics_resolved=True, and _create_grid
+/ _check_input_dates must return SpatialExtent / TemporalExtent rather
+than a dict or None. Both affect downstream subclasses only; all 48
+in-repo backends are unchanged, and download(aggregate=None) still
+works.
+
+### Feat
+
+- **caravan**: add the Caravan large-sample hydrology backend (open GRDC route) (#887)
+- **ecmwf**: three-store Copernicus Data Store backend (CDS + ADS + EWDS) (#871)
+- **emdat**: add the EM-DAT disaster-impacts backend (#888)
+
+### Refactor
+
+- **base**: enforce the shared contracts instead of restating them (#853)
+
 ## 0.12.0 (2026-07-27)
 
 ### BREAKING CHANGE

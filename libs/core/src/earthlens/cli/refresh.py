@@ -43,6 +43,7 @@ from typing import Any, cast
 
 import requests
 import yaml
+from loguru import logger
 
 from earthlens.cli.adapter import BackendInfo, load_catalog
 
@@ -1630,6 +1631,208 @@ def _iucn_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"iucn": sorted(set(catalog.available_datasets) | set(catalog.datasets))}
 
 
+#: Zenodo's version-chain endpoint for one record.
+_ZENODO_VERSIONS = "https://zenodo.org/api/records/{record}/versions"
+
+#: Zenodo's search endpoint, used to discover Caravan extensions the catalog
+#: does not yet know about. The community publishes new extensions as brand-new
+#: records, so watching the pinned version chains alone would never find them.
+_ZENODO_SEARCH = "https://zenodo.org/api/records"
+
+#: Queries whose **union** surfaces every known Caravan extension record.
+#:
+#: These are deliberately full-text rather than `title:`-scoped. A title-only
+#: search misses the extensions published under their source dataset's name -
+#: CAMELS-CZ and CAMELS-ES never say "Caravan" in their titles, only inside the
+#: record - and both were absent from this catalog until that was noticed by
+#: hand. No single query finds them all either: Denmark surfaces only on the
+#: phrase, GRDC only on the keyword, so the set is queried and unioned.
+_CARAVAN_DISCOVERY_QUERIES = (
+    '"Caravan extension"',
+    "Caravan AND CAMELS",
+    "caravan AND keywords:Hydrology",
+)
+
+#: Terms that mark a hit as a plausible Caravan extension rather than something
+#: else called a caravan. Full-text search for "caravan"/"camels" also returns
+#: camel-trade archaeology and animal taxonomy.
+#:
+#: Two families, because neither alone is sufficient. The hydrology terms catch
+#: records published under a source dataset's name (CAMELS-CZ, CAMELS-ES never
+#: say "Caravan" in their titles). The Caravan-specific phrases catch extensions
+#: whose titles are hydrological only by implication - "Caravan extension
+#: Iceland" and "Caravan-AUS-VIC (Maribyrnong River, Victoria)" contain no
+#: hydrology word at all, and an earlier version of this filter would have
+#: dropped both without a trace.
+#:
+#: The bare words "caravan" and "camels" are deliberately absent: both are
+#: ambiguous (the animal, the trade route), which is the noise this filters.
+_CARAVAN_HYDROLOGY_TERMS = (
+    "hydrolog",
+    "streamflow",
+    "runoff",
+    "catchment",
+    "discharge",
+    "caravan extension",
+    "caravan_extension",
+    "caravan-",
+)
+
+
+def _is_hydrological(hit: dict[str, Any]) -> bool:
+    """Whether a Zenodo hit looks like hydrology rather than a camel caravan.
+
+    Args:
+        hit: One record from a Zenodo search response.
+
+    Returns:
+        bool: `True` when the title or keywords carry a hydrology term.
+    """
+    metadata = hit.get("metadata") or {}
+    haystack = " ".join(
+        [
+            str(metadata.get("title", "")),
+            *(str(k) for k in metadata.get("keywords") or []),
+        ]
+    ).casefold()
+    return any(term in haystack for term in _CARAVAN_HYDROLOGY_TERMS)
+
+
+def _caravan_newer_releases(extension: Any, pinned: set[str]) -> list[str]:
+    """List an extension's releases published after its newest pin.
+
+    Compared against the NEWEST pin rather than each one: `base` pins both 1.6
+    and the older range-readable 1.2, and every release between them would
+    otherwise be reported as drift on a row that is perfectly current.
+
+    Args:
+        extension: One catalog `Extension`.
+        pinned: Every record id the catalog pins, across all extensions.
+
+    Returns:
+        list[str]: `"<record> (<date>)"` for each newer release, sorted.
+    """
+    latest_pin = max(
+        (version.release_date for version in extension.versions.values()), default=""
+    )
+    records = {
+        archive.record
+        for version in extension.versions.values()
+        for archive in version.files.values()
+    }
+    newer: set[str] = set()
+    for record in sorted(records):
+        payload = _get_json(_ZENODO_VERSIONS.format(record=record))
+        for hit in (payload.get("hits") or {}).get("hits") or []:
+            published = str((hit.get("metadata") or {}).get("publication_date", ""))
+            if published > latest_pin and str(hit.get("id")) not in pinned:
+                newer.add(f"{hit.get('id')} ({published})")
+    return sorted(newer)
+
+
+def _caravan_discovered(
+    pinned: set[str], concepts: set[str], unsupported: set[str]
+) -> list[str]:
+    """Find Caravan records on Zenodo the catalog does not track at all.
+
+    A new community extension is published as its own record, so it never
+    appears in any pinned version chain - only a search finds it.
+
+    Args:
+        pinned: Record ids the catalog pins.
+        concepts: Concept ids the catalog already tracks.
+        unsupported: Record ids deliberately not wrapped.
+
+    Returns:
+        list[str]: `"<record> (<title>)"` for each untracked record, sorted.
+    """
+    discovered: set[str] = set()
+    filtered: set[str] = set()
+    for query in _CARAVAN_DISCOVERY_QUERIES:
+        payload = _get_json(
+            _ZENODO_SEARCH, params={"q": query, "size": 25, "sort": "newest"}
+        )
+        for hit in (payload.get("hits") or {}).get("hits") or []:
+            record = str(hit.get("id"))
+            if (
+                record in pinned
+                or str(hit.get("conceptrecid")) in concepts
+                or record in unsupported
+            ):
+                continue
+            if not _is_hydrological(hit):
+                # Never drop a search hit silently: a false negative here is
+                # exactly how an extension stays invisible.
+                filtered.add(record)
+                continue
+            title = str((hit.get("metadata") or {}).get("title", ""))[:60]
+            discovered.add(f"{record} ({title})")
+    if filtered:
+        logger.debug(
+            f"caravan: {len(filtered)} record(s) filtered as non-hydrological "
+            f"({', '.join(sorted(filtered))})"
+        )
+    return sorted(discovered)
+
+
+def _caravan_grouped(catalog: Any) -> dict[str, list[str]]:
+    """Report Caravan release drift: newer versions, and undiscovered extensions.
+
+    Two kinds of drift matter for this backend and neither is visible from the
+    curated rows alone. A pinned extension can gain a newer release - the
+    catalog pins a specific version record rather than the moving concept DOI -
+    and Caravan has changed *packaging* mid-life, GRDC going `.tar.gz` to `.zip`
+    at v0.4, which silently decides whether the archive can be range-read at
+    all. Separately, a brand-new community extension is published as its own
+    record, so it never appears in any pinned version chain.
+
+    This reports; it never rewrites the catalog. Bumping a pin means re-checking
+    the archive layout, gauge-id convention and column set, which is a human
+    decision - hence no `_WRITERS` entry, so `--write` says "live read only".
+
+    Args:
+        catalog: The loaded Caravan `Catalog`.
+
+    Returns:
+        One group per extension holding only the releases published *after* its
+        pin (empty when current), plus a `discovered` group naming Caravan
+        records whose concept the catalog does not track at all.
+    """
+    pinned = {
+        str(archive.record)
+        for extension in catalog.datasets.values()
+        for version in extension.versions.values()
+        for archive in version.files.values()
+    }
+    # Both concepts per row: since v1.6 `base` publishes its CSV and NetCDF
+    # timeseries under different Zenodo concepts, and tracking only the first
+    # left the other looking like an undiscovered extension.
+    concepts = {
+        str(doi).rsplit(".", 1)[-1]
+        for extension in catalog.datasets.values()
+        for doi in (
+            extension.concept_doi,
+            getattr(extension, "concept_doi_csv", ""),
+        )
+        if doi
+    }
+    # Records the catalog deliberately does not wrap. Without this they surface
+    # as "discovered" on every run, which trains the reader to ignore the signal.
+    unsupported = {
+        str(record)
+        for entry in getattr(catalog, "extension_index", []) or []
+        if isinstance(entry, dict) and not entry.get("supported", True)
+        for record in (entry.get("records") or [])
+    }
+
+    grouped = {
+        key: _caravan_newer_releases(extension, pinned)
+        for key, extension in sorted(catalog.datasets.items())
+    }
+    grouped["discovered"] = _caravan_discovered(pinned, concepts, unsupported)
+    return grouped
+
+
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
 #: credentials; credentialed ones (openaq, firms) read their key from the env.
@@ -1659,6 +1862,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "obis": _obis_grouped,
     "wdpa": _wdpa_grouped,
     "iucn": _iucn_grouped,
+    "caravan": _caravan_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
