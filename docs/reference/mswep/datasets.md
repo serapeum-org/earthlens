@@ -118,5 +118,6 @@ They land under `out/Gauge_metadata/` and are shipped raw — read them with pan
     The range files bound the temporal span only. Many gauges have gaps — missing days, months or whole years.
 
 !!! note "Where the folder lives"
-    The documentation names the folder and every file but not its **parent**. The backend therefore probes the
-    version root (alongside `Past` / `NRT`) first, then the share root, and reports both if neither has it.
+    The documentation names the folder and every file but not its **parent**. The v3.16 share carries it directly
+    under the version root (the shared `folder_id`), alongside `Past` / `NRT`, so the backend looks for it there in
+    a single lookup and raises if it is absent (older versions such as v2.80 ship none).

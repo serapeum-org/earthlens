@@ -278,9 +278,10 @@ class GaugeMetadata(BaseModel):
 
     Describes the rain gauges behind MSWEP's gauge-correction step. The
     documentation names the folder and every file, but not the folder's
-    **parent** — it reads "included in the `Gauge_metadata` folder" — so
-    the backend probes the version root and then the share root instead
-    of assuming one.
+    **parent** — it reads "included in the `Gauge_metadata` folder". The
+    v3.16 share carries it directly under the version root (the shared
+    `folder_id`), alongside `Past` / `NRT`, so the backend looks for it
+    there in a single lookup.
 
     Attributes:
         folder: The folder name (`"Gauge_metadata"`).

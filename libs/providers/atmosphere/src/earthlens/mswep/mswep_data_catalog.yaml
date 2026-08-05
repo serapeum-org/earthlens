@@ -34,9 +34,9 @@ granule_warn_threshold: 500
 # Auxiliary CSVs describing the rain gauges used in MSWEP's gauge-correction
 # step. Folder and file names are verbatim from the MSWEP V3.16 Documentation,
 # section 7. What that section does NOT say is which folder holds it -- it
-# reads "included in the Gauge_metadata folder" with no parent -- so the
-# backend looks under the version root first, then the share root, rather than
-# assuming one.
+# reads "included in the Gauge_metadata folder" with no parent -- but the v3.16
+# share carries it directly under the version root, alongside Past / NRT, so the
+# backend looks for it there in a single lookup.
 gauge_metadata:
   folder: Gauge_metadata
   files:
