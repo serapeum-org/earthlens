@@ -13,7 +13,7 @@ from __future__ import annotations
 __all__ = ["BACKENDS"]
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 33 data-source keys.
+#: distribution's 36 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'chc': ('earthlens.chc', 'CHIRPS', '', {}),
     'chirps': ('earthlens.chc', 'CHIRPS', '', {}),
