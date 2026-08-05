@@ -318,7 +318,7 @@ class TestMswepAuth:
             auth.configure()
 
     def test_rclone_config_without_remote_raises(self, tmp_path, monkeypatch):
-        """A discovered config with no remote name asks for the remote."""
+        """An explicit $MSWEP_RCLONE_CONFIG with no remote name asks for the remote."""
         path = _write(tmp_path / "rclone.conf", RCLONE_DRIVE_REMOTE)
         monkeypatch.setenv(RCLONE_CONFIG_ENV, str(path))
         auth = MswepAuth(MswepCredentials(folder_id="1AbC"))
