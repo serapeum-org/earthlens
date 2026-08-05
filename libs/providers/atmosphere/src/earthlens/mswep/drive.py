@@ -23,6 +23,8 @@ is chosen by which share you point at.
 
 from __future__ import annotations
 
+import http.client
+import ssl
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -266,6 +268,19 @@ MAX_RETRIES = 5
 #: Base seconds for the exponential back-off between retries.
 BACKOFF_BASE = 2.0
 
+#: Connection-level failures that carry no HTTP status but are still
+#: worth retrying: a dropped or timed-out socket mid-transfer is exactly
+#: the transient case the back-off exists for. `ConnectionError` /
+#: `ssl.SSLError` are network-specific (a disk-full `OSError` is not one
+#: of these, so it is not retried), and `IncompleteRead` is the truncated
+#: streaming response httplib2 raises.
+_TRANSIENT_TRANSPORT_ERRORS: tuple[type[BaseException], ...] = (
+    ConnectionError,
+    TimeoutError,
+    ssl.SSLError,
+    http.client.IncompleteRead,
+)
+
 
 def classify_http_error(exc: Exception) -> Exception:
     """Map a Drive `HttpError` onto this module's typed failures.
@@ -280,6 +295,15 @@ def classify_http_error(exc: Exception) -> Exception:
             own traceback.
     """
     status = getattr(getattr(exc, "resp", None), "status", None)
+    if status is None:
+        # No HTTP status: a bare connection/timeout failure with no `.resp`.
+        # Retry the transient transport ones like throttling; leave anything
+        # else (a disk-full OSError, a programming error) to re-raise.
+        if isinstance(exc, _TRANSIENT_TRANSPORT_ERRORS):
+            return RateLimitedError(
+                f"Google Drive connection failed transiently: {exc!r}"
+            )
+        return exc
     if status not in (403, 429, 500, 502, 503, 504):
         return exc
 

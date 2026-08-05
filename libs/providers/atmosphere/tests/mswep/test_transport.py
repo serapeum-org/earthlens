@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import http.client
 import warnings
 
 import pytest
@@ -79,6 +80,23 @@ class TestClassifyHttpError:
         exc = ValueError("boom")
         assert classify_http_error(exc) is exc
 
+    def test_connection_error_is_retryable(self):
+        """A bare connection drop (no HTTP status) is treated as transient."""
+        assert isinstance(
+            classify_http_error(ConnectionError("reset")), RateLimitedError
+        )
+
+    def test_incomplete_read_is_retryable(self):
+        """A truncated streaming response is transient and worth a retry."""
+        assert isinstance(
+            classify_http_error(http.client.IncompleteRead(b"")), RateLimitedError
+        )
+
+    def test_disk_full_oserror_passes_through(self):
+        """A non-connection OSError (e.g. disk full) is not retried."""
+        exc = OSError("No space left on device")
+        assert classify_http_error(exc) is exc
+
     def test_quota_message_names_the_24_hour_reset(self):
         """The message tells the user waiting ~24 h is the fix, not retrying."""
         exc = FakeHttpError(403, "downloadQuotaExceeded")
@@ -132,6 +150,16 @@ class TestDownloadRetries:
         with pytest.raises(FakeHttpError):
             download_media(drive, file_id, tmp_path / "g.nc", sleep=lambda _: None)
         assert len(drive.media_calls) == 1
+
+    def test_connection_error_is_retried_then_raises(self, drive, tmp_path):
+        """A statusless connection drop now retries to the budget, not attempt one."""
+        file_id = drive.add_file("g.nc", "F")
+        drive.media_errors[file_id] = ConnectionError("connection reset by peer")
+        with pytest.raises(RateLimitedError):
+            download_media(
+                drive, file_id, tmp_path / "g.nc", max_retries=3, sleep=lambda _: None
+            )
+        assert len(drive.media_calls) == 3
 
     def test_no_partial_file_survives_a_failure(self, drive, tmp_path):
         """A failed transfer leaves nothing that could look cached."""
