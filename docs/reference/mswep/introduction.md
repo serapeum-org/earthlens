@@ -49,6 +49,10 @@ An hourly year is ~8760 granules. The Drive API is not built for that, and GloH2
 transfer via `rclone`. This backend is for targeted product / variant / resolution / window requests; it warns
 when a request exceeds the catalog's granule threshold.
 
+The folder is link-shared, **not** in the account's "Shared with me", so point `rclone` at it by id — the same
+id you pass earthlens as `folder_id`. With `--drive-root-folder-id` set to that id, the remote's root *is* the
+version folder, so its children (`Past` / `NRT` / …) are addressed relative to it:
+
 ```bash
-rclone sync -v --drive-shared-with-me GoogleDrive:/MSWEP_V316_test/Past/Daily ./mswep
+rclone sync -v --drive-root-folder-id <folder-id> GoogleDrive:Past/Daily ./mswep
 ```
