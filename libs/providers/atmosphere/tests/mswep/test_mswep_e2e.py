@@ -28,12 +28,17 @@ import warnings
 import pytest
 
 from earthlens.biodiversity import LicenseWarning
-from earthlens.mswep import MSWEP, MswepCredentials
+from earthlens.mswep import MSWEP, MswepAuth, MswepCredentials
 from earthlens.mswep.auth import (
     FOLDER_ID_ENV,
     RCLONE_REMOTE_ENV,
     TOKEN_FILE_ENV,
     try_application_default,
+)
+from earthlens.mswep.drive import (
+    download_media,
+    find_children_by_name,
+    list_folders,
 )
 
 pytestmark = [pytest.mark.e2e, pytest.mark.mswep]
@@ -62,6 +67,22 @@ requires_share = pytest.mark.skipif(
 )
 
 VERSION = os.getenv("MSWEP_E2E_VERSION", "3.16")
+
+#: A3 (issue #890): an arbitrary Drive folder shared with the resolved
+#: credential's own account, plus a file name inside it. Proves the credential +
+#: Drive-transport stack end to end without needing GloH2O access.
+SELFTEST_FOLDER = os.getenv("MSWEP_SELFTEST_FOLDER")
+SELFTEST_FILE = os.getenv("MSWEP_SELFTEST_FILE")
+
+requires_self_owned_share = pytest.mark.skipif(
+    not (SELFTEST_FOLDER and SELFTEST_FILE and _has_credential()),
+    reason=(
+        "A3 self-owned-share check not configured: set $MSWEP_SELFTEST_FOLDER "
+        "to a Drive folder id shared with your own account, $MSWEP_SELFTEST_FILE "
+        "to a file name inside it, plus a credential ($MSWEP_TOKEN_FILE, "
+        "$MSWEP_RCLONE_REMOTE, or ADC)."
+    ),
+)
 
 
 @requires_share
@@ -153,3 +174,29 @@ def test_root_is_the_shared_folder(tmp_path):
     # Auth is lazy: reading `resolver` opens the Drive client on first use.
     root = source.resolver.root()
     assert root.name.startswith("MSWEP_V"), root.name
+
+
+@requires_self_owned_share
+def test_self_owned_share_transport_stack(tmp_path):
+    """A3: the credential + Drive v3 transport path works against a real share.
+
+    Points `MswepAuth` at a folder shared with the resolved credential's own
+    account — no GloH2O layout assumed — and runs the whole stack against live
+    Drive: `configure` builds the client, `list_folders` and
+    `find_children_by_name` query it, and `download_media` streams a file down.
+    """
+    folder_id = os.environ["MSWEP_SELFTEST_FOLDER"]
+    filename = os.environ["MSWEP_SELFTEST_FILE"]
+    auth = MswepAuth(MswepCredentials(folder_id=folder_id))
+    auth.configure()
+    assert auth.is_authenticated(), "configure() should build a live Drive client"
+
+    service = auth.service
+    list_folders(service, folder_id)  # files.list against live Drive
+
+    found = find_children_by_name(service, folder_id, [filename])
+    assert filename in found, f"{filename!r} is not under the shared folder"
+
+    destination = download_media(service, found[filename].id, tmp_path / filename)
+    assert destination.exists(), "download_media should write the file"
+    assert destination.stat().st_size > 0, "the downloaded file should be non-empty"
