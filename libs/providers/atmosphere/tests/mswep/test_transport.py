@@ -71,14 +71,14 @@ class TestClassifyHttpError:
         assert isinstance(classify_http_error(exc), RateLimitedError)
 
     def test_404_passes_through_unchanged(self):
-        """An unrelated failure keeps its own type and traceback."""
+        """An unrelated failure classifies to None so the caller re-raises it."""
         exc = FakeHttpError(404, "not found")
-        assert classify_http_error(exc) is exc
+        assert classify_http_error(exc) is None
 
     def test_non_http_error_passes_through(self):
-        """An error with no `resp` is not misclassified."""
+        """An error with no `resp` is not misclassified (returns None)."""
         exc = ValueError("boom")
-        assert classify_http_error(exc) is exc
+        assert classify_http_error(exc) is None
 
     def test_connection_error_is_retryable(self):
         """A bare connection drop (no HTTP status) is treated as transient."""
@@ -93,9 +93,9 @@ class TestClassifyHttpError:
         )
 
     def test_disk_full_oserror_passes_through(self):
-        """A non-connection OSError (e.g. disk full) is not retried."""
+        """A non-connection OSError (e.g. disk full) is not retried (returns None)."""
         exc = OSError("No space left on device")
-        assert classify_http_error(exc) is exc
+        assert classify_http_error(exc) is None
 
     def test_quota_message_names_the_24_hour_reset(self):
         """The message tells the user waiting ~24 h is the fix, not retrying."""

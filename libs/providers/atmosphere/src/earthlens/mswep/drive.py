@@ -282,17 +282,18 @@ _TRANSIENT_TRANSPORT_ERRORS: tuple[type[BaseException], ...] = (
 )
 
 
-def classify_http_error(exc: Exception) -> Exception:
-    """Map a Drive `HttpError` onto this module's typed failures.
+def classify_http_error(exc: Exception) -> DriveTransportError | None:
+    """Map a Drive failure onto this module's typed transport errors.
 
     Args:
         exc: The exception raised by the Drive client.
 
     Returns:
-        Exception: A :class:`DownloadQuotaExceededError` /
-            :class:`RateLimitedError` when the status and reason say so,
-            otherwise `exc` unchanged so an unrelated failure keeps its
-            own traceback.
+        DriveTransportError | None: A :class:`DownloadQuotaExceededError`
+            / :class:`RateLimitedError` when the status and reason say
+            so, or `None` when `exc` is not a transport failure this
+            module handles — the caller re-raises the original so it
+            keeps its own traceback.
     """
     status = getattr(getattr(exc, "resp", None), "status", None)
     if status is None:
@@ -303,9 +304,9 @@ def classify_http_error(exc: Exception) -> Exception:
             return RateLimitedError(
                 f"Google Drive connection failed transiently: {exc!r}"
             )
-        return exc
+        return None
     if status not in (403, 429, 500, 502, 503, 504):
-        return exc
+        return None
 
     detail = str(exc)
     if any(reason in detail for reason in QUOTA_REASONS):
@@ -378,10 +379,10 @@ def download_media(
         except Exception as exc:  # noqa: BLE001 - re-raised after classification
             partial.unlink(missing_ok=True)
             classified = classify_http_error(exc)
+            if classified is None:
+                raise
             if isinstance(classified, DownloadQuotaExceededError):
                 raise classified from exc
-            if not isinstance(classified, RateLimitedError):
-                raise
             if attempt == max_retries - 1:
                 raise classified from exc
             delay = BACKOFF_BASE**attempt
