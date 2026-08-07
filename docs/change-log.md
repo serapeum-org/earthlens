@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.14.0 (2026-08-07)
+
+### Feat
+
+- **mswep**: add the GloH2O MSWEP / MSWX backend (#889)
+
 ## 0.13.0 (2026-08-02)
 
 ### BREAKING CHANGE
