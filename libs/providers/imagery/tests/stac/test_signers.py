@@ -413,6 +413,19 @@ class TestBuildSigner:
         """The anonymous name resolves to the pyramids AnonymousSigner."""
         assert build_signer("anonymous").name == "anonymous"
 
+    def test_anonymous_no_region_gdal_env_is_no_sign_only(self, fake_pyramids):
+        """Without a region the anonymous signer emits only the no-sign flag."""
+        assert build_signer("anonymous").gdal_env() == {"AWS_NO_SIGN_REQUEST": "YES"}
+
+    def test_anonymous_forwards_region_to_gdal_env(self, fake_pyramids):
+        """A region pins GDAL at that region's S3 endpoint (opt-in regions need this)."""
+        env = build_signer("anonymous", region="af-south-1").gdal_env()
+        assert env == {
+            "AWS_NO_SIGN_REQUEST": "YES",
+            "AWS_REGION": "af-south-1",
+            "AWS_S3_ENDPOINT": "s3.af-south-1.amazonaws.com",
+        }
+
     def test_aws_requester_pays_forwards_region(self, fake_pyramids):
         """The requester-pays name resolves to the pyramids signer with the region."""
         signer = build_signer("aws-requester-pays", region="us-west-2")

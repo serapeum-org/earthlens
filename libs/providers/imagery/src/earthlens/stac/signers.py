@@ -755,12 +755,37 @@ class _AnonymousS3Signer:
     the only kind that can succeed. Requester-pays keeps its own signer, which
     contributes real credentials plus `AWS_REQUEST_PAYER`, and is untouched.
 
+    An anonymous bucket in an **opt-in** AWS region (e.g. Digital Earth Africa
+    on `af-south-1`) needs more than the no-sign flag: GDAL's default
+    virtual-hosted endpoint is the *global* `<bucket>.s3.amazonaws.com`, which
+    an opt-in bucket rejects with `IllegalLocationConstraintException` ("the
+    <region> location constraint is incompatible for the region specific
+    endpoint this request was sent to"). Passing the endpoint's `region` makes
+    the signer point GDAL at that region's endpoint (`AWS_REGION` +
+    `AWS_S3_ENDPOINT=s3.<region>.amazonaws.com`), so the request lands at
+    `<bucket>.s3.<region>.amazonaws.com`. The region comes from the catalog
+    endpoint's `region:` field, threaded through `build_signer`; when it is
+    `None` (an HTTPS-asset endpoint such as the Brazil Data Cube) only the
+    no-sign flag is emitted.
+
+    Args:
+        region: AWS region of the endpoint's public bucket, or `None` when the
+            endpoint's assets are not region-bound S3 objects.
+
     Examples:
         - The GDAL config opts out of request signing:
             ```python
             >>> from earthlens.stac.signers import build_signer
             >>> build_signer("anonymous").gdal_env()["AWS_NO_SIGN_REQUEST"]
             'YES'
+
+            ```
+        - A region-bound endpoint also pins GDAL to that region's S3 endpoint:
+            ```python
+            >>> from earthlens.stac.signers import build_signer
+            >>> env = build_signer("anonymous", region="af-south-1").gdal_env()
+            >>> env["AWS_REGION"], env["AWS_S3_ENDPOINT"]
+            ('af-south-1', 's3.af-south-1.amazonaws.com')
 
             ```
         - Signing a request or an href is still a no-op — nothing to add:
@@ -777,10 +802,26 @@ class _AnonymousS3Signer:
     #: signers' own attribute, so `_signer_for` logging reads the same.
     name: str = "anonymous"
 
+    def __init__(self, region: str | None = None) -> None:
+        """Store the endpoint's bucket region (or `None` for non-S3 assets).
+
+        Args:
+            region: AWS region of the anonymous bucket, used to pin GDAL at the
+                region's S3 endpoint. `None` leaves the endpoint at GDAL's
+                default (correct for HTTPS-asset endpoints).
+        """
+        self._region = region
+
     def gdal_env(self) -> dict[str, str]:
         """Return the GDAL config for unsigned public-bucket reads.
 
-        Deliberately just the one option. Copying the requester-pays signer's
+        Always emits `AWS_NO_SIGN_REQUEST=YES`. When the signer carries a
+        `region`, it additionally emits `AWS_REGION` and
+        `AWS_S3_ENDPOINT=s3.<region>.amazonaws.com` so a bucket in an opt-in
+        region is reached at its region-specific endpoint rather than the
+        global one it would otherwise reject.
+
+        Deliberately nothing more. Copying the requester-pays signer's
         `GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR` and
         `CPL_VSIL_CURL_USE_HEAD=NO` alongside it would apply to *every*
         anonymous endpoint — the catalog default, so most of them — and
@@ -789,9 +830,14 @@ class _AnonymousS3Signer:
         for requester-pays, not part of not signing a request.
 
         Returns:
-            dict[str, str]: `{"AWS_NO_SIGN_REQUEST": "YES"}`.
+            dict[str, str]: `{"AWS_NO_SIGN_REQUEST": "YES"}`, plus `AWS_REGION`
+            and `AWS_S3_ENDPOINT` when a region is set.
         """
-        return {"AWS_NO_SIGN_REQUEST": "YES"}
+        env = {"AWS_NO_SIGN_REQUEST": "YES"}
+        if self._region:
+            env["AWS_REGION"] = self._region
+            env["AWS_S3_ENDPOINT"] = f"s3.{self._region}.amazonaws.com"
+        return env
 
     def sign_request(self, request: Any) -> Any:
         """Return `request` unchanged — an anonymous search needs no signing.
@@ -830,16 +876,18 @@ class _AnonymousS3Signer:
 def build_signer(signer_type: str, **creds: Any) -> Any:
     """Build the signer named by a catalog `signer:` field.
 
-    The `anonymous` / `aws-requester-pays` signers come from `pyramids.stac`
-    (imported lazily so the package imports without the `[stac]` extra); the
-    `mpc-sas` / `earthdata` / `cdse` / `cdse-s3` / `bdc-token` provider signers
-    are the earthlens-local classes above.
+    The `anonymous` signer is the earthlens-local `_AnonymousS3Signer` and the
+    `aws-requester-pays` signer comes from `pyramids.stac` (imported lazily so
+    the package imports without the `[stac]` extra); the `mpc-sas` /
+    `earthdata` / `cdse` / `cdse-s3` / `bdc-token` provider signers are the
+    earthlens-local classes above.
 
     Args:
         signer_type: One of `"anonymous"`, `"aws-requester-pays"`, `"mpc-sas"`,
             `"earthdata"`, `"cdse"`, `"cdse-s3"`, `"bdc-token"`.
         **creds: Extra credentials forwarded to the selected signer — `region`
-            for `aws-requester-pays`; `username` / `password` / `token` for
+            for `anonymous` (pins GDAL at an opt-in region's S3 endpoint) and
+            `aws-requester-pays`; `username` / `password` / `token` for
             `earthdata`; `username` / `password` / `client_id` for `cdse`; the
             CDSE S3 credential resolution kwargs for `cdse-s3` (see
             `auth_cdse.s3_credentials`); `token` for `bdc-token` (defaults to
@@ -884,7 +932,7 @@ def build_signer(signer_type: str, **creds: Any) -> Any:
             ```
     """
     if signer_type == "anonymous":
-        return _AnonymousS3Signer()
+        return _AnonymousS3Signer(region=creds.get("region"))
     if signer_type == "aws-requester-pays":
         from pyramids.stac import AWSRequesterPaysSigner
 
