@@ -39645,8 +39645,7 @@ caches it, and validates the requested version against the catalog.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/drive.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-399">399</a></span>
-<span class="normal"><a href="#__codelineno-0-400">400</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-400">400</a></span>
 <span class="normal"><a href="#__codelineno-0-401">401</a></span>
 <span class="normal"><a href="#__codelineno-0-402">402</a></span>
 <span class="normal"><a href="#__codelineno-0-403">403</a></span>
@@ -39747,109 +39746,110 @@ caches it, and validates the requested version against the catalog.</p>
 <span class="normal"><a href="#__codelineno-0-498">498</a></span>
 <span class="normal"><a href="#__codelineno-0-499">499</a></span>
 <span class="normal"><a href="#__codelineno-0-500">500</a></span>
-<span class="normal"><a href="#__codelineno-0-501">501</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="k">class</span><span class="w"> </span><span class="nc">RootResolver</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a product + version onto the shared Drive root folder.</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    GloH2O shares one folder per product **and** per version, so the</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    `folder_id` handed to a user is the `MSWEP_V280` / `MSWX_V100` /</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    `MSWEP_V316_test` folder itself — its children are the variants</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    (`Past`, `NRT`, …). There is no parent to search: the id you were</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    given is the root. The resolver reads that folder&#39;s metadata once,</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    caches it, and validates the requested version against the catalog.</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        _service: The Drive v3 client.</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        _folder_id: Drive id of the shared root folder GloH2O granted.</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        _catalog: The MSWEP catalog, read for version metadata.</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        _root: The cached root `DriveEntry`, or `None` before first use.</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        - The root&#39;s name comes from the shared folder itself:</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            &gt;&gt;&gt; from earthlens.mswep.drive import DriveEntry, FOLDER_MIME</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            &gt;&gt;&gt; DriveEntry(&quot;1a&quot;, &quot;MSWEP_V316_test&quot;, FOLDER_MIME).name</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            &#39;MSWEP_V316_test&#39;</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">folder_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">catalog</span><span class="p">:</span> <span class="n">Catalog</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Bind the resolver to a Drive client, share and catalog.</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">            service: The Drive v3 client.</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            folder_id: Drive id of the shared folder — which **is** the</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">                product/version root, not a parent to search.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">            catalog: The MSWEP catalog, read for version metadata.</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_service</span> <span class="o">=</span> <span class="n">service</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_folder_id</span> <span class="o">=</span> <span class="n">folder_id</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span> <span class="o">=</span> <span class="n">catalog</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">:</span> <span class="n">DriveEntry</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DriveEntry</span><span class="p">:</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the shared folder itself, as the product/version root (cached).</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">        GloH2O shares one folder per product **and** per version — the id</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        you are given is the `MSWEP_V280` / `MSWX_V100` / `MSWEP_V316_test`</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        folder directly, whose children are the variants (`Past`, `NRT`,</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        …). There is no parent to list, so this just reads the folder&#39;s</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        own metadata.</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">            DriveEntry: The shared folder.</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>            <span class="n">meta</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>                <span class="o">.</span><span class="n">get</span><span class="p">(</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>                    <span class="n">fileId</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_folder_id</span><span class="p">,</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>                    <span class="n">fields</span><span class="o">=</span><span class="s2">&quot;id, name, mimeType&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>                    <span class="n">supportsAllDrives</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>                <span class="p">)</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>                <span class="o">.</span><span class="n">execute</span><span class="p">()</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>            <span class="p">)</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">DriveEntry</span><span class="p">(</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>                <span class="nb">id</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>                <span class="n">name</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>                <span class="n">mime_type</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mimeType&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>            <span class="p">)</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DriveEntry</span><span class="p">:</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a product + version onto the shared root folder.</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">        The `folder_id` given at construction **is** the root, so this</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        validates the request against the catalog (product exists, version</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        known and not provisional) and returns the folder. The version</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        selects descriptive metadata — units, the trend caveat — not the</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        data itself: which version you get is decided by which per-version</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">        share you point `folder_id` at.</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">            product_key: Product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">            version: Version key; defaults to the product&#39;s</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">                `default_version`.</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">            DriveEntry: The shared root folder.</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">            ValueError: When the product or version is unknown.</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">            ProvisionalValueError: When the version row is an unverified</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">                placeholder.</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>        <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get_product</span><span class="p">(</span><span class="n">product_key</span><span class="p">)</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="n">key</span> <span class="o">=</span> <span class="n">version</span> <span class="ow">or</span> <span class="n">product</span><span class="o">.</span><span class="n">default_version</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known </span><span class="si">{</span><span class="n">product_key</span><span class="si">}</span><span class="s2"> version. Known &quot;</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>                <span class="sa">f</span><span class="s2">&quot;versions: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>            <span class="p">)</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">check_not_provisional</span><span class="p">(</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>            <span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">product_key</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> version&quot;</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="p">)</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-501">501</a></span>
+<span class="normal"><a href="#__codelineno-0-502">502</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="k">class</span><span class="w"> </span><span class="nc">RootResolver</span><span class="p">:</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a product + version onto the shared Drive root folder.</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    GloH2O shares one folder per product **and** per version, so the</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    `folder_id` handed to a user is the `MSWEP_V280` / `MSWX_V100` /</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    `MSWEP_V316_test` folder itself — its children are the variants</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    (`Past`, `NRT`, …). There is no parent to search: the id you were</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    given is the root. The resolver reads that folder&#39;s metadata once,</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    caches it, and validates the requested version against the catalog.</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        _service: The Drive v3 client.</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        _folder_id: Drive id of the shared root folder GloH2O granted.</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        _catalog: The MSWEP catalog, read for version metadata.</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        _root: The cached root `DriveEntry`, or `None` before first use.</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        - The root&#39;s name comes from the shared folder itself:</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            &gt;&gt;&gt; from earthlens.mswep.drive import DriveEntry, FOLDER_MIME</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            &gt;&gt;&gt; DriveEntry(&quot;1a&quot;, &quot;MSWEP_V316_test&quot;, FOLDER_MIME).name</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">            &#39;MSWEP_V316_test&#39;</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">folder_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">catalog</span><span class="p">:</span> <span class="n">Catalog</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Bind the resolver to a Drive client, share and catalog.</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">            service: The Drive v3 client.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            folder_id: Drive id of the shared folder — which **is** the</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">                product/version root, not a parent to search.</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">            catalog: The MSWEP catalog, read for version metadata.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_service</span> <span class="o">=</span> <span class="n">service</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_folder_id</span> <span class="o">=</span> <span class="n">folder_id</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span> <span class="o">=</span> <span class="n">catalog</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">:</span> <span class="n">DriveEntry</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DriveEntry</span><span class="p">:</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the shared folder itself, as the product/version root (cached).</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">        GloH2O shares one folder per product **and** per version — the id</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        you are given is the `MSWEP_V280` / `MSWX_V100` / `MSWEP_V316_test`</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        folder directly, whose children are the variants (`Past`, `NRT`,</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">        …). There is no parent to list, so this just reads the folder&#39;s</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">        own metadata.</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">            DriveEntry: The shared folder.</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>            <span class="n">meta</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>                <span class="o">.</span><span class="n">get</span><span class="p">(</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>                    <span class="n">fileId</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_folder_id</span><span class="p">,</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>                    <span class="n">fields</span><span class="o">=</span><span class="s2">&quot;id, name, mimeType&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>                    <span class="n">supportsAllDrives</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>                <span class="p">)</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>                <span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="p">)</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">DriveEntry</span><span class="p">(</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>                <span class="nb">id</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>                <span class="n">name</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>                <span class="n">mime_type</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mimeType&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>            <span class="p">)</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DriveEntry</span><span class="p">:</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a product + version onto the shared root folder.</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        The `folder_id` given at construction **is** the root, so this</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        validates the request against the catalog (product exists, version</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        known and not provisional) and returns the folder. The version</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">        selects descriptive metadata — units, the trend caveat — not the</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">        data itself: which version you get is decided by which per-version</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        share you point `folder_id` at.</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">            product_key: Product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">            version: Version key; defaults to the product&#39;s</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">                `default_version`.</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">            DriveEntry: The shared root folder.</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">            ValueError: When the product or version is unknown.</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            ProvisionalValueError: When the version row is an unverified</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">                placeholder.</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get_product</span><span class="p">(</span><span class="n">product_key</span><span class="p">)</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>        <span class="n">key</span> <span class="o">=</span> <span class="n">version</span> <span class="ow">or</span> <span class="n">product</span><span class="o">.</span><span class="n">default_version</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">:</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known </span><span class="si">{</span><span class="n">product_key</span><span class="si">}</span><span class="s2"> version. Known &quot;</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>                <span class="sa">f</span><span class="s2">&quot;versions: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>            <span class="p">)</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">check_not_provisional</span><span class="p">(</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>            <span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">product_key</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> version&quot;</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>        <span class="p">)</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -39946,8 +39946,7 @@ product/version root, not a parent to search.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/drive.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-425">425</a></span>
-<span class="normal"><a href="#__codelineno-0-426">426</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-426">426</a></span>
 <span class="normal"><a href="#__codelineno-0-427">427</a></span>
 <span class="normal"><a href="#__codelineno-0-428">428</a></span>
 <span class="normal"><a href="#__codelineno-0-429">429</a></span>
@@ -39958,19 +39957,20 @@ product/version root, not a parent to search.</p>
 <span class="normal"><a href="#__codelineno-0-434">434</a></span>
 <span class="normal"><a href="#__codelineno-0-435">435</a></span>
 <span class="normal"><a href="#__codelineno-0-436">436</a></span>
-<span class="normal"><a href="#__codelineno-0-437">437</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-425" name="__codelineno-0-425"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">folder_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">catalog</span><span class="p">:</span> <span class="n">Catalog</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Bind the resolver to a Drive client, share and catalog.</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        service: The Drive v3 client.</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        folder_id: Drive id of the shared folder — which **is** the</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">            product/version root, not a parent to search.</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        catalog: The MSWEP catalog, read for version metadata.</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_service</span> <span class="o">=</span> <span class="n">service</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_folder_id</span> <span class="o">=</span> <span class="n">folder_id</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span> <span class="o">=</span> <span class="n">catalog</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">:</span> <span class="n">DriveEntry</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-437">437</a></span>
+<span class="normal"><a href="#__codelineno-0-438">438</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">folder_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">catalog</span><span class="p">:</span> <span class="n">Catalog</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Bind the resolver to a Drive client, share and catalog.</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        service: The Drive v3 client.</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        folder_id: Drive id of the shared folder — which **is** the</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">            product/version root, not a parent to search.</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a><span class="sd">        catalog: The MSWEP catalog, read for version metadata.</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_service</span> <span class="o">=</span> <span class="n">service</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_folder_id</span> <span class="o">=</span> <span class="n">folder_id</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span> <span class="o">=</span> <span class="n">catalog</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_root</span><span class="p">:</span> <span class="n">DriveEntry</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -40109,8 +40109,7 @@ placeholder.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/drive.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-468">468</a></span>
-<span class="normal"><a href="#__codelineno-0-469">469</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-469">469</a></span>
 <span class="normal"><a href="#__codelineno-0-470">470</a></span>
 <span class="normal"><a href="#__codelineno-0-471">471</a></span>
 <span class="normal"><a href="#__codelineno-0-472">472</a></span>
@@ -40142,40 +40141,41 @@ placeholder.</p>
 <span class="normal"><a href="#__codelineno-0-498">498</a></span>
 <span class="normal"><a href="#__codelineno-0-499">499</a></span>
 <span class="normal"><a href="#__codelineno-0-500">500</a></span>
-<span class="normal"><a href="#__codelineno-0-501">501</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DriveEntry</span><span class="p">:</span>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a product + version onto the shared root folder.</span>
-<a id="__codelineno-0-470" name="__codelineno-0-470"></a>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">    The `folder_id` given at construction **is** the root, so this</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">    validates the request against the catalog (product exists, version</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">    known and not provisional) and returns the folder. The version</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">    selects descriptive metadata — units, the trend caveat — not the</span>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">    data itself: which version you get is decided by which per-version</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">    share you point `folder_id` at.</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">        product_key: Product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        version: Version key; defaults to the product&#39;s</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">            `default_version`.</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        DriveEntry: The shared root folder.</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        ValueError: When the product or version is unknown.</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        ProvisionalValueError: When the version row is an unverified</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">            placeholder.</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get_product</span><span class="p">(</span><span class="n">product_key</span><span class="p">)</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="n">key</span> <span class="o">=</span> <span class="n">version</span> <span class="ow">or</span> <span class="n">product</span><span class="o">.</span><span class="n">default_version</span>
-<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">:</span>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known </span><span class="si">{</span><span class="n">product_key</span><span class="si">}</span><span class="s2"> version. Known &quot;</span>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>            <span class="sa">f</span><span class="s2">&quot;versions: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>        <span class="p">)</span>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">check_not_provisional</span><span class="p">(</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">product_key</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> version&quot;</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>    <span class="p">)</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-501">501</a></span>
+<span class="normal"><a href="#__codelineno-0-502">502</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">product_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DriveEntry</span><span class="p">:</span>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a product + version onto the shared root folder.</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">    The `folder_id` given at construction **is** the root, so this</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">    validates the request against the catalog (product exists, version</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">    known and not provisional) and returns the folder. The version</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">    selects descriptive metadata — units, the trend caveat — not the</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">    data itself: which version you get is decided by which per-version</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">    share you point `folder_id` at.</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        product_key: Product key (`&quot;mswep&quot;`, `&quot;mswx&quot;`).</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        version: Version key; defaults to the product&#39;s</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">            `default_version`.</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        DriveEntry: The shared root folder.</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">        ValueError: When the product or version is unknown.</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a><span class="sd">        ProvisionalValueError: When the version row is an unverified</span>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a><span class="sd">            placeholder.</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="n">product</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">get_product</span><span class="p">(</span><span class="n">product_key</span><span class="p">)</span>
+<a id="__codelineno-0-493" name="__codelineno-0-493"></a>    <span class="n">key</span> <span class="o">=</span> <span class="n">version</span> <span class="ow">or</span> <span class="n">product</span><span class="o">.</span><span class="n">default_version</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">:</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not a known </span><span class="si">{</span><span class="n">product_key</span><span class="si">}</span><span class="s2"> version. Known &quot;</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>            <span class="sa">f</span><span class="s2">&quot;versions: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>        <span class="p">)</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="o">.</span><span class="n">check_not_provisional</span><span class="p">(</span>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="n">product</span><span class="o">.</span><span class="n">versions</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;the </span><span class="si">{</span><span class="n">product_key</span><span class="si">}</span><span class="s2"> v</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> version&quot;</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>    <span class="p">)</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -40231,8 +40231,7 @@ own metadata.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/drive.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-439">439</a></span>
-<span class="normal"><a href="#__codelineno-0-440">440</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-440">440</a></span>
 <span class="normal"><a href="#__codelineno-0-441">441</a></span>
 <span class="normal"><a href="#__codelineno-0-442">442</a></span>
 <span class="normal"><a href="#__codelineno-0-443">443</a></span>
@@ -40258,34 +40257,35 @@ own metadata.</p>
 <span class="normal"><a href="#__codelineno-0-463">463</a></span>
 <span class="normal"><a href="#__codelineno-0-464">464</a></span>
 <span class="normal"><a href="#__codelineno-0-465">465</a></span>
-<span class="normal"><a href="#__codelineno-0-466">466</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DriveEntry</span><span class="p">:</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the shared folder itself, as the product/version root (cached).</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">    GloH2O shares one folder per product **and** per version — the id</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">    you are given is the `MSWEP_V280` / `MSWX_V100` / `MSWEP_V316_test`</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    folder directly, whose children are the variants (`Past`, `NRT`,</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    …). There is no parent to list, so this just reads the folder&#39;s</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">    own metadata.</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">        DriveEntry: The shared folder.</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="n">meta</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-453" name="__codelineno-0-453"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span>
-<a id="__codelineno-0-454" name="__codelineno-0-454"></a>            <span class="o">.</span><span class="n">get</span><span class="p">(</span>
-<a id="__codelineno-0-455" name="__codelineno-0-455"></a>                <span class="n">fileId</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_folder_id</span><span class="p">,</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a>                <span class="n">fields</span><span class="o">=</span><span class="s2">&quot;id, name, mimeType&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>                <span class="n">supportsAllDrives</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>            <span class="p">)</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="o">.</span><span class="n">execute</span><span class="p">()</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>        <span class="p">)</span>
-<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">DriveEntry</span><span class="p">(</span>
-<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="nb">id</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-463" name="__codelineno-0-463"></a>            <span class="n">name</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>            <span class="n">mime_type</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mimeType&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>        <span class="p">)</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span>
+<span class="normal"><a href="#__codelineno-0-466">466</a></span>
+<span class="normal"><a href="#__codelineno-0-467">467</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DriveEntry</span><span class="p">:</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the shared folder itself, as the product/version root (cached).</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a><span class="sd">    GloH2O shares one folder per product **and** per version — the id</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    you are given is the `MSWEP_V280` / `MSWX_V100` / `MSWEP_V316_test`</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">    folder directly, whose children are the variants (`Past`, `NRT`,</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">    …). There is no parent to list, so this just reads the folder&#39;s</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">    own metadata.</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a><span class="sd">        DriveEntry: The shared folder.</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>        <span class="n">meta</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>            <span class="o">.</span><span class="n">get</span><span class="p">(</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>                <span class="n">fileId</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_folder_id</span><span class="p">,</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>                <span class="n">fields</span><span class="o">=</span><span class="s2">&quot;id, name, mimeType&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>                <span class="n">supportsAllDrives</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="p">)</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>            <span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>        <span class="p">)</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="n">DriveEntry</span><span class="p">(</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>            <span class="nb">id</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>            <span class="n">name</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>            <span class="n">mime_type</span><span class="o">=</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mimeType&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>        <span class="p">)</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -40312,7 +40312,7 @@ own metadata.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Map a Drive <code>HttpError</code> onto this module's typed failures.</p>
+        <p>Map a Drive failure onto this module's typed transport errors.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -40350,21 +40350,22 @@ own metadata.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>Exception</code></td>            <td>
-                  <code><span title="Exception">Exception</span></code>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="&lt;code&gt;DriveTransportError&lt;/code&gt; (&lt;code&gt;earthlens.mswep.drive.DriveTransportError&lt;/code&gt;)" href="#earthlens.mswep.drive.DriveTransportError">DriveTransportError</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A :class:<code>DownloadQuotaExceededError</code> /
-:class:<code>RateLimitedError</code> when the status and reason say so,
-otherwise <code>exc</code> unchanged so an unrelated failure keeps its
-own traceback.</p>
+                <p>DriveTransportError | None: A :class:<code>DownloadQuotaExceededError</code>
+/ :class:<code>RateLimitedError</code> when the status and reason say
+so, or <code>None</code> when <code>exc</code> is not a transport failure this
+module handles — the caller re-raises the original so it
+keeps its own traceback.</p>
               </div>
             </td>
           </tr>
@@ -40413,46 +40414,48 @@ own traceback.</p>
 <span class="normal"><a href="#__codelineno-0-321">321</a></span>
 <span class="normal"><a href="#__codelineno-0-322">322</a></span>
 <span class="normal"><a href="#__codelineno-0-323">323</a></span>
-<span class="normal"><a href="#__codelineno-0-324">324</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="k">def</span><span class="w"> </span><span class="nf">classify_http_error</span><span class="p">(</span><span class="n">exc</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="ne">Exception</span><span class="p">:</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Map a Drive `HttpError` onto this module&#39;s typed failures.</span>
+<span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="k">def</span><span class="w"> </span><span class="nf">classify_http_error</span><span class="p">(</span><span class="n">exc</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DriveTransportError</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Map a Drive failure onto this module&#39;s typed transport errors.</span>
 <a id="__codelineno-0-287" name="__codelineno-0-287"></a>
 <a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">    Args:</span>
 <a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">        exc: The exception raised by the Drive client.</span>
 <a id="__codelineno-0-290" name="__codelineno-0-290"></a>
 <a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        Exception: A :class:`DownloadQuotaExceededError` /</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">            :class:`RateLimitedError` when the status and reason say so,</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            otherwise `exc` unchanged so an unrelated failure keeps its</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            own traceback.</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="n">status</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="s2">&quot;resp&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>        <span class="c1"># No HTTP status: a bare connection/timeout failure with no `.resp`.</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="c1"># Retry the transient transport ones like throttling; leave anything</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="c1"># else (a disk-full OSError, a programming error) to re-raise.</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">_TRANSIENT_TRANSPORT_ERRORS</span><span class="p">):</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="k">return</span> <span class="n">RateLimitedError</span><span class="p">(</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>                <span class="sa">f</span><span class="s2">&quot;Google Drive connection failed transiently: </span><span class="si">{</span><span class="n">exc</span><span class="si">!r}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>            <span class="p">)</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>        <span class="k">return</span> <span class="n">exc</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">if</span> <span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="mi">429</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">502</span><span class="p">,</span> <span class="mi">503</span><span class="p">,</span> <span class="mi">504</span><span class="p">):</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="k">return</span> <span class="n">exc</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="n">detail</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">reason</span> <span class="ow">in</span> <span class="n">detail</span> <span class="k">for</span> <span class="n">reason</span> <span class="ow">in</span> <span class="n">QUOTA_REASONS</span><span class="p">):</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="k">return</span> <span class="n">DownloadQuotaExceededError</span><span class="p">(</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>            <span class="s2">&quot;Google Drive refused this granule: its per-file download quota &quot;</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="s2">&quot;is exhausted. Drive counts that quota across everyone holding &quot;</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="s2">&quot;the GloH2O share, so a popular file trips it regardless of your &quot;</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>            <span class="s2">&quot;own usage. Back-off does not help; it usually clears after &quot;</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="s2">&quot;~24 hours. For a large window use `rclone sync`, which GloH2O &quot;</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="sa">f</span><span class="s2">&quot;asks non-commercial users to use for bulk transfers. (</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="p">)</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>    <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="mi">429</span><span class="p">):</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="k">return</span> <span class="n">RateLimitedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Google Drive throttled the request: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>    <span class="c1"># Everything left is a 5xx the status filter above let through: transient</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="c1"># server-side trouble, cleared by waiting exactly like throttling.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="k">return</span> <span class="n">RateLimitedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Google Drive returned a transient </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="sd">        DriveTransportError | None: A :class:`DownloadQuotaExceededError`</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a><span class="sd">            / :class:`RateLimitedError` when the status and reason say</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">            so, or `None` when `exc` is not a transport failure this</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">            module handles — the caller re-raises the original so it</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">            keeps its own traceback.</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="n">status</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="s2">&quot;resp&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="c1"># No HTTP status: a bare connection/timeout failure with no `.resp`.</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>        <span class="c1"># Retry the transient transport ones like throttling; leave anything</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="c1"># else (a disk-full OSError, a programming error) to re-raise.</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">_TRANSIENT_TRANSPORT_ERRORS</span><span class="p">):</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>            <span class="k">return</span> <span class="n">RateLimitedError</span><span class="p">(</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                <span class="sa">f</span><span class="s2">&quot;Google Drive connection failed transiently: </span><span class="si">{</span><span class="n">exc</span><span class="si">!r}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>            <span class="p">)</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">if</span> <span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="mi">429</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">502</span><span class="p">,</span> <span class="mi">503</span><span class="p">,</span> <span class="mi">504</span><span class="p">):</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>        <span class="k">return</span> <span class="kc">None</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="n">detail</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">reason</span> <span class="ow">in</span> <span class="n">detail</span> <span class="k">for</span> <span class="n">reason</span> <span class="ow">in</span> <span class="n">QUOTA_REASONS</span><span class="p">):</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="k">return</span> <span class="n">DownloadQuotaExceededError</span><span class="p">(</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>            <span class="s2">&quot;Google Drive refused this granule: its per-file download quota &quot;</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="s2">&quot;is exhausted. Drive counts that quota across everyone holding &quot;</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>            <span class="s2">&quot;the GloH2O share, so a popular file trips it regardless of your &quot;</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="s2">&quot;own usage. Back-off does not help; it usually clears after &quot;</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="s2">&quot;~24 hours. For a large window use `rclone sync`, which GloH2O &quot;</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="sa">f</span><span class="s2">&quot;asks non-commercial users to use for bulk transfers. (</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="p">)</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">403</span><span class="p">,</span> <span class="mi">429</span><span class="p">):</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">return</span> <span class="n">RateLimitedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Google Drive throttled the request: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="c1"># Everything left is a 5xx the status filter above let through: transient</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>    <span class="c1"># server-side trouble, cleared by waiting exactly like throttling.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">return</span> <span class="n">RateLimitedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Google Drive returned a transient </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -40636,8 +40639,7 @@ exhausted.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/mswep/drive.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-328">328</a></span>
 <span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
@@ -40705,76 +40707,77 @@ exhausted.</p>
 <span class="normal"><a href="#__codelineno-0-393">393</a></span>
 <span class="normal"><a href="#__codelineno-0-394">394</a></span>
 <span class="normal"><a href="#__codelineno-0-395">395</a></span>
-<span class="normal"><a href="#__codelineno-0-396">396</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_media</span><span class="p">(</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="n">service</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="n">file_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="n">destination</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MAX_RETRIES</span><span class="p">,</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="n">sleep</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">,</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download one Drive file to `destination`, atomically and with retries.</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">    Streams through `MediaIoBaseDownload` so a multi-hundred-megabyte</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    granule never lands in memory, and writes to a `.part` sibling that</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">    is renamed only once the transfer completes. An interrupted download</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    therefore leaves no truncated file that a later run would mistake</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">    for a cached granule.</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">    Throttling and 5xx responses are retried with exponential back-off.</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    A **quota** refusal is not: it is raised immediately as</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    :class:`DownloadQuotaExceededError`, because waiting does not clear</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    it and retrying only burns the budget.</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        service: The Drive v3 client.</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        file_id: Drive id of the file to fetch.</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        destination: Final path to write.</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        max_retries: Attempts before a throttled download gives up.</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        sleep: Sleep function, injected so tests do not wait.</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">        Path: `destination`.</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        DownloadQuotaExceededError: When the file&#39;s download quota is</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">            exhausted.</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        RateLimitedError: When throttling outlasts the retry budget.</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">googleapiclient.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">MediaIoBaseDownload</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="n">destination</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="n">partial</span> <span class="o">=</span> <span class="n">destination</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">destination</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span><span class="p">):</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="n">request</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span><span class="o">.</span><span class="n">get_media</span><span class="p">(</span><span class="n">fileId</span><span class="o">=</span><span class="n">file_id</span><span class="p">,</span> <span class="n">supportsAllDrives</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>            <span class="k">with</span> <span class="n">partial</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>                <span class="n">downloader</span> <span class="o">=</span> <span class="n">MediaIoBaseDownload</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>                <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>                <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>                    <span class="n">_</span><span class="p">,</span> <span class="n">done</span> <span class="o">=</span> <span class="n">downloader</span><span class="o">.</span><span class="n">next_chunk</span><span class="p">()</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="n">partial</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="k">return</span> <span class="n">destination</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - re-raised after classification</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="n">partial</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="n">classified</span> <span class="o">=</span> <span class="n">classify_http_error</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">classified</span><span class="p">,</span> <span class="n">DownloadQuotaExceededError</span><span class="p">):</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>                <span class="k">raise</span> <span class="n">classified</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">classified</span><span class="p">,</span> <span class="n">RateLimitedError</span><span class="p">):</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>                <span class="k">raise</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>            <span class="k">if</span> <span class="n">attempt</span> <span class="o">==</span> <span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>                <span class="k">raise</span> <span class="n">classified</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>            <span class="n">delay</span> <span class="o">=</span> <span class="n">BACKOFF_BASE</span><span class="o">**</span><span class="n">attempt</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                <span class="sa">f</span><span class="s2">&quot;mswep: Drive throttled </span><span class="si">{</span><span class="n">destination</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">; retrying in &quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">delay</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s (</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>            <span class="p">)</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="k">raise</span> <span class="n">RateLimitedError</span><span class="p">(</span>  <span class="c1"># pragma: no cover - loop always returns or raises</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>        <span class="sa">f</span><span class="s2">&quot;exhausted </span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> attempts downloading </span><span class="si">{</span><span class="n">destination</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span>
+<span class="normal"><a href="#__codelineno-0-397">397</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_media</span><span class="p">(</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="n">service</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="n">file_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="n">destination</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="o">*</span><span class="p">,</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MAX_RETRIES</span><span class="p">,</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="n">sleep</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">,</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Download one Drive file to `destination`, atomically and with retries.</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">    Streams through `MediaIoBaseDownload` so a multi-hundred-megabyte</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">    granule never lands in memory, and writes to a `.part` sibling that</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    is renamed only once the transfer completes. An interrupted download</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">    therefore leaves no truncated file that a later run would mistake</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    for a cached granule.</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="sd">    Throttling and 5xx responses are retried with exponential back-off.</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="sd">    A **quota** refusal is not: it is raised immediately as</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="sd">    :class:`DownloadQuotaExceededError`, because waiting does not clear</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="sd">    it and retrying only burns the budget.</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        service: The Drive v3 client.</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        file_id: Drive id of the file to fetch.</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="sd">        destination: Final path to write.</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a><span class="sd">        max_retries: Attempts before a throttled download gives up.</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a><span class="sd">        sleep: Sleep function, injected so tests do not wait.</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="sd">        Path: `destination`.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        DownloadQuotaExceededError: When the file&#39;s download quota is</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">            exhausted.</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        RateLimitedError: When throttling outlasts the retry budget.</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">googleapiclient.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">MediaIoBaseDownload</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="n">destination</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>    <span class="n">partial</span> <span class="o">=</span> <span class="n">destination</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">destination</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.part&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>    <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span><span class="p">):</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">request</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">files</span><span class="p">()</span><span class="o">.</span><span class="n">get_media</span><span class="p">(</span><span class="n">fileId</span><span class="o">=</span><span class="n">file_id</span><span class="p">,</span> <span class="n">supportsAllDrives</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="k">with</span> <span class="n">partial</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>                <span class="n">downloader</span> <span class="o">=</span> <span class="n">MediaIoBaseDownload</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>                <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>                <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>                    <span class="n">_</span><span class="p">,</span> <span class="n">done</span> <span class="o">=</span> <span class="n">downloader</span><span class="o">.</span><span class="n">next_chunk</span><span class="p">()</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="n">partial</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">destination</span><span class="p">)</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="k">return</span> <span class="n">destination</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - re-raised after classification</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="n">partial</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">missing_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>            <span class="n">classified</span> <span class="o">=</span> <span class="n">classify_http_error</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>            <span class="k">if</span> <span class="n">classified</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>                <span class="k">raise</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">classified</span><span class="p">,</span> <span class="n">DownloadQuotaExceededError</span><span class="p">):</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>                <span class="k">raise</span> <span class="n">classified</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>            <span class="k">if</span> <span class="n">attempt</span> <span class="o">==</span> <span class="n">max_retries</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="k">raise</span> <span class="n">classified</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>            <span class="n">delay</span> <span class="o">=</span> <span class="n">BACKOFF_BASE</span><span class="o">**</span><span class="n">attempt</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                <span class="sa">f</span><span class="s2">&quot;mswep: Drive throttled </span><span class="si">{</span><span class="n">destination</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">; retrying in &quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">delay</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s (</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>            <span class="p">)</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>            <span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="k">raise</span> <span class="n">RateLimitedError</span><span class="p">(</span>  <span class="c1"># pragma: no cover - loop always returns or raises</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="sa">f</span><span class="s2">&quot;exhausted </span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> attempts downloading </span><span class="si">{</span><span class="n">destination</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
