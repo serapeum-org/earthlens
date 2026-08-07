@@ -198,8 +198,9 @@ class TestContract:
 
     def test_aggregate_is_refused_centrally(self, build):
         """A non-`None` aggregate is refused by the base wrapper."""
+        source = build()
         with pytest.raises(NotImplementedError, match="aggregate"):
-            build().download(progress_bar=False, aggregate=object())
+            source.download(progress_bar=False, aggregate=object())
 
     def test_aggregate_none_is_absorbed(self, build):
         """`aggregate=None` still works for callers that forward it."""
@@ -409,8 +410,9 @@ class TestForecastVariants:
             update={"forecast_path_template": ""}
         )
         cat = base.model_copy(update={"datasets": {**base.datasets, "mswx": product}})
+        source = self._forecast(share, tmp_path, members=[1], catalog=cat)
         with pytest.raises(ValueError, match="declares no forecast layout"):
-            _quiet_download(self._forecast(share, tmp_path, members=[1], catalog=cat))
+            _quiet_download(source)
 
     def test_forecast_requires_init(self, share, tmp_path):
         """A forecast variant with no init= is refused at construction."""
@@ -419,6 +421,7 @@ class TestForecastVariants:
 
     def test_init_on_analysis_variant_raises(self, share, tmp_path):
         """`init=` on an analysis variant is a mistake, not silently ignored."""
+        folder_id = share.path_id("MSWEP_V315")
         with pytest.raises(ValueError, match="applies only to a forecast"):
             MSWEP(
                 start="2020-04-25",
@@ -426,7 +429,7 @@ class TestForecastVariants:
                 temporal_resolution="daily",
                 variant="Past",
                 init="2020-04-25",
-                folder_id=share.path_id("MSWEP_V315"),
+                folder_id=folder_id,
                 service=share,
                 path=tmp_path,
             )

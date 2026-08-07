@@ -136,8 +136,9 @@ class TestCredentialLadder:
         creds = MswepCredentials(
             folder_id="1AbC", rclone_config=config, rclone_remote="a"
         )
+        auth = MswepAuth(creds)
         with pytest.raises(AuthenticationError, match="could not be parsed"):
-            MswepAuth(creds)._resolve_credentials()
+            auth._resolve_credentials()
 
     def test_configure_builds_a_client_from_resolved_credentials(
         self, tmp_path, monkeypatch

@@ -257,4 +257,5 @@ class TestNrtRevisionWindow:
         first = len(share.media_calls)
         paths = _quiet(MSWEP(**kwargs))
         assert len(share.media_calls) == first
-        assert paths and paths[0].exists()
+        assert paths
+        assert paths[0].exists()

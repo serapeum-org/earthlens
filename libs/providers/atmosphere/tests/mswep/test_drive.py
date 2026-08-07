@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import FrozenInstanceError
+
 import pytest
 
 from earthlens.mswep.catalog import Catalog, ProvisionalValueError
@@ -187,5 +189,5 @@ class TestDriveEntry:
     def test_entry_is_frozen(self):
         """Entries are immutable value objects."""
         entry = DriveEntry("1", "x.nc")
-        with pytest.raises(Exception):
+        with pytest.raises(FrozenInstanceError):
             entry.id = "2"

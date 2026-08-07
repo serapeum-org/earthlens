@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from earthlens.mswep import auth as auth_module
 from earthlens.mswep.auth import (
@@ -273,7 +274,7 @@ class TestCredentialResolution:
     def test_credentials_are_frozen(self):
         """The model is immutable, so a resolved credential cannot drift."""
         creds = MswepCredentials(folder_id="1AbC")
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             creds.folder_id = "other"
 
 

@@ -32,8 +32,9 @@ def _load_mint_token() -> ModuleType:
         candidate = parent / "tools" / "mswep" / "mint_token.py"
         if candidate.exists():
             spec = importlib.util.spec_from_file_location("mswep_mint_token", candidate)
+            assert spec is not None
+            assert spec.loader is not None
             module = importlib.util.module_from_spec(spec)
-            assert spec is not None and spec.loader is not None
             spec.loader.exec_module(module)
             return module
     raise FileNotFoundError("tools/mswep/mint_token.py not found above the test file")

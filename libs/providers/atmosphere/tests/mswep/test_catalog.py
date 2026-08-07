@@ -274,12 +274,14 @@ class TestForecastStreams:
     def test_notes_describe_the_layout(self):
         """The notes record the confirmed member-foldered layout."""
         row = Catalog().get_product("mswx").variants["Mid"]
-        assert "member" in row.notes and "valid" in row.notes
+        assert "member" in row.notes
+        assert "valid" in row.notes
 
     def test_forecast_path_template_carries_init_and_member(self):
         """MSWX declares a forecast template with the extra depth."""
         template = Catalog().get_product("mswx").forecast_path_template
-        assert "{init}" in template and "{member}" in template
+        assert "{init}" in template
+        assert "{member}" in template
 
     def test_mswep_has_no_forecast_template(self):
         """MSWEP has no forecast streams, so no forecast template."""
@@ -329,37 +331,43 @@ class TestLoading:
 
     def test_unknown_product_suggests_a_near_match(self):
         """A typo'd product name gets a did-you-mean hint."""
+        catalog = Catalog()
         with pytest.raises(ValueError, match="Did you mean 'mswep'"):
-            Catalog().get_product("mswpe")
+            catalog.get_product("mswpe")
 
     def test_missing_products_block_raises(self, tmp_path):
         """A catalog with no products is rejected."""
+        path = _write(tmp_path, "license: CC-BY-NC\n")
         with pytest.raises(ValueError, match="products"):
-            Catalog.load(_write(tmp_path, "license: CC-BY-NC\n"))
+            Catalog.load(path)
 
     def test_missing_required_field_raises(self, tmp_path):
         """A product without a path template names the missing field."""
         text = 'products:\n  mswep:\n    default_version: "1"\n'
+        path = _write(tmp_path, text)
         with pytest.raises(ValueError, match="path_template"):
-            Catalog.load(_write(tmp_path, text))
+            Catalog.load(path)
 
     def test_unknown_row_field_is_rejected(self, tmp_path):
         """`extra="forbid"` catches a typo'd row key rather than dropping it."""
         text = MINIMAL.replace("        root: MSWEP_V315", "        rooot: MSWEP_V315")
+        path = _write(tmp_path, text)
         with pytest.raises(ValueError, match="versions"):
-            Catalog.load(_write(tmp_path, text))
+            Catalog.load(path)
 
     def test_duplicate_keys_are_rejected(self, tmp_path):
         """The strict YAML loader refuses a duplicated mapping key."""
         text = MINIMAL + '  mswep:\n    path_template: "x"\n    default_version: "1"\n'
+        path = _write(tmp_path, text)
         with pytest.raises(ValueError):
-            Catalog.load(_write(tmp_path, text))
+            Catalog.load(path)
 
     def test_malformed_gauge_metadata_file_is_rejected(self, tmp_path):
         """A gauge-metadata file row with an unknown field fails validation."""
         text = MINIMAL + "gauge_metadata:\n  files:\n    bad.csv:\n      bogus: 1\n"
+        path = _write(tmp_path, text)
         with pytest.raises(ValueError, match="gauge_metadata file 'bad.csv'"):
-            Catalog.load(_write(tmp_path, text))
+            Catalog.load(path)
 
     def test_injected_datasets_skip_the_disk_read(self):
         """Passing datasets builds a Catalog without touching the YAML."""
