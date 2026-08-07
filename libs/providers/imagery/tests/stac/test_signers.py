@@ -430,22 +430,28 @@ class TestAnonymousS3Signer:
         """An empty-string region is falsy, so no region keys are added."""
         assert _AnonymousS3Signer("").gdal_env() == {"AWS_NO_SIGN_REQUEST": "YES"}
 
-    @pytest.mark.parametrize("region", ["af-south-1", "ap-southeast-2", "us-west-2"])
-    def test_gdal_env_with_region_pins_regional_endpoint(self, region):
-        """A region adds AWS_REGION and the matching regional S3 endpoint."""
+    @pytest.mark.parametrize("region", ["af-south-1", "eu-south-1", "me-south-1"])
+    def test_gdal_env_opt_in_region_pins_regional_endpoint(self, region):
+        """An opt-in region adds AWS_REGION and its regional S3 endpoint."""
         assert _AnonymousS3Signer(region).gdal_env() == {
             "AWS_NO_SIGN_REQUEST": "YES",
             "AWS_REGION": region,
             "AWS_S3_ENDPOINT": f"s3.{region}.amazonaws.com",
         }
 
+    @pytest.mark.parametrize("region", ["us-west-2", "ap-southeast-2", "eu-central-1"])
+    def test_gdal_env_standard_region_is_not_pinned(self, region):
+        """A standard region emits only the no-sign flag so GDAL can redirect."""
+        assert _AnonymousS3Signer(region).gdal_env() == {"AWS_NO_SIGN_REQUEST": "YES"}
+
     @pytest.mark.parametrize("region", ["cn-north-1", "cn-northwest-1"])
     def test_gdal_env_china_region_uses_cn_partition_endpoint(self, region):
-        """A China region resolves to the .amazonaws.com.cn partition host."""
-        assert (
-            _AnonymousS3Signer(region).gdal_env()["AWS_S3_ENDPOINT"]
-            == f"s3.{region}.amazonaws.com.cn"
-        )
+        """A China region pins the .amazonaws.com.cn partition host."""
+        assert _AnonymousS3Signer(region).gdal_env() == {
+            "AWS_NO_SIGN_REQUEST": "YES",
+            "AWS_REGION": region,
+            "AWS_S3_ENDPOINT": f"s3.{region}.amazonaws.com.cn",
+        }
 
     def test_sign_request_returns_same_object(self):
         """An anonymous search needs no signing, so the request is unchanged."""
@@ -489,12 +495,12 @@ class TestBuildSigner:
     def test_anonymous_ignores_unrelated_creds(self):
         """The anonymous branch uses only region and drops the other backend kwargs."""
         env = build_signer(
-            "anonymous", region="us-west-2", access_key="ak", secret_key="sk"
+            "anonymous", region="af-south-1", access_key="ak", secret_key="sk"
         ).gdal_env()
         assert env == {
             "AWS_NO_SIGN_REQUEST": "YES",
-            "AWS_REGION": "us-west-2",
-            "AWS_S3_ENDPOINT": "s3.us-west-2.amazonaws.com",
+            "AWS_REGION": "af-south-1",
+            "AWS_S3_ENDPOINT": "s3.af-south-1.amazonaws.com",
         }
 
     def test_aws_requester_pays_forwards_region(self, fake_pyramids):

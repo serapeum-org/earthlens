@@ -739,6 +739,80 @@ class BdcTokenSigner(_BaseSigner):
         )
 
 
+#: AWS **opt-in** regions (disabled by default). What matters here: their S3
+#: service *rejects* a request sent to the global `<bucket>.s3.amazonaws.com`
+#: endpoint with `IllegalLocationConstraintException` instead of redirecting it,
+#: so a public bucket in one of these regions is only reachable by naming the
+#: region's endpoint explicitly. Standard (enabled-by-default) regions redirect
+#: normally and are deliberately left unpinned — see `_region_needs_endpoint`.
+_OPT_IN_REGIONS = frozenset(
+    {
+        "af-south-1",
+        "ap-east-1",
+        "ap-east-2",
+        "ap-south-2",
+        "ap-southeast-3",
+        "ap-southeast-4",
+        "ap-southeast-5",
+        "ap-southeast-7",
+        "ca-west-1",
+        "eu-central-2",
+        "eu-south-1",
+        "eu-south-2",
+        "il-central-1",
+        "me-central-1",
+        "me-south-1",
+        "mx-central-1",
+    }
+)
+
+
+def _region_needs_endpoint(region: str) -> bool:
+    """Return whether a region must be reached at its own S3 endpoint.
+
+    True for an AWS opt-in region (the global endpoint rejects it, see
+    :data:`_OPT_IN_REGIONS`) and for any China-partition region (`cn-*`, whose
+    buckets the global `amazonaws.com` endpoint cannot reach at all). Standard
+    regions return False: the global endpoint redirects to them, so leaving them
+    unpinned keeps cross-region reads working for an endpoint that federates
+    buckets across regions (e.g. earth-search serving Copernicus DEM from
+    `eu-central-1` while its catalog region is `us-west-2`). GovCloud (`us-gov-*`)
+    is standard-TLD and needs no special case; the air-gapped ISO partitions
+    (`us-iso-*` / `us-isob-*`) are intentionally out of scope — they host no
+    public/anonymous STAC bucket.
+
+    Args:
+        region: An AWS region code (e.g. `"af-south-1"`, `"us-west-2"`).
+
+    Returns:
+        True when the region needs an explicit `AWS_S3_ENDPOINT`, else False.
+
+    Examples:
+        - An opt-in region needs its own endpoint:
+            ```python
+            >>> from earthlens.stac.signers import _region_needs_endpoint
+            >>> _region_needs_endpoint("af-south-1")
+            True
+
+            ```
+        - A standard region does not (the global endpoint redirects to it):
+            ```python
+            >>> from earthlens.stac.signers import _region_needs_endpoint
+            >>> _region_needs_endpoint("us-west-2")
+            False
+
+            ```
+        - A China-partition region needs its own endpoint:
+            ```python
+            >>> from earthlens.stac.signers import _region_needs_endpoint
+            >>> _region_needs_endpoint("cn-north-1")
+            True
+
+            ```
+    """
+    return region in _OPT_IN_REGIONS or region.startswith("cn-")
+
+
 class _AnonymousS3Signer:
     """Anonymous signer that also tells GDAL not to sign its S3 reads.
 
@@ -755,26 +829,31 @@ class _AnonymousS3Signer:
     the only kind that can succeed. Requester-pays keeps its own signer, which
     contributes real credentials plus `AWS_REQUEST_PAYER`, and is untouched.
 
-    When the endpoint declares a `region`, the signer pins GDAL at that region's
-    S3 endpoint (`AWS_REGION` + `AWS_S3_ENDPOINT=s3.<region>.amazonaws.com`), so
-    a `/vsis3/` read lands at `<bucket>.s3.<region>.amazonaws.com` rather than
-    the default global `<bucket>.s3.amazonaws.com`. This is **required** for a
-    bucket in an **opt-in** region (e.g. Digital Earth Africa on `af-south-1`),
-    which rejects the global endpoint with `IllegalLocationConstraintException`
-    ("the <region> location constraint is incompatible for the region specific
-    endpoint this request was sent to"). For a standard-region bucket the pin is
-    merely the canonical (redirect-free) endpoint, and for an HTTPS asset read
-    through `/vsicurl/` it is a no-op (the URL host is used directly). The pin
-    therefore fires for **every** anonymous endpoint that carries a `region`
-    (`deafrica`, `dea`, `earth-search`, `veda`), not only the opt-in one — each
-    serves single-region assets, so pinning the catalog region is correct. The
-    region comes from the catalog endpoint's `region:` field, threaded through
-    `build_signer`; when it is `None` (a regionless HTTPS-asset endpoint such as
-    the Brazil Data Cube) only the no-sign flag is emitted.
+    When the endpoint declares a `region` that **needs** its own S3 endpoint
+    (see :func:`_region_needs_endpoint`), the signer pins GDAL there
+    (`AWS_REGION` + `AWS_S3_ENDPOINT=s3.<region>.amazonaws.com`), so a `/vsis3/`
+    read lands at `<bucket>.s3.<region>.amazonaws.com` rather than the default
+    global `<bucket>.s3.amazonaws.com`. This is **required** for a bucket in an
+    **opt-in** region (e.g. Digital Earth Africa on `af-south-1`), which rejects
+    the global endpoint with `IllegalLocationConstraintException` ("the <region>
+    location constraint is incompatible for the region specific endpoint this
+    request was sent to"), and for the China partition (`cn-*`).
+
+    A **standard** region (e.g. `us-west-2`, `ap-southeast-2`) is deliberately
+    **left unpinned**: the global endpoint redirects to it, and pinning would be
+    wrong for an endpoint that federates buckets across regions — `earth-search`
+    is pinned by the catalog to `us-west-2` yet serves its `cop-dem-glo-90`
+    assets from an `eu-central-1` bucket, so a hard endpoint pin would send those
+    reads to the wrong region. Leaving standard regions unpinned keeps GDAL's
+    region redirect handling that case. The region comes from the catalog
+    endpoint's `region:` field, threaded through `build_signer`; when it is
+    `None`, a standard region, or an HTTPS `/vsicurl/` asset read, only the
+    no-sign flag is emitted.
 
     Args:
         region: AWS region of the endpoint's public bucket, or `None` when the
-            endpoint's assets are not region-bound S3 objects.
+            endpoint's assets are not region-bound S3 objects. Only an opt-in or
+            `cn-*` region triggers the endpoint pin.
 
     Examples:
         - The GDAL config opts out of request signing:
@@ -819,11 +898,13 @@ class _AnonymousS3Signer:
     def gdal_env(self) -> dict[str, str]:
         """Return the GDAL config for unsigned public-bucket reads.
 
-        Always emits `AWS_NO_SIGN_REQUEST=YES`. When the signer carries a
-        `region`, it additionally emits `AWS_REGION` and
-        `AWS_S3_ENDPOINT=s3.<region>.amazonaws.com` so a bucket in an opt-in
-        region is reached at its region-specific endpoint rather than the
-        global one it would otherwise reject.
+        Always emits `AWS_NO_SIGN_REQUEST=YES`. When the signer carries a region
+        that needs its own endpoint (opt-in or `cn-*`; see
+        :func:`_region_needs_endpoint`), it additionally emits `AWS_REGION` and
+        `AWS_S3_ENDPOINT=s3.<region>.amazonaws.com` so a bucket the global
+        endpoint would reject is reached at its region-specific endpoint. A
+        standard region emits only the no-sign flag, leaving GDAL's redirect to
+        find the bucket's region (correct for cross-region endpoints).
 
         Deliberately nothing more. Copying the requester-pays signer's
         `GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR` and
@@ -835,7 +916,7 @@ class _AnonymousS3Signer:
 
         Returns:
             dict[str, str]: `{"AWS_NO_SIGN_REQUEST": "YES"}`, plus `AWS_REGION`
-            and `AWS_S3_ENDPOINT` when a region is set.
+            and `AWS_S3_ENDPOINT` when the region needs an explicit endpoint.
 
         Examples:
             - An endpoint with no region emits only the no-sign flag:
@@ -845,20 +926,27 @@ class _AnonymousS3Signer:
                 {'AWS_NO_SIGN_REQUEST': 'YES'}
 
                 ```
-            - A region also pins GDAL at that region's S3 endpoint, so an
-              opt-in-region bucket is reached instead of rejected:
+            - An opt-in region pins GDAL at that region's S3 endpoint, so a
+              bucket the global endpoint would reject is reached instead:
                 ```python
                 >>> from earthlens.stac.signers import build_signer
-                >>> env = build_signer("anonymous", region="us-west-2").gdal_env()
+                >>> env = build_signer("anonymous", region="af-south-1").gdal_env()
                 >>> env["AWS_REGION"]
-                'us-west-2'
+                'af-south-1'
                 >>> env["AWS_S3_ENDPOINT"]
-                's3.us-west-2.amazonaws.com'
+                's3.af-south-1.amazonaws.com'
+
+                ```
+            - A standard region is left unpinned (GDAL redirects to the bucket):
+                ```python
+                >>> from earthlens.stac.signers import build_signer
+                >>> build_signer("anonymous", region="us-west-2").gdal_env()
+                {'AWS_NO_SIGN_REQUEST': 'YES'}
 
                 ```
         """
         env = {"AWS_NO_SIGN_REQUEST": "YES"}
-        if self._region:
+        if self._region and _region_needs_endpoint(self._region):
             env["AWS_REGION"] = self._region
             # China regions live in a separate AWS partition whose S3 hosts end
             # in `.amazonaws.com.cn`; every other region uses `.amazonaws.com`.
