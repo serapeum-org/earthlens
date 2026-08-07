@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -28076,12 +28076,12 @@ Google SDK.</p>
 <a id="__codelineno-0-553" name="__codelineno-0-553"></a>                <span class="s2">&quot;rclone.conf, or unset the remote to fall back to other credentials.&quot;</span>
 <a id="__codelineno-0-554" name="__codelineno-0-554"></a>            <span class="p">)</span>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>        <span class="c1"># A remote name is what turns rclone into a credential source. An</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>        <span class="c1"># A named remote is handled above, so `remote` is None here. An</span>
 <a id="__codelineno-0-557" name="__codelineno-0-557"></a>        <span class="c1"># *explicit* config with no remote is a misconfiguration worth flagging;</span>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a>        <span class="c1"># but a merely auto-discovered default rclone.conf — which a GloH2O user</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a>        <span class="c1"># very likely has, since the approval email tells them to install rclone</span>
 <a id="__codelineno-0-560" name="__codelineno-0-560"></a>        <span class="c1"># — must not pre-empt ADC. Fall through to it rather than erroring.</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>        <span class="k">if</span> <span class="n">remote</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">rclone_config_is_explicit</span><span class="p">():</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">rclone_config_is_explicit</span><span class="p">():</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a>                <span class="sa">f</span><span class="s2">&quot;found an rclone config at </span><span class="si">{</span><span class="n">config_path</span><span class="si">}</span><span class="s2"> but no remote name. &quot;</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a>                <span class="sa">f</span><span class="s2">&quot;Pass `rclone_remote=` or set $</span><span class="si">{</span><span class="n">RCLONE_REMOTE_ENV</span><span class="si">}</span><span class="s2"> to the &quot;</span>
@@ -37338,12 +37338,12 @@ Google SDK.</p>
 <a id="__codelineno-0-553" name="__codelineno-0-553"></a>                <span class="s2">&quot;rclone.conf, or unset the remote to fall back to other credentials.&quot;</span>
 <a id="__codelineno-0-554" name="__codelineno-0-554"></a>            <span class="p">)</span>
 <a id="__codelineno-0-555" name="__codelineno-0-555"></a>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>        <span class="c1"># A remote name is what turns rclone into a credential source. An</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>        <span class="c1"># A named remote is handled above, so `remote` is None here. An</span>
 <a id="__codelineno-0-557" name="__codelineno-0-557"></a>        <span class="c1"># *explicit* config with no remote is a misconfiguration worth flagging;</span>
 <a id="__codelineno-0-558" name="__codelineno-0-558"></a>        <span class="c1"># but a merely auto-discovered default rclone.conf — which a GloH2O user</span>
 <a id="__codelineno-0-559" name="__codelineno-0-559"></a>        <span class="c1"># very likely has, since the approval email tells them to install rclone</span>
 <a id="__codelineno-0-560" name="__codelineno-0-560"></a>        <span class="c1"># — must not pre-empt ADC. Fall through to it rather than erroring.</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>        <span class="k">if</span> <span class="n">remote</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">rclone_config_is_explicit</span><span class="p">():</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">rclone_config_is_explicit</span><span class="p">():</span>
 <a id="__codelineno-0-562" name="__codelineno-0-562"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
 <a id="__codelineno-0-563" name="__codelineno-0-563"></a>                <span class="sa">f</span><span class="s2">&quot;found an rclone config at </span><span class="si">{</span><span class="n">config_path</span><span class="si">}</span><span class="s2"> but no remote name. &quot;</span>
 <a id="__codelineno-0-564" name="__codelineno-0-564"></a>                <span class="sa">f</span><span class="s2">&quot;Pass `rclone_remote=` or set $</span><span class="si">{</span><span class="n">RCLONE_REMOTE_ENV</span><span class="si">}</span><span class="s2"> to the &quot;</span>
