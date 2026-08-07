@@ -12,6 +12,9 @@ from __future__ import annotations
 
 __all__ = ["BACKENDS"]
 
+#: Module path shared by the three GloH2O keys (`mswep` / `mswx` / `gloh2o`).
+_MSWEP = "earthlens.mswep"
+
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
 #: distribution's 36 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
@@ -45,9 +48,9 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'nsrdb': ('earthlens.nrel', 'NREL', '', {'product': 'nsrdb-psm3'}),
     'wind-toolkit': ('earthlens.nrel', 'NREL', '', {'product': 'wtk'}),
     'drought': ('earthlens.drought', 'Drought', '', {}),
-    'mswep': ('earthlens.mswep', 'MSWEP', 'mswep', {}),
-    'mswx': ('earthlens.mswep', 'MSWEP', 'mswep', {'product': 'mswx'}),
-    'gloh2o': ('earthlens.mswep', 'MSWEP', 'mswep', {}),
+    'mswep': (_MSWEP, 'MSWEP', 'mswep', {}),
+    'mswx': (_MSWEP, 'MSWEP', 'mswep', {'product': 'mswx'}),
+    'gloh2o': (_MSWEP, 'MSWEP', 'mswep', {}),
     'usdm': ('earthlens.drought', 'Drought', '', {}),
     'edo': ('earthlens.drought', 'Drought', '', {}),
     'gdo': ('earthlens.drought', 'Drought', '', {}),

@@ -553,12 +553,12 @@ class MswepAuth(AbstractAuth[MswepCredentials]):
                 "rclone.conf, or unset the remote to fall back to other credentials."
             )
 
-        # A remote name is what turns rclone into a credential source. An
+        # A named remote is handled above, so `remote` is None here. An
         # *explicit* config with no remote is a misconfiguration worth flagging;
         # but a merely auto-discovered default rclone.conf — which a GloH2O user
         # very likely has, since the approval email tells them to install rclone
         # — must not pre-empt ADC. Fall through to it rather than erroring.
-        if remote is None and self._creds.rclone_config_is_explicit():
+        if self._creds.rclone_config_is_explicit():
             raise AuthenticationError(
                 f"found an rclone config at {config_path} but no remote name. "
                 f"Pass `rclone_remote=` or set ${RCLONE_REMOTE_ENV} to the "
