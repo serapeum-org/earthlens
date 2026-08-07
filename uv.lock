@@ -1980,7 +1980,7 @@ dependencies = [
 
 [package.optional-dependencies]
 all = [
-    { name = "earthlens-atmosphere", extra = ["ecmwf", "ecmwf-modern", "eea-aq", "goes", "nwp", "radar", "s3", "tropycal"] },
+    { name = "earthlens-atmosphere", extra = ["ecmwf", "ecmwf-modern", "eea-aq", "goes", "mswep", "nwp", "radar", "s3", "tropycal"] },
     { name = "earthlens-hazards", extra = ["emdat", "fdsn", "hdx", "osm", "overture"] },
     { name = "earthlens-imagery", extra = ["asf", "earthdata", "eumetsat", "gee", "jaxa", "sentinel-hub", "stac"] },
     { name = "earthlens-imagery", extra = ["openeo"], marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
@@ -2043,6 +2043,9 @@ hdx = [
 ]
 jaxa = [
     { name = "earthlens-imagery", extra = ["jaxa"] },
+]
+mswep = [
+    { name = "earthlens-atmosphere", extra = ["mswep"] },
 ]
 nwm = [
     { name = "earthlens-ocean", extra = ["nwm"] },
@@ -2153,6 +2156,7 @@ requires-dist = [
     { name = "earthlens", extras = ["goes"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["hdx"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["jaxa"], marker = "extra == 'all'" },
+    { name = "earthlens", extras = ["mswep"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["nwm"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["nwp"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["obis"], marker = "extra == 'all'" },
@@ -2172,6 +2176,7 @@ requires-dist = [
     { name = "earthlens-atmosphere", extras = ["ecmwf-modern"], marker = "extra == 'ecmwf-modern'", editable = "libs/providers/atmosphere" },
     { name = "earthlens-atmosphere", extras = ["eea-aq"], marker = "extra == 'eea-aq'", editable = "libs/providers/atmosphere" },
     { name = "earthlens-atmosphere", extras = ["goes"], marker = "extra == 'goes'", editable = "libs/providers/atmosphere" },
+    { name = "earthlens-atmosphere", extras = ["mswep"], marker = "extra == 'mswep'", editable = "libs/providers/atmosphere" },
     { name = "earthlens-atmosphere", extras = ["nwp"], marker = "extra == 'nwp'", editable = "libs/providers/atmosphere" },
     { name = "earthlens-atmosphere", extras = ["radar"], marker = "extra == 'radar'", editable = "libs/providers/atmosphere" },
     { name = "earthlens-atmosphere", extras = ["s3"], marker = "extra == 's3'", editable = "libs/providers/atmosphere" },
@@ -2206,7 +2211,7 @@ requires-dist = [
     { name = "earthlens-ocean", extras = ["obis"], marker = "extra == 'obis'", editable = "libs/providers/ocean" },
     { name = "earthlens-ocean", extras = ["usgs-water"], marker = "extra == 'usgs-water'", editable = "libs/providers/ocean" },
 ]
-provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf", "ecmwf-modern", "eea-aq", "emdat", "erddap", "eumetsat", "fdsn", "gbif", "gee", "ghsl", "goes", "hdx", "jaxa", "nwm", "nwp", "obis", "openeo", "osm", "osm-pbf", "overture", "radar", "s3", "sentinel-hub", "stac", "tropycal", "usgs-water", "worldpop", "all"]
+provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf", "ecmwf-modern", "eea-aq", "emdat", "erddap", "eumetsat", "fdsn", "gbif", "gee", "ghsl", "goes", "hdx", "jaxa", "mswep", "nwm", "nwp", "obis", "openeo", "osm", "osm-pbf", "overture", "radar", "s3", "sentinel-hub", "stac", "tropycal", "usgs-water", "worldpop", "all"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2276,6 +2281,10 @@ eea-aq = [
 goes = [
     { name = "earthlens-core", extra = ["s3"] },
 ]
+mswep = [
+    { name = "google-api-python-client" },
+    { name = "google-auth" },
+]
 nwp = [
     { name = "ecmwf-opendata" },
     { name = "ecmwflibs", marker = "sys_platform == 'win32' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -2304,11 +2313,13 @@ requires-dist = [
     { name = "ecmwf-datastores-client", marker = "extra == 'ecmwf-modern'", specifier = ">=0.5.1" },
     { name = "ecmwf-opendata", marker = "extra == 'nwp'", specifier = ">=0.3" },
     { name = "ecmwflibs", marker = "sys_platform == 'win32' and extra == 'nwp'" },
+    { name = "google-api-python-client", marker = "extra == 'mswep'", specifier = ">=2.0" },
+    { name = "google-auth", marker = "extra == 'mswep'", specifier = ">=2.0" },
     { name = "herbie-data", marker = "extra == 'nwp'", specifier = ">=2026.3" },
     { name = "nest-asyncio", marker = "extra == 'eea-aq'", specifier = ">=1.5" },
     { name = "tropycal", marker = "extra == 'tropycal'", specifier = ">=1.4" },
 ]
-provides-extras = ["s3", "ecmwf", "ecmwf-modern", "cmip6", "nwp", "radar", "goes", "tropycal", "eea-aq"]
+provides-extras = ["s3", "ecmwf", "ecmwf-modern", "cmip6", "nwp", "radar", "goes", "tropycal", "eea-aq", "mswep"]
 
 [[package]]
 name = "earthlens-core"

@@ -1,6 +1,6 @@
 # Discovering datasets
 
-With 48 providers and thousands of datasets between them, the hard part is often not downloading — it is working
+With 50 providers and thousands of datasets between them, the hard part is often not downloading — it is working
 out *which* provider serves what you want, and what it is called there. earthlens exposes three functions for
 that, all importable from `earthlens.core`:
 
@@ -104,7 +104,7 @@ paths = lens.download()       # then fetch
 
 A typical path from "I need rainfall over Colombia" to a download:
 
-1. **`find("precipitation")`** — narrow 48 providers to a handful.
+1. **`find("precipitation")`** — narrow 50 providers to a handful.
 2. Read the candidates' [provider pages](reference/providers.md) — coverage, resolution, licence, auth.
 3. **`search(...)`** — confirm the request resolves to the granules you expect, on the backends that support it.
 4. **`download()`** — fetch. On a backend without `search()`, go straight here.

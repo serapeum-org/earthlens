@@ -1,0 +1,211 @@
+"""Mint the `token.json` the MSWEP / MSWX backend reads.
+
+`earthlens.mswep` only ever **consumes** a refresh token — that is why the
+`[mswep]` extra needs `google-auth` but not `google-auth-oauthlib`. Minting one
+is a one-off, interactive, browser-based step, so it lives here as an operator
+script rather than in the shipped package.
+
+You need this only if you are **not** using `rclone`. If you already configured
+an rclone Drive remote (which GloH2O's approval email tells you to), point
+earthlens at that instead and skip this entirely:
+
+    set MSWEP_RCLONE_REMOTE=GoogleDrive
+    set MSWEP_DRIVE_FOLDER=<folder-id>
+
+Usage:
+
+    pip install google-auth-oauthlib
+    python tools/mswep/mint_token.py <client-secret.json> [-o token.json]
+
+`<client-secret.json>` is what the Cloud console downloads for an **OAuth client
+ID** of type *Desktop app* — not a service-account key. Minting an
+authorized-user token needs an OAuth client ID; a service-account key cannot mint
+one. A service-account key *can* read the share directly, though — GloH2O
+link-shares the folder — so you can skip this script and point `MSWEP_TOKEN_FILE`
+straight at the key. This script rejects a service-account key so you find that
+out up front rather than mid-mint.
+
+The script opens a browser once, you approve read-only Drive access, and it
+writes an authorized-user file containing the refresh token. Point earthlens at
+it with `MSWEP_TOKEN_FILE`.
+
+Note:
+    Leave the OAuth consent screen in `Testing` and Google expires the refresh
+    token after **7 days**. Set the app to `In production` for one that persists;
+    for personal use you can publish unverified and click through the warning.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+#: Read-only Drive scope — the backend only lists and downloads. Mirrors
+#: `earthlens.mswep.auth.DRIVE_SCOPE`.
+SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
+
+
+def validated_path(raw: Path, *, must_exist: bool, suffix: str = ".json") -> Path:
+    """Canonicalise a command-line path and check it before touching disk.
+
+    Both paths this script handles come straight off the command line, so
+    they are canonicalised first — `resolve()` collapses `..` segments and
+    symlinks, so a traversal cannot reach somewhere the literal string did
+    not appear to point — and then checked for the shape this script
+    actually supports.
+
+    Args:
+        raw: The path as given on the command line.
+        must_exist: Require an existing **regular** file. A directory, a
+            device node or a FIFO is rejected either way: this script only
+            ever reads and writes ordinary JSON files.
+        suffix: Required file extension, case-insensitive.
+
+    Returns:
+        Path: The resolved, validated path.
+
+    Raises:
+        SystemExit: When the path is not a plain JSON file, does not exist
+            while `must_exist`, or resolves to something that is not a
+            regular file.
+    """
+    resolved = raw.expanduser().resolve()
+
+    if resolved.suffix.lower() != suffix:
+        raise SystemExit(f"{raw} must be a {suffix} file (got {resolved.suffix!r}).")
+    if resolved.exists() and not resolved.is_file():
+        raise SystemExit(f"{raw} is not a regular file.")
+    if must_exist and not resolved.is_file():
+        raise SystemExit(f"{raw} does not exist.")
+
+    return resolved
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse the command line.
+
+    Args:
+        argv: Argument list; defaults to `sys.argv[1:]`.
+
+    Returns:
+        argparse.Namespace: With `client_secrets` and `output` paths.
+    """
+    parser = argparse.ArgumentParser(
+        description="Mint a Drive token.json for the earthlens mswep backend.",
+    )
+    parser.add_argument(
+        "client_secrets",
+        type=Path,
+        help="OAuth client-ID JSON (Desktop app) downloaded from the Cloud console.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        default=Path("token.json"),
+        help="Where to write the authorized-user file (default: ./token.json).",
+    )
+    return parser.parse_args(argv)
+
+
+def check_not_service_account(path: Path) -> None:
+    """Reject a service-account key supplied in place of an OAuth client.
+
+    Args:
+        path: The validated JSON file the caller passed.
+
+    Raises:
+        SystemExit: When the file is a service-account key, or is not the
+            `installed` / `web` shape an OAuth client ID has.
+    """
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise SystemExit(f"{path} could not be read as JSON: {exc}") from exc
+
+    if payload.get("type") == "service_account":
+        raise SystemExit(
+            f"{path} is a service-account key ({payload.get('client_email')}), not an "
+            "OAuth client ID. Minting an authorized-user token needs an OAuth client "
+            "ID; a service-account key cannot mint one. It can, however, read the "
+            "GloH2O share directly (the folder is link-shared) -- point "
+            "MSWEP_TOKEN_FILE at this key and you do not need this script at all.\n\n"
+            "To mint a user token instead: Cloud console -> APIs & Services -> "
+            "Credentials -> Create credentials -> OAuth client ID -> Desktop app."
+        )
+    if not ({"installed", "web"} & set(payload)):
+        raise SystemExit(
+            f"{path} does not look like an OAuth client ID: expected a top-level "
+            "'installed' (Desktop app) or 'web' key."
+        )
+
+
+def mint(client_secrets: Path, output: Path) -> Path:
+    """Run the installed-app consent flow and write the authorized-user file.
+
+    Args:
+        client_secrets: The validated OAuth client-ID JSON.
+        output: Validated destination for the token.
+
+    Returns:
+        Path: `output`.
+
+    Raises:
+        SystemExit: When `google-auth-oauthlib` is not installed.
+    """
+    try:
+        from google_auth_oauthlib.flow import InstalledAppFlow
+    except ImportError as exc:
+        raise SystemExit(
+            "this script needs `google-auth-oauthlib`, which the earthlens "
+            "[mswep] extra deliberately does not ship (the backend consumes a "
+            "token, it never mints one). Install it just for this step:\n"
+            "    pip install google-auth-oauthlib"
+        ) from exc
+
+    flow = InstalledAppFlow.from_client_secrets_file(str(client_secrets), SCOPES)
+    # access_type=offline is what makes Google return a refresh token; without it
+    # the credential expires within the hour with no way to renew, and
+    # `MswepAuth` refuses it.
+    credentials = flow.run_local_server(port=0, access_type="offline", prompt="consent")
+
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(credentials.to_json(), encoding="utf-8")
+    return output
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Entry point.
+
+    Args:
+        argv: Argument list; defaults to `sys.argv[1:]`.
+
+    Returns:
+        int: Process exit status.
+    """
+    args = parse_args(argv)
+    client_secrets = validated_path(args.client_secrets, must_exist=True)
+    output = validated_path(args.output, must_exist=False)
+
+    check_not_service_account(client_secrets)
+    written = mint(client_secrets, output)
+
+    payload = json.loads(written.read_text(encoding="utf-8"))
+    if not payload.get("refresh_token"):
+        raise SystemExit(
+            f"{written} carries no refresh token, so it cannot renew. Re-run with a "
+            "consent screen set to 'In production', or revoke the app's prior grant "
+            "at https://myaccount.google.com/permissions and try again."
+        )
+
+    print(f"wrote {written}")
+    print("\nPoint earthlens at it:")
+    print(f"    set MSWEP_TOKEN_FILE={written}")
+    print("    set MSWEP_DRIVE_FOLDER=<folder-id from the GloH2O approval email>")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

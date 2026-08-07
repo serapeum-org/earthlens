@@ -59,6 +59,7 @@ ghsl = ["earthlens-land[ghsl]"]
 goes = ["earthlens-atmosphere[goes]"]
 hdx = ["earthlens-hazards[hdx]"]
 jaxa = ["earthlens-imagery[jaxa]"]
+mswep = ["earthlens-atmosphere[mswep]"]
 nwm = ["earthlens-ocean[nwm]"]
 nwp = ["earthlens-atmosphere[nwp]"]
 obis = ["earthlens-ocean[obis]"]
@@ -98,6 +99,7 @@ all = [
     "earthlens[goes]",
     "earthlens[hdx]",
     "earthlens[jaxa]",
+    "earthlens[mswep]",
     "earthlens[nwm]",
     "earthlens[nwp]",
     "earthlens[obis]",
@@ -381,6 +383,7 @@ markers = [
     "sensor_community: tests for the Sensor.Community air-quality backend (crowdsourced low-cost sensors; no extra SDK — core `requests` + `pandas`; public archive + live JSON API, ODbL).",
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
     "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
+    "mswep: tests for the GloH2O MSWEP / MSWX backend (requires the `mswep` extra).",
     "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
     "cmip6: tests for the CMIP6 backend (raw archive on the open Pangeo gs://cmip6 bucket; anonymous, no extra SDK; reads via pyramids).",
     "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",

@@ -37,6 +37,7 @@ def _info(provider):
 _CURATED_ENUM = (
     "nwp",
     "nwm",
+    "mswep",
     "s3",
     "ghsl",
     "overture",

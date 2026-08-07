@@ -6,7 +6,7 @@ earthlens is designed following the Template/Factory design pattern to create an
 
 The main objective is to provide a unified API for all remote sensing data sources, where you only have to worry about the domain of your data (date range and spatial extent) and the package does everything in the backend.
 
-`earthlens` provides a unified API across **48 providers** — see [All supported providers](#all-supported-providers)
+`earthlens` provides a unified API across **50 providers** — see [All supported providers](#all-supported-providers)
 below for the full index, or jump straight to a provider's own reference page
 (`docs/reference/<id>/introduction.md`) for its full walkthrough.
 
@@ -73,6 +73,7 @@ Each provider's `id` links to its own reference page for the full walkthrough, a
 |---|---|---|
 | <img src="../_images/logos/fdsn.png" height="20"> | [FDSN](../reference/fdsn/introduction.md) | `fdsn` |
 | <img src="../_images/logos/gdacs.png" height="20"> | [GDACS](../reference/gdacs/introduction.md) | `gdacs` |
+|   | [EM-DAT disaster impacts](../reference/emdat/introduction.md) | `emdat`, `gdis` |
 | <img src="../_images/logos/firms.png" height="20"> | [NASA FIRMS](../reference/firms/introduction.md) | `firms` |
 | <img src="../_images/logos/risk_indicators.svg" height="20"> | [ThinkHazard! (GFDRR/World Bank)](../reference/risk_indicators/introduction.md) | `thinkhazard` |
 
@@ -99,6 +100,7 @@ Each provider's `id` links to its own reference page for the full walkthrough, a
 
 | | Provider | `data_source` |
 |---|---|---|
+|   | [GloH2O MSWEP / MSWX](../reference/mswep/introduction.md) | `mswep`, `mswx` |
 |   | [NOAA National Water Model](../reference/nwm/introduction.md) | `nwm` |
 | <img src="../_images/logos/usgs-water.svg" height="20"> | [USGS National Water Information System](../reference/usgs-water/introduction.md) | `usgs-water` |
 

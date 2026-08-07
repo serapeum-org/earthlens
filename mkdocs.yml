@@ -352,6 +352,12 @@ nav:
       - Usage: reference/firms/usage.md
       - Authentication: reference/firms/authentication.md
       - Reference: reference/firms/firms.md
+    - MSWEP / MSWX (GloH2O):
+      - Introduction: reference/mswep/introduction.md
+      - Authentication: reference/mswep/authentication.md
+      - Usage: reference/mswep/usage.md
+      - Products & catalog: reference/mswep/datasets.md
+      - Reference: reference/mswep/mswep.md
     - National Water Model:
       - Introduction: reference/nwm/introduction.md
       - Usage: reference/nwm/usage.md
@@ -466,6 +472,7 @@ nav:
       - Hurricanes Ida & Milton from GOES (sub-daily): examples/showcases/hurricanes_goes_subdaily.ipynb
       - Europe temperature animation, June-July 2026 (ECMWF): examples/showcases/europe_temperature_2026.ipynb
       - Netherlands 2026 water shortage (multi-source): examples/showcases/netherlands_drought_2026.ipynb
+      - MSWEP pre-monsoon precipitation, April 2020 (GloH2O): examples/showcases/mswep_precipitation_2020.ipynb
     - June 2026 European heat wave:
       - Full case study: examples/heatwave/european_heatwave_2026.ipynb
       - True-colour time-lapse: examples/heatwave/european_heatwave_timelapse_2026.ipynb
@@ -654,6 +661,8 @@ nav:
       - Quickstart — recent fires: examples/firms/quickstart.ipynb
       - Fire-season time-series: examples/firms/fire_season_timeseries.ipynb
       - MODIS vs VIIRS comparison: examples/firms/modis_vs_viirs_comparison.ipynb
+    - MSWEP / MSWX (GloH2O):
+      - Catalog explorer (no network): examples/mswep/catalog_explorer.ipynb
     - National Water Model (NWM):
       - Catalog explorer (no network): examples/nwm/catalog_explorer.ipynb
       - Short-range streamflow (live): examples/nwm/streamflow_short_range.ipynb

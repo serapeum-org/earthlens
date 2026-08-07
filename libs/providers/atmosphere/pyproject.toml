@@ -46,6 +46,7 @@ radar = ["earthlens-core[s3]"]
 goes = ["earthlens-core[s3]"]
 tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
 eea_aq = ["airbase >=1.0", "nest_asyncio >=1.5"]
+mswep = ["google-api-python-client >=2.0", "google-auth >=2.0"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
@@ -63,7 +64,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.nrel*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
+include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.nrel*", "earthlens.mswep*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -92,6 +93,7 @@ markers = [
     "goes: tests for the NOAA GOES-R ABI backend (requires the `goes` extra: boto3; unsigned noaa-goes19/18/16 buckets).",
     "integration: exercises multiple modules together with mocked I/O.",
     "nrel: tests for the NREL NSRDB / WIND Toolkit solar-wind time-series backend (keyed REST CSV via core `requests` + `pandas`; no extra SDK; required api_key + email auth).",
+    "mswep: tests for the GloH2O MSWEP / MSWX backend (requires the `mswep` extra: google-api-python-client, google-auth; downloads NetCDF granules from the user's approved GloH2O Google-Drive share -- CC-BY-NC, access is a prerequisite).",
     "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
     "pvgis: tests for the JRC PVGIS solar-radiation / PV time-series backend (keyless REST via core `requests` + `pandas`; no extra SDK).",
