@@ -832,6 +832,26 @@ class _AnonymousS3Signer:
         Returns:
             dict[str, str]: `{"AWS_NO_SIGN_REQUEST": "YES"}`, plus `AWS_REGION`
             and `AWS_S3_ENDPOINT` when a region is set.
+
+        Examples:
+            - An endpoint with no region emits only the no-sign flag:
+                ```python
+                >>> from earthlens.stac.signers import build_signer
+                >>> build_signer("anonymous").gdal_env()
+                {'AWS_NO_SIGN_REQUEST': 'YES'}
+
+                ```
+            - A region also pins GDAL at that region's S3 endpoint, so an
+              opt-in-region bucket is reached instead of rejected:
+                ```python
+                >>> from earthlens.stac.signers import build_signer
+                >>> env = build_signer("anonymous", region="us-west-2").gdal_env()
+                >>> env["AWS_REGION"]
+                'us-west-2'
+                >>> env["AWS_S3_ENDPOINT"]
+                's3.us-west-2.amazonaws.com'
+
+                ```
         """
         env = {"AWS_NO_SIGN_REQUEST": "YES"}
         if self._region:

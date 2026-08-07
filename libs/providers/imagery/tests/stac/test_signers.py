@@ -18,6 +18,7 @@ from earthlens.stac.signers import (
     CDSESigner,
     EarthdataSigner,
     PlanetaryComputerSigner,
+    _AnonymousS3Signer,
     _BearerProviderSigner,
     build_signer,
 )
@@ -406,6 +407,57 @@ class TestBearerProviderSigner:
 
 
 @pytest.mark.stac
+class TestAnonymousS3Signer:
+    """`_AnonymousS3Signer` opts out of S3 signing and pins the region endpoint."""
+
+    def test_name_is_anonymous(self):
+        """The signer reports the anonymous catalog label."""
+        assert _AnonymousS3Signer().name == "anonymous"
+
+    def test_init_defaults_region_to_none(self):
+        """A signer built with no argument carries no region."""
+        assert _AnonymousS3Signer()._region is None
+
+    def test_init_stores_region(self):
+        """An explicit region is stored for gdal_env to use."""
+        assert _AnonymousS3Signer("af-south-1")._region == "af-south-1"
+
+    def test_gdal_env_without_region_is_no_sign_only(self):
+        """Without a region only the no-sign flag is emitted."""
+        assert _AnonymousS3Signer().gdal_env() == {"AWS_NO_SIGN_REQUEST": "YES"}
+
+    def test_gdal_env_empty_region_is_treated_as_none(self):
+        """An empty-string region is falsy, so no region keys are added."""
+        assert _AnonymousS3Signer("").gdal_env() == {"AWS_NO_SIGN_REQUEST": "YES"}
+
+    @pytest.mark.parametrize("region", ["af-south-1", "ap-southeast-2", "us-west-2"])
+    def test_gdal_env_with_region_pins_regional_endpoint(self, region):
+        """A region adds AWS_REGION and the matching regional S3 endpoint."""
+        assert _AnonymousS3Signer(region).gdal_env() == {
+            "AWS_NO_SIGN_REQUEST": "YES",
+            "AWS_REGION": region,
+            "AWS_S3_ENDPOINT": f"s3.{region}.amazonaws.com",
+        }
+
+    def test_sign_request_returns_same_object(self):
+        """An anonymous search needs no signing, so the request is unchanged."""
+        request = object()
+        assert _AnonymousS3Signer().sign_request(request) is request
+
+    def test_sign_href_passes_through(self):
+        """The credential is the absence of one, so the href is unchanged."""
+        assert (
+            _AnonymousS3Signer().sign_href("s3://bucket/key.tif")
+            == "s3://bucket/key.tif"
+        )
+
+    def test_sign_item_returns_same_object(self):
+        """Returned items are not rewritten by the anonymous signer."""
+        item = object()
+        assert _AnonymousS3Signer().sign_item(item) is item
+
+
+@pytest.mark.stac
 class TestBuildSigner:
     """`build_signer` dispatches a catalog signer name to the right object."""
 
@@ -424,6 +476,17 @@ class TestBuildSigner:
             "AWS_NO_SIGN_REQUEST": "YES",
             "AWS_REGION": "af-south-1",
             "AWS_S3_ENDPOINT": "s3.af-south-1.amazonaws.com",
+        }
+
+    def test_anonymous_ignores_unrelated_creds(self, fake_pyramids):
+        """The anonymous branch uses only region and drops the other backend kwargs."""
+        env = build_signer(
+            "anonymous", region="us-west-2", access_key="ak", secret_key="sk"
+        ).gdal_env()
+        assert env == {
+            "AWS_NO_SIGN_REQUEST": "YES",
+            "AWS_REGION": "us-west-2",
+            "AWS_S3_ENDPOINT": "s3.us-west-2.amazonaws.com",
         }
 
     def test_aws_requester_pays_forwards_region(self, fake_pyramids):
