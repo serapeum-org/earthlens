@@ -755,18 +755,22 @@ class _AnonymousS3Signer:
     the only kind that can succeed. Requester-pays keeps its own signer, which
     contributes real credentials plus `AWS_REQUEST_PAYER`, and is untouched.
 
-    An anonymous bucket in an **opt-in** AWS region (e.g. Digital Earth Africa
-    on `af-south-1`) needs more than the no-sign flag: GDAL's default
-    virtual-hosted endpoint is the *global* `<bucket>.s3.amazonaws.com`, which
-    an opt-in bucket rejects with `IllegalLocationConstraintException` ("the
-    <region> location constraint is incompatible for the region specific
-    endpoint this request was sent to"). Passing the endpoint's `region` makes
-    the signer point GDAL at that region's endpoint (`AWS_REGION` +
-    `AWS_S3_ENDPOINT=s3.<region>.amazonaws.com`), so the request lands at
-    `<bucket>.s3.<region>.amazonaws.com`. The region comes from the catalog
-    endpoint's `region:` field, threaded through `build_signer`; when it is
-    `None` (an HTTPS-asset endpoint such as the Brazil Data Cube) only the
-    no-sign flag is emitted.
+    When the endpoint declares a `region`, the signer pins GDAL at that region's
+    S3 endpoint (`AWS_REGION` + `AWS_S3_ENDPOINT=s3.<region>.amazonaws.com`), so
+    a `/vsis3/` read lands at `<bucket>.s3.<region>.amazonaws.com` rather than
+    the default global `<bucket>.s3.amazonaws.com`. This is **required** for a
+    bucket in an **opt-in** region (e.g. Digital Earth Africa on `af-south-1`),
+    which rejects the global endpoint with `IllegalLocationConstraintException`
+    ("the <region> location constraint is incompatible for the region specific
+    endpoint this request was sent to"). For a standard-region bucket the pin is
+    merely the canonical (redirect-free) endpoint, and for an HTTPS asset read
+    through `/vsicurl/` it is a no-op (the URL host is used directly). The pin
+    therefore fires for **every** anonymous endpoint that carries a `region`
+    (`deafrica`, `dea`, `earth-search`, `veda`), not only the opt-in one — each
+    serves single-region assets, so pinning the catalog region is correct. The
+    region comes from the catalog endpoint's `region:` field, threaded through
+    `build_signer`; when it is `None` (a regionless HTTPS-asset endpoint such as
+    the Brazil Data Cube) only the no-sign flag is emitted.
 
     Args:
         region: AWS region of the endpoint's public bucket, or `None` when the
