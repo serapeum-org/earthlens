@@ -439,6 +439,14 @@ class TestAnonymousS3Signer:
             "AWS_S3_ENDPOINT": f"s3.{region}.amazonaws.com",
         }
 
+    @pytest.mark.parametrize("region", ["cn-north-1", "cn-northwest-1"])
+    def test_gdal_env_china_region_uses_cn_partition_endpoint(self, region):
+        """A China region resolves to the .amazonaws.com.cn partition host."""
+        assert (
+            _AnonymousS3Signer(region).gdal_env()["AWS_S3_ENDPOINT"]
+            == f"s3.{region}.amazonaws.com.cn"
+        )
+
     def test_sign_request_returns_same_object(self):
         """An anonymous search needs no signing, so the request is unchanged."""
         request = object()

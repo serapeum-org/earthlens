@@ -860,7 +860,14 @@ class _AnonymousS3Signer:
         env = {"AWS_NO_SIGN_REQUEST": "YES"}
         if self._region:
             env["AWS_REGION"] = self._region
-            env["AWS_S3_ENDPOINT"] = f"s3.{self._region}.amazonaws.com"
+            # China regions live in a separate AWS partition whose S3 hosts end
+            # in `.amazonaws.com.cn`; every other region uses `.amazonaws.com`.
+            tld = (
+                "amazonaws.com.cn"
+                if self._region.startswith("cn-")
+                else "amazonaws.com"
+            )
+            env["AWS_S3_ENDPOINT"] = f"s3.{self._region}.{tld}"
         return env
 
     def sign_request(self, request: Any) -> Any:
