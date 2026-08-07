@@ -469,15 +469,15 @@ class TestAnonymousS3Signer:
 class TestBuildSigner:
     """`build_signer` dispatches a catalog signer name to the right object."""
 
-    def test_anonymous(self, fake_pyramids):
-        """The anonymous name resolves to the pyramids AnonymousSigner."""
+    def test_anonymous(self):
+        """The anonymous name resolves to the local _AnonymousS3Signer."""
         assert build_signer("anonymous").name == "anonymous"
 
-    def test_anonymous_no_region_gdal_env_is_no_sign_only(self, fake_pyramids):
+    def test_anonymous_no_region_gdal_env_is_no_sign_only(self):
         """Without a region the anonymous signer emits only the no-sign flag."""
         assert build_signer("anonymous").gdal_env() == {"AWS_NO_SIGN_REQUEST": "YES"}
 
-    def test_anonymous_forwards_region_to_gdal_env(self, fake_pyramids):
+    def test_anonymous_forwards_region_to_gdal_env(self):
         """A region pins GDAL at that region's S3 endpoint (opt-in regions need this)."""
         env = build_signer("anonymous", region="af-south-1").gdal_env()
         assert env == {
@@ -486,7 +486,7 @@ class TestBuildSigner:
             "AWS_S3_ENDPOINT": "s3.af-south-1.amazonaws.com",
         }
 
-    def test_anonymous_ignores_unrelated_creds(self, fake_pyramids):
+    def test_anonymous_ignores_unrelated_creds(self):
         """The anonymous branch uses only region and drops the other backend kwargs."""
         env = build_signer(
             "anonymous", region="us-west-2", access_key="ak", secret_key="sk"
