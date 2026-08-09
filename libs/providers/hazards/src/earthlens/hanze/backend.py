@@ -134,7 +134,6 @@ class HANZE(AbstractDataSource):
         self,
         start: str | None = None,
         end: str | None = None,
-        variables: list[str] | None = None,
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "all",
@@ -154,9 +153,6 @@ class HANZE(AbstractDataSource):
                 means "from the beginning of the record".
             end: Inclusive end of the optional window; `None` means "to the end
                 of the record".
-            variables: Accepted for facade parity and ignored — HANZE is a single
-                product, selected by the explicit `country=` / `region=` /
-                `flood_type=` keyword arguments rather than by `variables`.
             lat_lim: `[lat_min, lat_max]` bounding-box latitudes in degrees. A
                 non-global box selects the affected regions (and, on the tabular
                 path, the events touching them) that intersect it, which loads
@@ -182,16 +178,9 @@ class HANZE(AbstractDataSource):
             timeout: Per-request timeout in seconds for the Zenodo downloads.
 
         Raises:
-            TypeError: If `variables` is a mapping rather than a list.
             ValueError: If a `country` value is not a 2-letter ISO2 code, or a
                 `flood_type` value is not a registered HANZE flood type.
         """
-        if isinstance(variables, dict):
-            raise TypeError(
-                "HANZE `variables` must be a list (or omitted), not a mapping. "
-                "HANZE is a single product; select with country=/region=/"
-                "flood_type=."
-            )
         self._catalog = Catalog()
         # Resolve the always-loaded record / geometry blocks into non-optional
         # attributes once, so the rest of the backend (and the type checker) can
@@ -219,7 +208,11 @@ class HANZE(AbstractDataSource):
         super().__init__(
             start=cast("str", start),
             end=cast("str", end),
-            variables=list(variables) if variables else [],
+            # HANZE is facet-only: it is a single product selected by
+            # country=/region=/flood_type=, so it declares no `variables`
+            # parameter (the facade neither requires nor forwards one). The base
+            # class still wants the argument, so an empty list is passed here.
+            variables=[],
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim if lat_lim is not None else _GLOBAL_LAT,
             lon_lim=lon_lim if lon_lim is not None else _GLOBAL_LON,
