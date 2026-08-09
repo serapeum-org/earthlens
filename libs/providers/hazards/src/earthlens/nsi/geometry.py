@@ -47,9 +47,11 @@ def bbox_from_limits(
         )
     ymin, ymax = float(lat_lim[0]), float(lat_lim[1])
     xmin, xmax = float(lon_lim[0]), float(lon_lim[1])
-    if ymin >= ymax or xmin >= xmax:
+    # Allow a degenerate (min == max) axis — a point / zero-width AOI — to match
+    # the base SpatialExtent; only an inverted bound (min > max) is an error.
+    if ymin > ymax or xmin > xmax:
         raise ValueError(
-            f"each bound needs min < max; got lat_lim={lat_lim!r}, lon_lim={lon_lim!r}."
+            f"each bound needs min <= max; got lat_lim={lat_lim!r}, lon_lim={lon_lim!r}."
         )
     return xmin, ymin, xmax, ymax
 
@@ -137,10 +139,10 @@ def to_feature_collection(geojson: dict) -> FeatureCollection:
         )
     features = geojson["features"]
     if not features:
+        # An empty result carries just an (empty) geometry column — no fabricated
+        # attribute column, so its shape does not differ from a populated one.
         empty = gpd.GeoDataFrame(
-            {"id": gpd.GeoSeries([], dtype="object")},
-            geometry=gpd.GeoSeries([], crs="EPSG:4326"),
-            crs="EPSG:4326",
+            geometry=gpd.GeoSeries([], crs="EPSG:4326"), crs="EPSG:4326"
         )
         return FeatureCollection(empty)
     gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")

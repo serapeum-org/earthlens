@@ -39,10 +39,19 @@ class TestBboxFromLimits:
         with pytest.raises(ValueError):
             bbox_from_limits(lat_lim, lon_lim)
 
-    def test_min_not_less_than_max_raises(self) -> None:
-        """A degenerate or inverted bound is rejected."""
+    def test_inverted_bound_raises(self) -> None:
+        """An inverted bound (min > max) is rejected."""
         with pytest.raises(ValueError):
             bbox_from_limits([30.0, 29.0], [-90.07, -90.06])
+
+    def test_degenerate_point_box_allowed(self) -> None:
+        """A zero-width axis (min == max) is allowed, matching SpatialExtent."""
+        assert bbox_from_limits([30.0, 30.0], [-90.0, -90.0]) == (
+            -90.0,
+            30.0,
+            -90.0,
+            30.0,
+        )
 
 
 @pytest.mark.unit

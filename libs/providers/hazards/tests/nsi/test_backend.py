@@ -66,7 +66,7 @@ class TestBoundGuard:
 
     def test_malformed_box_raises_at_construction(self, tmp_path) -> None:
         """An inverted box is rejected at construction, not deep in download()."""
-        with pytest.raises(ValueError, match="min < max"):
+        with pytest.raises(ValueError, match="min <= max"):
             NSI(
                 source="nfhl",
                 lat_lim=[30.0, 29.0],
