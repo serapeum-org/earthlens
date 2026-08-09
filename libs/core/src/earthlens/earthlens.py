@@ -447,7 +447,8 @@ class EarthLens:
             >>> from earthlens.earthlens import EarthLens
             >>> sorted(EarthLens.DataSources)  # doctest: +NORMALIZE_WHITESPACE
             ['admin', 'admin-boundaries', 'airnow', 'alaska-satellite-facility',
-             'amazon-s3', 'argo', 'argo-floats', 'argopy', 'asf', 'bathymetry',
+             'amazon-s3', 'aqueduct', 'aqueduct-flood-risk', 'aqueduct-floods',
+             'argo', 'argo-floats', 'argopy', 'asf', 'bathymetry',
              'bdc', 'brazil-data-cube', 'caravan', 'caravan-grdc', 'cdse',
              'chc', 'chirps', 'climate-indices',
              'climate-projections', 'climate_indices', 'cmems', 'cmip6',
