@@ -98,6 +98,35 @@ def test_bbox_filters_units(country_cache: Path, tmp_path: Path) -> None:
     assert set(fc["unit_name"]) == {"ALPHA", "BETA"}
 
 
+def test_country_and_bbox_filters_compose(country_cache: Path, tmp_path: Path) -> None:
+    """A country and a bbox filter compose (both must hold)."""
+    fc = _backend(
+        country_cache,
+        tmp_path,
+        country="ALPHA",
+        lat_lim=[-1, 4],
+        lon_lim=[-1, 4],
+        return_period=100,
+    ).download()
+    assert list(fc["unit_name"]) == ["ALPHA"]
+
+
+def test_geometry_false_empty_returns_empty_dataframe(
+    country_cache: Path, tmp_path: Path
+) -> None:
+    """A no-match tabular request returns an empty geometry-less DataFrame."""
+    df = _backend(
+        country_cache,
+        tmp_path,
+        country="Nowhere At All",
+        return_period=100,
+        geometry=False,
+    ).download()
+    assert isinstance(df, pd.DataFrame)
+    assert len(df) == 0
+    assert "geometry" not in df.columns
+
+
 def test_2030_scenario_selects_future_columns(
     country_cache: Path, tmp_path: Path
 ) -> None:
