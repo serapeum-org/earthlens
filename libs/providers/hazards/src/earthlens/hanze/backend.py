@@ -155,7 +155,13 @@ class HANZE(AbstractDataSource):
 
     REQUIRES_TIME_WINDOW = False
 
-    AGGREGATE_REFUSAL_REASON = "HANZE serves observed flood event / impact records (and, with with_geometry, their NUTS-3 region polygons), not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned DataFrame / FeatureCollection directly"
+    AGGREGATE_REFUSAL_REASON = (
+        "HANZE serves observed flood event / impact records (and, with "
+        "with_geometry, their NUTS-3 region polygons), not gridded rasters, so "
+        "there is no meaningful gridded reduction. Call download() without "
+        "aggregate= and post-process the returned DataFrame / FeatureCollection "
+        "directly"
+    )
 
     #: Whether the transport should draw a progress bar, set from
     #: `download(progress_bar=...)` so the flag reaches the fetch.
@@ -468,7 +474,9 @@ class HANZE(AbstractDataSource):
         join_field = self._geo.join_field
         min_lon, min_lat, max_lon, max_lat = bbox
         within = regions.cx[min_lon:max_lon, min_lat:max_lat]
-        return set(within[join_field].astype(str))
+        # Upper-cased here (like `self._region`) so `_row_matches_codes` compares
+        # already-normalised sets rather than re-casing them per event row.
+        return set(within[join_field].astype(str).str.upper())
 
     def _filter_events(self, events: pd.DataFrame) -> pd.DataFrame:
         """Apply the request's country / region / type / date / bbox filters.
@@ -526,10 +534,10 @@ class HANZE(AbstractDataSource):
         Returns:
             bool: `True` when the event's codes intersect every filter set.
         """
+        # The filter sets are already upper-cased at construction (`self._region`)
+        # and in `_bbox_region_codes`, so only the row's codes need normalising.
         row_codes = {code.upper() for code in geometry_module.split_nuts3(cell)}
-        return all(
-            bool(row_codes & {c.upper() for c in codes}) for codes in code_filters
-        )
+        return all(bool(row_codes & codes) for codes in code_filters)
 
     def _search(self) -> list[RemoteProduct]:
         """Pin the one product to fetch (the HANZE events table).
@@ -624,6 +632,10 @@ class HANZE(AbstractDataSource):
         """
         self._progress = progress_bar
         results = self._api()
+        # `_search` always yields one product, so `_fetch` returns a single
+        # element (a 0-row DataFrame / empty FC is still one element); the
+        # `_empty_result()` fallback is a defensive guard for a future `_search`
+        # that could return nothing, not a path this backend reaches today.
         result = results[0] if results else self._empty_result()
         self._log_citation()
 
