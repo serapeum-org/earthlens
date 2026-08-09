@@ -101,7 +101,12 @@ class Source(BaseModel):
         long_name: Human-readable label.
         citation: The source's citation string, logged once on use.
         license: The data licence (all three are US public domain).
-        fields: Friendly -> provider field-name map.
+        fields: Friendly -> provider field-name map. For the tabular `nfip`
+            source this **shapes the output** — the `DataFrame` is subset to
+            these columns, renamed friendly. For the vector `structures` / `nfhl`
+            sources it is **informational only**: those return the full provider
+            column set unchanged (renaming would drop the many other NSI/ArcGIS
+            fields), and this map documents the notable ones.
         layer_id: ArcGIS MapServer layer id (`nfhl` only — `S_Fld_Haz_Ar` = 28).
         layer_name: ArcGIS layer name (`nfhl` only).
         records_key: JSON envelope key holding the record list (`nfip` only —
