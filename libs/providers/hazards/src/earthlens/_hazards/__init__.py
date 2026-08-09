@@ -12,6 +12,9 @@ from __future__ import annotations
 
 __all__ = ["BACKENDS"]
 
+#: Module path shared by the three `aqueduct` facade keys (canonical + aliases).
+_AQUEDUCT_MODULE = "earthlens.aqueduct"
+
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
 #: distribution's 24 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
@@ -19,9 +22,9 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
     # WRI Aqueduct riverine flood-risk exposure (files.wri.org 2015 Analyzer);
     # public CC-BY-4.0, no extra SDK (core requests + pyramids).
-    'aqueduct': ('earthlens.aqueduct', 'Aqueduct', '', {}),
-    'aqueduct-floods': ('earthlens.aqueduct', 'Aqueduct', '', {}),
-    'aqueduct-flood-risk': ('earthlens.aqueduct', 'Aqueduct', '', {}),
+    'aqueduct': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
+    'aqueduct-floods': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
+    'aqueduct-flood-risk': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
     # The extras hint covers the gdis:* sources, which need earthaccess. The
     # emdat:events source is anonymous HTTP and needs no extra; the hint is
     # per key, not per dataset, so it is stated once here.

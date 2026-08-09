@@ -27,8 +27,9 @@ def test_get_returns_admin_level_row() -> None:
 
 def test_get_unknown_level_raises_with_hint() -> None:
     """An unknown admin level raises with a did-you-mean hint."""
+    catalog = Catalog()
     with pytest.raises(ValueError, match="Did you mean 'country'"):
-        Catalog().get("countries")
+        catalog.get("countries")
 
 
 def test_download_url_direct_level_uses_own_zip() -> None:
@@ -87,16 +88,15 @@ def test_missing_admin_levels_block_raises(tmp_path: Path, monkeypatch) -> None:
 
 def test_admin_level_and_scenario_models_are_frozen() -> None:
     """The AdminLevel and Scenario rows are immutable and reject extra fields."""
-    import pytest as _pytest
     from pydantic import ValidationError
 
     row = AdminLevel(zip="c.zip", shapefile_stem="c")
-    with _pytest.raises(ValidationError):
+    with pytest.raises(ValidationError):
         row.zip = "other.zip"
-    with _pytest.raises(ValidationError):
+    with pytest.raises(ValidationError):
         AdminLevel(zip="c.zip", shapefile_stem="c", bogus=1)
     scenario = Scenario(code="bh", years=["2010"])
-    with _pytest.raises(ValidationError):
+    with pytest.raises(ValidationError):
         scenario.code = "24"
 
 

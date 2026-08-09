@@ -23,31 +23,33 @@ def test_resolve_columns_builds_expected_names() -> None:
 
 def test_resolve_columns_unknown_metric_raises() -> None:
     """An unknown metric is rejected."""
+    catalog = Catalog()
     with pytest.raises(ValueError, match="metric"):
-        _helpers.resolve_columns(Catalog(), "deaths", "2010", "baseline", [100])
+        _helpers.resolve_columns(catalog, "deaths", "2010", "baseline", [100])
 
 
 def test_resolve_columns_unknown_year_raises() -> None:
     """An unknown year is rejected."""
+    catalog = Catalog()
     with pytest.raises(ValueError, match="year"):
         _helpers.resolve_columns(
-            Catalog(), "population_affected", "2099", "baseline", [100]
+            catalog, "population_affected", "2099", "baseline", [100]
         )
 
 
 def test_resolve_columns_unknown_scenario_raises() -> None:
     """An entirely unknown scenario name is rejected."""
+    catalog = Catalog()
     with pytest.raises(ValueError, match="scenario 'nope' is not"):
-        _helpers.resolve_columns(
-            Catalog(), "population_affected", "2030", "nope", [100]
-        )
+        _helpers.resolve_columns(catalog, "population_affected", "2030", "nope", [100])
 
 
 def test_resolve_columns_unknown_return_period_raises() -> None:
     """A return period outside the shipped nine is rejected."""
+    catalog = Catalog()
     with pytest.raises(ValueError, match="return_period"):
         _helpers.resolve_columns(
-            Catalog(), "population_affected", "2010", "baseline", [3]
+            catalog, "population_affected", "2010", "baseline", [3]
         )
 
 
@@ -64,16 +66,18 @@ def test_extract_shapefile_missing_inner_zip_raises(tmp_path: Path) -> None:
     """A nested level whose container lacks the inner zip raises."""
     zip_path = _zip_with(tmp_path, {"other.zip": b"PK\x03\x04"})
     row = AdminLevel(zip="inner.zip", shapefile_stem="s", container_zip="bundle.zip")
+    dest = tmp_path / "out"
     with pytest.raises(FileNotFoundError, match="inner.zip"):
-        _helpers.extract_shapefile(zip_path, row, tmp_path / "out")
+        _helpers.extract_shapefile(zip_path, row, dest)
 
 
 def test_extract_shapefile_missing_shp_member_raises(tmp_path: Path) -> None:
     """A zip with sidecars but no .shp raises."""
     zip_path = _zip_with(tmp_path, {"s.dbf": b"x", "s.shx": b"y"})
     row = AdminLevel(zip="s.zip", shapefile_stem="s")
+    dest = tmp_path / "out"
     with pytest.raises(FileNotFoundError, match="s.shp"):
-        _helpers.extract_shapefile(zip_path, row, tmp_path / "out")
+        _helpers.extract_shapefile(zip_path, row, dest)
 
 
 def test_build_feature_collection_missing_column_raises() -> None:

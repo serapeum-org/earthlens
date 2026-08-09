@@ -111,6 +111,34 @@ class Scenario(BaseModel):
     years: list[str] = Field(default_factory=list)
 
 
+def _parse_rows(
+    rows_yaml: dict[str, Any], model: type[BaseModel], path: Path, label: str
+) -> dict[str, Any]:
+    """Validate a `name -> body` mapping into `model` instances.
+
+    Args:
+        rows_yaml: The raw mapping from the catalog YAML.
+        model: The pydantic model each body is validated against.
+        path: The catalog path (for the error message).
+        label: The row kind, named in a validation error (`"admin level"`).
+
+    Returns:
+        dict[str, Any]: One validated `model` instance per key.
+
+    Raises:
+        ValueError: If any row fails validation.
+    """
+    parsed: dict[str, Any] = {}
+    for name, body in rows_yaml.items():
+        try:
+            parsed[name] = model(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} {label} {name!r} failed validation:\n{exc}"
+            ) from exc
+    return parsed
+
+
 def _load_catalog_data(path: Path) -> dict[str, Any]:
     """Parse, validate, and cache the catalog at `path`.
 
@@ -140,22 +168,8 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
             f"{path} is missing or has an empty 'admin_levels:' block. "
             "The Aqueduct catalog must list at least one admin level."
         )
-    levels: dict[str, AdminLevel] = {}
-    for name, body in levels_yaml.items():
-        try:
-            levels[name] = AdminLevel(**dict(body or {}))
-        except ValidationError as exc:
-            raise ValueError(
-                f"{path} admin level {name!r} failed validation:\n{exc}"
-            ) from exc
-    scenarios: dict[str, Scenario] = {}
-    for name, body in (data.get("scenarios") or {}).items():
-        try:
-            scenarios[name] = Scenario(**dict(body or {}))
-        except ValidationError as exc:
-            raise ValueError(
-                f"{path} scenario {name!r} failed validation:\n{exc}"
-            ) from exc
+    levels = _parse_rows(levels_yaml, AdminLevel, path, "admin level")
+    scenarios = _parse_rows(data.get("scenarios") or {}, Scenario, path, "scenario")
 
     value: dict[str, Any] = {
         "datasets": levels,
