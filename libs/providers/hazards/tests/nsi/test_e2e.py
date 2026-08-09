@@ -26,6 +26,19 @@ def test_structures_fips_live(tmp_path) -> None:
     assert len(fc) > 0
 
 
+def test_structures_box_post_live(tmp_path) -> None:
+    """A live NSI structures pull by bounding box (the POST-polygon path) returns features."""
+    fc = EarthLens(
+        "nsi",
+        source="structures",
+        lat_lim=[29.95, 29.96],
+        lon_lim=[-90.07, -90.06],
+        path=tmp_path,
+    ).download()
+    assert isinstance(fc, FeatureCollection)
+    assert len(fc) > 0
+
+
 def test_nfip_county_live(tmp_path) -> None:
     """A live NFIP claims pull for one county/year returns a claims table."""
     df = EarthLens(
