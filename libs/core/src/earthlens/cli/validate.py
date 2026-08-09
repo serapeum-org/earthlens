@@ -302,6 +302,14 @@ def _validate_gdacs(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("name", "description")))
 
 
+def _validate_nsi(catalog: Any) -> tuple[int, list[str]]:
+    """Each NSI source needs a provider, endpoint, output kind, and field map."""
+    return _lint(
+        catalog,
+        lambda k, r: _require(k, r, ("provider", "endpoint", "output_kind", "fields")),
+    )
+
+
 #: Drought transports whose output is a raster (vs USDM's vector polygons).
 _DROUGHT_RASTER_TRANSPORTS = frozenset({"edo-wcs", "netcdf-url"})
 
@@ -832,6 +840,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "radar": _validate_radar,
     "tropycal": _validate_tropycal,
     "gdacs": _validate_gdacs,
+    "nsi": _validate_nsi,
     "drought": _validate_drought,
     "argo": _validate_argo,
     "chc": _validate_chc,

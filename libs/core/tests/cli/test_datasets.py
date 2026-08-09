@@ -628,6 +628,13 @@ class TestValidate:
         payload = json.loads(result.output)
         assert payload[0]["status"] == "ok" and payload[0]["issues"] == []
 
+    def test_nsi_validates_clean(self):
+        """The nsi offline validator passes for the bundled catalog."""
+        result = runner.invoke(app, ["datasets", "validate", "nsi", "--json"])
+        payload = json.loads(result.output)
+        assert payload[0]["status"] == "ok", "nsi validated"
+        assert payload[0]["checked"] == 3, "three nsi sources checked"
+
     def test_emdat_validates_clean(self):
         """The emdat offline validator passes for the bundled catalog."""
         result = runner.invoke(app, ["datasets", "validate", "emdat", "--json"])
