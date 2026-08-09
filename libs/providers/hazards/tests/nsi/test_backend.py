@@ -74,6 +74,37 @@ class TestBoundGuard:
                 path=tmp_path,
             )
 
+    def test_malformed_fips_raises(self, tmp_path) -> None:
+        """A fips that is not a 2/5/11/15-digit code is rejected."""
+        with pytest.raises(ValueError, match="2/5/11/15-digit"):
+            NSI(source="structures", fips="220710", path=tmp_path)
+
+    def test_nfip_box_is_ignored(self, tmp_path) -> None:
+        """A (valid) box passed to nfip is ignored, not a spatial filter."""
+        client = _FakeSession(nfip_records=make_nfip_records(2))
+        df = NSI(
+            source="nfip",
+            county="22071",
+            lat_lim=[29.9, 30.0],
+            lon_lim=[-90.1, -90.0],
+            session=client,
+            path=tmp_path,
+        ).download()
+        assert len(df) == 2
+
+    def test_structures_fips_and_box_uses_fips(self, fake_session, tmp_path) -> None:
+        """Given both fips and a box, structures uses fips (GET), ignoring the box."""
+        fc = NSI(
+            source="structures",
+            fips="22071012700",
+            lat_lim=[29.9, 30.0],
+            lon_lim=[-90.1, -90.0],
+            session=fake_session,
+            path=tmp_path,
+        ).download()
+        assert len(fc) == 2
+        assert fake_session.calls[-1]["method"] == "GET"
+
 
 @pytest.mark.unit
 class TestStructures:
