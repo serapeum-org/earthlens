@@ -89,7 +89,6 @@ class Aqueduct(AbstractDataSource):
         self,
         start: str | None = None,
         end: str | None = None,
-        variables: list[str] | None = None,
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "all",
@@ -112,8 +111,6 @@ class Aqueduct(AbstractDataSource):
             start: Accepted for signature parity; the product has no time axis,
                 so `None` (the default) is normal.
             end: Accepted for signature parity; `None` is normal.
-            variables: Accepted for signature parity and ignored — the metric is
-                selected with `metric=`, not `variables=`.
             lat_lim: `[lat_min, lat_max]` bbox latitudes; `None` keeps every
                 unit. A narrower box filters the returned units.
             lon_lim: `[lon_min, lon_max]` bbox longitudes; `None` keeps all.
@@ -172,10 +169,13 @@ class Aqueduct(AbstractDataSource):
         # Per-instance output shape (G2): drop-geometry is a tabular DataFrame.
         self.OUTPUT_KIND = "vector" if geometry else "tabular"
 
+        # The metric is the request axis, addressed by `metric=` (a facet), so
+        # `variables` is not a facade-visible parameter — the facade then neither
+        # requires nor accepts `variables=`. The base still records one.
         super().__init__(
             start=cast("str", start),
             end=cast("str", end),
-            variables=variables or [metric],
+            variables=[metric],
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim if lat_lim is not None else _GLOBAL_LAT,
             lon_lim=lon_lim if lon_lim is not None else _GLOBAL_LON,
