@@ -219,9 +219,12 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
 
     try:
         record = ZenodoRecord(**dict(record_yaml))
-        file_map = {name: HanzeFile(**dict(body or {})) for name, body in files_yaml.items()}
+        file_map = {
+            name: HanzeFile(**dict(body or {})) for name, body in files_yaml.items()
+        }
         flood_types = {
-            name: FloodType(**dict(body or {})) for name, body in flood_types_yaml.items()
+            name: FloodType(**dict(body or {}))
+            for name, body in flood_types_yaml.items()
         }
         geometry = GeometryJoin(**dict(geometry_yaml))
     except ValidationError as exc:

@@ -20,9 +20,13 @@ pandas, `base/archive`, pyramids) are all core.
 
 Public surface (re-exported from this package):
 
+* :class:`HANZE` — the backend; instantiate with a date range and optional
+  `country=` / `region=` / `flood_type=` filters, then call :meth:`HANZE.download`.
 * :class:`Catalog` — loader for the bundled `hanze_data_catalog.yaml`.
 * :class:`ZenodoRecord` / :class:`HanzeFile` / :class:`FloodType` /
   :class:`GeometryJoin` — the catalog's frozen row models.
+* :func:`join_events_to_regions` / :func:`empty_region_fc` — the event ->
+  region-geometry join and its empty-result counterpart.
 * :data:`CATALOG_PATH` — path to the bundled catalog YAML; monkey-patchable in
   tests.
 
@@ -39,6 +43,7 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.hanze.backend import HANZE
 from earthlens.hanze.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -47,12 +52,16 @@ from earthlens.hanze.catalog import (
     HanzeFile,
     ZenodoRecord,
 )
+from earthlens.hanze.geometry import empty_region_fc, join_events_to_regions
 
 __all__ = [
     "CATALOG_PATH",
     "Catalog",
     "FloodType",
     "GeometryJoin",
+    "HANZE",
     "HanzeFile",
     "ZenodoRecord",
+    "empty_region_fc",
+    "join_events_to_regions",
 ]
