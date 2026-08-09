@@ -1,0 +1,87 @@
+# HANZE — historical European flood impacts.
+#
+# One tabular dataset: the HANZE (Historical Analysis of Natural Hazards in
+# Europe) database of observed flood events and their impacts (Paprotny et al.),
+# published as individual small files on a pinned Zenodo *version* record. This
+# is a single-family enumeration, so it lives in one `<pkg>_data_catalog.yaml`
+# (the layout rule) rather than a sharded `catalog/` directory.
+#
+# The record id, file names, licence and event schema were verified live against
+# Zenodo record 20478847 (2026-08-07); the region shapefile's join field / CRS
+# and the flood-type vocabulary were pinned by the A1 probe (2026-08-09) — see
+# `planning/flood-risk/captures/a1_hanze_probe.json`.
+
+# The pinned Zenodo *version* record (never the moving concept DOI), so a
+# request is reproducible. A refresh check reports drift; it never auto-bumps.
+record:
+  record: 20478847
+  concept_doi: "10.5281/zenodo.8410025"
+  version: v3.0.1-beta
+  data_period: "1870-2025"
+  license: CC-BY-4.0
+  attribution: >-
+    Paprotny, D. (2024). HANZE (Historical Analysis of Natural Hazards in
+    Europe) v3.0.1-beta. Zenodo. https://doi.org/10.5281/zenodo.8410025.
+    Licensed CC-BY-4.0.
+
+# The individual Zenodo objects the backend fetches directly (no range-read —
+# these are small files, not one multi-GB archive).
+files:
+  events:
+    name: HANZE_events_v3_0_1b.csv
+    description: >-
+      The events / impacts table (618 KB CSV) — the headline deliverable: one
+      row per historical European flood with its fatalities, persons affected,
+      area flooded and economic losses.
+  regions:
+    name: Regions_v2024_simplified.zip
+    description: >-
+      NUTS-3 region boundary shapefiles (2.4 MB zip). Joined to events on the
+      semicolon-separated NUTS-3 code list to attach the affected geometry.
+  region_names:
+    name: S2_regions_codes_and_names_v2024.csv
+    description: NUTS-3 code -> human-readable name lookup (32 KB CSV).
+
+# The affected-region geometry attach. The shapefile is stored in ETRS89-LAEA
+# (EPSG:3035), so the backend reprojects to WGS84 for the degree bbox filter and
+# for parity with the other vector backends.
+geometry:
+  member_stem: NUTS3_regions_v2024_simplified
+  join_field: Code
+  name_field: Name
+  crs: EPSG:3035
+
+# The flood-type vocabulary, verified from the events CSV `Type` column. Note
+# there is no `Compound` value — the combined type is spelled `River/Coastal`.
+flood_types:
+  River:
+    description: Riverine (fluvial) floods.
+  Flash:
+    description: Flash / pluvial floods.
+  Coastal:
+    description: Coastal (storm-surge) floods.
+  River/Coastal:
+    description: Compound river-and-coastal floods.
+
+# Friendly name -> exact HANZE CSV header. The output DataFrame keeps HANZE's
+# documented headers; this map lets the backend locate the selector and impact
+# columns without hard-coding the spellings at each use site.
+columns:
+  id: ID
+  country_code: Country code
+  year: Year
+  country_name: Country name
+  start_date: Start date
+  end_date: End date
+  type: Type
+  profile_code: Profile code
+  profile_name: Profile name
+  event_source: Event source
+  regions_nuts3: Regions affected (NUTS 3)
+  area_affected: Area affected
+  fatalities: Fatalities
+  persons_affected: Persons affected
+  losses_nominal: Losses (nominal value)
+  losses_original_currency: Losses (original currency)
+  losses_real: Losses (real value)
+  cause: Cause

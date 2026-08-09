@@ -71,7 +71,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.gdacs*", "earthlens.hdx*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
+include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.gdacs*", "earthlens.hanze*", "earthlens.hdx*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
