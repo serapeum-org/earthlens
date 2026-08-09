@@ -49,6 +49,7 @@ _CURATED_ENUM = (
     "goes",
     "tropycal",
     "gdacs",
+    "hanze",
     "drought",
     "argo",
     "chc",
