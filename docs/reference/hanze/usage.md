@@ -40,12 +40,19 @@ EarthLens("hanze", region="DE300", path="out").download()
 EarthLens("hanze", lat_lim=[50.5, 53.7], lon_lim=[3.3, 7.3], path="out").download()
 ```
 
-- `country=` takes an ISO2 code or a list; a value that is not two letters is rejected up front.
+- `country=` takes an ISO2 code or a list; a value that is not two letters is rejected up front. **Codes follow
+  HANZE's own NUTS-aligned spelling** — Greece is `EL` (not `GR`) and the United Kingdom is `UK` (not `GB`); a code
+  in the wrong vocabulary simply matches nothing.
+- `region=` takes a 5-character NUTS-3 code or a list (a 2-letter country prefix plus three alphanumerics); a
+  malformed code is rejected rather than silently matching nothing.
 - `flood_type=` is case-insensitive and one of `River`, `Flash`, `Coastal`, `River/Coastal`; an unknown type
   raises with a did-you-mean hint.
 - `start=` / `end=` filter on the event `Year`. Omitting both returns the whole record.
 - A non-global `lat_lim` / `lon_lim` (or `aoi=`) downloads the region shapefile once and keeps the events whose
-  affected regions intersect the box.
+  affected regions intersect the box. Bbox selection is **mediated by the boundary file's NUTS-3 code coverage**:
+  an event is kept when one of its affected codes both sits in the box and is present in
+  `Regions_v2024_simplified` (events and boundaries share the 2024 vintage, so this matches in practice). Use
+  `country=` / `region=` if you need selection independent of the boundary geometry.
 
 ## Affected-region geometry
 
