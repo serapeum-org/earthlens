@@ -564,21 +564,36 @@ class HANZE(AbstractDataSource):
     def _build_region_collection(self, events: pd.DataFrame) -> FeatureCollection:
         """Join the filtered events to their affected NUTS-3 region polygons.
 
+        When the request carries a bbox, the joined regions are additionally
+        clipped to it: an event that touched an in-bbox region also lists regions
+        outside the box, and returning those would put polygons well outside a
+        spatial query on the map. Clipping keeps the vector answer to "affected
+        regions within the box", matching what a bbox spatial query implies.
+
         Args:
             events: The filtered events table.
 
         Returns:
-            FeatureCollection: One polygon per affected region, CRS `EPSG:4326`.
+            FeatureCollection: One polygon per affected region (clipped to the
+                bbox when one is set), CRS `EPSG:4326`.
         """
         regions = self._load_regions()
         geometry = self._geo
-        return geometry_module.join_events_to_regions(
+        collection = geometry_module.join_events_to_regions(
             events,
             regions,
             regions_column=self._catalog.columns["regions_nuts3"],
             join_field=geometry.join_field,
             name_field=geometry.name_field,
         )
+        bbox = self._bbox
+        if bbox is None or not len(collection):
+            return collection
+        from pyramids.feature.collection import FeatureCollection
+
+        min_lon, min_lat, max_lon, max_lat = bbox
+        within = collection.cx[min_lon:max_lon, min_lat:max_lat]
+        return FeatureCollection(within.reset_index(drop=True))
 
     def _api(self) -> list[Any]:
         """Compose :meth:`_search` and :meth:`_fetch`.

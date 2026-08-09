@@ -232,6 +232,17 @@ class TestDownloadVector:
         )
         assert len(fc) == 0
 
+    def test_bbox_clips_out_of_box_regions(self, hanze_root: Path) -> None:
+        """A bbox drops affected regions that lie outside it (cross-border event)."""
+        backend = _tabular(
+            hanze_root, with_geometry=True, lat_lim=[51.0, 53.0], lon_lim=[4.0, 6.0]
+        )
+        # A single event touching an in-box region (NL414) and an out-of-box one
+        # (DE300); only the in-box region should survive the clip.
+        crafted = pd.DataFrame({"Regions affected (NUTS 3)": ["NL414;DE300"]})
+        fc = backend._build_region_collection(crafted)
+        assert list(fc["nuts3_code"]) == ["NL414"]
+
 
 @pytest.mark.hanze
 class TestAggregateRejection:

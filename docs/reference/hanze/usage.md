@@ -70,6 +70,10 @@ The collection carries `nuts3_code`, `region_name`, `n_events` (how many of the 
 region) and `geometry`, in WGS84 (`EPSG:4326`) — the shapefile ships in ETRS89-LAEA (`EPSG:3035`) and is
 reprojected for you. It is written to a GeoPackage under `path`.
 
+When you combine `with_geometry=True` with a `lat_lim` / `lon_lim` (or `aoi=`) box, the returned regions are
+**clipped to that box**: an event that touched an in-box region may also list regions outside it, and those are
+dropped so the map shows only the affected regions within your query extent.
+
 ## Notes
 
 - **Caching.** The events CSV and the region zip are downloaded once into `path` and reused on the next call, so
