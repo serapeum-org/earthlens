@@ -36,9 +36,7 @@ from earthlens.base import (
     AbstractDataSource,
     OutputKind,
     RemoteProduct,
-    SpatialExtent,
     TemporalExtent,
-    to_datetime,
 )
 from earthlens.base.http import HttpClient
 
@@ -79,7 +77,12 @@ class Aqueduct(AbstractDataSource):
 
     OUTPUT_KIND: OutputKind = "vector"
 
-    AGGREGATE_REFUSAL_REASON = "Aqueduct returns flood exposure aggregated per admin unit, not a gridded raster, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
+    AGGREGATE_REFUSAL_REASON = (
+        "Aqueduct returns flood exposure aggregated per admin unit, not a gridded "
+        "raster, so there is no meaningful gridded reduction. Call download() "
+        "without aggregate= and post-process the returned FeatureCollection (a "
+        "GeoDataFrame) directly"
+    )
 
     #: The exposure shapefiles are a 2015 snapshot with no time axis, so a
     #: missing `start` / `end` is legal.
@@ -201,18 +204,6 @@ class Aqueduct(AbstractDataSource):
             return [return_period]
         return list(return_period)
 
-    def _create_grid(self, lat_lim: list[float], lon_lim: list[float]) -> SpatialExtent:
-        """Wrap the requested bbox verbatim (used to filter the returned units).
-
-        Args:
-            lat_lim: `[lat_min, lat_max]` in degrees.
-            lon_lim: `[lon_min, lon_max]` in degrees.
-
-        Returns:
-            SpatialExtent: The validated bbox.
-        """
-        return SpatialExtent.from_pairs(lat_lim=lat_lim, lon_lim=lon_lim)
-
     def _check_input_dates(
         self,
         start: str | None,
@@ -220,33 +211,22 @@ class Aqueduct(AbstractDataSource):
         temporal_resolution: str,
         fmt: str,
     ) -> TemporalExtent:
-        """Parse the optional `[start, end]` window into a :class:`TemporalExtent`.
+        """Return the base static-snapshot extent (the product has no time axis).
 
-        Dates are not part of the request (the product is a static snapshot), so
-        `None` bounds are allowed and yield a `None`-dated extent.
+        Delegates to :meth:`~earthlens.base.AbstractDataSource._static_extent`,
+        the shared factory for no-time-axis backends, so `start` / `end` / `fmt`
+        are ignored — there is no window to parse.
 
         Args:
-            start: Inclusive start date string, or `None`.
-            end: Inclusive end date string, or `None`.
-            temporal_resolution: Recorded as the resolution label.
-            fmt: `strptime` format for a string `start` / `end`.
+            start: Ignored (no time axis).
+            end: Ignored.
+            temporal_resolution: Recorded as the resolution label on the extent.
+            fmt: Ignored.
 
         Returns:
-            TemporalExtent: Frozen model with the parsed (or `None`) endpoints.
+            TemporalExtent: The frozen static extent.
         """
-        start_dt = to_datetime(start, fmt) if start else None
-        end_dt = to_datetime(end, fmt) if end else None
-        dates = (
-            pd.DatetimeIndex([start_dt, end_dt])
-            if start_dt is not None and end_dt is not None
-            else pd.DatetimeIndex([])
-        )
-        return TemporalExtent(
-            start_date=start_dt,
-            end_date=end_dt,
-            resolution=temporal_resolution,
-            dates=dates,
-        )
+        return self._static_extent(resolution=temporal_resolution)
 
     def _search(self) -> list[RemoteProduct]:
         """Pin the one product: the admin level, its URL, and the columns.
@@ -311,8 +291,15 @@ class Aqueduct(AbstractDataSource):
         zip_name = self._admin_row.container_zip or self._admin_row.zip
         zip_path = cache_dir / zip_name
         if zip_path.exists():
-            logger.info(f"Aqueduct: using cached {zip_name}")
-            return zip_path
+            with open(zip_path, "rb") as handle:
+                head = handle.read(4)
+            if head == _ZIP_MAGIC:
+                logger.info(f"Aqueduct: using cached {zip_name}")
+                return zip_path
+            logger.warning(
+                f"Aqueduct: cached {zip_name} is not a valid zip "
+                "(empty / truncated / foreign); re-downloading."
+            )
         url = cast("str", product.href)
         logger.info(
             f"Aqueduct: downloading {zip_name} for admin level {self._admin_level!r}"
@@ -353,6 +340,9 @@ class Aqueduct(AbstractDataSource):
         )
         if not self._geometry:
             return pd.DataFrame(collection.drop(columns=collection.geometry.name))
+        if not len(collection):
+            logger.warning("Aqueduct: no unit matched the request; nothing written.")
+            return collection
         out_path = self._write(collection)
         logger.info(f"Aqueduct: wrote {len(collection)} unit(s) to {out_path}")
         return collection

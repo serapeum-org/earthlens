@@ -37,6 +37,30 @@ def test_live_country_download_returns_real_collection(tmp_path: Path) -> None:
     assert list(tmp_path.glob("aqueduct_country_*.gpkg"))
 
 
+@pytest.mark.parametrize(
+    ("level", "min_units"),
+    [("state", 4000), ("basin", 200)],
+)
+def test_live_subnational_levels_have_expected_schema(
+    level: str, min_units: int, tmp_path: Path
+) -> None:
+    """The state and basin shapefiles carry the expected identity + rp columns."""
+    fc = Aqueduct(
+        admin_level=level,
+        metric="population_affected",
+        year=2010,
+        scenario="baseline",
+        return_period=100,
+        path=tmp_path,
+        cache_dir=tmp_path,
+    ).download()
+
+    assert isinstance(fc, FeatureCollection)
+    assert len(fc) > min_units
+    assert list(fc.columns) == ["unit_id", "unit_name", "rp_100", "geometry"]
+    assert fc.crs.to_epsg() == 4326
+
+
 def test_live_facade_country_filter(tmp_path: Path) -> None:
     """The facade routes a country-filtered live download to one unit."""
     fc = EarthLens(

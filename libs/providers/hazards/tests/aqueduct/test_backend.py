@@ -161,6 +161,51 @@ def test_empty_result_returns_empty_collection(
     assert "rp_100" in fc.columns
 
 
+def test_empty_result_writes_no_file(country_cache: Path, tmp_path: Path) -> None:
+    """An empty vector result writes no GeoPackage (nothing to persist)."""
+    _backend(
+        country_cache, tmp_path, country="Nowhere At All", return_period=100
+    ).download()
+    assert not list(tmp_path.glob("aqueduct_*.gpkg"))
+
+
+def test_unmatched_country_warns(country_cache: Path, tmp_path: Path) -> None:
+    """An unmatched country name emits a warning naming the value."""
+    from loguru import logger
+
+    messages: list[str] = []
+    sink = logger.add(messages.append, level="WARNING")
+    try:
+        _backend(
+            country_cache, tmp_path, country="Sylvania", return_period=100
+        ).download()
+    finally:
+        logger.remove(sink)
+    assert any("Sylvania" in message for message in messages)
+
+
+def test_corrupt_cached_zip_is_redownloaded(
+    country_cache: Path, tmp_path: Path, monkeypatch
+) -> None:
+    """A non-zip file at the cache path is discarded and re-downloaded."""
+    source = (country_cache / Catalog().get("country").zip).read_bytes()
+    cache = tmp_path / "cache"
+    cache.mkdir()
+    (cache / Catalog().get("country").zip).write_bytes(b"not a zip at all")
+
+    class _FakeClient:
+        def __init__(self, *args, **kwargs) -> None:
+            pass
+
+        def download(self, url: str, dest, **kwargs) -> Path:
+            Path(dest).write_bytes(source)
+            return Path(dest)
+
+    monkeypatch.setattr("earthlens.aqueduct.backend.HttpClient", _FakeClient)
+    fc = Aqueduct(path=tmp_path, cache_dir=cache, return_period=100).download()
+    assert len(fc) == 3
+
+
 def test_coastal_hazard_is_rejected(country_cache: Path, tmp_path: Path) -> None:
     """coastal is part of the locked 2020 product and is rejected."""
     with pytest.raises(ValueError, match="riverine"):
