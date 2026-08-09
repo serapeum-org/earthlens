@@ -266,6 +266,16 @@ nav:
       - Usage: reference/dem/usage.md
       - Available datasets: reference/dem/datasets.md
       - Reference: reference/dem/dem.md
+    - FABDEM (bare-earth DEM):
+      - Introduction: reference/fabdem/introduction.md
+      - Usage: reference/fabdem/usage.md
+      - Available datasets: reference/fabdem/datasets.md
+      - Reference: reference/fabdem/fabdem.md
+    - JRC European flood hazard (EFHM):
+      - Introduction: reference/jrc-flood/introduction.md
+      - Usage: reference/jrc-flood/usage.md
+      - Available datasets: reference/jrc-flood/datasets.md
+      - Reference: reference/jrc-flood/jrc-flood.md
     - Solar & Wind Atlas (solar / wind climatology):
       - Introduction: reference/solar_wind_atlas/introduction.md
       - Usage: reference/solar_wind_atlas/usage.md
