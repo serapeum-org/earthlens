@@ -13,9 +13,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pandas as pd
+from loguru import logger
 
 if TYPE_CHECKING:
     from earthlens.base.http import HttpClient
+
+#: Hard cap on ArcGIS pages walked, a backstop against a layer that ignores
+#: paging and reports `exceededTransferLimit` forever.
+_MAX_ARCGIS_PAGES: int = 1000
 
 
 def _odata_literal(value: str) -> str:
@@ -107,6 +112,7 @@ def paginate_nfip(
     collected: list[dict] = []
     skip = 0
     total: int | None = None
+    counted = False
     while True:
         top = page_size
         if max_records is not None:
@@ -119,12 +125,13 @@ def paginate_nfip(
             params["$filter"] = filter_str
         if select:
             params["$select"] = select
-        if total is None:
+        if not counted:
             params["$inlinecount"] = "allpages"
         payload = client.get_json(endpoint, params=params)
-        if total is None and isinstance(payload, dict):
-            meta = payload.get("metadata", {})
-            total = int(meta.get("count", 0) or 0)
+        if not counted and isinstance(payload, dict):
+            counted = True
+            count = payload.get("metadata", {}).get("count")
+            total = int(count) if count is not None else None
         page = payload.get(records_key, []) if isinstance(payload, dict) else []
         collected.extend(page)
         if len(page) < top:
@@ -160,7 +167,7 @@ def paginate_arcgis(
     """
     features: list = []
     offset = 0
-    while True:
+    for _ in range(_MAX_ARCGIS_PAGES):
         page_params = {**params, "resultOffset": offset, "resultRecordCount": page_size}
         payload = client.get_json(url, params=page_params)
         page = payload.get("features", []) if isinstance(payload, dict) else []
@@ -170,9 +177,16 @@ def paginate_arcgis(
             if isinstance(payload, dict)
             else False
         )
-        if not exceeded or not page:
+        # A short page is the last page; stop even if the layer still flags a
+        # limit, so a server that ignores paging cannot loop forever.
+        if not exceeded or not page or len(page) < page_size:
             break
         offset += len(page)
+    else:
+        logger.warning(
+            f"paginate_arcgis hit the {_MAX_ARCGIS_PAGES}-page cap for {url!r}; "
+            "the result may be truncated — narrow the box."
+        )
     return {"type": "FeatureCollection", "features": features}
 
 
@@ -197,6 +211,15 @@ def records_to_frame(
     inverse = {provider: friendly for friendly, provider in field_map.items()}
     present = [col for col in inverse if col in frame.columns]
     if not present:
+        if not frame.empty:
+            # Records came back but none of the mapped provider columns are
+            # present — upstream schema drift. Do not silently drop the data.
+            logger.warning(
+                f"NSI: {len(frame)} record(s) fetched but none of the mapped "
+                f"fields {sorted(field_map.values())} are present (columns: "
+                f"{sorted(frame.columns)}); returning the raw, unmapped frame."
+            )
+            return frame
         return pd.DataFrame(columns=list(field_map))
     subset = frame[present].rename(columns=inverse)
     return subset.reindex(columns=list(field_map))

@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 from earthlens.nsi._helpers import (
+    _MAX_ARCGIS_PAGES,
     odata_filter,
     paginate_arcgis,
     paginate_nfip,
@@ -94,6 +95,15 @@ class TestPagination:
         )
         assert session.calls[0]["params"]["$select"] == "id,yearOfLoss"
 
+    def test_total_is_none_when_count_omitted(self) -> None:
+        """A server that omits metadata.count yields total None, not 0."""
+        session = _FakeSession(nfip_records=make_nfip_records(3), nfip_omit_count=True)
+        rows, total = paginate_nfip(
+            make_client(session), ENDPOINT, "NfipClaims", filter_str=None, page_size=10
+        )
+        assert len(rows) == 3
+        assert total is None
+
 
 @pytest.mark.unit
 class TestPaginateArcgis:
@@ -126,6 +136,22 @@ class TestPaginateArcgis:
         assert len(merged["features"]) == 1
         assert len(session.calls) == 1
 
+    def test_page_cap_stops_a_layer_that_ignores_paging(self) -> None:
+        """A layer that always flags exceeded is bounded by the page cap."""
+        feats = [
+            {"type": "Feature", "geometry": None, "properties": {"i": i}}
+            for i in range(2)
+        ]
+        session = _FakeSession(nfhl={"features": feats}, nfhl_ignore_paging=True)
+        merged = paginate_arcgis(
+            make_client(session),
+            "https://x/MapServer/28/query",
+            {"f": "geojson"},
+            page_size=2,
+        )
+        assert len(session.calls) == _MAX_ARCGIS_PAGES
+        assert len(merged["features"]) == _MAX_ARCGIS_PAGES * 2
+
 
 @pytest.mark.unit
 class TestRecordsToFrame:
@@ -148,3 +174,10 @@ class TestRecordsToFrame:
         frame = records_to_frame([], FIELD_MAP)
         assert list(frame.columns) == ["claim_id", "paid", "zone"]
         assert frame.empty
+
+    def test_schema_drift_returns_raw_frame_not_empty(self) -> None:
+        """Records with no mapped columns are returned raw, not silently dropped."""
+        records = [{"totally": "different", "shape": 1}, {"totally": "x", "shape": 2}]
+        frame = records_to_frame(records, FIELD_MAP)
+        assert len(frame) == 2
+        assert "totally" in frame.columns

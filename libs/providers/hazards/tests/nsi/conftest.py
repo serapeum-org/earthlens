@@ -193,6 +193,8 @@ class _FakeSession:
         nfhl: dict | None = None,
         nfip_records: list[dict] | None = None,
         nfip_total: int | None = None,
+        nfip_omit_count: bool = False,
+        nfhl_ignore_paging: bool = False,
     ) -> None:
         self.calls: list[dict[str, Any]] = []
         self.structures = structures if structures is not None else STRUCTURES_GEOJSON
@@ -201,6 +203,11 @@ class _FakeSession:
         self.nfip_total = (
             nfip_total if nfip_total is not None else len(self.nfip_records)
         )
+        # When set, omit metadata.count entirely (server that never reports it).
+        self.nfip_omit_count = nfip_omit_count
+        # When set, always return a full first page flagged exceeded, ignoring
+        # resultOffset — a layer that does not honour paging.
+        self.nfhl_ignore_paging = nfhl_ignore_paging
 
     def get(self, url: str, params: dict | None = None, **kwargs: Any) -> _FakeResponse:
         """Route a GET to its canned payload by URL and query params."""
@@ -210,8 +217,18 @@ class _FakeSession:
             return _FakeResponse(self.structures)
         if "/query" in url:
             feats = self.nfhl.get("features", [])
-            offset = int(params.get("resultOffset", 0))
             count = int(params.get("resultRecordCount", len(feats)))
+            if self.nfhl_ignore_paging:
+                # Same full page every time, always flagged exceeded.
+                page = feats[:count]
+                return _FakeResponse(
+                    {
+                        "type": "FeatureCollection",
+                        "features": page,
+                        "exceededTransferLimit": True,
+                    }
+                )
+            offset = int(params.get("resultOffset", 0))
             page = feats[offset : offset + count]
             payload = {
                 "type": "FeatureCollection",
@@ -223,7 +240,7 @@ class _FakeSession:
             skip = int(params.get("$skip", 0))
             top = int(params.get("$top", len(self.nfip_records)))
             payload = {"NfipClaims": self.nfip_records[skip : skip + top]}
-            if "$inlinecount" in params:
+            if "$inlinecount" in params and not self.nfip_omit_count:
                 payload["metadata"] = {"count": self.nfip_total}
             return _FakeResponse(payload)
         raise AssertionError(f"no fixture routed for URL {url!r}")

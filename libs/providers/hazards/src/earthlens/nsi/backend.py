@@ -44,6 +44,7 @@ from earthlens.nsi import _helpers
 from earthlens.nsi.catalog import Catalog, Source
 from earthlens.nsi.geometry import (
     arcgis_envelope,
+    bbox_from_limits,
     nsi_polygon_body,
     to_feature_collection,
 )
@@ -185,7 +186,8 @@ class NSI(AbstractDataSource):
 
         Raises:
             ValueError: If `structures` has neither `fips=` nor a box, `nfhl`
-                has no box, or `nfip` has no `state`/`county`/`year`/`flood_event`.
+                has no box, `nfip` has no `state`/`county`/`year`/`flood_event`,
+                or a supplied box is not a valid `[min, max]` pair.
         """
         provider = self._source.provider
         if provider == "nsi" and not (self._fips or self._has_box):
@@ -198,6 +200,9 @@ class NSI(AbstractDataSource):
                 "source='nfhl' needs a [lat_lim, lon_lim] box (the ArcGIS query "
                 "envelope); an unbounded national pull is refused."
             )
+        # Fail fast on a malformed box at construction, not deep in download().
+        if self._has_box and not (provider == "nsi" and self._fips):
+            bbox_from_limits(self._lat_lim, self._lon_lim)
         if provider == "openfema" and not (
             self._state or self._county or self._year or self._flood_event
         ):
