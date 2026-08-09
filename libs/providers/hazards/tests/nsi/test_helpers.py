@@ -95,6 +95,14 @@ class TestPagination:
         )
         assert session.calls[0]["params"]["$select"] == "id,yearOfLoss"
 
+    def test_stable_orderby_sent_on_every_page(self) -> None:
+        """Every NFIP page carries a stable `$orderby` so paging can't drift (M2)."""
+        session = _FakeSession(nfip_records=make_nfip_records(25), nfip_total=25)
+        paginate_nfip(
+            make_client(session), ENDPOINT, "NfipClaims", filter_str=None, page_size=10
+        )
+        assert all(c["params"].get("$orderby") == "id" for c in session.calls)
+
     def test_total_is_none_when_count_omitted(self) -> None:
         """A server that omits metadata.count yields total None, not 0."""
         session = _FakeSession(nfip_records=make_nfip_records(3), nfip_omit_count=True)
@@ -135,6 +143,24 @@ class TestPaginateArcgis:
         )
         assert len(merged["features"]) == 1
         assert len(session.calls) == 1
+
+    def test_short_but_exceeded_pages_are_not_truncated(self) -> None:
+        """A layer whose maxRecordCount is below page_size still pages fully (M1)."""
+        feats = [
+            {"type": "Feature", "geometry": None, "properties": {"i": i}}
+            for i in range(5)
+        ]
+        # Server caps at 2/page though we request 1000 — short pages flagged exceeded.
+        session = _FakeSession(nfhl={"features": feats}, nfhl_server_cap=2)
+        merged = paginate_arcgis(
+            make_client(session),
+            "https://x/MapServer/28/query",
+            {"f": "geojson"},
+            page_size=1000,
+        )
+        assert len(merged["features"]) == 5
+        offsets = [c["params"]["resultOffset"] for c in session.calls]
+        assert offsets == [0, 2, 4]
 
     def test_page_cap_stops_a_layer_that_ignores_paging(self) -> None:
         """A layer that always flags exceeded is bounded by the page cap."""

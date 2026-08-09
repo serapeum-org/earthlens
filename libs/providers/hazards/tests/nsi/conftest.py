@@ -195,6 +195,7 @@ class _FakeSession:
         nfip_total: int | None = None,
         nfip_omit_count: bool = False,
         nfhl_ignore_paging: bool = False,
+        nfhl_server_cap: int | None = None,
     ) -> None:
         self.calls: list[dict[str, Any]] = []
         self.structures = structures if structures is not None else STRUCTURES_GEOJSON
@@ -208,6 +209,9 @@ class _FakeSession:
         # When set, always return a full first page flagged exceeded, ignoring
         # resultOffset — a layer that does not honour paging.
         self.nfhl_ignore_paging = nfhl_ignore_paging
+        # When set, cap features returned per page (an ArcGIS maxRecordCount
+        # below the requested resultRecordCount) — the short-but-exceeded case.
+        self.nfhl_server_cap = nfhl_server_cap
 
     def get(self, url: str, params: dict | None = None, **kwargs: Any) -> _FakeResponse:
         """Route a GET to its canned payload by URL and query params."""
@@ -229,11 +233,14 @@ class _FakeSession:
                     }
                 )
             offset = int(params.get("resultOffset", 0))
-            page = feats[offset : offset + count]
+            per_page = (
+                min(count, self.nfhl_server_cap) if self.nfhl_server_cap else count
+            )
+            page = feats[offset : offset + per_page]
             payload = {
                 "type": "FeatureCollection",
                 "features": page,
-                "exceededTransferLimit": offset + count < len(feats),
+                "exceededTransferLimit": offset + per_page < len(feats),
             }
             return _FakeResponse(payload)
         if "NfipClaims" in url:

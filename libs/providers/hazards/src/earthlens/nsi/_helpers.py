@@ -86,6 +86,7 @@ def paginate_nfip(
     page_size: int,
     max_records: int | None = None,
     select: str | None = None,
+    order_by: str = "id",
 ) -> tuple[list[dict], int | None]:
     """Page through the OpenFEMA NFIP endpoint and collect every record.
 
@@ -93,7 +94,8 @@ def paginate_nfip(
     `max_records` is reached), reading the record list from `records_key` in
     each envelope. The **first** request also carries `$inlinecount=allpages`, so
     the total matching count comes back on the same round-trip rather than a
-    separate probe.
+    separate probe. Every page is `$orderby`-sorted on a stable key so
+    `$skip`/`$top` deep paging cannot duplicate or miss rows.
 
     Args:
         client: The transport used for each GET (injectable for tests).
@@ -103,6 +105,7 @@ def paginate_nfip(
         page_size: Records per page (the `$top` value).
         max_records: Optional cap on the total collected; `None` for no cap.
         select: Optional `$select` comma-separated projection.
+        order_by: Stable `$orderby` field for consistent paging (default `id`).
 
     Returns:
         tuple[list[dict], int | None]: All fetched records (server order), and
@@ -125,6 +128,8 @@ def paginate_nfip(
             params["$filter"] = filter_str
         if select:
             params["$select"] = select
+        if order_by:
+            params["$orderby"] = order_by
         if not counted:
             params["$inlinecount"] = "allpages"
         payload = client.get_json(endpoint, params=params)
@@ -177,9 +182,12 @@ def paginate_arcgis(
             if isinstance(payload, dict)
             else False
         )
-        # A short page is the last page; stop even if the layer still flags a
-        # limit, so a server that ignores paging cannot loop forever.
-        if not exceeded or not page or len(page) < page_size:
+        # Terminate on the layer's own signal (`exceededTransferLimit` cleared)
+        # or an empty page. A short page must NOT end the walk: a layer whose
+        # `maxRecordCount` is below `page_size` returns short-but-exceeded pages,
+        # and stopping there would silently truncate. A server that ignores
+        # paging (same full page forever) is bounded by `_MAX_ARCGIS_PAGES`.
+        if not exceeded or not page:
             break
         offset += len(page)
     else:
