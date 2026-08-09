@@ -189,22 +189,30 @@ class TestDownload:
             _make(tmp_path).download()
         assert calls, "a different-AOI request must re-fetch, not return the stale file"
 
-    def test_cached_tiles_skip_download(
+    def test_fetched_bundle_skips_download(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
     ):
-        """An already-extracted tile is reused without re-downloading the bundle."""
+        """An already-fetched bundle (marker present) is not re-downloaded."""
         cache = tmp_path / ".fabdem_cache"
         cache.mkdir(parents=True)
+        (cache / "N50E000-N60E010.fetched").write_text("ok", encoding="utf-8")
         (cache / "N50E000_FABDEM_V1-2.tif").write_bytes(b"II*\x00tile")
 
         def _boom(url, dest):
-            raise AssertionError("must not download when the tile is already cached")
+            raise AssertionError("must not re-download an already-fetched bundle")
 
         monkeypatch.setattr(backend_module, "download_bundle", _boom)
         with pytest.warns(LicenseWarning):
             out = _make(tmp_path).download()
         assert out == [tmp_path / "fabdem_V1-2.tif"]
         assert out[0].exists()
+
+    def test_antimeridian_aoi_raises(self, tmp_path: Path):
+        """An antimeridian-crossing AOI (west > east) raises a clear error."""
+        with pytest.raises(ValueError, match="antimeridian"):
+            FABDEM(
+                lat_lim=[-17.6, -17.4], lon_lim=[179.4, -179.8], path=tmp_path
+            )._search()
 
     def test_force_rewrites(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict

@@ -258,8 +258,16 @@ class FABDEM(AbstractDataSource):
             list[RemoteProduct]: The download plan, one per bundle.
 
         Raises:
-            ValueError: If the AOI intersects no FABDEM land cell.
+            ValueError: If the AOI crosses the antimeridian (`west > east`) or
+                intersects no FABDEM land cell.
         """
+        west, _, east, _ = self._bbox
+        if west > east:
+            raise ValueError(
+                "FABDEM does not support antimeridian-crossing AOIs "
+                f"(lon_lim west {west} > east {east}); request each side of the "
+                "dateline separately, e.g. lon_lim=[west, 180] and [-180, east]."
+            )
         plan = bundles_for_bbox(self._bbox)
         if not plan:
             raise ValueError(
@@ -300,26 +308,34 @@ class FABDEM(AbstractDataSource):
             )
             return [target]
 
+        self._raw_dir.mkdir(parents=True, exist_ok=True)
         tifs: list[Path] = []
         for rp in products:
+            bundle = rp.metadata["bundle"]
             tiles = rp.metadata["tiles"]
-            cached = [self._raw_dir / n for n in tiles if (self._raw_dir / n).exists()]
-            missing = [n for n in tiles if not (self._raw_dir / n).exists()]
-            tifs.extend(cached)
-            if not missing:
-                # Every wanted tile is already extracted; don't re-stream the
-                # multi-GB bundle for another AOI in the same 10° block.
+            # A per-bundle marker records that the 0.8-2.4 GB `.zip` has already
+            # been fetched (and its tiles extracted), so a later AOI in the same
+            # 10° block is not re-downloaded — even when it also touches an
+            # ocean-only 1° cell that the archive never contained (which would
+            # otherwise keep the "missing" set permanently non-empty).
+            marker = self._raw_dir / f"{bundle}.fetched"
+            if marker.exists():
+                tifs.extend(
+                    self._raw_dir / n for n in tiles if (self._raw_dir / n).exists()
+                )
                 continue
             zip_path = download_bundle(rp.metadata["url"], self._raw_dir)
             if zip_path is None:
                 logger.info(
-                    f"FABDEM: bundle {rp.metadata['bundle']} is not published "
-                    "(ocean-only block); skipping."
+                    f"FABDEM: bundle {bundle} is not published (ocean-only "
+                    "block); skipping."
                 )
+                marker.write_text("404", encoding="utf-8")
                 continue
-            extracted = extract_tiles(zip_path, self._raw_dir, missing)
+            extracted = extract_tiles(zip_path, self._raw_dir, tiles)
             # The bundle is 0.8-2.4 GB; drop it once the wanted tiles are out.
             zip_path.unlink(missing_ok=True)
+            marker.write_text("ok", encoding="utf-8")
             tifs.extend(extracted)
 
         if not tifs:

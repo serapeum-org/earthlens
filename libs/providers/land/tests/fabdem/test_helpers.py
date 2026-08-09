@@ -77,13 +77,6 @@ class TestCellsForBbox:
         """A box beyond the valid grid yields no cells."""
         assert h.cells_for_bbox((181.0, 91.0, 182.0, 92.0)) == []
 
-    def test_antimeridian_split(self):
-        """A west>east (antimeridian) box selects cells on both sides of the seam."""
-        assert h.cells_for_bbox((179.4, -17.6, -179.8, -17.4)) == [
-            (-18, -180),
-            (-18, 179),
-        ]
-
 
 class TestBundlesForBbox:
     """Tests for bundles_for_bbox."""
@@ -219,8 +212,8 @@ class TestExtractTiles:
         assert [p.name for p in out] == ["N50E000_FABDEM_V1-2.tif"]
 
     def test_zip_slip_guarded(self, tmp_path: Path):
-        """A member escaping the destination raises rather than extracting."""
+        """A wanted-basename member with a path-traversal prefix raises."""
         zip_path = tmp_path / "evil.zip"
-        _write_zip(zip_path, ["../evil.tif"])
+        _write_zip(zip_path, ["../N50E000_FABDEM_V1-2.tif"])
         with pytest.raises(ValueError, match="unsafe archive member"):
-            h.extract_tiles(zip_path, tmp_path / "dest", ["../evil.tif"])
+            h.extract_tiles(zip_path, tmp_path / "dest", ["N50E000_FABDEM_V1-2.tif"])

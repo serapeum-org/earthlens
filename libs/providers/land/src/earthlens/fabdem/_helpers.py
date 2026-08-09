@@ -97,32 +97,19 @@ def bundle_url(bundle: str) -> str:
     return f"{BASE_URL}/{bundle}_FABDEM_{DATASET_VERSION}.zip"
 
 
-def _cells_no_wrap(
-    west: float, south: float, east: float, north: float
-) -> list[tuple[int, int]]:
-    """Return intersecting 1° SW corners for a non-antimeridian bbox (`west<=east`)."""
-    cells: list[tuple[int, int]] = []
-    for lat in range(math.floor(south), math.ceil(north)):
-        for lon in range(math.floor(west), math.ceil(east)):
-            overlaps = lat + 1 > south and lat < north and lon + 1 > west and lon < east
-            if overlaps and -90 <= lat <= 89 and -180 <= lon <= 179:
-                cells.append((lat, lon))
-    return cells
-
-
 def cells_for_bbox(bbox: tuple[float, float, float, float]) -> list[tuple[int, int]]:
     """Return the SW corners of every 1° cell intersecting the AOI bbox.
 
     A 1° cell with SW corner `(lat, lon)` covers `[lat, lat+1] × [lon, lon+1]`;
     it is selected when that square overlaps the bbox with positive area (an
     edge-only touch does not count). Corners are clamped to the valid FABDEM
-    grid (`lat ∈ [-90, 89]`, `lon ∈ [-180, 179]`). An antimeridian-crossing box
-    (`west > east`, the GeoJSON/STAC spelling that `SpatialExtent` permits) is
-    split into `[west, 180]` and `[-180, east]` and the two cell sets unioned, so
-    FABDEM's global land coverage across the dateline is not missed.
+    grid (`lat ∈ [-90, 89]`, `lon ∈ [-180, 179]`). The bbox must be
+    non-antimeridian (`west <= east`); the backend rejects a `west > east` AOI
+    up front, since mosaicking the two far-apart seam columns would span the
+    whole globe.
 
     Args:
-        bbox: `(west, south, east, north)` in degrees.
+        bbox: `(west, south, east, north)` in degrees, with `west <= east`.
 
     Returns:
         list[tuple[int, int]]: Sorted `(lat, lon)` SW corners.
@@ -135,20 +122,15 @@ def cells_for_bbox(bbox: tuple[float, float, float, float]) -> list[tuple[int, i
             [(50, 0), (50, 1), (51, 0), (51, 1)]
 
             ```
-        - An antimeridian box (Fiji) selects cells on both sides of the seam:
-            ```python
-            >>> from earthlens.fabdem._helpers import cells_for_bbox
-            >>> cells_for_bbox((179.4, -17.6, -179.8, -17.4))
-            [(-18, -180), (-18, 179)]
-
-            ```
     """
     west, south, east, north = bbox
-    if west <= east:
-        return sorted(_cells_no_wrap(west, south, east, north))
-    left = _cells_no_wrap(west, south, 180.0, north)
-    right = _cells_no_wrap(-180.0, south, east, north)
-    return sorted(set(left + right))
+    cells: list[tuple[int, int]] = []
+    for lat in range(math.floor(south), math.ceil(north)):
+        for lon in range(math.floor(west), math.ceil(east)):
+            overlaps = lat + 1 > south and lat < north and lon + 1 > west and lon < east
+            if overlaps and -90 <= lat <= 89 and -180 <= lon <= 179:
+                cells.append((lat, lon))
+    return sorted(cells)
 
 
 def bundles_for_bbox(
@@ -275,7 +257,9 @@ def extract_tiles(zip_path: Path, dest_dir: Path, names: list[str]) -> list[Path
     out: list[Path] = []
     dest_root = dest_dir.resolve()
     with zipfile.ZipFile(zip_path) as zf:
-        present = [m for m in zf.namelist() if m in wanted]
+        # Match on the member basename so a (hypothetical) folder-nested archive
+        # still resolves the wanted tiles; the Bristol bundles are flat today.
+        present = [m for m in zf.namelist() if Path(m).name in wanted]
         for member in present:
             target = (dest_dir / member).resolve()
             if dest_root not in target.parents and target != dest_root:

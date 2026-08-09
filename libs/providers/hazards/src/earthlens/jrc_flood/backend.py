@@ -31,8 +31,8 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
-    mask_to_geometry,
 )
+from earthlens.base.spatial import crop_to_aoi
 from earthlens.jrc_flood._helpers import (
     configure_gdal_http,
     efhm_url,
@@ -285,10 +285,17 @@ class JRCFlood(AbstractDataSource):
             list[Path]: The written GeoTIFF path(s), one per return period.
 
         Raises:
-            ValueError: If the AOI is outside the EFHM's Europe / Mediterranean
-                coverage.
+            ValueError: If the AOI crosses the antimeridian (`west > east`) or is
+                outside the EFHM's Europe / Mediterranean coverage.
         """
         self._force = force
+        west, _, east, _ = self._bbox
+        if west > east:
+            raise ValueError(
+                "JRCFlood does not support antimeridian-crossing AOIs "
+                f"(lon_lim west {west} > east {east}); the EFHM covers Europe / "
+                "the Mediterranean, well away from the dateline."
+            )
         products = self._search()
         return self._fetch(products)
 
@@ -382,15 +389,21 @@ class JRCFlood(AbstractDataSource):
         finally:
             close_quietly(source)
 
-        cropped = PyramidsDataset.create_from_array(
+        window_ds = PyramidsDataset.create_from_array(
             array,
             geo=window_geo,
             epsg=4326,
             no_data_value=nodata,
         )
-        # A polygon `aoi=` is only expressed to the window as its bbox; apply the
-        # exact polygon here (a no-op when the request carries no polygon).
-        cropped = mask_to_geometry(cropped, self.space)
+        # The floor/ceil pixel window covers the bbox with up to one extra pixel
+        # per edge; crop to the exact bbox (matching FABDEM) — or to the exact
+        # polygon when the request carried an `aoi=` polygon.
+        cropped = crop_to_aoi(
+            window_ds,
+            self.space,
+            bbox=[self.space.west, self.space.south, self.space.east, self.space.north],
+            touch=False,
+        )
 
         staged = target.with_name(f"{target.stem}.part{target.suffix}")
         try:
@@ -401,5 +414,7 @@ class JRCFlood(AbstractDataSource):
             close_quietly(cropped)
             staged.unlink(missing_ok=True)
             raise
+        finally:
+            close_quietly(window_ds)
         self._write_aoi_sidecar(target)
         return target

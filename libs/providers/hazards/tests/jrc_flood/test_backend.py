@@ -75,7 +75,7 @@ def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> dict:
     import pyramids.dataset as pyr_dataset
 
     monkeypatch.setattr(pyr_dataset, "Dataset", _FakeDataset)
-    monkeypatch.setattr(backend_module, "mask_to_geometry", lambda ds, space: ds)
+    monkeypatch.setattr(backend_module, "crop_to_aoi", lambda ds, space, **kw: ds)
     return recorder
 
 
@@ -125,6 +125,13 @@ class TestReturnPeriods:
         """A missing bounding box raises a clear error."""
         with pytest.raises(ValueError, match="bounding box"):
             JRCFlood(path="x")
+
+    def test_antimeridian_aoi_raises(self, tmp_path: Path):
+        """An antimeridian-crossing AOI (west > east) raises a clear error."""
+        with pytest.raises(ValueError, match="antimeridian"):
+            JRCFlood(
+                lat_lim=[51.8, 52.0], lon_lim=[179.4, -179.8], path=tmp_path
+            ).download()
 
 
 class TestSearch:
@@ -202,7 +209,7 @@ class TestFetch:
         import pyramids.dataset as pyr_dataset
 
         monkeypatch.setattr(pyr_dataset, "Dataset", _FakeDataset)
-        monkeypatch.setattr(backend_module, "mask_to_geometry", lambda ds, space: ds)
+        monkeypatch.setattr(backend_module, "crop_to_aoi", lambda ds, space, **kw: ds)
         with pytest.raises(RuntimeError, match="disk full"):
             _make(tmp_path, return_periods=[100]).download()
         assert not (tmp_path / "efhm_RP100.part.tif").exists()
