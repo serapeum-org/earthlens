@@ -13,7 +13,7 @@ from __future__ import annotations
 __all__ = ["BACKENDS"]
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 21 data-source keys.
+#: distribution's 25 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
@@ -25,6 +25,10 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'hdx': ('earthlens.hdx', 'HDX', 'hdx', {}),
     'overture': ('earthlens.overture', 'Overture', 'overture', {}),
     'firms': ('earthlens.firms', 'FIRMS', '', {}),
+    'jrc-flood': ('earthlens.jrc_flood', 'JRCFlood', '', {}),
+    'efhm': ('earthlens.jrc_flood', 'JRCFlood', '', {}),
+    'jrc-flood-hazard': ('earthlens.jrc_flood', 'JRCFlood', '', {}),
+    'european-flood-hazard': ('earthlens.jrc_flood', 'JRCFlood', '', {}),
     'risk-indicators': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'thinkhazard': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'inform': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
