@@ -1,0 +1,193 @@
+"""Unit tests for the NSI backend (offline, faked transport)."""
+
+from __future__ import annotations
+
+import pandas as pd
+import pytest
+from pyramids.feature.collection import FeatureCollection
+
+from earthlens.nsi import NSI
+
+from .conftest import EMPTY_GEOJSON, FakeHttpClient, make_nfip_records
+
+pytestmark = pytest.mark.nsi
+
+BOX = {"lat_lim": [29.95, 29.96], "lon_lim": [-90.07, -90.06]}
+
+
+@pytest.mark.unit
+class TestConstruction:
+    """Constructor validation and per-instance OUTPUT_KIND."""
+
+    def test_output_kind_structures_vector(self, tmp_path) -> None:
+        """A structures instance is vector."""
+        b = NSI(source="structures", fips="22071012700", path=tmp_path)
+        assert b.OUTPUT_KIND == "vector"
+
+    def test_output_kind_nfhl_vector(self, tmp_path) -> None:
+        """An nfhl instance is vector."""
+        assert NSI(source="nfhl", path=tmp_path, **BOX).OUTPUT_KIND == "vector"
+
+    def test_output_kind_nfip_tabular(self, tmp_path) -> None:
+        """An nfip instance is tabular."""
+        assert (
+            NSI(source="nfip", county="22071", path=tmp_path).OUTPUT_KIND == "tabular"
+        )
+
+    def test_unknown_source_raises(self, tmp_path) -> None:
+        """An unknown source key is rejected by the catalog."""
+        with pytest.raises(ValueError):
+            NSI(source="buildings", fips="22071", path=tmp_path)
+
+    def test_bad_output_format_raises(self, tmp_path) -> None:
+        """An unrecognised output_format is rejected."""
+        with pytest.raises(ValueError):
+            NSI(source="nfip", county="22071", output_format="xlsx", path=tmp_path)
+
+
+@pytest.mark.unit
+class TestBoundGuard:
+    """The required-bound guard (`G3`)."""
+
+    def test_structures_without_bound_raises(self, tmp_path) -> None:
+        """structures with neither fips nor box is refused."""
+        with pytest.raises(ValueError, match="fips"):
+            NSI(source="structures", path=tmp_path)
+
+    def test_nfhl_without_box_raises(self, tmp_path) -> None:
+        """nfhl without a box is refused."""
+        with pytest.raises(ValueError, match="box"):
+            NSI(source="nfhl", path=tmp_path)
+
+    def test_nfip_without_filter_raises(self, tmp_path) -> None:
+        """nfip with no attribute selector is refused."""
+        with pytest.raises(ValueError, match="state|county|year"):
+            NSI(source="nfip", path=tmp_path)
+
+
+@pytest.mark.unit
+class TestStructures:
+    """The NSI structures source."""
+
+    def test_fips_uses_get_with_fips_param(self, fake_http, tmp_path) -> None:
+        """A fips request GETs the endpoint with a `fips` query param."""
+        fc = NSI(
+            source="structures",
+            fips="22071012700",
+            http_client=fake_http,
+            path=tmp_path,
+        ).download()
+        assert isinstance(fc, FeatureCollection)
+        assert len(fc) == 2
+        assert fake_http.calls[-1] == {
+            "method": "GET",
+            "url": "https://nsi.sec.usace.army.mil/nsiapi/structures",
+            "params": {"fips": "22071012700"},
+        }
+
+    def test_box_uses_post_polygon_body(self, fake_http, tmp_path) -> None:
+        """A box request POSTs a GeoJSON polygon body (the ?bbox= repair)."""
+        fc = NSI(
+            source="structures", http_client=fake_http, path=tmp_path, **BOX
+        ).download()
+        assert isinstance(fc, FeatureCollection)
+        post = fake_http.calls[-1]
+        assert post["method"] == "POST"
+        assert post["json"]["features"][0]["geometry"]["type"] == "Polygon"
+
+    def test_foreign_box_returns_empty(self, tmp_path) -> None:
+        """A non-US box returns an empty collection, not an error (`G4`)."""
+        client = FakeHttpClient(structures=EMPTY_GEOJSON)
+        fc = NSI(
+            source="structures",
+            lat_lim=[30.0, 30.1],
+            lon_lim=[31.2, 31.3],
+            http_client=client,
+            path=tmp_path,
+        ).download()
+        assert isinstance(fc, FeatureCollection)
+        assert len(fc) == 0
+
+
+@pytest.mark.unit
+class TestNfhl:
+    """The FEMA NFHL source (canned fixture; live blocked in this env)."""
+
+    def test_query_url_and_envelope(self, fake_http, tmp_path) -> None:
+        """nfhl GETs the layer's /query with an esri envelope."""
+        fc = NSI(source="nfhl", http_client=fake_http, path=tmp_path, **BOX).download()
+        assert isinstance(fc, FeatureCollection)
+        assert len(fc) == 2
+        call = fake_http.calls[-1]
+        assert call["url"].endswith("/MapServer/28/query")
+        assert call["params"]["geometryType"] == "esriGeometryEnvelope"
+
+
+@pytest.mark.unit
+class TestNfip:
+    """The FEMA NFIP claims source."""
+
+    def test_download_returns_friendly_dataframe(self, tmp_path) -> None:
+        """nfip returns a DataFrame with the friendly column names."""
+        client = FakeHttpClient(nfip_records=make_nfip_records(5))
+        df = NSI(
+            source="nfip", county="22071", http_client=client, path=tmp_path
+        ).download()
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 5
+        assert "building_paid" in df.columns
+        assert "rated_flood_zone" in df.columns
+
+    def test_pagination_and_cap(self, tmp_path) -> None:
+        """nfip pages the endpoint and honours max_records."""
+        client = FakeHttpClient(nfip_records=make_nfip_records(100))
+        df = NSI(
+            source="nfip",
+            county="22071",
+            max_records=25,
+            http_client=client,
+            path=tmp_path,
+        ).download()
+        assert len(df) == 25
+
+    def test_writes_csv(self, tmp_path) -> None:
+        """A tabular result is written to root_dir as CSV."""
+        client = FakeHttpClient(nfip_records=make_nfip_records(3))
+        NSI(source="nfip", county="22071", http_client=client, path=tmp_path).download()
+        assert (tmp_path / "nsi_nfip.csv").exists()
+
+    def test_writes_parquet(self, tmp_path) -> None:
+        """`output_format='parquet'` writes a parquet file."""
+        pytest.importorskip("pyarrow")
+        client = FakeHttpClient(nfip_records=make_nfip_records(3))
+        NSI(
+            source="nfip",
+            county="22071",
+            output_format="parquet",
+            http_client=client,
+            path=tmp_path,
+        ).download()
+        assert (tmp_path / "nsi_nfip.parquet").exists()
+
+    def test_empty_result_writes_schema_only(self, tmp_path) -> None:
+        """No matching claims still writes an empty schema-only table."""
+        client = FakeHttpClient(nfip_records=[])
+        df = NSI(source="nfip", year=1900, http_client=client, path=tmp_path).download()
+        assert df.empty
+        assert (tmp_path / "nsi_nfip.csv").exists()
+
+
+@pytest.mark.unit
+class TestAggregate:
+    """`aggregate=` rejection."""
+
+    def test_download_rejects_aggregate(self, fake_http, tmp_path) -> None:
+        """Passing aggregate= is refused for the record-shaped backend."""
+        b = NSI(
+            source="structures",
+            fips="22071012700",
+            http_client=fake_http,
+            path=tmp_path,
+        )
+        with pytest.raises(NotImplementedError):
+            b.download(aggregate=object())
