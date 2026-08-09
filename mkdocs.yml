@@ -574,6 +574,7 @@ nav:
       - Real footprints and flooded area: examples/emdat/flood_footprints_and_area.ipynb
     - Flood impacts (HANZE):
       - Quickstart — floods and impacts: examples/hanze/quickstart.ipynb
+      - Flood types across Europe: examples/hanze/flood_types_across_europe.ipynb
     - OpenStreetMap (Overpass / ohsome):
       - Quickstart — current-state features (Overpass): examples/osm/quickstart.ipynb
       - History — building footprints over time (ohsome): examples/osm/ohsome_history.ipynb
