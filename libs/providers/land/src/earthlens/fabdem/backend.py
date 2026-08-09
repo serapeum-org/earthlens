@@ -278,9 +278,11 @@ class FABDEM(AbstractDataSource):
         """Download the bundles, extract the tiles, mosaic + crop to one GeoTIFF.
 
         Idempotent: a complete output is returned without re-downloading (unless
-        `force`). Ocean-only bundles (`404`) and missing 1° cells are skipped;
-        an AOI that yields no tile at all raises rather than writing an empty
-        raster.
+        `force`). A bundle whose wanted 1° tiles are already extracted in the
+        cache is **not** re-downloaded — the multi-GB `.zip` is only fetched when
+        a tile is actually missing. Ocean-only bundles (`404`) and missing 1°
+        cells are skipped; an AOI that yields no tile at all raises rather than
+        writing an empty raster.
 
         Args:
             products: The plan from `_search`.
@@ -300,6 +302,14 @@ class FABDEM(AbstractDataSource):
 
         tifs: list[Path] = []
         for rp in products:
+            tiles = rp.metadata["tiles"]
+            cached = [self._raw_dir / n for n in tiles if (self._raw_dir / n).exists()]
+            missing = [n for n in tiles if not (self._raw_dir / n).exists()]
+            tifs.extend(cached)
+            if not missing:
+                # Every wanted tile is already extracted; don't re-stream the
+                # multi-GB bundle for another AOI in the same 10° block.
+                continue
             zip_path = download_bundle(rp.metadata["url"], self._raw_dir)
             if zip_path is None:
                 logger.info(
@@ -307,7 +317,7 @@ class FABDEM(AbstractDataSource):
                     "(ocean-only block); skipping."
                 )
                 continue
-            extracted = extract_tiles(zip_path, self._raw_dir, rp.metadata["tiles"])
+            extracted = extract_tiles(zip_path, self._raw_dir, missing)
             # The bundle is 0.8-2.4 GB; drop it once the wanted tiles are out.
             zip_path.unlink(missing_ok=True)
             tifs.extend(extracted)
@@ -368,13 +378,17 @@ class FABDEM(AbstractDataSource):
             staged.replace(target)
         except BaseException:
             close_quietly(cropped)
-            close_quietly(dataset)
             staged.unlink(missing_ok=True)
             raise
-        close_quietly(dataset)
+        finally:
+            # Always drop the handle + the multi-GB merge intermediate, so a
+            # failed write does not strand `fabdem_merged.tif` in the cache. On
+            # Windows the GDAL handle can briefly outlive the Python object, so a
+            # still-locked file is left rather than raising.
+            close_quietly(dataset)
+            try:
+                merged.unlink(missing_ok=True)
+            except OSError:
+                pass
         self._write_aoi_sidecar(target)
-        try:
-            merged.unlink(missing_ok=True)
-        except OSError:
-            pass
         return target

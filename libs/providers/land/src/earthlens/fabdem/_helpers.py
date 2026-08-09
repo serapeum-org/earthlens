@@ -97,13 +97,29 @@ def bundle_url(bundle: str) -> str:
     return f"{BASE_URL}/{bundle}_FABDEM_{DATASET_VERSION}.zip"
 
 
+def _cells_no_wrap(
+    west: float, south: float, east: float, north: float
+) -> list[tuple[int, int]]:
+    """Return intersecting 1° SW corners for a non-antimeridian bbox (`west<=east`)."""
+    cells: list[tuple[int, int]] = []
+    for lat in range(math.floor(south), math.ceil(north)):
+        for lon in range(math.floor(west), math.ceil(east)):
+            overlaps = lat + 1 > south and lat < north and lon + 1 > west and lon < east
+            if overlaps and -90 <= lat <= 89 and -180 <= lon <= 179:
+                cells.append((lat, lon))
+    return cells
+
+
 def cells_for_bbox(bbox: tuple[float, float, float, float]) -> list[tuple[int, int]]:
     """Return the SW corners of every 1° cell intersecting the AOI bbox.
 
     A 1° cell with SW corner `(lat, lon)` covers `[lat, lat+1] × [lon, lon+1]`;
     it is selected when that square overlaps the bbox with positive area (an
     edge-only touch does not count). Corners are clamped to the valid FABDEM
-    grid (`lat ∈ [-90, 89]`, `lon ∈ [-180, 179]`).
+    grid (`lat ∈ [-90, 89]`, `lon ∈ [-180, 179]`). An antimeridian-crossing box
+    (`west > east`, the GeoJSON/STAC spelling that `SpatialExtent` permits) is
+    split into `[west, 180]` and `[-180, east]` and the two cell sets unioned, so
+    FABDEM's global land coverage across the dateline is not missed.
 
     Args:
         bbox: `(west, south, east, north)` in degrees.
@@ -119,15 +135,20 @@ def cells_for_bbox(bbox: tuple[float, float, float, float]) -> list[tuple[int, i
             [(50, 0), (50, 1), (51, 0), (51, 1)]
 
             ```
+        - An antimeridian box (Fiji) selects cells on both sides of the seam:
+            ```python
+            >>> from earthlens.fabdem._helpers import cells_for_bbox
+            >>> cells_for_bbox((179.4, -17.6, -179.8, -17.4))
+            [(-18, -180), (-18, 179)]
+
+            ```
     """
     west, south, east, north = bbox
-    cells: list[tuple[int, int]] = []
-    for lat in range(math.floor(south), math.ceil(north)):
-        for lon in range(math.floor(west), math.ceil(east)):
-            overlaps = lat + 1 > south and lat < north and lon + 1 > west and lon < east
-            if overlaps and -90 <= lat <= 89 and -180 <= lon <= 179:
-                cells.append((lat, lon))
-    return sorted(cells)
+    if west <= east:
+        return sorted(_cells_no_wrap(west, south, east, north))
+    left = _cells_no_wrap(west, south, 180.0, north)
+    right = _cells_no_wrap(-180.0, south, east, north)
+    return sorted(set(left + right))
 
 
 def bundles_for_bbox(
@@ -197,10 +218,15 @@ def download_bundle(
     zip_path = dest_dir / url.rsplit("/", 1)[-1]
     if zip_path.exists():
         return zip_path
+    # Retry only transport errors, not HTTP status errors: a 404 (the expected
+    # ocean-only-bundle case) is a `requests.HTTPError` — a `RequestException`
+    # subclass — so retrying that class would sleep + retry the 404 before the
+    # caller converts it to `None`. 429/5xx are still retried via
+    # `status_forcelist` (they retry before `raise_for_status`).
     client = HttpClient(
         session=session if session is not None else thread_local_session("fabdem"),
         status_forcelist=(429, 500, 502, 503, 504),
-        retry_on_exceptions=(requests.RequestException, OSError),
+        retry_on_exceptions=(requests.ConnectionError, requests.Timeout, OSError),
         raise_for_status=True,
         max_retries=max(retries - 1, 0),
         backoff_factor=backoff,

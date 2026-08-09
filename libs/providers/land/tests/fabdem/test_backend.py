@@ -189,6 +189,23 @@ class TestDownload:
             _make(tmp_path).download()
         assert calls, "a different-AOI request must re-fetch, not return the stale file"
 
+    def test_cached_tiles_skip_download(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
+    ):
+        """An already-extracted tile is reused without re-downloading the bundle."""
+        cache = tmp_path / ".fabdem_cache"
+        cache.mkdir(parents=True)
+        (cache / "N50E000_FABDEM_V1-2.tif").write_bytes(b"II*\x00tile")
+
+        def _boom(url, dest):
+            raise AssertionError("must not download when the tile is already cached")
+
+        monkeypatch.setattr(backend_module, "download_bundle", _boom)
+        with pytest.warns(LicenseWarning):
+            out = _make(tmp_path).download()
+        assert out == [tmp_path / "fabdem_V1-2.tif"]
+        assert out[0].exists()
+
     def test_force_rewrites(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
     ):
@@ -244,3 +261,5 @@ class TestDownload:
                 _make(tmp_path).download()
         assert not (tmp_path / "fabdem_V1-2.part.tif").exists()
         assert not (tmp_path / "fabdem_V1-2.tif").exists()
+        # #5: the merge intermediate is cleaned up even on a write failure.
+        assert not (tmp_path / ".fabdem_cache" / "fabdem_merged.tif").exists()

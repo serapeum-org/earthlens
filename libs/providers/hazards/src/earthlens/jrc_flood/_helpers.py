@@ -15,12 +15,15 @@ from __future__ import annotations
 import math
 import os
 
-#: GDAL `/vsicurl` HTTP defaults — skip the per-open sidecar probes
-#: (`.aux.xml` / `.ovr`) against the JRC host and bound the retry/timeout, so
-#: each windowed open issues one range request instead of several.
+#: GDAL `/vsicurl` HTTP defaults applied (via `setdefault`) before a remote read.
+#: `GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR` stops the per-open sidecar probes
+#: (`.aux.xml` / `.ovr`) against the JRC host; the retry/timeout knobs bound each
+#: range request. `CPL_VSIL_CURL_ALLOWED_EXTENSIONS` is deliberately **not** set:
+#: it is a process-global whitelist, so pinning it to `.tif` here would break
+#: another backend's extension-less `/vsicurl` reads in the same process (e.g.
+#: solar_wind_atlas' figshare URLs) — the exact reason that backend omits it too.
 _GDAL_HTTP_ENV: dict[str, str] = {
     "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
-    "CPL_VSIL_CURL_ALLOWED_EXTENSIONS": ".tif",
     "GDAL_HTTP_TIMEOUT": "30",
     "GDAL_HTTP_MAX_RETRY": "3",
     "GDAL_HTTP_RETRY_DELAY": "2",

@@ -77,6 +77,13 @@ class TestCellsForBbox:
         """A box beyond the valid grid yields no cells."""
         assert h.cells_for_bbox((181.0, 91.0, 182.0, 92.0)) == []
 
+    def test_antimeridian_split(self):
+        """A west>east (antimeridian) box selects cells on both sides of the seam."""
+        assert h.cells_for_bbox((179.4, -17.6, -179.8, -17.4)) == [
+            (-18, -180),
+            (-18, 179),
+        ]
+
 
 class TestBundlesForBbox:
     """Tests for bundles_for_bbox."""
