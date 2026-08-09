@@ -73,6 +73,10 @@
          <lastmod>2026-08-09</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/aqueduct/quickstart/</loc>
+         <lastmod>2026-08-09</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/argo/catalog_and_selectors/</loc>
          <lastmod>2026-08-09</lastmod>
     </url>
@@ -546,10 +550,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/nrel/02_nrel_products_and_behavior/</loc>
-         <lastmod>2026-08-09</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/nsi/01_nsi_quickstart/</loc>
          <lastmod>2026-08-09</lastmod>
     </url>
     <url>
@@ -1070,6 +1070,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/airnow/usage/</loc>
+         <lastmod>2026-08-09</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/aqueduct/aqueduct/</loc>
+         <lastmod>2026-08-09</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/aqueduct/introduction/</loc>
+         <lastmod>2026-08-09</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/aqueduct/usage/</loc>
          <lastmod>2026-08-09</lastmod>
     </url>
     <url>
@@ -1594,18 +1606,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/nrel/usage/</loc>
-         <lastmod>2026-08-09</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nsi/introduction/</loc>
-         <lastmod>2026-08-09</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nsi/nsi/</loc>
-         <lastmod>2026-08-09</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/nsi/usage/</loc>
          <lastmod>2026-08-09</lastmod>
     </url>
     <url>
