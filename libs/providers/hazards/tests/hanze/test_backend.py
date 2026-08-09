@@ -320,6 +320,18 @@ class TestDownloadAndCache:
         with pytest.raises(ValueError, match="does not start with"):
             backend.download(progress_bar=False)
 
+    def test_bom_prefixed_events_csv_accepted(
+        self, tmp_path: Path, events_csv_text: str
+    ) -> None:
+        """The live CSV ships a UTF-8 BOM; it passes the guard and the ID is clean."""
+        bom_src = tmp_path / "_src_bom.csv"
+        bom_src.write_bytes(b"\xef\xbb\xbf" + events_csv_text.encode("utf-8"))
+        backend = HANZE(path=str(tmp_path), country="DE")
+        backend._http = FakeHttpClient({EVENTS_NAME: bom_src})  # type: ignore[assignment]
+        df = backend.download(progress_bar=False)
+        assert len(df) == 3
+        assert "ID" in df.columns, "the UTF-8 BOM must be stripped from the header"
+
 
 @pytest.mark.hanze
 class TestResultStem:

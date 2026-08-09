@@ -387,13 +387,16 @@ class HANZE(AbstractDataSource):
             )
         return self._http
 
-    def _download_file(self, key: str, *, expect_magic: bytes | None = None) -> Path:
+    def _download_file(
+        self, key: str, *, expect_magic: bytes | tuple[bytes, ...] | None = None
+    ) -> Path:
         """Download one catalog file into `root_dir`, reusing a cached copy.
 
         Args:
             key: A logical file key (`"events"`, `"regions"`).
-            expect_magic: Optional leading-byte guard rejecting an error page
-                served with a 200 status.
+            expect_magic: Optional leading-byte guard (one prefix or a tuple of
+                acceptable prefixes) rejecting an error page served with a 200
+                status.
 
         Returns:
             Path: The local file in `root_dir`.
@@ -414,17 +417,20 @@ class HANZE(AbstractDataSource):
     def _load_events(self) -> pd.DataFrame:
         """Download and parse the HANZE events / impacts CSV.
 
-        The download is guarded by the events header's leading bytes (`ID,`), so
-        an HTML error page served with a `200` status (a proxy / CDN hiccup) is
-        rejected at the download site rather than cached under the CSV name and
-        failing confusingly at `read_csv` on every later call — the same guard
-        the region zip (`PK`) and the sibling `emdat` xlsx (`PK`) use.
+        The download is guarded by the events header's leading bytes, so an HTML
+        error page served with a `200` status (a proxy / CDN hiccup) is rejected
+        at the download site rather than cached under the CSV name and failing
+        confusingly at `read_csv` on every later call — the same guard the region
+        zip (`PK`) and the sibling `emdat` xlsx (`PK`) use. The live file is
+        published with a UTF-8 BOM, so both the BOM-prefixed and the plain header
+        are accepted; `utf-8-sig` then strips the BOM so the `ID` column name is
+        clean.
 
         Returns:
             pandas.DataFrame: The full events table, HANZE's documented headers.
         """
-        local = self._download_file("events", expect_magic=b"ID,")
-        return pd.read_csv(local)
+        local = self._download_file("events", expect_magic=(b"\xef\xbb\xbfID,", b"ID,"))
+        return pd.read_csv(local, encoding="utf-8-sig")
 
     def _load_regions(self) -> FeatureCollection:
         """Download, extract and read the NUTS-3 region shapefile (cached).
