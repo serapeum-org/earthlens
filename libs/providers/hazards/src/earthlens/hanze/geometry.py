@@ -86,6 +86,20 @@ def event_region_counts(events: pd.DataFrame, regions_column: str) -> Counter[st
         Counter[str]: NUTS-3 code -> number of events referencing it. Each code
             is counted at most once per event, even if it appears twice in that
             event's list.
+
+    Examples:
+        - Two events over three regions, counted per code (case-normalised):
+            ```python
+            >>> import pandas as pd
+            >>> from earthlens.hanze.geometry import event_region_counts
+            >>> events = pd.DataFrame({"regions": ["DE300;DE711", "de300"]})
+            >>> counts = event_region_counts(events, "regions")
+            >>> counts["DE300"]
+            2
+            >>> counts["DE711"]
+            1
+
+            ```
     """
     counts: Counter[str] = Counter()
     if regions_column not in events.columns:
@@ -161,6 +175,30 @@ def join_events_to_regions(
             `nuts3_code` / `region_name` / `n_events` / `geometry`, CRS
             `EPSG:4326`. Empty (schema-only) when no affected code is present in
             the boundary file.
+
+    Examples:
+        - Join two events to their affected region polygons and read the counts:
+            ```python
+            >>> import geopandas as gpd
+            >>> import pandas as pd
+            >>> from shapely.geometry import box
+            >>> from earthlens.hanze.geometry import join_events_to_regions
+            >>> regions = gpd.GeoDataFrame(
+            ...     {"Code": ["DE300", "NL414"], "Name": ["Berlin", "Zuidoost"]},
+            ...     geometry=[box(13, 52, 14, 53), box(5, 51, 6, 52)],
+            ...     crs="EPSG:4326",
+            ... )
+            >>> events = pd.DataFrame({"regions": ["DE300;NL414", "DE300"]})
+            >>> fc = join_events_to_regions(
+            ...     events, regions, regions_column="regions",
+            ...     join_field="Code", name_field="Name",
+            ... )
+            >>> dict(zip(fc["nuts3_code"], fc["n_events"]))
+            {'DE300': 2, 'NL414': 1}
+            >>> fc.crs.to_epsg()
+            4326
+
+            ```
     """
     counts = event_region_counts(events, regions_column)
     if not counts or join_field not in regions.columns:

@@ -123,6 +123,15 @@ class HanzeFile(BaseModel):
 
         Returns:
             str: `https://zenodo.org/api/records/<record>/files/<name>/content`.
+
+        Examples:
+            - Compose the REST content URL for a file on a record:
+                ```python
+                >>> from earthlens.hanze import HanzeFile
+                >>> HanzeFile(name="events.csv").content_url(20478847)
+                'https://zenodo.org/api/records/20478847/files/events.csv/content'
+
+                ```
         """
         return _CONTENT_URL.format(record=record, name=self.name)
 
@@ -333,6 +342,18 @@ class Catalog(AbstractCatalog):
         Raises:
             ValueError: If `catalog_path` does not exist, a required block is
                 missing, or a row fails validation.
+
+        Examples:
+            - Loading the bundled catalog yields the pinned record and types:
+                ```python
+                >>> from earthlens.hanze import Catalog
+                >>> cat = Catalog.load()
+                >>> cat.record.record
+                20478847
+                >>> cat.flood_types()
+                ['Coastal', 'Flash', 'River', 'River/Coastal']
+
+                ```
         """
         catalog_path = catalog_path if catalog_path is not None else CATALOG_PATH
         parsed = load_catalog(
@@ -345,6 +366,15 @@ class Catalog(AbstractCatalog):
 
         Returns:
             dict[str, FloodType]: Same object as :attr:`datasets`.
+
+        Examples:
+            - The flood-type map is keyed by the `Type` string:
+                ```python
+                >>> from earthlens.hanze import Catalog
+                >>> sorted(Catalog().get_catalog())
+                ['Coastal', 'Flash', 'River', 'River/Coastal']
+
+                ```
         """
         return self.datasets
 
@@ -362,6 +392,15 @@ class Catalog(AbstractCatalog):
 
         Raises:
             ValueError: If `flood_type` is not a registered flood type.
+
+        Examples:
+            - Resolve a type and read its description:
+                ```python
+                >>> from earthlens.hanze import Catalog
+                >>> Catalog().get_flood_type("Coastal").description
+                'Coastal (storm-surge) floods.'
+
+                ```
         """
         return cast("FloodType", self.get_dataset(flood_type))
 
@@ -371,6 +410,15 @@ class Catalog(AbstractCatalog):
         Returns:
             list[str]: The flood types
                 (`["Coastal", "Flash", "River", "River/Coastal"]`).
+
+        Examples:
+            - The registered types come back sorted:
+                ```python
+                >>> from earthlens.hanze import Catalog
+                >>> Catalog().flood_types()
+                ['Coastal', 'Flash', 'River', 'River/Coastal']
+
+                ```
         """
         return sorted(self.datasets)
 
@@ -385,6 +433,18 @@ class Catalog(AbstractCatalog):
 
         Raises:
             KeyError: If `key` is not a known file.
+
+        Examples:
+            - Resolve the events and region file names:
+                ```python
+                >>> from earthlens.hanze import Catalog
+                >>> cat = Catalog()
+                >>> cat.file("events").name
+                'HANZE_events_v3_0_1b.csv'
+                >>> cat.file("regions").name
+                'Regions_v2024_simplified.zip'
+
+                ```
         """
         return self.files[key]
 
@@ -400,5 +460,17 @@ class Catalog(AbstractCatalog):
 
         Raises:
             KeyError: If `friendly` is not a mapped column.
+
+        Examples:
+            - Map friendly keys to their exact HANZE headers:
+                ```python
+                >>> from earthlens.hanze import Catalog
+                >>> cat = Catalog()
+                >>> cat.column("country_code")
+                'Country code'
+                >>> cat.column("regions_nuts3")
+                'Regions affected (NUTS 3)'
+
+                ```
         """
         return self.columns[friendly]

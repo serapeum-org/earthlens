@@ -149,6 +149,23 @@ class HANZE(AbstractDataSource):
             to know the return shape and rejects `aggregate=` for both.
         REQUIRES_TIME_WINDOW: `False` — a request without a window returns every
             year the record covers.
+
+    Examples:
+        - Pull DE + NL flood events, or the affected-region geometry, through the
+          facade (both fetch from Zenodo, so this is illustrative, not a
+          doctest):
+
+            ```python
+            from earthlens.core import EarthLens
+
+            events = EarthLens(
+                "hanze", start="1950", end="2020", country=["DE", "NL"]
+            ).download()  # a pandas.DataFrame of events + impacts
+
+            regions = EarthLens(
+                "hanze", start="1990", end="2020", country="DE", with_geometry=True
+            ).download()  # a FeatureCollection of the affected NUTS-3 regions
+            ```
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
