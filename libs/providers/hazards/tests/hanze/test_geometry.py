@@ -120,6 +120,20 @@ class TestJoinEventsToRegions:
         )
         assert set(fc["nuts3_code"]) == {"FR101", "ITH10", "DE300"}
 
+    def test_case_insensitive_code_match(self, region_zip, tmp_path) -> None:
+        """Lower-case event codes still join to the upper-case boundary codes."""
+        regions = _read_regions(region_zip, tmp_path)
+        events = pd.DataFrame({_REGIONS_COLUMN: ["de300;nl414"]})
+        fc = join_events_to_regions(
+            events,
+            regions,
+            regions_column=_REGIONS_COLUMN,
+            join_field="Code",
+            name_field="Name",
+        )
+        assert set(fc["nuts3_code"]) == {"DE300", "NL414"}
+        assert not fc.geometry.isna().any()
+
     def test_unmatched_code_dropped(self, region_zip, tmp_path) -> None:
         """A code absent from the boundary file contributes no feature."""
         regions = _read_regions(region_zip, tmp_path)

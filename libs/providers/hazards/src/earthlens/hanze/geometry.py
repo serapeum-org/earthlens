@@ -91,7 +91,10 @@ def event_region_counts(events: pd.DataFrame, regions_column: str) -> Counter[st
     if regions_column not in events.columns:
         return counts
     for cell in events[regions_column]:
-        counts.update(set(split_nuts3(cell)))
+        # Upper-case the codes so the join stays in lockstep with the tabular
+        # filter (`_row_matches_codes` / `_bbox_region_codes`), which compare
+        # upper-cased sets — the two output kinds must not diverge on case skew.
+        counts.update({code.upper() for code in split_nuts3(cell)})
     return counts
 
 
@@ -163,7 +166,10 @@ def join_events_to_regions(
     if not counts or join_field not in regions.columns:
         return empty_region_fc()
 
-    selected = regions[regions[join_field].isin(counts.keys())]
+    # Compare upper-cased on both sides so the selection tolerates any case skew
+    # between the events column and the boundary file's `Code` field, matching
+    # the tabular path's normalisation.
+    selected = regions[regions[join_field].astype(str).str.upper().isin(counts.keys())]
     if not len(selected):
         return empty_region_fc()
 
@@ -180,7 +186,7 @@ def join_events_to_regions(
             "region_name": reprojected[name_field].astype("string")
             if name_field in reprojected.columns
             else pd.Series([pd.NA] * len(reprojected), dtype="string"),
-            "n_events": [counts[code] for code in reprojected[join_field]],
+            "n_events": [counts[str(code).upper()] for code in reprojected[join_field]],
         }
     ).astype(REGION_COLUMNS)
     gdf = gpd.GeoDataFrame(
