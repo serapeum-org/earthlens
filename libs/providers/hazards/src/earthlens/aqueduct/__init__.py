@@ -20,6 +20,9 @@ expected-annual damage) is not freely downloadable and is out of scope.
 
 Public surface (re-exported from this package):
 
+* :class:`Aqueduct` — the backend; instantiate with an `admin_level` / `metric`
+  / `year` / `scenario` / `return_period` selection and call
+  :meth:`Aqueduct.download`.
 * :class:`Catalog` — loader for the bundled `aqueduct_data_catalog.yaml` (admin
   levels + the indicator / year / scenario / return-period vocabularies).
 * :class:`AdminLevel` — one admin level's download + shapefile spec.
@@ -31,6 +34,7 @@ Public surface (re-exported from this package):
 
 from __future__ import annotations
 
+from earthlens.aqueduct.backend import Aqueduct
 from earthlens.aqueduct.catalog import (
     CATALOG_PATH,
     AdminLevel,
@@ -42,6 +46,7 @@ from earthlens.aqueduct.catalog import (
 __all__ = [
     "CATALOG_PATH",
     "AdminLevel",
+    "Aqueduct",
     "Catalog",
     "Scenario",
     "clear_catalog_cache",
