@@ -1,8 +1,10 @@
 """Offline fixtures for the NSI backend tests.
 
-Every fixture is offline: a :class:`FakeHttpClient` records requests and returns
-canned NSI / NFHL GeoJSON and OpenFEMA NFIP JSON, injected into the backend via
-`http_client=`. No network, no real GDAL beyond pyramids' GeoJSON decode.
+Every fixture is offline: a :class:`_FakeSession` records requests and returns
+canned NSI / NFHL GeoJSON and OpenFEMA NFIP JSON. It is injected into the backend
+via `session=` (the repo's HTTP-test idiom), so the real
+:class:`~earthlens.base.http.HttpClient` runs on top of it. No network, no real
+GDAL beyond pyramids' GeoJSON decode.
 """
 
 from __future__ import annotations
@@ -146,10 +148,21 @@ def make_nfip_records(count: int) -> list[dict[str, Any]]:
 
 
 class _FakeResponse:
-    """A minimal `requests.Response` stand-in wrapping a JSON payload."""
+    """A minimal `requests.Response` stand-in wrapping a JSON payload.
 
-    def __init__(self, payload: Any) -> None:
+    Carries `status_code` and `headers` so the real
+    :class:`~earthlens.base.http.HttpClient` retry/JSON path runs unchanged.
+    """
+
+    def __init__(
+        self,
+        payload: Any,
+        status_code: int = 200,
+        headers: dict[str, str] | None = None,
+    ) -> None:
         self._payload = payload
+        self.status_code = status_code
+        self.headers = headers or {}
 
     def raise_for_status(self) -> None:
         """No-op: canned responses are always 200."""
@@ -159,8 +172,12 @@ class _FakeResponse:
         return self._payload
 
 
-class FakeHttpClient:
-    """Records requests and routes each to a canned NSI / NFHL / NFIP payload.
+class _FakeSession:
+    """A `requests.Session` stand-in routing each verb to a canned payload.
+
+    :class:`~earthlens.base.http.HttpClient` dispatches to `session.get` /
+    `session.post`, so implementing those two is enough to drive the backend
+    through the real client offline.
 
     Attributes:
         calls: Every recorded `(method, url, params, json)` request.
@@ -185,20 +202,21 @@ class FakeHttpClient:
             nfip_total if nfip_total is not None else len(self.nfip_records)
         )
 
-    def get_json(self, url: str, params: dict | None = None, **kwargs: Any) -> Any:
-        """Route a GET+JSON request to its canned payload."""
+    def get(self, url: str, params: dict | None = None, **kwargs: Any) -> _FakeResponse:
+        """Route a GET to its canned payload by URL and query params."""
         params = params or {}
         self.calls.append({"method": "GET", "url": url, "params": params})
         if "nsiapi/structures" in url:
-            return self.structures
+            return _FakeResponse(self.structures)
         if "/query" in url:
-            return self.nfhl
+            return _FakeResponse(self.nfhl)
         if "NfipClaims" in url:
             if "$inlinecount" in params:
-                return {"metadata": {"count": self.nfip_total}, "NfipClaims": [{}]}
+                payload = {"metadata": {"count": self.nfip_total}, "NfipClaims": [{}]}
+                return _FakeResponse(payload)
             skip = int(params.get("$skip", 0))
             top = int(params.get("$top", len(self.nfip_records)))
-            return {"NfipClaims": self.nfip_records[skip : skip + top]}
+            return _FakeResponse({"NfipClaims": self.nfip_records[skip : skip + top]})
         raise AssertionError(f"no fixture routed for URL {url!r}")
 
     def post(self, url: str, json: dict | None = None, **kwargs: Any) -> _FakeResponse:
@@ -207,7 +225,14 @@ class FakeHttpClient:
         return _FakeResponse(self.structures)
 
 
+def make_client(session: _FakeSession):
+    """Wrap a fake session in a real `HttpClient` for the helper tests."""
+    from earthlens.base.http import HttpClient
+
+    return HttpClient(session=session)
+
+
 @pytest.fixture
-def fake_http() -> FakeHttpClient:
-    """A default recording client with the two-feature structures fixture."""
-    return FakeHttpClient()
+def fake_session() -> _FakeSession:
+    """A default recording session with the two-feature structures fixture."""
+    return _FakeSession()

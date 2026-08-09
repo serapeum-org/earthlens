@@ -49,6 +49,7 @@ from earthlens.nsi.geometry import (
 )
 
 if TYPE_CHECKING:
+    import requests
     from pyramids.feature.collection import FeatureCollection
 
 OutputFormat = Literal["csv", "parquet"]
@@ -106,7 +107,7 @@ class NSI(AbstractDataSource):
         flood_event: str | None = None,
         max_records: int | None = None,
         output_format: OutputFormat = "csv",
-        http_client: HttpClient | None = None,
+        session: requests.Session | None = None,
     ):
         """Initialise an NSI backend instance.
 
@@ -131,9 +132,9 @@ class NSI(AbstractDataSource):
             max_records: Optional cap on the number of `nfip` records fetched.
             output_format: On-disk format for the `nfip` table — `"csv"`
                 (default) or `"parquet"`.
-            http_client: An :class:`~earthlens.base.http.HttpClient` to use for
-                every request. Defaults to a fresh client; injectable so the
-                whole path is testable with a fake transport.
+            session: An existing `requests.Session` to reuse for every request.
+                Defaults to a fresh session; injectable so the whole path is
+                testable with a fake transport.
 
         Raises:
             ValueError: If `source` is unknown, `output_format` is
@@ -154,9 +155,7 @@ class NSI(AbstractDataSource):
         self._flood_event = flood_event
         self._max_records = max_records
         self._output_format: OutputFormat = output_format
-        self._http: HttpClient = (
-            http_client if http_client is not None else HttpClient()
-        )
+        self._http: HttpClient = HttpClient(session=session)
 
         # G1 — the per-instance output shape comes from the resolved source.
         self.OUTPUT_KIND = self._source.output_kind

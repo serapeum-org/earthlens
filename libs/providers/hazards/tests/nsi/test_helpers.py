@@ -12,7 +12,7 @@ from earthlens.nsi._helpers import (
     records_to_frame,
 )
 
-from .conftest import FakeHttpClient, make_nfip_records
+from .conftest import _FakeSession, make_client, make_nfip_records
 
 pytestmark = pytest.mark.nsi
 
@@ -50,19 +50,23 @@ class TestPagination:
 
     def test_collects_all_pages(self) -> None:
         """Paging walks `$skip` until a short page ends it."""
-        client = FakeHttpClient(nfip_records=make_nfip_records(25))
+        session = _FakeSession(nfip_records=make_nfip_records(25))
         rows = paginate_nfip(
-            client, ENDPOINT, "NfipClaims", filter_str="x eq 1", page_size=10
+            make_client(session),
+            ENDPOINT,
+            "NfipClaims",
+            filter_str="x eq 1",
+            page_size=10,
         )
         assert len(rows) == 25
-        skips = [c["params"]["$skip"] for c in client.calls]
+        skips = [c["params"]["$skip"] for c in session.calls]
         assert skips == [0, 10, 20]
 
     def test_max_records_caps_total(self) -> None:
         """`max_records` stops paging early and caps the last `$top`."""
-        client = FakeHttpClient(nfip_records=make_nfip_records(100))
+        session = _FakeSession(nfip_records=make_nfip_records(100))
         rows = paginate_nfip(
-            client,
+            make_client(session),
             ENDPOINT,
             "NfipClaims",
             filter_str=None,
@@ -70,20 +74,20 @@ class TestPagination:
             max_records=15,
         )
         assert len(rows) == 15
-        assert client.calls[-1]["params"]["$top"] == 5
+        assert session.calls[-1]["params"]["$top"] == 5
 
     def test_select_forwarded(self) -> None:
         """A `$select` projection reaches the query params."""
-        client = FakeHttpClient(nfip_records=make_nfip_records(3))
+        session = _FakeSession(nfip_records=make_nfip_records(3))
         paginate_nfip(
-            client,
+            make_client(session),
             ENDPOINT,
             "NfipClaims",
             filter_str=None,
             page_size=10,
             select="id,yearOfLoss",
         )
-        assert client.calls[0]["params"]["$select"] == "id,yearOfLoss"
+        assert session.calls[0]["params"]["$select"] == "id,yearOfLoss"
 
 
 @pytest.mark.unit
@@ -92,9 +96,9 @@ class TestNfipCount:
 
     def test_reads_metadata_count(self) -> None:
         """The total comes from `metadata.count` under `$inlinecount`."""
-        client = FakeHttpClient(nfip_records=make_nfip_records(2), nfip_total=127250)
-        assert nfip_count(client, ENDPOINT, filter_str="x eq 1") == 127250
-        assert client.calls[0]["params"]["$inlinecount"] == "allpages"
+        session = _FakeSession(nfip_records=make_nfip_records(2), nfip_total=127250)
+        assert nfip_count(make_client(session), ENDPOINT, filter_str="x eq 1") == 127250
+        assert session.calls[0]["params"]["$inlinecount"] == "allpages"
 
 
 @pytest.mark.unit
