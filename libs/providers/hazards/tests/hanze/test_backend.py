@@ -171,6 +171,25 @@ class TestFilterEvents:
         )
         assert set(df["ID"]) == {1, 2}
 
+    def test_region_and_bbox_compose_with_and(self, hanze_root: Path) -> None:
+        """`region=` and a disjoint bbox intersect to nothing (AND, not OR)."""
+        # NL414 events, but a bbox covering only the DE300 box — the two code
+        # restrictions share no event, so a true AND yields an empty result.
+        df = _tabular(
+            hanze_root,
+            region="NL414",
+            lat_lim=[52.3, 52.7],
+            lon_lim=[13.0, 13.8],
+        ).download(progress_bar=False)
+        assert len(df) == 0
+
+    def test_empty_bbox_set_drops_every_event(self, hanze_root: Path) -> None:
+        """A bbox over open water resolves to no regions and drops every event."""
+        df = _tabular(hanze_root, lat_lim=[0.0, 1.0], lon_lim=[-30.0, -29.0]).download(
+            progress_bar=False
+        )
+        assert len(df) == 0
+
 
 @pytest.mark.hanze
 class TestDownloadTabular:
