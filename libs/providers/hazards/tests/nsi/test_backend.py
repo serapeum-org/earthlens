@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 import pytest
+from loguru import logger
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.nsi import NSI
@@ -13,6 +14,15 @@ from .conftest import EMPTY_GEOJSON, _FakeSession, make_nfip_records
 pytestmark = pytest.mark.nsi
 
 BOX = {"lat_lim": [29.95, 29.96], "lon_lim": [-90.07, -90.06]}
+
+
+@pytest.fixture
+def warnings_log():
+    """Capture loguru WARNING messages emitted during the test."""
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+    yield messages
+    logger.remove(sink_id)
 
 
 @pytest.mark.unit
@@ -79,8 +89,8 @@ class TestBoundGuard:
         with pytest.raises(ValueError, match="2/5/11/15-digit"):
             NSI(source="structures", fips="220710", path=tmp_path)
 
-    def test_nfip_box_is_ignored(self, tmp_path) -> None:
-        """A (valid) box passed to nfip is ignored, not a spatial filter."""
+    def test_nfip_box_is_ignored(self, warnings_log, tmp_path) -> None:
+        """A (valid) box passed to nfip is ignored (with a warning), not a filter."""
         client = _FakeSession(nfip_records=make_nfip_records(2))
         df = NSI(
             source="nfip",
@@ -91,6 +101,7 @@ class TestBoundGuard:
             path=tmp_path,
         ).download()
         assert len(df) == 2
+        assert any("box is ignored" in m for m in warnings_log)
 
     def test_structures_fips_and_box_uses_fips(self, fake_session, tmp_path) -> None:
         """Given both fips and a box, structures uses fips (GET), ignoring the box."""
@@ -136,13 +147,16 @@ class TestStructures:
         assert post["method"] == "POST"
         assert post["json"]["features"][0]["geometry"]["type"] == "Polygon"
 
-    def test_state_fips_warns_but_returns(self, fake_session, tmp_path) -> None:
+    def test_state_fips_warns_but_returns(
+        self, fake_session, warnings_log, tmp_path
+    ) -> None:
         """A 2-digit (whole-state) FIPS warns but still returns the features."""
         fc = NSI(
             source="structures", fips="22", session=fake_session, path=tmp_path
         ).download()
         assert isinstance(fc, FeatureCollection)
         assert len(fc) == 2
+        assert any("whole-state pull" in m for m in warnings_log)
 
     def test_foreign_box_returns_empty(self, tmp_path) -> None:
         """A non-US box returns an empty collection, not an error (`G4`)."""
@@ -234,11 +248,12 @@ class TestNfip:
         assert df.empty
         assert (tmp_path / "nsi_nfip.csv").exists()
 
-    def test_large_uncapped_pull_still_returns(self, tmp_path) -> None:
+    def test_large_uncapped_pull_still_returns(self, warnings_log, tmp_path) -> None:
         """A large uncapped match count warns but still returns the fetched rows."""
         client = _FakeSession(nfip_records=make_nfip_records(3), nfip_total=60_000)
         df = NSI(source="nfip", state="LA", session=client, path=tmp_path).download()
         assert len(df) == 3
+        assert any("large pull" in m for m in warnings_log)
 
 
 @pytest.mark.unit
