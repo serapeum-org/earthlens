@@ -270,13 +270,15 @@ class TestAggregateRejection:
 
     def test_tabular_rejects_aggregate(self, hanze_root: Path) -> None:
         """A tabular download refuses a non-None aggregate."""
+        backend = _tabular(hanze_root)
         with pytest.raises(NotImplementedError, match="aggregate="):
-            _tabular(hanze_root).download(aggregate=object())
+            backend.download(aggregate=object())
 
     def test_vector_rejects_aggregate(self, hanze_root: Path) -> None:
         """A vector download refuses a non-None aggregate too."""
+        backend = _tabular(hanze_root, with_geometry=True)
         with pytest.raises(NotImplementedError):
-            _tabular(hanze_root, with_geometry=True).download(aggregate=object())
+            backend.download(aggregate=object())
 
 
 @pytest.mark.hanze
@@ -344,7 +346,8 @@ class TestResultStem:
     def test_filtered_has_digest(self, hanze_root: Path) -> None:
         """A filtered request appends a stable digest."""
         stem = _tabular(hanze_root, country="DE")._result_stem("hanze_events")
-        assert stem.startswith("hanze_events-") and len(stem) > len("hanze_events-")
+        assert stem.startswith("hanze_events-")
+        assert len(stem) > len("hanze_events-")
 
     def test_digest_order_insensitive(self, hanze_root: Path) -> None:
         """The digest is the same regardless of multi-value filter order."""

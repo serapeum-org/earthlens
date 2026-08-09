@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from earthlens.hanze import (
     CATALOG_PATH,
@@ -109,8 +110,9 @@ class TestGetFloodType:
 
     def test_unknown_type_raises_with_hint(self) -> None:
         """An unknown but close type names the closest match."""
+        cat = Catalog()
         with pytest.raises(ValueError, match="Did you mean 'River'") as exc:
-            Catalog().get_flood_type("Rivers")
+            cat.get_flood_type("Rivers")
         assert "HANZE catalog" in str(exc.value)
 
     def test_getitem_raises_keyerror(self) -> None:
@@ -130,8 +132,9 @@ class TestRowModels:
 
     def test_record_is_frozen(self) -> None:
         """`ZenodoRecord` is immutable."""
-        with pytest.raises(Exception):  # noqa: B017 - pydantic frozen error type varies
-            ZenodoRecord(record=1).record = 2  # type: ignore[misc]
+        record = ZenodoRecord(record=1)
+        with pytest.raises(ValidationError):
+            record.record = 2  # type: ignore[misc]
 
     def test_geometry_defaults(self) -> None:
         """`GeometryJoin` defaults the join field, name field and CRS."""
@@ -144,7 +147,7 @@ class TestRowModels:
 
     def test_extra_field_rejected(self) -> None:
         """An unexpected field is rejected (extra='forbid')."""
-        with pytest.raises(Exception):  # noqa: B017 - pydantic ValidationError
+        with pytest.raises(ValidationError):
             FloodType(bogus=1)  # type: ignore[call-arg]
 
 
@@ -172,20 +175,23 @@ class TestLoad:
         body = _MINIMAL.replace(
             "record:\n  record: 999\n  version: v0-test\n  license: CC-BY-4.0\n", ""
         )
+        path = _write(tmp_path, body)
         with pytest.raises(ValueError, match="record:"):
-            Catalog.load(_write(tmp_path, body))
+            Catalog.load(path)
 
     def test_missing_flood_types_raises(self, tmp_path: Path) -> None:
         """A YAML without a `flood_types:` block is rejected."""
         body = _MINIMAL.replace("flood_types:\n  River: {description: Riverine.}\n", "")
+        path = _write(tmp_path, body)
         with pytest.raises(ValueError, match="flood_types:"):
-            Catalog.load(_write(tmp_path, body))
+            Catalog.load(path)
 
     def test_missing_required_file_raises(self, tmp_path: Path) -> None:
         """A `files:` block missing a required key (regions) is rejected."""
         body = _MINIMAL.replace("  regions: {name: regions.zip}\n", "")
+        path = _write(tmp_path, body)
         with pytest.raises(ValueError, match="regions"):
-            Catalog.load(_write(tmp_path, body))
+            Catalog.load(path)
 
     def test_optional_region_names_not_required(self, tmp_path: Path) -> None:
         """The unused `region_names` file is optional — its absence still loads."""
@@ -195,5 +201,6 @@ class TestLoad:
     def test_invalid_row_raises(self, tmp_path: Path) -> None:
         """A row that fails validation surfaces a clear error."""
         body = _MINIMAL.replace("  record: 999", "  record: not-an-int")
+        path = _write(tmp_path, body)
         with pytest.raises(ValueError, match="failed validation"):
-            Catalog.load(_write(tmp_path, body))
+            Catalog.load(path)
