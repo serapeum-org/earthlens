@@ -81,6 +81,21 @@ class TestPagination:
         assert total == 100
         assert session.calls[-1]["params"]["$top"] == 5
 
+    def test_max_records_on_exact_page_boundary(self) -> None:
+        """`max_records` on an exact page boundary stops without an extra page."""
+        session = _FakeSession(nfip_records=make_nfip_records(50), nfip_total=50)
+        rows, total = paginate_nfip(
+            make_client(session),
+            ENDPOINT,
+            "NfipClaims",
+            filter_str=None,
+            page_size=10,
+            max_records=20,
+        )
+        assert len(rows) == 20
+        skips = [c["params"]["$skip"] for c in session.calls]
+        assert skips == [0, 10]
+
     def test_select_forwarded(self) -> None:
         """A `$select` projection reaches the query params."""
         session = _FakeSession(nfip_records=make_nfip_records(3))

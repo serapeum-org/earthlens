@@ -145,6 +145,15 @@ class TestNfhl:
 class TestNfip:
     """The FEMA NFIP claims source."""
 
+    def test_download_progress_bar_is_a_noop(self, tmp_path) -> None:
+        """`progress_bar=` is accepted and does not change the result."""
+        client = _FakeSession(nfip_records=make_nfip_records(3))
+        df = NSI(source="nfip", county="22071", session=client, path=tmp_path).download(
+            progress_bar=False
+        )
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 3
+
     def test_download_returns_friendly_dataframe(self, tmp_path) -> None:
         """nfip returns a DataFrame with the friendly column names."""
         client = _FakeSession(nfip_records=make_nfip_records(5))
