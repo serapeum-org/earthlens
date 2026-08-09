@@ -127,6 +127,24 @@ def test_geometry_false_empty_returns_empty_dataframe(
     assert "geometry" not in df.columns
 
 
+def test_year_accepts_string(country_cache: Path, tmp_path: Path) -> None:
+    """`year` accepts a string as well as an int."""
+    fc = _backend(
+        country_cache,
+        tmp_path,
+        year="2030",
+        scenario="ssp2-rcp8p5",
+        return_period=100,
+    ).download()
+    assert "rp_100" in fc.columns
+
+
+def test_duplicate_return_periods_collapse(country_cache: Path, tmp_path: Path) -> None:
+    """A duplicated return period yields a single rp_<n> column."""
+    fc = _backend(country_cache, tmp_path, return_period=[100, 100]).download()
+    assert [c for c in fc.columns if c.startswith("rp_")] == ["rp_100"]
+
+
 def test_2030_scenario_selects_future_columns(
     country_cache: Path, tmp_path: Path
 ) -> None:

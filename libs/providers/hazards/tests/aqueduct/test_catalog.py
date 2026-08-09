@@ -85,6 +85,21 @@ def test_missing_admin_levels_block_raises(tmp_path: Path, monkeypatch) -> None:
     clear_catalog_cache()
 
 
+def test_admin_level_and_scenario_models_are_frozen() -> None:
+    """The AdminLevel and Scenario rows are immutable and reject extra fields."""
+    import pytest as _pytest
+    from pydantic import ValidationError
+
+    row = AdminLevel(zip="c.zip", shapefile_stem="c")
+    with _pytest.raises(ValidationError):
+        row.zip = "other.zip"
+    with _pytest.raises(ValidationError):
+        AdminLevel(zip="c.zip", shapefile_stem="c", bogus=1)
+    scenario = Scenario(code="bh", years=["2010"])
+    with _pytest.raises(ValidationError):
+        scenario.code = "24"
+
+
 def test_get_catalog_returns_datasets() -> None:
     """get_catalog returns the same admin-level map as datasets."""
     cat = Catalog()
