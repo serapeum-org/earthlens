@@ -71,8 +71,10 @@ horn = EarthLens(
 ).download()
 ```
 
-At country level `country=` matches the country name. Below country level the
-source carries no country column, so use `lat_lim` / `lon_lim` to narrow a region.
+At country level `country=` matches the country name. Below country level
+`country=` matches the unit's own name (the state layer carries an unused `admin`
+country column, the basin layer none), so use `lat_lim` / `lon_lim` to narrow a
+region.
 
 ## Table output (no geometry)
 

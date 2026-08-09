@@ -238,10 +238,12 @@ def filter_units(
 ) -> FeatureCollection:
     """Filter the collection by unit name and/or the requested bounding box.
 
-    A `country` (really any unit name — the source carries no separate country
-    column below country level) keeps rows whose `unit_name` matches
-    case-insensitively. A bounding box narrower than the whole globe keeps rows
-    whose geometry intersects it (via `GeoDataFrame.cx`). Both filters compose.
+    A `country` keeps rows whose `unit_name` matches case-insensitively — at
+    country level `unit_name` *is* the country name. (The state layer also carries
+    an `admin` country column and the basin layer none, but this backend filters
+    `country=` on `unit_name` only; use the bounding box to select a sub-national
+    region.) A bounding box narrower than the whole globe keeps rows whose
+    geometry intersects it (via `GeoDataFrame.cx`). Both filters compose.
 
     Args:
         collection: The trimmed collection from :func:`build_feature_collection`.

@@ -132,6 +132,28 @@ def test_written_geopackage_lands_under_path(
     assert len(written) == 1
 
 
+def test_distinct_return_periods_write_distinct_files(
+    country_cache: Path, tmp_path: Path
+) -> None:
+    """Requests differing only by return period do not overwrite each other."""
+    _backend(country_cache, tmp_path, return_period=100).download()
+    _backend(country_cache, tmp_path, return_period=500).download()
+    assert len(list(tmp_path.glob("aqueduct_country_*.gpkg"))) == 2
+
+
+def test_download_logs_source_attribution(country_cache: Path, tmp_path: Path) -> None:
+    """A download logs the CC-BY attribution + licence."""
+    from loguru import logger
+
+    messages: list[str] = []
+    sink = logger.add(messages.append, level="INFO")
+    try:
+        _backend(country_cache, tmp_path, return_period=100).download()
+    finally:
+        logger.remove(sink)
+    assert any("World Resources Institute" in message for message in messages)
+
+
 def test_cached_zip_is_not_redownloaded(country_cache: Path, tmp_path: Path) -> None:
     """A present cache zip is reused without any HTTP call."""
     backend = _backend(country_cache, tmp_path, return_period=100)

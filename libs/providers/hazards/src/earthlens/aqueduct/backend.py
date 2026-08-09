@@ -128,12 +128,16 @@ class Aqueduct(AbstractDataSource):
             scenario: `"baseline"` (the only 2010 scenario) or one of the seven
                 2030 combinations (`"ssp2-rcp8p5"`, ...).
             return_period: The flood return period(s) in years — an `int`, a
-                list, or `None` (the default) for all nine (2 → 1000).
+                list, or `None` (the default) for all nine (2 → 1000). Duplicates
+                in a list are collapsed (output columns are keyed by return
+                period).
             hazard: Only `"riverine"` is supported; `"coastal"` is part of the
                 2020 product, which is not freely downloadable, and is rejected.
             country: A unit name to keep (case-insensitive exact match on
                 `unit_name`). At country level this is the country name; below it
-                the source carries no country column, so use `lat_lim`/`lon_lim`.
+                `country=` matches the unit's own name (the state layer has an
+                unused `admin` country column, the basin layer none), so use
+                `lat_lim` / `lon_lim` to select a sub-national region.
             geometry: `True` (default) returns a `FeatureCollection`; `False`
                 returns a geometry-dropped `DataFrame` (`OUTPUT_KIND="tabular"`).
             cache_dir: Directory for the downloaded zip. Defaults to
@@ -338,6 +342,10 @@ class Aqueduct(AbstractDataSource):
             f"Aqueduct {self._admin_level}/{self._metric}/{self._year}/"
             f"{self._scenario}: {len(collection)} unit(s)."
         )
+        logger.info(
+            f"Aqueduct source: {self._catalog.attribution} "
+            f"(licence {self._catalog.license})."
+        )
         if not self._geometry:
             return pd.DataFrame(collection.drop(columns=collection.geometry.name))
         if not len(collection):
@@ -359,8 +367,13 @@ class Aqueduct(AbstractDataSource):
         Returns:
             Path: The written file path.
         """
+        return_periods = "-".join(str(rp) for rp in self._return_periods)
+        country_tag = (
+            f"_{self._country.strip().replace(' ', '-')}" if self._country else ""
+        )
         stem = (
-            f"aqueduct_{self._admin_level}_{self._metric}_{self._year}_{self._scenario}"
+            f"aqueduct_{self._admin_level}_{self._metric}_{self._year}_"
+            f"{self._scenario}_rp{return_periods}{country_tag}"
         )
         out_path = self.root_dir / f"{stem}.gpkg"
         collection.to_file(str(out_path), driver="GPKG")
