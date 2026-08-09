@@ -149,6 +149,18 @@ def test_cached_zip_is_not_redownloaded(country_cache: Path, tmp_path: Path) -> 
         HttpClient.download = original  # type: ignore[method-assign]
 
 
+def test_empty_result_returns_empty_collection(
+    country_cache: Path, tmp_path: Path
+) -> None:
+    """A filter matching no unit returns an empty FeatureCollection, no crash."""
+    fc = _backend(
+        country_cache, tmp_path, country="Nowhere At All", return_period=100
+    ).download()
+    assert isinstance(fc, FeatureCollection)
+    assert len(fc) == 0
+    assert "rp_100" in fc.columns
+
+
 def test_coastal_hazard_is_rejected(country_cache: Path, tmp_path: Path) -> None:
     """coastal is part of the locked 2020 product and is rejected."""
     with pytest.raises(ValueError, match="riverine"):
