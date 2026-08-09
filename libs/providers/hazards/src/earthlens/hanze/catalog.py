@@ -230,7 +230,11 @@ def _parse_catalog(files: list[Path]) -> dict[str, Any]:
     except ValidationError as exc:
         raise ValueError(f"{catalog_path} failed validation:\n{exc}") from exc
 
-    for required in ("events", "regions", "region_names"):
+    # Only the two files the backend actually fetches are required. The
+    # `region_names` (S2) lookup is documented and shipped but never downloaded —
+    # region names come from the shapefile `Name` attribute — so requiring it
+    # would make a maintainer who drops the unused entry break `Catalog()`.
+    for required in ("events", "regions"):
         if required not in file_map:
             raise ValueError(
                 f"{catalog_path} 'files:' block is missing required file "

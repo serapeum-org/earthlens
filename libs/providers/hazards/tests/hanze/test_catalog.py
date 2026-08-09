@@ -182,10 +182,15 @@ class TestLoad:
             Catalog.load(_write(tmp_path, body))
 
     def test_missing_required_file_raises(self, tmp_path: Path) -> None:
-        """A `files:` block missing a required key is rejected."""
-        body = _MINIMAL.replace("  region_names: {name: names.csv}\n", "")
-        with pytest.raises(ValueError, match="region_names"):
+        """A `files:` block missing a required key (regions) is rejected."""
+        body = _MINIMAL.replace("  regions: {name: regions.zip}\n", "")
+        with pytest.raises(ValueError, match="regions"):
             Catalog.load(_write(tmp_path, body))
+
+    def test_optional_region_names_not_required(self, tmp_path: Path) -> None:
+        """The unused `region_names` file is optional — its absence still loads."""
+        body = _MINIMAL.replace("  region_names: {name: names.csv}\n", "")
+        assert Catalog.load(_write(tmp_path, body)).flood_types() == ["River"]
 
     def test_invalid_row_raises(self, tmp_path: Path) -> None:
         """A row that fails validation surfaces a clear error."""
