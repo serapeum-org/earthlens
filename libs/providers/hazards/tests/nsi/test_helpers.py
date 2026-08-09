@@ -126,6 +126,17 @@ class TestPagination:
         assert len(rows) == 3
         assert total is None
 
+    def test_identical_page_stops_a_server_that_ignores_skip(self) -> None:
+        """An endpoint re-serving the same page for a new $skip stops early (M1)."""
+        session = _FakeSession(
+            nfip_records=make_nfip_records(10), nfip_ignore_paging=True
+        )
+        rows, _ = paginate_nfip(
+            make_client(session), ENDPOINT, "NfipClaims", filter_str=None, page_size=5
+        )
+        assert len(rows) == 5
+        assert len(session.calls) == 2
+
     def test_null_metadata_degrades_to_none(self) -> None:
         """A `"metadata": null` envelope degrades to total None, not a crash (L4)."""
         session = _FakeSession(

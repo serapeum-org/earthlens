@@ -195,6 +195,7 @@ class _FakeSession:
         nfip_total: int | None = None,
         nfip_omit_count: bool = False,
         nfip_null_metadata: bool = False,
+        nfip_ignore_paging: bool = False,
         nfhl_ignore_paging: bool = False,
         nfhl_server_cap: int | None = None,
         nfhl_omit_exceeded: bool = False,
@@ -210,6 +211,9 @@ class _FakeSession:
         self.nfip_omit_count = nfip_omit_count
         # When set, return `"metadata": null` (present key, null value).
         self.nfip_null_metadata = nfip_null_metadata
+        # When set, ignore $skip and always return the first page (a server that
+        # does not honour paging).
+        self.nfip_ignore_paging = nfip_ignore_paging
         # When set, always return a full first page flagged exceeded, ignoring
         # resultOffset — a layer that does not honour paging.
         self.nfhl_ignore_paging = nfhl_ignore_paging
@@ -249,7 +253,7 @@ class _FakeSession:
                 payload["exceededTransferLimit"] = offset + per_page < len(feats)
             return _FakeResponse(payload)
         if "NfipClaims" in url:
-            skip = int(params.get("$skip", 0))
+            skip = 0 if self.nfip_ignore_paging else int(params.get("$skip", 0))
             top = int(params.get("$top", len(self.nfip_records)))
             payload = {"NfipClaims": self.nfip_records[skip : skip + top]}
             if "$inlinecount" in params:

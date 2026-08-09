@@ -22,6 +22,10 @@ if TYPE_CHECKING:
 #: paging and reports `exceededTransferLimit` forever.
 _MAX_ARCGIS_PAGES: int = 1000
 
+#: Hard cap on NFIP pages walked (page_size up to 1000 → up to ~10M rows), a
+#: backstop against an endpoint that ignores `$skip` and never empties out.
+_MAX_NFIP_PAGES: int = 10000
+
 
 def _odata_literal(value: str) -> str:
     """Quote a string as an OData literal, doubling any embedded quote.
@@ -116,7 +120,8 @@ def paginate_nfip(
     skip = 0
     total: int | None = None
     counted = False
-    while True:
+    prev_page: list | None = None
+    for _ in range(_MAX_NFIP_PAGES):
         top = page_size
         if max_records is not None:
             remaining = max_records - len(collected)
@@ -139,10 +144,26 @@ def paginate_nfip(
             count = (payload.get("metadata") or {}).get("count")
             total = int(count) if count is not None else None
         page = payload.get(records_key, []) if isinstance(payload, dict) else []
+        if page and page == prev_page:
+            # Server re-sent the previous page for a new $skip — it does not
+            # honour paging. Stop before accumulating duplicates (mirrors
+            # paginate_arcgis). The `==` short-circuits on the first record, so
+            # this is cheap on the happy path (distinct pages differ at [0]).
+            logger.warning(
+                f"paginate_nfip: {endpoint!r} re-sent the same page for a new "
+                "$skip (server does not honour paging); result may be incomplete."
+            )
+            break
         collected.extend(page)
+        prev_page = page
         if len(page) < top:
             break
         skip += len(page)
+    else:  # pragma: no cover - pathological server that paginates past the cap
+        logger.warning(
+            f"paginate_nfip hit the {_MAX_NFIP_PAGES}-page cap for {endpoint!r}; "
+            "result may be incomplete — narrow the filter or set max_records."
+        )
     return collected, total
 
 
