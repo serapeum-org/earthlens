@@ -167,8 +167,13 @@ def join_events_to_regions(
     if not len(selected):
         return empty_region_fc()
 
-    # Reproject to WGS84 first; the shapefile is ETRS89-LAEA (EPSG:3035).
-    reprojected = selected.to_crs(OUTPUT_CRS)
+    # Reproject to WGS84 first; the shapefile is ETRS89-LAEA (EPSG:3035). Reset
+    # the index so the geometry `GeoSeries` (built from a positional numpy array
+    # below) aligns with `frame` row-for-row: `selected` keeps the boundary
+    # file's original scattered indices, and geopandas aligns a `GeoSeries` to
+    # the frame *by index*, so without this a region at a high original index
+    # would be paired with a missing (null) geometry.
+    reprojected = selected.to_crs(OUTPUT_CRS).reset_index(drop=True)
     frame = pd.DataFrame(
         {
             "nuts3_code": reprojected[join_field].astype("string"),

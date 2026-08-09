@@ -102,6 +102,24 @@ class TestJoinEventsToRegions:
         assert counts == {"DE300": 2, "DE711": 1}
         assert set(fc.columns) == {"nuts3_code", "region_name", "n_events", "geometry"}
 
+    def test_high_index_region_keeps_geometry(self, region_zip, tmp_path) -> None:
+        """A region at a high boundary-file index keeps its geometry (no null)."""
+        regions = _read_regions(region_zip, tmp_path)
+        # FR101 / ITH10 sit past index 0/1 in the fixture; the join must align the
+        # geometry positionally rather than by the boundary file's index.
+        events = pd.DataFrame({_REGIONS_COLUMN: ["FR101;ITH10;DE300"]})
+        fc = join_events_to_regions(
+            events,
+            regions,
+            regions_column=_REGIONS_COLUMN,
+            join_field="Code",
+            name_field="Name",
+        )
+        assert not fc.geometry.isna().any(), (
+            "every affected region must keep its geometry"
+        )
+        assert set(fc["nuts3_code"]) == {"FR101", "ITH10", "DE300"}
+
     def test_unmatched_code_dropped(self, region_zip, tmp_path) -> None:
         """A code absent from the boundary file contributes no feature."""
         regions = _read_regions(region_zip, tmp_path)
