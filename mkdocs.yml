@@ -241,6 +241,10 @@ nav:
       - Introduction: reference/gdacs/introduction.md
       - Usage: reference/gdacs/usage.md
       - Reference: reference/gdacs/gdacs.md
+    - Aqueduct (riverine flood risk):
+      - Introduction: reference/aqueduct/introduction.md
+      - Usage: reference/aqueduct/usage.md
+      - Reference: reference/aqueduct/aqueduct.md
     - EM-DAT (disaster impacts):
       - Introduction: reference/emdat/introduction.md
       - Usage: reference/emdat/usage.md
