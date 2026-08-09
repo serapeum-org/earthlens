@@ -45,13 +45,16 @@ IUCN_LICENSE = "IUCN Red List (CC-BY-NC)"
 
 #: License ids/labels that carry non-commercial or restricted-redistribution
 #: obligations. The GBIF record value is underscore-spelled (`CC_BY_NC_4_0`);
-#: OBIS rows use the hyphenated Creative Commons forms; WDPA/IUCN use the
-#: sentinels above. ODbL stays the concern of Overture's own `warn_if_odbl`.
+#: OBIS rows use the hyphenated Creative Commons forms; the share-alike
+#: `CC-BY-NC-SA` variants cover FABDEM; WDPA/IUCN use the sentinels above. ODbL
+#: stays the concern of Overture's own `warn_if_odbl`.
 RESTRICTIVE_LICENSES: frozenset[str] = frozenset(
     {
         "CC_BY_NC_4_0",
         "CC-BY-NC-4.0",
         "CC-BY-NC",
+        "CC-BY-NC-SA-4.0",
+        "CC-BY-NC-SA",
         WDPA_LICENSE,
         IUCN_LICENSE,
     }

@@ -1,0 +1,29 @@
+# FABDEM V1-2 catalog — a single, static, global bare-earth DEM.
+#
+# FABDEM (Forest And Buildings removed Copernicus DEM; Hawker & Neal, University
+# of Bristol / Fathom) is the Copernicus GLO-30 DSM with forest canopy and
+# building heights removed, giving a ~30 m (1 arc-second) global bare-earth
+# terrain model — the recommended DEM for flood routing.
+#
+# Licence: CC-BY-NC-SA 4.0 (non-commercial). Commercial licensing via Fathom.
+license: CC-BY-NC-SA-4.0
+attribution: >-
+  Hawker, L., Uhe, P., Paulo, L., Sosa, J., Savage, J., Sampson, C., Neal, J.
+  (2022). A 30 m global map of elevation with forests and buildings removed.
+  Environmental Research Letters, 17, 024016. University of Bristol.
+commercial_contact: >-
+  FABDEM is CC-BY-NC-SA 4.0 (non-commercial). For commercial use, obtain a
+  licence from Fathom (https://www.fathom.global).
+
+datasets:
+  fabdem:
+    title: "FABDEM V1-2 — Forest And Buildings removed Copernicus DEM (~30 m, bare-earth)"
+    version: "V1-2"
+    provider: fathom-bristol
+    band: elevation
+    long_name: Bare-earth surface elevation (forests and buildings removed)
+    units: m
+    dtype: float32
+    crs: EPSG:4326
+    spatial_resolution: 30
+    source_url: "https://data.bris.ac.uk/data/dataset/s5hqmjcdj8yo2ibzi9b4ew3sn"

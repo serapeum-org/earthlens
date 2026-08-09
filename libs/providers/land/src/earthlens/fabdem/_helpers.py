@@ -1,0 +1,263 @@
+"""Bristol FABDEM V1-2 file-tree glue: bbox → 1° cells → 10° bundle zips.
+
+FABDEM V1-2 is served from the University of Bristol data repository over a
+deterministic, anonymous HTTPS tree (verified live 2026-08-09): each 10°×10°
+bundle is one `.zip` at `{BASE_URL}/{bundle}_FABDEM_V1-2.zip`, and each bundle
+holds one Cloud-Optimized GeoTIFF per 1°×1° land cell, named
+`{cell}_FABDEM_V1-2.tif`. Ocean-only bundles and ocean-only cells are simply
+absent upstream (a `404` for a bundle, a missing member inside one), so both
+are skipped rather than treated as errors.
+
+Cell and bundle ids use the **SW-corner** convention: latitude as `N`/`S` plus
+two zero-padded digits, longitude as `E`/`W` plus three zero-padded digits
+(e.g. `N50E000`, `S10W073`). A 10° bundle id is `{sw}-{ne}` — the SW corner of
+its 10° block joined to the corner 10° north-east (e.g. `N50E000-N60E010`).
+"""
+
+from __future__ import annotations
+
+import math
+import time
+import zipfile
+from pathlib import Path
+
+import requests
+
+from earthlens.base.http import HttpClient, thread_local_session
+
+#: Root of the Bristol FABDEM V1-2 file tree (anonymous HTTPS, no auth).
+BASE_URL: str = "https://data.bris.ac.uk/datasets/s5hqmjcdj8yo2ibzi9b4ew3sn"
+
+#: The published data version; appears in every bundle and tile file name.
+DATASET_VERSION: str = "V1-2"
+
+
+def _corner(lat: int, lon: int) -> str:
+    """Format an integer SW corner as a FABDEM corner token.
+
+    Args:
+        lat: Integer latitude of the SW corner in degrees (negative = south).
+        lon: Integer longitude of the SW corner in degrees (negative = west).
+
+    Returns:
+        str: The token, e.g. `"N50E000"`, `"S10W073"` (2-digit latitude,
+            3-digit longitude, zero-padded).
+    """
+    ns = "N" if lat >= 0 else "S"
+    ew = "E" if lon >= 0 else "W"
+    return f"{ns}{abs(lat):02d}{ew}{abs(lon):03d}"
+
+
+def tile_name(lat: int, lon: int) -> str:
+    """Return the 1° GeoTIFF member name for the cell with SW corner (lat, lon).
+
+    Args:
+        lat: Integer SW-corner latitude of the 1° cell.
+        lon: Integer SW-corner longitude of the 1° cell.
+
+    Returns:
+        str: e.g. `"N50E000_FABDEM_V1-2.tif"`.
+    """
+    return f"{_corner(lat, lon)}_FABDEM_{DATASET_VERSION}.tif"
+
+
+def bundle_id(lat: int, lon: int) -> str:
+    """Return the 10° bundle id containing the 1° cell at SW corner (lat, lon).
+
+    Args:
+        lat: Integer SW-corner latitude of the 1° cell.
+        lon: Integer SW-corner longitude of the 1° cell.
+
+    Returns:
+        str: The `{sw}-{ne}` bundle id, e.g. `"N50E000-N60E010"`.
+    """
+    base_lat = math.floor(lat / 10) * 10
+    base_lon = math.floor(lon / 10) * 10
+    return f"{_corner(base_lat, base_lon)}-{_corner(base_lat + 10, base_lon + 10)}"
+
+
+def bundle_url(bundle: str) -> str:
+    """Return the deterministic Bristol `.zip` URL for a 10° bundle id.
+
+    Args:
+        bundle: A `{sw}-{ne}` bundle id from `bundle_id`.
+
+    Returns:
+        str: The fully-qualified `.zip` URL.
+
+    Examples:
+        - The verified bundle URL:
+            ```python
+            >>> from earthlens.fabdem._helpers import bundle_url
+            >>> bundle_url("N50E000-N60E010")
+            'https://data.bris.ac.uk/datasets/s5hqmjcdj8yo2ibzi9b4ew3sn/N50E000-N60E010_FABDEM_V1-2.zip'
+
+            ```
+    """
+    return f"{BASE_URL}/{bundle}_FABDEM_{DATASET_VERSION}.zip"
+
+
+def cells_for_bbox(bbox: tuple[float, float, float, float]) -> list[tuple[int, int]]:
+    """Return the SW corners of every 1° cell intersecting the AOI bbox.
+
+    A 1° cell with SW corner `(lat, lon)` covers `[lat, lat+1] × [lon, lon+1]`;
+    it is selected when that square overlaps the bbox with positive area (an
+    edge-only touch does not count). Corners are clamped to the valid FABDEM
+    grid (`lat ∈ [-90, 89]`, `lon ∈ [-180, 179]`).
+
+    Args:
+        bbox: `(west, south, east, north)` in degrees.
+
+    Returns:
+        list[tuple[int, int]]: Sorted `(lat, lon)` SW corners.
+
+    Examples:
+        - A small AOI over the English Channel selects four cells:
+            ```python
+            >>> from earthlens.fabdem._helpers import cells_for_bbox
+            >>> cells_for_bbox((0.4, 50.4, 1.6, 51.6))
+            [(50, 0), (50, 1), (51, 0), (51, 1)]
+
+            ```
+    """
+    west, south, east, north = bbox
+    cells: list[tuple[int, int]] = []
+    for lat in range(math.floor(south), math.ceil(north)):
+        for lon in range(math.floor(west), math.ceil(east)):
+            overlaps = lat + 1 > south and lat < north and lon + 1 > west and lon < east
+            if overlaps and -90 <= lat <= 89 and -180 <= lon <= 179:
+                cells.append((lat, lon))
+    return sorted(cells)
+
+
+def bundles_for_bbox(
+    bbox: tuple[float, float, float, float],
+) -> dict[str, list[str]]:
+    """Map each needed 10° bundle id to the intersecting 1° tile member names.
+
+    Args:
+        bbox: `(west, south, east, north)` in degrees.
+
+    Returns:
+        dict[str, list[str]]: Bundle id → sorted tile file names, itself
+            ordered by bundle id. Empty when the AOI covers no land cell.
+
+    Examples:
+        - An AOI straddling two 10° blocks needs two bundles:
+            ```python
+            >>> from earthlens.fabdem._helpers import bundles_for_bbox
+            >>> plan = bundles_for_bbox((9.4, 50.4, 10.6, 50.6))
+            >>> sorted(plan)
+            ['N50E000-N60E010', 'N50E010-N60E020']
+            >>> plan['N50E010-N60E020']
+            ['N50E010_FABDEM_V1-2.tif']
+
+            ```
+    """
+    groups: dict[str, list[str]] = {}
+    for lat, lon in cells_for_bbox(bbox):
+        groups.setdefault(bundle_id(lat, lon), []).append(tile_name(lat, lon))
+    return {bundle: sorted(names) for bundle, names in sorted(groups.items())}
+
+
+def download_bundle(
+    url: str,
+    dest_dir: Path,
+    *,
+    session: requests.Session | None = None,
+    retries: int = 3,
+    backoff: float = 2.0,
+    timeout: float = 300.0,
+    chunk_size: int = 1 << 20,
+) -> Path | None:
+    """Stream a FABDEM bundle `.zip` to `dest_dir`, retrying transient failures.
+
+    Idempotent: an already-downloaded `.zip` is returned without re-fetching.
+    A `404` means the 10° block is ocean-only (no bundle published), so `None`
+    is returned rather than raising — the caller skips it. Other transient
+    HTTP failures (`429`/`5xx`) are retried with exponential backoff.
+
+    Args:
+        url: A bundle `.zip` URL from `bundle_url`.
+        dest_dir: Directory to download into (created if absent).
+        session: Optional shared `requests.Session` for connection reuse.
+        retries: Number of attempts before giving up.
+        backoff: Base seconds for exponential backoff between retries.
+        timeout: Per-request timeout in seconds (bundles are 0.8–2.4 GB).
+        chunk_size: Streaming chunk size in bytes.
+
+    Returns:
+        pathlib.Path | None: The downloaded `.zip`, or `None` when the bundle
+            does not exist upstream (`404` — an ocean-only block).
+
+    Raises:
+        requests.HTTPError: If a non-404 error persists after every attempt.
+    """
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    zip_path = dest_dir / url.rsplit("/", 1)[-1]
+    if zip_path.exists():
+        return zip_path
+    client = HttpClient(
+        session=session if session is not None else thread_local_session("fabdem"),
+        status_forcelist=(429, 500, 502, 503, 504),
+        retry_on_exceptions=(requests.RequestException, OSError),
+        raise_for_status=True,
+        max_retries=max(retries - 1, 0),
+        backoff_factor=backoff,
+        sleep=time.sleep,
+    )
+    try:
+        client.download(
+            url, zip_path, chunk=chunk_size, progress=False, timeout=timeout
+        )
+    except requests.HTTPError as exc:
+        response = exc.response
+        if response is not None and response.status_code == 404:
+            zip_path.unlink(missing_ok=True)
+            return None
+        raise
+    except (requests.RequestException, OSError) as exc:
+        raise requests.HTTPError(
+            f"FABDEM: download {url} failed after {retries} attempts: {exc}"
+        ) from exc
+    return zip_path
+
+
+def extract_tiles(zip_path: Path, dest_dir: Path, names: list[str]) -> list[Path]:
+    """Extract only the named GeoTIFF members from a bundle zip.
+
+    Extracting just the intersecting 1° tiles avoids unpacking a whole 10°
+    bundle (up to ~100 COGs) when a small AOI needs only a few. A requested
+    name that is not in the archive is silently skipped — it is an ocean-only
+    cell that was never published. Every member's resolved destination is
+    checked to stay within `dest_dir` (Zip-Slip / CWE-22) before extraction.
+
+    Args:
+        zip_path: A downloaded bundle `.zip`.
+        dest_dir: Directory to extract into (created if absent).
+        names: Tile file names to extract (from `tile_name`).
+
+    Returns:
+        list[Path]: The extracted `.tif` paths, sorted; empty when none of
+            `names` is present in the archive.
+
+    Raises:
+        ValueError: If a member would escape `dest_dir`.
+    """
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    wanted = set(names)
+    out: list[Path] = []
+    dest_root = dest_dir.resolve()
+    with zipfile.ZipFile(zip_path) as zf:
+        present = [m for m in zf.namelist() if m in wanted]
+        for member in present:
+            target = (dest_dir / member).resolve()
+            if dest_root not in target.parents and target != dest_root:
+                raise ValueError(
+                    f"FABDEM: refusing unsafe archive member {member!r} in "
+                    f"{zip_path.name} (escapes {dest_dir})."
+                )
+            if not target.exists():
+                zf.extract(member, dest_dir)
+            out.append(dest_dir / member)
+    return sorted(out)
