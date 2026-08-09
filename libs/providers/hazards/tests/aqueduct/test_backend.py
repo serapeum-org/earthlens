@@ -8,9 +8,33 @@ import pandas as pd
 import pytest
 from pyramids.feature.collection import FeatureCollection
 
-from earthlens.aqueduct import Aqueduct
+from earthlens.aqueduct import Aqueduct, Catalog
 
 pytestmark = pytest.mark.aqueduct
+
+
+def test_cache_miss_downloads_via_http_client(
+    country_cache: Path, tmp_path: Path, monkeypatch
+) -> None:
+    """On a cache miss the backend downloads the zip through HttpClient."""
+    source = (country_cache / Catalog().get("country").zip).read_bytes()
+    empty_cache = tmp_path / "empty_cache"
+
+    class _FakeClient:
+        def __init__(self, *args, **kwargs) -> None:
+            pass
+
+        def download(self, url: str, dest, **kwargs) -> Path:
+            Path(dest).parent.mkdir(parents=True, exist_ok=True)
+            Path(dest).write_bytes(source)
+            return Path(dest)
+
+    monkeypatch.setattr("earthlens.aqueduct.backend.HttpClient", _FakeClient)
+    fc = Aqueduct(
+        path=tmp_path, cache_dir=empty_cache, return_period=100
+    ).download()
+    assert (empty_cache / Catalog().get("country").zip).exists()
+    assert len(fc) == 3
 
 
 def _backend(cache: Path, tmp_path: Path, **kwargs) -> Aqueduct:

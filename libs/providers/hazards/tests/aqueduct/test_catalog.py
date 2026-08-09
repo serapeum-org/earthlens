@@ -85,6 +85,42 @@ def test_missing_admin_levels_block_raises(tmp_path: Path, monkeypatch) -> None:
     clear_catalog_cache()
 
 
+def test_get_catalog_returns_datasets() -> None:
+    """get_catalog returns the same admin-level map as datasets."""
+    cat = Catalog()
+    assert cat.get_catalog() is cat.datasets
+
+
+def test_malformed_admin_level_raises(tmp_path: Path, monkeypatch) -> None:
+    """An admin-level row with an unknown field fails validation."""
+    bad = tmp_path / "bad.yaml"
+    bad.write_text(
+        "admin_levels:\n  country:\n    zip: c.zip\n    shapefile_stem: c\n"
+        "    bogus: 1\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(catalog_module, "CATALOG_PATH", bad)
+    clear_catalog_cache()
+    with pytest.raises(ValueError, match="admin level 'country' failed validation"):
+        Catalog.load()
+    clear_catalog_cache()
+
+
+def test_malformed_scenario_raises(tmp_path: Path, monkeypatch) -> None:
+    """A scenario row with an unknown field fails validation."""
+    bad = tmp_path / "bad.yaml"
+    bad.write_text(
+        "admin_levels:\n  country:\n    zip: c.zip\n    shapefile_stem: c\n"
+        "scenarios:\n  x:\n    code: bh\n    bogus: 1\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(catalog_module, "CATALOG_PATH", bad)
+    clear_catalog_cache()
+    with pytest.raises(ValueError, match="scenario 'x' failed validation"):
+        Catalog.load()
+    clear_catalog_cache()
+
+
 def test_load_accepts_explicit_path(tmp_path: Path) -> None:
     """load reads an explicit catalog path, not just the bundled default."""
     custom = tmp_path / "one.yaml"
