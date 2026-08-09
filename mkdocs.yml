@@ -291,6 +291,10 @@ nav:
       - Usage: reference/risk_indicators/usage.md
       - Available datasets: reference/risk_indicators/datasets.md
       - Reference: reference/risk_indicators/risk_indicators.md
+    - US flood exposure & loss (NSI / NFHL / NFIP):
+      - Introduction: reference/nsi/introduction.md
+      - Usage: reference/nsi/usage.md
+      - Reference: reference/nsi/nsi.md
     - Glaciers (RGI / GLIMS / WGMS):
       - Introduction: reference/glaciers/introduction.md
       - Usage: reference/glaciers/usage.md
