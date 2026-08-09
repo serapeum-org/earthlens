@@ -140,7 +140,8 @@ def to_feature_collection(geojson: dict) -> FeatureCollection:
     features = geojson["features"]
     if not features:
         # An empty result carries just an (empty) geometry column — no fabricated
-        # attribute column, so its shape does not differ from a populated one.
+        # attribute/id column that a populated result (built from the provider's
+        # properties) would not also have.
         empty = gpd.GeoDataFrame(
             geometry=gpd.GeoSeries([], crs="EPSG:4326"), crs="EPSG:4326"
         )

@@ -26,7 +26,7 @@ dependency.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd
 from loguru import logger
@@ -266,7 +266,7 @@ class NSI(AbstractDataSource):
         """
         return [RemoteProduct(id=self._source.id, metadata={})]
 
-    def _fetch(self, products: list[RemoteProduct]) -> list:
+    def _fetch(self, products: list[RemoteProduct]) -> list[Any]:
         """Route the product to its source and parse the response.
 
         Args:
@@ -278,7 +278,7 @@ class NSI(AbstractDataSource):
         """
         return [self._fetch_source()]
 
-    def _fetch_source(self):
+    def _fetch_source(self) -> FeatureCollection | pd.DataFrame:
         """Fetch and parse the resolved source.
 
         Returns:
