@@ -325,7 +325,7 @@ class NSI(AbstractDataSource):
         """Fetch NSI structures by `fips=` (GET) or a box (POST polygon)."""
         endpoint = self._source.endpoint
         if self._fips:
-            if len(self._fips) <= 2:
+            if len(self._fips) == 2:
                 logger.warning(
                     f"NSI structures fips={self._fips!r} is a whole-state pull "
                     "returned in a single response; this can be very large — "
@@ -353,6 +353,9 @@ class NSI(AbstractDataSource):
             year=self._year,
             flood_event=self._flood_event,
         )
+        # Only the curated columns are kept, so project them server-side with
+        # $select rather than pulling all ~84 provider fields per record.
+        select = ",".join(source.fields.values()) or None
         records, total = _helpers.paginate_nfip(
             self._http,
             source.endpoint,
@@ -360,6 +363,7 @@ class NSI(AbstractDataSource):
             filter_str=filter_str,
             page_size=source.page_size or 1000,
             max_records=self._max_records,
+            select=select,
         )
         logger.info(
             f"NSI nfip: {total} claim record(s) match {filter_str!r}; fetched "

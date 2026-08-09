@@ -144,11 +144,12 @@ def paginate_nfip(
             count = (payload.get("metadata") or {}).get("count")
             total = int(count) if count is not None else None
         page = payload.get(records_key, []) if isinstance(payload, dict) else []
-        if page and page == prev_page:
-            # Server re-sent the previous page for a new $skip — it does not
-            # honour paging. Stop before accumulating duplicates (mirrors
-            # paginate_arcgis). The `==` short-circuits on the first record, so
-            # this is cheap on the happy path (distinct pages differ at [0]).
+        if page and prev_page and page[0] == prev_page[0]:
+            # Server re-sent the same first record for a new $skip — it does not
+            # honour paging. Compare the first record (not the whole page) so a
+            # shrunk last-page $top from `max_records` can't hide a re-serve, and
+            # so the check stays O(1). With $orderby=id + advancing $skip a
+            # legitimate next page always starts at a new id.
             logger.warning(
                 f"paginate_nfip: {endpoint!r} re-sent the same page for a new "
                 "$skip (server does not honour paging); result may be incomplete."
