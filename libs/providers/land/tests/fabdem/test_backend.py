@@ -46,8 +46,12 @@ def fake_localise(monkeypatch: pytest.MonkeyPatch) -> dict:
     """Patch merge_rasters + pyramids Dataset + crop_to_aoi to touch no GDAL."""
     recorder: dict = {}
 
-    def _fake_merge(*, src, dst, dst_crs, resampling) -> None:
-        recorder["merge"] = {"src": list(src), "dst_crs": dst_crs}
+    def _fake_merge(*, src, dst, dst_crs, resampling, no_data_value=None) -> None:
+        recorder["merge"] = {
+            "src": list(src),
+            "dst_crs": dst_crs,
+            "no_data_value": no_data_value,
+        }
         Path(dst).write_bytes(b"II*\x00merged")
 
     def _fake_crop(dataset, space, *, bbox, touch):
@@ -121,6 +125,10 @@ class TestDownload:
             out = _make(tmp_path).download()
         assert out == [tmp_path / "fabdem_V1-2.tif"]
         assert out[0].exists()
+        # #1: the source nodata (-9999) is stamped, not merge_rasters' default 0.
+        assert fake_localise["merge"]["no_data_value"] == -9999.0
+        # #3: an AOI sidecar is written next to the output.
+        assert (tmp_path / "fabdem_V1-2.tif.aoi").exists()
 
     def test_ocean_bundle_skipped_then_empty_raises(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
@@ -136,19 +144,50 @@ class TestDownload:
             with pytest.raises(ValueError, match="no published 1"):
                 _make(tmp_path).download()
 
-    def test_idempotent_skip_existing(
+    def test_idempotent_skip_same_aoi(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
     ):
-        """An existing output is returned without re-downloading."""
+        """A re-request for the same AOI skips the download (sidecar match)."""
+        monkeypatch.setattr(
+            backend_module, "download_bundle", lambda url, dest: dest / "b.zip"
+        )
+        monkeypatch.setattr(
+            backend_module,
+            "extract_tiles",
+            lambda zip_path, dest, names: [dest / n for n in names],
+        )
+        with pytest.warns(LicenseWarning):
+            _make(tmp_path).download()
 
         def _boom(url, dest):
-            raise AssertionError("must not download when the output exists")
+            raise AssertionError("must not download for the same cached AOI")
 
-        (tmp_path / "fabdem_V1-2.tif").write_bytes(b"cached")
         monkeypatch.setattr(backend_module, "download_bundle", _boom)
         with pytest.warns(LicenseWarning):
             out = _make(tmp_path).download()
         assert out == [tmp_path / "fabdem_V1-2.tif"]
+
+    def test_different_aoi_not_skipped(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
+    ):
+        """A same-path request for a different AOI re-fetches (no stale return)."""
+        # A stale output + sidecar from a different AOI must not be reused.
+        (tmp_path / "fabdem_V1-2.tif").write_bytes(b"stale")
+        (tmp_path / "fabdem_V1-2.tif.aoi").write_text("9,9,9.1,9.1", encoding="utf-8")
+        calls: list[str] = []
+        monkeypatch.setattr(
+            backend_module,
+            "download_bundle",
+            lambda url, dest: calls.append(url) or (dest / "b.zip"),
+        )
+        monkeypatch.setattr(
+            backend_module,
+            "extract_tiles",
+            lambda zip_path, dest, names: [dest / n for n in names],
+        )
+        with pytest.warns(LicenseWarning):
+            _make(tmp_path).download()
+        assert calls, "a different-AOI request must re-fetch, not return the stale file"
 
     def test_force_rewrites(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
@@ -184,7 +223,9 @@ class TestDownload:
         monkeypatch.setattr(
             merge_module,
             "merge_rasters",
-            lambda *, src, dst, dst_crs, resampling: Path(dst).write_bytes(b"m"),
+            lambda *, src, dst, dst_crs, resampling, no_data_value=None: Path(
+                dst
+            ).write_bytes(b"m"),
         )
         monkeypatch.setattr(pyr_dataset, "Dataset", _FakeDataset)
         monkeypatch.setattr(

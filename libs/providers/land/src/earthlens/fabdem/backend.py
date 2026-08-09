@@ -176,6 +176,42 @@ class FABDEM(AbstractDataSource):
         """The deterministic output GeoTIFF path for this request."""
         return Path(self.path) / f"fabdem_{self._dataset.version}.tif"
 
+    @property
+    def _aoi_tag(self) -> str:
+        """The AOI bbox as a stable string, used to key the skip-if-exists cache."""
+        return (
+            f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
+        )
+
+    def _is_cached(self, target: Path) -> bool:
+        """Whether `target` already holds this exact AOI (AOI-aware skip).
+
+        The output filename does not encode the AOI, so a bare
+        exists-check would return a previous AOI's raster for a new bbox in the
+        same `path`. A `<target>.aoi` sidecar records the bbox the file was
+        written for; the skip only fires when it matches the current request and
+        `force` is off.
+
+        Args:
+            target: The candidate output GeoTIFF path.
+
+        Returns:
+            bool: `True` when a matching cached output exists and may be reused.
+        """
+        sidecar = target.with_suffix(target.suffix + ".aoi")
+        return (
+            not self._force
+            and target.exists()
+            and sidecar.exists()
+            and sidecar.read_text(encoding="utf-8").strip() == self._aoi_tag
+        )
+
+    def _write_aoi_sidecar(self, target: Path) -> None:
+        """Record the AOI `target` was written for, next to it."""
+        target.with_suffix(target.suffix + ".aoi").write_text(
+            self._aoi_tag, encoding="utf-8"
+        )
+
     def download(
         self,
         progress_bar: bool = True,
@@ -256,8 +292,10 @@ class FABDEM(AbstractDataSource):
             ValueError: If no tile could be fetched for the AOI.
         """
         target = self._target
-        if target.exists() and not self._force:
-            logger.info(f"FABDEM: {target.name} already exists; skipping download.")
+        if self._is_cached(target):
+            logger.info(
+                f"FABDEM: {target.name} already holds this AOI; skipping download."
+            )
             return [target]
 
         tifs: list[Path] = []
@@ -287,7 +325,9 @@ class FABDEM(AbstractDataSource):
         The pyramids-consuming core: `merge_rasters` mosaics the intersecting 1°
         COGs (FABDEM is already EPSG:4326, so no reprojection), then
         `crop_to_aoi` clips to the AOI bbox — or to the exact polygon when the
-        request carried an `aoi=` polygon.
+        request carried an `aoi=` polygon. The source no-data value is stamped on
+        the mosaic (`merge_rasters` otherwise defaults it to `0`, which would
+        wrongly mark every genuine 0 m sea-level cell as missing).
 
         Args:
             tifs: The extracted 1° `.tif` tiles (WGS84).
@@ -306,6 +346,7 @@ class FABDEM(AbstractDataSource):
             dst=str(merged),
             dst_crs=None,
             resampling="bilinear",
+            no_data_value=self._dataset.nodata,
         )
 
         dataset = PyramidsDataset.read_file(str(merged))
@@ -331,6 +372,7 @@ class FABDEM(AbstractDataSource):
             staged.unlink(missing_ok=True)
             raise
         close_quietly(dataset)
+        self._write_aoi_sidecar(target)
         try:
             merged.unlink(missing_ok=True)
         except OSError:

@@ -45,6 +45,8 @@ class Dataset(BaseModel):
         units: Physical units of the band (`"m"`).
         dtype: Pixel data type (`"float32"`).
         crs: Native CRS as an EPSG string (`"EPSG:4326"`).
+        nodata: The source tiles' no-data value (`-9999.0`), stamped on the
+            mosaic so genuine 0 m (sea-level) cells are not lost.
         spatial_resolution: Nominal resolution in metres (`30`).
         source_url: The dataset landing page.
 
@@ -70,6 +72,7 @@ class Dataset(BaseModel):
     units: str = "m"
     dtype: str = "float32"
     crs: str = "EPSG:4326"
+    nodata: float = -9999.0
     spatial_resolution: float | None = None
     source_url: str = ""
 

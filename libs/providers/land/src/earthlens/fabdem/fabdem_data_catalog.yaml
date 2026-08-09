@@ -25,5 +25,6 @@ datasets:
     units: m
     dtype: float32
     crs: EPSG:4326
+    nodata: -9999.0
     spatial_resolution: 30
     source_url: "https://data.bris.ac.uk/data/dataset/s5hqmjcdj8yo2ibzi9b4ew3sn"

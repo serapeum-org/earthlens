@@ -19,10 +19,11 @@ _GT = (-24.54208333, 0.0008333333333333334, 0.0, 71.13375, 0.0, -0.0008333333333
 class _FakeSource:
     """Stand-in for a lazily-opened pyramids Dataset over the EFHM."""
 
-    def __init__(self, geo, columns: int, rows: int):
+    def __init__(self, geo, columns: int, rows: int, no_data_value=(-9999.0,)):
         self.geotransform = geo
         self.columns = columns
         self.rows = rows
+        self.no_data_value = no_data_value
         self.reads: list[list[int]] = []
 
     def read_array(self, window: list[int]) -> np.ndarray:
@@ -142,11 +143,15 @@ class TestFetch:
 
     def test_writes_one_geotiff_per_rp(self, tmp_path: Path, fake_pyramids: dict):
         """A download reads the AOI window and writes one GeoTIFF."""
+        # #2: the source's own nodata (not the catalog default) is carried through.
+        fake_pyramids["source"].no_data_value = (-8888.0,)
         out = _make(tmp_path, return_periods=[100]).download()
         assert out == [tmp_path / "efhm_RP100.tif"]
         assert out[0].exists()
         assert fake_pyramids["source"].reads == [[35210, 22960, 241, 241]]
-        assert fake_pyramids["create"]["nodata"] == -9999.0
+        assert fake_pyramids["create"]["nodata"] == -8888.0
+        # #3: an AOI sidecar is written next to the output.
+        assert (tmp_path / "efhm_RP100.tif.aoi").exists()
 
     def test_outside_coverage_raises(self, tmp_path: Path, fake_pyramids: dict):
         """An AOI outside the EFHM coverage raises rather than writing."""
@@ -158,12 +163,20 @@ class TestFetch:
                 lat_lim=[50.0, 51.0], lon_lim=[50.0, 51.0], path=tmp_path
             ).download()
 
-    def test_idempotent_skip(self, tmp_path: Path, fake_pyramids: dict):
-        """An existing output is returned without a windowed read."""
-        (tmp_path / "efhm_RP100.tif").write_bytes(b"cached")
+    def test_idempotent_skip_same_aoi(self, tmp_path: Path, fake_pyramids: dict):
+        """A re-request for the same AOI skips the windowed read (sidecar match)."""
+        _make(tmp_path, return_periods=[100]).download()
+        fake_pyramids["source"].reads.clear()
         out = _make(tmp_path, return_periods=[100]).download()
         assert out == [tmp_path / "efhm_RP100.tif"]
         assert fake_pyramids["source"].reads == []
+
+    def test_different_aoi_not_skipped(self, tmp_path: Path, fake_pyramids: dict):
+        """A same-path request for a different AOI re-reads (no stale return)."""
+        (tmp_path / "efhm_RP100.tif").write_bytes(b"stale")
+        (tmp_path / "efhm_RP100.tif.aoi").write_text("9,9,9.1,9.1", encoding="utf-8")
+        _make(tmp_path, return_periods=[100]).download()
+        assert fake_pyramids["source"].reads, "a different AOI must re-read the window"
 
     def test_write_failure_cleans_up(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch

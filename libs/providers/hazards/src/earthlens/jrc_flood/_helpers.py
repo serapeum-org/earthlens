@@ -13,6 +13,18 @@ pixel window; `pixel_window` turns a geographic bbox into that window.
 from __future__ import annotations
 
 import math
+import os
+
+#: GDAL `/vsicurl` HTTP defaults — skip the per-open sidecar probes
+#: (`.aux.xml` / `.ovr`) against the JRC host and bound the retry/timeout, so
+#: each windowed open issues one range request instead of several.
+_GDAL_HTTP_ENV: dict[str, str] = {
+    "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
+    "CPL_VSIL_CURL_ALLOWED_EXTENSIONS": ".tif",
+    "GDAL_HTTP_TIMEOUT": "30",
+    "GDAL_HTTP_MAX_RETRY": "3",
+    "GDAL_HTTP_RETRY_DELAY": "2",
+}
 
 #: Root of the JRC CEMS-EFAS flood-hazard directory (anonymous HTTPS, no auth).
 BASE_URL: str = (
@@ -21,6 +33,38 @@ BASE_URL: str = (
 
 #: `strftime`-free file-name template; `{rp}` is the integer return period.
 FILENAME_TEMPLATE: str = "Europe_RP{rp}_filled_depth.tif"
+
+
+def configure_gdal_http() -> None:
+    """Apply the `/vsicurl` HTTP environment defaults (idempotent).
+
+    Sets each key in `_GDAL_HTTP_ENV` only when absent, so a caller that has
+    already tuned GDAL is left untouched. Called once before every windowed read
+    to avoid per-open sidecar-probe requests against the JRC host.
+    """
+    for key, value in _GDAL_HTTP_ENV.items():
+        os.environ.setdefault(key, value)
+
+
+def source_no_data(dataset: object, *, default: float = -9999.0) -> float:
+    """Return an opened raster's first-band no-data value, or `default`.
+
+    `pyramids` exposes `no_data_value` as a per-band tuple (e.g. `(-9999.0,)` or
+    `(None,)`); the windowed crop carries the source value through so genuinely
+    empty cells stay flagged, falling back to `default` when the source declares
+    none.
+
+    Args:
+        dataset: An opened `pyramids.Dataset`.
+        default: The value to use when the source declares no no-data.
+
+    Returns:
+        float: The first-band no-data value, or `default`.
+    """
+    nodata = getattr(dataset, "no_data_value", None)
+    if isinstance(nodata, (list, tuple)) and nodata and nodata[0] is not None:
+        return float(nodata[0])
+    return default
 
 
 def efhm_url(

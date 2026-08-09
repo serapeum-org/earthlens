@@ -60,6 +60,46 @@ class TestPixelWindow:
         assert 0 < cols <= _COLUMNS and 0 < rows <= _ROWS
 
 
+class TestConfigureGdalHttp:
+    """Tests for configure_gdal_http."""
+
+    def test_sets_vsicurl_defaults(self, monkeypatch: pytest.MonkeyPatch):
+        """The idempotent tuning sets the readdir + extension defaults."""
+        monkeypatch.delenv("GDAL_DISABLE_READDIR_ON_OPEN", raising=False)
+        h.configure_gdal_http()
+        import os
+
+        assert os.environ["GDAL_DISABLE_READDIR_ON_OPEN"] == "EMPTY_DIR"
+
+    def test_does_not_override_existing(self, monkeypatch: pytest.MonkeyPatch):
+        """An already-set value is left untouched (setdefault semantics)."""
+        monkeypatch.setenv("GDAL_HTTP_TIMEOUT", "99")
+        h.configure_gdal_http()
+        import os
+
+        assert os.environ["GDAL_HTTP_TIMEOUT"] == "99"
+
+
+class TestSourceNoData:
+    """Tests for source_no_data."""
+
+    def test_reads_first_band_value(self):
+        """A declared per-band no-data tuple yields its first value."""
+
+        class _DS:
+            no_data_value = (-8888.0,)
+
+        assert h.source_no_data(_DS()) == -8888.0
+
+    def test_falls_back_when_absent(self):
+        """A missing / None no-data falls back to the default."""
+
+        class _DS:
+            no_data_value = (None,)
+
+        assert h.source_no_data(_DS(), default=-1.0) == -1.0
+
+
 class TestWindowOrigin:
     """Tests for window_origin."""
 

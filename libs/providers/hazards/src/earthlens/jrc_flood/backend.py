@@ -33,7 +33,13 @@ from earthlens.base import (
     TemporalExtent,
     mask_to_geometry,
 )
-from earthlens.jrc_flood._helpers import efhm_url, pixel_window, window_origin
+from earthlens.jrc_flood._helpers import (
+    configure_gdal_http,
+    efhm_url,
+    pixel_window,
+    source_no_data,
+    window_origin,
+)
 from earthlens.jrc_flood.catalog import Catalog, Dataset
 
 
@@ -228,6 +234,41 @@ class JRCFlood(AbstractDataSource):
         """The AOI as `(west, south, east, north)` in degrees."""
         return (self.space.west, self.space.south, self.space.east, self.space.north)
 
+    @property
+    def _aoi_tag(self) -> str:
+        """The AOI bbox as a stable string, used to key the skip-if-exists cache."""
+        return (
+            f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
+        )
+
+    def _is_cached(self, target: Path) -> bool:
+        """Whether `target` already holds this exact AOI (AOI-aware skip).
+
+        The output filename encodes the return period but not the AOI, so a bare
+        exists-check would return a previous AOI's raster for a new bbox in the
+        same `path`. A `<target>.aoi` sidecar records the bbox the file was
+        written for; the skip only fires when it matches and `force` is off.
+
+        Args:
+            target: The candidate output GeoTIFF path.
+
+        Returns:
+            bool: `True` when a matching cached output exists and may be reused.
+        """
+        sidecar = target.with_suffix(target.suffix + ".aoi")
+        return (
+            not getattr(self, "_force", False)
+            and target.exists()
+            and sidecar.exists()
+            and sidecar.read_text(encoding="utf-8").strip() == self._aoi_tag
+        )
+
+    def _write_aoi_sidecar(self, target: Path) -> None:
+        """Record the AOI `target` was written for, next to it."""
+        target.with_suffix(target.suffix + ".aoi").write_text(
+            self._aoi_tag, encoding="utf-8"
+        )
+
     def download(
         self,
         progress_bar: bool = True,
@@ -292,10 +333,11 @@ class JRCFlood(AbstractDataSource):
         """Read the AOI window of one return-period GeoTIFF and write the crop.
 
         Opens the whole-Europe GeoTIFF lazily over `/vsicurl` (HTTP range
-        requests), maps the AOI bbox to a pixel window, reads **only** that
-        window with `pyramids`, rebuilds a small `Dataset` from the window (with
-        the shifted geotransform), applies the polygon mask when the request
-        carried an `aoi=` polygon, and writes the GeoTIFF.
+        requests, tuned via `configure_gdal_http`), maps the AOI bbox to a pixel
+        window, reads **only** that window with `pyramids`, rebuilds a small
+        `Dataset` from the window (with the shifted geotransform and the source's
+        own no-data value), applies the polygon mask when the request carried an
+        `aoi=` polygon, and writes the GeoTIFF.
 
         Args:
             product: The `RemoteProduct` whose `metadata` carries `rp` + `url`.
@@ -313,10 +355,11 @@ class JRCFlood(AbstractDataSource):
         rp = product.metadata["rp"]
         url = product.metadata["url"]
         target = Path(self.path) / f"{product.id}.tif"
-        if target.exists() and not getattr(self, "_force", False):
-            logger.info(f"JRCFlood: {target.name} already exists; skipping.")
+        if self._is_cached(target):
+            logger.info(f"JRCFlood: {target.name} already holds this AOI; skipping.")
             return target
 
+        configure_gdal_http()
         source = PyramidsDataset.read_file(url)
         try:
             geo = source.geotransform
@@ -333,6 +376,9 @@ class JRCFlood(AbstractDataSource):
             )
             array = source.read_array(window=[col_off, row_off, cols, rows])
             window_geo = window_origin(geo, col_off, row_off)
+            # Carry the source's own no-data through rather than assuming the
+            # catalog value; fall back to the catalog nodata if it declares none.
+            nodata = source_no_data(source, default=self._dataset.nodata)
         finally:
             close_quietly(source)
 
@@ -340,7 +386,7 @@ class JRCFlood(AbstractDataSource):
             array,
             geo=window_geo,
             epsg=4326,
-            no_data_value=self._dataset.nodata,
+            no_data_value=nodata,
         )
         # A polygon `aoi=` is only expressed to the window as its bbox; apply the
         # exact polygon here (a no-op when the request carries no polygon).
@@ -355,4 +401,5 @@ class JRCFlood(AbstractDataSource):
             close_quietly(cropped)
             staged.unlink(missing_ok=True)
             raise
+        self._write_aoi_sidecar(target)
         return target
