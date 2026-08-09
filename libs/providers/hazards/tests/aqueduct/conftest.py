@@ -46,9 +46,7 @@ def _synthetic_gdf() -> gpd.GeoDataFrame:
     }
     for offset, column in enumerate(_all_columns()):
         data[column] = [float(offset * 10 + i) for i in range(len(units))]
-    return gpd.GeoDataFrame(
-        data, geometry=[u[2] for u in units], crs="EPSG:4326"
-    )
+    return gpd.GeoDataFrame(data, geometry=[u[2] for u in units], crs="EPSG:4326")
 
 
 def _write_shapefile_zip(stem: str, zip_path: Path) -> None:

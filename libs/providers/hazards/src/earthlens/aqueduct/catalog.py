@@ -162,7 +162,9 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
         "base_url": str(data.get("base_url") or "").rstrip("/"),
         "license": str(data.get("license") or ""),
         "attribution": str(data.get("attribution") or ""),
-        "indicators": {str(k): str(v) for k, v in (data.get("indicators") or {}).items()},
+        "indicators": {
+            str(k): str(v) for k, v in (data.get("indicators") or {}).items()
+        },
         "years": {str(k): str(v) for k, v in (data.get("years") or {}).items()},
         "scenarios": scenarios,
         "return_periods": {

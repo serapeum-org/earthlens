@@ -30,9 +30,7 @@ def test_cache_miss_downloads_via_http_client(
             return Path(dest)
 
     monkeypatch.setattr("earthlens.aqueduct.backend.HttpClient", _FakeClient)
-    fc = Aqueduct(
-        path=tmp_path, cache_dir=empty_cache, return_period=100
-    ).download()
+    fc = Aqueduct(path=tmp_path, cache_dir=empty_cache, return_period=100).download()
     assert (empty_cache / Catalog().get("country").zip).exists()
     assert len(fc) == 3
 
@@ -42,7 +40,9 @@ def _backend(cache: Path, tmp_path: Path, **kwargs) -> Aqueduct:
     return Aqueduct(path=tmp_path, cache_dir=cache, **kwargs)
 
 
-def test_download_returns_feature_collection(country_cache: Path, tmp_path: Path) -> None:
+def test_download_returns_feature_collection(
+    country_cache: Path, tmp_path: Path
+) -> None:
     """The default download returns a FeatureCollection of admin units."""
     fc = _backend(country_cache, tmp_path, return_period=100).download()
     assert isinstance(fc, FeatureCollection)
@@ -84,7 +84,9 @@ def test_output_kind_tracks_geometry_flag(country_cache: Path, tmp_path: Path) -
 
 def test_country_name_filters_units(country_cache: Path, tmp_path: Path) -> None:
     """A country name keeps only the matching unit, case-insensitively."""
-    fc = _backend(country_cache, tmp_path, country="alpha", return_period=100).download()
+    fc = _backend(
+        country_cache, tmp_path, country="alpha", return_period=100
+    ).download()
     assert list(fc["unit_name"]) == ["ALPHA"]
 
 

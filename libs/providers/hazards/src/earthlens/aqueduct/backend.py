@@ -314,8 +314,9 @@ class Aqueduct(AbstractDataSource):
             logger.info(f"Aqueduct: using cached {zip_name}")
             return zip_path
         url = cast("str", product.href)
-        logger.info(f"Aqueduct: downloading {zip_name} for admin level "
-                    f"{self._admin_level!r}")
+        logger.info(
+            f"Aqueduct: downloading {zip_name} for admin level {self._admin_level!r}"
+        )
         HttpClient(timeout=self._timeout).download(
             url, zip_path, expect_magic=_ZIP_MAGIC, progress=False
         )
@@ -369,8 +370,7 @@ class Aqueduct(AbstractDataSource):
             Path: The written file path.
         """
         stem = (
-            f"aqueduct_{self._admin_level}_{self._metric}_{self._year}_"
-            f"{self._scenario}"
+            f"aqueduct_{self._admin_level}_{self._metric}_{self._year}_{self._scenario}"
         )
         out_path = self.root_dir / f"{stem}.gpkg"
         collection.to_file(str(out_path), driver="GPKG")

@@ -188,8 +188,7 @@ def _extract_members(archive: zipfile.ZipFile, stem: str, dest_dir: Path) -> Pat
             shp_path = out
     if shp_path is None:
         raise FileNotFoundError(
-            f"{stem}.shp is not a member of the archive (members: "
-            f"{sorted(members)})."
+            f"{stem}.shp is not a member of the archive (members: {sorted(members)})."
         )
     return shp_path
 

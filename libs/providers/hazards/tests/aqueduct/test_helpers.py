@@ -7,8 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from earthlens.aqueduct import AdminLevel, Catalog
-from earthlens.aqueduct import _helpers
+from earthlens.aqueduct import AdminLevel, Catalog, _helpers
 from earthlens.base import SpatialExtent
 
 pytestmark = pytest.mark.aqueduct
