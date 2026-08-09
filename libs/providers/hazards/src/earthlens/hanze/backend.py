@@ -101,6 +101,37 @@ def _normalize_country(country: str | list[str] | None) -> set[str]:
     return codes
 
 
+def _normalize_region(region: str | list[str] | None) -> set[str]:
+    """Validate and upper-case the requested NUTS-3 region codes.
+
+    Args:
+        region: One NUTS-3 code, a list of them, or `None` to keep every region.
+
+    Returns:
+        set[str]: The upper-cased codes; empty when `None`.
+
+    Raises:
+        ValueError: If a value is not a 5-character NUTS-3 code (a 2-letter
+            country prefix plus three alphanumerics). Like `country=`, a
+            malformed code would otherwise filter every row away and look like an
+            empty result rather than a mistake.
+    """
+    codes: set[str] = set()
+    for raw in _as_list(region):
+        code = raw.strip().upper()
+        well_formed = (
+            len(code) == 5 and code.isascii() and code.isalnum() and code[:2].isalpha()
+        )
+        if not well_formed:
+            raise ValueError(
+                f"region= must be 5-character NUTS-3 code(s) (e.g. 'DE300', "
+                f"'NL414'); got {raw!r}. A malformed code matches nothing and "
+                "looks like an empty result."
+            )
+        codes.add(code)
+    return codes
+
+
 class HANZE(AbstractDataSource):
     """HANZE historical-flood-impacts backend (per-instance output kind).
 
@@ -178,7 +209,8 @@ class HANZE(AbstractDataSource):
             timeout: Per-request timeout in seconds for the Zenodo downloads.
 
         Raises:
-            ValueError: If a `country` value is not a 2-letter ISO2 code, or a
+            ValueError: If a `country` value is not a 2-letter ISO2 code, a
+                `region` value is not a 5-character NUTS-3 code, or a
                 `flood_type` value is not a registered HANZE flood type.
         """
         self._catalog = Catalog()
@@ -193,7 +225,7 @@ class HANZE(AbstractDataSource):
         self._record = self._catalog.record
         self._geo = self._catalog.geometry
         self._country = _normalize_country(country)
-        self._region = {code.strip().upper() for code in _as_list(region)}
+        self._region = _normalize_region(region)
         # Validate flood types against the catalog (did-you-mean hint on a typo).
         self._flood_types = [
             self._resolve_flood_type(name) for name in _as_list(flood_type)

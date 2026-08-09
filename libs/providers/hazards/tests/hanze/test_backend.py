@@ -10,7 +10,7 @@ import pytest
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.hanze import HANZE
-from earthlens.hanze.backend import _as_list, _normalize_country
+from earthlens.hanze.backend import _as_list, _normalize_country, _normalize_region
 
 from .conftest import EVENTS_NAME, REGIONS_NAME, FakeHttpClient
 
@@ -41,6 +41,16 @@ class TestHelpers:
         """A non-2-letter code is rejected rather than silently matching nothing."""
         with pytest.raises(ValueError, match="ISO2"):
             _normalize_country([bad])
+
+    def test_normalize_region_upper(self) -> None:
+        """NUTS-3 codes are upper-cased into a set."""
+        assert _normalize_region(["de300", "nl414"]) == {"DE300", "NL414"}
+
+    @pytest.mark.parametrize("bad", ["DE30", "DE3000", "12345", "D3400"])
+    def test_normalize_region_rejects_malformed(self, bad: str) -> None:
+        """A code that is not a 5-char NUTS-3 code is rejected."""
+        with pytest.raises(ValueError, match="NUTS-3"):
+            _normalize_region([bad])
 
 
 @pytest.mark.hanze
