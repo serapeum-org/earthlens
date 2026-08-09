@@ -15,6 +15,7 @@ from earthlens.cli.validate import (
     _validate_drought,
     _validate_erddap,
     _validate_goes,
+    _validate_hanze,
     _validate_nrel,
     _validate_nwp,
     _validate_osm,
@@ -128,6 +129,28 @@ class TestValidateOsm:
         )
         checked, issues = _validate_osm(catalog)
         assert any("missing pyrosm_method" in i for i in issues)
+
+
+class TestValidateHanze:
+    """Tests for the HANZE structural lint."""
+
+    def test_flags_missing_top_level_blocks(self):
+        """A catalog missing record / geometry / files / columns flags each."""
+        catalog = SimpleNamespace(
+            datasets={"River": SimpleNamespace(description="")},
+            record=None,
+            geometry=None,
+            files={},
+            columns={},
+        )
+        checked, issues = _validate_hanze(catalog)
+        joined = " ".join(issues)
+        assert checked == 1
+        assert "River: missing description" in joined
+        assert "record: missing pinned Zenodo record id" in joined
+        assert "geometry: missing shapefile member_stem" in joined
+        assert "files: missing required file 'events'" in joined
+        assert "columns: missing required key 'regions_nuts3'" in joined
 
 
 class TestValidateSoilgrids:

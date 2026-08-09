@@ -306,9 +306,11 @@ def _validate_hanze(catalog: Any) -> tuple[int, list[str]]:
     """Each HANZE flood type needs a description; the record/geometry stay pinned.
 
     Beyond the per-flood-type lint, the single-product HANZE catalog carries a
-    pinned Zenodo record, a file map and the region-geometry join at the top
-    level; a stanza that dropped any of those would still load, so they are
-    checked here rather than left to the row model.
+    pinned Zenodo record, a file map, the region-geometry join and the
+    friendly-to-header column map at the top level; a stanza that dropped any of
+    those would still load, so they are checked here rather than left to the row
+    model. The column keys are the ones the backend's `_filter_events` reads, so a
+    catalog missing them passes structural load but breaks at fetch time.
     """
     checked, issues = _lint(catalog, lambda k, r: _require(k, r, ("description",)))
     record = getattr(catalog, "record", None)
@@ -321,6 +323,10 @@ def _validate_hanze(catalog: Any) -> tuple[int, list[str]]:
     for required in ("events", "regions"):
         if required not in files:
             issues.append(f"files: missing required file {required!r}")
+    columns = getattr(catalog, "columns", None) or {}
+    for required in ("country_code", "type", "year", "regions_nuts3"):
+        if required not in columns:
+            issues.append(f"columns: missing required key {required!r}")
     return checked, issues
 
 
