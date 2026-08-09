@@ -641,11 +641,12 @@ class HANZE(AbstractDataSource):
 
         if self.OUTPUT_KIND == "vector":
             out_path = self.root_dir / (self._result_stem("hanze_regions") + ".gpkg")
-            if len(result):
-                result.to_file(str(out_path), driver="GPKG")
+            # Written unconditionally — an empty result still writes a schema-only
+            # GeoPackage, so the vector path matches the tabular one (which always
+            # writes a header-only CSV) and a caller globbing `path` finds a file.
+            result.to_file(str(out_path), driver="GPKG")
             logger.info(
-                f"HANZE: returned a FeatureCollection ({len(result)} affected "
-                f"region(s))."
+                f"HANZE: {len(result)} affected region(s) written to {out_path}."
             )
             return result
 

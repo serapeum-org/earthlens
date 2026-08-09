@@ -245,11 +245,12 @@ class TestDownloadVector:
         assert list(hanze_root.glob("hanze_regions-*.gpkg"))
 
     def test_empty_geometry(self, hanze_root: Path) -> None:
-        """A request matching no events returns the empty region FC."""
+        """A no-match request returns the empty FC and still writes a GeoPackage."""
         fc = _tabular(hanze_root, country="ES", with_geometry=True).download(
             progress_bar=False
         )
         assert len(fc) == 0
+        assert list(hanze_root.glob("hanze_regions*.gpkg")), "empty GeoPackage written"
 
     def test_bbox_clips_out_of_box_regions(self, hanze_root: Path) -> None:
         """A bbox drops affected regions that lie outside it (cross-border event)."""
