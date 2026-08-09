@@ -410,7 +410,7 @@ class HANZE(AbstractDataSource):
         """Download one catalog file into `root_dir`, reusing a cached copy.
 
         Args:
-            key: A logical file key (`"events"`, `"regions"`).
+            key: A logical file key (`"events"`, `"regions"`, or `"region_names"`).
             expect_magic: Optional leading-byte guard (one prefix or a tuple of
                 acceptable prefixes) rejecting an error page served with a 200
                 status.
@@ -596,17 +596,19 @@ class HANZE(AbstractDataSource):
         """Join the filtered events to their affected NUTS-3 region polygons.
 
         When the request carries a bbox, the joined regions are additionally
-        clipped to it: an event that touched an in-bbox region also lists regions
-        outside the box, and returning those would put polygons well outside a
-        spatial query on the map. Clipping keeps the vector answer to "affected
-        regions within the box", matching what a bbox spatial query implies.
+        restricted to it by bounding-box intersection (`GeoDataFrame.cx`): an
+        event that touched an in-bbox region also lists regions outside the box,
+        and returning those would put polygons well outside a spatial query on
+        the map. A region whose extent intersects the box is kept **whole** (it
+        is selected, not geometrically trimmed), so the vector answer stays
+        "affected regions within the box", matching the tabular bbox path.
 
         Args:
             events: The filtered events table.
 
         Returns:
-            FeatureCollection: One polygon per affected region (clipped to the
-                bbox when one is set), CRS `EPSG:4326`.
+            FeatureCollection: One polygon per affected region (restricted to the
+                regions intersecting the bbox when one is set), CRS `EPSG:4326`.
         """
         regions = self._load_regions()
         geometry = self._geo

@@ -78,8 +78,9 @@ region) and `geometry`, in WGS84 (`EPSG:4326`) — the shapefile ships in ETRS89
 reprojected for you. It is written to a GeoPackage under `path`.
 
 When you combine `with_geometry=True` with a `lat_lim` / `lon_lim` (or `aoi=`) box, the returned regions are
-**clipped to that box**: an event that touched an in-box region may also list regions outside it, and those are
-dropped so the map shows only the affected regions within your query extent.
+**restricted to that box** by bounding-box intersection: an event that touched an in-box region may also list
+regions outside it, and those are dropped so the map shows only the affected regions within your query extent. A
+region whose extent intersects the box is kept whole (selected, not geometrically trimmed).
 
 ## Notes
 
