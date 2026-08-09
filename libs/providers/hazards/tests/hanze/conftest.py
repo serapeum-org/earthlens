@@ -126,11 +126,22 @@ class FakeHttpClient:
         self.calls: list[str] = []
 
     def download(self, url: str, dest: Any, **kwargs: Any) -> Path:
-        """Copy the fixture whose name appears in `url` to `dest`, recording it."""
+        """Copy the fixture whose name appears in `url` to `dest`, recording it.
+
+        Honours `expect_magic` the way the real `HttpClient.download` does — a
+        body not starting with the required prefix raises `ValueError` — so the
+        download-time content guard can be exercised offline.
+        """
         dest = Path(dest)
         self.calls.append(url)
         name = next(name for name in self._sources if name in url)
-        dest.write_bytes(self._sources[name].read_bytes())
+        payload = self._sources[name].read_bytes()
+        magic = kwargs.get("expect_magic")
+        if magic is not None and not payload.startswith(magic):
+            raise ValueError(
+                f"{url} returned a body that does not start with {magic!r}"
+            )
+        dest.write_bytes(payload)
         return dest
 
 

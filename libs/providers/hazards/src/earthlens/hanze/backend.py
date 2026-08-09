@@ -376,10 +376,16 @@ class HANZE(AbstractDataSource):
     def _load_events(self) -> pd.DataFrame:
         """Download and parse the HANZE events / impacts CSV.
 
+        The download is guarded by the events header's leading bytes (`ID,`), so
+        an HTML error page served with a `200` status (a proxy / CDN hiccup) is
+        rejected at the download site rather than cached under the CSV name and
+        failing confusingly at `read_csv` on every later call — the same guard
+        the region zip (`PK`) and the sibling `emdat` xlsx (`PK`) use.
+
         Returns:
             pandas.DataFrame: The full events table, HANZE's documented headers.
         """
-        local = self._download_file("events")
+        local = self._download_file("events", expect_magic=b"ID,")
         return pd.read_csv(local)
 
     def _load_regions(self) -> FeatureCollection:

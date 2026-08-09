@@ -270,6 +270,15 @@ class TestDownloadAndCache:
         backend.download(progress_bar=False)
         assert any(REGIONS_NAME in url for url in fake_http.calls)
 
+    def test_html_error_page_rejected(self, tmp_path: Path) -> None:
+        """An HTML error page served for the events CSV is rejected, not cached."""
+        bad = tmp_path / "_src_bad.html"
+        bad.write_text("<html>503 Service Unavailable</html>", encoding="utf-8")
+        backend = HANZE(path=str(tmp_path), country="DE")
+        backend._http = FakeHttpClient({EVENTS_NAME: bad})  # type: ignore[assignment]
+        with pytest.raises(ValueError, match="does not start with"):
+            backend.download(progress_bar=False)
+
 
 @pytest.mark.hanze
 class TestResultStem:
