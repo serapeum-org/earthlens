@@ -460,6 +460,7 @@ class EarthLens:
              'global-forest-watch', 'global-solar-atlas',
              'global-wind-atlas', 'gloh2o', 'goes', 'google-earth-engine',
              'grdc-caravan', 'gsa', 'gwa',
+             'hanze',
              'hdx', 'himawari', 'human-settlement', 'inform', 'insar', 'ioos',
              'isric', 'iucn', 'jaxa', 'jaxa-earth', 'landsat',
              'mswep', 'mswx',
