@@ -654,6 +654,9 @@ class HANZE(AbstractDataSource):
 
         Raises:
             requests.HTTPError: If a Zenodo download returns a non-2xx status.
+            ValueError: If a download's body fails its content guard (an HTML
+                error page served with a 200 status), or `with_geometry=True` and
+                the region archive has no `<member_stem>.shp` member.
         """
         self._progress = progress_bar
         results = self._api()
