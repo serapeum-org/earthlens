@@ -13,7 +13,7 @@ from __future__ import annotations
 __all__ = ["BACKENDS"]
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 21 data-source keys.
+#: distribution's 24 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
@@ -34,6 +34,12 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'openstreetmap': ('earthlens.osm', 'OSM', 'osm', {}),
     'overpass': ('earthlens.osm', 'OSM', 'osm', {}),
     'ohsome': ('earthlens.osm', 'OSM', 'osm', {}),
+    # NSI — US object-level flood exposure & loss over three keyless sources.
+    # `nsi` defaults to source='structures'; the source-pinning aliases carry a
+    # default_kwargs so `EarthLens("nfip")` does not silently fall back to it.
+    'nsi': ('earthlens.nsi', 'NSI', '', {}),
+    'nfip': ('earthlens.nsi', 'NSI', '', {'source': 'nfip'}),
+    'nfhl': ('earthlens.nsi', 'NSI', '', {'source': 'nfhl'}),
     'admin': ('earthlens.admin', 'AdminBoundaries', '', {}),
     'admin-boundaries': ('earthlens.admin', 'AdminBoundaries', '', {}),
     'geoboundaries': ('earthlens.admin', 'AdminBoundaries', '', {}),
