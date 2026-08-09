@@ -6,9 +6,11 @@ University of Bristol / Fathom) is the Copernicus GLO-30 DSM with forest canopy
 and building heights removed — a ~30 m (1 arc-second) global bare-earth terrain
 model, the recommended DEM for flood routing.
 
-A request is a bbox (`lat_lim` / `lon_lim`); the DEM is static, so `start` /
-`end` are accepted for facade parity and ignored, and the facade-forwarded
-`aggregate=` is rejected (there is no temporal axis to reduce). The backend maps
+A request is a bbox (`lat_lim` / `lon_lim`) — FABDEM has a single `elevation`
+band, so the backend is facet-only (it declares no `variables` axis). The DEM is
+static, so `start` / `end` are accepted for facade parity and ignored, and the
+facade-forwarded `aggregate=` is rejected (there is no temporal axis to reduce).
+The backend maps
 the bbox to the intersecting Bristol 10° bundle zip(s), downloads them over
 anonymous HTTPS, extracts only the intersecting 1° Cloud-Optimized GeoTIFF
 tiles, then uses `pyramids` to mosaic and crop to the AOI — writing one
@@ -22,7 +24,6 @@ and anonymous, so there is no auth module. The GIS work happens locally in
 
 from __future__ import annotations
 
-import difflib
 from pathlib import Path
 
 from loguru import logger
@@ -93,7 +94,6 @@ class FABDEM(AbstractDataSource):
         end: str = "",
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
-        variables: list[str] | None = None,
         temporal_resolution: str = "static",
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
@@ -107,9 +107,6 @@ class FABDEM(AbstractDataSource):
             end: Accepted for facade parity; ignored.
             lat_lim: `[lat_min, lat_max]` bounding-box latitudes. Required.
             lon_lim: `[lon_min, lon_max]` bounding-box longitudes. Required.
-            variables: Optional band name(s); defaults to the row's single
-                `elevation` band. A name other than that band raises with a
-                did-you-mean.
             temporal_resolution: Advisory label only (FABDEM is static).
             path: Output directory for the written GeoTIFF.
             fmt: Accepted for facade parity; unused.
@@ -117,58 +114,27 @@ class FABDEM(AbstractDataSource):
                 defaults to the bundled catalog.
 
         Raises:
-            ValueError: If the bounding box is missing, or a requested variable
-                is not the row's elevation band.
-            TypeError: If `variables` is a mapping (the band is fixed).
+            ValueError: If the bounding box is missing.
         """
         if lat_lim is None or lon_lim is None:
             raise ValueError(
                 "FABDEM requires a bounding box (lat_lim=[s, n], lon_lim=[w, e]) "
                 "— a DEM subset has no default global extent."
             )
-        if isinstance(variables, dict):
-            raise TypeError(
-                "FABDEM `variables` must be a list of band names (or omitted), "
-                "not a mapping; the only band is 'elevation'."
-            )
 
         self._catalog = catalog if catalog is not None else Catalog()
         self._dataset: Dataset = self._catalog.get("fabdem")
 
-        resolved_variables = list(variables) if variables else [self._dataset.band]
-        self._validate_variables(resolved_variables)
-
         super().__init__(
             start=start,
             end=end,
-            variables=resolved_variables,
+            variables=[self._dataset.band],
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim,
             lon_lim=lon_lim,
             fmt=fmt,
             path=path,
         )
-
-    def _validate_variables(self, variables: list[str]) -> None:
-        """Check every requested variable is the row's elevation band.
-
-        Args:
-            variables: The resolved band name(s).
-
-        Raises:
-            ValueError: If a name is not the row's single band; the message
-                offers the band as a did-you-mean.
-        """
-        band = self._dataset.band
-        for name in variables:
-            if name != band:
-                hint = ""
-                if difflib.get_close_matches(name, [band], n=1):
-                    hint = f" Did you mean {band!r}?"
-                raise ValueError(
-                    f"{name!r} is not a band of FABDEM; its only elevation band "
-                    f"is {band!r}.{hint}"
-                )
 
     def _initialize(self):
         """No-op initialiser — FABDEM is public + anonymous (no client).

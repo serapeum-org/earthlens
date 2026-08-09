@@ -84,7 +84,6 @@ class JRCFlood(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         return_periods: list[int | str] | int | str | None = None,
-        variables: list[str] | None = None,
         temporal_resolution: str = "static",
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
@@ -92,6 +91,9 @@ class JRCFlood(AbstractDataSource):
         catalog: Catalog | None = None,
     ):
         """Initialise a JRC-flood backend instance.
+
+        The EFHM has a single `water_depth` band, so the backend is facet-only
+        (it declares no `variables` axis); the request axis is `return_periods`.
 
         Args:
             start: Accepted for facade parity; ignored (the EFHM is static).
@@ -101,9 +103,6 @@ class JRCFlood(AbstractDataSource):
             return_periods: One return period, or a list, in years — as ints
                 (`100`) or strings (`"100"` / `"RP100"`). Defaults to `[100]`.
                 Every value must be a published return period.
-            variables: Optional band name(s); defaults to the row's single
-                `water_depth` band. A name other than that band raises with a
-                did-you-mean.
             temporal_resolution: Advisory label only (the EFHM is static).
             path: Output directory for the written GeoTIFF(s).
             fmt: Accepted for facade parity; unused.
@@ -111,34 +110,23 @@ class JRCFlood(AbstractDataSource):
                 defaults to the bundled catalog.
 
         Raises:
-            ValueError: If the bounding box is missing, a requested return
-                period is not published, or a requested variable is not the
-                row's band.
-            TypeError: If `variables` is a mapping (the band is fixed).
+            ValueError: If the bounding box is missing or a requested return
+                period is not published.
         """
         if lat_lim is None or lon_lim is None:
             raise ValueError(
                 "JRCFlood requires a bounding box (lat_lim=[s, n], "
                 "lon_lim=[w, e]) — a hazard-map subset has no default extent."
             )
-        if isinstance(variables, dict):
-            raise TypeError(
-                "JRCFlood `variables` must be a list of band names (or omitted), "
-                "not a mapping; the only band is 'water_depth'. Select return "
-                "periods with return_periods=."
-            )
 
         self._catalog = catalog if catalog is not None else Catalog()
         self._dataset: Dataset = self._catalog.get("efhm")
         self._return_periods = self._resolve_return_periods(return_periods)
 
-        resolved_variables = list(variables) if variables else [self._dataset.band]
-        self._validate_variables(resolved_variables)
-
         super().__init__(
             start=start,
             end=end,
-            variables=resolved_variables,
+            variables=[self._dataset.band],
             temporal_resolution=temporal_resolution,
             lat_lim=lat_lim,
             lon_lim=lon_lim,
@@ -209,23 +197,6 @@ class JRCFlood(AbstractDataSource):
                 f"could not parse return period {value!r} (expected e.g. 100, "
                 "'100', or 'RP100')."
             ) from None
-
-    def _validate_variables(self, variables: list[str]) -> None:
-        """Check every requested variable is the row's water-depth band.
-
-        Args:
-            variables: The resolved band name(s).
-
-        Raises:
-            ValueError: If a name is not the row's single band.
-        """
-        band = self._dataset.band
-        for name in variables:
-            if name != band:
-                raise ValueError(
-                    f"{name!r} is not a band of the EFHM; its only band is "
-                    f"{band!r}. Select return periods with return_periods=."
-                )
 
     def _initialize(self):
         """No-op initialiser — the EFHM is public + anonymous (no client).

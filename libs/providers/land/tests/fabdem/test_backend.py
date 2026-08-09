@@ -1,0 +1,205 @@
+"""Unit tests for the FABDEM backend (faked download + pyramids)."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+from pyramids.dataset import merge as merge_module
+
+from earthlens.biodiversity import LicenseWarning
+from earthlens.fabdem import backend as backend_module
+from earthlens.fabdem.backend import FABDEM
+
+pytestmark = pytest.mark.fabdem
+
+
+class _FakeCropped:
+    """Stand-in for a cropped pyramids Dataset that writes a stub GeoTIFF."""
+
+    def __init__(self, recorder: dict):
+        self._recorder = recorder
+
+    def to_file(self, path: str) -> None:
+        """Write a tiny stub and record the destination."""
+        Path(path).write_bytes(b"II*\x00stub-geotiff")
+        self._recorder.setdefault("written", []).append(path)
+
+    def close(self) -> None:
+        """No-op — the fake holds no GDAL handle."""
+
+
+class _FakeDataset:
+    """Stand-in for `pyramids.dataset.Dataset`, recording the read path."""
+
+    @classmethod
+    def read_file(cls, path: str) -> _FakeDataset:
+        """Return a fake dataset (no real GDAL)."""
+        return cls()
+
+    def close(self) -> None:
+        """No-op."""
+
+
+@pytest.fixture
+def fake_localise(monkeypatch: pytest.MonkeyPatch) -> dict:
+    """Patch merge_rasters + pyramids Dataset + crop_to_aoi to touch no GDAL."""
+    recorder: dict = {}
+
+    def _fake_merge(*, src, dst, dst_crs, resampling) -> None:
+        recorder["merge"] = {"src": list(src), "dst_crs": dst_crs}
+        Path(dst).write_bytes(b"II*\x00merged")
+
+    def _fake_crop(dataset, space, *, bbox, touch):
+        recorder["crop_bbox"] = bbox
+        return _FakeCropped(recorder)
+
+    import pyramids.dataset as pyr_dataset
+
+    monkeypatch.setattr(merge_module, "merge_rasters", _fake_merge)
+    monkeypatch.setattr(pyr_dataset, "Dataset", _FakeDataset)
+    monkeypatch.setattr(backend_module, "crop_to_aoi", _fake_crop)
+    return recorder
+
+
+def _make(tmp_path: Path, **kwargs) -> FABDEM:
+    """Construct a FABDEM over a small Channel-coast bbox under tmp_path."""
+    return FABDEM(
+        lat_lim=[50.4, 50.6],
+        lon_lim=[0.4, 0.6],
+        path=tmp_path,
+        **kwargs,
+    )
+
+
+class TestInit:
+    """Tests for construction + validation."""
+
+    def test_missing_bbox_raises(self):
+        """A missing bounding box raises a clear error."""
+        with pytest.raises(ValueError, match="bounding box"):
+            FABDEM(path="x")
+
+    def test_single_elevation_band(self, tmp_path: Path):
+        """The facet-only backend fixes the single elevation band."""
+        assert _make(tmp_path).vars == ["elevation"]
+
+
+class TestSearch:
+    """Tests for the download plan."""
+
+    def test_search_single_bundle(self, tmp_path: Path):
+        """A small AOI resolves to one bundle carrying its tiles + URL."""
+        plan = _make(tmp_path)._search()
+        assert [p.id for p in plan] == ["N50E000-N60E010"]
+        assert plan[0].metadata["tiles"] == ["N50E000_FABDEM_V1-2.tif"]
+        assert plan[0].metadata["url"].endswith("N50E000-N60E010_FABDEM_V1-2.zip")
+
+    def test_empty_plan_raises(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+        """An AOI intersecting no land grid cell raises."""
+        monkeypatch.setattr(backend_module, "bundles_for_bbox", lambda bbox: {})
+        with pytest.raises(ValueError, match="no FABDEM land tiles"):
+            _make(tmp_path)._search()
+
+
+class TestDownload:
+    """Tests for the download / fetch / localise path."""
+
+    def test_download_emits_license_warning_and_writes(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
+    ):
+        """download emits a LicenseWarning and writes one cropped GeoTIFF."""
+        monkeypatch.setattr(
+            backend_module, "download_bundle", lambda url, dest: dest / "b.zip"
+        )
+        monkeypatch.setattr(
+            backend_module,
+            "extract_tiles",
+            lambda zip_path, dest, names: [dest / n for n in names],
+        )
+        with pytest.warns(LicenseWarning, match="non-commercial"):
+            out = _make(tmp_path).download()
+        assert out == [tmp_path / "fabdem_V1-2.tif"]
+        assert out[0].exists()
+
+    def test_ocean_bundle_skipped_then_empty_raises(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
+    ):
+        """When every bundle 404s the AOI yields no tile and raises."""
+        monkeypatch.setattr(backend_module, "download_bundle", lambda url, dest: None)
+        monkeypatch.setattr(
+            backend_module,
+            "extract_tiles",
+            lambda zip_path, dest, names: [],
+        )
+        with pytest.warns(LicenseWarning):
+            with pytest.raises(ValueError, match="no published 1"):
+                _make(tmp_path).download()
+
+    def test_idempotent_skip_existing(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
+    ):
+        """An existing output is returned without re-downloading."""
+
+        def _boom(url, dest):
+            raise AssertionError("must not download when the output exists")
+
+        (tmp_path / "fabdem_V1-2.tif").write_bytes(b"cached")
+        monkeypatch.setattr(backend_module, "download_bundle", _boom)
+        with pytest.warns(LicenseWarning):
+            out = _make(tmp_path).download()
+        assert out == [tmp_path / "fabdem_V1-2.tif"]
+
+    def test_force_rewrites(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
+    ):
+        """force=True re-fetches even when an output exists."""
+        (tmp_path / "fabdem_V1-2.tif").write_bytes(b"old")
+        monkeypatch.setattr(
+            backend_module, "download_bundle", lambda url, dest: dest / "b.zip"
+        )
+        monkeypatch.setattr(
+            backend_module,
+            "extract_tiles",
+            lambda zip_path, dest, names: [dest / n for n in names],
+        )
+        with pytest.warns(LicenseWarning):
+            out = _make(tmp_path).download(force=True)
+        assert out[0].read_bytes() != b"old"
+
+    def test_localise_write_failure_cleans_up(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """A crash while writing removes the partial file and re-raises."""
+        import pyramids.dataset as pyr_dataset
+        from pyramids.dataset import merge as merge_module
+
+        class _Raising:
+            def to_file(self, path: str) -> None:
+                raise RuntimeError("disk full")
+
+            def close(self) -> None:
+                pass
+
+        monkeypatch.setattr(
+            merge_module,
+            "merge_rasters",
+            lambda *, src, dst, dst_crs, resampling: Path(dst).write_bytes(b"m"),
+        )
+        monkeypatch.setattr(pyr_dataset, "Dataset", _FakeDataset)
+        monkeypatch.setattr(
+            backend_module, "crop_to_aoi", lambda ds, space, **kw: _Raising()
+        )
+        monkeypatch.setattr(
+            backend_module, "download_bundle", lambda url, dest: dest / "b.zip"
+        )
+        monkeypatch.setattr(
+            backend_module,
+            "extract_tiles",
+            lambda zip_path, dest, names: [dest / n for n in names],
+        )
+        with pytest.warns(LicenseWarning):
+            with pytest.raises(RuntimeError, match="disk full"):
+                _make(tmp_path).download()
+        assert not (tmp_path / "fabdem_V1-2.part.tif").exists()
+        assert not (tmp_path / "fabdem_V1-2.tif").exists()
