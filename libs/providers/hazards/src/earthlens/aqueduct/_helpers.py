@@ -18,6 +18,7 @@ import zipfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from loguru import logger
 from pyramids.feature.collection import FeatureCollection
 
 if TYPE_CHECKING:
@@ -211,7 +212,19 @@ def build_feature_collection(
 
     Returns:
         FeatureCollection: The trimmed, renamed collection, CRS `EPSG:4326`.
+
+    Raises:
+        ValueError: If the shapefile lacks an expected identity or value column
+            (a clean domain error rather than a raw pandas `KeyError`), listing
+            what is available.
     """
+    required = [*IDENTITY_COLUMNS, *columns.values()]
+    missing = [column for column in required if column not in source.columns]
+    if missing:
+        raise ValueError(
+            f"the Aqueduct shapefile is missing expected column(s) {missing}; "
+            f"available columns: {sorted(source.columns)}."
+        )
     rename = {name: f"rp_{rp}" for rp, name in columns.items()}
     keep = [*IDENTITY_COLUMNS, *columns.values(), source.geometry.name]
     trimmed = source[keep].rename(columns=rename)
@@ -243,6 +256,12 @@ def filter_units(
     if country is not None:
         target = country.strip().casefold()
         result = result[result["unit_name"].str.casefold() == target]
+        if result.empty:
+            logger.warning(
+                f"Aqueduct: country={country!r} matched no unit_name (the match "
+                "is exact, case-insensitive, against the source spelling). "
+                "Check the spelling/diacritics, or filter by bbox instead."
+            )
     if not _is_global(space):
         result = result.cx[
             space.longitude_min : space.longitude_max,

@@ -76,6 +76,20 @@ def test_extract_shapefile_missing_shp_member_raises(tmp_path: Path) -> None:
         _helpers.extract_shapefile(zip_path, row, tmp_path / "out")
 
 
+def test_build_feature_collection_missing_column_raises() -> None:
+    """A shapefile lacking an expected column raises a clear domain error."""
+    import geopandas as gpd
+    from pyramids.feature.collection import FeatureCollection
+    from shapely.geometry import box
+
+    # No `unit_name`, and no `P10_bh_100` value column.
+    gdf = gpd.GeoDataFrame(
+        {"unit_id": [1.0]}, geometry=[box(0, 0, 1, 1)], crs="EPSG:4326"
+    )
+    with pytest.raises(ValueError, match="missing expected column"):
+        _helpers.build_feature_collection(FeatureCollection(gdf), {100: "P10_bh_100"})
+
+
 def test_is_global_true_for_whole_globe() -> None:
     """The whole-globe extent applies no bbox filter."""
     space = SpatialExtent.from_pairs(lat_lim=[-90, 90], lon_lim=[-180, 180])
