@@ -178,10 +178,21 @@ class FABDEM(AbstractDataSource):
 
     @property
     def _aoi_tag(self) -> str:
-        """The AOI bbox as a stable string, used to key the skip-if-exists cache."""
-        return (
+        """A stable cache key for this AOI (bbox plus any polygon geometry).
+
+        The bbox alone is not enough: with `SUPPORTS_POLYGON_AOI`, two requests
+        can share a bounding box but carry different polygon masks, so the
+        polygon's WKT is folded in to keep their cached crops distinct.
+        """
+        import hashlib
+
+        tag = (
             f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
         )
+        geometry = getattr(self.space, "geometry", None)
+        if geometry is not None:
+            tag += "|" + hashlib.sha1(geometry.wkt.encode("utf-8")).hexdigest()
+        return tag
 
     def _is_cached(self, target: Path) -> bool:
         """Whether `target` already holds this exact AOI (AOI-aware skip).
@@ -236,6 +247,10 @@ class FABDEM(AbstractDataSource):
                 (an ocean-only area).
         """
         self._force = force
+        # Validate the request first; only warn about the non-commercial licence
+        # once we know there is something to fetch (an invalid/ocean AOI raises
+        # in `_search` without a spurious licence warning).
+        products = self._search()
         warn_license(
             self._catalog.license_id,
             "fabdem",
@@ -245,7 +260,6 @@ class FABDEM(AbstractDataSource):
                 f"{self._catalog.commercial_contact}"
             ),
         )
-        products = self._search()
         return self._fetch(products)
 
     def _search(self) -> list[RemoteProduct]:
@@ -285,12 +299,13 @@ class FABDEM(AbstractDataSource):
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
         """Download the bundles, extract the tiles, mosaic + crop to one GeoTIFF.
 
-        Idempotent: a complete output is returned without re-downloading (unless
-        `force`). A bundle whose wanted 1° tiles are already extracted in the
-        cache is **not** re-downloaded — the multi-GB `.zip` is only fetched when
-        a tile is actually missing. Ocean-only bundles (`404`) and missing 1°
-        cells are skipped; an AOI that yields no tile at all raises rather than
-        writing an empty raster.
+        Idempotent: a complete output for this AOI is returned without
+        re-downloading (unless `force`). Downloaded bundle `.zip`s are **kept**
+        in the cache (`.fabdem_cache/`), so a later AOI in the same 10° block
+        extracts the tiles it needs from the cached zip without re-fetching, and
+        an ocean-only 1° cell absent from the archive simply stays absent.
+        Ocean-only bundles (`404`) are skipped; an AOI that yields no tile at all
+        raises rather than writing an empty raster.
 
         Args:
             products: The plan from `_search`.
@@ -313,30 +328,25 @@ class FABDEM(AbstractDataSource):
         for rp in products:
             bundle = rp.metadata["bundle"]
             tiles = rp.metadata["tiles"]
-            # A per-bundle marker records that the 0.8-2.4 GB `.zip` has already
-            # been fetched (and its tiles extracted), so a later AOI in the same
-            # 10° block is not re-downloaded — even when it also touches an
-            # ocean-only 1° cell that the archive never contained (which would
-            # otherwise keep the "missing" set permanently non-empty).
-            marker = self._raw_dir / f"{bundle}.fetched"
-            if marker.exists():
-                tifs.extend(
-                    self._raw_dir / n for n in tiles if (self._raw_dir / n).exists()
-                )
-                continue
-            zip_path = download_bundle(rp.metadata["url"], self._raw_dir)
-            if zip_path is None:
-                logger.info(
-                    f"FABDEM: bundle {bundle} is not published (ocean-only "
-                    "block); skipping."
-                )
-                marker.write_text("404", encoding="utf-8")
-                continue
-            extracted = extract_tiles(zip_path, self._raw_dir, tiles)
-            # The bundle is 0.8-2.4 GB; drop it once the wanted tiles are out.
-            zip_path.unlink(missing_ok=True)
-            marker.write_text("ok", encoding="utf-8")
-            tifs.extend(extracted)
+            # Only the tiles this AOI needs and does not already have are
+            # extracted; the 0.8-2.4 GB bundle `.zip` is kept in the cache (not
+            # deleted), so a later AOI in the same 10° block extracts the tiles
+            # it needs from the cached zip without re-downloading — and an
+            # ocean-only 1° cell absent from the archive simply stays absent
+            # rather than forcing a re-fetch.
+            missing = [n for n in tiles if not (self._raw_dir / n).exists()]
+            if missing:
+                zip_path = download_bundle(rp.metadata["url"], self._raw_dir)
+                if zip_path is None:
+                    logger.info(
+                        f"FABDEM: bundle {bundle} is not published (ocean-only "
+                        "block); skipping."
+                    )
+                    continue
+                extract_tiles(zip_path, self._raw_dir, missing)
+            tifs.extend(
+                self._raw_dir / n for n in tiles if (self._raw_dir / n).exists()
+            )
 
         if not tifs:
             raise ValueError(

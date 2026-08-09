@@ -146,14 +146,20 @@ def pixel_window(
     # `py` is negative, so the northern edge maps to the smaller row index.
     row_start = math.floor((north - oy) / py)
     row_stop = math.ceil((south - oy) / py)
+    # No overlap with the raster's pixel extent at all -> genuinely outside the
+    # coverage.
+    if col_stop <= 0 or col_start >= columns or row_stop <= 0 or row_start >= rows:
+        return None
     col_off = max(0, col_start)
     row_off = max(0, row_start)
-    col_end = min(columns, col_stop)
-    row_end = min(rows, row_stop)
-    cols = col_end - col_off
-    rows_out = row_end - row_off
-    if cols <= 0 or rows_out <= 0:
-        return None
+    # A bbox edge that lands exactly on a pixel boundary (or a point AOI) inside
+    # the coverage collapses to a zero-width window; read at least one pixel so it
+    # yields a 1x1 cell rather than being mistaken for out-of-coverage.
+    cols = max(1, min(columns, col_stop) - col_off)
+    rows_out = max(1, min(rows, row_stop) - row_off)
+    # Keep the window inside the raster when the offset sits on the last pixel.
+    col_off = min(col_off, columns - cols)
+    row_off = min(row_off, rows - rows_out)
     return (col_off, row_off, cols, rows_out)
 
 

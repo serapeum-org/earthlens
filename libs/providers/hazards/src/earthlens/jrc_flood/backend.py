@@ -236,10 +236,21 @@ class JRCFlood(AbstractDataSource):
 
     @property
     def _aoi_tag(self) -> str:
-        """The AOI bbox as a stable string, used to key the skip-if-exists cache."""
-        return (
+        """A stable cache key for this AOI (bbox plus any polygon geometry).
+
+        The bbox alone is not enough: with `SUPPORTS_POLYGON_AOI`, two requests
+        can share a bounding box but carry different polygon masks, so the
+        polygon's WKT is folded in to keep their cached crops distinct.
+        """
+        import hashlib
+
+        tag = (
             f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
         )
+        geometry = getattr(self.space, "geometry", None)
+        if geometry is not None:
+            tag += "|" + hashlib.sha1(geometry.wkt.encode("utf-8")).hexdigest()
+        return tag
 
     def _is_cached(self, target: Path) -> bool:
         """Whether `target` already holds this exact AOI (AOI-aware skip).

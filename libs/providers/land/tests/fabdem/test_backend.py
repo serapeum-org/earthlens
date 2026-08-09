@@ -66,6 +66,17 @@ def fake_localise(monkeypatch: pytest.MonkeyPatch) -> dict:
     return recorder
 
 
+def _fake_extract(zip_path, dest, names) -> list[Path]:
+    """Fake extract_tiles: write a stub for each wanted tile and return the paths."""
+    out: list[Path] = []
+    for name in names:
+        target = dest / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(b"II*\x00tile")
+        out.append(target)
+    return out
+
+
 def _make(tmp_path: Path, **kwargs) -> FABDEM:
     """Construct a FABDEM over a small Channel-coast bbox under tmp_path."""
     return FABDEM(
@@ -119,7 +130,7 @@ class TestDownload:
         monkeypatch.setattr(
             backend_module,
             "extract_tiles",
-            lambda zip_path, dest, names: [dest / n for n in names],
+            _fake_extract,
         )
         with pytest.warns(LicenseWarning, match="non-commercial"):
             out = _make(tmp_path).download()
@@ -154,7 +165,7 @@ class TestDownload:
         monkeypatch.setattr(
             backend_module,
             "extract_tiles",
-            lambda zip_path, dest, names: [dest / n for n in names],
+            _fake_extract,
         )
         with pytest.warns(LicenseWarning):
             _make(tmp_path).download()
@@ -183,23 +194,22 @@ class TestDownload:
         monkeypatch.setattr(
             backend_module,
             "extract_tiles",
-            lambda zip_path, dest, names: [dest / n for n in names],
+            _fake_extract,
         )
         with pytest.warns(LicenseWarning):
             _make(tmp_path).download()
         assert calls, "a different-AOI request must re-fetch, not return the stale file"
 
-    def test_fetched_bundle_skips_download(
+    def test_cached_tile_skips_download(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
     ):
-        """An already-fetched bundle (marker present) is not re-downloaded."""
+        """An already-extracted tile is reused without re-downloading the bundle."""
         cache = tmp_path / ".fabdem_cache"
         cache.mkdir(parents=True)
-        (cache / "N50E000-N60E010.fetched").write_text("ok", encoding="utf-8")
         (cache / "N50E000_FABDEM_V1-2.tif").write_bytes(b"II*\x00tile")
 
         def _boom(url, dest):
-            raise AssertionError("must not re-download an already-fetched bundle")
+            raise AssertionError("must not download when the tile is already cached")
 
         monkeypatch.setattr(backend_module, "download_bundle", _boom)
         with pytest.warns(LicenseWarning):
@@ -207,12 +217,61 @@ class TestDownload:
         assert out == [tmp_path / "fabdem_V1-2.tif"]
         assert out[0].exists()
 
+    def test_second_aoi_same_bundle_extracts_new_tile(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
+    ):
+        """A later AOI needing a different tile in the same bundle still extracts it.
+
+        Regression for the removed `.fetched` marker, which returned an
+        incomplete mosaic (or a false 'ocean-only' error) for the second AOI.
+        """
+        monkeypatch.setattr(
+            backend_module, "download_bundle", lambda url, dest: dest / "b.zip"
+        )
+        monkeypatch.setattr(backend_module, "extract_tiles", _fake_extract)
+        with pytest.warns(LicenseWarning):
+            FABDEM(lat_lim=[50.4, 50.6], lon_lim=[0.4, 0.6], path=tmp_path).download()
+        # A different 1° cell (55, 5) in the SAME 10° bundle N50E000-N60E010.
+        with pytest.warns(LicenseWarning):
+            out = FABDEM(
+                lat_lim=[55.4, 55.6], lon_lim=[5.4, 5.6], path=tmp_path
+            ).download()
+        assert out[0].exists()
+        assert (tmp_path / ".fabdem_cache" / "N55E005_FABDEM_V1-2.tif").exists()
+
     def test_antimeridian_aoi_raises(self, tmp_path: Path):
         """An antimeridian-crossing AOI (west > east) raises a clear error."""
         with pytest.raises(ValueError, match="antimeridian"):
             FABDEM(
                 lat_lim=[-17.6, -17.4], lon_lim=[179.4, -179.8], path=tmp_path
             )._search()
+
+    def test_antimeridian_download_no_license_warning(self, tmp_path: Path):
+        """An invalid (antimeridian) request raises before any licence warning."""
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", LicenseWarning)
+            with pytest.raises(ValueError, match="antimeridian"):
+                FABDEM(
+                    lat_lim=[-17.6, -17.4], lon_lim=[179.4, -179.8], path=tmp_path
+                ).download()
+
+    def test_aoi_tag_includes_polygon(self, tmp_path: Path):
+        """The cache key folds in the polygon geometry, not just the bbox."""
+        from shapely.geometry import Polygon
+
+        backend = _make(tmp_path)
+        bbox_only = backend._aoi_tag
+        backend.space = backend.space.model_copy(
+            update={
+                "geometry": Polygon(
+                    [(0.4, 50.4), (0.6, 50.4), (0.6, 50.6), (0.4, 50.6)]
+                )
+            }
+        )
+        assert backend._aoi_tag != bbox_only
+        assert "|" in backend._aoi_tag
 
     def test_force_rewrites(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
@@ -225,7 +284,7 @@ class TestDownload:
         monkeypatch.setattr(
             backend_module,
             "extract_tiles",
-            lambda zip_path, dest, names: [dest / n for n in names],
+            _fake_extract,
         )
         with pytest.warns(LicenseWarning):
             out = _make(tmp_path).download(force=True)
@@ -262,7 +321,7 @@ class TestDownload:
         monkeypatch.setattr(
             backend_module,
             "extract_tiles",
-            lambda zip_path, dest, names: [dest / n for n in names],
+            _fake_extract,
         )
         with pytest.warns(LicenseWarning):
             with pytest.raises(RuntimeError, match="disk full"):

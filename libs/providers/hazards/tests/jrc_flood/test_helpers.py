@@ -51,6 +51,16 @@ class TestPixelWindow:
         """An AOI west of the raster origin returns None."""
         assert h.pixel_window(_GT, (-40.0, 40.0, -39.0, 41.0), _COLUMNS, _ROWS) is None
 
+    def test_point_inside_yields_one_pixel(self):
+        """A point / boundary-aligned AOI inside the raster yields a 1x1 window."""
+        gt = (0.0, 1.0, 0.0, 10.0, 0.0, -1.0)
+        assert h.pixel_window(gt, (5.0, 5.0, 5.0, 5.0), 10, 10) == (5, 5, 1, 1)
+
+    def test_point_outside_returns_none(self):
+        """A point AOI beyond the raster extent is still None (outside)."""
+        gt = (0.0, 1.0, 0.0, 10.0, 0.0, -1.0)
+        assert h.pixel_window(gt, (50.0, 5.0, 50.0, 5.0), 10, 10) is None
+
     def test_clamps_to_raster_extent(self):
         """A window overflowing the north-west corner clamps to the raster."""
         window = h.pixel_window(_GT, (-30.0, 68.0, -20.0, 75.0), _COLUMNS, _ROWS)

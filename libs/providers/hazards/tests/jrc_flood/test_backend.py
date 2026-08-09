@@ -133,6 +133,22 @@ class TestReturnPeriods:
                 lat_lim=[51.8, 52.0], lon_lim=[179.4, -179.8], path=tmp_path
             ).download()
 
+    def test_aoi_tag_includes_polygon(self, tmp_path: Path):
+        """The cache key folds in the polygon geometry, not just the bbox."""
+        from shapely.geometry import Polygon
+
+        backend = _make(tmp_path)
+        bbox_only = backend._aoi_tag
+        backend.space = backend.space.model_copy(
+            update={
+                "geometry": Polygon(
+                    [(4.8, 51.8), (5.0, 51.8), (5.0, 52.0), (4.8, 52.0)]
+                )
+            }
+        )
+        assert backend._aoi_tag != bbox_only
+        assert "|" in backend._aoi_tag
+
 
 class TestSearch:
     """Tests for the download plan."""
