@@ -69,6 +69,20 @@ def nsi_polygon_body(lat_lim: list[float], lon_lim: list[float]) -> dict:
     Returns:
         dict: A GeoJSON `FeatureCollection` mapping with a single closed
             rectangle `Polygon`, ready to pass as the JSON request body.
+
+    Examples:
+        - Build a polygon body for a small box:
+            ```python
+            >>> from earthlens.nsi import nsi_polygon_body
+            >>> body = nsi_polygon_body([29.95, 29.96], [-90.07, -90.06])
+            >>> body["type"]
+            'FeatureCollection'
+            >>> body["features"][0]["geometry"]["type"]
+            'Polygon'
+            >>> len(body["features"][0]["geometry"]["coordinates"][0])
+            5
+
+            ```
     """
     xmin, ymin, xmax, ymax = bbox_from_limits(lat_lim, lon_lim)
     ring = [
@@ -103,6 +117,20 @@ def arcgis_envelope(
     Returns:
         dict: The `params` for a GET against the layer's `query` endpoint —
             an `esriGeometryEnvelope` in WGS84, GeoJSON output, geometry on.
+
+    Examples:
+        - Build the query params for a box:
+            ```python
+            >>> from earthlens.nsi import arcgis_envelope
+            >>> params = arcgis_envelope([29.95, 29.96], [-90.07, -90.06])
+            >>> params["geometryType"]
+            'esriGeometryEnvelope'
+            >>> params["f"]
+            'geojson'
+            >>> params["outFields"]
+            '*'
+
+            ```
     """
     xmin, ymin, xmax, ymax = bbox_from_limits(lat_lim, lon_lim)
     envelope = {"xmin": xmin, "ymin": ymin, "xmax": xmax, "ymax": ymax}
@@ -131,6 +159,27 @@ def to_feature_collection(geojson: dict) -> FeatureCollection:
 
     Raises:
         ValueError: If `geojson` carries no `features` key at all.
+
+    Examples:
+        - Wrap a one-feature GeoJSON and inspect the collection:
+            ```python
+            >>> from earthlens.nsi import to_feature_collection
+            >>> fc = to_feature_collection(
+            ...     {
+            ...         "type": "FeatureCollection",
+            ...         "features": [
+            ...             {
+            ...                 "type": "Feature",
+            ...                 "geometry": {"type": "Point", "coordinates": [-90.0, 29.9]},
+            ...                 "properties": {"occtype": "RES1"},
+            ...             }
+            ...         ],
+            ...     }
+            ... )
+            >>> len(fc)
+            1
+
+            ```
     """
     if "features" not in geojson:
         raise ValueError(

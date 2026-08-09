@@ -225,6 +225,31 @@ def records_to_frame(
         pd.DataFrame: One row per record. When `field_map` is given, the frame
             has the friendly column names (empty-but-typed when there are no
             records).
+
+    Examples:
+        - Map provider fields to friendly names and read a value:
+            ```python
+            >>> from earthlens.nsi._helpers import records_to_frame
+            >>> frame = records_to_frame(
+            ...     [{"id": 1, "amountPaidOnBuildingClaim": 100.0}],
+            ...     {"claim_id": "id", "paid": "amountPaidOnBuildingClaim"},
+            ... )
+            >>> list(frame.columns)
+            ['claim_id', 'paid']
+            >>> float(frame["paid"].iloc[0])
+            100.0
+
+            ```
+        - No records with a field map yields an empty, schema-only frame:
+            ```python
+            >>> from earthlens.nsi._helpers import records_to_frame
+            >>> frame = records_to_frame([], {"claim_id": "id"})
+            >>> list(frame.columns)
+            ['claim_id']
+            >>> len(frame)
+            0
+
+            ```
     """
     frame = pd.DataFrame(records)
     if field_map is None:
