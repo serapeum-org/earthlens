@@ -194,8 +194,10 @@ class _FakeSession:
         nfip_records: list[dict] | None = None,
         nfip_total: int | None = None,
         nfip_omit_count: bool = False,
+        nfip_null_metadata: bool = False,
         nfhl_ignore_paging: bool = False,
         nfhl_server_cap: int | None = None,
+        nfhl_omit_exceeded: bool = False,
     ) -> None:
         self.calls: list[dict[str, Any]] = []
         self.structures = structures if structures is not None else STRUCTURES_GEOJSON
@@ -206,12 +208,17 @@ class _FakeSession:
         )
         # When set, omit metadata.count entirely (server that never reports it).
         self.nfip_omit_count = nfip_omit_count
+        # When set, return `"metadata": null` (present key, null value).
+        self.nfip_null_metadata = nfip_null_metadata
         # When set, always return a full first page flagged exceeded, ignoring
         # resultOffset — a layer that does not honour paging.
         self.nfhl_ignore_paging = nfhl_ignore_paging
         # When set, cap features returned per page (an ArcGIS maxRecordCount
         # below the requested resultRecordCount) — the short-but-exceeded case.
         self.nfhl_server_cap = nfhl_server_cap
+        # When set, page by resultOffset but omit the exceededTransferLimit flag
+        # (a server that paginates but does not emit the flag in f=geojson).
+        self.nfhl_omit_exceeded = nfhl_omit_exceeded
 
     def get(self, url: str, params: dict | None = None, **kwargs: Any) -> _FakeResponse:
         """Route a GET to its canned payload by URL and query params."""
@@ -237,18 +244,19 @@ class _FakeSession:
                 min(count, self.nfhl_server_cap) if self.nfhl_server_cap else count
             )
             page = feats[offset : offset + per_page]
-            payload = {
-                "type": "FeatureCollection",
-                "features": page,
-                "exceededTransferLimit": offset + per_page < len(feats),
-            }
+            payload: dict[str, Any] = {"type": "FeatureCollection", "features": page}
+            if not self.nfhl_omit_exceeded:
+                payload["exceededTransferLimit"] = offset + per_page < len(feats)
             return _FakeResponse(payload)
         if "NfipClaims" in url:
             skip = int(params.get("$skip", 0))
             top = int(params.get("$top", len(self.nfip_records)))
             payload = {"NfipClaims": self.nfip_records[skip : skip + top]}
-            if "$inlinecount" in params and not self.nfip_omit_count:
-                payload["metadata"] = {"count": self.nfip_total}
+            if "$inlinecount" in params:
+                if self.nfip_null_metadata:
+                    payload["metadata"] = None
+                elif not self.nfip_omit_count:
+                    payload["metadata"] = {"count": self.nfip_total}
             return _FakeResponse(payload)
         raise AssertionError(f"no fixture routed for URL {url!r}")
 

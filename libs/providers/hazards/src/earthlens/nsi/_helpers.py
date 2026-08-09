@@ -135,7 +135,8 @@ def paginate_nfip(
         payload = client.get_json(endpoint, params=params)
         if not counted and isinstance(payload, dict):
             counted = True
-            count = payload.get("metadata", {}).get("count")
+            # `or {}` also guards a present-but-null `metadata` (None.get crashes).
+            count = (payload.get("metadata") or {}).get("count")
             total = int(count) if count is not None else None
         page = payload.get(records_key, []) if isinstance(payload, dict) else []
         collected.extend(page)
@@ -172,28 +173,40 @@ def paginate_arcgis(
     """
     features: list = []
     offset = 0
+    prev_page: list | None = None
     for _ in range(_MAX_ARCGIS_PAGES):
         page_params = {**params, "resultOffset": offset, "resultRecordCount": page_size}
         payload = client.get_json(url, params=page_params)
         page = payload.get("features", []) if isinstance(payload, dict) else []
+        if page and page == prev_page:
+            # The server re-sent the previous page for a new offset — it does not
+            # honour paging. Stop now instead of accumulating duplicate features
+            # up to the page cap.
+            logger.warning(
+                f"paginate_arcgis: {url!r} returned an identical page for a new "
+                "offset (server does not honour paging); result may be incomplete."
+            )
+            break
         features.extend(page)
+        prev_page = page
         exceeded = (
             bool(payload.get("exceededTransferLimit"))
             if isinstance(payload, dict)
             else False
         )
-        # Terminate on the layer's own signal (`exceededTransferLimit` cleared)
-        # or an empty page. A short page must NOT end the walk: a layer whose
-        # `maxRecordCount` is below `page_size` returns short-but-exceeded pages,
-        # and stopping there would silently truncate. A server that ignores
-        # paging (same full page forever) is bounded by `_MAX_ARCGIS_PAGES`.
-        if not exceeded or not page:
+        # Continue while the layer flags more (`exceededTransferLimit`) OR a full
+        # page came back — a page equal to the requested size is a strong
+        # "there may be more" signal even when the optional flag is absent from
+        # the f=geojson response. Stop on an empty page, or a short page the
+        # layer did not flag (the genuine last page). A short-but-flagged page (a
+        # `maxRecordCount` below `page_size`) keeps paging.
+        if not page or (not exceeded and len(page) < page_size):
             break
         offset += len(page)
-    else:
+    else:  # pragma: no cover - pathological server that paginates forever
         logger.warning(
             f"paginate_arcgis hit the {_MAX_ARCGIS_PAGES}-page cap for {url!r}; "
-            "the result may be truncated — narrow the box."
+            "result may be incomplete — narrow the box."
         )
     return {"type": "FeatureCollection", "features": features}
 

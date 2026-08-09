@@ -6,7 +6,6 @@ import pandas as pd
 import pytest
 
 from earthlens.nsi._helpers import (
-    _MAX_ARCGIS_PAGES,
     odata_filter,
     paginate_arcgis,
     paginate_nfip,
@@ -112,6 +111,17 @@ class TestPagination:
         assert len(rows) == 3
         assert total is None
 
+    def test_null_metadata_degrades_to_none(self) -> None:
+        """A `"metadata": null` envelope degrades to total None, not a crash (L4)."""
+        session = _FakeSession(
+            nfip_records=make_nfip_records(3), nfip_null_metadata=True
+        )
+        rows, total = paginate_nfip(
+            make_client(session), ENDPOINT, "NfipClaims", filter_str=None, page_size=10
+        )
+        assert len(rows) == 3
+        assert total is None
+
 
 @pytest.mark.unit
 class TestPaginateArcgis:
@@ -162,8 +172,25 @@ class TestPaginateArcgis:
         offsets = [c["params"]["resultOffset"] for c in session.calls]
         assert offsets == [0, 2, 4]
 
-    def test_page_cap_stops_a_layer_that_ignores_paging(self) -> None:
-        """A layer that always flags exceeded is bounded by the page cap."""
+    def test_full_page_continues_without_exceeded_flag(self) -> None:
+        """A full page keeps paging even when the server omits the flag (M2)."""
+        feats = [
+            {"type": "Feature", "geometry": None, "properties": {"i": i}}
+            for i in range(5)
+        ]
+        session = _FakeSession(nfhl={"features": feats}, nfhl_omit_exceeded=True)
+        merged = paginate_arcgis(
+            make_client(session),
+            "https://x/MapServer/28/query",
+            {"f": "geojson"},
+            page_size=2,
+        )
+        assert len(merged["features"]) == 5
+        offsets = [c["params"]["resultOffset"] for c in session.calls]
+        assert offsets == [0, 2, 4]
+
+    def test_identical_page_stops_a_server_that_ignores_paging(self) -> None:
+        """A server that re-sends the same page stops early, no duplicates (L3)."""
         feats = [
             {"type": "Feature", "geometry": None, "properties": {"i": i}}
             for i in range(2)
@@ -175,8 +202,8 @@ class TestPaginateArcgis:
             {"f": "geojson"},
             page_size=2,
         )
-        assert len(session.calls) == _MAX_ARCGIS_PAGES
-        assert len(merged["features"]) == _MAX_ARCGIS_PAGES * 2
+        assert len(merged["features"]) == 2
+        assert len(session.calls) == 2
 
 
 @pytest.mark.unit
