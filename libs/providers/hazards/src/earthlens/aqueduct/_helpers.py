@@ -64,6 +64,26 @@ def resolve_columns(
     Raises:
         ValueError: If any selector is unknown, if `scenario` is not valid for
             `year`, or if a return period is not one of the shipped nine.
+
+    Examples:
+        - Resolve a 2030 population selection to its `.dbf` column names:
+            ```python
+            >>> from earthlens.aqueduct import Catalog
+            >>> from earthlens.aqueduct._helpers import resolve_columns
+            >>> resolve_columns(
+            ...     Catalog(), "population_affected", "2030", "ssp2-rcp8p5", [100, 1000]
+            ... )
+            {100: 'P30_28_100', 1000: 'P30_28_1T'}
+
+            ```
+        - The 2010 baseline uses the `baseline` scenario:
+            ```python
+            >>> from earthlens.aqueduct import Catalog
+            >>> from earthlens.aqueduct._helpers import resolve_columns
+            >>> resolve_columns(Catalog(), "gdp_affected", "2010", "baseline", [100])
+            {100: 'G10_bh_100'}
+
+            ```
     """
     indicator_code = _lookup(catalog.indicators, metric, "metric")
     year_code = _lookup(catalog.years, year, "year")
