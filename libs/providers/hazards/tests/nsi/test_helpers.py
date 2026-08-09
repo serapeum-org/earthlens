@@ -6,8 +6,8 @@ import pandas as pd
 import pytest
 
 from earthlens.nsi._helpers import (
-    nfip_count,
     odata_filter,
+    paginate_arcgis,
     paginate_nfip,
     records_to_frame,
 )
@@ -48,10 +48,10 @@ class TestOdataFilter:
 class TestPagination:
     """`paginate_nfip` paging and capping."""
 
-    def test_collects_all_pages(self) -> None:
-        """Paging walks `$skip` until a short page ends it."""
-        session = _FakeSession(nfip_records=make_nfip_records(25))
-        rows = paginate_nfip(
+    def test_collects_all_pages_with_total(self) -> None:
+        """Paging walks `$skip` until a short page ends it; total from page 1."""
+        session = _FakeSession(nfip_records=make_nfip_records(25), nfip_total=25)
+        rows, total = paginate_nfip(
             make_client(session),
             ENDPOINT,
             "NfipClaims",
@@ -59,13 +59,17 @@ class TestPagination:
             page_size=10,
         )
         assert len(rows) == 25
+        assert total == 25
         skips = [c["params"]["$skip"] for c in session.calls]
         assert skips == [0, 10, 20]
+        # Only the first request carries the count probe.
+        assert session.calls[0]["params"]["$inlinecount"] == "allpages"
+        assert "$inlinecount" not in session.calls[1]["params"]
 
-    def test_max_records_caps_total(self) -> None:
-        """`max_records` stops paging early and caps the last `$top`."""
-        session = _FakeSession(nfip_records=make_nfip_records(100))
-        rows = paginate_nfip(
+    def test_max_records_caps_total_but_reports_full_count(self) -> None:
+        """`max_records` caps the fetch and last `$top`, total stays the real count."""
+        session = _FakeSession(nfip_records=make_nfip_records(100), nfip_total=100)
+        rows, total = paginate_nfip(
             make_client(session),
             ENDPOINT,
             "NfipClaims",
@@ -74,6 +78,7 @@ class TestPagination:
             max_records=15,
         )
         assert len(rows) == 15
+        assert total == 100
         assert session.calls[-1]["params"]["$top"] == 5
 
     def test_select_forwarded(self) -> None:
@@ -91,14 +96,35 @@ class TestPagination:
 
 
 @pytest.mark.unit
-class TestNfipCount:
-    """`nfip_count` reads the inline count."""
+class TestPaginateArcgis:
+    """`paginate_arcgis` walks `exceededTransferLimit`."""
 
-    def test_reads_metadata_count(self) -> None:
-        """The total comes from `metadata.count` under `$inlinecount`."""
-        session = _FakeSession(nfip_records=make_nfip_records(2), nfip_total=127250)
-        assert nfip_count(make_client(session), ENDPOINT, filter_str="x eq 1") == 127250
-        assert session.calls[0]["params"]["$inlinecount"] == "allpages"
+    def test_merges_pages_until_not_exceeded(self) -> None:
+        """Features from every page are concatenated until the limit clears."""
+        feats = [
+            {"type": "Feature", "geometry": None, "properties": {"i": i}}
+            for i in range(5)
+        ]
+        session = _FakeSession(nfhl={"features": feats})
+        merged = paginate_arcgis(
+            make_client(session),
+            "https://x/MapServer/28/query",
+            {"f": "geojson"},
+            page_size=2,
+        )
+        assert len(merged["features"]) == 5
+        offsets = [c["params"]["resultOffset"] for c in session.calls]
+        assert offsets == [0, 2, 4]
+
+    def test_single_page_when_not_exceeded(self) -> None:
+        """A small result is one request with no follow-up page."""
+        feats = [{"type": "Feature", "geometry": None, "properties": {}}]
+        session = _FakeSession(nfhl={"features": feats})
+        merged = paginate_arcgis(
+            make_client(session), "https://x/MapServer/28/query", {"f": "geojson"}
+        )
+        assert len(merged["features"]) == 1
+        assert len(session.calls) == 1
 
 
 @pytest.mark.unit

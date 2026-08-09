@@ -209,14 +209,23 @@ class _FakeSession:
         if "nsiapi/structures" in url:
             return _FakeResponse(self.structures)
         if "/query" in url:
-            return _FakeResponse(self.nfhl)
+            feats = self.nfhl.get("features", [])
+            offset = int(params.get("resultOffset", 0))
+            count = int(params.get("resultRecordCount", len(feats)))
+            page = feats[offset : offset + count]
+            payload = {
+                "type": "FeatureCollection",
+                "features": page,
+                "exceededTransferLimit": offset + count < len(feats),
+            }
+            return _FakeResponse(payload)
         if "NfipClaims" in url:
-            if "$inlinecount" in params:
-                payload = {"metadata": {"count": self.nfip_total}, "NfipClaims": [{}]}
-                return _FakeResponse(payload)
             skip = int(params.get("$skip", 0))
             top = int(params.get("$top", len(self.nfip_records)))
-            return _FakeResponse({"NfipClaims": self.nfip_records[skip : skip + top]})
+            payload = {"NfipClaims": self.nfip_records[skip : skip + top]}
+            if "$inlinecount" in params:
+                payload["metadata"] = {"count": self.nfip_total}
+            return _FakeResponse(payload)
         raise AssertionError(f"no fixture routed for URL {url!r}")
 
     def post(self, url: str, json: dict | None = None, **kwargs: Any) -> _FakeResponse:

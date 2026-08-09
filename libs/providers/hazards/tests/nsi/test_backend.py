@@ -95,6 +95,14 @@ class TestStructures:
         assert post["method"] == "POST"
         assert post["json"]["features"][0]["geometry"]["type"] == "Polygon"
 
+    def test_state_fips_warns_but_returns(self, fake_session, tmp_path) -> None:
+        """A 2-digit (whole-state) FIPS warns but still returns the features."""
+        fc = NSI(
+            source="structures", fips="22", session=fake_session, path=tmp_path
+        ).download()
+        assert isinstance(fc, FeatureCollection)
+        assert len(fc) == 2
+
     def test_foreign_box_returns_empty(self, tmp_path) -> None:
         """A non-US box returns an empty collection, not an error (`G4`)."""
         client = _FakeSession(structures=EMPTY_GEOJSON)
@@ -175,6 +183,12 @@ class TestNfip:
         df = NSI(source="nfip", year=1900, session=client, path=tmp_path).download()
         assert df.empty
         assert (tmp_path / "nsi_nfip.csv").exists()
+
+    def test_large_uncapped_pull_still_returns(self, tmp_path) -> None:
+        """A large uncapped match count warns but still returns the fetched rows."""
+        client = _FakeSession(nfip_records=make_nfip_records(3), nfip_total=60_000)
+        df = NSI(source="nfip", state="LA", session=client, path=tmp_path).download()
+        assert len(df) == 3
 
 
 @pytest.mark.unit

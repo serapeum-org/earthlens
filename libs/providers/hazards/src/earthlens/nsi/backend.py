@@ -62,6 +62,10 @@ OUTPUT_FORMATS: tuple[str, ...] = ("csv", "parquet")
 _GLOBAL_LAT: list[float] = [-90.0, 90.0]
 _GLOBAL_LON: list[float] = [-180.0, 180.0]
 
+#: A matching-record count above which an uncapped `nfip` pull is warned about
+#: (the request is honoured, but a `max_records=` / narrower selector is advised).
+_LARGE_PULL_THRESHOLD: int = 50_000
+
 
 class NSI(AbstractDataSource):
     """US flood exposure / loss backend (per-instance output).
@@ -170,8 +174,8 @@ class NSI(AbstractDataSource):
             end=cast("str", end),
             variables=[self._source.id],
             temporal_resolution=temporal_resolution,
-            lat_lim=lat_lim if lat_lim is not None else _GLOBAL_LAT,
-            lon_lim=lon_lim if lon_lim is not None else _GLOBAL_LON,
+            lat_lim=self._lat_lim,
+            lon_lim=self._lon_lim,
             fmt=fmt,
             path=path,
         )
@@ -289,6 +293,12 @@ class NSI(AbstractDataSource):
         """Fetch NSI structures by `fips=` (GET) or a box (POST polygon)."""
         endpoint = self._source.endpoint
         if self._fips:
+            if len(self._fips) <= 2:
+                logger.warning(
+                    f"NSI structures fips={self._fips!r} is a whole-state pull "
+                    "returned in a single response; this can be very large — "
+                    "consider a county/tract/block FIPS or a box."
+                )
             geojson = self._http.get_json(endpoint, params={"fips": self._fips})
         else:
             body = nsi_polygon_body(self._lat_lim, self._lon_lim)
@@ -296,10 +306,10 @@ class NSI(AbstractDataSource):
         return to_feature_collection(geojson)
 
     def _fetch_nfhl(self) -> FeatureCollection:
-        """Fetch FEMA NFHL flood zones for the box via the ArcGIS query."""
+        """Fetch FEMA NFHL flood zones for the box via the paged ArcGIS query."""
         url = f"{self._source.endpoint}/{self._source.layer_id}/query"
         params = arcgis_envelope(self._lat_lim, self._lon_lim)
-        geojson = self._http.get_json(url, params=params)
+        geojson = _helpers.paginate_arcgis(self._http, url, params)
         return to_feature_collection(geojson)
 
     def _fetch_nfip(self) -> pd.DataFrame:
@@ -311,12 +321,7 @@ class NSI(AbstractDataSource):
             year=self._year,
             flood_event=self._flood_event,
         )
-        total = _helpers.nfip_count(self._http, source.endpoint, filter_str=filter_str)
-        logger.info(
-            f"NSI nfip: {total} claim record(s) match {filter_str!r}"
-            + (f"; capping at {self._max_records}" if self._max_records else "")
-        )
-        records = _helpers.paginate_nfip(
+        records, total = _helpers.paginate_nfip(
             self._http,
             source.endpoint,
             cast("str", source.records_key),
@@ -324,6 +329,21 @@ class NSI(AbstractDataSource):
             page_size=source.page_size or 1000,
             max_records=self._max_records,
         )
+        logger.info(
+            f"NSI nfip: {total} claim record(s) match {filter_str!r}; fetched "
+            f"{len(records)}"
+            + (f" (capped at {self._max_records})" if self._max_records else "")
+        )
+        if (
+            self._max_records is None
+            and total is not None
+            and total > _LARGE_PULL_THRESHOLD
+        ):
+            logger.warning(
+                f"NSI nfip: {total} records matched with no max_records= cap; "
+                "this is a large pull — pass max_records= or a narrower selector "
+                "(add year=/county=) to bound it."
+            )
         return _helpers.records_to_frame(records, source.fields)
 
     def download(

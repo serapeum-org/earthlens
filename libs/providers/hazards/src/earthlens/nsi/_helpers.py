@@ -81,12 +81,14 @@ def paginate_nfip(
     page_size: int,
     max_records: int | None = None,
     select: str | None = None,
-) -> list[dict]:
+) -> tuple[list[dict], int | None]:
     """Page through the OpenFEMA NFIP endpoint and collect every record.
 
     Issues `$top`/`$skip` requests until a short page is returned (or
     `max_records` is reached), reading the record list from `records_key` in
-    each envelope.
+    each envelope. The **first** request also carries `$inlinecount=allpages`, so
+    the total matching count comes back on the same round-trip rather than a
+    separate probe.
 
     Args:
         client: The transport used for each GET (injectable for tests).
@@ -98,10 +100,13 @@ def paginate_nfip(
         select: Optional `$select` comma-separated projection.
 
     Returns:
-        list[dict]: All fetched records, in server order.
+        tuple[list[dict], int | None]: All fetched records (server order), and
+            the total matching count from `metadata.count` (`None` if the server
+            omitted it).
     """
     collected: list[dict] = []
     skip = 0
+    total: int | None = None
     while True:
         top = page_size
         if max_records is not None:
@@ -114,37 +119,61 @@ def paginate_nfip(
             params["$filter"] = filter_str
         if select:
             params["$select"] = select
+        if total is None:
+            params["$inlinecount"] = "allpages"
         payload = client.get_json(endpoint, params=params)
+        if total is None and isinstance(payload, dict):
+            meta = payload.get("metadata", {})
+            total = int(meta.get("count", 0) or 0)
         page = payload.get(records_key, []) if isinstance(payload, dict) else []
         collected.extend(page)
         if len(page) < top:
             break
         skip += len(page)
-    return collected
+    return collected, total
 
 
-def nfip_count(
+def paginate_arcgis(
     client: HttpClient,
-    endpoint: str,
+    url: str,
+    params: dict,
     *,
-    filter_str: str | None,
-) -> int:
-    """Return the total NFIP record count for a filter via `$inlinecount`.
+    page_size: int = 1000,
+) -> dict:
+    """Page an ArcGIS `query` and merge every feature into one GeoJSON mapping.
+
+    An ArcGIS `MapServer` layer caps a single response at its `maxRecordCount`
+    and flags a truncated result with `exceededTransferLimit`. This walks the
+    result with `resultOffset` / `resultRecordCount` until the layer stops
+    signalling more, so a dense box is not silently truncated.
 
     Args:
-        client: The transport used for the GET.
-        endpoint: The NFIP v3 endpoint URL.
-        filter_str: An OData `$filter` expression, or `None`.
+        client: The transport used for each GET.
+        url: The layer's `query` endpoint URL.
+        params: The base query params (envelope, `f=geojson`, …) — copied per
+            page with the offset/count added.
+        page_size: Features requested per page (`resultRecordCount`).
 
     Returns:
-        int: `metadata.count` for the query (total matching records).
+        dict: A GeoJSON `FeatureCollection` mapping with every page's features
+            concatenated.
     """
-    params: dict[str, object] = {"$inlinecount": "allpages", "$top": 1}
-    if filter_str:
-        params["$filter"] = filter_str
-    payload = client.get_json(endpoint, params=params)
-    meta = payload.get("metadata", {}) if isinstance(payload, dict) else {}
-    return int(meta.get("count", 0) or 0)
+    features: list = []
+    offset = 0
+    while True:
+        page_params = {**params, "resultOffset": offset, "resultRecordCount": page_size}
+        payload = client.get_json(url, params=page_params)
+        page = payload.get("features", []) if isinstance(payload, dict) else []
+        features.extend(page)
+        exceeded = (
+            bool(payload.get("exceededTransferLimit"))
+            if isinstance(payload, dict)
+            else False
+        )
+        if not exceeded or not page:
+            break
+        offset += len(page)
+    return {"type": "FeatureCollection", "features": features}
 
 
 def records_to_frame(
