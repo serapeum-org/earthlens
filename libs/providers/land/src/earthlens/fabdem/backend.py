@@ -182,7 +182,7 @@ class FABDEM(AbstractDataSource):
 
         The bbox alone is not enough: with `SUPPORTS_POLYGON_AOI`, two requests
         can share a bounding box but carry different polygon masks, so the
-        polygon's WKT is folded in to keep their cached crops distinct.
+        polygon geometry is folded in to keep their cached crops distinct.
         """
         import hashlib
 
@@ -191,7 +191,13 @@ class FABDEM(AbstractDataSource):
         )
         geometry = getattr(self.space, "geometry", None)
         if geometry is not None:
-            tag += "|" + hashlib.sha1(geometry.wkt.encode("utf-8")).hexdigest()
+            # `space.geometry` is a geopandas GeoDataFrame (from the facade's
+            # `aoi=`), so serialise it to GeoJSON; fall back to a shapely `.wkt`.
+            if hasattr(geometry, "to_json"):
+                key = geometry.to_json()
+            else:
+                key = getattr(geometry, "wkt", str(geometry))
+            tag += "|" + hashlib.sha1(key.encode("utf-8")).hexdigest()
         return tag
 
     def _is_cached(self, target: Path) -> bool:
@@ -247,10 +253,11 @@ class FABDEM(AbstractDataSource):
                 (an ocean-only area).
         """
         self._force = force
-        # Validate the request first; only warn about the non-commercial licence
-        # once we know there is something to fetch (an invalid/ocean AOI raises
-        # in `_search` without a spurious licence warning).
         products = self._search()
+        result = self._fetch(products)
+        # Warn about the non-commercial licence only once the data has actually
+        # been fetched, so a request that resolves to nothing (e.g. an ocean-only
+        # AOI, which raises in `_fetch`) does not print a spurious warning.
         warn_license(
             self._catalog.license_id,
             "fabdem",
@@ -260,7 +267,7 @@ class FABDEM(AbstractDataSource):
                 f"{self._catalog.commercial_contact}"
             ),
         )
-        return self._fetch(products)
+        return result
 
     def _search(self) -> list[RemoteProduct]:
         """Resolve the AOI to one `RemoteProduct` per intersecting 10° bundle.
@@ -272,16 +279,10 @@ class FABDEM(AbstractDataSource):
             list[RemoteProduct]: The download plan, one per bundle.
 
         Raises:
-            ValueError: If the AOI crosses the antimeridian (`west > east`) or
-                intersects no FABDEM land cell.
+            ValueError: If the AOI intersects no FABDEM land cell. (An
+                antimeridian-crossing `west > east` AOI is already rejected by
+                `SpatialExtent` at construction.)
         """
-        west, _, east, _ = self._bbox
-        if west > east:
-            raise ValueError(
-                "FABDEM does not support antimeridian-crossing AOIs "
-                f"(lon_lim west {west} > east {east}); request each side of the "
-                "dateline separately, e.g. lon_lim=[west, 180] and [-180, east]."
-            )
         plan = bundles_for_bbox(self._bbox)
         if not plan:
             raise ValueError(
@@ -377,11 +378,14 @@ class FABDEM(AbstractDataSource):
 
         self._raw_dir.mkdir(parents=True, exist_ok=True)
         merged = self._raw_dir / "fabdem_merged.tif"
+        # The 1° tiles share FABDEM's grid and CRS, so the mosaic is a straight
+        # composite with no reprojection; nearest-neighbour keeps the exact
+        # source elevations and never blends real values with the -9999 no-data.
         merge_rasters(
             src=[str(t) for t in tifs],
             dst=str(merged),
             dst_crs=None,
-            resampling="bilinear",
+            resampling="nearest neighbor",
             no_data_value=self._dataset.nodata,
         )
 

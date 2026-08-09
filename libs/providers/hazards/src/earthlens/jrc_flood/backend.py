@@ -240,7 +240,7 @@ class JRCFlood(AbstractDataSource):
 
         The bbox alone is not enough: with `SUPPORTS_POLYGON_AOI`, two requests
         can share a bounding box but carry different polygon masks, so the
-        polygon's WKT is folded in to keep their cached crops distinct.
+        polygon geometry is folded in to keep their cached crops distinct.
         """
         import hashlib
 
@@ -249,7 +249,13 @@ class JRCFlood(AbstractDataSource):
         )
         geometry = getattr(self.space, "geometry", None)
         if geometry is not None:
-            tag += "|" + hashlib.sha1(geometry.wkt.encode("utf-8")).hexdigest()
+            # `space.geometry` is a geopandas GeoDataFrame (from the facade's
+            # `aoi=`), so serialise it to GeoJSON; fall back to a shapely `.wkt`.
+            if hasattr(geometry, "to_json"):
+                key = geometry.to_json()
+            else:
+                key = getattr(geometry, "wkt", str(geometry))
+            tag += "|" + hashlib.sha1(key.encode("utf-8")).hexdigest()
         return tag
 
     def _is_cached(self, target: Path) -> bool:
@@ -296,17 +302,11 @@ class JRCFlood(AbstractDataSource):
             list[Path]: The written GeoTIFF path(s), one per return period.
 
         Raises:
-            ValueError: If the AOI crosses the antimeridian (`west > east`) or is
-                outside the EFHM's Europe / Mediterranean coverage.
+            ValueError: If the AOI is outside the EFHM's Europe / Mediterranean
+                coverage. (An antimeridian-crossing `west > east` AOI is already
+                rejected by `SpatialExtent` at construction.)
         """
         self._force = force
-        west, _, east, _ = self._bbox
-        if west > east:
-            raise ValueError(
-                "JRCFlood does not support antimeridian-crossing AOIs "
-                f"(lon_lim west {west} > east {east}); the EFHM covers Europe / "
-                "the Mediterranean, well away from the dateline."
-            )
         products = self._search()
         return self._fetch(products)
 

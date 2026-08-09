@@ -126,28 +126,33 @@ class TestReturnPeriods:
         with pytest.raises(ValueError, match="bounding box"):
             JRCFlood(path="x")
 
-    def test_antimeridian_aoi_raises(self, tmp_path: Path):
-        """An antimeridian-crossing AOI (west > east) raises a clear error."""
+    def test_antimeridian_aoi_rejected_at_construction(self, tmp_path: Path):
+        """An antimeridian-crossing AOI (west > east) is rejected at construction."""
         with pytest.raises(ValueError, match="antimeridian"):
-            JRCFlood(
-                lat_lim=[51.8, 52.0], lon_lim=[179.4, -179.8], path=tmp_path
-            ).download()
+            JRCFlood(lat_lim=[51.8, 52.0], lon_lim=[179.4, -179.8], path=tmp_path)
 
     def test_aoi_tag_includes_polygon(self, tmp_path: Path):
-        """The cache key folds in the polygon geometry, not just the bbox."""
-        from shapely.geometry import Polygon
+        """The cache key folds in the real `aoi=` polygon (a GeoDataFrame)."""
+        from earthlens.earthlens import EarthLens
 
-        backend = _make(tmp_path)
-        bbox_only = backend._aoi_tag
-        backend.space = backend.space.model_copy(
-            update={
-                "geometry": Polygon(
-                    [(4.8, 51.8), (5.0, 51.8), (5.0, 52.0), (4.8, 52.0)]
-                )
-            }
-        )
-        assert backend._aoi_tag != bbox_only
-        assert "|" in backend._aoi_tag
+        aoi = {
+            "type": "Polygon",
+            "coordinates": [
+                [[4.8, 51.8], [5.0, 51.8], [5.0, 52.0], [4.8, 52.0], [4.8, 51.8]]
+            ],
+        }
+        bbox_only = EarthLens(
+            data_source="jrc-flood",
+            lat_lim=[51.8, 52.0],
+            lon_lim=[4.8, 5.0],
+            return_periods=[100],
+            path=tmp_path,
+        ).datasource._aoi_tag
+        with_polygon = EarthLens(
+            data_source="jrc-flood", aoi=aoi, return_periods=[100], path=tmp_path
+        ).datasource._aoi_tag
+        assert with_polygon != bbox_only
+        assert "|" in with_polygon
 
 
 class TestSearch:

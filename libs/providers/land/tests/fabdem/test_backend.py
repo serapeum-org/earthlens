@@ -144,14 +144,17 @@ class TestDownload:
     def test_ocean_bundle_skipped_then_empty_raises(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
     ):
-        """When every bundle 404s the AOI yields no tile and raises."""
+        """An ocean-only AOI raises and emits no (spurious) licence warning."""
+        import warnings
+
         monkeypatch.setattr(backend_module, "download_bundle", lambda url, dest: None)
         monkeypatch.setattr(
             backend_module,
             "extract_tiles",
             lambda zip_path, dest, names: [],
         )
-        with pytest.warns(LicenseWarning):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", LicenseWarning)
             with pytest.raises(ValueError, match="no published 1"):
                 _make(tmp_path).download()
 
@@ -239,39 +242,32 @@ class TestDownload:
         assert out[0].exists()
         assert (tmp_path / ".fabdem_cache" / "N55E005_FABDEM_V1-2.tif").exists()
 
-    def test_antimeridian_aoi_raises(self, tmp_path: Path):
-        """An antimeridian-crossing AOI (west > east) raises a clear error."""
+    def test_antimeridian_aoi_rejected_at_construction(self, tmp_path: Path):
+        """An antimeridian-crossing AOI (west > east) is rejected at construction."""
         with pytest.raises(ValueError, match="antimeridian"):
-            FABDEM(
-                lat_lim=[-17.6, -17.4], lon_lim=[179.4, -179.8], path=tmp_path
-            )._search()
-
-    def test_antimeridian_download_no_license_warning(self, tmp_path: Path):
-        """An invalid (antimeridian) request raises before any licence warning."""
-        import warnings
-
-        with warnings.catch_warnings():
-            warnings.simplefilter("error", LicenseWarning)
-            with pytest.raises(ValueError, match="antimeridian"):
-                FABDEM(
-                    lat_lim=[-17.6, -17.4], lon_lim=[179.4, -179.8], path=tmp_path
-                ).download()
+            FABDEM(lat_lim=[-17.6, -17.4], lon_lim=[179.4, -179.8], path=tmp_path)
 
     def test_aoi_tag_includes_polygon(self, tmp_path: Path):
-        """The cache key folds in the polygon geometry, not just the bbox."""
-        from shapely.geometry import Polygon
+        """The cache key folds in the real `aoi=` polygon (a GeoDataFrame)."""
+        from earthlens.earthlens import EarthLens
 
-        backend = _make(tmp_path)
-        bbox_only = backend._aoi_tag
-        backend.space = backend.space.model_copy(
-            update={
-                "geometry": Polygon(
-                    [(0.4, 50.4), (0.6, 50.4), (0.6, 50.6), (0.4, 50.6)]
-                )
-            }
-        )
-        assert backend._aoi_tag != bbox_only
-        assert "|" in backend._aoi_tag
+        aoi = {
+            "type": "Polygon",
+            "coordinates": [
+                [[0.4, 50.4], [0.6, 50.4], [0.6, 50.6], [0.4, 50.6], [0.4, 50.4]]
+            ],
+        }
+        bbox_only = EarthLens(
+            data_source="fabdem",
+            lat_lim=[50.4, 50.6],
+            lon_lim=[0.4, 0.6],
+            path=tmp_path,
+        ).datasource._aoi_tag
+        with_polygon = EarthLens(
+            data_source="fabdem", aoi=aoi, path=tmp_path
+        ).datasource._aoi_tag
+        assert with_polygon != bbox_only
+        assert "|" in with_polygon
 
     def test_force_rewrites(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
@@ -323,9 +319,9 @@ class TestDownload:
             "extract_tiles",
             _fake_extract,
         )
-        with pytest.warns(LicenseWarning):
-            with pytest.raises(RuntimeError, match="disk full"):
-                _make(tmp_path).download()
+        # The write fails inside _fetch, before the (post-fetch) licence warning.
+        with pytest.raises(RuntimeError, match="disk full"):
+            _make(tmp_path).download()
         assert not (tmp_path / "fabdem_V1-2.part.tif").exists()
         assert not (tmp_path / "fabdem_V1-2.tif").exists()
         # #5: the merge intermediate is cleaned up even on a write failure.
