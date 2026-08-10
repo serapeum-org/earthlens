@@ -226,16 +226,21 @@ def download_bundle(
             timeout=timeout,
             expect_magic=b"PK\x03\x04",
         )
-    except requests.HTTPError as exc:
-        response = exc.response
-        if response is not None and response.status_code == 404:
-            zip_path.unlink(missing_ok=True)
-            return None
-        raise
-    # The transport errors the retry policy re-raises once exhausted — listed
-    # explicitly (not the base `RequestException`) so `HTTPError` handled above is
-    # not caught together with its base class.
-    except (requests.ConnectionError, requests.Timeout, OSError) as exc:
+    # A single `except OSError` covers every failure worth handling: `requests`
+    # exceptions all derive from `OSError` (`HTTPError` and the transport errors
+    # `ConnectionError` / `Timeout` alike), as do the local write errors. Catching
+    # them in one clause and branching on the type — rather than listing a class
+    # together with a base it derives from across two clauses — keeps the handling
+    # free of the redundant-base-class smell.
+    except OSError as exc:
+        if isinstance(exc, requests.HTTPError):
+            response = exc.response
+            if response is not None and response.status_code == 404:
+                # An ocean-only 10° block: no bundle is published, so skip it.
+                zip_path.unlink(missing_ok=True)
+                return None
+            raise
+        # A transport or local write error the retry policy exhausted.
         raise requests.HTTPError(
             f"FABDEM: download {url} failed after {retries} attempts: {exc}"
         ) from exc
