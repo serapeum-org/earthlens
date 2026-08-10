@@ -70,6 +70,19 @@ def _as_list(value: str | list[str] | None) -> list[str]:
 
     Returns:
         list[str]: `[]` for `None`, `[value]` for a bare string, else the list.
+
+    Examples:
+        - `None` becomes an empty list; a bare string is wrapped; a list passes through:
+            ```python
+            >>> from earthlens.flodis.backend import _as_list
+            >>> _as_list(None)
+            []
+            >>> _as_list("MOZ")
+            ['MOZ']
+            >>> _as_list(["MOZ", "BGD"])
+            ['MOZ', 'BGD']
+
+            ```
     """
     if value is None:
         return []
@@ -92,6 +105,28 @@ def _normalize_iso3(country: str | list[str] | None) -> set[str]:
             *malformed* code (a typo in the ISO3 form). A well-formed but absent
             code (`"XYZ"`, or a country with no 2000-2018 flood events) is
             allowed through and legitimately yields an empty result.
+
+    Examples:
+        - Codes are upper-cased and de-duplicated; `None` keeps every country:
+            ```python
+            >>> from earthlens.flodis.backend import _normalize_iso3
+            >>> _normalize_iso3("moz")
+            {'MOZ'}
+            >>> sorted(_normalize_iso3(["moz", "MOZ", "bgd"]))
+            ['BGD', 'MOZ']
+            >>> _normalize_iso3(None)
+            set()
+
+            ```
+        - A malformed code (not three letters) is rejected:
+            ```python
+            >>> from earthlens.flodis.backend import _normalize_iso3
+            >>> _normalize_iso3("MO")
+            Traceback (most recent call last):
+                ...
+            ValueError: country= must be 3-letter ISO3 code(s) (e.g. 'MOZ'); got 'MO'. FLODIS keys events by ISO3 country code.
+
+            ```
     """
     codes: set[str] = set()
     for raw in _as_list(country):
@@ -122,6 +157,28 @@ def _normalize_gid(
     Raises:
         ValueError: If `gid` is given for a table that is not GADM-keyed (the
             `damages` table has no `GID_1` / `GID_2` columns).
+
+    Examples:
+        - A gid is upper-cased for the GADM-keyed displacement table:
+            ```python
+            >>> from earthlens.flodis import FlodisDataset
+            >>> from earthlens.flodis.backend import _normalize_gid
+            >>> row = FlodisDataset(file="FLODIS_displacement.csv", key_columns=("GID_1", "GID_2"))
+            >>> sorted(_normalize_gid("moz.1_1", "displacement", row))
+            ['MOZ.1_1']
+
+            ```
+        - It is rejected for the non-GADM damages table:
+            ```python
+            >>> from earthlens.flodis import FlodisDataset
+            >>> from earthlens.flodis.backend import _normalize_gid
+            >>> row = FlodisDataset(file="FLODIS_mortality_damage.csv", key_columns=("disasterno",))
+            >>> _normalize_gid("MOZ.1_1", "damages", row)
+            Traceback (most recent call last):
+                ...
+            ValueError: gid= filters the GADM-keyed table, but dataset='damages' is keyed on ['disasterno']. Pass gid= only with dataset='displacement', or filter the damages table by country=.
+
+            ```
     """
     codes = {raw.strip().upper() for raw in _as_list(gid)}
     if codes and "GID_1" not in row.key_columns:
