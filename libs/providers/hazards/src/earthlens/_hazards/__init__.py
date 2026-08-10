@@ -12,6 +12,9 @@ from __future__ import annotations
 
 __all__ = ["BACKENDS"]
 
+#: Module path shared by the three NSI facade keys (nsi / nfip / nfhl).
+_NSI = "earthlens.nsi"
+
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
 #: distribution's 24 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
@@ -37,9 +40,9 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     # NSI — US object-level flood exposure & loss over three keyless sources.
     # `nsi` defaults to source='structures'; the source-pinning aliases carry a
     # default_kwargs so `EarthLens("nfip")` does not silently fall back to it.
-    'nsi': ('earthlens.nsi', 'NSI', '', {}),
-    'nfip': ('earthlens.nsi', 'NSI', '', {'source': 'nfip'}),
-    'nfhl': ('earthlens.nsi', 'NSI', '', {'source': 'nfhl'}),
+    'nsi': (_NSI, 'NSI', '', {}),
+    'nfip': (_NSI, 'NSI', '', {'source': 'nfip'}),
+    'nfhl': (_NSI, 'NSI', '', {'source': 'nfhl'}),
     'admin': ('earthlens.admin', 'AdminBoundaries', '', {}),
     'admin-boundaries': ('earthlens.admin', 'AdminBoundaries', '', {}),
     'geoboundaries': ('earthlens.admin', 'AdminBoundaries', '', {}),

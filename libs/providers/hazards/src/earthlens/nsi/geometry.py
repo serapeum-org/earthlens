@@ -14,6 +14,9 @@ import json
 import geopandas as gpd
 from pyramids.feature.collection import FeatureCollection
 
+#: WGS84 lon/lat CRS tag applied to every returned collection.
+_WGS84 = "EPSG:4326"
+
 
 def bbox_from_limits(
     lat_lim: list[float], lon_lim: list[float]
@@ -191,9 +194,7 @@ def to_feature_collection(geojson: dict) -> FeatureCollection:
         # An empty result carries just an (empty) geometry column — no fabricated
         # attribute/id column that a populated result (built from the provider's
         # properties) would not also have.
-        empty = gpd.GeoDataFrame(
-            geometry=gpd.GeoSeries([], crs="EPSG:4326"), crs="EPSG:4326"
-        )
+        empty = gpd.GeoDataFrame(geometry=gpd.GeoSeries([], crs=_WGS84), crs=_WGS84)
         return FeatureCollection(empty)
-    gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")
+    gdf = gpd.GeoDataFrame.from_features(features, crs=_WGS84)
     return FeatureCollection(gdf)
