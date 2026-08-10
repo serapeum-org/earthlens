@@ -7,9 +7,10 @@
 # pulls them whole: it submits a server-side **cutout job** on the files API (`files_api_url`) that returns the
 # granule cut to the requested bbox.
 #
-# The curated `variables:` / `forcings:` / `scenarios:` / `rounds:` blocks power facet validation, output metadata,
-# docs, and did-you-mean hints; the actual dataset resolution + licence run against the live API, so an uncurated
-# facet the API still knows resolves — the curated rows only enrich validation and messages.
+# The curated `variables:` / `forcings:` / `scenarios:` / `rounds:` blocks are the validated request vocabulary: the
+# backend checks each requested facet against them and raises a did-you-mean error on an unknown one (G6), so the
+# blocks cover the ISIMIP3b / ISIMIP3a InputData facets. Dataset resolution and the authoritative per-dataset licence
+# still run against the live API.
 
 # The ISIMIP repository REST API (datasets / files search). Public, no auth.
 data_url: https://data.isimip.org/api/v1
@@ -82,6 +83,10 @@ forcings:
     institution: ISIMIP
     round: ISIMIP3a
     description: 20CRv3-W5E5 bias-adjusted reanalysis forcing (ISIMIP3a).
+  chelsa-w5e5:
+    institution: ISIMIP
+    round: ISIMIP3a
+    description: CHELSA-W5E5 high-resolution bias-adjusted forcing (ISIMIP3a).
 
 # --- Curated climate scenarios ------------------------------------------------
 scenarios:
@@ -106,6 +111,12 @@ scenarios:
   counterclim:
     round: ISIMIP3a
     description: Counterfactual (no-trend) climate forcing (ISIMIP3a).
+  spinclim:
+    round: ISIMIP3a
+    description: Detrended spin-up forcing preceding the obsclim period (ISIMIP3a).
+  transclim:
+    round: ISIMIP3a
+    description: Transient climate forcing bridging spinclim and obsclim (ISIMIP3a).
 
 # --- Curated climate variables (the `datasets` block) -------------------------
 # Units follow the ISIMIP / CMIP6 CMOR conventions.

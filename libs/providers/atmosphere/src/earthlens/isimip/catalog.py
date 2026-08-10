@@ -9,11 +9,11 @@ the backend never pulls them whole — it submits a server-side cutout job that
 returns the granule cut to the requested bbox.
 
 This catalog holds only the *config* (the API + files-API URLs, the product /
-time-step enumerations) plus a *curated vocabulary* of the common rounds /
-forcings (GCMs) / scenarios / variables used for facet validation, output
-metadata, docs, and did-you-mean hints. Resolution and the authoritative licence
-run against the live API, so an uncurated facet the API still knows resolves —
-the curated rows only enrich validation and messages.
+time-step enumerations) plus the *request vocabulary* — the rounds / forcings
+(GCMs) / scenarios / variables the backend validates each request against,
+raising a did-you-mean error on an unknown facet. The blocks cover the
+ISIMIP3b / ISIMIP3a InputData facets; dataset resolution and the authoritative
+per-dataset licence still run against the live API.
 
 :data:`CATALOG_PATH` is the path to the bundled YAML;
 :func:`clear_catalog_cache` empties the `(path, mtime)` parse cache.
@@ -45,8 +45,9 @@ class Variable(BaseModel):
 
     A frozen value object with descriptive metadata only — ISIMIP variables carry
     no request-shaping parameters; the facet set selects the dataset and the
-    cutout job returns the granule. Curated rows are optional: an uncurated
-    `climate_variable` the API knows still resolves, it just lacks these labels.
+    cutout job returns the granule. The variable keys form the validated request
+    vocabulary, so a `climate_variable` outside this block raises a did-you-mean
+    error rather than reaching the API.
 
     Attributes:
         units: ISIMIP / CMIP6 CMOR unit (`"kg m-2 s-1"`, `"K"`, `"1"`).
