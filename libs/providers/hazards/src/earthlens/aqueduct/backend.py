@@ -368,9 +368,14 @@ class Aqueduct(AbstractDataSource):
             Path: The written file path.
         """
         return_periods = "-".join(str(rp) for rp in self._return_periods)
-        country_tag = (
-            f"_{self._country.strip().replace(' ', '-')}" if self._country else ""
-        )
+        country_tag = ""
+        if self._country:
+            # Slugify to keep the filename path-safe (a unit name may carry
+            # spaces, punctuation, or a slash, e.g. "Gulf of Mexico, North ...").
+            slug = "".join(
+                ch if ch.isalnum() else "-" for ch in self._country.strip()
+            ).strip("-")
+            country_tag = f"_{slug}"
         stem = (
             f"aqueduct_{self._admin_level}_{self._metric}_{self._year}_"
             f"{self._scenario}_rp{return_periods}{country_tag}"
