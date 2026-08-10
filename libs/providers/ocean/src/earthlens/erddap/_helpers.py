@@ -15,6 +15,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pandas as pd
+from loguru import logger
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent, TemporalExtent
@@ -43,8 +44,10 @@ def build_constraints(
     `[0, 360]` instead, so a raw `[-180, 180]` bound matches nothing.
     Pass `lon_360=True` for such a **tabledap** row to shift the two
     `longitude` keys into `[0, 360]`; a near-global or seam-crossing box
-    drops the longitude constraint entirely (latitude + time still
-    subset). The flag is ignored for griddap.
+    (one straddling the prime meridian) drops the longitude constraint
+    entirely — latitude + time still subset — and logs a warning so the
+    caller knows the result is not longitude-bounded. The flag is ignored
+    for griddap.
 
     Args:
         space: The request bbox (a :class:`~earthlens.base.SpatialExtent`).
@@ -113,10 +116,19 @@ def build_constraints(
     if lon_360:
         west, east = space.west % 360.0, space.east % 360.0
         if (space.east - space.west) >= 359.0 or west > east:
-            # Near-global or wraps the 0/360 seam — ERDDAP cannot express a
-            # wrapped `>=`/`<=` range, so drop the longitude filter and let
-            # latitude + time subset the stations.
+            # Near-global or wraps the 0/360 seam (e.g. an AOI straddling the
+            # prime meridian) — ERDDAP cannot express a wrapped `>=`/`<=` range,
+            # so drop the longitude filter and let latitude + time subset the
+            # stations. Warn loudly: the caller gets every latitude-matching
+            # station, not just those in its longitude band.
             del base["longitude>="], base["longitude<="]
+            logger.warning(
+                f"ERDDAP lon_360: the requested longitude band "
+                f"[{space.west}, {space.east}] wraps the 0/360 seam (or is "
+                "near-global), which a single tabledap query cannot express; "
+                "returning stations filtered by latitude + time only. Split the "
+                "request at 0 deg (or 180 deg) for a longitude-bounded result."
+            )
         else:
             base["longitude>="], base["longitude<="] = west, east
     return base

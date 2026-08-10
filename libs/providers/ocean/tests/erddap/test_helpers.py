@@ -98,6 +98,23 @@ def test_build_constraints_lon_360_global_box_drops_longitude_keys():
     assert c["latitude>="] == -80.0 and c["time>="] == "2023-06-01T12:00:00Z"
 
 
+def test_build_constraints_lon_360_greenwich_box_drops_longitude_keys():
+    """A `lon_360` box straddling 0 deg drops the longitude keys and warns."""
+    from loguru import logger
+
+    channel = SpatialExtent.from_pairs(lat_lim=[49.0, 52.0], lon_lim=[-1.0, 1.0])
+    messages: list[str] = []
+    sink = logger.add(messages.append, level="WARNING")
+    try:
+        c = build_constraints(channel, _time(), "tabledap", lon_360=True)
+    finally:
+        logger.remove(sink)
+    assert "longitude>=" not in c and "longitude<=" not in c
+    # Latitude still constrains, and the drop is not silent.
+    assert c["latitude>="] == 49.0
+    assert any("wraps the 0/360 seam" in message for message in messages)
+
+
 def test_build_constraints_lon_360_no_effect_on_griddap():
     """`lon_360` never touches griddap constraints (grids carry their axis)."""
     c = build_constraints(_space_sf(), _time(), "griddap", lon_360=True)
