@@ -1,0 +1,79 @@
+# NSI backend catalog — US object-level flood exposure & loss.
+#
+# Three keyless US-federal REST sources, selected by the backend's `source=`
+# discriminator. Each row pins the endpoint, the natural output kind (per
+# instance), a friendly -> provider field map, and the public-domain licence.
+# Verified live 2026-08-09 (see planning/flood-risk/captures/nsi-a1-findings-2026-08-09.md);
+# `nfhl` is network-blocked from the build env and unit-tested against a canned
+# fixture with an xfail e2e.
+sources:
+  structures:
+    long_name: USACE National Structure Inventory
+    provider: nsi
+    endpoint: https://nsi.sec.usace.army.mil/nsiapi/structures
+    output_kind: vector
+    license: US public domain
+    citation: "USACE National Structure Inventory (NSI 2022)."
+    # Selectors: `?fips=` (2/5/11/15-digit) GET, or a POST GeoJSON-polygon body
+    # (the `?bbox=` query returns empty and is not used).
+    fields:
+      structure_id: fd_id
+      occupancy_type: occtype
+      damage_category: st_damcat
+      structure_value: val_struct
+      contents_value: val_cont
+      vehicle_value: val_vehic
+      foundation_type: found_type
+      foundation_height: found_ht
+      num_stories: num_story
+      area_sqft: sqft
+      footprint_sqft: ftprntsqft
+      year_built: med_yr_blt
+      firm_zone: firmzone
+      ground_elevation: ground_elv
+      census_block: cbfips
+  nfhl:
+    long_name: FEMA National Flood Hazard Layer
+    provider: fema-arcgis
+    endpoint: https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer
+    layer_id: 28
+    layer_name: S_Fld_Haz_Ar
+    output_kind: vector
+    license: US public domain
+    citation: "FEMA National Flood Hazard Layer (NFHL)."
+    # ArcGIS: query?geometry=<envelope>&geometryType=esriGeometryEnvelope&inSR=4326&f=geojson
+    fields:
+      flood_zone: FLD_ZONE
+      sfha: SFHA_TF
+      zone_subtype: ZONE_SUBTY
+      static_bfe: STATIC_BFE
+      depth: DEPTH
+  nfip:
+    long_name: FEMA NFIP redacted claims (v3)
+    provider: openfema
+    endpoint: https://www.fema.gov/api/open/v3/NfipClaims
+    records_key: NfipClaims
+    output_kind: tabular
+    page_size: 1000
+    license: US public domain
+    citation: "FEMA OpenFEMA NFIP Redacted Claims (v3)."
+    # OData: $filter / $top / $skip / $select / $orderby; total via $inlinecount=allpages.
+    fields:
+      date_of_loss: dateOfLoss
+      year_of_loss: yearOfLoss
+      rated_flood_zone: ratedFloodZone
+      current_flood_zone: floodZoneCurrent
+      building_paid: amountPaidOnBuildingClaim
+      contents_paid: amountPaidOnContentsClaim
+      icc_paid: amountPaidOnIncreasedCostOfComplianceClaim
+      building_damage: buildingDamageAmount
+      building_value: buildingPropertyValue
+      occupancy_type: occupancyType
+      cause_of_damage: causeOfDamage
+      flood_event: floodEvent
+      water_depth: waterDepth
+      state: state
+      county_code: countyCode
+      census_geoid: censusGeoid
+      latitude: latitude
+      longitude: longitude

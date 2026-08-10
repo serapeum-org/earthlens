@@ -1,0 +1,337 @@
+"""Pure query/parse helpers for the NSI backend's tabular source.
+
+The OpenFEMA NFIP v3 endpoint speaks OData: a `$filter` expression plus
+`$top`/`$skip` paging over a `{"metadata": ..., "NfipClaims": [...]}` envelope.
+These helpers build the filter, page through the result via an injected
+:class:`~earthlens.base.http.HttpClient`, and flatten the records into a
+:class:`pandas.DataFrame`. No state; the client is passed in so the whole path
+is unit-testable with a fake transport.
+"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+import pandas as pd
+from loguru import logger
+
+if TYPE_CHECKING:
+    from earthlens.base.http import HttpClient
+
+#: Hard cap on ArcGIS pages walked, a backstop against a layer that ignores
+#: paging and reports `exceededTransferLimit` forever.
+_MAX_ARCGIS_PAGES: int = 1000
+
+#: Hard cap on NFIP pages walked (page_size up to 1000 → up to ~10M rows), a
+#: backstop against an endpoint that ignores `$skip` and never empties out.
+_MAX_NFIP_PAGES: int = 10000
+
+
+def _odata_literal(value: str) -> str:
+    """Quote a string as an OData literal, doubling any embedded quote.
+
+    Args:
+        value: The raw string value.
+
+    Returns:
+        str: The value wrapped in single quotes, OData-escaped.
+    """
+    escaped = value.replace("'", "''")
+    return f"'{escaped}'"
+
+
+#: Friendly NFIP filter key -> (provider field, is-numeric). The clause order in
+#: the built `$filter` follows this mapping's order, so it is deterministic.
+_NFIP_FILTER_FIELDS: dict[str, tuple[str, bool]] = {
+    "state": ("state", False),
+    "county": ("countyCode", False),
+    "year": ("yearOfLoss", True),
+    "flood_event": ("floodEvent", False),
+}
+
+
+def odata_filter(filters: dict[str, str | int] | None) -> str | None:
+    """Build an OData `$filter` string from an NFIP filter mapping.
+
+    Recognised keys are `state` / `county` / `year` / `flood_event` (see
+    :data:`_NFIP_FILTER_FIELDS`). Clauses join with `and` in the canonical field
+    order; string values are quoted (OData-escaped), `year` is emitted bare.
+
+    Args:
+        filters: A mapping of friendly filter key to value, or `None`/empty.
+
+    Returns:
+        str | None: The `$filter` expression, or `None` when no filter is given.
+
+    Raises:
+        ValueError: If `filters` contains an unrecognised key.
+
+    Examples:
+        ```python
+        >>> from earthlens.nsi._helpers import odata_filter
+        >>> odata_filter({"county": "22071", "year": 2005})
+        "countyCode eq '22071' and yearOfLoss eq 2005"
+
+        ```
+    """
+    if not filters:
+        return None
+    unknown = set(filters) - set(_NFIP_FILTER_FIELDS)
+    if unknown:
+        raise ValueError(
+            f"unknown nfip filter key(s) {sorted(unknown)}; valid keys are "
+            f"{sorted(_NFIP_FILTER_FIELDS)}."
+        )
+    clauses: list[str] = []
+    for key, (field, is_numeric) in _NFIP_FILTER_FIELDS.items():
+        if key not in filters:
+            continue
+        value = filters[key]
+        if is_numeric:
+            clauses.append(f"{field} eq {int(value)}")
+        else:
+            clauses.append(f"{field} eq {_odata_literal(str(value))}")
+    return " and ".join(clauses) if clauses else None
+
+
+def paginate_nfip(
+    client: HttpClient,
+    endpoint: str,
+    records_key: str,
+    *,
+    filter_str: str | None,
+    page_size: int,
+    max_records: int | None = None,
+    select: str | None = None,
+    order_by: str = "id",
+) -> tuple[list[dict], int | None]:
+    """Page through the OpenFEMA NFIP endpoint and collect every record.
+
+    Issues `$top`/`$skip` requests until a short page is returned (or
+    `max_records` is reached), reading the record list from `records_key` in
+    each envelope. The **first** request also carries `$inlinecount=allpages`, so
+    the total matching count comes back on the same round-trip rather than a
+    separate probe. Every page is `$orderby`-sorted on a stable key so
+    `$skip`/`$top` deep paging cannot duplicate or miss rows.
+
+    Args:
+        client: The transport used for each GET (injectable for tests).
+        endpoint: The NFIP v3 endpoint URL.
+        records_key: Envelope key holding the record list (`"NfipClaims"`).
+        filter_str: An OData `$filter` expression, or `None` for no filter.
+        page_size: Records per page (the `$top` value).
+        max_records: Optional cap on the total collected; `None` for no cap.
+        select: Optional `$select` comma-separated projection.
+        order_by: Stable `$orderby` field for consistent paging (default `id`).
+
+    Returns:
+        tuple[list[dict], int | None]: All fetched records (server order), and
+            the total matching count from `metadata.count` (`None` if the server
+            omitted it).
+    """
+    collected: list[dict] = []
+    skip = 0
+    total: int | None = None
+    counted = False
+    prev_page: list | None = None
+    for _ in range(_MAX_NFIP_PAGES):
+        top = _nfip_top(page_size, max_records, len(collected))
+        if top <= 0:
+            break
+        params = _nfip_page_params(
+            top,
+            skip,
+            filter_str=filter_str,
+            select=select,
+            order_by=order_by,
+            want_count=not counted,
+        )
+        payload = client.get_json(endpoint, params=params)
+        if not counted:
+            counted = True
+            total = _nfip_total(payload)
+        page = payload.get(records_key, []) if isinstance(payload, dict) else []
+        if page and prev_page and page[0] == prev_page[0]:
+            # Server re-sent the same first record for a new $skip — it does not
+            # honour paging. Comparing the first record (not the whole page) also
+            # catches a shrunk last-page $top and stays O(1); with $orderby=id +
+            # advancing $skip a legitimate next page always starts at a new id.
+            logger.warning(
+                f"paginate_nfip: {endpoint!r} re-sent the same page for a new "
+                "$skip (server does not honour paging); result may be incomplete."
+            )
+            break
+        collected.extend(page)
+        prev_page = page
+        if len(page) < top:
+            break
+        skip += len(page)
+    else:  # pragma: no cover - pathological server that paginates past the cap
+        logger.warning(
+            f"paginate_nfip hit the {_MAX_NFIP_PAGES}-page cap for {endpoint!r}; "
+            "result may be incomplete — narrow the filter or set max_records."
+        )
+    return collected, total
+
+
+def _nfip_top(page_size: int, max_records: int | None, fetched: int) -> int:
+    """Return the `$top` for the next page (`<= 0` means the cap is reached)."""
+    if max_records is None:
+        return page_size
+    return min(page_size, max_records - fetched)
+
+
+def _nfip_page_params(
+    top: int,
+    skip: int,
+    *,
+    filter_str: str | None,
+    select: str | None,
+    order_by: str,
+    want_count: bool,
+) -> dict[str, object]:
+    """Assemble the OData query params for one NFIP page."""
+    params: dict[str, object] = {"$top": top, "$skip": skip}
+    if filter_str:
+        params["$filter"] = filter_str
+    if select:
+        params["$select"] = select
+    if order_by:
+        params["$orderby"] = order_by
+    if want_count:
+        params["$inlinecount"] = "allpages"
+    return params
+
+
+def _nfip_total(payload: object) -> int | None:
+    """Read `metadata.count` from a payload; `None` when absent/null/non-dict."""
+    if not isinstance(payload, dict):
+        return None
+    # `or {}` also guards a present-but-null `metadata` (None.get crashes).
+    count = (payload.get("metadata") or {}).get("count")
+    return int(count) if count is not None else None
+
+
+def paginate_arcgis(
+    client: HttpClient,
+    url: str,
+    params: dict,
+    *,
+    page_size: int = 1000,
+) -> dict:
+    """Page an ArcGIS `query` and merge every feature into one GeoJSON mapping.
+
+    An ArcGIS `MapServer` layer caps a single response at its `maxRecordCount`
+    and flags a truncated result with `exceededTransferLimit`. This walks the
+    result with `resultOffset` / `resultRecordCount` until the layer stops
+    signalling more, so a dense box is not silently truncated.
+
+    Args:
+        client: The transport used for each GET.
+        url: The layer's `query` endpoint URL.
+        params: The base query params (envelope, `f=geojson`, …) — copied per
+            page with the offset/count added.
+        page_size: Features requested per page (`resultRecordCount`).
+
+    Returns:
+        dict: A GeoJSON `FeatureCollection` mapping with every page's features
+            concatenated.
+    """
+    features: list = []
+    offset = 0
+    prev_page: list | None = None
+    for _ in range(_MAX_ARCGIS_PAGES):
+        page_params = {**params, "resultOffset": offset, "resultRecordCount": page_size}
+        payload = client.get_json(url, params=page_params)
+        page = payload.get("features", []) if isinstance(payload, dict) else []
+        if page and page == prev_page:
+            # The server re-sent the previous page for a new offset — it does not
+            # honour paging. Stop now instead of accumulating duplicate features
+            # up to the page cap.
+            logger.warning(
+                f"paginate_arcgis: {url!r} returned an identical page for a new "
+                "offset (server does not honour paging); result may be incomplete."
+            )
+            break
+        features.extend(page)
+        prev_page = page
+        exceeded = (
+            bool(payload.get("exceededTransferLimit"))
+            if isinstance(payload, dict)
+            else False
+        )
+        # Continue while the layer flags more (`exceededTransferLimit`) OR a full
+        # page came back — a page equal to the requested size is a strong
+        # "there may be more" signal even when the optional flag is absent from
+        # the f=geojson response. Stop on an empty page, or a short page the
+        # layer did not flag (the genuine last page). A short-but-flagged page (a
+        # `maxRecordCount` below `page_size`) keeps paging.
+        if not page or (not exceeded and len(page) < page_size):
+            break
+        offset += len(page)
+    else:  # pragma: no cover - pathological server that paginates forever
+        logger.warning(
+            f"paginate_arcgis hit the {_MAX_ARCGIS_PAGES}-page cap for {url!r}; "
+            "result may be incomplete — narrow the box."
+        )
+    return {"type": "FeatureCollection", "features": features}
+
+
+def records_to_frame(
+    records: list[dict], field_map: dict[str, str] | None = None
+) -> pd.DataFrame:
+    """Flatten NFIP records into a :class:`pandas.DataFrame`.
+
+    Args:
+        records: The list of record dicts from :func:`paginate_nfip`.
+        field_map: Optional friendly -> provider map; when given, only these
+            columns are kept and renamed friendly, in map order.
+
+    Returns:
+        pd.DataFrame: One row per record. When `field_map` is given, the frame
+            has the friendly column names (empty-but-typed when there are no
+            records).
+
+    Examples:
+        - Map provider fields to friendly names and read a value:
+            ```python
+            >>> from earthlens.nsi._helpers import records_to_frame
+            >>> frame = records_to_frame(
+            ...     [{"id": 1, "amountPaidOnBuildingClaim": 100.0}],
+            ...     {"claim_id": "id", "paid": "amountPaidOnBuildingClaim"},
+            ... )
+            >>> list(frame.columns)
+            ['claim_id', 'paid']
+            >>> float(frame["paid"].iloc[0])
+            100.0
+
+            ```
+        - No records with a field map yields an empty, schema-only frame:
+            ```python
+            >>> from earthlens.nsi._helpers import records_to_frame
+            >>> frame = records_to_frame([], {"claim_id": "id"})
+            >>> list(frame.columns)
+            ['claim_id']
+            >>> len(frame)
+            0
+
+            ```
+    """
+    frame = pd.DataFrame(records)
+    if field_map is None:
+        return frame
+    inverse = {provider: friendly for friendly, provider in field_map.items()}
+    present = [col for col in inverse if col in frame.columns]
+    if not present:
+        if not frame.empty:
+            # Records came back but none of the mapped provider columns are
+            # present — upstream schema drift. Do not silently drop the data.
+            logger.warning(
+                f"NSI: {len(frame)} record(s) fetched but none of the mapped "
+                f"fields {sorted(field_map.values())} are present (columns: "
+                f"{sorted(frame.columns)}); returning the raw, unmapped frame."
+            )
+            return frame
+        return pd.DataFrame(columns=list(field_map))
+    subset = frame[present].rename(columns=inverse)
+    return subset.reindex(columns=list(field_map))

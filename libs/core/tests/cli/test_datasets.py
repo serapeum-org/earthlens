@@ -233,7 +233,7 @@ class TestRefresh:
         )
         result = runner.invoke(app, ["datasets", "refresh", "all", "--json"])
         payload = json.loads(result.output)
-        assert len(payload) == 52, "one outcome per backend"
+        assert len(payload) == 53, "one outcome per backend"
         assert any(o["provider"] == "stac" for o in payload), "stac included"
 
     def test_stac_json_reports_new_ids(self, monkeypatch):
@@ -627,6 +627,13 @@ class TestValidate:
         result = runner.invoke(app, ["datasets", "validate", "usgs_water", "--json"])
         payload = json.loads(result.output)
         assert payload[0]["status"] == "ok" and payload[0]["issues"] == []
+
+    def test_nsi_validates_clean(self):
+        """The nsi offline validator passes for the bundled catalog."""
+        result = runner.invoke(app, ["datasets", "validate", "nsi", "--json"])
+        payload = json.loads(result.output)
+        assert payload[0]["status"] == "ok", "nsi validated"
+        assert payload[0]["checked"] == 3, "three nsi sources checked"
 
     def test_emdat_validates_clean(self):
         """The emdat offline validator passes for the bundled catalog."""

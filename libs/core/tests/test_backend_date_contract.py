@@ -121,6 +121,7 @@ _NO_WINDOW_REQUIRED = {
     "EMDAT",
     "Glaciers",
     "HANZE",
+    "NSI",
     "OSM",
     "Overture",
     "RiskIndicators",
