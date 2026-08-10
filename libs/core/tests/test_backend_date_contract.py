@@ -121,6 +121,7 @@ _NO_WINDOW_REQUIRED = {
     "EMDAT",
     "FABDEM",
     "Glaciers",
+    "HANZE",
     "JRCFlood",
     "OSM",
     "Overture",
