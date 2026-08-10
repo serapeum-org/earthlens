@@ -120,6 +120,7 @@ _NO_WINDOW_REQUIRED = {
     "DEM",
     "EMDAT",
     "Glaciers",
+    "HANZE",
     "NSI",
     "OSM",
     "Overture",

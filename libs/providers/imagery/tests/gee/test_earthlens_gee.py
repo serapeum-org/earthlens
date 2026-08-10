@@ -132,6 +132,7 @@ class TestRegistry:
             "grdc-caravan",
             "gsa",
             "gwa",
+            "hanze",
             "hdx",
             "himawari",
             "human-settlement",
