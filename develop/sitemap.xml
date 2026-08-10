@@ -73,6 +73,10 @@
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/aqueduct/quickstart/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/argo/catalog_and_selectors/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
@@ -337,14 +341,6 @@
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/fabdem/01_catalog_explorer/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/fabdem/02_fabdem_quickstart/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/fdsn/global_seismicity_map/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
@@ -542,18 +538,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/jaxa/04_ptree_himawari/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/jrc-flood/01_catalog_explorer/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/jrc-flood/02_efhm_quickstart/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/jrc-flood/03_return_periods/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
@@ -1089,6 +1073,18 @@
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/aqueduct/aqueduct/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/aqueduct/introduction/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/aqueduct/usage/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/argo/argo/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
@@ -1397,22 +1393,6 @@
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/fabdem/datasets/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/fabdem/fabdem/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/fabdem/introduction/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/fabdem/usage/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/fdsn/fdsn/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
@@ -1590,22 +1570,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/jaxa/usage/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc-flood/datasets/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc-flood/introduction/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc-flood/jrc-flood/</loc>
-         <lastmod>2026-08-10</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/jrc-flood/usage/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
