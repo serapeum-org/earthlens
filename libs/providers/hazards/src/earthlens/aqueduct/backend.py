@@ -206,7 +206,7 @@ class Aqueduct(AbstractDataSource):
             return sorted(self._catalog.return_periods)
         if isinstance(return_period, int):
             return [return_period]
-        return list(return_period)
+        return list(dict.fromkeys(return_period))
 
     def _check_input_dates(
         self,
@@ -266,7 +266,7 @@ class Aqueduct(AbstractDataSource):
         """
         product = products[0]
         zip_path = self._cached_zip(product)
-        extract_dir = self.root_dir / "_aqueduct_extract" / self._admin_level
+        extract_dir = self._cache_root / "_extract" / self._admin_level
         shp_path = _helpers.extract_shapefile(zip_path, self._admin_row, extract_dir)
 
         from pyramids.feature.collection import FeatureCollection
@@ -276,6 +276,17 @@ class Aqueduct(AbstractDataSource):
         trimmed = _helpers.build_feature_collection(source, columns)
         filtered = _helpers.filter_units(trimmed, self._country, self.space)
         return [filtered]
+
+    @property
+    def _cache_root(self) -> Path:
+        """The directory holding the downloaded zips and their extracted shapefiles.
+
+        Defaults to an `_aqueduct_cache` folder under the output path; overridden
+        by `cache_dir`. Keeping the extraction here (rather than under the output
+        `root_dir`) means a `geometry=False` request writes nothing into the
+        user's output directory.
+        """
+        return self._cache_dir or (self.root_dir / "_aqueduct_cache")
 
     def _cached_zip(self, product: RemoteProduct) -> Path:
         """Return the local zip path, downloading it on a cache miss.
@@ -290,7 +301,7 @@ class Aqueduct(AbstractDataSource):
         Raises:
             requests.HTTPError: If the download returns a non-2xx status.
         """
-        cache_dir = self._cache_dir or (self.root_dir / "_aqueduct_cache")
+        cache_dir = self._cache_root
         cache_dir.mkdir(parents=True, exist_ok=True)
         zip_name = self._admin_row.container_zip or self._admin_row.zip
         zip_path = cache_dir / zip_name
