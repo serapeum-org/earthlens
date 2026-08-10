@@ -90,8 +90,9 @@ def test_build_feature_collection_missing_column_raises() -> None:
     gdf = gpd.GeoDataFrame(
         {"unit_id": [1.0]}, geometry=[box(0, 0, 1, 1)], crs="EPSG:4326"
     )
+    source = FeatureCollection(gdf)
     with pytest.raises(ValueError, match="missing expected column"):
-        _helpers.build_feature_collection(FeatureCollection(gdf), {100: "P10_bh_100"})
+        _helpers.build_feature_collection(source, {100: "P10_bh_100"})
 
 
 def test_is_global_true_for_whole_globe() -> None:

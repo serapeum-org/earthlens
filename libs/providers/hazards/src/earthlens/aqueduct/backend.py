@@ -88,7 +88,7 @@ class Aqueduct(AbstractDataSource):
     #: missing `start` / `end` is legal.
     REQUIRES_TIME_WINDOW = False
 
-    def __init__(  # NOSONAR: wide signature is the facade kwarg-forwarding contract
+    def __init__(
         self,
         start: str | None = None,
         end: str | None = None,
