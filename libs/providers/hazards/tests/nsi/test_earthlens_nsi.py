@@ -60,7 +60,6 @@ class TestFacadeConstruction:
 
     def test_facade_rejects_aggregate(self, tmp_path) -> None:
         """`aggregate=` is refused for the record-shaped NSI backend."""
+        el = EarthLens("nsi", source="structures", fips="22071012700", path=tmp_path)
         with pytest.raises(NotImplementedError):
-            EarthLens(
-                "nsi", source="structures", fips="22071012700", path=tmp_path
-            ).download(aggregate=object())
+            el.download(aggregate=object())

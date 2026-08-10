@@ -33,7 +33,8 @@ class TestCatalogLoad:
         """The nfip row pins the envelope key and a page size."""
         nfip = Catalog().get("nfip")
         assert nfip.records_key == "NfipClaims"
-        assert nfip.page_size and nfip.page_size > 0
+        assert nfip.page_size is not None
+        assert nfip.page_size > 0
 
     def test_nfhl_carries_layer(self) -> None:
         """The nfhl row pins the ArcGIS flood-hazard layer."""
@@ -51,8 +52,9 @@ class TestCatalogLoad:
 
     def test_unknown_source_hints(self) -> None:
         """An unknown key raises with a did-you-mean hint."""
+        cat = Catalog()
         with pytest.raises(ValueError, match="did you mean|structures|NSI catalog"):
-            Catalog().get("structure")
+            cat.get("structure")
 
 
 @pytest.mark.unit

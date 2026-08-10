@@ -6,6 +6,8 @@ import pandas as pd
 import pytest
 
 from earthlens.nsi._helpers import (
+    _nfip_top,
+    _nfip_total,
     odata_filter,
     paginate_arcgis,
     paginate_nfip,
@@ -147,6 +149,26 @@ class TestPagination:
         )
         assert len(rows) == 3
         assert total is None
+
+
+@pytest.mark.unit
+class TestNfipHelpers:
+    """The extracted `_nfip_top` / `_nfip_total` helpers."""
+
+    def test_top_uncapped_is_page_size(self) -> None:
+        """With no max_records the page size is used unchanged."""
+        assert _nfip_top(1000, None, 500) == 1000
+
+    def test_top_capped_shrinks_and_hits_zero(self) -> None:
+        """max_records shrinks the last $top and reaches 0 when exhausted."""
+        assert _nfip_top(10, 15, 10) == 5
+        assert _nfip_top(10, 15, 15) == 0
+
+    def test_total_from_dict_and_non_dict(self) -> None:
+        """Count comes from a dict payload; a non-dict / null degrades to None."""
+        assert _nfip_total({"metadata": {"count": 42}}) == 42
+        assert _nfip_total({"metadata": None}) is None
+        assert _nfip_total(["not", "a", "dict"]) is None
 
 
 @pytest.mark.unit
