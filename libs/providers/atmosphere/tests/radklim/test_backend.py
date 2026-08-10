@@ -9,7 +9,7 @@ import pytest
 
 from earthlens.base import SpatialExtent
 from earthlens.radklim import GERMANY_ENVELOPE, RADKLIM
-from earthlens.radklim.backend import _is_missing, _period_start_year
+from earthlens.radklim.backend import _inclusive_end, _is_missing, _period_start_year
 
 from .conftest import FakeHttp, _MissingResp
 
@@ -121,6 +121,17 @@ class TestSearchReproc:
         p = _make(tmp_path)._search()[0]
         assert p.metadata["format"] == "nc"
 
+    def test_clamps_end_to_current_year(self, tmp_path):
+        """A window ending in the future is clamped to the current year."""
+        b = _make(
+            tmp_path,
+            start="2024-01-01",
+            end="2030-01-01",
+            now=dt.datetime(2026, 6, 1),
+        )
+        years = [p.metadata["year"] for p in b._search()]
+        assert years == [2024, 2025, 2026], years
+
 
 class TestSearchOperational:
     """Tests for the operational (per-timestamp) enumeration."""
@@ -158,6 +169,37 @@ class TestSearchOperational:
         )
         names = [p.href.rsplit("/", 1)[-1] for p in b._search()]
         assert names == ["raa01-yw_10000-2401011200-dwd---bin.bz2"], names
+
+    def test_default_fmt_date_only_end_includes_end_day(
+        self, tmp_path, operational_listing
+    ):
+        """A date-only end (default fmt) keeps the whole end day's granules."""
+        http = FakeHttp(listing=operational_listing)
+        b = _make(
+            tmp_path,
+            "radolan-yw",
+            start="2024-01-01",
+            end="2024-01-01",
+            now=dt.datetime(2024, 1, 1, 13, 0),
+            http=http,
+        )
+        names = [p.href.rsplit("/", 1)[-1] for p in b._search()]
+        assert len(names) == 3, names
+
+    def test_date_only_end_within_retention_not_expired(
+        self, tmp_path, operational_listing
+    ):
+        """A still-retained date-only end day is not falsely reported as expired."""
+        http = FakeHttp(listing=operational_listing)
+        b = _make(
+            tmp_path,
+            "radolan-yw",
+            start="2024-01-01",
+            end="2024-01-01",
+            now=dt.datetime(2024, 1, 2, 13, 0),
+            http=http,
+        )
+        assert b._search(), "end day is within the ~2-day retention window"
 
     def test_retention_expired_returns_empty(self, tmp_path, operational_listing):
         """A window before the retention window returns nothing (with a warning)."""
@@ -232,6 +274,14 @@ class TestHelpers:
     def test_period_start_year(self, period, expected):
         """_period_start_year reads the leading year, or None when absent."""
         assert _period_start_year(period) == expected
+
+    @pytest.mark.parametrize(
+        "end, expect_hour",
+        [(dt.datetime(2024, 1, 1), 23), (dt.datetime(2024, 1, 1, 6, 30), 6)],
+    )
+    def test_inclusive_end(self, end, expect_hour):
+        """A midnight end extends to end-of-day; a timed end is unchanged."""
+        assert _inclusive_end(end).hour == expect_hour
 
     def test_is_missing_true_for_404(self):
         """_is_missing is True only for a 404 response."""

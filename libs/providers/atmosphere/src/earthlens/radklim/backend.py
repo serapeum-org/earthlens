@@ -126,7 +126,7 @@ class RADKLIM(AbstractDataSource):
                 requested `data_format` is not offered by a product, or the bbox
                 does not overlap Germany.
         """
-        keys = list(variables) if not isinstance(variables, dict) else list(variables)
+        keys = list(variables)
         if not keys:
             raise ValueError(
                 "RADKLIM requires a non-empty product selection, e.g. "
@@ -233,8 +233,15 @@ class RADKLIM(AbstractDataSource):
         return self._fmt_override
 
     def _current_time(self) -> dt.datetime:
-        """Return the reference time for the retention guard (injectable)."""
-        return self._now if self._now is not None else dt.datetime.now()
+        """Return the naive-UTC reference time for the retention guard (injectable).
+
+        The operational granule timestamps are naive UTC, so the guard's clock is
+        naive UTC too — a naive local `datetime.now()` would skew the cutoff by the
+        machine's UTC offset near the retention boundary.
+        """
+        if self._now is not None:
+            return self._now
+        return dt.datetime.now(dt.UTC).replace(tzinfo=None)
 
     def _search(self) -> list[RemoteProduct]:
         """Enumerate the granule set for every requested product over the window.
@@ -263,14 +270,16 @@ class RADKLIM(AbstractDataSource):
             product: A reproc product row.
 
         Returns:
-            list[RemoteProduct]: One item per year in range (clamped to the
-                archive's first year), each an archive URL.
+            list[RemoteProduct]: One item per year in range (clamped below to the
+                archive's first year and above to the current year), each an
+                archive URL.
         """
         low = _period_start_year(product.data_period)
         start_year = (
             max(self.time.start_date.year, low) if low else self.time.start_date.year
         )
-        years = [y for y in range(start_year, self.time.end_date.year + 1)]
+        end_year = min(self.time.end_date.year, self._current_time().year)
+        years = list(range(start_year, end_year + 1))
         fmt = self._format_for(product)
         out: list[RemoteProduct] = []
         for year in years:
@@ -298,7 +307,7 @@ class RADKLIM(AbstractDataSource):
                 retention.
         """
         start_date = self.time.start_date
-        end_date = self.time.end_date
+        end_date = _inclusive_end(self.time.end_date)
         cutoff = self._current_time() - dt.timedelta(days=product.retention_days)
         if end_date < cutoff:
             logger.warning(
@@ -390,6 +399,27 @@ class RADKLIM(AbstractDataSource):
         """
         self._show_progress = progress_bar
         return cast("list[Path]", self._api_via_search_fetch())
+
+
+def _inclusive_end(end_date: dt.datetime) -> dt.datetime:
+    """Extend a date-only (midnight) end bound to the end of that day.
+
+    The operational stream is compared at per-scan (sub-day) granularity, but a
+    window parsed with the default `%Y-%m-%d` lands `end` at `00:00:00`, which
+    would drop every granule after midnight on the end day. A midnight end bound
+    is therefore treated as "the whole end day" (`23:59:59`); a bound that
+    carries a time of day is respected as-is.
+
+    Args:
+        end_date: The parsed inclusive end of the window.
+
+    Returns:
+        datetime.datetime: `end_date` at `23:59:59` when it was midnight, else
+            `end_date` unchanged.
+    """
+    if end_date.time() == dt.time(0):
+        return end_date.replace(hour=23, minute=59, second=59)
+    return end_date
 
 
 def _period_start_year(data_period: str) -> int | None:

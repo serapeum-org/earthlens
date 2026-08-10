@@ -25,8 +25,18 @@ class TestReprocArchiveUrl:
     @pytest.mark.parametrize(
         "frequency, code, year, tail",
         [
-            ("5_minutes", "YW", 2024, "5_minutes/radolan/reproc/2017_002/netCDF/2024/YW2017.002_2024_netcdf.tar.gz"),
-            ("hourly", "RW", 2001, "hourly/radolan/reproc/2017_002/netCDF/2001/RW2017.002_2001_netcdf.tar.gz"),
+            (
+                "5_minutes",
+                "YW",
+                2024,
+                "5_minutes/radolan/reproc/2017_002/netCDF/2024/YW2017.002_2024_netcdf.tar.gz",
+            ),
+            (
+                "hourly",
+                "RW",
+                2001,
+                "hourly/radolan/reproc/2017_002/netCDF/2001/RW2017.002_2001_netcdf.tar.gz",
+            ),
         ],
     )
     def test_builds_yearly_archive_url(self, frequency, code, year, tail):
@@ -41,7 +51,10 @@ class TestOperationalUrls:
 
     def test_dir_url_has_trailing_slash(self):
         """The operational directory URL ends with the product slash."""
-        assert operational_dir_url("yw") == "https://opendata.dwd.de/weather/radar/radolan/yw/"
+        assert (
+            operational_dir_url("yw")
+            == "https://opendata.dwd.de/weather/radar/radolan/yw/"
+        )
 
     def test_granule_url_joins_dir_and_name(self):
         """A granule URL is the directory URL plus the file name."""
@@ -99,7 +112,11 @@ class TestFormatMaps:
 
     @pytest.mark.parametrize(
         "fmt, magic, ext",
-        [("nc", b"\x1f\x8b", "tar.gz"), ("hdf5", b"\x89HDF", "hdf5"), ("bin", b"BZh", "bz2")],
+        [
+            ("nc", b"\x1f\x8b", "tar.gz"),
+            ("hdf5", b"\x89HDF", "hdf5"),
+            ("bin", b"BZh", "bz2"),
+        ],
     )
     def test_magic_and_extension_agree(self, fmt, magic, ext):
         """Each format maps to its file magic and on-disk extension."""

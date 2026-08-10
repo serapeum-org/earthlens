@@ -70,7 +70,11 @@ class TestCatalog:
     def test_injected_datasets_skip_disk(self):
         """Passing datasets= builds a Catalog without reading disk."""
         row = RadklimProduct(
-            product="x", stream="reproc", code="RW", step_minutes=60, default_format="nc"
+            product="x",
+            stream="reproc",
+            code="RW",
+            step_minutes=60,
+            default_format="nc",
         )
         cat = Catalog(datasets={"x": row})
         assert cat.products() == ["x"]
