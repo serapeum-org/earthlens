@@ -116,6 +116,19 @@ def test_filter_units_country_miss_is_empty():
     assert filter_units(trimmed, "Atlantis", _global_space()).empty
 
 
+def test_extract_shapefile_missing_shp_raises(tmp_path):
+    """A zip with no matching `.shp` member raises a listing FileNotFoundError."""
+    import zipfile
+
+    from earthlens.flopros._helpers import extract_shapefile
+
+    zip_path = tmp_path / "bad.zip"
+    with zipfile.ZipFile(zip_path, "w") as archive:
+        archive.writestr("MYSTEM.dbf", b"only a sidecar, no .shp")
+    with pytest.raises(FileNotFoundError, match="MYSTEM.shp is not a member"):
+        extract_shapefile(zip_path, "MYSTEM", tmp_path / "out")
+
+
 def test_is_global_true_for_whole_earth():
     """`_is_global` is True only for a full WGS84 box."""
     assert _is_global(_global_space())

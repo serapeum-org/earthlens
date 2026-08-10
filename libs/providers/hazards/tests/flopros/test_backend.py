@@ -77,3 +77,62 @@ def test_written_file_lands_under_path(flopros_cache, tmp_path):
     assert len(fc) == 3
     written = list(tmp_path.glob("flopros_*.gpkg"))
     assert len(written) == 1
+
+
+def test_write_filename_embeds_country_and_bbox(flopros_cache, tmp_path):
+    """The written filename carries the country slug and a bbox tag."""
+    FLOPROS(
+        cache_dir=flopros_cache,
+        path=tmp_path,
+        layer="merged_riverine",
+        country="Alphaland",
+        lat_lim=[-1.0, 1.5],
+        lon_lim=[-1.0, 1.5],
+    ).download()
+    written = list(tmp_path.glob("flopros_merged_riverine_Alphaland_bbox*.gpkg"))
+    assert len(written) == 1
+
+
+def test_empty_result_with_geometry_writes_nothing(flopros_cache, tmp_path):
+    """A country miss with geometry=True returns empty and writes no file."""
+    fc = FLOPROS(
+        cache_dir=flopros_cache, path=tmp_path, country="Atlantis"
+    ).download()
+    assert isinstance(fc, FeatureCollection)
+    assert len(fc) == 0
+    assert not list(tmp_path.glob("*.gpkg"))
+
+
+def test_cache_miss_triggers_download(tmp_path, write_canned_zip, monkeypatch):
+    """An empty cache downloads the zip via HttpClient before reading."""
+    calls: list[tuple] = []
+
+    def _fake_download(self, url, dest, **kwargs):
+        calls.append((url, dest))
+        write_canned_zip(dest)
+
+    monkeypatch.setattr(
+        "earthlens.flopros.backend.HttpClient.download", _fake_download
+    )
+    fc = FLOPROS(cache_dir=tmp_path / "cache", geometry=False).download()
+    assert len(calls) == 1
+    assert len(fc) == 3
+
+
+def test_invalid_cached_zip_is_redownloaded(tmp_path, write_canned_zip, monkeypatch):
+    """A truncated cached zip is discarded and re-downloaded."""
+    cache = tmp_path / "cache"
+    cache.mkdir(parents=True)
+    (cache / "flopros_supplement.zip").write_bytes(b"not a zip")
+    downloaded: list[Path] = []
+
+    def _fake_download(self, url, dest, **kwargs):
+        downloaded.append(dest)
+        write_canned_zip(dest)
+
+    monkeypatch.setattr(
+        "earthlens.flopros.backend.HttpClient.download", _fake_download
+    )
+    fc = FLOPROS(cache_dir=cache, geometry=False).download()
+    assert len(downloaded) == 1
+    assert len(fc) == 3

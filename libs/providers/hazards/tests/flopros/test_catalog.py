@@ -67,3 +67,18 @@ def test_catalog_path_points_at_bundled_yaml():
     """`CATALOG_PATH` is the shipped `flopros_data_catalog.yaml`."""
     assert CATALOG_PATH.name == "flopros_data_catalog.yaml"
     assert CATALOG_PATH.is_file()
+
+
+def test_get_catalog_returns_the_datasets_map():
+    """`get_catalog()` returns the same object as `datasets`."""
+    cat = Catalog()
+    assert cat.get_catalog() is cat.datasets
+
+
+def test_invalid_row_rejected(tmp_path, monkeypatch):
+    """A row missing a required field fails validation with a listing error."""
+    bad = tmp_path / "bad.yaml"
+    bad.write_text("datasets:\n  flopros:\n    shapefile_stem: X\n")  # no `url`
+    monkeypatch.setattr("earthlens.flopros.catalog.CATALOG_PATH", bad)
+    with pytest.raises(ValueError, match="failed validation"):
+        Catalog.load(bad)

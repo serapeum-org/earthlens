@@ -66,3 +66,14 @@ def flopros_cache(tmp_path_factory: pytest.TempPathFactory) -> Path:
     stem = Catalog().get("flopros").shapefile_stem
     _write_shapefile_zip(stem, cache / "flopros_supplement.zip")
     return cache
+
+
+@pytest.fixture
+def write_canned_zip():
+    """Return a callable that writes the canned supplement zip to a given path."""
+    stem = Catalog().get("flopros").shapefile_stem
+
+    def _write(target: Path) -> None:
+        _write_shapefile_zip(stem, Path(target))
+
+    return _write
