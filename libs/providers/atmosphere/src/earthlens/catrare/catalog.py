@@ -64,6 +64,37 @@ class CatRaReDataset(BaseModel):
     description: str = ""
 
 
+def _parse_thresholds(
+    rows_yaml: dict[str, Any], path: Path
+) -> dict[str, CatRaReDataset]:
+    """Validate the `datasets:` rows into :class:`CatRaReDataset` instances.
+
+    Args:
+        rows_yaml: The raw `name -> body` mapping from the catalog YAML.
+        path: The catalog path (for the error message).
+
+    Returns:
+        dict[str, CatRaReDataset]: One validated row per threshold key.
+
+    Raises:
+        ValueError: If any row fails validation.
+    """
+    datasets: dict[str, CatRaReDataset] = {}
+    for name, body in rows_yaml.items():
+        try:
+            datasets[name] = CatRaReDataset(**dict(body or {}))
+        except ValidationError as exc:
+            raise ValueError(
+                f"{path} dataset {name!r} failed validation:\n{exc}"
+            ) from exc
+    return datasets
+
+
+def _str_map(data: dict[str, Any], key: str) -> dict[str, str]:
+    """Return `data[key]` coerced to a `str -> str` mapping (empty when absent)."""
+    return {str(k): str(v) for k, v in (data.get(key) or {}).items()}
+
+
 def _load_catalog_data(path: Path) -> dict[str, Any]:
     """Parse, validate, and cache the catalog at `path`.
 
@@ -89,17 +120,9 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
             f"{path} is missing or has an empty 'datasets:' block. The CatRaRE "
             "catalog must list at least one threshold (t5 / w3)."
         )
-    datasets: dict[str, CatRaReDataset] = {}
-    for name, body in rows_yaml.items():
-        try:
-            datasets[name] = CatRaReDataset(**dict(body or {}))
-        except ValidationError as exc:
-            raise ValueError(
-                f"{path} dataset {name!r} failed validation:\n{exc}"
-            ) from exc
 
     value: dict[str, Any] = {
-        "datasets": datasets,
+        "datasets": _parse_thresholds(rows_yaml, path),
         "base_url": str(data.get("base_url") or "").rstrip("/"),
         "version": str(data.get("version") or ""),
         "version_tag": str(data.get("version_tag") or ""),
@@ -107,12 +130,8 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
         "source_crs": str(data.get("source_crs") or ""),
         "license": str(data.get("license") or ""),
         "attribution": str(data.get("attribution") or ""),
-        "geometry_layers": {
-            str(k): str(v) for k, v in (data.get("geometry_layers") or {}).items()
-        },
-        "date_columns": {
-            str(k): str(v) for k, v in (data.get("date_columns") or {}).items()
-        },
+        "geometry_layers": _str_map(data, "geometry_layers"),
+        "date_columns": _str_map(data, "date_columns"),
         "event_columns": [str(c) for c in (data.get("event_columns") or [])],
     }
     _CATALOG_CACHE[key] = value
