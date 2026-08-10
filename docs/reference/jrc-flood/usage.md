@@ -70,7 +70,7 @@ EarthLens(
 ## Global flood hazard
 
 For the **global** JRC flood hazard (covering Europe too, at ~90 m), use the
-[`gee`](../gee/index.md) backend with `asset="JRC/CEMS_GLOFAS/FloodHazard/v2_1"`.
+[`gee`](../gee/introduction.md) backend with `asset="JRC/CEMS_GLOFAS/FloodHazard/v2_1"`.
 The `jrc-flood` backend here serves the separate, Europe-focused EFHM product.
 
 ## No temporal aggregation

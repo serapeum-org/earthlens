@@ -36,7 +36,7 @@ catalog.license_id                  # 'CC-BY-4.0'
 ## Related coverage
 
 - **Global** JRC flood hazard (`JRC/CEMS_GLOFAS/FloodHazard/v2_1`, ~90 m, also
-  covering Europe) is available via the [`gee`](../gee/index.md) backend.
+  covering Europe) is available via the [`gee`](../gee/introduction.md) backend.
 
 ## Licence & attribution
 

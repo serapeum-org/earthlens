@@ -17,7 +17,7 @@ There are two JRC flood-hazard products, and earthlens covers both — through
 different backends:
 
 - **Global** (`JRC/CEMS_GLOFAS/FloodHazard`, ~90 m, RP10–RP500) — already
-  available through the [`gee`](../gee/index.md) backend as a curated catalog row
+  available through the [`gee`](../gee/introduction.md) backend as a curated catalog row
   (`JRC/CEMS_GLOFAS/FloodHazard/v2_1`). It covers Europe too. Use `gee` for the
   global product.
 - **European EFHM** (this backend, ~90 m / 3 arc-second, 9 return periods) — a
