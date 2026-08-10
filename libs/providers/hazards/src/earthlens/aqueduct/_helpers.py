@@ -277,7 +277,7 @@ def filter_units(
     result = collection
     if country is not None:
         target = country.strip().casefold()
-        result = result[result["unit_name"].str.casefold() == target]
+        result = result[result["unit_name"].str.strip().str.casefold() == target]
         if result.empty:
             logger.warning(
                 f"Aqueduct: country={country!r} matched no unit_name (the match "
