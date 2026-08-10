@@ -12,6 +12,9 @@ from __future__ import annotations
 
 __all__ = ["BACKENDS"]
 
+#: Module path shared by the three `aqueduct` facade keys (canonical + aliases).
+_AQUEDUCT_MODULE = "earthlens.aqueduct"
+
 #: Module path shared by the three NSI facade keys (nsi / nfip / nfhl).
 _NSI = "earthlens.nsi"
 
@@ -19,10 +22,15 @@ _NSI = "earthlens.nsi"
 _JRC_FLOOD = "earthlens.jrc_flood"
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 29 data-source keys.
+#: distribution's 32 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
+    # WRI Aqueduct riverine flood-risk exposure (files.wri.org 2015 Analyzer);
+    # public CC-BY-4.0, no extra SDK (core requests + pyramids).
+    'aqueduct': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
+    'aqueduct-floods': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
+    'aqueduct-flood-risk': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
     # HANZE historical European flood impacts — public Zenodo record
     # (CC-BY-4.0), no extra SDK: the deps are core.
     'hanze': ('earthlens.hanze', 'HANZE', '', {}),
