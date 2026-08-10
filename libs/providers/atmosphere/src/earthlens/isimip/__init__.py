@@ -17,6 +17,9 @@ imports `xarray` / `netCDF4` — reading the NetCDF is pyramids'.
 
 Public surface (re-exported from this package):
 
+* :class:`ISIMIP` — the backend; instantiate with a date window, a bbox, and a
+  facet set (`dataset` / `gcm` / `scenario` / `variables`), then call
+  :meth:`ISIMIP.download`.
 * :class:`Catalog` — loader for the bundled `isimip_data_catalog.yaml` (config +
   curated facet vocabulary).
 * :class:`Variable` / :class:`Forcing` / :class:`Scenario` / :class:`Round` — one
@@ -36,6 +39,7 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.isimip.backend import ISIMIP
 from earthlens.isimip.catalog import (
     CATALOG_PATH,
     Catalog,
@@ -48,6 +52,7 @@ from earthlens.isimip.catalog import (
 
 __all__ = [
     "CATALOG_PATH",
+    "ISIMIP",
     "Catalog",
     "Forcing",
     "Round",
