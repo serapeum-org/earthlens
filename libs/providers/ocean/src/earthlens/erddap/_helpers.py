@@ -24,7 +24,10 @@ _ISO_TIME = "%Y-%m-%dT%H:%M:%SZ"
 
 
 def build_constraints(
-    space: SpatialExtent, time: TemporalExtent, protocol: str
+    space: SpatialExtent,
+    time: TemporalExtent,
+    protocol: str,
+    lon_360: bool = False,
 ) -> dict:
     """Map a bbox + time window onto an ERDDAP constraints dict.
 
@@ -34,15 +37,28 @@ def build_constraints(
     the OPeNDAP `[(lo):step:(hi)]` ranges. tabledap passes the dict
     straight to `erddapy.ERDDAP.constraints`.
 
+    The framework's :class:`~earthlens.base.SpatialExtent` always carries
+    longitudes in the `[-180, 180]` convention. Some ERDDAP servers
+    (notably the UHSLC tide-gauge tabledap datasets) store longitude in
+    `[0, 360]` instead, so a raw `[-180, 180]` bound matches nothing.
+    Pass `lon_360=True` for such a **tabledap** row to shift the two
+    `longitude` keys into `[0, 360]`; a near-global or seam-crossing box
+    drops the longitude constraint entirely (latitude + time still
+    subset). The flag is ignored for griddap.
+
     Args:
         space: The request bbox (a :class:`~earthlens.base.SpatialExtent`).
         time: The request window (a :class:`~earthlens.base.TemporalExtent`).
         protocol: `"tabledap"` or `"griddap"`.
+        lon_360: Shift the tabledap longitude bounds from `[-180, 180]`
+            into the server's `[0, 360]` convention. No effect on griddap.
 
     Returns:
-        dict: The constraints. For `"tabledap"`, the six `time`/`latitude`/
-            `longitude` `>=`/`<=` keys; for `"griddap"`, those plus
-            `time_step`, `latitude_step`, `longitude_step` (all `1`).
+        dict: The constraints. For `"tabledap"`, the `time`/`latitude`/
+            `longitude` `>=`/`<=` keys (the two `longitude` keys are
+            dropped for a `lon_360` box that wraps or spans the globe);
+            for `"griddap"`, the six keys plus `time_step`,
+            `latitude_step`, `longitude_step` (all `1`).
 
     Raises:
         ValueError: If `protocol` is neither `"tabledap"` nor `"griddap"`.
@@ -64,6 +80,15 @@ def build_constraints(
             ('2023-01-01T00:00:00Z', 1.0)
 
             ```
+        - a `lon_360` box shifts a negative longitude into `[0, 360]`:
+
+            ```python
+            >>> sf = SimpleNamespace(south=37.0, north=38.5, west=-123.5, east=-121.5)
+            >>> c = build_constraints(sf, time, "tabledap", lon_360=True)
+            >>> c["longitude>="], c["longitude<="]
+            (236.5, 238.5)
+
+            ```
         - griddap adds the three `_step` strides:
 
             ```python
@@ -83,9 +108,18 @@ def build_constraints(
         "longitude>=": space.west,
         "longitude<=": space.east,
     }
-    if protocol == "tabledap":
-        return base
-    return {**base, "time_step": 1, "latitude_step": 1, "longitude_step": 1}
+    if protocol == "griddap":
+        return {**base, "time_step": 1, "latitude_step": 1, "longitude_step": 1}
+    if lon_360:
+        west, east = space.west % 360.0, space.east % 360.0
+        if (space.east - space.west) >= 359.0 or west > east:
+            # Near-global or wraps the 0/360 seam — ERDDAP cannot express a
+            # wrapped `>=`/`<=` range, so drop the longitude filter and let
+            # latitude + time subset the stations.
+            del base["longitude>="], base["longitude<="]
+        else:
+            base["longitude>="], base["longitude<="] = west, east
+    return base
 
 
 def build_griddap_url(

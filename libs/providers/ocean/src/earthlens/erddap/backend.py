@@ -345,7 +345,9 @@ class ERDDAP(AbstractDataSource):
         client = _ErddapClient(server=row.server_url, protocol="tabledap")
         client.dataset_id = row.dataset_id
         client.variables = variables
-        client.constraints = build_constraints(self.space, self.time, "tabledap")
+        client.constraints = build_constraints(
+            self.space, self.time, "tabledap", lon_360=row.lon_360
+        )
         try:
             return client.to_pandas()
         except requests.exceptions.HTTPError as exc:

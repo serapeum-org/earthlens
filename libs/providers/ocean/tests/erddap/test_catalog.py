@@ -154,3 +154,29 @@ class TestLoaderEdgeCases:
         )
         with pytest.raises(ValueError, match="failed validation"):
             _load_catalog_data(tmp_path)
+
+
+class TestUhslcGeslaRows:
+    """The UHSLC / GESLA sea-level slice is curated and well-formed."""
+
+    UHSLC_IDS = (
+        "global_hourly_gesla",
+        "global_hourly_rqds",
+        "global_daily_rqds",
+        "global_daily_fast",
+    )
+
+    @pytest.mark.parametrize("dataset_id", UHSLC_IDS)
+    def test_row_is_uhslc_tabledap_sea_level(self, dataset_id):
+        """Each GESLA/UHSLC row is a UHSLC tabledap sea-level series."""
+        ds = Catalog().get(dataset_id)
+        assert ds.protocol == "tabledap"
+        assert ds.server_url == "https://uhslc.soest.hawaii.edu/erddap"
+        assert "sea_level" in ds.variables
+        # UHSLC serves longitude in 0..360, so the rows must flag it.
+        assert ds.lon_360 is True
+
+    def test_rows_present_in_available_index(self):
+        """Every curated UHSLC id is mirrored in `available_datasets`."""
+        available = set(Catalog().available_datasets)
+        assert set(self.UHSLC_IDS) <= available

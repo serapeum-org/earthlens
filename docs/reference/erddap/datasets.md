@@ -22,11 +22,19 @@ rasters, tabledap tables, test/demo datasets, and missing ids.
 | `erdMH1chla8day` | griddap | raster | `chlorophyll` | Chlorophyll-a, Aqua MODIS, global 4 km, 8-day composite — **historical, 2003–2022 only** |
 | `nceiPH53sstd1day` | griddap | raster | `sea_surface_temperature` | NCEI AVHRR Pathfinder v5.3 L3-collated SST, daytime, daily (current) |
 | `cwwcNDBCMet` | tabledap | tabular | `station`, `time`, `wtmp` | NDBC standard meteorological buoy time series (current) |
+| `global_hourly_gesla` | tabledap | tabular | `sea_level`, `time`, `latitude`, `longitude`, `station_name`, … | GESLA global tide-gauge sea level (mm), sub-hourly to hourly |
+| `global_hourly_rqds` | tabledap | tabular | `sea_level`, `time`, `latitude`, `longitude`, `station_name`, … | JASL/UHSLC Research Quality tide gauges, hourly |
+| `global_daily_rqds` | tabledap | tabular | `sea_level`, `time`, `latitude`, `longitude`, `station_name`, … | JASL/UHSLC Research Quality tide gauges, daily |
+| `global_daily_fast` | tabledap | tabular | `sea_level`, `time`, `latitude`, `longitude`, `station_name`, … | UHSLC Fast Delivery tide gauges, daily (near-real-time) |
 
 `erdMH1chla8day` is a **historical** record (the Aqua MODIS product stopped updating in mid-2022); request a
 date inside 2003–2022, or a recent-date request returns a clear out-of-coverage error.
 
-All four are U.S. Government public-domain datasets on a public, no-auth server.
+The first four rows are U.S. Government public-domain datasets on a public, no-auth server. The four
+`global_*` rows are coastal tide-gauge extreme-sea-level series on the University of Hawaii Sea Level Center
+ERDDAP (`https://uhslc.soest.hawaii.edu/erddap`) — the coastal boundary-condition input for flood work, free
+with citation. A `latitude`/`longitude` bbox filters the returned stations by location. The UHSLC ERDDAP covers
+~85 % of GESLA-3; the full GESLA-3 archive zip at `https://gesla.org` is the fallback for the remainder.
 
 ## Variables
 
