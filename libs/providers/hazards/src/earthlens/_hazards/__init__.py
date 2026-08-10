@@ -19,10 +19,13 @@ _AQUEDUCT_MODULE = "earthlens.aqueduct"
 _NSI = "earthlens.nsi"
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 28 data-source keys.
+#: distribution's 29 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
+    # FLOPROS global flood-protection standards (Scussolini et al. 2016) — one
+    # public NHESS supplement shapefile, CC-BY-3.0, no extra SDK.
+    'flopros': ('earthlens.flopros', 'FLOPROS', '', {}),
     # WRI Aqueduct riverine flood-risk exposure (files.wri.org 2015 Analyzer);
     # public CC-BY-4.0, no extra SDK (core requests + pyramids).
     'aqueduct': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
