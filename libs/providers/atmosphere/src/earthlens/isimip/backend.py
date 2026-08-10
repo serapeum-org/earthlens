@@ -63,7 +63,7 @@ class ISIMIP(AbstractDataSource):
         "with earthlens.aggregate.aggregate_netcdf"
     )
 
-    def __init__(  # NOSONAR(S107) - one keyword per ISIMIP request facet; the facade forwards these flat, matching every sibling backend (e.g. cmip6)
+    def __init__(  # NOSONAR - S107: one keyword per ISIMIP request facet; the facade forwards these flat, matching every sibling backend (e.g. cmip6)
         self,
         start: str,
         end: str,
