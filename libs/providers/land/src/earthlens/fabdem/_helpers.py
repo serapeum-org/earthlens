@@ -232,7 +232,10 @@ def download_bundle(
             zip_path.unlink(missing_ok=True)
             return None
         raise
-    except (requests.RequestException, OSError) as exc:
+    # The transport errors the retry policy re-raises once exhausted — listed
+    # explicitly (not the base `RequestException`) so `HTTPError` handled above is
+    # not caught together with its base class.
+    except (requests.ConnectionError, requests.Timeout, OSError) as exc:
         raise requests.HTTPError(
             f"FABDEM: download {url} failed after {retries} attempts: {exc}"
         ) from exc
