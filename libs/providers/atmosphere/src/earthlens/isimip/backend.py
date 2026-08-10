@@ -292,6 +292,7 @@ class ISIMIP(AbstractDataSource):
                     f"(round={self._round}, gcm={self._gcm}, scenario={self._scenario}, "
                     f"product={self._product}, time_step={self._time_step})."
                 )
+            var_products = 0
             for dataset in datasets:
                 files = [
                     f
@@ -318,11 +319,14 @@ class ISIMIP(AbstractDataSource):
                         },
                     )
                 )
-        if not products:
-            raise ValueError(
-                "ISIMIP: no granule overlaps the requested window "
-                f"[{self.time.start_date.date()}, {self.time.end_date.date()}]."
-            )
+                var_products += 1
+            if var_products == 0:
+                raise ValueError(
+                    f"ISIMIP: climate_variable={var!r} matched datasets but no "
+                    "granule overlaps the requested window "
+                    f"[{self.time.start_date.date()}, {self.time.end_date.date()}]; "
+                    "widen the date window or drop the variable."
+                )
         return products
 
     def _fetch(self, products: list[RemoteProduct]) -> list[Path]:
@@ -360,24 +364,52 @@ class ISIMIP(AbstractDataSource):
                     f"ISIMIP cutout job for {product.id!r} did not finish: "
                     f"status={None if not job else job.get('status')!r}."
                 )
-            out.extend(self._download_extract(client, job["file_url"]))
+            out.extend(self._download_extract(client, product, job["file_url"]))
         return out
 
-    def _download_extract(self, client: IsimipClient, file_url: str) -> list[Path]:
+    def _product_dir(self, product: RemoteProduct) -> Path:
+        """Return a per-product output subdirectory under the output root.
+
+        Each resolved dataset writes into its own subdirectory so that
+        concurrent cutouts never collide on a shared filename and re-running the
+        same request still returns the (overwritten) granules rather than an
+        empty diff.
+
+        Args:
+            product: The product whose output subdirectory to build.
+
+        Returns:
+            Path: The created per-product directory.
+        """
+        slug = re.sub(r"[^0-9A-Za-z._-]+", "_", str(product.id)) or "isimip"
+        directory = self._ensure_root_dir() / slug
+        directory.mkdir(parents=True, exist_ok=True)
+        return directory
+
+    def _download_extract(
+        self, client: IsimipClient, product: RemoteProduct, file_url: str
+    ) -> list[Path]:
         """Download a finished cutout zip and return the extracted NetCDFs.
 
         Args:
             client: The active ISIMIP client.
+            product: The product the cutout belongs to (its output subdirectory).
             file_url: The finished job's `file_url` (a `.zip`).
 
         Returns:
-            list[Path]: The `*.nc` files the zip yielded, newly present in the
-                output directory.
+            list[Path]: The `*.nc` files the zip yielded, under the product dir.
+
+        Raises:
+            RuntimeError: If the cutout produced no NetCDF granule.
         """
-        root = self._ensure_root_dir()
-        before = {p.resolve() for p in root.glob("*.nc")}
-        client.download(file_url, path=str(root), extract=True)
-        return sorted(p for p in root.glob("*.nc") if p.resolve() not in before)
+        directory = self._product_dir(product)
+        client.download(file_url, path=str(directory), extract=True)
+        found = sorted(directory.rglob("*.nc"))
+        if not found:
+            raise RuntimeError(
+                f"ISIMIP cutout for {product.id!r} produced no NetCDF granule."
+            )
+        return found
 
     def _download_whole(
         self, client: IsimipClient, product: RemoteProduct
@@ -389,21 +421,27 @@ class ISIMIP(AbstractDataSource):
             product: The product whose raw granule `urls` to download.
 
         Returns:
-            list[Path]: The downloaded `*.nc` paths.
+            list[Path]: The downloaded `*.nc` paths, under the product dir.
+
+        Raises:
+            RuntimeError: If no granule carried a downloadable URL.
         """
         logger.warning(
             f"isimip: whole_globe download for {product.id!r} — pulling the raw "
             "~1-2 GB global granule(s); pass lat_lim/lon_lim to cut server-side."
         )
-        root = self._ensure_root_dir()
-        out: list[Path] = []
+        directory = self._product_dir(product)
         for url in product.metadata["urls"]:
             if not url:
                 continue
-            before = {p.resolve() for p in root.glob("*.nc")}
-            client.download(url, path=str(root))
-            out.extend(p for p in root.glob("*.nc") if p.resolve() not in before)
-        return sorted(set(out))
+            client.download(url, path=str(directory))
+        found = sorted(directory.rglob("*.nc"))
+        if not found:
+            raise RuntimeError(
+                f"ISIMIP whole-globe download for {product.id!r} produced no "
+                "granule with a downloadable URL."
+            )
+        return found
 
     def _warn_license(self, product: RemoteProduct) -> None:
         """Emit a :class:`LicenseWarning` for a restricted or non-open dataset.

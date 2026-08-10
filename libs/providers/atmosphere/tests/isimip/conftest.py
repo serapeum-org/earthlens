@@ -52,6 +52,7 @@ class FakeClient:
         job_status: str = "finished",
         empty_vars: tuple[str, ...] = (),
         job: dict[str, Any] | None = None,
+        writes_output: bool = True,
     ) -> None:
         self._datasets_by_var = datasets_by_var
         self._restricted = restricted
@@ -59,6 +60,7 @@ class FakeClient:
         self._job_status = job_status
         self._empty = set(empty_vars)
         self._job = job
+        self._writes_output = writes_output
         self.datasets_calls: list[dict[str, Any]] = []
         self.cutout_calls: list[dict[str, Any]] = []
         self.download_calls: list[dict[str, Any]] = []
@@ -106,6 +108,8 @@ class FakeClient:
     ) -> None:
         """Record the download and drop a tiny fake `.nc` into the output dir."""
         self.download_calls.append({"url": url, "path": path, "extract": extract})
+        if not self._writes_output:
+            return
         out = Path(path or ".") / f"cut_{len(self.download_calls)}.nc"
         out.write_bytes(b"CDF\x01 fake netcdf")
 

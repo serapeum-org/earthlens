@@ -160,6 +160,27 @@ class TestSearch:
         with pytest.raises(ValueError, match="no granule overlaps"):
             b._search()
 
+    def test_one_variable_out_of_window_raises_even_if_another_succeeds(
+        self, make_backend
+    ):
+        """A requested variable with no in-window granule raises, not silently dropped."""
+        future = [
+            make_dataset(
+                "tas",
+                files=[
+                    {
+                        "name": "x_tas_global_daily_2091_2100.nc",
+                        "path": "p",
+                        "file_url": "u",
+                    }
+                ],
+            )
+        ]
+        client = FakeClient(datasets_by_var={"pr": [make_dataset("pr")], "tas": future})
+        b = make_backend(client=client, variables=["pr", "tas"])
+        with pytest.raises(ValueError, match="climate_variable='tas'"):
+            b._search()
+
 
 class TestFetchAndDownload:
     """Tests for `_fetch` / `download` over the cutout job flow."""
@@ -202,6 +223,12 @@ class TestFetchAndDownload:
         with pytest.raises(RuntimeError, match="did not finish"):
             b.download(progress_bar=False)
 
+    def test_finished_job_with_no_netcdf_raises(self, make_backend):
+        """A finished cutout that yields no NetCDF raises rather than returning []."""
+        b = make_backend(client=FakeClient(writes_output=False))
+        with pytest.raises(RuntimeError, match="produced no NetCDF granule"):
+            b.download(progress_bar=False)
+
     def test_whole_globe_downloads_raw(self, make_backend):
         """whole_globe downloads raw granules and never runs a cutout."""
         b = make_backend(lat_lim=None, lon_lim=None, whole_globe=True)
@@ -209,8 +236,8 @@ class TestFetchAndDownload:
         assert out and b._client.cutout_calls == []
         assert b._client.download_calls, "expected a raw download"
 
-    def test_whole_globe_skips_empty_url(self, make_backend):
-        """A raw granule with no file_url is skipped without error."""
+    def test_whole_globe_all_urls_missing_raises(self, make_backend):
+        """A whole-globe request whose granules carry no file_url raises."""
         ds = [
             make_dataset(
                 "pr",
@@ -229,7 +256,14 @@ class TestFetchAndDownload:
             lon_lim=None,
             whole_globe=True,
         )
-        assert b.download(progress_bar=False) == []
+        with pytest.raises(RuntimeError, match="no.*downloadable URL"):
+            b.download(progress_bar=False)
+
+    def test_products_write_to_isolated_dirs(self, make_backend):
+        """Two variables' cutouts land in separate per-dataset subdirectories."""
+        out = make_backend(variables=["pr", "tas"]).download(progress_bar=False)
+        assert len(out) == 2
+        assert len({p.parent for p in out}) == 2, "products must not share a dir"
 
 
 class TestLicense:
