@@ -245,6 +245,10 @@ nav:
       - Introduction: reference/emdat/introduction.md
       - Usage: reference/emdat/usage.md
       - Reference: reference/emdat/emdat.md
+    - HANZE (flood impacts):
+      - Introduction: reference/hanze/introduction.md
+      - Usage: reference/hanze/usage.md
+      - Reference: reference/hanze/hanze.md
     - JAXA (Earth-observation archive):
       - Introduction: reference/jaxa/introduction.md
       - Usage: reference/jaxa/usage.md
@@ -568,6 +572,9 @@ nav:
     - Disaster impacts (EM-DAT):
       - Flood events and where they happened: examples/emdat/flood_events_and_footprints.ipynb
       - Real footprints and flooded area: examples/emdat/flood_footprints_and_area.ipynb
+    - Flood impacts (HANZE):
+      - Quickstart — floods and impacts: examples/hanze/quickstart.ipynb
+      - Flood types across Europe: examples/hanze/flood_types_across_europe.ipynb
     - OpenStreetMap (Overpass / ohsome):
       - Quickstart — current-state features (Overpass): examples/osm/quickstart.ipynb
       - History — building footprints over time (ohsome): examples/osm/ohsome_history.ipynb
