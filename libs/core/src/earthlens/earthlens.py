@@ -473,7 +473,7 @@ class EarthLens:
              'ohsome', 'openaq',
              'openeo', 'openstreetmap', 'osm', 'overpass', 'overture',
              'pangeo-cmip6', 'planetary-computer', 'protected-planet', 'ptree',
-             'pvgis', 'radar',
+             'pvgis', 'radar', 'radklim', 'radolan',
              'redlist', 'rgi', 'risk-indicators', 'sensor-community',
              'sentinel-hub',
              'sentinelhub', 'soilgrids', 'solar-pv', 'solar-wind-atlas',
