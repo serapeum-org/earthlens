@@ -281,10 +281,11 @@ class Aqueduct(AbstractDataSource):
     def _cache_root(self) -> Path:
         """The directory holding the downloaded zips and their extracted shapefiles.
 
-        Defaults to an `_aqueduct_cache` folder under the output path; overridden
-        by `cache_dir`. Keeping the extraction here (rather than under the output
-        `root_dir`) means a `geometry=False` request writes nothing into the
-        user's output directory.
+        Defaults to an `_aqueduct_cache` subfolder under the output path; overridden
+        by `cache_dir`. The download and extraction land here (in the cache
+        subfolder), not directly under the output `root_dir`, so a `geometry=False`
+        request — which skips the GeoPackage write — leaves the output directory
+        free of result files, with only the reusable cache subfolder alongside.
         """
         return self._cache_dir or (self.root_dir / "_aqueduct_cache")
 
@@ -358,7 +359,10 @@ class Aqueduct(AbstractDataSource):
             f"(licence {self._catalog.license})."
         )
         if not self._geometry:
-            return pd.DataFrame(collection.drop(columns=collection.geometry.name))
+            frame = pd.DataFrame(collection.drop(columns=collection.geometry.name))
+            if frame.empty:
+                logger.warning("Aqueduct: no unit matched the request (empty table).")
+            return frame
         if not len(collection):
             logger.warning("Aqueduct: no unit matched the request; nothing written.")
             return collection
@@ -387,9 +391,16 @@ class Aqueduct(AbstractDataSource):
                 ch if ch.isalnum() else "-" for ch in self._country.strip()
             ).strip("-")
             country_tag = f"_{slug}"
+        bbox_tag = ""
+        if not _helpers._is_global(self.space):
+            box = self.space
+            bbox_tag = (
+                f"_bbox{box.latitude_min:g}_{box.longitude_min:g}_"
+                f"{box.latitude_max:g}_{box.longitude_max:g}"
+            )
         stem = (
             f"aqueduct_{self._admin_level}_{self._metric}_{self._year}_"
-            f"{self._scenario}_rp{return_periods}{country_tag}"
+            f"{self._scenario}_rp{return_periods}{country_tag}{bbox_tag}"
         )
         out_path = self.root_dir / f"{stem}.gpkg"
         collection.to_file(str(out_path), driver="GPKG")

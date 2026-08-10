@@ -188,6 +188,38 @@ def test_distinct_return_periods_write_distinct_files(
     assert len(list(tmp_path.glob("aqueduct_country_*.gpkg"))) == 2
 
 
+def test_distinct_bbox_write_distinct_files(
+    country_cache: Path, tmp_path: Path
+) -> None:
+    """Requests differing only by bounding box do not overwrite each other."""
+    _backend(
+        country_cache, tmp_path, lat_lim=[-1, 4], lon_lim=[-1, 4], return_period=100
+    ).download()
+    _backend(
+        country_cache, tmp_path, lat_lim=[30, 45], lon_lim=[30, 45], return_period=100
+    ).download()
+    assert len(list(tmp_path.glob("aqueduct_country_*_bbox*.gpkg"))) == 2
+
+
+def test_empty_tabular_result_warns(country_cache: Path, tmp_path: Path) -> None:
+    """A no-match tabular request emits an empty-table warning."""
+    from loguru import logger
+
+    messages: list[str] = []
+    sink = logger.add(messages.append, level="WARNING")
+    try:
+        _backend(
+            country_cache,
+            tmp_path,
+            country="Nowhere",
+            return_period=100,
+            geometry=False,
+        ).download()
+    finally:
+        logger.remove(sink)
+    assert any("empty table" in message for message in messages)
+
+
 def test_download_logs_source_attribution(country_cache: Path, tmp_path: Path) -> None:
     """A download logs the CC-BY attribution + licence."""
     from loguru import logger
