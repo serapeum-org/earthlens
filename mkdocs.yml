@@ -396,6 +396,11 @@ nav:
       - Usage: reference/radar/usage.md
       - Catalog & tooling: reference/radar/catalog.md
       - Reference: reference/radar/radar.md
+    - DWD RADKLIM / RADOLAN:
+      - Introduction: reference/radklim/introduction.md
+      - Usage: reference/radklim/usage.md
+      - Catalog: reference/radklim/catalog.md
+      - Reference: reference/radklim/radklim.md
     - GOES-R ABI (geostationary):
       - Introduction: reference/goes/introduction.md
       - Usage: reference/goes/usage.md
