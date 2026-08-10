@@ -725,6 +725,10 @@
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/radklim/catalog_explorer/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/risk_indicators/01_risk_indicators_quickstart/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
@@ -1838,6 +1842,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/radar/usage/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/radklim/catalog/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/radklim/introduction/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/radklim/radklim/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/radklim/usage/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
