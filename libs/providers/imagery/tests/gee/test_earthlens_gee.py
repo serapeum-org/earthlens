@@ -113,6 +113,7 @@ class TestRegistry:
             "eumetsat",
             "fdsn",
             "firms",
+            "flodis",
             "g-portal",
             "gbif",
             "gdacs",

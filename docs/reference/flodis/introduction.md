@@ -44,7 +44,7 @@ overlap window of the three input archives — so it is a historical record, not
 geometry. earthlens does **not** re-implement GDIS or the Global Flood Database — it exposes the join keys so you can
 attach the footprints from the layers earthlens already ships: the GDIS disaster geometry from the
 [`emdat`](../emdat/introduction.md) backend (joined on `disasterno`) and the GFD flood extents from the
-[`gee`](../google-earth-engine/introduction.md) backend
+[`gee`](../gee/introduction.md) backend
 (`GLOBAL_FLOOD_DB/MODIS_EVENTS/V1`). [Usage](usage.md) shows the join.
 
 **3. The two tables are keyed differently.** `damages` is keyed on the EM-DAT `disasterno`; `displacement` is keyed

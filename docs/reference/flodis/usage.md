@@ -56,7 +56,7 @@ gdis = EarthLens("emdat", variables=["gdis:points"], country="MOZ").download()  
 merged = gdis.to_dataframe().merge(damages, on="disasterno", how="inner", suffixes=("_gdis", "_flodis"))
 ```
 
-**Global Flood Database extents** come from the [`gee`](../google-earth-engine/introduction.md) backend
+**Global Flood Database extents** come from the [`gee`](../gee/introduction.md) backend
 (`GLOBAL_FLOOD_DB/MODIS_EVENTS/V1`). FLODIS records which GFD events it matched in `GFD_matches`, so you fetch the
 matching footprints and overlay them on the impact rows:
 
