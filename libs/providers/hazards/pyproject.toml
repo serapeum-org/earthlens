@@ -71,7 +71,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.aqueduct*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.gdacs*", "earthlens.hanze*", "earthlens.hdx*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
+include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.aqueduct*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.gdacs*", "earthlens.hanze*", "earthlens.hdx*", "earthlens.nsi*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -106,6 +106,7 @@ markers = [
     "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; requires the `osm-pbf` extra: pyrosm + osmium/pyosmium; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract).",
     "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
     "risk_indicators: tests for the risk-indicators backend (GFDRR ThinkHazard! + INFORM Risk + Global Forest Watch; no extra SDK — core requests + pandas + pyramids; GFW datasets need GFW_API_KEY, ThinkHazard/INFORM are public).",
+    "nsi: tests for the NSI US flood exposure/loss backend (USACE National Structure Inventory + FEMA NFHL flood zones + FEMA NFIP claims v3; no extra SDK — core requests + pandas + pyramids; per-instance OUTPUT_KIND; all three keyless US public domain).",
     "slow: mark test as slow.",
     "unit: in-process unit test, no network or filesystem outside tmp_path.",
 ]

@@ -318,6 +318,14 @@ def _validate_aqueduct(catalog: Any) -> tuple[int, list[str]]:
     return checked, issues
 
 
+def _validate_nsi(catalog: Any) -> tuple[int, list[str]]:
+    """Each NSI source needs a provider, endpoint, output kind, and field map."""
+    return _lint(
+        catalog,
+        lambda k, r: _require(k, r, ("provider", "endpoint", "output_kind", "fields")),
+    )
+
+
 def _validate_hanze(catalog: Any) -> tuple[int, list[str]]:
     """Each HANZE flood type needs a description; the record/geometry stay pinned.
 
@@ -877,6 +885,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "tropycal": _validate_tropycal,
     "gdacs": _validate_gdacs,
     "aqueduct": _validate_aqueduct,
+    "nsi": _validate_nsi,
     "hanze": _validate_hanze,
     "drought": _validate_drought,
     "argo": _validate_argo,
