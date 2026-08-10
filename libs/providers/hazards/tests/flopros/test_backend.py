@@ -18,17 +18,17 @@ def _backend(cache: Path, **kwargs) -> FLOPROS:
     return FLOPROS(cache_dir=cache, **kwargs)
 
 
-def test_download_returns_feature_collection(flopros_cache):
+def test_download_returns_feature_collection(flopros_cache, tmp_path):
     """A default download returns all three units as a FeatureCollection."""
-    fc = _backend(flopros_cache).download()
+    fc = _backend(flopros_cache, path=tmp_path).download()
     assert isinstance(fc, FeatureCollection)
     assert len(fc) == 3
     assert "merged_riverine" in fc.columns
 
 
-def test_layer_selection_keeps_only_requested_columns(flopros_cache):
+def test_layer_selection_keeps_only_requested_columns(flopros_cache, tmp_path):
     """`layer=` trims the value columns to the requested layer(s)."""
-    fc = _backend(flopros_cache, layer="merged_riverine").download()
+    fc = _backend(flopros_cache, layer="merged_riverine", path=tmp_path).download()
     value_cols = [c for c in fc.columns if c not in ("name", "geonunit", "type_en")]
     assert "merged_riverine" in value_cols
     assert "modelled_riverine" not in value_cols
