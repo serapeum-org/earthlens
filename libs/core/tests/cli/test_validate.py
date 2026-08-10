@@ -61,6 +61,8 @@ _CURATED_ENUM = (
     "wdpa",
     "iucn",
     "bathymetry",
+    "fabdem",
+    "jrc_flood",
     "pvgis",
     "glaciers",
     "soilgrids",
