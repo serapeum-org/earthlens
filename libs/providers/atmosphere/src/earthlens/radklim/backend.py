@@ -287,6 +287,13 @@ class RADKLIM(AbstractDataSource):
                 "outside the reprocessing coverage (2001 to the current year); no yearly "
                 "archive is enumerated, returning none."
             )
+        elif low and self.time.start_date.year < low:
+            logger.warning(
+                f"radklim: {product.product} window starts "
+                f"{self.time.start_date:%Y-%m-%d} — before the reprocessing coverage; "
+                f"only the {low}- portion is enumerated (mirrors the operational "
+                "retention straddle)."
+            )
         fmt = self._format_for(product)
         out: list[RemoteProduct] = []
         for year in years:
