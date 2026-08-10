@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from earthlens.flodis import Catalog, FlodisDataset, ZenodoRecord
 from earthlens.flodis import catalog as catalog_module
@@ -53,12 +54,12 @@ class TestZenodoRecord:
     def test_frozen(self) -> None:
         """The record is immutable."""
         record = ZenodoRecord(record=1)
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             record.record = 2  # type: ignore[misc]
 
     def test_extra_forbidden(self) -> None:
         """An unknown field is rejected."""
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             ZenodoRecord(record=1, bogus="x")  # type: ignore[call-arg]
 
 
@@ -100,8 +101,9 @@ class TestCatalogLoad:
 
     def test_dataset_unknown_hints(self) -> None:
         """An unknown table raises with a did-you-mean hint."""
+        cat = Catalog()
         with pytest.raises(ValueError, match="Did you mean 'damages'"):
-            Catalog().dataset("damage")
+            cat.dataset("damage")
 
     def test_column_maps_header(self) -> None:
         """A friendly key maps to its exact FLODIS header."""
@@ -109,8 +111,9 @@ class TestCatalogLoad:
 
     def test_column_unknown_raises(self) -> None:
         """An unmapped friendly key raises KeyError."""
+        cat = Catalog()
         with pytest.raises(KeyError):
-            Catalog().column("nope")
+            cat.column("nope")
 
     def test_dict_surface(self) -> None:
         """The catalog exposes the dict surface over its tables."""
@@ -139,20 +142,23 @@ class TestParseCatalog:
         text = (
             "datasets:\n  damages:\n    file: a.csv\n  displacement:\n    file: b.csv\n"
         )
+        path = _write(tmp_path, text)
         with pytest.raises(ValueError, match="'record:' block"):
-            catalog_module._parse_catalog([_write(tmp_path, text)])
+            catalog_module._parse_catalog([path])
 
     def test_missing_datasets(self, tmp_path: Path) -> None:
         """A catalog with no datasets block is rejected."""
         text = "record:\n  record: 1\n"
+        path = _write(tmp_path, text)
         with pytest.raises(ValueError, match="'datasets:' block"):
-            catalog_module._parse_catalog([_write(tmp_path, text)])
+            catalog_module._parse_catalog([path])
 
     def test_missing_required_table(self, tmp_path: Path) -> None:
         """A datasets block missing a required table is rejected."""
         text = "record:\n  record: 1\ndatasets:\n  damages:\n    file: a.csv\n"
+        path = _write(tmp_path, text)
         with pytest.raises(ValueError, match="missing required table 'displacement'"):
-            catalog_module._parse_catalog([_write(tmp_path, text)])
+            catalog_module._parse_catalog([path])
 
     def test_row_validation_error(self, tmp_path: Path) -> None:
         """A row with an unknown field fails validation."""
@@ -162,8 +168,9 @@ class TestParseCatalog:
             "  damages:\n    file: a.csv\n    bogus: 1\n"
             "  displacement:\n    file: b.csv\n"
         )
+        path = _write(tmp_path, text)
         with pytest.raises(ValueError, match="failed validation"):
-            catalog_module._parse_catalog([_write(tmp_path, text)])
+            catalog_module._parse_catalog([path])
 
 
 class TestClearCache:

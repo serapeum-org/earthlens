@@ -362,10 +362,8 @@ class TestResultStem:
         stem = _make(
             tmp_path, country="MOZ", start="2000", end="2018", fmt="%Y"
         )._result_stem()
-        assert (
-            stem.startswith("flodis_damages-")
-            and len(stem) == len("flodis_damages-") + 8
-        )
+        assert stem.startswith("flodis_damages-")
+        assert len(stem) == len("flodis_damages-") + 8
 
 
 class TestLogCitation:
