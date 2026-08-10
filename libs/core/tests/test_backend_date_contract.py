@@ -123,6 +123,7 @@ _NO_WINDOW_REQUIRED = {
     "Glaciers",
     "HANZE",
     "JRCFlood",
+    "NSI",
     "OSM",
     "Overture",
     "RiskIndicators",

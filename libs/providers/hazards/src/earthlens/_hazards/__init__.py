@@ -12,11 +12,14 @@ from __future__ import annotations
 
 __all__ = ["BACKENDS"]
 
-#: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 26 data-source keys.
+#: Module path shared by the three NSI facade keys (nsi / nfip / nfhl).
+_NSI = "earthlens.nsi"
+
 #: Module path for the JRC-flood backend, reused across its alias keys.
 _JRC_FLOOD = "earthlens.jrc_flood"
 
+#: `key -> (module, class_name, extras_hint, default_kwargs)` for this
+#: distribution's 29 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
@@ -44,6 +47,12 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'openstreetmap': ('earthlens.osm', 'OSM', 'osm', {}),
     'overpass': ('earthlens.osm', 'OSM', 'osm', {}),
     'ohsome': ('earthlens.osm', 'OSM', 'osm', {}),
+    # NSI — US object-level flood exposure & loss over three keyless sources.
+    # `nsi` defaults to source='structures'; the source-pinning aliases carry a
+    # default_kwargs so `EarthLens("nfip")` does not silently fall back to it.
+    'nsi': (_NSI, 'NSI', '', {}),
+    'nfip': (_NSI, 'NSI', '', {'source': 'nfip'}),
+    'nfhl': (_NSI, 'NSI', '', {'source': 'nfhl'}),
     'admin': ('earthlens.admin', 'AdminBoundaries', '', {}),
     'admin-boundaries': ('earthlens.admin', 'AdminBoundaries', '', {}),
     'geoboundaries': ('earthlens.admin', 'AdminBoundaries', '', {}),

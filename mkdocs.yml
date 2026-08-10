@@ -305,6 +305,10 @@ nav:
       - Usage: reference/risk_indicators/usage.md
       - Available datasets: reference/risk_indicators/datasets.md
       - Reference: reference/risk_indicators/risk_indicators.md
+    - US flood exposure & loss (NSI / NFHL / NFIP):
+      - Introduction: reference/nsi/introduction.md
+      - Usage: reference/nsi/usage.md
+      - Reference: reference/nsi/nsi.md
     - Glaciers (RGI / GLIMS / WGMS):
       - Introduction: reference/glaciers/introduction.md
       - Usage: reference/glaciers/usage.md
@@ -634,6 +638,8 @@ nav:
       - Quickstart — ThinkHazard + INFORM (live): examples/risk_indicators/01_risk_indicators_quickstart.ipynb
       - Catalog & behaviour (no network): examples/risk_indicators/02_catalog_and_behavior.ipynb
       - Global Forest Watch (live, needs key): examples/risk_indicators/03_global_forest_watch.ipynb
+    - US flood exposure & loss (NSI / NFHL / NFIP):
+      - Quickstart — NSI structures + NFIP claims (live): examples/nsi/01_nsi_quickstart.ipynb
     - Glaciers (RGI / GLIMS / WGMS):
       - Quickstart — RGI outlines (live): examples/glaciers/01_glaciers_quickstart.ipynb
       - Catalog & behaviour (no network): examples/glaciers/02_catalog_and_behavior.ipynb
