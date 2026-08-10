@@ -33,7 +33,9 @@ class TestFacadeRouting:
 
     def test_facade_builds_catrare_backend(self, catrare_cache: Path) -> None:
         """The facade binds a CatRaRE instance as its datasource."""
-        assert isinstance(_make_facade(catrare_cache).datasource, earthlens.catrare.CatRaRE)
+        assert isinstance(
+            _make_facade(catrare_cache).datasource, earthlens.catrare.CatRaRE
+        )
 
     def test_selection_kwargs_forwarded(self, catrare_cache: Path) -> None:
         """`threshold` / `geometry_layer` ride through to the backend."""

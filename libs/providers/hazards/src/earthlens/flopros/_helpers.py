@@ -91,9 +91,7 @@ def extract_shapefile(zip_path: Path, stem: str, dest_dir: Path) -> Path:
     Raises:
         FileNotFoundError: If no `.shp` member for `stem` is present.
     """
-    extracted = extract_members(
-        zip_path, dest_dir, include=_SHAPEFILE_EXTENSIONS
-    )
+    extracted = extract_members(zip_path, dest_dir, include=_SHAPEFILE_EXTENSIONS)
     for path in extracted:
         if path.name == f"{stem}.shp":
             return path

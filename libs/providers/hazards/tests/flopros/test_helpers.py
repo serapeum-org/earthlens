@@ -60,7 +60,8 @@ def test_resolve_layers_single_name():
 def test_resolve_layers_dedupes_a_list():
     """A list of layers is de-duplicated, order preserved."""
     resolved = resolve_layers(
-        Catalog().get("flopros"), ["modelled_riverine", "merged_riverine", "modelled_riverine"]
+        Catalog().get("flopros"),
+        ["modelled_riverine", "merged_riverine", "modelled_riverine"],
     )
     assert list(resolved) == ["modelled_riverine", "merged_riverine"]
 

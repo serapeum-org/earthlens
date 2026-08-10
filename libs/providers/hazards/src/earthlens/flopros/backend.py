@@ -285,9 +285,7 @@ class FLOPROS(AbstractDataSource):
         """
         collections = self._api()
         collection = collections[0]
-        logger.info(
-            f"FLOPROS {sorted(self._layers)}: {len(collection)} unit(s)."
-        )
+        logger.info(f"FLOPROS {sorted(self._layers)}: {len(collection)} unit(s).")
         logger.info(
             f"FLOPROS source: {self._catalog.attribution} "
             f"(licence {self._catalog.license})."

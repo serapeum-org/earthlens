@@ -58,9 +58,7 @@ def test_cache_miss_triggers_download(tmp_path, write_canned_gdb, monkeypatch):
         calls.append((url, dest))
         write_canned_gdb(dest)
 
-    monkeypatch.setattr(
-        "earthlens.catrare.backend.HttpClient.download", _fake_download
-    )
+    monkeypatch.setattr("earthlens.catrare.backend.HttpClient.download", _fake_download)
     fc = _backend(tmp_path / "cache", geometry=False).download()
     assert len(calls) == 1
     assert len(fc) == 3
@@ -77,9 +75,7 @@ def test_invalid_cached_zip_is_redownloaded(tmp_path, write_canned_gdb, monkeypa
         downloaded.append(dest)
         write_canned_gdb(dest)
 
-    monkeypatch.setattr(
-        "earthlens.catrare.backend.HttpClient.download", _fake_download
-    )
+    monkeypatch.setattr("earthlens.catrare.backend.HttpClient.download", _fake_download)
     fc = _backend(cache, geometry=False).download()
     assert len(downloaded) == 1
     assert len(fc) == 3

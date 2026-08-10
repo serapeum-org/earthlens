@@ -95,9 +95,7 @@ def test_write_filename_embeds_country_and_bbox(flopros_cache, tmp_path):
 
 def test_empty_result_with_geometry_writes_nothing(flopros_cache, tmp_path):
     """A country miss with geometry=True returns empty and writes no file."""
-    fc = FLOPROS(
-        cache_dir=flopros_cache, path=tmp_path, country="Atlantis"
-    ).download()
+    fc = FLOPROS(cache_dir=flopros_cache, path=tmp_path, country="Atlantis").download()
     assert isinstance(fc, FeatureCollection)
     assert len(fc) == 0
     assert not list(tmp_path.glob("*.gpkg"))
@@ -111,9 +109,7 @@ def test_cache_miss_triggers_download(tmp_path, write_canned_zip, monkeypatch):
         calls.append((url, dest))
         write_canned_zip(dest)
 
-    monkeypatch.setattr(
-        "earthlens.flopros.backend.HttpClient.download", _fake_download
-    )
+    monkeypatch.setattr("earthlens.flopros.backend.HttpClient.download", _fake_download)
     fc = FLOPROS(cache_dir=tmp_path / "cache", geometry=False).download()
     assert len(calls) == 1
     assert len(fc) == 3
@@ -130,9 +126,7 @@ def test_invalid_cached_zip_is_redownloaded(tmp_path, write_canned_zip, monkeypa
         downloaded.append(dest)
         write_canned_zip(dest)
 
-    monkeypatch.setattr(
-        "earthlens.flopros.backend.HttpClient.download", _fake_download
-    )
+    monkeypatch.setattr("earthlens.flopros.backend.HttpClient.download", _fake_download)
     fc = FLOPROS(cache_dir=cache, geometry=False).download()
     assert len(downloaded) == 1
     assert len(fc) == 3

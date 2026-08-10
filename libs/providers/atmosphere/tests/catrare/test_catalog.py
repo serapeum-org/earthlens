@@ -44,14 +44,21 @@ def test_shared_metadata_present():
 def test_download_url_composed():
     """`download_url` composes the versioned `.gdb.zip` path."""
     url = Catalog().download_url("t5")
-    assert url.endswith("CatRaRE_v2026.01/data/CatRaRE_2001_2025_T5_Eta_v2026_01.gdb.zip")
+    assert url.endswith(
+        "CatRaRE_v2026.01/data/CatRaRE_2001_2025_T5_Eta_v2026_01.gdb.zip"
+    )
 
 
 def test_layer_name_composed():
     """`layer_name` composes the `<stem>_<layer>_<tag>` FileGDB layer name."""
     cat = Catalog()
-    assert cat.layer_name("t5", "zones") == "CatRaRE_2001_2025_T5_Eta_EventZones_v2026_01"
-    assert cat.layer_name("w3", "points") == "CatRaRE_2001_2025_W3_Eta_RRmaxPoints_v2026_01"
+    assert (
+        cat.layer_name("t5", "zones") == "CatRaRE_2001_2025_T5_Eta_EventZones_v2026_01"
+    )
+    assert (
+        cat.layer_name("w3", "points")
+        == "CatRaRE_2001_2025_W3_Eta_RRmaxPoints_v2026_01"
+    )
 
 
 def test_layer_name_unknown_geometry_raises():

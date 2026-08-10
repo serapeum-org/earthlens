@@ -18,12 +18,24 @@ _EVENT_COLUMNS = Catalog().event_columns
 # German extent (kept by a Germany bbox / reprojected to ~lon 6-14, lat 47-54)
 # and dated in July 2021; one dated in 2005 for the date-filter negative case.
 _EVENTS = [
-    dict(Event_ID=1, Date_START="2021-07-14 09:50:00", Date_END="2021-07-14 12:50:00",
-         xy=(0.0, -4400000.0)),
-    dict(Event_ID=2, Date_START="2021-07-15 00:50:00", Date_END="2021-07-15 06:50:00",
-         xy=(100000.0, -4300000.0)),
-    dict(Event_ID=3, Date_START="2005-08-01 00:50:00", Date_END="2005-08-01 06:50:00",
-         xy=(-200000.0, -4600000.0)),
+    dict(
+        Event_ID=1,
+        Date_START="2021-07-14 09:50:00",
+        Date_END="2021-07-14 12:50:00",
+        xy=(0.0, -4400000.0),
+    ),
+    dict(
+        Event_ID=2,
+        Date_START="2021-07-15 00:50:00",
+        Date_END="2021-07-15 06:50:00",
+        xy=(100000.0, -4300000.0),
+    ),
+    dict(
+        Event_ID=3,
+        Date_START="2005-08-01 00:50:00",
+        Date_END="2005-08-01 06:50:00",
+        xy=(-200000.0, -4600000.0),
+    ),
 ]
 
 

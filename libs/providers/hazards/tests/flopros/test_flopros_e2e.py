@@ -19,13 +19,17 @@ pytestmark = [pytest.mark.e2e, pytest.mark.flopros]
 
 def test_live_download_returns_real_collection(tmp_path: Path) -> None:
     """A live download returns the ~4650 FLOPROS protection polygons."""
-    fc = FLOPROS(
-        layer="merged_riverine", path=tmp_path, cache_dir=tmp_path
-    ).download()
+    fc = FLOPROS(layer="merged_riverine", path=tmp_path, cache_dir=tmp_path).download()
 
     assert isinstance(fc, FeatureCollection)
     assert len(fc) > 4000  # ~4650 subnational units in the shipped shapefile
-    assert list(fc.columns) == ["name", "geonunit", "type_en", "merged_riverine", "geometry"]
+    assert list(fc.columns) == [
+        "name",
+        "geonunit",
+        "type_en",
+        "merged_riverine",
+        "geometry",
+    ]
     assert fc.crs.to_epsg() == 4326
     assert (fc["merged_riverine"] >= 0).all()
     assert list(tmp_path.glob("flopros_*.gpkg"))

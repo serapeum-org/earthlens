@@ -26,9 +26,7 @@ if TYPE_CHECKING:
 FEATURE_CRS = "EPSG:4326"
 
 
-def read_events(
-    zip_path: Path, layer: str, source_crs: str
-) -> FeatureCollection:
+def read_events(zip_path: Path, layer: str, source_crs: str) -> FeatureCollection:
     """Read one FileGDB layer and reproject it to EPSG:4326.
 
     The CatRaRE FileGDB carries no embedded CRS; its geometry is in the DWD
@@ -44,7 +42,9 @@ def read_events(
         FeatureCollection: The layer's features, reprojected to EPSG:4326.
     """
     source = FeatureCollection.read_file(f"/vsizip/{zip_path}", layer=layer)
-    return FeatureCollection(source.set_crs(source_crs, allow_override=True).to_crs(FEATURE_CRS))
+    return FeatureCollection(
+        source.set_crs(source_crs, allow_override=True).to_crs(FEATURE_CRS)
+    )
 
 
 def build_feature_collection(
