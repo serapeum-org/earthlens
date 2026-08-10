@@ -348,26 +348,27 @@ class RADKLIM(AbstractDataSource):
                 out.append(fetched)
         return out
 
-    def _fetch_one(self, rp: RemoteProduct) -> Path | None:
+    def _fetch_one(self, product: RemoteProduct) -> Path | None:
         """Download one granule, or return `None` when it is not published.
 
         Args:
-            rp: One :class:`~earthlens.base.RemoteProduct` from :meth:`_search`.
+            product: One :class:`~earthlens.base.RemoteProduct` from
+                :meth:`_search`.
 
         Returns:
             Path | None: The written path, or `None` when the URL 404s.
         """
-        assert rp.href is not None  # every radklim product carries a granule URL
-        dest = self.root_dir / safe_filename(rp.href.rsplit("/", 1)[-1])
-        magic = FORMAT_MAGIC[rp.metadata["format"]]
+        assert product.href is not None  # every radklim product carries a granule URL
+        dest = self.root_dir / safe_filename(product.href.rsplit("/", 1)[-1])
+        magic = FORMAT_MAGIC[product.metadata["format"]]
         try:
             self._http.download(
-                rp.href, dest, progress=self._show_progress, expect_magic=magic
+                product.href, dest, progress=self._show_progress, expect_magic=magic
             )
         except requests.HTTPError as exc:
             if _is_missing(exc):
                 logger.warning(
-                    f"radklim: skipping {rp.id} — not published ({rp.href})."
+                    f"radklim: skipping {product.id} — not published ({product.href})."
                 )
                 return None
             raise
