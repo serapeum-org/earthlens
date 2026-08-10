@@ -113,8 +113,9 @@ class TestSearch:
     def test_empty_plan_raises(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         """An AOI intersecting no land grid cell raises."""
         monkeypatch.setattr(backend_module, "bundles_for_bbox", lambda bbox: {})
+        backend = _make(tmp_path)
         with pytest.raises(ValueError, match="no FABDEM land tiles"):
-            _make(tmp_path)._search()
+            backend._search()
 
 
 class TestDownload:
@@ -153,10 +154,11 @@ class TestDownload:
             "extract_tiles",
             lambda zip_path, dest, names: [],
         )
+        backend = _make(tmp_path)
         with warnings.catch_warnings():
             warnings.simplefilter("error", LicenseWarning)
             with pytest.raises(ValueError, match="no published 1"):
-                _make(tmp_path).download()
+                backend.download()
 
     def test_idempotent_skip_same_aoi(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, fake_localise: dict
@@ -320,8 +322,9 @@ class TestDownload:
             _fake_extract,
         )
         # The write fails inside _fetch, before the (post-fetch) licence warning.
+        backend = _make(tmp_path)
         with pytest.raises(RuntimeError, match="disk full"):
-            _make(tmp_path).download()
+            backend.download()
         assert not (tmp_path / "fabdem_V1-2.part.tif").exists()
         assert not (tmp_path / "fabdem_V1-2.tif").exists()
         # #5: the merge intermediate is cleaned up even on a write failure.

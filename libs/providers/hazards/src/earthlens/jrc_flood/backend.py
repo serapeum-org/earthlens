@@ -255,7 +255,7 @@ class JRCFlood(AbstractDataSource):
                 key = geometry.to_json()
             else:
                 key = getattr(geometry, "wkt", str(geometry))
-            tag += "|" + hashlib.sha1(key.encode("utf-8")).hexdigest()
+            tag += "|" + hashlib.sha256(key.encode("utf-8")).hexdigest()
         return tag
 
     def _is_cached(self, target: Path) -> bool:

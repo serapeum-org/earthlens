@@ -147,8 +147,9 @@ class TestDownloadBundle:
         monkeypatch.setattr(
             h, "HttpClient", lambda **kw: _FakeClient(error=_http_error(500), **kw)
         )
+        url = h.bundle_url("N50E000-N60E010")
         with pytest.raises(requests.HTTPError):
-            h.download_bundle(h.bundle_url("N50E000-N60E010"), tmp_path)
+            h.download_bundle(url, tmp_path)
 
     def test_transport_error_wrapped(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -159,8 +160,9 @@ class TestDownloadBundle:
             "HttpClient",
             lambda **kw: _FakeClient(error=requests.ConnectionError("boom"), **kw),
         )
+        url = h.bundle_url("N50E000-N60E010")
         with pytest.raises(requests.HTTPError, match="failed after"):
-            h.download_bundle(h.bundle_url("N50E000-N60E010"), tmp_path)
+            h.download_bundle(url, tmp_path)
 
     def test_idempotent_existing_zip(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch

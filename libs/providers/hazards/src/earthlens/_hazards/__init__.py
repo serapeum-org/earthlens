@@ -14,6 +14,9 @@ __all__ = ["BACKENDS"]
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
 #: distribution's 25 data-source keys.
+#: Module path for the JRC-flood backend, reused across its alias keys.
+_JRC_FLOOD = "earthlens.jrc_flood"
+
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
@@ -25,10 +28,10 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'hdx': ('earthlens.hdx', 'HDX', 'hdx', {}),
     'overture': ('earthlens.overture', 'Overture', 'overture', {}),
     'firms': ('earthlens.firms', 'FIRMS', '', {}),
-    'jrc-flood': ('earthlens.jrc_flood', 'JRCFlood', '', {}),
-    'efhm': ('earthlens.jrc_flood', 'JRCFlood', '', {}),
-    'jrc-flood-hazard': ('earthlens.jrc_flood', 'JRCFlood', '', {}),
-    'european-flood-hazard': ('earthlens.jrc_flood', 'JRCFlood', '', {}),
+    'jrc-flood': (_JRC_FLOOD, 'JRCFlood', '', {}),
+    'efhm': (_JRC_FLOOD, 'JRCFlood', '', {}),
+    'jrc-flood-hazard': (_JRC_FLOOD, 'JRCFlood', '', {}),
+    'european-flood-hazard': (_JRC_FLOOD, 'JRCFlood', '', {}),
     'risk-indicators': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'thinkhazard': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'inform': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),

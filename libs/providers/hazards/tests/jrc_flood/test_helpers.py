@@ -66,8 +66,10 @@ class TestPixelWindow:
         window = h.pixel_window(_GT, (-30.0, 68.0, -20.0, 75.0), _COLUMNS, _ROWS)
         assert window is not None
         col_off, row_off, cols, rows = window
-        assert col_off == 0 and row_off == 0
-        assert 0 < cols <= _COLUMNS and 0 < rows <= _ROWS
+        assert col_off == 0
+        assert row_off == 0
+        assert 0 < cols <= _COLUMNS
+        assert 0 < rows <= _ROWS
 
 
 class TestConfigureGdalHttp:
@@ -116,6 +118,7 @@ class TestWindowOrigin:
     def test_shifts_origin_keeps_pixel_size(self):
         """window_origin shifts the origin by the offset, keeping pixel sizes."""
         geo = h.window_origin(_GT, 35210, 22960)
-        assert geo[1] == _GT[1] and geo[5] == _GT[5]
+        assert geo[1] == _GT[1]
+        assert geo[5] == _GT[5]
         assert geo[0] == pytest.approx(_GT[0] + 35210 * _GT[1])
         assert geo[3] == pytest.approx(_GT[3] + 22960 * _GT[5])

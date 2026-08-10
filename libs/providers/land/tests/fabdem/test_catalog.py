@@ -42,8 +42,9 @@ class TestCatalog:
 
     def test_unknown_key_raises_did_you_mean(self):
         """An unknown key raises with a did-you-mean hint."""
+        catalog = Catalog()
         with pytest.raises(ValueError, match="fabdem"):
-            Catalog().get("fabdm")
+            catalog.get("fabdm")
 
     def test_load_classmethod_matches_default(self):
         """Catalog.load() with no path reads the bundled catalog."""

@@ -14,6 +14,9 @@ __all__ = ["BACKENDS"]
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
 #: distribution's 26 data-source keys.
+#: Module path for the FABDEM backend, reused across its alias keys.
+_FABDEM = "earthlens.fabdem"
+
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'ghsl': ('earthlens.ghsl', 'GHSL', '', {}),
     'ghs': ('earthlens.ghsl', 'GHSL', '', {}),
@@ -38,7 +41,7 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'copernicus-dem': ('earthlens.dem', 'DEM', 's3', {}),
     'cop-dem': ('earthlens.dem', 'DEM', 's3', {}),
     'elevation': ('earthlens.dem', 'DEM', 's3', {}),
-    'fabdem': ('earthlens.fabdem', 'FABDEM', '', {}),
-    'fab-dem': ('earthlens.fabdem', 'FABDEM', '', {}),
-    'bare-earth-dem': ('earthlens.fabdem', 'FABDEM', '', {}),
+    'fabdem': (_FABDEM, 'FABDEM', '', {}),
+    'fab-dem': (_FABDEM, 'FABDEM', '', {}),
+    'bare-earth-dem': (_FABDEM, 'FABDEM', '', {}),
 }

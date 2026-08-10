@@ -40,8 +40,9 @@ class TestCatalog:
 
     def test_unknown_key_raises(self):
         """An unknown key raises a did-you-mean error."""
+        catalog = Catalog()
         with pytest.raises(ValueError, match="efhm"):
-            Catalog().get("efmh")
+            catalog.get("efmh")
 
     def test_load_classmethod(self):
         """Catalog.load() reads the bundled catalog."""

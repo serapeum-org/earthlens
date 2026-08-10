@@ -186,10 +186,9 @@ class TestFetch:
         fake_pyramids["source"] = _FakeSource(
             (0.0, 0.01, 0.0, 10.0, 0.0, -0.01), 100, 100
         )
+        backend = JRCFlood(lat_lim=[50.0, 51.0], lon_lim=[50.0, 51.0], path=tmp_path)
         with pytest.raises(ValueError, match="outside the EFHM"):
-            JRCFlood(
-                lat_lim=[50.0, 51.0], lon_lim=[50.0, 51.0], path=tmp_path
-            ).download()
+            backend.download()
 
     def test_idempotent_skip_same_aoi(self, tmp_path: Path, fake_pyramids: dict):
         """A re-request for the same AOI skips the windowed read (sidecar match)."""
@@ -231,7 +230,8 @@ class TestFetch:
 
         monkeypatch.setattr(pyr_dataset, "Dataset", _FakeDataset)
         monkeypatch.setattr(backend_module, "crop_to_aoi", lambda ds, space, **kw: ds)
+        backend = _make(tmp_path, return_periods=[100])
         with pytest.raises(RuntimeError, match="disk full"):
-            _make(tmp_path, return_periods=[100]).download()
+            backend.download()
         assert not (tmp_path / "efhm_RP100.part.tif").exists()
         assert not (tmp_path / "efhm_RP100.tif").exists()
