@@ -159,4 +159,6 @@ def timestamp_from_name(name: str) -> dt.datetime:
     match = _GRANULE_RE.search(name)
     if match is None:
         raise ValueError(f"{name!r} carries no RADOLAN timestamp.")
+    # The granule name carries only two year digits; `%y` pivots 00-68 -> 2000-2068
+    # and 69-99 -> 1969-1999. Harmless for the operational stream's ~2-day horizon.
     return dt.datetime.strptime(match.group("ts"), "%y%m%d%H%M")

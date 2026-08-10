@@ -61,7 +61,7 @@ HDF5 opens directly:
 from pyramids.dataset import Dataset
 
 ds = Dataset.read_file(str(paths[0]))   # operational .hdf5
-print(ds.shape)                          # (1, 1200, 1100) on the RADOLAN grid
+print(ds.shape)   # grid-dependent — e.g. (1, 1200, 1100) for the RW HDF5 above
 ```
 
 The RADKLIM `.tar.gz` is a gzip-of-tar of per-timestamp `.nc` files; extract it
