@@ -23,6 +23,10 @@ if TYPE_CHECKING:
 #: ISO-8601 stamp ERDDAP accepts for `time` constraints (UTC `Z`).
 _ISO_TIME = "%Y-%m-%dT%H:%M:%SZ"
 
+#: The two ERDDAP longitude subset-constraint keys (`>=` / `<=`).
+_LON_GE = "longitude>="
+_LON_LE = "longitude<="
+
 
 def build_constraints(
     space: SpatialExtent,
@@ -108,8 +112,8 @@ def build_constraints(
         "time<=": time.end_date.strftime(_ISO_TIME),
         "latitude>=": space.south,
         "latitude<=": space.north,
-        "longitude>=": space.west,
-        "longitude<=": space.east,
+        _LON_GE: space.west,
+        _LON_LE: space.east,
     }
     if protocol == "griddap":
         return {**base, "time_step": 1, "latitude_step": 1, "longitude_step": 1}
@@ -121,7 +125,7 @@ def build_constraints(
             # so drop the longitude filter and let latitude + time subset the
             # stations. Warn loudly: the caller gets every latitude-matching
             # station, not just those in its longitude band.
-            del base["longitude>="], base["longitude<="]
+            del base[_LON_GE], base[_LON_LE]
             logger.warning(
                 f"ERDDAP lon_360: the requested longitude band "
                 f"[{space.west}, {space.east}] wraps the 0/360 seam (or is "
@@ -130,7 +134,7 @@ def build_constraints(
                 "request at 0 deg (or 180 deg) for a longitude-bounded result."
             )
         else:
-            base["longitude>="], base["longitude<="] = west, east
+            base[_LON_GE], base[_LON_LE] = west, east
     return base
 
 
