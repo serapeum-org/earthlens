@@ -303,8 +303,19 @@ def _validate_gdacs(catalog: Any) -> tuple[int, list[str]]:
 
 
 def _validate_aqueduct(catalog: Any) -> tuple[int, list[str]]:
-    """Each Aqueduct admin level needs a download zip and a shapefile stem."""
-    return _lint(catalog, lambda k, r: _require(k, r, ("zip", "shapefile_stem")))
+    """Each admin level needs a zip + shapefile stem, and every vocab is populated.
+
+    Beyond the admin-level rows, the request path resolves a column name from the
+    `indicators` / `years` / `scenarios` / `return_periods` vocabularies, so an
+    emptied vocabulary would load cleanly yet break every download — flag it here.
+    """
+    checked, issues = _lint(
+        catalog, lambda k, r: _require(k, r, ("zip", "shapefile_stem"))
+    )
+    for vocabulary in ("indicators", "years", "scenarios", "return_periods"):
+        if not getattr(catalog, vocabulary, None):
+            issues.append(f"catalog: the {vocabulary!r} vocabulary is empty")
+    return checked, issues
 
 
 #: Drought transports whose output is a raster (vs USDM's vector polygons).

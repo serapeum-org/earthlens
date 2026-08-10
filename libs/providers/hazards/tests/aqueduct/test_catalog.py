@@ -106,6 +106,18 @@ def test_get_catalog_returns_datasets() -> None:
     assert cat.get_catalog() is cat.datasets
 
 
+def test_cli_validator_flags_empty_vocabulary() -> None:
+    """The datasets-validate validator passes a full catalog but flags an empty vocab."""
+    from earthlens.cli.validate import _validate_aqueduct
+
+    checked, issues = _validate_aqueduct(Catalog())
+    assert checked == 3
+    assert issues == []
+    emptied = Catalog().model_copy(update={"return_periods": {}})
+    _, broken = _validate_aqueduct(emptied)
+    assert any("return_periods" in issue for issue in broken)
+
+
 def test_malformed_admin_level_raises(tmp_path: Path, monkeypatch) -> None:
     """An admin-level row with an unknown field fails validation."""
     bad = tmp_path / "bad.yaml"
