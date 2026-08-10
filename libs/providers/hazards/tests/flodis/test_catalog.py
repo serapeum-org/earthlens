@@ -43,7 +43,9 @@ class TestZenodoRecord:
 
     def test_fields(self) -> None:
         """The record carries the pinned id, licence and data period."""
-        record = ZenodoRecord(record=8123096, license="CC-BY-4.0", data_period="2000-2018")
+        record = ZenodoRecord(
+            record=8123096, license="CC-BY-4.0", data_period="2000-2018"
+        )
         assert record.record == 8123096
         assert record.license == "CC-BY-4.0"
         assert record.data_period == "2000-2018"
@@ -134,7 +136,9 @@ class TestParseCatalog:
 
     def test_missing_record(self, tmp_path: Path) -> None:
         """A catalog with no record block is rejected."""
-        text = "datasets:\n  damages:\n    file: a.csv\n  displacement:\n    file: b.csv\n"
+        text = (
+            "datasets:\n  damages:\n    file: a.csv\n  displacement:\n    file: b.csv\n"
+        )
         with pytest.raises(ValueError, match="'record:' block"):
             catalog_module._parse_catalog([_write(tmp_path, text)])
 

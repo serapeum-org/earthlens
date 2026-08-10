@@ -56,4 +56,6 @@ class TestFlodisLiveDownload:
         assert len(displacement) > 0, "expected IDMC displacement events"
         for column in ("ISO3", "year", "displacements", "GID_1", "GID_2"):
             assert column in displacement.columns, f"missing FLODIS column {column!r}"
-        assert (tmp_path / "flodis_displacement.csv").exists(), "displacement CSV written"
+        assert (tmp_path / "flodis_displacement.csv").exists(), (
+            "displacement CSV written"
+        )

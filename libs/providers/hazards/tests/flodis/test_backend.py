@@ -96,7 +96,9 @@ class TestNormalizeGid:
     def test_valid_on_displacement(self) -> None:
         """A gid is accepted for the GADM-keyed displacement table."""
         row = backend_module.Catalog().dataset("displacement")
-        assert backend_module._normalize_gid("moz.1_1", "displacement", row) == {"MOZ.1_1"}
+        assert backend_module._normalize_gid("moz.1_1", "displacement", row) == {
+            "MOZ.1_1"
+        }
 
     def test_rejected_on_damages(self) -> None:
         """A gid is rejected for the non-GADM damages table."""
@@ -132,7 +134,9 @@ class TestInit:
         """The country argument is normalised to an upper-cased set."""
         assert _make(tmp_path, country="moz")._country == {"MOZ"}
 
-    def test_malformed_record_raises(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_malformed_record_raises(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """A catalog whose record failed to load is reported clearly."""
 
         class _NoRecordCatalog:
@@ -173,7 +177,9 @@ class TestLoadTable:
         assert not any(col.startswith("Unnamed") for col in table.columns)
         assert "disasterno" in table.columns
 
-    def test_downloads_when_absent(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_downloads_when_absent(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """A missing CSV is fetched via the client with the magic guard."""
         backend = _make(tmp_path)
         client = _FakeClient(DAMAGES_CSV)
@@ -288,8 +294,13 @@ class TestResultStem:
 
     def test_digest_when_filtered(self, tmp_path: Path) -> None:
         """A filtered request appends a stable digest to the stem."""
-        stem = _make(tmp_path, country="MOZ", start="2000", end="2018", fmt="%Y")._result_stem()
-        assert stem.startswith("flodis_damages-") and len(stem) == len("flodis_damages-") + 8
+        stem = _make(
+            tmp_path, country="MOZ", start="2000", end="2018", fmt="%Y"
+        )._result_stem()
+        assert (
+            stem.startswith("flodis_damages-")
+            and len(stem) == len("flodis_damages-") + 8
+        )
 
 
 class TestLogCitation:
