@@ -41,6 +41,7 @@ class FakeHttp:
         missing: File names whose `download()` raises a 404.
         downloaded: File names downloaded so far (call order).
         got: URLs passed to `get()`.
+        download_headers: The `headers=` mapping passed to each `download()`.
     """
 
     def __init__(
@@ -54,6 +55,7 @@ class FakeHttp:
         self.missing = set(missing)
         self.downloaded: list[str] = []
         self.got: list[str] = []
+        self.download_headers: list[dict[str, str] | None] = []
 
     def get(self, url: str, **kwargs: object) -> _Resp:
         """Return the canned listing response, recording the URL."""
@@ -67,14 +69,17 @@ class FakeHttp:
         *,
         progress: bool = True,
         expect_magic: bytes | tuple[bytes, ...] | None = None,
+        headers: dict[str, str] | None = None,
         **kwargs: object,
     ) -> Path:
         """Write the canned bytes for `url` to `dest`, or 404 for a missing name.
 
         Honours `expect_magic` the way `HttpClient.download` does — a canned body
         that starts with none of the accepted prefixes raises `ValueError`, so a
-        wrong-format body is rejected in tests instead of silently written.
+        wrong-format body is rejected in tests instead of silently written — and
+        records the request `headers` so a test can assert what was sent.
         """
+        self.download_headers.append(headers)
         name = url.rsplit("/", 1)[-1]
         if name in self.missing:
             raise requests.HTTPError(response=_MissingResp())
@@ -111,3 +116,14 @@ OPERATIONAL_LISTING = """
 def operational_listing() -> str:
     """Return the canned operational directory-listing HTML."""
     return OPERATIONAL_LISTING
+
+
+@pytest.fixture
+def loguru_messages():
+    """Collect WARNING+ loguru messages into a list (loguru bypasses caplog)."""
+    from loguru import logger
+
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+    yield messages
+    logger.remove(sink_id)

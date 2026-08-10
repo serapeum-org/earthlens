@@ -40,7 +40,7 @@ def _network_available() -> bool:
 @pytest.mark.skipif(not _network_available(), reason="opendata.dwd.de unreachable")
 def test_operational_hdf5_download(tmp_path):
     """A recent radolan-rw window downloads at least one readable HDF5 granule."""
-    now = dt.datetime.now(dt.timezone.utc).replace(tzinfo=None)
+    now = dt.datetime.now(dt.UTC).replace(tzinfo=None)
     backend = RADKLIM(
         start=(now - dt.timedelta(minutes=95)).strftime("%Y-%m-%dT%H:%M"),
         end=now.strftime("%Y-%m-%dT%H:%M"),

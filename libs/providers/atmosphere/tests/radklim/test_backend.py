@@ -121,10 +121,26 @@ class TestSearchReproc:
         p = _make(tmp_path)._search()[0]
         assert p.metadata["format"] == "nc"
 
-    def test_window_before_archive_returns_empty(self, tmp_path):
-        """A window entirely before the 2001 archive start enumerates nothing."""
+    def test_window_before_archive_returns_empty(self, tmp_path, loguru_messages):
+        """A window entirely before the 2001 archive start enumerates nothing, with a warning."""
         b = _make(tmp_path, start="1990-01-01", end="1995-01-01")
         assert b._search() == []
+        assert any("outside the reprocessing coverage" in m for m in loguru_messages)
+
+    def test_future_window_returns_empty_with_warning(self, tmp_path, loguru_messages):
+        """A window entirely in the future enumerates nothing, with a warning."""
+        b = _make(
+            tmp_path, start="2030-01-01", end="2031-01-01", now=dt.datetime(2026, 6, 1)
+        )
+        assert b._search() == []
+        assert any("outside the reprocessing coverage" in m for m in loguru_messages)
+
+    def test_pre_2001_straddle_warns(self, tmp_path, loguru_messages):
+        """A window starting before 2001 enumerates the 2001- portion, with a warning."""
+        b = _make(tmp_path, start="1998-01-01", end="2003-06-01")
+        years = [p.metadata["year"] for p in b._search()]
+        assert years == [2001, 2002, 2003], years
+        assert any("before the reprocessing coverage" in m for m in loguru_messages)
 
     def test_clamps_end_to_current_year(self, tmp_path):
         """A window ending in the future is clamped to the current year."""
@@ -231,14 +247,16 @@ class TestSearchOperational:
             start="2024-01-01T12:00",
             end="2024-01-01T12:07",
             fmt="%Y-%m-%dT%H:%M",
-            now=dt.datetime(2024, 1, 1, 13, 0, tzinfo=dt.timezone.utc),
+            now=dt.datetime(2024, 1, 1, 13, 0, tzinfo=dt.UTC),
             http=http,
         )
         assert b._current_time() == dt.datetime(2024, 1, 1, 13, 0)
         assert len(b._search()) == 2
 
-    def test_straddling_retention_returns_tail(self, tmp_path, operational_listing):
-        """A window straddling the retention edge returns the retained tail."""
+    def test_straddling_retention_returns_tail(
+        self, tmp_path, operational_listing, loguru_messages
+    ):
+        """A window straddling the retention edge returns the retained tail, with a warning."""
         http = FakeHttp(listing=operational_listing)
         b = _make(
             tmp_path,
@@ -249,6 +267,7 @@ class TestSearchOperational:
             http=http,
         )
         assert len(b._search()) == 3, "the in-listing 2024-01-01 granules are returned"
+        assert any("only the retained tail" in m for m in loguru_messages)
 
     def test_retention_expired_returns_empty(self, tmp_path, operational_listing):
         """A window before the retention window returns nothing (with a warning)."""
@@ -285,6 +304,13 @@ class TestFetch:
         b = _make(tmp_path, start="2023-01-01", end="2024-01-01", http=http)
         out = b.download(progress_bar=False)
         assert [p.name for p in out] == ["YW2017.002_2023_netcdf.tar.gz"], out
+
+    def test_download_sends_identity_encoding(self, tmp_path):
+        """Each granule download sends Accept-Encoding: identity (no transparent gunzip)."""
+        http = FakeHttp()
+        b = _make(tmp_path, start="2023-01-01", end="2023-06-01", http=http)
+        b.download(progress_bar=False)
+        assert http.download_headers == [{"Accept-Encoding": "identity"}]
 
     def test_wrong_magic_body_rejected(self, tmp_path):
         """A body that fails the format magic-byte check is rejected, not written."""
