@@ -54,6 +54,7 @@ class TestConstruction:
             ({"scenario": "ssp999"}, "not a curated ISIMIP scenario"),
             ({"gcm": "no-such-model"}, "not a curated ISIMIP forcing"),
             ({"variables": ["nope"]}, "not in the ISIMIP catalog"),
+            ({"product": "Nope"}, "not an ISIMIP product"),
             ({"temporal_resolution": "hourly"}, "not an ISIMIP time_step"),
         ],
     )

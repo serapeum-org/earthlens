@@ -63,15 +63,7 @@ class ISIMIP(AbstractDataSource):
         "with earthlens.aggregate.aggregate_netcdf"
     )
 
-    #: Seconds between cutout-job status polls (an internal cadence, not a request
-    #: knob).
-    POLL_SECONDS: float = 4.0
-
-    #: ISIMIP product this backend fetches. It resolves the bias-adjusted climate
-    #: *forcing* (`InputData`); impact-model `OutputData` is out of scope here.
-    PRODUCT: str = "InputData"
-
-    def __init__(
+    def __init__(  # NOSONAR(S107) - one keyword per ISIMIP request facet; the facade forwards these flat, matching every sibling backend (e.g. cmip6)
         self,
         start: str,
         end: str,
@@ -80,24 +72,29 @@ class ISIMIP(AbstractDataSource):
         variables: list[str] | None = None,
         scenario: str | None = None,
         gcm: str | None = None,
+        product: str = "InputData",
         temporal_resolution: str = "daily",
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         whole_globe: bool = False,
+        poll: float = 4.0,
         path: Path | str = "",
         fmt: str = "%Y-%m-%d",
+        catalog: Catalog | None = None,
         client: IsimipClient | None = None,
     ):
         """Initialise an ISIMIP backend instance.
 
         Args:
-            start: Inclusive start of the date window (ISO `YYYY-MM-DD`).
-            end: Inclusive end of the date window (ISO `YYYY-MM-DD`).
+            start: Inclusive start of the date window (parsed with `fmt`).
+            end: Inclusive end of the date window.
             dataset: The `simulation_round` (`"ISIMIP3b"` / `"ISIMIP3a"`).
             variables: The `climate_variable`s to fetch (`["pr"]`, `["tas"]`).
             scenario: The `climate_scenario` (`"ssp585"`, `"historical"`).
             gcm: The `climate_forcing` (`"gfdl-esm4"`); any casing is accepted
                 and lowercased to the API spelling.
+            product: `"InputData"` (bias-adjusted forcing) or `"OutputData"`
+                (impact-model results). Defaults to `"InputData"`.
             temporal_resolution: The ISIMIP `time_step` — `"daily"` or
                 `"monthly"`. Defaults to `"daily"`.
             lat_lim: `[lat_min, lat_max]` in degrees for the cutout bbox.
@@ -105,20 +102,20 @@ class ISIMIP(AbstractDataSource):
             whole_globe: Skip the cutout and download the raw whole-globe
                 granules (warned — each is ~1-2 GB). Defaults to `False`; a
                 request must give a bbox or set this.
+            poll: Seconds between cutout-job status polls. Defaults to `4.0`.
             path: Output directory for the written NetCDFs.
-            fmt: `strptime` format for `start` / `end`. Defaults to ISO
-                `"%Y-%m-%d"`.
+            fmt: `strptime` format for `start` / `end`.
+            catalog: Optional pre-built :class:`Catalog`; defaults to the bundled
+                catalog.
             client: Optional pre-built :class:`IsimipClient`; defaults to a
                 lazily-built `isimip-client` client (needs the `[isimip]` extra).
-                The product is fixed to :attr:`PRODUCT` (`InputData`) and the
-                cutout poll cadence to :attr:`POLL_SECONDS`.
 
         Raises:
             ValueError: If a required facet (`scenario` / `gcm` / `variables`) is
                 omitted, a facet is not in the catalog vocabulary, a date bound is
                 empty, or no bbox is given without `whole_globe`.
         """
-        self._catalog = Catalog()
+        self._catalog = catalog if catalog is not None else Catalog()
         self._client = client
 
         if not variables:
@@ -134,13 +131,13 @@ class ISIMIP(AbstractDataSource):
             )
 
         self._round = dataset
-        self._product = self.PRODUCT
+        self._product = product
         self._time_step = temporal_resolution
         self._scenario = scenario
         self._gcm = Catalog.normalize_forcing(gcm)
         self._variables = list(variables)
         self._whole_globe = whole_globe
-        self._poll = self.POLL_SECONDS
+        self._poll = poll
         self._show_progress = True
 
         self._validate_facets()
@@ -167,14 +164,19 @@ class ISIMIP(AbstractDataSource):
         """Validate every requested facet against the catalog vocabulary.
 
         Raises:
-            ValueError: If the round / time-step / scenario / GCM or any variable
-                is not in the catalog (each with a did-you-mean hint).
+            ValueError: If the round / product / time-step / scenario / GCM or any
+                variable is not in the catalog (each with a did-you-mean hint).
         """
         self._catalog.get_round(self._round)
         self._catalog.get_scenario(self._scenario)
         self._catalog.get_forcing(self._gcm)
         for var in self._variables:
             self._catalog.get_dataset(var)
+        if self._product not in self._catalog.products:
+            raise ValueError(
+                f"{self._product!r} is not an ISIMIP product. "
+                f"Known products: {self._catalog.products}."
+            )
         if self._time_step not in self._catalog.time_steps:
             raise ValueError(
                 f"{self._time_step!r} is not an ISIMIP time_step. "
