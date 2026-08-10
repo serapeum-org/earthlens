@@ -73,7 +73,7 @@ class ISIMIP(AbstractDataSource):
         scenario: str | None = None,
         gcm: str | None = None,
         product: str = "InputData",
-        time_step: str = "daily",
+        temporal_resolution: str = "daily",
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         whole_globe: bool = False,
@@ -95,7 +95,8 @@ class ISIMIP(AbstractDataSource):
                 and lowercased to the API spelling.
             product: `"InputData"` (bias-adjusted forcing) or `"OutputData"`
                 (impact-model results). Defaults to `"InputData"`.
-            time_step: `"daily"` or `"monthly"`. Defaults to `"daily"`.
+            temporal_resolution: The ISIMIP `time_step` — `"daily"` or
+                `"monthly"`. Defaults to `"daily"`.
             lat_lim: `[lat_min, lat_max]` in degrees for the cutout bbox.
             lon_lim: `[lon_min, lon_max]` in degrees for the cutout bbox.
             whole_globe: Skip the cutout and download the raw whole-globe
@@ -131,7 +132,7 @@ class ISIMIP(AbstractDataSource):
 
         self._round = dataset
         self._product = product
-        self._time_step = time_step
+        self._time_step = temporal_resolution
         self._scenario = scenario
         self._gcm = Catalog.normalize_forcing(gcm)
         self._variables = list(variables)
@@ -145,7 +146,7 @@ class ISIMIP(AbstractDataSource):
             start=start,
             end=end,
             variables=self._variables,
-            temporal_resolution=time_step,
+            temporal_resolution=temporal_resolution,
             lat_lim=[-90.0, 90.0] if lat_lim is None else lat_lim,
             lon_lim=[-180.0, 180.0] if lon_lim is None else lon_lim,
             fmt=fmt,
