@@ -274,6 +274,16 @@ nav:
       - Usage: reference/dem/usage.md
       - Available datasets: reference/dem/datasets.md
       - Reference: reference/dem/dem.md
+    - FABDEM (bare-earth DEM):
+      - Introduction: reference/fabdem/introduction.md
+      - Usage: reference/fabdem/usage.md
+      - Available datasets: reference/fabdem/datasets.md
+      - Reference: reference/fabdem/fabdem.md
+    - JRC European flood hazard (EFHM):
+      - Introduction: reference/jrc-flood/introduction.md
+      - Usage: reference/jrc-flood/usage.md
+      - Available datasets: reference/jrc-flood/datasets.md
+      - Reference: reference/jrc-flood/jrc-flood.md
     - Solar & Wind Atlas (solar / wind climatology):
       - Introduction: reference/solar_wind_atlas/introduction.md
       - Usage: reference/solar_wind_atlas/usage.md
@@ -607,6 +617,13 @@ nav:
     - Copernicus DEM (global land elevation):
       - DEM quickstart (live): examples/dem/01_dem_quickstart.ipynb
       - Catalog & tile math (no network): examples/dem/02_catalog_and_tile_math.ipynb
+    - FABDEM (bare-earth DEM):
+      - Catalog explorer (no network): examples/fabdem/01_catalog_explorer.ipynb
+      - Quickstart & vs Copernicus DEM (live): examples/fabdem/02_fabdem_quickstart.ipynb
+    - JRC European flood hazard (EFHM):
+      - Catalog explorer (no network): examples/jrc-flood/01_catalog_explorer.ipynb
+      - EFHM quickstart (live): examples/jrc-flood/02_efhm_quickstart.ipynb
+      - Return periods (live): examples/jrc-flood/03_return_periods.ipynb
     - PVGIS (solar radiation / PV):
       - Quickstart — hourly radiation (live): examples/pvgis/01_pvgis_quickstart.ipynb
       - Catalog explorer (no network): examples/pvgis/02_catalog_explorer.ipynb

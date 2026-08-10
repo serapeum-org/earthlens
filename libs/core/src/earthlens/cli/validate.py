@@ -671,6 +671,21 @@ def _validate_bathymetry(catalog: Any) -> tuple[int, list[str]]:
     return len(catalog.datasets), issues
 
 
+def _validate_fabdem(catalog: Any) -> tuple[int, list[str]]:
+    """Each FABDEM row needs a band and a data version (for the tile URLs)."""
+    return _lint(catalog, lambda k, r: _require(k, r, ("band", "version")))
+
+
+def _validate_jrc_flood(catalog: Any) -> tuple[int, list[str]]:
+    """Each EFHM row needs a band, base URL, filename template, and return periods."""
+    return _lint(
+        catalog,
+        lambda k, r: _require(
+            k, r, ("band", "base_url", "filename_template", "return_periods")
+        ),
+    )
+
+
 def _validate_pvgis(catalog: Any) -> tuple[int, list[str]]:
     """Each PVGIS product needs a tool, an endpoint, and non-empty columns."""
     return _lint(catalog, lambda k, r: _require(k, r, ("tool", "endpoint", "columns")))
@@ -901,6 +916,8 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "emdat": _validate_emdat,
     "erddap": _validate_erddap,
     "bathymetry": _validate_bathymetry,
+    "fabdem": _validate_fabdem,
+    "jrc_flood": _validate_jrc_flood,
     "pvgis": _validate_pvgis,
     "nrel": _validate_nrel,
     "glaciers": _validate_glaciers,
