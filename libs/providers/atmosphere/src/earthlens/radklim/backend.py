@@ -113,8 +113,9 @@ class RADKLIM(AbstractDataSource):
                 the product's `default_format` (`nc` reproc, `hdf5`
                 operational).
             now: Reference time for the operational retention guard. Defaults to
-                the wall clock; an explicit value pins it (a deterministic clock
-                for reproducible enumeration).
+                the current UTC time (matching the naive-UTC granule timestamps);
+                an explicit value pins it (a deterministic clock for reproducible
+                enumeration) and a tz-aware value is normalised to naive UTC.
             catalog: Optional pre-built :class:`Catalog`; defaults to the bundled
                 catalog.
             client: Optional :class:`~earthlens.base.HttpClient`; defaults to a
@@ -279,6 +280,13 @@ class RADKLIM(AbstractDataSource):
         )
         end_year = min(self.time.end_date.year, self._current_time().year)
         years = list(range(start_year, end_year + 1))
+        if not years:
+            logger.warning(
+                f"radklim: {product.product} window "
+                f"[{self.time.start_date:%Y-%m-%d}, {self.time.end_date:%Y-%m-%d}] falls "
+                "outside the reprocessing coverage (2001 to the current year); no yearly "
+                "archive is enumerated, returning none."
+            )
         fmt = self._format_for(product)
         out: list[RemoteProduct] = []
         for year in years:
@@ -325,6 +333,13 @@ class RADKLIM(AbstractDataSource):
                 "archive."
             )
             return []
+        if start_date < cutoff:
+            logger.warning(
+                f"radklim: {product.product} window starts {start_date:%Y-%m-%d} — before "
+                f"the ~{product.retention_days}-day operational retention "
+                f"(since {cutoff:%Y-%m-%d}); only the retained tail is returned. Use a "
+                "RADKLIM reproc product for the earlier part of the window."
+            )
         fmt = self._format_for(product)
         ext = FORMAT_EXTENSION[fmt]
         html = self._http.get(operational_dir_url(product.code)).text
@@ -378,8 +393,16 @@ class RADKLIM(AbstractDataSource):
         dest = self.root_dir / safe_filename(product.href.rsplit("/", 1)[-1])
         magic = FORMAT_MAGIC[product.metadata["format"]]
         try:
+            # `Accept-Encoding: identity`: the granule is already compressed
+            # (gzip `.tar.gz` / bzip2 / HDF5), so a transparent `Content-Encoding:
+            # gzip` from the server would make `requests` decode the body and the
+            # `expect_magic` byte check fire against the wrong (decoded) bytes.
             self._http.download(
-                product.href, dest, progress=self._show_progress, expect_magic=magic
+                product.href,
+                dest,
+                progress=self._show_progress,
+                expect_magic=magic,
+                headers={"Accept-Encoding": "identity"},
             )
         except requests.HTTPError as exc:
             if _is_missing(exc):
