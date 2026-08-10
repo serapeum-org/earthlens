@@ -122,34 +122,27 @@ def paginate_nfip(
     counted = False
     prev_page: list | None = None
     for _ in range(_MAX_NFIP_PAGES):
-        top = page_size
-        if max_records is not None:
-            remaining = max_records - len(collected)
-            if remaining <= 0:
-                break
-            top = min(page_size, remaining)
-        params: dict[str, object] = {"$top": top, "$skip": skip}
-        if filter_str:
-            params["$filter"] = filter_str
-        if select:
-            params["$select"] = select
-        if order_by:
-            params["$orderby"] = order_by
-        if not counted:
-            params["$inlinecount"] = "allpages"
+        top = _nfip_top(page_size, max_records, len(collected))
+        if top <= 0:
+            break
+        params = _nfip_page_params(
+            top,
+            skip,
+            filter_str=filter_str,
+            select=select,
+            order_by=order_by,
+            want_count=not counted,
+        )
         payload = client.get_json(endpoint, params=params)
-        if not counted and isinstance(payload, dict):
+        if not counted:
             counted = True
-            # `or {}` also guards a present-but-null `metadata` (None.get crashes).
-            count = (payload.get("metadata") or {}).get("count")
-            total = int(count) if count is not None else None
+            total = _nfip_total(payload)
         page = payload.get(records_key, []) if isinstance(payload, dict) else []
         if page and prev_page and page[0] == prev_page[0]:
             # Server re-sent the same first record for a new $skip — it does not
-            # honour paging. Compare the first record (not the whole page) so a
-            # shrunk last-page $top from `max_records` can't hide a re-serve, and
-            # so the check stays O(1). With $orderby=id + advancing $skip a
-            # legitimate next page always starts at a new id.
+            # honour paging. Comparing the first record (not the whole page) also
+            # catches a shrunk last-page $top and stays O(1); with $orderby=id +
+            # advancing $skip a legitimate next page always starts at a new id.
             logger.warning(
                 f"paginate_nfip: {endpoint!r} re-sent the same page for a new "
                 "$skip (server does not honour paging); result may be incomplete."
@@ -166,6 +159,44 @@ def paginate_nfip(
             "result may be incomplete — narrow the filter or set max_records."
         )
     return collected, total
+
+
+def _nfip_top(page_size: int, max_records: int | None, fetched: int) -> int:
+    """Return the `$top` for the next page (`<= 0` means the cap is reached)."""
+    if max_records is None:
+        return page_size
+    return min(page_size, max_records - fetched)
+
+
+def _nfip_page_params(
+    top: int,
+    skip: int,
+    *,
+    filter_str: str | None,
+    select: str | None,
+    order_by: str,
+    want_count: bool,
+) -> dict[str, object]:
+    """Assemble the OData query params for one NFIP page."""
+    params: dict[str, object] = {"$top": top, "$skip": skip}
+    if filter_str:
+        params["$filter"] = filter_str
+    if select:
+        params["$select"] = select
+    if order_by:
+        params["$orderby"] = order_by
+    if want_count:
+        params["$inlinecount"] = "allpages"
+    return params
+
+
+def _nfip_total(payload: object) -> int | None:
+    """Read `metadata.count` from a payload; `None` when absent/null/non-dict."""
+    if not isinstance(payload, dict):
+        return None
+    # `or {}` also guards a present-but-null `metadata` (None.get crashes).
+    count = (payload.get("metadata") or {}).get("count")
+    return int(count) if count is not None else None
 
 
 def paginate_arcgis(

@@ -98,7 +98,7 @@ class NSI(AbstractDataSource):
     #: series, so a missing `start` / `end` is legal.
     REQUIRES_TIME_WINDOW = False
 
-    def __init__(
+    def __init__(  # NOSONAR(S107): facade forwards these kwargs to every backend
         self,
         start: str | None = None,
         end: str | None = None,
@@ -197,46 +197,62 @@ class NSI(AbstractDataSource):
                 `state`/`county`/`year`/`flood_event`, or a box that will be used
                 is not a valid `[min, max]` pair.
         """
+        self._validate_fips_shape()
         provider = self._source.provider
+        if provider == "nsi":
+            self._validate_structures_bound()
+        elif provider == "fema-arcgis":
+            self._validate_nfhl_bound()
+        elif provider == "openfema":
+            self._validate_nfip_bound()
+
+    def _validate_fips_shape(self) -> None:
+        """Reject a `fips` that is not a 2/5/11/15-digit code."""
         if self._fips is not None and not (
             self._fips.isdigit() and len(self._fips) in _FIPS_LENGTHS
         ):
             raise ValueError(
-                f"fips must be a 2/5/11/15-digit code (state/county/tract/block); "
+                "fips must be a 2/5/11/15-digit code (state/county/tract/block); "
                 f"got {self._fips!r}."
             )
-        if provider == "nsi":
-            if not (self._fips or self._has_box):
-                raise ValueError(
-                    "source='structures' needs a fips= (2/5/11/15-digit) or a "
-                    "[lat_lim, lon_lim] box; an unbounded national pull is refused."
-                )
-            if self._fips and self._has_box:
-                logger.warning(
-                    "NSI structures: both fips= and a [lat_lim, lon_lim] box were "
-                    "given; using fips= and ignoring the box."
-                )
-            # Validate the box only when it is the selector (no fips).
-            if self._has_box and not self._fips:
-                bbox_from_limits(self._lat_lim, self._lon_lim)
-        elif provider == "fema-arcgis":
-            if not self._has_box:
-                raise ValueError(
-                    "source='nfhl' needs a [lat_lim, lon_lim] box (the ArcGIS "
-                    "query envelope); an unbounded national pull is refused."
-                )
+
+    def _validate_structures_bound(self) -> None:
+        """`structures` needs a `fips` or a box; a box alongside `fips` is warned."""
+        if not (self._fips or self._has_box):
+            raise ValueError(
+                "source='structures' needs a fips= (2/5/11/15-digit) or a "
+                "[lat_lim, lon_lim] box; an unbounded national pull is refused."
+            )
+        if self._fips and self._has_box:
+            logger.warning(
+                "NSI structures: both fips= and a [lat_lim, lon_lim] box were "
+                "given; using fips= and ignoring the box."
+            )
+        # Validate the box only when it is the selector (no fips).
+        if self._has_box and not self._fips:
             bbox_from_limits(self._lat_lim, self._lon_lim)
-        elif provider == "openfema":
-            if not (self._state or self._county or self._year or self._flood_event):
-                raise ValueError(
-                    "source='nfip' needs at least one of state=, county=, year=, "
-                    "flood_event=; an unbounded national pull is refused."
-                )
-            if self._has_box:
-                logger.warning(
-                    "NSI nfip: a [lat_lim, lon_lim] box is ignored; nfip filters "
-                    "by state=/county=/year=/flood_event= only."
-                )
+
+    def _validate_nfhl_bound(self) -> None:
+        """`nfhl` needs a valid box (the ArcGIS query envelope)."""
+        if not self._has_box:
+            raise ValueError(
+                "source='nfhl' needs a [lat_lim, lon_lim] box (the ArcGIS "
+                "query envelope); an unbounded national pull is refused."
+            )
+        bbox_from_limits(self._lat_lim, self._lon_lim)
+
+    def _validate_nfip_bound(self) -> None:
+        """`nfip` needs an attribute selector; a supplied box is warned + ignored."""
+        if not (self._state or self._county or self._year or self._flood_event):
+            raise ValueError(
+                "source='nfip' needs at least one of state=, county=, year=, "
+                "flood_event=; an unbounded national pull is refused."
+            )
+        if self._has_box:
+            logger.warning(
+                "NSI nfip: a [lat_lim, lon_lim] box is ignored; nfip filters "
+                "by state=/county=/year=/flood_event= only."
+            )
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
         """Return the request's :class:`SpatialExtent`.
