@@ -50,19 +50,18 @@ print(zones[["FLD_ZONE", "SFHA_TF"]].head())
 ```python
 claims = EarthLens(
     "nfip",  # alias for source="nfip"
-    county="22071",   # 5-digit county FIPS
-    year=2005,        # loss year
-    max_records=500,  # cap the pull
+    filters={"county": "22071", "year": 2005},  # OData attribute filter
+    max_records=500,                            # cap the pull
 ).download()
 
 print(claims.shape)
 print(claims[["date_of_loss", "rated_flood_zone", "building_paid"]].head())
 ```
 
-`nfip` accepts any combination of `state=` (two-letter), `county=` (5-digit
-FIPS), `year=`, and `flood_event=`. At least one is required. The result is a
-`DataFrame` with friendly column names and is also written to the output
-directory (`output_format="csv"` by default, or `"parquet"`).
+`nfip` takes a `filters=` mapping with any combination of `state` (two-letter),
+`county` (5-digit FIPS), `year`, and `flood_event`. At least one is required. The
+result is a `DataFrame` with friendly column names and is also written to the
+output directory (`output_format="csv"` by default, or `"parquet"`).
 
 ## Combining the three
 
@@ -75,7 +74,9 @@ box = dict(lat_lim=[29.95, 29.96], lon_lim=[-90.07, -90.06])
 
 structures = EarthLens("nsi", source="structures", fips=county_fips).download()
 zones = EarthLens("nfhl", **box).download()
-claims = EarthLens("nfip", county=county_fips, year=2005, max_records=500).download()
+claims = EarthLens(
+    "nfip", filters={"county": county_fips, "year": 2005}, max_records=500
+).download()
 ```
 
 ## What you cannot do

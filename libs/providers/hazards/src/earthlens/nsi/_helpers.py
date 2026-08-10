@@ -40,44 +40,57 @@ def _odata_literal(value: str) -> str:
     return f"'{escaped}'"
 
 
-def odata_filter(
-    state: str | None = None,
-    county: str | None = None,
-    year: int | None = None,
-    flood_event: str | None = None,
-) -> str | None:
-    """Build an OData `$filter` string for the NFIP claims query.
+#: Friendly NFIP filter key -> (provider field, is-numeric). The clause order in
+#: the built `$filter` follows this mapping's order, so it is deterministic.
+_NFIP_FILTER_FIELDS: dict[str, tuple[str, bool]] = {
+    "state": ("state", False),
+    "county": ("countyCode", False),
+    "year": ("yearOfLoss", True),
+    "flood_event": ("floodEvent", False),
+}
 
-    Clauses are joined with `and`; string values are quoted, `year` is emitted
-    bare (a numeric field).
+
+def odata_filter(filters: dict[str, str | int] | None) -> str | None:
+    """Build an OData `$filter` string from an NFIP filter mapping.
+
+    Recognised keys are `state` / `county` / `year` / `flood_event` (see
+    :data:`_NFIP_FILTER_FIELDS`). Clauses join with `and` in the canonical field
+    order; string values are quoted (OData-escaped), `year` is emitted bare.
 
     Args:
-        state: Two-letter state code (`"LA"`) -> `state eq 'LA'`.
-        county: 5-digit county FIPS (`"22071"`) -> `countyCode eq '22071'`.
-        year: Loss year (`2005`) -> `yearOfLoss eq 2005`.
-        flood_event: Named flood event -> `floodEvent eq '...'`.
+        filters: A mapping of friendly filter key to value, or `None`/empty.
 
     Returns:
-        str | None: The `$filter` expression, or `None` when no selector is
-            given.
+        str | None: The `$filter` expression, or `None` when no filter is given.
+
+    Raises:
+        ValueError: If `filters` contains an unrecognised key.
 
     Examples:
         ```python
         >>> from earthlens.nsi._helpers import odata_filter
-        >>> odata_filter(county="22071", year=2005)
+        >>> odata_filter({"county": "22071", "year": 2005})
         "countyCode eq '22071' and yearOfLoss eq 2005"
 
         ```
     """
+    if not filters:
+        return None
+    unknown = set(filters) - set(_NFIP_FILTER_FIELDS)
+    if unknown:
+        raise ValueError(
+            f"unknown nfip filter key(s) {sorted(unknown)}; valid keys are "
+            f"{sorted(_NFIP_FILTER_FIELDS)}."
+        )
     clauses: list[str] = []
-    if state:
-        clauses.append(f"state eq {_odata_literal(state)}")
-    if county:
-        clauses.append(f"countyCode eq {_odata_literal(county)}")
-    if year is not None:
-        clauses.append(f"yearOfLoss eq {int(year)}")
-    if flood_event:
-        clauses.append(f"floodEvent eq {_odata_literal(flood_event)}")
+    for key, (field, is_numeric) in _NFIP_FILTER_FIELDS.items():
+        if key not in filters:
+            continue
+        value = filters[key]
+        if is_numeric:
+            clauses.append(f"{field} eq {int(value)}")
+        else:
+            clauses.append(f"{field} eq {_odata_literal(str(value))}")
     return " and ".join(clauses) if clauses else None
 
 

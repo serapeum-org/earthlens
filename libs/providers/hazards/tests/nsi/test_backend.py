@@ -41,7 +41,8 @@ class TestConstruction:
     def test_output_kind_nfip_tabular(self, tmp_path) -> None:
         """An nfip instance is tabular."""
         assert (
-            NSI(source="nfip", county="22071", path=tmp_path).OUTPUT_KIND == "tabular"
+            NSI(source="nfip", filters={"county": "22071"}, path=tmp_path).OUTPUT_KIND
+            == "tabular"
         )
 
     def test_unknown_source_raises(self, tmp_path) -> None:
@@ -52,7 +53,12 @@ class TestConstruction:
     def test_bad_output_format_raises(self, tmp_path) -> None:
         """An unrecognised output_format is rejected."""
         with pytest.raises(ValueError):
-            NSI(source="nfip", county="22071", output_format="xlsx", path=tmp_path)
+            NSI(
+                source="nfip",
+                filters={"county": "22071"},
+                output_format="xlsx",
+                path=tmp_path,
+            )
 
 
 @pytest.mark.unit
@@ -94,7 +100,7 @@ class TestBoundGuard:
         client = _FakeSession(nfip_records=make_nfip_records(2))
         df = NSI(
             source="nfip",
-            county="22071",
+            filters={"county": "22071"},
             lat_lim=[29.9, 30.0],
             lon_lim=[-90.1, -90.0],
             session=client,
@@ -193,9 +199,9 @@ class TestNfip:
     def test_download_progress_bar_is_a_noop(self, tmp_path) -> None:
         """`progress_bar=` is accepted and does not change the result."""
         client = _FakeSession(nfip_records=make_nfip_records(3))
-        df = NSI(source="nfip", county="22071", session=client, path=tmp_path).download(
-            progress_bar=False
-        )
+        df = NSI(
+            source="nfip", filters={"county": "22071"}, session=client, path=tmp_path
+        ).download(progress_bar=False)
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 3
 
@@ -203,7 +209,7 @@ class TestNfip:
         """nfip returns a DataFrame with the friendly column names."""
         client = _FakeSession(nfip_records=make_nfip_records(5))
         df = NSI(
-            source="nfip", county="22071", session=client, path=tmp_path
+            source="nfip", filters={"county": "22071"}, session=client, path=tmp_path
         ).download()
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 5
@@ -215,7 +221,7 @@ class TestNfip:
         client = _FakeSession(nfip_records=make_nfip_records(100))
         df = NSI(
             source="nfip",
-            county="22071",
+            filters={"county": "22071"},
             max_records=25,
             session=client,
             path=tmp_path,
@@ -225,7 +231,9 @@ class TestNfip:
     def test_writes_csv(self, tmp_path) -> None:
         """A tabular result is written to root_dir as CSV."""
         client = _FakeSession(nfip_records=make_nfip_records(3))
-        NSI(source="nfip", county="22071", session=client, path=tmp_path).download()
+        NSI(
+            source="nfip", filters={"county": "22071"}, session=client, path=tmp_path
+        ).download()
         assert (tmp_path / "nsi_nfip.csv").exists()
 
     def test_writes_parquet(self, tmp_path) -> None:
@@ -234,7 +242,7 @@ class TestNfip:
         client = _FakeSession(nfip_records=make_nfip_records(3))
         NSI(
             source="nfip",
-            county="22071",
+            filters={"county": "22071"},
             output_format="parquet",
             session=client,
             path=tmp_path,
@@ -244,14 +252,18 @@ class TestNfip:
     def test_empty_result_writes_schema_only(self, tmp_path) -> None:
         """No matching claims still writes an empty schema-only table."""
         client = _FakeSession(nfip_records=[])
-        df = NSI(source="nfip", year=1900, session=client, path=tmp_path).download()
+        df = NSI(
+            source="nfip", filters={"year": 1900}, session=client, path=tmp_path
+        ).download()
         assert df.empty
         assert (tmp_path / "nsi_nfip.csv").exists()
 
     def test_large_uncapped_pull_still_returns(self, warnings_log, tmp_path) -> None:
         """A large uncapped match count warns but still returns the fetched rows."""
         client = _FakeSession(nfip_records=make_nfip_records(3), nfip_total=60_000)
-        df = NSI(source="nfip", state="LA", session=client, path=tmp_path).download()
+        df = NSI(
+            source="nfip", filters={"state": "LA"}, session=client, path=tmp_path
+        ).download()
         assert len(df) == 3
         assert any("large pull" in m for m in warnings_log)
 

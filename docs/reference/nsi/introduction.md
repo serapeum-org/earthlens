@@ -51,7 +51,7 @@ refuses the request otherwise:
 - `structures` — a `fips=` code (2-digit state / 5-digit county / 11-digit tract
   / 15-digit block), **or** a `[lat_lim, lon_lim]` box.
 - `nfhl` — a `[lat_lim, lon_lim]` box (the ArcGIS query envelope).
-- `nfip` — at least one of `state=`, `county=`, `year=`, `flood_event=`. The
+- `nfip` — a `filters=` mapping with at least one of `state`, `county`, `year`, `flood_event`. The
   paged fetch logs the total matching-record count so a large pull is visible,
   and `max_records=` caps it.
 

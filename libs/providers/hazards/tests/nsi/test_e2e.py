@@ -42,7 +42,7 @@ def test_structures_box_post_live(tmp_path) -> None:
 def test_nfip_county_live(tmp_path) -> None:
     """A live NFIP claims pull for one county/year returns a claims table."""
     df = EarthLens(
-        "nfip", county="22071", year=2005, max_records=25, path=tmp_path
+        "nfip", filters={"county": "22071", "year": 2005}, max_records=25, path=tmp_path
     ).download()
     assert isinstance(df, pd.DataFrame)
     assert 0 < len(df) <= 25

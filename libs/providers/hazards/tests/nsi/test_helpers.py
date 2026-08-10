@@ -31,19 +31,25 @@ class TestOdataFilter:
     """`odata_filter` clause building."""
 
     def test_none_when_no_selector(self) -> None:
-        """No selector yields no filter."""
-        assert odata_filter() is None
+        """An empty / None mapping yields no filter."""
+        assert odata_filter(None) is None
+        assert odata_filter({}) is None
 
     def test_string_and_numeric_clauses(self) -> None:
-        """Strings are quoted; the year is bare; clauses join with `and`."""
+        """Strings are quoted; the year is bare; clauses join in canonical order."""
         assert (
-            odata_filter(state="LA", county="22071", year=2005)
+            odata_filter({"year": 2005, "county": "22071", "state": "LA"})
             == "state eq 'LA' and countyCode eq '22071' and yearOfLoss eq 2005"
         )
 
     def test_flood_event_quote_escaped(self) -> None:
         """An embedded single quote is doubled per OData."""
-        assert odata_filter(flood_event="O'Brien") == "floodEvent eq 'O''Brien'"
+        assert odata_filter({"flood_event": "O'Brien"}) == "floodEvent eq 'O''Brien'"
+
+    def test_unknown_filter_key_raises(self) -> None:
+        """An unrecognised filter key is rejected."""
+        with pytest.raises(ValueError, match="unknown nfip filter"):
+            odata_filter({"zip": "70112"})
 
 
 @pytest.mark.unit

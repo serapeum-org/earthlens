@@ -46,7 +46,7 @@ class TestFacadeConstruction:
 
     def test_nfip_alias_pins_tabular_source(self, tmp_path) -> None:
         """`EarthLens('nfip', ...)` resolves the nfip source (tabular), not structures."""
-        el = EarthLens("nfip", county="22071", path=tmp_path)
+        el = EarthLens("nfip", filters={"county": "22071"}, path=tmp_path)
         assert el.datasource._source.id == "nfip"
         assert el.datasource.OUTPUT_KIND == "tabular"
 

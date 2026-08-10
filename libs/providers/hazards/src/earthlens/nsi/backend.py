@@ -98,7 +98,7 @@ class NSI(AbstractDataSource):
     #: series, so a missing `start` / `end` is legal.
     REQUIRES_TIME_WINDOW = False
 
-    def __init__(  # NOSONAR(S107): facade forwards these kwargs to every backend
+    def __init__(
         self,
         start: str | None = None,
         end: str | None = None,
@@ -109,10 +109,7 @@ class NSI(AbstractDataSource):
         fmt: str = "%Y-%m-%d",
         source: str = "structures",
         fips: str | None = None,
-        state: str | None = None,
-        county: str | None = None,
-        year: int | None = None,
-        flood_event: str | None = None,
+        filters: dict[str, str | int] | None = None,
         max_records: int | None = None,
         output_format: OutputFormat = "csv",
         session: requests.Session | None = None,
@@ -133,10 +130,10 @@ class NSI(AbstractDataSource):
                 or `"nfip"`.
             fips: A 2/5/11/15-digit FIPS code selecting `structures` by
                 state/county/tract/block.
-            state: Two-letter state code selecting `nfip` claims.
-            county: 5-digit county FIPS selecting `nfip` claims.
-            year: Loss year selecting `nfip` claims.
-            flood_event: Named flood event selecting `nfip` claims.
+            filters: NFIP attribute filter mapping — recognised keys are
+                `state` (two-letter), `county` (5-digit FIPS), `year` (loss
+                year), and `flood_event` (named event). At least one is required
+                for `source="nfip"`, e.g. `filters={"county": "22071", "year": 2005}`.
             max_records: Optional cap on the number of `nfip` records fetched.
             output_format: On-disk format for the `nfip` table — `"csv"`
                 (default) or `"parquet"`.
@@ -157,10 +154,7 @@ class NSI(AbstractDataSource):
         self._catalog = Catalog()
         self._source: Source = self._catalog.get(source)
         self._fips = fips
-        self._state = state
-        self._county = county
-        self._year = year
-        self._flood_event = flood_event
+        self._filters = dict(filters) if filters else {}
         self._max_records = max_records
         self._output_format: OutputFormat = output_format
         self._http: HttpClient = HttpClient(session=session)
@@ -242,16 +236,20 @@ class NSI(AbstractDataSource):
         bbox_from_limits(self._lat_lim, self._lon_lim)
 
     def _validate_nfip_bound(self) -> None:
-        """`nfip` needs an attribute selector; a supplied box is warned + ignored."""
-        if not (self._state or self._county or self._year or self._flood_event):
+        """`nfip` needs an attribute filter; a supplied box is warned + ignored."""
+        # odata_filter validates the keys (raises on an unknown one) and returns
+        # None for an empty mapping — so this both fail-fasts and refuses an
+        # unbounded pull.
+        if _helpers.odata_filter(self._filters) is None:
             raise ValueError(
-                "source='nfip' needs at least one of state=, county=, year=, "
-                "flood_event=; an unbounded national pull is refused."
+                "source='nfip' needs a filters= mapping with at least one of "
+                f"{sorted(_helpers._NFIP_FILTER_FIELDS)}; an unbounded national "
+                "pull is refused."
             )
         if self._has_box:
             logger.warning(
                 "NSI nfip: a [lat_lim, lon_lim] box is ignored; nfip filters "
-                "by state=/county=/year=/flood_event= only."
+                "by the filters= mapping (state/county/year/flood_event) only."
             )
 
     def _create_grid(self, lat_lim: list, lon_lim: list) -> SpatialExtent:
@@ -363,12 +361,7 @@ class NSI(AbstractDataSource):
     def _fetch_nfip(self) -> pd.DataFrame:
         """Fetch NFIP claims for the attribute filter, paged, as a `DataFrame`."""
         source = self._source
-        filter_str = _helpers.odata_filter(
-            state=self._state,
-            county=self._county,
-            year=self._year,
-            flood_event=self._flood_event,
-        )
+        filter_str = _helpers.odata_filter(self._filters)
         # Only the curated columns are kept, so project them server-side with
         # $select rather than pulling all ~84 provider fields per record.
         select = ",".join(source.fields.values()) or None
@@ -394,7 +387,7 @@ class NSI(AbstractDataSource):
             logger.warning(
                 f"NSI nfip: {total} records matched with no max_records= cap; "
                 "this is a large pull — pass max_records= or a narrower selector "
-                "(add year=/county=) to bound it."
+                "(add year/county to filters=) to bound it."
             )
         return _helpers.records_to_frame(records, source.fields)
 
