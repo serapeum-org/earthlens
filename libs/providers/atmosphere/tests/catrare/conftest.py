@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import functools
 import zipfile
+from collections.abc import Callable
 from pathlib import Path
 
 import geopandas as gpd
@@ -81,10 +83,6 @@ def catrare_cache(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 
 @pytest.fixture
-def write_canned_gdb():
+def write_canned_gdb() -> Callable[[Path], None]:
     """Return a callable that writes the canned T5 FileGDB zip to a given path."""
-
-    def _write(target: Path) -> None:
-        _write_gdb_zip("t5", Path(target))
-
-    return _write
+    return functools.partial(_write_gdb_zip, "t5")

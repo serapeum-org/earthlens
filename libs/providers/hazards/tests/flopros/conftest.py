@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import functools
 import zipfile
+from collections.abc import Callable
 from pathlib import Path
 
 import geopandas as gpd
@@ -69,11 +71,7 @@ def flopros_cache(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
 
 @pytest.fixture
-def write_canned_zip():
+def write_canned_zip() -> Callable[[Path], None]:
     """Return a callable that writes the canned supplement zip to a given path."""
     stem = Catalog().get("flopros").shapefile_stem
-
-    def _write(target: Path) -> None:
-        _write_shapefile_zip(stem, Path(target))
-
-    return _write
+    return functools.partial(_write_shapefile_zip, stem)
