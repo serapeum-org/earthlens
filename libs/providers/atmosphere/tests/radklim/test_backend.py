@@ -201,6 +201,37 @@ class TestSearchOperational:
         )
         assert b._search(), "end day is within the ~2-day retention window"
 
+    def test_future_window_returns_empty_without_fetch(
+        self, tmp_path, operational_listing
+    ):
+        """A window that starts in the future returns [] and skips the listing fetch."""
+        http = FakeHttp(listing=operational_listing)
+        b = _make(
+            tmp_path,
+            "radolan-yw",
+            start="2027-01-01",
+            end="2027-01-02",
+            now=dt.datetime(2026, 8, 10),
+            http=http,
+        )
+        assert b._search() == []
+        assert http.got == [], "no listing request for a future window"
+
+    def test_tz_aware_now_is_normalised(self, tmp_path, operational_listing):
+        """An injected tz-aware now is normalised to naive UTC (no compare error)."""
+        http = FakeHttp(listing=operational_listing)
+        b = _make(
+            tmp_path,
+            "radolan-yw",
+            start="2024-01-01T12:00",
+            end="2024-01-01T12:07",
+            fmt="%Y-%m-%dT%H:%M",
+            now=dt.datetime(2024, 1, 1, 13, 0, tzinfo=dt.timezone.utc),
+            http=http,
+        )
+        assert b._current_time() == dt.datetime(2024, 1, 1, 13, 0)
+        assert len(b._search()) == 2
+
     def test_retention_expired_returns_empty(self, tmp_path, operational_listing):
         """A window before the retention window returns nothing (with a warning)."""
         http = FakeHttp(listing=operational_listing)

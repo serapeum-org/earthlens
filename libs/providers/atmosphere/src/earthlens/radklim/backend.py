@@ -139,13 +139,10 @@ class RADKLIM(AbstractDataSource):
         self._show_progress = True
 
         self._products: list[RadklimProduct] = []
-        self._requested: dict[str, list[str]] = {}
         for key in keys:
             product = self._catalog.get_product(key)
-            names = variables[key] if isinstance(variables, dict) else []
             self._format_for(product)  # validate the override up front
             self._products.append(product)
-            self._requested[key] = list(names or [])
 
         super().__init__(
             start=start,
@@ -240,6 +237,8 @@ class RADKLIM(AbstractDataSource):
         machine's UTC offset near the retention boundary.
         """
         if self._now is not None:
+            if self._now.tzinfo is not None:
+                return self._now.astimezone(dt.UTC).replace(tzinfo=None)
             return self._now
         return dt.datetime.now(dt.UTC).replace(tzinfo=None)
 
@@ -308,7 +307,15 @@ class RADKLIM(AbstractDataSource):
         """
         start_date = self.time.start_date
         end_date = _inclusive_end(self.time.end_date)
-        cutoff = self._current_time() - dt.timedelta(days=product.retention_days)
+        now = self._current_time()
+        if start_date > now:
+            logger.warning(
+                f"radklim: {product.product} window starts {start_date:%Y-%m-%d} — in "
+                f"the future (after {now:%Y-%m-%d}); no granules exist yet, returning "
+                "none."
+            )
+            return []
+        cutoff = now - dt.timedelta(days=product.retention_days)
         if end_date < cutoff:
             logger.warning(
                 f"radklim: {product.product} window ends {end_date:%Y-%m-%d} — before "
