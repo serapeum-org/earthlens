@@ -360,6 +360,7 @@ markers = [
     "unit: in-process unit test, no network or filesystem outside tmp_path.",
     "integration: exercises multiple modules together with mocked I/O.",
     "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
+    "catrare: tests for the CatRaRE DWD heavy-rainfall event-catalogue backend (opendata.dwd.de FileGDB v2026.01, CC-BY-4.0 / GeoNutzV, no extra SDK — core HttpClient + pyramids; RADKLIM-derived events reprojected from the RADOLAN grid).",
     "chc: tests for the Climate Hazards Center (CHC) FTP backend (no extra SDK; covers CHIRPS / CHIRP / CHIRTS / WBGT / SPI / SPEI / CHC_CMIP6 etc.).",
     "caravan: tests for the Caravan large-sample hydrology backend (no extra SDK; static Zenodo archives read over HTTP Range, includes the open GRDC-Caravan subset).",
     "s3: tests for the S3 backend (requires the `s3` extra: boto3).",

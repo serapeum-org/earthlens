@@ -118,6 +118,7 @@ _NO_WINDOW_REQUIRED = {
     "AdminBoundaries",
     "Aqueduct",
     "Bathymetry",
+    "CatRaRE",
     "DEM",
     "EMDAT",
     "FLOPROS",

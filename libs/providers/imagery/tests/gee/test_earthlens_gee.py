@@ -85,6 +85,7 @@ class TestRegistry:
             "brazil-data-cube",
             "caravan",
             "caravan-grdc",
+            "catrare",
             "cdse",
             "chc",
             "chirps",

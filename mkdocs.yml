@@ -180,6 +180,10 @@ nav:
       - Usage: reference/chc/usage.md
       - Catalog & tooling: reference/chc/catalog.md
       - Reference: reference/chc/chc.md
+    - CatRaRE (heavy-rainfall events):
+      - Introduction: reference/catrare/introduction.md
+      - Usage: reference/catrare/usage.md
+      - Reference: reference/catrare/catrare.md
     - Amazon S3 (AWS Open Data):
       - Introduction: reference/s3/introduction.md
       - Authentication: reference/s3/authentication.md

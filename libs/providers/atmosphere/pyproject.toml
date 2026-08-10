@@ -64,7 +64,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.nrel*", "earthlens.mswep*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
+include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.catrare*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.nrel*", "earthlens.mswep*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -83,6 +83,7 @@ consider_namespace_packages = true
 addopts = "--import-mode=importlib"
 markers = [
     "airnow: tests for the AirNow air-quality backend (US/Canada EPA `/aq/data/` bbox REST; no extra SDK — core `requests` + `pandas`; needs a free AIRNOW_API_KEY for live e2e).",
+    "catrare: tests for the CatRaRE DWD heavy-rainfall event-catalogue backend (opendata.dwd.de FileGDB v2026.01, CC-BY-4.0 / GeoNutzV, no extra SDK — core HttpClient + pyramids; RADKLIM-derived events reprojected from the RADOLAN grid).",
     "chc: tests for the Climate Hazards Center (CHC) FTP backend (no extra SDK; covers CHIRPS / CHIRP / CHIRTS / WBGT / SPI / SPEI / CHC_CMIP6 etc.).",
     "climate_indices: tests for the climate / teleconnection index backend (NOAA PSL + KNMI Climate Explorer monthly ASCII series; no extra SDK — core requests + pandas).",
     "cmip6: tests for the CMIP6 backend (raw archive on the open Pangeo gs://cmip6 bucket; anonymous, no extra SDK; reads via pyramids).",

@@ -16,10 +16,13 @@ __all__ = ["BACKENDS"]
 _MSWEP = "earthlens.mswep"
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 36 data-source keys.
+#: distribution's 37 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'chc': ('earthlens.chc', 'CHIRPS', '', {}),
     'chirps': ('earthlens.chc', 'CHIRPS', '', {}),
+    # CatRaRE DWD heavy-rainfall event catalogue (RADKLIM-derived) — public
+    # FileGDB, CC-BY-4.0 / GeoNutzV, no extra SDK. Companion to `radar`/radklim.
+    'catrare': ('earthlens.catrare', 'CatRaRE', '', {}),
     'amazon-s3': ('earthlens.s3', 'S3', 's3', {}),
     'cmip6': ('earthlens.cmip6', 'CMIP6', '', {}),
     'pangeo-cmip6': ('earthlens.cmip6', 'CMIP6', '', {}),
