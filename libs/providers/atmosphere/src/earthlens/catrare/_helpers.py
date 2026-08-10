@@ -79,13 +79,15 @@ def filter_events(
     space: SpatialExtent,
     start: datetime | None,
     end: datetime | None,
+    date_columns: dict[str, str],
 ) -> FeatureCollection:
     """Filter the events by date window and/or the requested bounding box.
 
-    An event is kept when its `[Date_START, Date_END]` interval overlaps the
-    requested `[start, end]` window (a half-open bound is honoured — pass only
-    `start` or only `end` to bound one side). A bounding box narrower than the
-    whole globe keeps events whose geometry intersects it. Both filters compose.
+    An event is kept when its `[start, end]` interval (the `date_columns`
+    `start` / `end` fields) overlaps the requested `[start, end]` window (a
+    half-open bound is honoured — pass only `start` or only `end` to bound one
+    side). A bounding box narrower than the whole globe keeps events whose
+    geometry intersects it. Both filters compose.
 
     Args:
         collection: The trimmed collection from :func:`build_feature_collection`.
@@ -93,14 +95,16 @@ def filter_events(
             whole-globe extent applies no spatial filter.
         start: Inclusive window start, or `None` for no lower bound.
         end: Inclusive window end, or `None` for no upper bound.
+        date_columns: The `start` / `end` event-interval column names (from the
+            catalog), e.g. `{"start": "Date_START", "end": "Date_END"}`.
 
     Returns:
         FeatureCollection: The filtered events, CRS `EPSG:4326`.
     """
     result = collection
     if start is not None or end is not None:
-        event_start = pd.to_datetime(result["Date_START"], errors="coerce")
-        event_end = pd.to_datetime(result["Date_END"], errors="coerce")
+        event_start = pd.to_datetime(result[date_columns["start"]], errors="coerce")
+        event_end = pd.to_datetime(result[date_columns["end"]], errors="coerce")
         mask = pd.Series(True, index=result.index)
         if start is not None:
             mask &= event_end >= pd.Timestamp(start)

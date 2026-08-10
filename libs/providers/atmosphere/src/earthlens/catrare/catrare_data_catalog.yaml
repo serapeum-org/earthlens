@@ -28,6 +28,12 @@ geometry_layers:
   zones: EventZones
   points: RRmaxPoints
 
+# The event columns the date-window filter compares against (start / end of each
+# event's interval), so a future column rename is a catalog-only change.
+date_columns:
+  start: Date_START
+  end: Date_END
+
 # Event attribute columns kept on every returned feature.
 event_columns:
   - Event_ID

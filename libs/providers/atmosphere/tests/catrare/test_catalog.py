@@ -39,6 +39,7 @@ def test_shared_metadata_present():
     assert cat.source_crs.startswith("+proj=stere")
     assert cat.license == "CC-BY-4.0"
     assert "Event_ID" in cat.event_columns
+    assert cat.date_columns == {"start": "Date_START", "end": "Date_END"}
 
 
 def test_download_url_composed():

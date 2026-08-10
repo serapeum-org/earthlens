@@ -49,6 +49,10 @@ def _global_space() -> SimpleNamespace:
     )
 
 
+#: The catalog date-column mapping the filter compares against.
+_DATE_COLS = {"start": "Date_START", "end": "Date_END"}
+
+
 def test_build_feature_collection_selects_columns():
     """The trimmed collection keeps the requested event columns + geometry."""
     trimmed = build_feature_collection(_events(), ["Event_ID", "Area"])
@@ -64,15 +68,43 @@ def test_build_feature_collection_missing_column_raises():
 def test_filter_events_by_date_window():
     """The date window keeps only events overlapping it."""
     result = filter_events(
-        _events(), _global_space(), datetime(2021, 7, 1), datetime(2021, 7, 31)
+        _events(),
+        _global_space(),
+        datetime(2021, 7, 1),
+        datetime(2021, 7, 31),
+        _DATE_COLS,
     )
     assert sorted(result["Event_ID"]) == [1, 2]
 
 
 def test_filter_events_open_ended_start():
     """A start-only window drops events that end before it."""
-    result = filter_events(_events(), _global_space(), datetime(2010, 1, 1), None)
+    result = filter_events(
+        _events(), _global_space(), datetime(2010, 1, 1), None, _DATE_COLS
+    )
     assert sorted(result["Event_ID"]) == [1, 2]
+
+
+def test_filter_events_keeps_event_spanning_the_window():
+    """An event that starts before and ends after the window still overlaps."""
+    gdf = gpd.GeoDataFrame(
+        {
+            "Event_ID": [9],
+            "Date_START": ["2021-06-01 00:00:00"],
+            "Date_END": ["2021-08-31 00:00:00"],
+            "Area": [1.0],
+        },
+        geometry=[box(6, 50, 7, 51)],
+        crs="EPSG:4326",
+    )
+    result = filter_events(
+        FeatureCollection(gdf),
+        _global_space(),
+        datetime(2021, 7, 10),
+        datetime(2021, 7, 20),
+        _DATE_COLS,
+    )
+    assert list(result["Event_ID"]) == [9]
 
 
 def test_filter_events_by_bbox():
@@ -80,13 +112,13 @@ def test_filter_events_by_bbox():
     space = SimpleNamespace(
         latitude_min=49.5, latitude_max=51.5, longitude_min=5.5, longitude_max=7.5
     )
-    result = filter_events(_events(), space, None, None)
+    result = filter_events(_events(), space, None, None, _DATE_COLS)
     assert sorted(result["Event_ID"]) == [1, 2]
 
 
 def test_filter_events_no_filters_keeps_all():
     """With no date or bbox filter every event is returned."""
-    result = filter_events(_events(), _global_space(), None, None)
+    result = filter_events(_events(), _global_space(), None, None, _DATE_COLS)
     assert len(result) == 3
 
 

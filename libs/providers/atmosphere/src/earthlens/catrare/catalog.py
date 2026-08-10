@@ -110,6 +110,9 @@ def _load_catalog_data(path: Path) -> dict[str, Any]:
         "geometry_layers": {
             str(k): str(v) for k, v in (data.get("geometry_layers") or {}).items()
         },
+        "date_columns": {
+            str(k): str(v) for k, v in (data.get("date_columns") or {}).items()
+        },
         "event_columns": [str(c) for c in (data.get("event_columns") or [])],
     }
     _CATALOG_CACHE[key] = value
@@ -138,6 +141,8 @@ class Catalog(AbstractCatalog):
         attribution: Required attribution string.
         geometry_layers: Layer name stem per geometry kind (`zones` ->
             `"EventZones"`, `points` -> `"RRmaxPoints"`).
+        date_columns: The `start` / `end` event-interval column names the
+            date-window filter compares against (`Date_START` / `Date_END`).
         event_columns: Event attribute columns kept on every returned feature.
 
     Examples:
@@ -165,6 +170,7 @@ class Catalog(AbstractCatalog):
     license: str = ""
     attribution: str = ""
     geometry_layers: dict[str, str] = Field(default_factory=dict)
+    date_columns: dict[str, str] = Field(default_factory=dict)
     event_columns: list[str] = Field(default_factory=list)
 
     @classmethod
@@ -185,6 +191,7 @@ class Catalog(AbstractCatalog):
             "license": loaded.license,
             "attribution": loaded.attribution,
             "geometry_layers": loaded.geometry_layers,
+            "date_columns": loaded.date_columns,
             "event_columns": loaded.event_columns,
         }
 

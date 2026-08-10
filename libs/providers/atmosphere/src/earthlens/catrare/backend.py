@@ -218,7 +218,11 @@ class CatRaRE(AbstractDataSource):
         source = _helpers.read_events(gdb_path, layer, self._catalog.source_crs)
         trimmed = _helpers.build_feature_collection(source, event_columns)
         filtered = _helpers.filter_events(
-            trimmed, self.space, self.time.start_date, self.time.end_date
+            trimmed,
+            self.space,
+            self.time.start_date,
+            self.time.end_date,
+            self._catalog.date_columns,
         )
         return [filtered]
 
