@@ -338,11 +338,24 @@ class TestLogCitation:
     """Tests for the citation logging."""
 
     def test_logs_when_attribution_present(self, tmp_path: Path) -> None:
-        """A record with attribution logs its citation without raising."""
-        _make(tmp_path)._log_citation()
+        """A record with attribution emits its citation line."""
+        backend = _make(tmp_path)
+        messages: list[str] = []
+        sink_id = backend_module.logger.add(messages.append, format="{message}")
+        try:
+            backend._log_citation()
+        finally:
+            backend_module.logger.remove(sink_id)
+        assert any("FLODIS source citation" in message for message in messages)
 
     def test_silent_when_attribution_empty(self, tmp_path: Path) -> None:
-        """A record with no attribution logs nothing and does not raise."""
+        """A record with no attribution emits no citation line."""
         backend = _make(tmp_path)
         backend._record = ZenodoRecord(record=1, attribution="")
-        backend._log_citation()
+        messages: list[str] = []
+        sink_id = backend_module.logger.add(messages.append, format="{message}")
+        try:
+            backend._log_citation()
+        finally:
+            backend_module.logger.remove(sink_id)
+        assert not any("FLODIS source citation" in message for message in messages)

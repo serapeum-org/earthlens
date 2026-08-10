@@ -52,13 +52,14 @@ FLODIS carries the **keys** to the footprints, not the geometry. Attach the foot
 ```python
 gdis = EarthLens("emdat", variables=["gdis:points"], country="MOZ").download()  # a FeatureCollection
 
-# `disasterno` is the shared key. GDIS carries it as `disasterno`; FLODIS damages as `disasterno`.
-merged = gdis.to_dataframe().merge(damages, on="disasterno", how="inner", suffixes=("_gdis", "_flodis"))
+# `disasterno` is the shared key, and a FeatureCollection is a GeoDataFrame, so
+# it merges directly — the join keeps the GDIS point geometry alongside the impacts.
+merged = gdis.merge(damages, on="disasterno", how="inner", suffixes=("_gdis", "_flodis"))
 ```
 
 **Global Flood Database extents** come from the [`gee`](../gee/introduction.md) backend
-(`GLOBAL_FLOOD_DB/MODIS_EVENTS/V1`). FLODIS records which GFD events it matched in `GFD_matches`, so you fetch the
-matching footprints and overlay them on the impact rows:
+(`GLOBAL_FLOOD_DB/MODIS_EVENTS/V1`). FLODIS records how many GFD footprints it matched in `GFD_matches` (and their
+GFD event ids in `GFD_matches_nr`), so you fetch the matching footprints and overlay them on the impact rows:
 
 ```python
 gfd = EarthLens(
