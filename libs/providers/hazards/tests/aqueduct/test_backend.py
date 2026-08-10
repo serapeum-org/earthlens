@@ -201,21 +201,41 @@ def test_download_logs_source_attribution(country_cache: Path, tmp_path: Path) -
     assert any("World Resources Institute" in message for message in messages)
 
 
-def test_cached_zip_is_not_redownloaded(country_cache: Path, tmp_path: Path) -> None:
+def test_cached_zip_is_not_redownloaded(
+    country_cache: Path, tmp_path: Path, monkeypatch
+) -> None:
     """A present cache zip is reused without any HTTP call."""
-    backend = _backend(country_cache, tmp_path, return_period=100)
 
     def _boom(*args, **kwargs):
         raise AssertionError("download must not be called on a cache hit")
 
-    from earthlens.base.http import HttpClient
+    monkeypatch.setattr("earthlens.aqueduct.backend.HttpClient.download", _boom)
+    _backend(country_cache, tmp_path, return_period=100).download()
 
-    original = HttpClient.download
-    HttpClient.download = _boom  # type: ignore[method-assign]
-    try:
-        backend.download()
-    finally:
-        HttpClient.download = original  # type: ignore[method-assign]
+
+def test_state_cache_miss_downloads_container(
+    state_cache: Path, tmp_path: Path, monkeypatch
+) -> None:
+    """A state cache miss downloads the nested container zip and extracts it."""
+    row = Catalog().get("state")
+    source = (state_cache / row.container_zip).read_bytes()
+    empty_cache = tmp_path / "empty_cache"
+
+    class _FakeClient:
+        def __init__(self, *args, **kwargs) -> None:
+            pass
+
+        def download(self, url: str, dest, **kwargs) -> Path:
+            Path(dest).parent.mkdir(parents=True, exist_ok=True)
+            Path(dest).write_bytes(source)
+            return Path(dest)
+
+    monkeypatch.setattr("earthlens.aqueduct.backend.HttpClient", _FakeClient)
+    fc = Aqueduct(
+        admin_level="state", path=tmp_path, cache_dir=empty_cache, return_period=100
+    ).download()
+    assert (empty_cache / row.container_zip).exists()
+    assert "rp_100" in fc.columns
 
 
 def test_empty_result_returns_empty_collection(
