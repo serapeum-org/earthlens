@@ -44,9 +44,9 @@ earthlens datasets refresh stac,openeo         # a comma list
 earthlens datasets validate all                # every provider
 ```
 
-Canonical ids: `airnow`, `argo`, `asf`, `bathymetry`, `caravan`, `chc`, `climate-indices`, `cmems`, `dem`, `earthdata`,
+Canonical ids: `airnow`, `argo`, `asf`, `bathymetry`, `caravan`, `catrare`, `chc`, `climate-indices`, `cmems`, `dem`, `earthdata`,
 `ecmwf`,
-`eea-aq`, `erddap`, `eumetsat`, `fdsn`, `firms`, `gbif`, `gdacs`, `gee`, `ghsl`, `glaciers`, `goes`, `hanze`, `hdx`, `iucn`, `jaxa`, `nwm`, `nwp`,
+`eea-aq`, `erddap`, `eumetsat`, `fdsn`, `firms`, `flopros`, `gbif`, `gdacs`, `gee`, `ghsl`, `glaciers`, `goes`, `hanze`, `hdx`, `iucn`, `jaxa`, `nwm`, `nwp`,
 `obis`, `openaq`, `openeo`, `overture`, `pvgis`, `radar`, `risk-indicators`, `s3`, `sensor-community`, `sentinel_hub`, `soilgrids`,
 `stac`, `tropycal`, `usgs_water`, `wdpa`, `worldpop`. Common aliases include `amazon-s3`, `chirps`,
 `google-earth-engine`, `argo-floats`/`argopy`, `ioos` (erddap), `gebco`/`etopo` (bathymetry),
