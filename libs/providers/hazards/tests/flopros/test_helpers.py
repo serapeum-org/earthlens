@@ -68,8 +68,9 @@ def test_resolve_layers_dedupes_a_list():
 
 def test_resolve_layers_unknown_raises():
     """An unknown layer name raises a listing `ValueError`."""
+    dataset = Catalog().get("flopros")
     with pytest.raises(ValueError, match="is not a FLOPROS layer"):
-        resolve_layers(Catalog().get("flopros"), "typhoon")
+        resolve_layers(dataset, "typhoon")
 
 
 def test_build_feature_collection_selects_and_renames():
@@ -84,8 +85,9 @@ def test_build_feature_collection_selects_and_renames():
 
 def test_build_feature_collection_missing_column_raises():
     """A missing source column is a clean domain error, not a KeyError."""
+    source = _source()
     with pytest.raises(ValueError, match="missing expected column"):
-        build_feature_collection(_source(), ["name"], {"ghost": "NotThere"})
+        build_feature_collection(source, ["name"], {"ghost": "NotThere"})
 
 
 def test_filter_units_by_country_matches_name_or_geonunit():

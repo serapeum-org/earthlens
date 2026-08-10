@@ -50,8 +50,9 @@ def test_get_default_is_flopros():
 
 def test_unknown_dataset_raises_with_hint():
     """An unknown dataset name raises a listing `ValueError`."""
+    cat = Catalog()
     with pytest.raises(ValueError, match="FLOPROS catalog"):
-        Catalog().get("floprosx")
+        cat.get("floprosx")
 
 
 def test_empty_datasets_block_rejected(tmp_path, monkeypatch):

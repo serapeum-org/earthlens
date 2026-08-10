@@ -32,7 +32,8 @@ def test_live_july_2021_events_over_germany(tmp_path: Path) -> None:
     assert isinstance(fc, FeatureCollection)
     assert len(fc) > 0
     assert fc.crs.to_epsg() == 4326  # reprojected off the RADOLAN grid
-    assert "Eta" in fc.columns and "Area" in fc.columns
+    assert "Eta" in fc.columns
+    assert "Area" in fc.columns
     assert list(tmp_path.glob("catrare_t5_zones_*.gpkg"))
 
 

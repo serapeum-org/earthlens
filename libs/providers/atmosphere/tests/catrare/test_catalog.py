@@ -64,14 +64,16 @@ def test_layer_name_composed():
 
 def test_layer_name_unknown_geometry_raises():
     """An unknown geometry kind raises a listing `ValueError`."""
+    cat = Catalog()
     with pytest.raises(ValueError, match="is not a CatRaRE geometry kind"):
-        Catalog().layer_name("t5", "lines")
+        cat.layer_name("t5", "lines")
 
 
 def test_unknown_threshold_raises_with_hint():
     """An unknown threshold key raises a listing `ValueError`."""
+    cat = Catalog()
     with pytest.raises(ValueError, match="CatRaRE catalog"):
-        Catalog().get("t9")
+        cat.get("t9")
 
 
 def test_get_catalog_returns_datasets_map():

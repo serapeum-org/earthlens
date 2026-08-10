@@ -61,8 +61,9 @@ def test_build_feature_collection_selects_columns():
 
 def test_build_feature_collection_missing_column_raises():
     """A missing event column is a clean domain error, not a KeyError."""
+    source = _events()
     with pytest.raises(ValueError, match="missing expected column"):
-        build_feature_collection(_events(), ["Event_ID", "Ghost"])
+        build_feature_collection(source, ["Event_ID", "Ghost"])
 
 
 def test_filter_events_by_date_window():
