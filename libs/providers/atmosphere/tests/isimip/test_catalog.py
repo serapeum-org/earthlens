@@ -34,9 +34,13 @@ class TestCatalogLoad:
         cat = Catalog()
         assert cat.data_url == "https://data.isimip.org/api/v1", cat.data_url
         assert cat.files_api_url == "https://files.isimip.org/api/v2", cat.files_api_url
-        assert "InputData" in cat.products and "OutputData" in cat.products
+        assert "InputData" in cat.products
+        assert "OutputData" in cat.products
         assert cat.time_steps == ["daily", "monthly"], cat.time_steps
-        assert cat.datasets and cat.forcings and cat.scenarios and cat.rounds
+        assert cat.datasets
+        assert cat.forcings
+        assert cat.scenarios
+        assert cat.rounds
 
     def test_available_datasets_sorted(self):
         """`available_datasets` is the sorted variable-key index."""
@@ -97,13 +101,15 @@ class TestLookups:
     )
     def test_unknown_key_raises_with_hint(self, getter, key, noun):
         """An unknown forcing / scenario / round raises a did-you-mean ValueError."""
+        cat = Catalog()
         with pytest.raises(ValueError, match=f"not a curated ISIMIP {noun}"):
-            getattr(Catalog(), getter)(key)
+            getattr(cat, getter)(key)
 
     def test_unknown_variable_raises(self):
         """An unknown variable raises via the base did-you-mean lookup."""
+        cat = Catalog()
         with pytest.raises(ValueError, match="not in the ISIMIP catalog"):
-            Catalog().get_dataset("rainfall")
+            cat.get_dataset("rainfall")
 
     def test_contains_and_getitem(self):
         """`in` and `[]` operate over the curated variable map."""

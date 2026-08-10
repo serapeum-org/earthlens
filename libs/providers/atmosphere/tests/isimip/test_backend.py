@@ -24,7 +24,8 @@ class TestConstruction:
         """A fully-specified request builds a raster backend."""
         b = make_backend()
         assert b.OUTPUT_KIND == "raster"
-        assert b._round == "ISIMIP3b" and b._scenario == "ssp585"
+        assert b._round == "ISIMIP3b"
+        assert b._scenario == "ssp585"
 
     def test_gcm_casing_normalised(self, make_backend):
         """A CMIP6-cased GCM is lowercased to the API spelling."""
@@ -190,7 +191,8 @@ class TestFetchAndDownload:
         """A bbox download returns the extracted NetCDF path(s)."""
         b = make_backend()
         out = b.download(progress_bar=False)
-        assert out and all(p.suffix == ".nc" for p in out), out
+        assert out, out
+        assert all(p.suffix == ".nc" for p in out), out
 
     def test_cutout_called_with_bbox(self, make_backend):
         """The cutout job gets the window-filtered paths and the bbox order."""
@@ -234,7 +236,8 @@ class TestFetchAndDownload:
         """whole_globe downloads raw granules and never runs a cutout."""
         b = make_backend(lat_lim=None, lon_lim=None, whole_globe=True)
         out = b.download(progress_bar=False)
-        assert out and b._client.cutout_calls == []
+        assert out
+        assert b._client.cutout_calls == []
         assert b._client.download_calls, "expected a raw download"
 
     def test_whole_globe_all_urls_missing_raises(self, make_backend):
@@ -274,7 +277,8 @@ class TestFetchAndDownload:
             product
         )
         assert wide != narrow, "a narrower window must not reuse the wider run's dir"
-        assert "2015_2100" in wide.name and "2030_2031" in narrow.name
+        assert "2015_2100" in wide.name
+        assert "2030_2031" in narrow.name
 
 
 class TestLicense:

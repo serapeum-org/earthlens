@@ -64,23 +64,24 @@ def test_facade_download_returns_paths(tmp_path):
         path=str(tmp_path),
         client=FakeClient(),
     ).download(progress_bar=False)
-    assert out and all(p.suffix == ".nc" for p in out), out
+    assert out, out
+    assert all(p.suffix == ".nc" for p in out), out
 
 
 def test_facade_rejects_aggregate(tmp_path):
-    """The ISIMIP backend refuses a non-None aggregate through the facade."""
-    with pytest.raises(Exception, match="reduce|aggregate|separately"):
-        EarthLens(
-            "isimip",
-            dataset="ISIMIP3b",
-            variables=["pr"],
-            scenario="ssp585",
-            gcm="gfdl-esm4",
-            start="2016-01-01",
-            end="2018-12-31",
-            lat_lim=[51.0, 53.0],
-            lon_lim=[6.0, 8.0],
-            path=str(tmp_path),
-            client=FakeClient(),
-            aggregate={"reducer": "mean"},
-        ).download(progress_bar=False)
+    """The ISIMIP backend refuses a non-None `aggregate` through the facade."""
+    el = EarthLens(
+        "isimip",
+        dataset="ISIMIP3b",
+        variables=["pr"],
+        scenario="ssp585",
+        gcm="gfdl-esm4",
+        start="2016-01-01",
+        end="2018-12-31",
+        lat_lim=[51.0, 53.0],
+        lon_lim=[6.0, 8.0],
+        path=str(tmp_path),
+        client=FakeClient(),
+    )
+    with pytest.raises(NotImplementedError, match="reduce|aggregate|separately"):
+        el.download(aggregate={"reducer": "mean"}, progress_bar=False)
