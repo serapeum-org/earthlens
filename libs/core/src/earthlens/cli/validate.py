@@ -218,6 +218,38 @@ def _validate_asf(catalog: Any) -> tuple[int, list[str]]:
     return len(products), issues
 
 
+def _check_radklim_row(key: str, record: Any) -> list[str]:
+    """Lint one RADKLIM product: stream fields + a served default format.
+
+    A `reproc` product must carry the reprocessing `version` and the CDC path
+    token `cdc_frequency`; an `operational` product must carry a positive
+    `retention_days`; and `default_format` must be one of the row's `formats`.
+
+    Args:
+        key: The product id.
+        record: The `earthlens.radklim.RadklimProduct` row.
+
+    Returns:
+        One issue string per problem found.
+    """
+    issues = _require(key, record, ("stream", "code", "default_format", "formats"))
+    stream = getattr(record, "stream", None)
+    if stream == "reproc":
+        issues += _require(key, record, ("version", "cdc_frequency"))
+    elif stream == "operational" and not getattr(record, "retention_days", 0):
+        issues.append(f"{key}: operational row needs a positive retention_days")
+    fmt = getattr(record, "default_format", None)
+    formats = getattr(record, "formats", None) or []
+    if fmt and formats and fmt not in formats:
+        issues.append(f"{key}: default_format {fmt!r} not in formats {formats}")
+    return issues
+
+
+def _validate_radklim(catalog: Any) -> tuple[int, list[str]]:
+    """Each RADKLIM / RADOLAN product needs its stream fields + a served format."""
+    return _lint(catalog, _check_radklim_row)
+
+
 def _validate_radar(catalog: Any) -> tuple[int, list[str]]:
     """Each radar station needs a name and in-range latitude / longitude."""
 
@@ -882,6 +914,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "firms": _validate_firms,
     "asf": _validate_asf,
     "radar": _validate_radar,
+    "radklim": _validate_radklim,
     "tropycal": _validate_tropycal,
     "gdacs": _validate_gdacs,
     "aqueduct": _validate_aqueduct,
