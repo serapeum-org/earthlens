@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Any
 
@@ -43,8 +44,9 @@ class _FakeClient:
 
 
 def _seed(backend: FLODIS, csv_text: str) -> Path:
-    """Write `csv_text` into the backend's cache under the dataset file name."""
-    path = backend.root_dir / backend._dataset.file
+    """Write `csv_text` into the backend's pristine-download cache."""
+    path = backend._source_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(csv_text, encoding="utf-8")
     return path
 
@@ -283,6 +285,35 @@ class TestDownload:
         _seed(backend, DAMAGES_CSV)
         backend.download(progress_bar=False)
         assert (backend.root_dir / "flodis_damages.csv").exists()
+
+    def test_output_does_not_case_collide_with_source_cache(
+        self, tmp_path: Path
+    ) -> None:
+        """The written CSV never shares a case-insensitive path with the raw cache."""
+        backend = _make(tmp_path, dataset="displacement")
+        source = os.path.normcase(str(backend._source_path()))
+        output = os.path.normcase(
+            str(backend.root_dir / (backend._result_stem() + ".csv"))
+        )
+        assert source != output, (
+            "raw cache and output must not collide on Windows/macOS"
+        )
+
+    def test_repeated_unfiltered_displacement_download(self, tmp_path: Path) -> None:
+        """Downloading the displacement table twice keeps the schema intact.
+
+        Regression for the case-insensitive collision that overwrote the raw
+        cache with the index-stripped output and dropped `ISO3` on re-read.
+        """
+        first = _make(tmp_path, dataset="displacement")
+        _seed(first, DISPLACEMENT_CSV)
+        first.download(progress_bar=False)
+
+        second = _make(tmp_path, dataset="displacement")
+        reread = second.download(progress_bar=False)
+        assert "ISO3" in reread.columns
+        assert not any(col.startswith("Unnamed") for col in reread.columns)
+        assert len(reread) == 3
 
 
 class TestResultStem:

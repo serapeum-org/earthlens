@@ -362,9 +362,17 @@ class FLODIS(AbstractDataSource):
         """
         record = self._record.record
         entry = self._dataset
-        local = self.root_dir / entry.file
+        # The pristine download lives in a dedicated sub-directory, never in
+        # `root_dir` beside the written output. `download()` writes its filtered
+        # result as `flodis_<table>.csv`, which on a case-insensitive filesystem
+        # (Windows, default macOS) would be the *same path* as the raw
+        # `FLODIS_<table>.csv` for the displacement table — overwriting the
+        # pristine cache with an index-stripped copy and corrupting every later
+        # read. Separating the two directories makes that collision impossible.
+        local = self._source_path()
         if not local.exists():
             logger.info(f"FLODIS: downloading {entry.file} (record {record}).")
+            local.parent.mkdir(parents=True, exist_ok=True)
             self._client().download(
                 entry.content_url(record),
                 local,
@@ -372,6 +380,18 @@ class FLODIS(AbstractDataSource):
                 progress=self._progress,
             )
         return pd.read_csv(local, index_col=0).reset_index(drop=True)
+
+    def _source_path(self) -> Path:
+        """Return the cache path for the pristine download of the selected table.
+
+        Kept in a dedicated `flodis_source/` sub-directory so it cannot collide
+        with the filtered CSV `download()` writes into `root_dir` (see
+        :meth:`_load_table`).
+
+        Returns:
+            Path: `root_dir/flodis_source/<file>`.
+        """
+        return self.root_dir / "flodis_source" / self._dataset.file
 
     def _filter_table(self, table: pd.DataFrame) -> pd.DataFrame:
         """Apply the request's country / GADM / date filters.
@@ -389,9 +409,12 @@ class FLODIS(AbstractDataSource):
             mask &= table[columns["iso3"]].astype(str).str.upper().isin(self._country)
 
         if self._gid:
-            gid_cols = [columns[key] for key in ("gid_1", "gid_2") if key in columns]
+            # Filter against the dataset's own join-key columns (`GID_1`/`GID_2`),
+            # the same source of truth `_normalize_gid` validated against — so a
+            # `gid=` that was accepted always has real columns to match, rather
+            # than silently dropping every row if the `columns:` map drifted.
             gid_mask = pd.Series(False, index=table.index)
-            for col in gid_cols:
+            for col in self._dataset.key_columns:
                 if col in table.columns:
                     gid_mask |= table[col].astype(str).str.upper().isin(self._gid)
             mask &= gid_mask
