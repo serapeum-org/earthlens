@@ -31,9 +31,10 @@ so only the requested box is transferred.
 ## The facet set
 
 `gcm`, `scenario`, and `variables` are required; `dataset` defaults to
-`"ISIMIP3b"`, `product` to `"InputData"`, and `temporal_resolution` to
-`"daily"`. Every facet is validated against the bundled catalog, so an unknown
-GCM / scenario / variable raises a clear did-you-mean error:
+`"ISIMIP3b"` and `temporal_resolution` to `"daily"`. The backend fetches the
+bias-adjusted `InputData` forcing. Every facet is validated against the bundled
+catalog, so an unknown GCM / scenario / variable raises a clear did-you-mean
+error:
 
 ```python
 from earthlens.isimip import Catalog

@@ -35,8 +35,8 @@ deliberately does **not** re-expose raw CMIP6 — that is `cmip6`'s job.
 ## The request is a facet set
 
 A request pins the ISIMIP facets — the simulation round (`dataset`), the GCM
-(`gcm`), the scenario (`scenario`), one or more variables (`variables`), the
-product, and the time step (`temporal_resolution`):
+(`gcm`), the scenario (`scenario`), one or more variables (`variables`), and the
+time step (`temporal_resolution`):
 
 | Facet | Argument | Example |
 |-------|----------|---------|
@@ -44,12 +44,12 @@ product, and the time step (`temporal_resolution`):
 | Climate forcing (GCM) | `gcm` | `"gfdl-esm4"`, `"ukesm1-0-ll"` (any casing) |
 | Scenario | `scenario` | `"ssp585"`, `"ssp126"`, `"historical"` |
 | Variable | `variables` | `["pr"]`, `["tas", "tasmax"]` |
-| Product | `product` | `"InputData"` (default) / `"OutputData"` |
 | Time step | `temporal_resolution` | `"daily"` (default) / `"monthly"` |
 
-The facets are validated against the bundled catalog vocabulary, so a typo in a
-GCM / scenario / variable raises a clear did-you-mean error before any network
-call.
+The backend fetches the ISIMIP `InputData` product — the bias-adjusted climate
+*forcing*; impact-model `OutputData` is out of scope. The facets are validated
+against the bundled catalog vocabulary, so a typo in a GCM / scenario / variable
+raises a clear did-you-mean error before any network call.
 
 ## The cutout is mandatory
 
