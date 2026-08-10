@@ -318,8 +318,8 @@ class CatRaRE(AbstractDataSource):
     def _write(self, collection: FeatureCollection) -> Path:
         """Write the collection to one GeoPackage under `root_dir`.
 
-        The filename embeds the threshold and geometry layer (and a bbox tag)
-        so distinct requests do not overwrite one another.
+        The filename embeds the threshold, geometry layer, the date window,
+        and a bbox tag so distinct requests do not overwrite one another.
 
         Args:
             collection: The collection to write.
@@ -327,6 +327,12 @@ class CatRaRE(AbstractDataSource):
         Returns:
             Path: The written file path.
         """
+        date_tag = ""
+        start, end = self.time.start_date, self.time.end_date
+        if start is not None or end is not None:
+            lo = start.strftime("%Y%m%d") if start is not None else "min"
+            hi = end.strftime("%Y%m%d") if end is not None else "max"
+            date_tag = f"_{lo}-{hi}"
         bbox_tag = ""
         if not _helpers._is_global(self.space):
             box = self.space
@@ -334,7 +340,7 @@ class CatRaRE(AbstractDataSource):
                 f"_bbox{box.latitude_min:g}_{box.longitude_min:g}_"
                 f"{box.latitude_max:g}_{box.longitude_max:g}"
             )
-        stem = f"catrare_{self._threshold}_{self._geometry_layer}{bbox_tag}"
+        stem = f"catrare_{self._threshold}_{self._geometry_layer}{date_tag}{bbox_tag}"
         out_path = self.root_dir / f"{stem}.gpkg"
         collection.to_file(str(out_path), driver="GPKG")
         return out_path

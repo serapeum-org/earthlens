@@ -128,3 +128,15 @@ def test_written_filename_embeds_bbox(catrare_cache, tmp_path):
         lon_lim=[5.0, 15.0],
     ).download()
     assert len(list(tmp_path.glob("catrare_t5_zones_bbox*.gpkg"))) == 1
+
+
+def test_written_filename_embeds_date_window(catrare_cache, tmp_path):
+    """Two downloads differing only by date window write to distinct files."""
+    CatRaRE(
+        cache_dir=catrare_cache, path=tmp_path, start="2021-07-01", end="2021-07-31"
+    ).download()
+    CatRaRE(
+        cache_dir=catrare_cache, path=tmp_path, start="2005-01-01", end="2005-12-31"
+    ).download()
+    assert len(list(tmp_path.glob("catrare_t5_zones_20210701-20210731.gpkg"))) == 1
+    assert len(list(tmp_path.glob("catrare_t5_zones_20050101-20051231.gpkg"))) == 1
