@@ -20,7 +20,7 @@ from earthlens.earthlens import (
 )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def fake_gee(monkeypatch):
     """Replace `earthlens.gee.GEE` with a `MagicMock` class.
 
