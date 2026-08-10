@@ -86,6 +86,14 @@ def test_filter_events_open_ended_start():
     assert sorted(result["Event_ID"]) == [1, 2]
 
 
+def test_filter_events_open_ended_end():
+    """An end-only window drops events that start after it."""
+    result = filter_events(
+        _events(), _global_space(), None, datetime(2010, 1, 1), _DATE_COLS
+    )
+    assert sorted(result["Event_ID"]) == [3]
+
+
 def test_filter_events_keeps_event_spanning_the_window():
     """An event that starts before and ends after the window still overlaps."""
     gdf = gpd.GeoDataFrame(
