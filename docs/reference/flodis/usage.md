@@ -85,9 +85,9 @@ The three layers share time and place, so a mapped example is: FLODIS gives the 
 
 ## Aggregation
 
-`flodis` is tabular, so it takes no `aggregate=`:
+`flodis` is tabular, so `download()` takes no `aggregate=`:
 
 ```python
-EarthLens("flodis", dataset="damages", aggregate=object()).download()
+EarthLens("flodis", dataset="damages").download(aggregate=object())
 # NotImplementedError: aggregate= is not supported by FLODIS ...
 ```
