@@ -86,8 +86,12 @@ def filter_events(
     An event is kept when its `[start, end]` interval (the `date_columns`
     `start` / `end` fields) overlaps the requested `[start, end]` window (a
     half-open bound is honoured — pass only `start` or only `end` to bound one
-    side). A bounding box narrower than the whole globe keeps events whose
-    geometry intersects it. Both filters compose.
+    side). An event whose dates do not parse (`NaT`) cannot be shown to
+    overlap, so it is excluded whenever a date filter is active; with no date
+    filter every event (including any unparseable one) is kept. Real CatRaRE
+    data is well-formed, so this only guards against a malformed row. A
+    bounding box narrower than the whole globe keeps events whose geometry
+    intersects it. Both filters compose.
 
     Args:
         collection: The trimmed collection from :func:`build_feature_collection`.
