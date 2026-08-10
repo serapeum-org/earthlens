@@ -341,6 +341,14 @@
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/fabdem/01_catalog_explorer/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/fabdem/02_fabdem_quickstart/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/fdsn/global_seismicity_map/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
@@ -546,6 +554,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/jaxa/04_ptree_himawari/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/jrc-flood/01_catalog_explorer/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/jrc-flood/02_efhm_quickstart/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/jrc-flood/03_return_periods/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
@@ -1405,6 +1425,22 @@
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/fabdem/datasets/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/fabdem/fabdem/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/fabdem/introduction/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/fabdem/usage/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/fdsn/fdsn/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
@@ -1594,6 +1630,22 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/reference/jaxa/usage/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/jrc-flood/datasets/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/jrc-flood/introduction/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/jrc-flood/jrc-flood/</loc>
+         <lastmod>2026-08-10</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/reference/jrc-flood/usage/</loc>
          <lastmod>2026-08-10</lastmod>
     </url>
     <url>
