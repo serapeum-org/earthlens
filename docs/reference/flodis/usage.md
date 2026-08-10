@@ -65,6 +65,7 @@ GFD event ids in `GFD_matches_nr`), so you fetch the matching footprints and ove
 gfd = EarthLens(
     "gee",
     dataset="GLOBAL_FLOOD_DB/MODIS_EVENTS/V1",
+    variables=["flooded"],  # the flood-extent band (GEE addresses bands, not whole assets)
     start="2000",
     end="2018",
     aoi=(32.0, -26.0, 41.0, -10.0),  # Mozambique bbox

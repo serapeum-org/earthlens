@@ -45,7 +45,8 @@ CATALOG_PATH: Path = Path(__file__).parent / "flodis_data_catalog.yaml"
 _CONTENT_URL = "https://zenodo.org/api/records/{record}/files/{name}/content"
 
 #: Module-level parse cache, keyed by `load_catalog` on the resolved path plus
-#: the YAML's `(mtime_ns, size)`, so a repeated `Catalog()` skips the parse.
+#: the YAML's `(mtime_ns, size)`, so a repeated `Catalog.load()` skips the parse.
+#: (`Catalog()` autoloads through `_autoload` and does not consult this cache.)
 _CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 
 
