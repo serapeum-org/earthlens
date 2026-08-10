@@ -69,11 +69,26 @@ class FakeHttp:
         expect_magic: bytes | tuple[bytes, ...] | None = None,
         **kwargs: object,
     ) -> Path:
-        """Write the canned bytes for `url` to `dest`, or 404 for a missing name."""
+        """Write the canned bytes for `url` to `dest`, or 404 for a missing name.
+
+        Honours `expect_magic` the way `HttpClient.download` does — a canned body
+        that starts with none of the accepted prefixes raises `ValueError`, so a
+        wrong-format body is rejected in tests instead of silently written.
+        """
         name = url.rsplit("/", 1)[-1]
         if name in self.missing:
             raise requests.HTTPError(response=_MissingResp())
         data = self.files.get(name, b"\x1f\x8bcanned")
+        if expect_magic is not None:
+            options = (
+                (expect_magic,)
+                if isinstance(expect_magic, bytes)
+                else tuple(expect_magic)
+            )
+            if not any(data.startswith(m) for m in options):
+                raise ValueError(
+                    f"body does not start with {expect_magic!r} (starts {data[:8]!r})"
+                )
         dest = Path(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(data)

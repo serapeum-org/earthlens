@@ -121,6 +121,11 @@ class TestSearchReproc:
         p = _make(tmp_path)._search()[0]
         assert p.metadata["format"] == "nc"
 
+    def test_window_before_archive_returns_empty(self, tmp_path):
+        """A window entirely before the 2001 archive start enumerates nothing."""
+        b = _make(tmp_path, start="1990-01-01", end="1995-01-01")
+        assert b._search() == []
+
     def test_clamps_end_to_current_year(self, tmp_path):
         """A window ending in the future is clamped to the current year."""
         b = _make(
@@ -232,6 +237,19 @@ class TestSearchOperational:
         assert b._current_time() == dt.datetime(2024, 1, 1, 13, 0)
         assert len(b._search()) == 2
 
+    def test_straddling_retention_returns_tail(self, tmp_path, operational_listing):
+        """A window straddling the retention edge returns the retained tail."""
+        http = FakeHttp(listing=operational_listing)
+        b = _make(
+            tmp_path,
+            "radolan-yw",
+            start="2023-12-01",
+            end="2024-01-01",
+            now=dt.datetime(2024, 1, 2, 13, 0),
+            http=http,
+        )
+        assert len(b._search()) == 3, "the in-listing 2024-01-01 granules are returned"
+
     def test_retention_expired_returns_empty(self, tmp_path, operational_listing):
         """A window before the retention window returns nothing (with a warning)."""
         http = FakeHttp(listing=operational_listing)
@@ -267,6 +285,37 @@ class TestFetch:
         b = _make(tmp_path, start="2023-01-01", end="2024-01-01", http=http)
         out = b.download(progress_bar=False)
         assert [p.name for p in out] == ["YW2017.002_2023_netcdf.tar.gz"], out
+
+    def test_wrong_magic_body_rejected(self, tmp_path):
+        """A body that fails the format magic-byte check is rejected, not written."""
+        archive = "YW2017.002_2023_netcdf.tar.gz"
+        http = FakeHttp(files={archive: b"<html>error</html>"})
+        b = _make(tmp_path, start="2023-01-01", end="2023-06-01", http=http)
+        with pytest.raises(ValueError, match="does not start with"):
+            b.download(progress_bar=False)
+
+    def test_operational_hdf5_download(self, tmp_path, operational_listing):
+        """The operational HDF5 path downloads granules whose bytes carry HDF5 magic."""
+        names = [
+            "raa01-yw_10000-2401011200-dwd---bin.hdf5",
+            "raa01-yw_10000-2401011205-dwd---bin.hdf5",
+        ]
+        http = FakeHttp(
+            listing=operational_listing,
+            files={n: b"\x89HDF\r\n\x1a\n rest" for n in names},
+        )
+        b = _make(
+            tmp_path,
+            "radolan-yw",
+            start="2024-01-01T12:00",
+            end="2024-01-01T12:07",
+            fmt="%Y-%m-%dT%H:%M",
+            now=dt.datetime(2024, 1, 1, 13, 0),
+            http=http,
+        )
+        out = b.download(progress_bar=False)
+        assert [p.name for p in out] == names, out
+        assert Path(out[0]).read_bytes()[:4] == b"\x89HDF"
 
     def test_non_404_error_propagates(self, tmp_path):
         """A non-404 HTTP error during download is re-raised, not skipped."""
