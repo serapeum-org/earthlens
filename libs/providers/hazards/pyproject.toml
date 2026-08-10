@@ -71,7 +71,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.gdacs*", "earthlens.hanze*", "earthlens.hdx*", "earthlens.nsi*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
+include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.aqueduct*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.gdacs*", "earthlens.hanze*", "earthlens.hdx*", "earthlens.nsi*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -92,6 +92,7 @@ consider_namespace_packages = true
 addopts = "--import-mode=importlib"
 markers = [
     "admin: tests for the administrative-boundaries backend (geoBoundaries + CGAZ + Natural Earth + US Census TIGER/Line; no extra SDK — core requests + pyramids; all four public, GADM omitted for license).",
+    "aqueduct: tests for the WRI Aqueduct riverine flood-risk backend (files.wri.org 2015 Analyzer, CC-BY-4.0; no extra SDK — core requests + pyramids; country/state/basin exposure shapefiles).",
     "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
     "emdat: tests for the EM-DAT disaster backend (the UCLouvain Dataverse archive is anonymous and needs no extra; the GDIS sources need the `emdat` extra: earthaccess, plus an Earthdata Login).",
     "gdis: tests for the GDIS half of the EM-DAT backend (needs an Earthdata Login plus acceptance of the SEDAC data-use agreement); deselect with `-m \"not gdis\"` on a machine without credentials.",

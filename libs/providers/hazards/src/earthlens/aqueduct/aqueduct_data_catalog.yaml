@@ -1,0 +1,69 @@
+# WRI Aqueduct Global Flood Analyzer (2015) — riverine flood-risk data by admin
+# unit, served publicly by WRI's own file host (CC-BY-4.0, no auth). Pinned live
+# 2026-08-09; see planning/flood-risk/captures/a1-hydroshare-findings-2026-08-09.md.
+#
+# Each `admin_levels:` row is one shapefile (253 countries / 4647 states / 230
+# river basins, verified live). The per-unit attributes are a {indicator}{year}_{scenario}_{rp}
+# column grid decoded by `dictionary.xlsx` and mirrored in `indicators:`,
+# `years:`, `scenarios:`, `return_periods:` below.
+
+# Base host for every download URL.
+base_url: https://files.wri.org/d8/s3fs-public
+
+# Redistribution licence + required attribution (both riverine-only; the coastal
+# / 2050 / 2080 product is a separate, S3-access-gated dataset not shipped here).
+license: CC-BY-4.0
+attribution: "World Resources Institute 2015; Winsemius et al. 2013; Ward et al. 2013"
+
+# The three shipped admin levels. `country` and `basin` are direct zip downloads;
+# `state` has no standalone URL (404) and is nested inside the maps-and-data
+# bundle, so it declares `container_zip:` (download that, extract `zip:` from it,
+# then read the shapefile).
+admin_levels:
+  country:
+    zip: aqueduct_global_flood_risk_data_by_country_20150304.zip
+    shapefile_stem: aqueduct_global_flood_risk_data_by_country_20150304
+  basin:
+    zip: aqueduct_global_flood_risk_data_by_river_basin_20150304.zip
+    shapefile_stem: aqueduct_global_flood_risk_data_by_river_basin_20150304
+  state:
+    container_zip: aqueduct_global_flood_risk_maps_and_data_20150304.zip
+    zip: aqueduct_global_flood_risk_data_by_state_20150304.zip
+    shapefile_stem: aqueduct_global_flood_risk_data_by_state_20150304
+
+# Column-grammar vocabularies (public name -> the code used in the .dbf column).
+# A column name is f"{indicator}{year}_{scenario}_{return_period}",
+# e.g. population_affected + 2030 + ssp2-rcp8p5 + 100yr -> "P30_28_100".
+indicators:
+  gdp_affected: G       # Affected GDP
+  population_affected: P # Affected Population
+  urban_damage: U       # Urban Damage
+
+years:
+  "2010": "10"  # estimated risk in 2010 (current)
+  "2030": "30"  # projected risk in 2030 (future)
+
+# scenario code = {socio-economic}{climate}; `bh` is the 2010 baseline. The seven
+# 2030 combinations are the only futures WRI ships. `year_2010` / `year_2030`
+# record which years each scenario is valid for (2010 has baseline only).
+scenarios:
+  baseline:        {code: bh, years: ["2010"]}   # baseline socio + baseline hydrology
+  ssp2-rcp4p5:     {code: "24", years: ["2030"]} # SSP2 + RCP4.5
+  ssp2-rcp8p5:     {code: "28", years: ["2030"]} # SSP2 + RCP8.5
+  ssp3-rcp8p5:     {code: "38", years: ["2030"]} # SSP3 + RCP8.5
+  base-rcp4p5:     {code: b4, years: ["2030"]}   # baseline socio + RCP4.5
+  base-rcp8p5:     {code: b8, years: ["2030"]}   # baseline socio + RCP8.5
+  ssp2-basehydro:  {code: 2h, years: ["2030"]}   # SSP2 + baseline hydrology
+  ssp3-basehydro:  {code: 3h, years: ["2030"]}   # SSP3 + baseline hydrology
+
+# Flood magnitude (return period, years) -> the code in the column name.
+return_periods:
+  2: "2"
+  5: "5"
+  10: "10"
+  25: "25"
+  50: "50"
+  100: "100"
+  250: "250"
+  500: "500"
+  1000: "1T"

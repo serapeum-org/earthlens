@@ -116,6 +116,7 @@ class TestFlexibleDateForms:
 #: window — or dropping it from one that does not — fails here.
 _NO_WINDOW_REQUIRED = {
     "AdminBoundaries",
+    "Aqueduct",
     "Bathymetry",
     "DEM",
     "EMDAT",
