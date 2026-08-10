@@ -182,6 +182,8 @@ class TestRegistry:
             "ptree",
             "pvgis",
             "radar",
+            "radklim",
+            "radolan",
             "redlist",
             "rgi",
             "risk-indicators",

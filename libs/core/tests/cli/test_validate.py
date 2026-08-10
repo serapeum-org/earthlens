@@ -48,6 +48,7 @@ _CURATED_ENUM = (
     "firms",
     "asf",
     "radar",
+    "radklim",
     "goes",
     "tropycal",
     "gdacs",
