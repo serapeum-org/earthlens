@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 
+from earthlens.base import RemoteProduct
 from earthlens.biodiversity import LicenseWarning
 from earthlens.isimip import ISIMIP
 from earthlens.isimip import backend as backend_mod
@@ -264,6 +265,16 @@ class TestFetchAndDownload:
         out = make_backend(variables=["pr", "tas"]).download(progress_bar=False)
         assert len(out) == 2
         assert len({p.parent for p in out}) == 2, "products must not share a dir"
+
+    def test_product_dir_keyed_by_window(self, make_backend):
+        """Different date windows resolve to different output subdirectories."""
+        product = RemoteProduct(id="ds_pr", metadata={})
+        wide = make_backend(start="2015-01-01", end="2100-12-31")._product_dir(product)
+        narrow = make_backend(start="2030-01-01", end="2031-12-31")._product_dir(
+            product
+        )
+        assert wide != narrow, "a narrower window must not reuse the wider run's dir"
+        assert "2015_2100" in wide.name and "2030_2031" in narrow.name
 
 
 class TestLicense:

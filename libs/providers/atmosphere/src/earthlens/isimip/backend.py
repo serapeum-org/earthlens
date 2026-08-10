@@ -368,12 +368,14 @@ class ISIMIP(AbstractDataSource):
         return out
 
     def _product_dir(self, product: RemoteProduct) -> Path:
-        """Return a per-product output subdirectory under the output root.
+        """Return a per-product, per-window output subdirectory under the root.
 
-        Each resolved dataset writes into its own subdirectory so that
-        concurrent cutouts never collide on a shared filename and re-running the
-        same request still returns the (overwritten) granules rather than an
-        empty diff.
+        Each resolved dataset writes into its own subdirectory keyed by both the
+        dataset id and the requested `[start, end]` window, so that concurrent
+        cutouts never collide on a shared filename, re-running the same request
+        still returns the (overwritten) granules, and re-running with a narrower
+        window never picks up a wider run's out-of-window granules left in a
+        shared dir (:meth:`_download_extract` returns every `*.nc` it finds).
 
         Args:
             product: The product whose output subdirectory to build.
@@ -381,7 +383,8 @@ class ISIMIP(AbstractDataSource):
         Returns:
             Path: The created per-product directory.
         """
-        slug = re.sub(r"[^0-9A-Za-z._-]+", "_", str(product.id)) or "isimip"
+        window = f"{self.time.start_date.year}_{self.time.end_date.year}"
+        slug = re.sub(r"[^0-9A-Za-z._-]+", "_", f"{product.id}_{window}") or "isimip"
         directory = self._ensure_root_dir() / slug
         directory.mkdir(parents=True, exist_ok=True)
         return directory
