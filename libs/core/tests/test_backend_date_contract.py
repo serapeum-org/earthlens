@@ -120,6 +120,7 @@ _NO_WINDOW_REQUIRED = {
     "Bathymetry",
     "DEM",
     "EMDAT",
+    "FLOPROS",
     "Glaciers",
     "HANZE",
     "NSI",
