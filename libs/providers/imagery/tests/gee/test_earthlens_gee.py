@@ -20,7 +20,7 @@ from earthlens.earthlens import (
 )
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def fake_gee(monkeypatch):
     """Replace `earthlens.gee.GEE` with a `MagicMock` class.
 
@@ -73,10 +73,14 @@ class TestRegistry:
             "airnow",
             "alaska-satellite-facility",
             "amazon-s3",
+            "aqueduct",
+            "aqueduct-flood-risk",
+            "aqueduct-floods",
             "argo",
             "argo-floats",
             "argopy",
             "asf",
+            "bare-earth-dem",
             "bathymetry",
             "bdc",
             "brazil-data-cube",
@@ -103,11 +107,15 @@ class TestRegistry:
             "ecmwf",
             "edo",
             "eea-aq",
+            "efhm",
             "elevation",
             "emdat",
             "erddap",
             "etopo",
             "eumetsat",
+            "european-flood-hazard",
+            "fab-dem",
+            "fabdem",
             "fdsn",
             "firms",
             "g-portal",
@@ -144,6 +152,8 @@ class TestRegistry:
             "iucn",
             "jaxa",
             "jaxa-earth",
+            "jrc-flood",
+            "jrc-flood-hazard",
             "landsat",
             "mswep",
             "mswx",

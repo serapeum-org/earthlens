@@ -302,6 +302,22 @@ def _validate_gdacs(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("name", "description")))
 
 
+def _validate_aqueduct(catalog: Any) -> tuple[int, list[str]]:
+    """Each admin level needs a zip + shapefile stem, and every vocab is populated.
+
+    Beyond the admin-level rows, the request path resolves a column name from the
+    `indicators` / `years` / `scenarios` / `return_periods` vocabularies, so an
+    emptied vocabulary would load cleanly yet break every download — flag it here.
+    """
+    checked, issues = _lint(
+        catalog, lambda k, r: _require(k, r, ("zip", "shapefile_stem"))
+    )
+    for vocabulary in ("indicators", "years", "scenarios", "return_periods"):
+        if not getattr(catalog, vocabulary, None):
+            issues.append(f"catalog: the {vocabulary!r} vocabulary is empty")
+    return checked, issues
+
+
 def _validate_nsi(catalog: Any) -> tuple[int, list[str]]:
     """Each NSI source needs a provider, endpoint, output kind, and field map."""
     return _lint(
@@ -655,6 +671,21 @@ def _validate_bathymetry(catalog: Any) -> tuple[int, list[str]]:
     return len(catalog.datasets), issues
 
 
+def _validate_fabdem(catalog: Any) -> tuple[int, list[str]]:
+    """Each FABDEM row needs a band and a data version (for the tile URLs)."""
+    return _lint(catalog, lambda k, r: _require(k, r, ("band", "version")))
+
+
+def _validate_jrc_flood(catalog: Any) -> tuple[int, list[str]]:
+    """Each EFHM row needs a band, base URL, filename template, and return periods."""
+    return _lint(
+        catalog,
+        lambda k, r: _require(
+            k, r, ("band", "base_url", "filename_template", "return_periods")
+        ),
+    )
+
+
 def _validate_pvgis(catalog: Any) -> tuple[int, list[str]]:
     """Each PVGIS product needs a tool, an endpoint, and non-empty columns."""
     return _lint(catalog, lambda k, r: _require(k, r, ("tool", "endpoint", "columns")))
@@ -868,6 +899,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "radar": _validate_radar,
     "tropycal": _validate_tropycal,
     "gdacs": _validate_gdacs,
+    "aqueduct": _validate_aqueduct,
     "nsi": _validate_nsi,
     "hanze": _validate_hanze,
     "drought": _validate_drought,
@@ -884,6 +916,8 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "emdat": _validate_emdat,
     "erddap": _validate_erddap,
     "bathymetry": _validate_bathymetry,
+    "fabdem": _validate_fabdem,
+    "jrc_flood": _validate_jrc_flood,
     "pvgis": _validate_pvgis,
     "nrel": _validate_nrel,
     "glaciers": _validate_glaciers,
