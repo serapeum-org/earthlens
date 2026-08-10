@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/radklim/catalog/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/reference/isimip/introduction/">
       
       
-        <link rel="prev" href="../usage/">
+        <link rel="prev" href="../../cmip6/cmip6/">
       
       
-        <link rel="next" href="../radklim/">
+        <link rel="next" href="../usage/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Catalog - earthlens</title>
+        <title>Introduction - earthlens</title>
       
     
     
@@ -87,13 +87,13 @@
     
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="earthlens">
-    <meta property="og:title" content="Catalog">
+    <meta property="og:title" content="Introduction">
     <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
-    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/reference/radklim/catalog/">
+    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/reference/isimip/introduction/">
     <meta property="og:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Catalog">
+    <meta name="twitter:title" content="Introduction">
     <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
     <meta name="twitter:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
@@ -119,7 +119,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#dwd-radklim-radolan-catalog" class="md-skip">
+        <a href="#isimip-bias-adjusted-climate-forcing-introduction" class="md-skip">
           Skip to content
         </a>
       
@@ -158,7 +158,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Catalog
+              Introduction
             
           </span>
         </div>
@@ -1902,6 +1902,241 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ISIMIP (bias-adjusted forcing)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ISIMIP (bias-adjusted forcing)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-this-backend-exists-isimip-vs-cmip6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why this backend exists — isimip vs cmip6
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-request-is-a-facet-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The request is a facet set
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-cutout-is-mandatory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The cutout is mandatory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#licence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Licence
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../isimip/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     
@@ -1916,10 +2151,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
         
           
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
             
   
   
@@ -1937,8 +2172,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2114,10 +2349,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
         
           
-          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
             
   
   
@@ -2135,8 +2370,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2340,10 +2575,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
         
           
-          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
             
   
   
@@ -2361,8 +2596,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_10">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2566,10 +2801,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
         
           
-          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
             
   
   
@@ -2587,8 +2822,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_11">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2708,10 +2943,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
         
           
-          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
             
   
   
@@ -2729,8 +2964,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2906,10 +3141,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
         
           
-          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
             
   
   
@@ -2927,8 +3162,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3104,10 +3339,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
         
           
-          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
             
   
   
@@ -3125,8 +3360,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3246,10 +3481,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
         
           
-          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_16" id="__nav_4_16_label" tabindex="0">
             
   
   
@@ -3267,8 +3502,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3388,10 +3623,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_16" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
         
           
-          <label class="md-nav__link" for="__nav_4_16" id="__nav_4_16_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
             
   
   
@@ -3409,8 +3644,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_16_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_16">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_17">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3530,10 +3765,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
         
           
-          <label class="md-nav__link" for="__nav_4_17" id="__nav_4_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
             
   
   
@@ -3551,8 +3786,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_17">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_18">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3672,10 +3907,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_19" >
         
           
-          <label class="md-nav__link" for="__nav_4_18" id="__nav_4_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_19" id="__nav_4_19_label" tabindex="0">
             
   
   
@@ -3693,8 +3928,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_18">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3870,10 +4105,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_19" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_20" >
         
           
-          <label class="md-nav__link" for="__nav_4_19" id="__nav_4_19_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_20" id="__nav_4_20_label" tabindex="0">
             
   
   
@@ -3891,8 +4126,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_19_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_19">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_20">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4040,10 +4275,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_20" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" >
         
           
-          <label class="md-nav__link" for="__nav_4_20" id="__nav_4_20_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_21" id="__nav_4_21_label" tabindex="0">
             
   
   
@@ -4061,8 +4296,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_20_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_20">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4210,10 +4445,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_22" >
         
           
-          <label class="md-nav__link" for="__nav_4_21" id="__nav_4_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_22" id="__nav_4_22_label" tabindex="0">
             
   
   
@@ -4231,8 +4466,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_21">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_22">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4380,10 +4615,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_22" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_23" >
         
           
-          <label class="md-nav__link" for="__nav_4_22" id="__nav_4_22_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_23" id="__nav_4_23_label" tabindex="0">
             
   
   
@@ -4401,8 +4636,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_22_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_22">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_23_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_23">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4550,10 +4785,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_23" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_24" >
         
           
-          <label class="md-nav__link" for="__nav_4_23" id="__nav_4_23_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_24" id="__nav_4_24_label" tabindex="0">
             
   
   
@@ -4571,8 +4806,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_23_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_23">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_24_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_24">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4720,10 +4955,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_24" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_25" >
         
           
-          <label class="md-nav__link" for="__nav_4_24" id="__nav_4_24_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_25" id="__nav_4_25_label" tabindex="0">
             
   
   
@@ -4741,8 +4976,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_24_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_24">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_25_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_25">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -4890,10 +5125,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_25" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_26" >
         
           
-          <label class="md-nav__link" for="__nav_4_25" id="__nav_4_25_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_26" id="__nav_4_26_label" tabindex="0">
             
   
   
@@ -4911,8 +5146,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_25_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_25">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_26_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_26">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5060,10 +5295,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_26" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_27" >
         
           
-          <label class="md-nav__link" for="__nav_4_26" id="__nav_4_26_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_27" id="__nav_4_27_label" tabindex="0">
             
   
   
@@ -5081,8 +5316,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_26_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_26">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_27_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_27">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5230,10 +5465,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_27" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_28" >
         
           
-          <label class="md-nav__link" for="__nav_4_27" id="__nav_4_27_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_28" id="__nav_4_28_label" tabindex="0">
             
   
   
@@ -5251,8 +5486,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_27_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_27">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_28_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_28">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5400,10 +5635,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_28" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_29" >
         
           
-          <label class="md-nav__link" for="__nav_4_28" id="__nav_4_28_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_29" id="__nav_4_29_label" tabindex="0">
             
   
   
@@ -5421,8 +5656,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_28_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_28">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_29_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_29">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5570,10 +5805,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_29" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_30" >
         
           
-          <label class="md-nav__link" for="__nav_4_29" id="__nav_4_29_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_30" id="__nav_4_30_label" tabindex="0">
             
   
   
@@ -5591,8 +5826,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_29_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_29">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_30_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_30">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5712,10 +5947,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_30" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_31" >
         
           
-          <label class="md-nav__link" for="__nav_4_30" id="__nav_4_30_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_31" id="__nav_4_31_label" tabindex="0">
             
   
   
@@ -5733,8 +5968,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_30_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_30">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_31_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_31">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -5882,10 +6117,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_31" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_32" >
         
           
-          <label class="md-nav__link" for="__nav_4_31" id="__nav_4_31_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_32" id="__nav_4_32_label" tabindex="0">
             
   
   
@@ -5903,8 +6138,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_31_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_31">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_32_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_32">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6052,10 +6287,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_32" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_33" >
         
           
-          <label class="md-nav__link" for="__nav_4_32" id="__nav_4_32_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_33" id="__nav_4_33_label" tabindex="0">
             
   
   
@@ -6073,8 +6308,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_32_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_32">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_33_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_33">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6194,10 +6429,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_33" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_34" >
         
           
-          <label class="md-nav__link" for="__nav_4_33" id="__nav_4_33_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_34" id="__nav_4_34_label" tabindex="0">
             
   
   
@@ -6215,8 +6450,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_33_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_33">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_34_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_34">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6364,10 +6599,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_34" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_35" >
         
           
-          <label class="md-nav__link" for="__nav_4_34" id="__nav_4_34_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_35" id="__nav_4_35_label" tabindex="0">
             
   
   
@@ -6385,8 +6620,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_34_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_34">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_35_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_35">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6534,10 +6769,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_35" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_36" >
         
           
-          <label class="md-nav__link" for="__nav_4_35" id="__nav_4_35_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_36" id="__nav_4_36_label" tabindex="0">
             
   
   
@@ -6555,8 +6790,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_35_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_35">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_36_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_36">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6704,10 +6939,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_36" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_37" >
         
           
-          <label class="md-nav__link" for="__nav_4_36" id="__nav_4_36_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_37" id="__nav_4_37_label" tabindex="0">
             
   
   
@@ -6725,8 +6960,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_36_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_36">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_37_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_37">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -6874,10 +7109,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_37" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_38" >
         
           
-          <label class="md-nav__link" for="__nav_4_37" id="__nav_4_37_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_38" id="__nav_4_38_label" tabindex="0">
             
   
   
@@ -6895,8 +7130,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_37_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_37">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_38_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_38">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7044,10 +7279,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_38" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_39" >
         
           
-          <label class="md-nav__link" for="__nav_4_38" id="__nav_4_38_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_39" id="__nav_4_39_label" tabindex="0">
             
   
   
@@ -7065,8 +7300,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_38_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_38">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_39_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_39">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7242,10 +7477,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_39" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_40" >
         
           
-          <label class="md-nav__link" for="__nav_4_39" id="__nav_4_39_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_40" id="__nav_4_40_label" tabindex="0">
             
   
   
@@ -7263,8 +7498,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_39_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_39">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_40_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_40">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7468,10 +7703,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_40" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_41" >
         
           
-          <label class="md-nav__link" for="__nav_4_40" id="__nav_4_40_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_41" id="__nav_4_41_label" tabindex="0">
             
   
   
@@ -7489,8 +7724,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_40_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_40">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_41_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_41">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7610,10 +7845,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_41" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_42" >
         
           
-          <label class="md-nav__link" for="__nav_4_41" id="__nav_4_41_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_42" id="__nav_4_42_label" tabindex="0">
             
   
   
@@ -7631,8 +7866,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_41_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_41">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_42_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_42">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7780,10 +8015,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_42" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_43" >
         
           
-          <label class="md-nav__link" for="__nav_4_42" id="__nav_4_42_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_43" id="__nav_4_43_label" tabindex="0">
             
   
   
@@ -7801,8 +8036,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_42_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_42">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_43_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_43">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -7978,10 +8213,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_43" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_44" >
         
           
-          <label class="md-nav__link" for="__nav_4_43" id="__nav_4_43_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_44" id="__nav_4_44_label" tabindex="0">
             
   
   
@@ -7999,8 +8234,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_43_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_43">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_44_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_44">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8148,10 +8383,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_44" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_45" >
         
           
-          <label class="md-nav__link" for="__nav_4_44" id="__nav_4_44_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_45" id="__nav_4_45_label" tabindex="0">
             
   
   
@@ -8169,8 +8404,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_44_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_44">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_45_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_45">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8318,10 +8553,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_45" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_46" >
         
           
-          <label class="md-nav__link" for="__nav_4_45" id="__nav_4_45_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_46" id="__nav_4_46_label" tabindex="0">
             
   
   
@@ -8339,8 +8574,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_45_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_45">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_46_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_46">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8516,10 +8751,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_46" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_47" >
         
           
-          <label class="md-nav__link" for="__nav_4_46" id="__nav_4_46_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_47" id="__nav_4_47_label" tabindex="0">
             
   
   
@@ -8537,8 +8772,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_46_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_46">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_47_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_47">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8686,10 +8921,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_47" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_48" >
         
           
-          <label class="md-nav__link" for="__nav_4_47" id="__nav_4_47_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_48" id="__nav_4_48_label" tabindex="0">
             
   
   
@@ -8707,8 +8942,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_47_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_47">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_48_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_48">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -8810,258 +9045,6 @@
   
     <li class="md-nav__item">
       <a href="../../radar/radar/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_48" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_4_48" id="__nav_4_48_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DWD RADKLIM / RADOLAN
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_48_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_48">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    DWD RADKLIM / RADOLAN
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../introduction/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Introduction
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../usage/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Usage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Catalog
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Catalog
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#products" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Products
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#inspecting-the-catalog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inspecting the catalog
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#url-templates" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        URL templates
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../radklim/" class="md-nav__link">
         
   
   
@@ -12965,7 +12948,7 @@
   <span class="md-ellipsis">
     
   
-    ASF (InSAR / SAR)
+    ISIMIP (bias-adjusted forcing)
   
 
     
@@ -12978,6 +12961,92 @@
         
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_11_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ISIMIP (bias-adjusted forcing)
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/isimip/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ISIMIP — bias-adjusted, impact-ready climate forcing (quickstart)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_12" id="__nav_5_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ASF (InSAR / SAR)
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_12">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13153,10 +13222,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_12" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_13" >
         
           
-          <label class="md-nav__link" for="__nav_5_12" id="__nav_5_12_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_13" id="__nav_5_13_label" tabindex="0">
             
   
   
@@ -13174,8 +13243,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_12">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_13">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13407,10 +13476,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_14" >
         
           
-          <label class="md-nav__link" for="__nav_5_13" id="__nav_5_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_14" id="__nav_5_14_label" tabindex="0">
             
   
   
@@ -13428,8 +13497,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_14">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -13801,10 +13870,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_14" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_15" >
         
           
-          <label class="md-nav__link" for="__nav_5_14" id="__nav_5_14_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_15" id="__nav_5_15_label" tabindex="0">
             
   
   
@@ -13822,8 +13891,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_14_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_14">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_15">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -14055,10 +14124,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_15" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_16" >
         
           
-          <label class="md-nav__link" for="__nav_5_15" id="__nav_5_15_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_16" id="__nav_5_16_label" tabindex="0">
             
   
   
@@ -14076,8 +14145,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_15_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_15">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_16">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -14197,10 +14266,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_16" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_17" >
         
           
-          <label class="md-nav__link" for="__nav_5_16" id="__nav_5_16_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_17" id="__nav_5_17_label" tabindex="0">
             
   
   
@@ -14218,8 +14287,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_16_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_16">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_17_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_17">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -14591,10 +14660,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_17" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_18" >
         
           
-          <label class="md-nav__link" for="__nav_5_17" id="__nav_5_17_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_18" id="__nav_5_18_label" tabindex="0">
             
   
   
@@ -14612,8 +14681,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_17_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_17">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_18">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -14845,10 +14914,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_18" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_19" >
         
           
-          <label class="md-nav__link" for="__nav_5_18" id="__nav_5_18_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_19" id="__nav_5_19_label" tabindex="0">
             
   
   
@@ -14866,8 +14935,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_18_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_18">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_19_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_19">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15015,10 +15084,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_19" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_20" >
         
           
-          <label class="md-nav__link" for="__nav_5_19" id="__nav_5_19_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_20" id="__nav_5_20_label" tabindex="0">
             
   
   
@@ -15036,8 +15105,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_19_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_19">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_20_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_20">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15129,10 +15198,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_20" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_21" >
         
           
-          <label class="md-nav__link" for="__nav_5_20" id="__nav_5_20_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_21" id="__nav_5_21_label" tabindex="0">
             
   
   
@@ -15150,8 +15219,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_20_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_20">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_21_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_21">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15243,10 +15312,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_21" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_22" >
         
           
-          <label class="md-nav__link" for="__nav_5_21" id="__nav_5_21_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="0">
             
   
   
@@ -15264,8 +15333,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_21_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_21">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_22">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15385,10 +15454,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_22" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_23" >
         
           
-          <label class="md-nav__link" for="__nav_5_22" id="__nav_5_22_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_23" id="__nav_5_23_label" tabindex="0">
             
   
   
@@ -15406,8 +15475,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_22_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_22">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_23_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_23">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15555,10 +15624,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_23" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_24" >
         
           
-          <label class="md-nav__link" for="__nav_5_23" id="__nav_5_23_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_24" id="__nav_5_24_label" tabindex="0">
             
   
   
@@ -15576,8 +15645,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_23_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_23">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_24_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_24">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15725,10 +15794,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_24" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_25" >
         
           
-          <label class="md-nav__link" for="__nav_5_24" id="__nav_5_24_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_25" id="__nav_5_25_label" tabindex="0">
             
   
   
@@ -15746,8 +15815,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_24_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_24">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_25_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_25">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -15951,10 +16020,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_25" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_26" >
         
           
-          <label class="md-nav__link" for="__nav_5_25" id="__nav_5_25_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_26" id="__nav_5_26_label" tabindex="0">
             
   
   
@@ -15972,8 +16041,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_25_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_25">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_26_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_26">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16065,10 +16134,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_26" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_27" >
         
           
-          <label class="md-nav__link" for="__nav_5_26" id="__nav_5_26_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_27" id="__nav_5_27_label" tabindex="0">
             
   
   
@@ -16086,8 +16155,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_26_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_26">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_27_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_27">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16179,10 +16248,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_27" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_28" >
         
           
-          <label class="md-nav__link" for="__nav_5_27" id="__nav_5_27_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_28" id="__nav_5_28_label" tabindex="0">
             
   
   
@@ -16200,8 +16269,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_27_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_27">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_28_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_28">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16321,10 +16390,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_28" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_29" >
         
           
-          <label class="md-nav__link" for="__nav_5_28" id="__nav_5_28_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_29" id="__nav_5_29_label" tabindex="0">
             
   
   
@@ -16342,8 +16411,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_28_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_28">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_29_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_29">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16463,10 +16532,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_29" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_30" >
         
           
-          <label class="md-nav__link" for="__nav_5_29" id="__nav_5_29_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_30" id="__nav_5_30_label" tabindex="0">
             
   
   
@@ -16484,8 +16553,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_29_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_29">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_30_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_30">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16577,10 +16646,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_30" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_31" >
         
           
-          <label class="md-nav__link" for="__nav_5_30" id="__nav_5_30_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_31" id="__nav_5_31_label" tabindex="0">
             
   
   
@@ -16598,8 +16667,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_30_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_30">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_31_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_31">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16691,10 +16760,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_31" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_32" >
         
           
-          <label class="md-nav__link" for="__nav_5_31" id="__nav_5_31_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_32" id="__nav_5_32_label" tabindex="0">
             
   
   
@@ -16712,8 +16781,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_31_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_31">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_32_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_32">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16833,10 +16902,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_32" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_33" >
         
           
-          <label class="md-nav__link" for="__nav_5_32" id="__nav_5_32_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_33" id="__nav_5_33_label" tabindex="0">
             
   
   
@@ -16854,8 +16923,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_32_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_32">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_33_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_33">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -16975,10 +17044,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_33" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_34" >
         
           
-          <label class="md-nav__link" for="__nav_5_33" id="__nav_5_33_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_34" id="__nav_5_34_label" tabindex="0">
             
   
   
@@ -16996,8 +17065,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_33_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_33">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_34_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_34">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17061,10 +17130,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_34" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_35" >
         
           
-          <label class="md-nav__link" for="__nav_5_34" id="__nav_5_34_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_35" id="__nav_5_35_label" tabindex="0">
             
   
   
@@ -17082,8 +17151,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_34_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_34">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_35_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_35">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17203,10 +17272,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_35" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_36" >
         
           
-          <label class="md-nav__link" for="__nav_5_35" id="__nav_5_35_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_36" id="__nav_5_36_label" tabindex="0">
             
   
   
@@ -17224,8 +17293,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_35_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_35">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_36_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_36">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17345,10 +17414,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_36" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_37" >
         
           
-          <label class="md-nav__link" for="__nav_5_36" id="__nav_5_36_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_37" id="__nav_5_37_label" tabindex="0">
             
   
   
@@ -17366,8 +17435,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_36_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_36">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_37_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_37">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17487,10 +17556,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_37" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_38" >
         
           
-          <label class="md-nav__link" for="__nav_5_37" id="__nav_5_37_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_38" id="__nav_5_38_label" tabindex="0">
             
   
   
@@ -17508,8 +17577,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_37_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_37">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_38_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_38">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17629,10 +17698,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_38" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_39" >
         
           
-          <label class="md-nav__link" for="__nav_5_38" id="__nav_5_38_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_39" id="__nav_5_39_label" tabindex="0">
             
   
   
@@ -17650,8 +17719,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_38_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_38">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_39_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_39">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17715,10 +17784,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_39" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_40" >
         
           
-          <label class="md-nav__link" for="__nav_5_39" id="__nav_5_39_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_40" id="__nav_5_40_label" tabindex="0">
             
   
   
@@ -17736,8 +17805,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_39_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_39">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_40_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_40">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17801,10 +17870,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_40" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_41" >
         
           
-          <label class="md-nav__link" for="__nav_5_40" id="__nav_5_40_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_41" id="__nav_5_41_label" tabindex="0">
             
   
   
@@ -17822,8 +17891,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_40_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_40">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_41_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_41">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -17887,10 +17956,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_41" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_42" >
         
           
-          <label class="md-nav__link" for="__nav_5_41" id="__nav_5_41_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_42" id="__nav_5_42_label" tabindex="0">
             
   
   
@@ -17908,8 +17977,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_41_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_41">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_42_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_42">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18113,10 +18182,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_42" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_43" >
         
           
-          <label class="md-nav__link" for="__nav_5_42" id="__nav_5_42_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_43" id="__nav_5_43_label" tabindex="0">
             
   
   
@@ -18134,8 +18203,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_42_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_42">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_43_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_43">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18395,10 +18464,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_43" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_44" >
         
           
-          <label class="md-nav__link" for="__nav_5_43" id="__nav_5_43_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_44" id="__nav_5_44_label" tabindex="0">
             
   
   
@@ -18416,8 +18485,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_43_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_43">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_44_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_44">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18677,10 +18746,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_44" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_45" >
         
           
-          <label class="md-nav__link" for="__nav_5_44" id="__nav_5_44_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_45" id="__nav_5_45_label" tabindex="0">
             
   
   
@@ -18698,8 +18767,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_44_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_44">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_45_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_45">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18819,10 +18888,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_45" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_46" >
         
           
-          <label class="md-nav__link" for="__nav_5_45" id="__nav_5_45_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_46" id="__nav_5_46_label" tabindex="0">
             
   
   
@@ -18840,8 +18909,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_45_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_45">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_46_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_46">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -18905,10 +18974,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_46" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_47" >
         
           
-          <label class="md-nav__link" for="__nav_5_46" id="__nav_5_46_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_47" id="__nav_5_47_label" tabindex="0">
             
   
   
@@ -18926,8 +18995,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_46_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_46">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_47_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_47">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19103,10 +19172,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_47" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_48" >
         
           
-          <label class="md-nav__link" for="__nav_5_47" id="__nav_5_47_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_48" id="__nav_5_48_label" tabindex="0">
             
   
   
@@ -19124,8 +19193,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_47_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_47">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_48_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_48">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19301,10 +19370,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_48" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_49" >
         
           
-          <label class="md-nav__link" for="__nav_5_48" id="__nav_5_48_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_49" id="__nav_5_49_label" tabindex="0">
             
   
   
@@ -19322,8 +19391,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_48_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_48">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_49_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_49">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19555,10 +19624,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_49" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_50" >
         
           
-          <label class="md-nav__link" for="__nav_5_49" id="__nav_5_49_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_50" id="__nav_5_50_label" tabindex="0">
             
   
   
@@ -19576,8 +19645,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_49_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_49">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_50_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_50">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19781,10 +19850,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_50" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_51" >
         
           
-          <label class="md-nav__link" for="__nav_5_50" id="__nav_5_50_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_51" id="__nav_5_51_label" tabindex="0">
             
   
   
@@ -19802,8 +19871,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_50_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_50">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_51_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_51">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19895,10 +19964,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_51" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_52" >
         
           
-          <label class="md-nav__link" for="__nav_5_51" id="__nav_5_51_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_52" id="__nav_5_52_label" tabindex="0">
             
   
   
@@ -19916,8 +19985,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_51_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_51">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_52_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_52">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -19942,92 +20011,6 @@
     
   
     NEXRAD radar — catalog explorer (no network)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_52" >
-        
-          
-          <label class="md-nav__link" for="__nav_5_52" id="__nav_5_52_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DWD RADKLIM / RADOLAN
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_52_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5_52">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    DWD RADKLIM / RADOLAN
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/radklim/catalog_explorer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DWD RADKLIM / RADOLAN — catalog explorer (no network)
   
 
     
@@ -21979,10 +21962,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#products" class="md-nav__link">
+  <a href="#why-this-backend-exists-isimip-vs-cmip6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Products
+        Why this backend exists — isimip vs cmip6
       
     </span>
   </a>
@@ -21990,10 +21973,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#inspecting-the-catalog" class="md-nav__link">
+  <a href="#the-request-is-a-facet-set" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Inspecting the catalog
+        The request is a facet set
       
     </span>
   </a>
@@ -22001,10 +21984,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#url-templates" class="md-nav__link">
+  <a href="#the-cutout-is-mandatory" class="md-nav__link">
     <span class="md-ellipsis">
       
-        URL templates
+        The cutout is mandatory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#licence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Licence
       
     </span>
   </a>
@@ -22028,7 +22022,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/radklim/catalog.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/reference/isimip/introduction.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -22037,81 +22031,104 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/radklim/catalog.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/reference/isimip/introduction.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="dwd-radklim-radolan-catalog"><a class="toclink" href="#dwd-radklim-radolan-catalog">DWD RADKLIM / RADOLAN — catalog</a><a class="headerlink" href="#dwd-radklim-radolan-catalog" title="Permanent link">#</a></h1>
-<p>The bundled <code>radklim_data_catalog.yaml</code> declares the four products and the
-shared grid / licence metadata. It is loaded by
-<code>earthlens.radklim.Catalog</code> (a <code>pydantic</code>-backed reader over the strict YAML
-loader).</p>
-<h2 id="products"><a class="toclink" href="#products">Products</a><a class="headerlink" href="#products" title="Permanent link">#</a></h2>
+<h1 id="isimip-bias-adjusted-climate-forcing-introduction"><a class="toclink" href="#isimip-bias-adjusted-climate-forcing-introduction">ISIMIP bias-adjusted climate forcing — introduction</a><a class="headerlink" href="#isimip-bias-adjusted-climate-forcing-introduction" title="Permanent link">#</a></h1>
+<p><code>earthlens.isimip</code> exposes the <strong>ISIMIP</strong> repository of <strong>bias-adjusted,
+impact-model-ready climate forcing</strong> — the CMIP6-derived, W5E5-bias-corrected
+input that hydrology / flood / agriculture impact models actually consume. It is
+registered on the <code>EarthLens</code> facade under the key <code>"isimip"</code>.</p>
+<p>The ISIMIP repository is <strong>public</strong> (no credentials). Search and the mandatory
+server-side cutout run through the <code>isimip-client</code> SDK, so this backend has one
+small extra:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;earthlens[isimip]&quot;</span><span class="w">   </span><span class="c1"># adds isimip-client</span>
+</code></pre></div>
+<h2 id="why-this-backend-exists-isimip-vs-cmip6"><a class="toclink" href="#why-this-backend-exists-isimip-vs-cmip6">Why this backend exists — <code>isimip</code> vs <code>cmip6</code></a><a class="headerlink" href="#why-this-backend-exists-isimip-vs-cmip6" title="Permanent link">#</a></h2>
+<p>Both <code>cmip6</code> and <code>isimip</code> give you CMIP6-lineage climate futures, but they are
+<strong>not</strong> the same thing, and <code>isimip</code> is not a duplicate:</p>
+<ul>
+<li><strong><code>cmip6</code></strong> exposes the <strong>raw</strong> CMIP6 archive (the Pangeo <code>gs://cmip6</code> mirror)
+  on each model's <strong>native grid, unadjusted</strong>. To drive an impact model with it
+  you must bias-adjust and regrid it yourself against an observational reference
+  — a non-trivial, error-prone step.</li>
+<li><strong><code>isimip</code></strong> exposes the <strong>already-bias-adjusted</strong> derivative: CMIP6 GCMs
+  statistically bias-corrected and downscaled against the <strong>W5E5</strong> observational
+  dataset and packaged on a common grid, exactly as the ISIMIP impact-modelling
+  community uses them. It is the pragmatic non-stationary-futures forcing — you
+  skip the bias-adjustment entirely.</li>
+</ul>
+<p>So reach for <code>isimip</code> when you want impact-ready forcing out of the box, and for
+<code>cmip6</code> when you want the raw archive to process yourself. <code>earthlens.isimip</code>
+deliberately does <strong>not</strong> re-expose raw CMIP6 — that is <code>cmip6</code>'s job.</p>
+<h2 id="the-request-is-a-facet-set"><a class="toclink" href="#the-request-is-a-facet-set">The request is a facet set</a><a class="headerlink" href="#the-request-is-a-facet-set" title="Permanent link">#</a></h2>
+<p>A request pins the ISIMIP facets — the simulation round (<code>dataset</code>), the GCM
+(<code>gcm</code>), the scenario (<code>scenario</code>), one or more variables (<code>variables</code>), and the
+time step (<code>temporal_resolution</code>):</p>
 <table>
 <thead>
 <tr>
-<th>Product</th>
-<th>Stream</th>
-<th>Cadence</th>
-<th>Format</th>
-<th>Coverage</th>
+<th>Facet</th>
+<th>Argument</th>
+<th>Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>radklim-rw</code></td>
-<td>reproc (RADKLIM)</td>
-<td>hourly</td>
-<td>yearly NetCDF <code>.tar.gz</code></td>
-<td>2001– (full archive)</td>
+<td>Simulation round</td>
+<td><code>dataset</code></td>
+<td><code>"ISIMIP3b"</code> (scenarios) / <code>"ISIMIP3a"</code> (obs-based)</td>
 </tr>
 <tr>
-<td><code>radklim-yw</code></td>
-<td>reproc (RADKLIM)</td>
-<td>5-min</td>
-<td>yearly NetCDF <code>.tar.gz</code></td>
-<td>2001– (full archive)</td>
+<td>Climate forcing (GCM)</td>
+<td><code>gcm</code></td>
+<td><code>"gfdl-esm4"</code>, <code>"ukesm1-0-ll"</code> (any casing)</td>
 </tr>
 <tr>
-<td><code>radolan-rw</code></td>
-<td>operational (RADOLAN)</td>
-<td>hourly</td>
-<td>per-timestamp HDF5 / <code>.bz2</code></td>
-<td>rolling ~2 days</td>
+<td>Scenario</td>
+<td><code>scenario</code></td>
+<td><code>"ssp585"</code>, <code>"ssp126"</code>, <code>"historical"</code></td>
 </tr>
 <tr>
-<td><code>radolan-yw</code></td>
-<td>operational (RADOLAN)</td>
-<td>5-min</td>
-<td>per-timestamp HDF5 / <code>.bz2</code></td>
-<td>rolling ~2 days</td>
+<td>Variable</td>
+<td><code>variables</code></td>
+<td><code>["pr"]</code>, <code>["tas", "tasmax"]</code></td>
+</tr>
+<tr>
+<td>Time step</td>
+<td><code>temporal_resolution</code></td>
+<td><code>"daily"</code> (default) / <code>"monthly"</code></td>
 </tr>
 </tbody>
 </table>
-<p>Each reproc row carries the reprocessing <code>version</code> (<code>2017_002</code>) and its CDC
-tree token; each operational row carries its <code>retention_days</code>.</p>
-<h2 id="inspecting-the-catalog"><a class="toclink" href="#inspecting-the-catalog">Inspecting the catalog</a><a class="headerlink" href="#inspecting-the-catalog" title="Permanent link">#</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.radklim</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">cat</span><span class="o">.</span><span class="n">products</span><span class="p">()</span>                       <span class="c1"># [&#39;radklim-rw&#39;, &#39;radklim-yw&#39;, &#39;radolan-rw&#39;, &#39;radolan-yw&#39;]</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">cat</span><span class="o">.</span><span class="n">license</span>                          <span class="c1"># &#39;CC-BY-4.0/GeoNutzV&#39;</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">cat</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>                       <span class="c1"># &#39;radolan-polar-stereographic&#39;</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">yw</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_product</span><span class="p">(</span><span class="s2">&quot;radklim-yw&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">yw</span><span class="o">.</span><span class="n">stream</span><span class="p">,</span> <span class="n">yw</span><span class="o">.</span><span class="n">default_format</span><span class="p">,</span> <span class="n">yw</span><span class="o">.</span><span class="n">version</span>   <span class="c1"># (&#39;reproc&#39;, &#39;nc&#39;, &#39;2017_002&#39;)</span>
-</code></pre></div>
-<p>An unknown key raises a <code>ValueError</code> with a did-you-mean hint.</p>
-<h2 id="url-templates"><a class="toclink" href="#url-templates">URL templates</a><a class="headerlink" href="#url-templates" title="Permanent link">#</a></h2>
-<ul>
-<li><strong>reproc:</strong> <code>.../CDC/grids_germany/{5_minutes|hourly}/radolan/reproc/2017_002/
-  netCDF/{year}/{CODE}2017.002_{year}_netcdf.tar.gz</code></li>
-<li><strong>operational:</strong> <code>.../weather/radar/radolan/{rw|yw}/
-  raa01-{code}_10000-{YYMMDDHHMM}-dwd---bin.{hdf5|bz2}</code></li>
-</ul>
+<p>The backend fetches the ISIMIP <code>InputData</code> product — the bias-adjusted climate
+<em>forcing</em>; impact-model <code>OutputData</code> is out of scope. The facets are validated
+against the bundled catalog vocabulary, so a typo in a GCM / scenario / variable
+raises a clear did-you-mean error before any network call.</p>
+<h2 id="the-cutout-is-mandatory"><a class="toclink" href="#the-cutout-is-mandatory">The cutout is mandatory</a><a class="headerlink" href="#the-cutout-is-mandatory" title="Permanent link">#</a></h2>
+<p>A single ISIMIP global-daily granule is <strong>~1–2 GB</strong>, and a whole dataset is
+<strong>~18 GB</strong>. <code>earthlens.isimip</code> therefore <strong>never</strong> pulls a granule whole for a
+regional request: it submits a <strong>server-side cutout job</strong> (<code>isimip-client</code>'s
+<code>cutout_bbox</code>) — submit the bbox → poll → download the cut file — so only the
+requested box crosses the wire (a 2° × 2° European box of one decade granule is
+~4 MB rather than ~1.2 GB).</p>
+<p>Because of that, a request <strong>must</strong> give a bounding box (<code>lat_lim</code> / <code>lon_lim</code>),
+or explicitly opt into the raw whole-globe pull with <code>whole_globe=True</code> (which
+warns and downloads the multi-GB granules directly). <code>download()</code> returns the
+<code>list[Path]</code> of the written NetCDF granules; reading / regridding them is
+<a href="https://github.com/serapeum-org/pyramids">pyramids</a>' job — <code>earthlens</code> never
+imports <code>xarray</code> or <code>netCDF4</code>.</p>
+<h2 id="licence"><a class="toclink" href="#licence">Licence</a><a class="headerlink" href="#licence" title="Permanent link">#</a></h2>
+<p>ISIMIP licences are <strong>per dataset</strong> and read live from the repository. Most
+ISIMIP3b <strong>InputData</strong> (the W5E5-bias-adjusted forcing) is <strong><code>CC0 1.0</code></strong> (public
+domain); some <strong>OutputData</strong> and sectoral inputs carry their own terms and are
+flagged <code>restricted</code>. <code>earthlens.isimip</code> surfaces each dataset's actual rights
+and emits a <code>LicenseWarning</code> only for a restricted / non-open dataset — cite
+ISIMIP and the underlying GCM per the ISIMIP terms of use.</p>
 
 
 
@@ -22147,7 +22164,7 @@ tree token; each operational row carries its <code>retention_days</code>.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../usage/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Usage">
+          <a href="../../cmip6/cmip6/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Reference">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -22157,20 +22174,20 @@ tree token; each operational row carries its <code>retention_days</code>.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Usage
+                Reference
               </div>
             </div>
           </a>
         
         
           
-          <a href="../radklim/" class="md-footer__link md-footer__link--next" aria-label="Next: Reference">
+          <a href="../usage/" class="md-footer__link md-footer__link--next" aria-label="Next: Usage">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Reference
+                Usage
               </div>
             </div>
             <div class="md-footer__button md-icon">
