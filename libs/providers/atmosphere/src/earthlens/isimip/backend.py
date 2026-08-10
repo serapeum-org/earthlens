@@ -447,14 +447,17 @@ class ISIMIP(AbstractDataSource):
         return found
 
     def _warn_license(self, product: RemoteProduct) -> None:
-        """Emit a :class:`LicenseWarning` for a restricted or non-open dataset.
+        """Emit a :class:`LicenseWarning` for a restricted, non-open, or unknown-licence dataset.
+
+        A dataset whose `rights` are empty is treated as unknown (warned), so a
+        licence the API does not report is surfaced rather than assumed open.
 
         Args:
             product: The product whose licence flags to check.
         """
         rights = str(product.metadata.get("rights", ""))
         restricted = bool(product.metadata.get("restricted"))
-        if restricted or (rights and rights.lower() not in _OPEN_RIGHTS):
+        if restricted or rights.lower() not in _OPEN_RIGHTS:
             warnings.warn(
                 f"ISIMIP dataset {product.id!r} carries non-open terms "
                 f"(rights={rights or 'unknown'!r}, restricted={restricted}); "

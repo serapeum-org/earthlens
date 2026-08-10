@@ -302,6 +302,12 @@ class TestLicense:
         with pytest.warns(LicenseWarning):
             b.download(progress_bar=False)
 
+    def test_unknown_rights_warns(self, make_backend):
+        """A dataset with empty/unknown rights is warned, not assumed open."""
+        b = make_backend(client=FakeClient(rights=""))
+        with pytest.warns(LicenseWarning, match="unknown"):
+            b.download(progress_bar=False)
+
 
 class TestMisc:
     """Tests for the remaining public surface."""
