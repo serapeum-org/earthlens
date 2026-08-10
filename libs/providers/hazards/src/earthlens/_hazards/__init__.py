@@ -16,7 +16,7 @@ __all__ = ["BACKENDS"]
 _AQUEDUCT_MODULE = "earthlens.aqueduct"
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 24 data-source keys.
+#: distribution's 25 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
@@ -25,6 +25,9 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'aqueduct': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
     'aqueduct-floods': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
     'aqueduct-flood-risk': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
+    # HANZE historical European flood impacts — public Zenodo record
+    # (CC-BY-4.0), no extra SDK: the deps are core.
+    'hanze': ('earthlens.hanze', 'HANZE', '', {}),
     # The extras hint covers the gdis:* sources, which need earthaccess. The
     # emdat:events source is anonymous HTTP and needs no extra; the hint is
     # per key, not per dataset, so it is stated once here.
