@@ -253,6 +253,10 @@ nav:
       - Introduction: reference/hanze/introduction.md
       - Usage: reference/hanze/usage.md
       - Reference: reference/hanze/hanze.md
+    - FLODIS (footprints ↔ impacts):
+      - Introduction: reference/flodis/introduction.md
+      - Usage: reference/flodis/usage.md
+      - Reference: reference/flodis/flodis.md
     - JAXA (Earth-observation archive):
       - Introduction: reference/jaxa/introduction.md
       - Usage: reference/jaxa/usage.md
