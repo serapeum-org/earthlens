@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 import requests
 from loguru import logger
@@ -135,7 +135,7 @@ class RADKLIM(AbstractDataSource):
         self._catalog = catalog if catalog is not None else Catalog()
         self._fmt_override = data_format
         self._now = now
-        self._http = client if client is not None else HttpClient()
+        self._http: HttpClient = client if client is not None else HttpClient()
         self._show_progress = True
 
         self._products: list[RadklimProduct] = []
@@ -177,7 +177,12 @@ class RADKLIM(AbstractDataSource):
             ValueError: If the bbox does not overlap the Germany envelope.
         """
         west, south, east, north = GERMANY_ENVELOPE
-        if lon_lim[1] < west or lon_lim[0] > east or lat_lim[1] < south or lat_lim[0] > north:
+        if (
+            lon_lim[1] < west
+            or lon_lim[0] > east
+            or lat_lim[1] < south
+            or lat_lim[0] > north
+        ):
             raise ValueError(
                 f"the requested bbox lat={lat_lim} lon={lon_lim} does not overlap "
                 f"Germany {GERMANY_ENVELOPE} (west, south, east, north); RADKLIM / "
@@ -262,7 +267,9 @@ class RADKLIM(AbstractDataSource):
                 archive's first year), each an archive URL.
         """
         low = _period_start_year(product.data_period)
-        start_year = max(self.time.start_date.year, low) if low else self.time.start_date.year
+        start_year = (
+            max(self.time.start_date.year, low) if low else self.time.start_date.year
+        )
         years = [y for y in range(start_year, self.time.end_date.year + 1)]
         fmt = self._format_for(product)
         out: list[RemoteProduct] = []
@@ -359,7 +366,9 @@ class RADKLIM(AbstractDataSource):
             )
         except requests.HTTPError as exc:
             if _is_missing(exc):
-                logger.warning(f"radklim: skipping {rp.id} — not published ({rp.href}).")
+                logger.warning(
+                    f"radklim: skipping {rp.id} — not published ({rp.href})."
+                )
                 return None
             raise
         return dest

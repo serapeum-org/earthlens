@@ -28,9 +28,7 @@ FORMAT_MAGIC: dict[str, bytes] = {
 FORMAT_EXTENSION: dict[str, str] = {"nc": "tar.gz", "hdf5": "hdf5", "bin": "bz2"}
 
 
-def reproc_archive_url(
-    frequency: str, version: str, code: str, year: int
-) -> str:
+def reproc_archive_url(frequency: str, version: str, code: str, year: int) -> str:
     """Build the yearly RADKLIM reproc NetCDF archive URL for one year.
 
     The reprocessing is served as a single `{CODE}{version}_{year}_netcdf.tar.gz`
