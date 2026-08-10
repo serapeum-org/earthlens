@@ -88,8 +88,10 @@ def _normalize_iso3(country: str | list[str] | None) -> set[str]:
         set[str]: The upper-cased codes; empty when `None`.
 
     Raises:
-        ValueError: If a value is not three ASCII letters — an unrecognised code
-            would otherwise filter every row away and look like an empty result.
+        ValueError: If a value is not three ASCII letters. This catches a
+            *malformed* code (a typo in the ISO3 form). A well-formed but absent
+            code (`"XYZ"`, or a country with no 2000-2018 flood events) is
+            allowed through and legitimately yields an empty result.
     """
     codes: set[str] = set()
     for raw in _as_list(country):
@@ -451,6 +453,9 @@ class FLODIS(AbstractDataSource):
         Returns:
             list[Any]: One element — the filtered :class:`pandas.DataFrame`.
         """
+        # Single-product backend: the one table is re-derived from instance state
+        # (`dataset` + filters), so `products` is accepted for the base
+        # search -> fetch contract but carries nothing this method needs to read.
         return [self._filter_table(self._load_table())]
 
     def _api(self) -> list[Any]:
