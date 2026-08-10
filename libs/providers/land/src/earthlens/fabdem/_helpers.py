@@ -17,6 +17,7 @@ its 10° block joined to the corner 10° north-east (e.g. `N50E000-N60E010`).
 from __future__ import annotations
 
 import math
+import shutil
 import time
 import zipfile
 from pathlib import Path
@@ -215,8 +216,15 @@ def download_bundle(
         sleep=time.sleep,
     )
     try:
+        # `expect_magic` rejects an HTTP-200 non-zip body (e.g. an HTML error
+        # page) up front, so a corrupt file is never cached as a complete `.zip`.
         client.download(
-            url, zip_path, chunk=chunk_size, progress=False, timeout=timeout
+            url,
+            zip_path,
+            chunk=chunk_size,
+            progress=False,
+            timeout=timeout,
+            expect_magic=b"PK\x03\x04",
         )
     except requests.HTTPError as exc:
         response = exc.response
@@ -232,13 +240,15 @@ def download_bundle(
 
 
 def extract_tiles(zip_path: Path, dest_dir: Path, names: list[str]) -> list[Path]:
-    """Extract only the named GeoTIFF members from a bundle zip.
+    """Extract the named GeoTIFF members from a bundle zip, flattened by basename.
 
     Extracting just the intersecting 1° tiles avoids unpacking a whole 10°
     bundle (up to ~100 COGs) when a small AOI needs only a few. A requested
     name that is not in the archive is silently skipped — it is an ocean-only
-    cell that was never published. Every member's resolved destination is
-    checked to stay within `dest_dir` (Zip-Slip / CWE-22) before extraction.
+    cell that was never published. Members are matched and written by
+    **basename** directly under `dest_dir` (a flat cache the backend looks up by
+    bare tile name); this also neutralises any path-traversal member name
+    (`../evil.tif` lands as `evil.tif` inside `dest_dir`, never escaping it).
 
     Args:
         zip_path: A downloaded bundle `.zip`.
@@ -246,28 +256,20 @@ def extract_tiles(zip_path: Path, dest_dir: Path, names: list[str]) -> list[Path
         names: Tile file names to extract (from `tile_name`).
 
     Returns:
-        list[Path]: The extracted `.tif` paths, sorted; empty when none of
-            `names` is present in the archive.
-
-    Raises:
-        ValueError: If a member would escape `dest_dir`.
+        list[Path]: The extracted `.tif` paths (`dest_dir/<basename>`), sorted;
+            empty when none of `names` is present in the archive.
     """
     dest_dir.mkdir(parents=True, exist_ok=True)
     wanted = set(names)
     out: list[Path] = []
-    dest_root = dest_dir.resolve()
     with zipfile.ZipFile(zip_path) as zf:
-        # Match on the member basename so a (hypothetical) folder-nested archive
-        # still resolves the wanted tiles; the Bristol bundles are flat today.
-        present = [m for m in zf.namelist() if Path(m).name in wanted]
-        for member in present:
-            target = (dest_dir / member).resolve()
-            if dest_root not in target.parents and target != dest_root:
-                raise ValueError(
-                    f"FABDEM: refusing unsafe archive member {member!r} in "
-                    f"{zip_path.name} (escapes {dest_dir})."
-                )
+        # Map wanted basename -> archive member (handles a hypothetical
+        # folder-nested archive; the Bristol bundles are flat today).
+        by_basename = {Path(m).name: m for m in zf.namelist() if Path(m).name in wanted}
+        for basename, member in sorted(by_basename.items()):
+            target = dest_dir / basename
             if not target.exists():
-                zf.extract(member, dest_dir)
-            out.append(dest_dir / member)
+                with zf.open(member) as src, open(target, "wb") as dst:
+                    shutil.copyfileobj(src, dst)
+            out.append(target)
     return sorted(out)

@@ -66,7 +66,11 @@ class TestEfhmLiveFetch:
         assert paths[0].exists()
         from pyramids.dataset import Dataset
 
-        array = Dataset.read_file(str(paths[0])).read_array()
+        from earthlens.base import close_quietly
+
+        dataset = Dataset.read_file(str(paths[0]))
+        array = dataset.read_array()
+        close_quietly(dataset)
         valid = array[array > -9999]
         assert valid.size > 0, "the AOI window carried no valid depth cells"
         assert 0 <= float(np.nanmax(valid)) < 100, "implausible flood depth"

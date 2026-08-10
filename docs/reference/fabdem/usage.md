@@ -21,8 +21,12 @@ paths           # [Path('fabdem_out/fabdem_V1-2.tif')]
 ```
 
 `download()` returns the list of written GeoTIFF paths (one mosaicked, cropped
-DEM). The downloaded bundle zips are cached under `fabdem_out/.fabdem_cache/`
-during the run and the bundle is removed once its tiles are extracted.
+DEM). The downloaded bundle zips are **kept** under `fabdem_out/.fabdem_cache/`
+so a later request for another AOI in the same 10° block extracts the tiles it
+needs from the cached zip without re-downloading. That cache is **persistent**
+and can grow to several GB across many blocks — it is safe to delete
+`.fabdem_cache/` at any time to reclaim the space (the next request re-downloads
+only what it needs).
 
 Read the result back with pyramids:
 

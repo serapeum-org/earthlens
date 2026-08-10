@@ -345,7 +345,7 @@ class JRCFlood(AbstractDataSource):
         Raises:
             ValueError: If the AOI is outside the EFHM coverage for a period.
         """
-        return [self._fetch_one(rp) for rp in products]
+        return [self._fetch_one(product) for product in products]
 
     def _fetch_one(self, product: RemoteProduct) -> Path:
         """Read the AOI window of one return-period GeoTIFF and write the crop.

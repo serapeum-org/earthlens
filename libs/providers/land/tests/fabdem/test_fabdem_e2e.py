@@ -17,7 +17,6 @@ import urllib.request
 import warnings
 from pathlib import Path
 
-import numpy as np
 import pytest
 
 from earthlens.biodiversity import LicenseWarning
@@ -72,8 +71,14 @@ class TestFabdemLiveFetch:
         )
         from pyramids.dataset import Dataset
 
-        array = Dataset.read_file(str(paths[0])).read_array()
-        finite = array[np.isfinite(array)]
-        assert finite.size > 0, "the AOI carried no elevation cells"
-        low, high = float(finite.min()), float(finite.max())
+        from earthlens.base import close_quietly
+
+        dataset = Dataset.read_file(str(paths[0]))
+        array = dataset.read_array()
+        close_quietly(dataset)
+        # FABDEM no-data is -9999.0 (finite), so np.isfinite would not drop it;
+        # filter on the actual no-data sentinel like the JRC e2e does.
+        valid = array[array > -9999]
+        assert valid.size > 0, "the AOI carried no elevation cells"
+        low, high = float(valid.min()), float(valid.max())
         assert -20 < low <= high < 400, f"implausible bare-earth heights: {low}..{high}"

@@ -211,9 +211,13 @@ class TestExtractTiles:
         )
         assert [p.name for p in out] == ["N50E000_FABDEM_V1-2.tif"]
 
-    def test_zip_slip_guarded(self, tmp_path: Path):
-        """A wanted-basename member with a path-traversal prefix raises."""
+    def test_traversal_member_flattened_safely(self, tmp_path: Path):
+        """A path-traversal member is flattened to its basename inside dest, not escaping."""
         zip_path = tmp_path / "evil.zip"
+        dest = tmp_path / "dest"
         _write_zip(zip_path, ["../N50E000_FABDEM_V1-2.tif"])
-        with pytest.raises(ValueError, match="unsafe archive member"):
-            h.extract_tiles(zip_path, tmp_path / "dest", ["N50E000_FABDEM_V1-2.tif"])
+        out = h.extract_tiles(zip_path, dest, ["N50E000_FABDEM_V1-2.tif"])
+        assert out == [dest / "N50E000_FABDEM_V1-2.tif"]
+        assert (dest / "N50E000_FABDEM_V1-2.tif").exists()
+        # The `../` prefix must NOT have written outside dest.
+        assert not (tmp_path / "N50E000_FABDEM_V1-2.tif").exists()

@@ -30,7 +30,8 @@ catalog.license_id                  # 'CC-BY-4.0'
 - **Europe and the Mediterranean Basin** — one whole-Europe GeoTIFF per return
   period (`Europe_RP{n}_filled_depth.tif`) on the JRC CEMS-EFAS open-data server.
 - The backend reads only the AOI window over `/vsicurl`, so a small subset never
-  downloads the full ~300 MB per-return-period file.
+  downloads the full per-return-period file (~300 MB compressed on the wire;
+  ~23 GB uncompressed at 110162×51992 px).
 
 ## Related coverage
 
