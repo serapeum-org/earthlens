@@ -51,8 +51,9 @@ class TestCatalog:
 
     def test_unknown_product_raises_did_you_mean(self):
         """An unknown product key raises with a did-you-mean hint."""
+        cat = Catalog()
         with pytest.raises(ValueError, match="Did you mean 'radklim-yw'"):
-            Catalog().get_product("radklim-y")
+            cat.get_product("radklim-y")
 
     def test_get_catalog_returns_datasets(self):
         """get_catalog returns the same object as datasets."""
