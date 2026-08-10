@@ -245,6 +245,30 @@ class TestFilterTable:
         table = backend._filter_table(backend._load_table())
         assert list(table["displacements"]) == [500]
 
+    def test_absent_country_yields_empty_frame(self, tmp_path: Path) -> None:
+        """A well-formed but absent country keeps the columns but no rows."""
+        backend = _make(tmp_path, country="ZZZ")
+        _seed(backend, DAMAGES_CSV)
+        table = backend._filter_table(backend._load_table())
+        assert len(table) == 0
+        assert "disasterno" in table.columns
+
+    def test_combined_country_and_year(self, tmp_path: Path) -> None:
+        """Country and a date window intersect — both must match."""
+        backend = _make(tmp_path, country="MOZ", start="2010", end="2018", fmt="%Y")
+        _seed(backend, DAMAGES_CSV)
+        table = backend._filter_table(backend._load_table())
+        assert list(table["year"]) == [2013.0]
+
+    def test_combined_country_and_gid(self, tmp_path: Path) -> None:
+        """Country and gid intersect on the displacement table."""
+        backend = _make(
+            tmp_path, dataset="displacement", country="MOZ", gid=["MOZ.1_1"]
+        )
+        _seed(backend, DISPLACEMENT_CSV)
+        table = backend._filter_table(backend._load_table())
+        assert list(table["displacements"]) == [500]
+
 
 class TestSearchFetchApi:
     """Tests for the search / fetch / api composition."""
@@ -285,6 +309,16 @@ class TestDownload:
         _seed(backend, DAMAGES_CSV)
         backend.download(progress_bar=False)
         assert (backend.root_dir / "flodis_damages.csv").exists()
+
+    def test_download_fetches_when_cache_absent(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """download() drives the fetch when nothing is cached, then filters."""
+        backend = _make(tmp_path, country="BGD")
+        monkeypatch.setattr(backend, "_client", lambda: _FakeClient(DAMAGES_CSV))
+        frame = backend.download(progress_bar=False)
+        assert list(frame["ISO3"]) == ["BGD"]
+        assert list(backend.root_dir.glob("flodis_damages-*.csv"))
 
     def test_output_does_not_case_collide_with_source_cache(
         self, tmp_path: Path
