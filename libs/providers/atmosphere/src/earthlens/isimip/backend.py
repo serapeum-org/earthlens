@@ -441,6 +441,10 @@ class ISIMIP(AbstractDataSource):
             raise RuntimeError(
                 f"ISIMIP cutout for {product.id!r} produced no NetCDF granule."
             )
+        # Drop the downloaded cutout archive + its README so the output dir holds
+        # only the extracted NetCDFs.
+        for clutter in (*directory.glob("*.zip"), *directory.glob("README.txt")):
+            clutter.unlink(missing_ok=True)
         return found
 
     def _download_whole(

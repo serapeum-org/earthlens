@@ -110,8 +110,11 @@ class FakeClient:
         self.download_calls.append({"url": url, "path": path, "extract": extract})
         if not self._writes_output:
             return
-        out = Path(path or ".") / f"cut_{len(self.download_calls)}.nc"
-        out.write_bytes(b"CDF\x01 fake netcdf")
+        directory = Path(path or ".")
+        (directory / f"cut_{len(self.download_calls)}.nc").write_bytes(b"CDF\x01 nc")
+        if extract:
+            (directory / "isimip-download.zip").write_bytes(b"PK\x03\x04 zip")
+            (directory / "README.txt").write_text("terms", encoding="utf-8")
 
 
 @pytest.fixture

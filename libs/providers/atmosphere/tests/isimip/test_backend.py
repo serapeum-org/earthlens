@@ -238,6 +238,15 @@ class TestFetchAndDownload:
         )
         assert call["poll"] == b._poll
 
+    def test_cutout_zip_and_readme_cleaned_up(self, make_backend):
+        """The extracted output dir keeps only NetCDFs, not the zip / README."""
+        b = make_backend()
+        out = b.download(progress_bar=False)
+        directory = out[0].parent
+        assert list(directory.glob("*.zip")) == [], "cutout zip must be removed"
+        assert list(directory.glob("README.txt")) == [], "README must be removed"
+        assert list(directory.glob("*.nc")), "the NetCDF granule must remain"
+
     def test_download_extracts_with_flag(self, make_backend):
         """The cut zip is downloaded with `extract=True`."""
         b = make_backend()
