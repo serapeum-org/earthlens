@@ -122,8 +122,11 @@ class Bathymetry(AbstractDataSource):
             end: Accepted for facade parity; ignored.
             lat_lim: `[lat_min, lat_max]` bounding-box latitudes. Required.
             lon_lim: `[lon_min, lon_max]` bounding-box longitudes. Required.
-            dataset: The curated DEM id to fetch (`"gebco_2020"`,
-                `"etopo1_ice"`, `"etopo1_bedrock"`). Required.
+            dataset: The curated DEM id to fetch — a global ERDDAP DEM
+                (`"gebco_2020"`, `"etopo1_ice"`, `"etopo1_bedrock"`) or an
+                EMODnet Bathymetry WCS row (`"emodnet"` for the latest release,
+                or a year-stamped `"emodnet_2022"` / `"_2020"` / `"_2018"` /
+                `"_2016"`). Required.
             variables: Optional band name(s); defaults to the row's single
                 elevation band. A name other than that band raises with a
                 did-you-mean.
