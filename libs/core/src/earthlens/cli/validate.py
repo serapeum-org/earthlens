@@ -386,6 +386,40 @@ def _validate_hanze(catalog: Any) -> tuple[int, list[str]]:
     return checked, issues
 
 
+def _validate_flopros(catalog: Any) -> tuple[int, list[str]]:
+    """The FLOPROS row needs a URL, shapefile stem, identity columns, and layers.
+
+    The single-shapefile catalog resolves a `layer=` selection against the
+    `layers` map and keeps the `identity_columns` on every returned polygon, so
+    an emptied map would load cleanly yet break the read — flag it here.
+    """
+    return _lint(
+        catalog,
+        lambda k, r: _require(
+            k, r, ("url", "shapefile_stem", "identity_columns", "layers")
+        ),
+    )
+
+
+def _validate_catrare(catalog: Any) -> tuple[int, list[str]]:
+    """Each CatRaRE threshold needs a code; the shared version/CRS/columns stay pinned.
+
+    Beyond the per-threshold lint, the catalog composes the download URL and the
+    FileGDB layer name from `base_url` / `version` / `version_tag` / `years` and
+    reprojects the geometry from `source_crs`; the date filter and the returned
+    columns read `date_columns` / `event_columns` / `geometry_layers`. A stanza
+    dropping any of those loads cleanly but breaks at fetch time.
+    """
+    checked, issues = _lint(catalog, lambda k, r: _require(k, r, ("threshold",)))
+    for attr in ("base_url", "version", "version_tag", "years", "source_crs"):
+        if not getattr(catalog, attr, ""):
+            issues.append(f"catalog: missing {attr!r}")
+    for mapping in ("geometry_layers", "date_columns", "event_columns"):
+        if not getattr(catalog, mapping, None):
+            issues.append(f"catalog: the {mapping!r} is empty")
+    return checked, issues
+
+
 def _validate_flodis(catalog: Any) -> tuple[int, list[str]]:
     """Each FLODIS table needs a description and join keys; the record stays pinned.
 
@@ -958,6 +992,8 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "aqueduct": _validate_aqueduct,
     "nsi": _validate_nsi,
     "hanze": _validate_hanze,
+    "flopros": _validate_flopros,
+    "catrare": _validate_catrare,
     "flodis": _validate_flodis,
     "drought": _validate_drought,
     "argo": _validate_argo,

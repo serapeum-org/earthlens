@@ -20,6 +20,9 @@ _MSWEP = "earthlens.mswep"
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'chc': ('earthlens.chc', 'CHIRPS', '', {}),
     'chirps': ('earthlens.chc', 'CHIRPS', '', {}),
+    # CatRaRE DWD heavy-rainfall event catalogue (RADKLIM-derived) — public
+    # FileGDB, CC-BY-4.0 / GeoNutzV, no extra SDK. Companion to `radar`/radklim.
+    'catrare': ('earthlens.catrare', 'CatRaRE', '', {}),
     'amazon-s3': ('earthlens.s3', 'S3', 's3', {}),
     'cmip6': ('earthlens.cmip6', 'CMIP6', '', {}),
     'pangeo-cmip6': ('earthlens.cmip6', 'CMIP6', '', {}),

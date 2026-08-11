@@ -53,6 +53,8 @@ _CURATED_ENUM = (
     "tropycal",
     "gdacs",
     "hanze",
+    "flopros",
+    "catrare",
     "flodis",
     "drought",
     "argo",

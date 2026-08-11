@@ -71,7 +71,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.aqueduct*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.flodis*", "earthlens.gdacs*", "earthlens.hanze*", "earthlens.hdx*", "earthlens.jrc_flood*", "earthlens.nsi*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
+include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.aqueduct*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.flodis*", "earthlens.flopros*", "earthlens.gdacs*", "earthlens.hanze*", "earthlens.hdx*", "earthlens.jrc_flood*", "earthlens.nsi*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -99,6 +99,7 @@ markers = [
     "fdsn: tests for the FDSN seismic-event backend (requires the `fdsn` extra: obspy).",
     "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
     "flodis: tests for the FLODIS observed-flood footprints<->impacts backend (public Zenodo record 8123096, CC-BY-4.0, no extra SDK — core HttpClient + pandas; global companion to hanze, sibling of emdat).",
+    "flopros: tests for the FLOPROS flood-protection-standard backend (NHESS-2016 supplement shapefile, CC-BY-3.0, no extra SDK — core HttpClient + base/archive + pyramids; subnational protection standards as return periods).",
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
     "hanze: tests for the HANZE historical European flood-impacts backend (public Zenodo record 20478847, CC-BY-4.0, no extra SDK — core HttpClient + pandas + pyramids).",
     "hdx: tests for the Humanitarian Data Exchange backend (requires the `hdx` extra: hdx-python-api).",

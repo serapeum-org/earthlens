@@ -180,6 +180,10 @@ nav:
       - Usage: reference/chc/usage.md
       - Catalog & tooling: reference/chc/catalog.md
       - Reference: reference/chc/chc.md
+    - CatRaRE (heavy-rainfall events):
+      - Introduction: reference/catrare/introduction.md
+      - Usage: reference/catrare/usage.md
+      - Reference: reference/catrare/catrare.md
     - Amazon S3 (AWS Open Data):
       - Introduction: reference/s3/introduction.md
       - Authentication: reference/s3/authentication.md
@@ -249,6 +253,10 @@ nav:
       - Introduction: reference/aqueduct/introduction.md
       - Usage: reference/aqueduct/usage.md
       - Reference: reference/aqueduct/aqueduct.md
+    - FLOPROS (flood-protection standards):
+      - Introduction: reference/flopros/introduction.md
+      - Usage: reference/flopros/usage.md
+      - Reference: reference/flopros/flopros.md
     - EM-DAT (disaster impacts):
       - Introduction: reference/emdat/introduction.md
       - Usage: reference/emdat/usage.md
@@ -610,6 +618,10 @@ nav:
       - Flood types across Europe: examples/hanze/flood_types_across_europe.ipynb
     - Footprints ↔ impacts (FLODIS):
       - Quickstart — impacts and footprints: examples/flodis/quickstart.ipynb
+    - Flood-protection standards (FLOPROS):
+      - Quickstart — protection standards: examples/flopros/quickstart.ipynb
+    - Heavy-rainfall events (CatRaRE):
+      - Quickstart — radar rainfall events: examples/catrare/quickstart.ipynb
     - OpenStreetMap (Overpass / ohsome):
       - Quickstart — current-state features (Overpass): examples/osm/quickstart.ipynb
       - History — building footprints over time (ohsome): examples/osm/ohsome_history.ipynb

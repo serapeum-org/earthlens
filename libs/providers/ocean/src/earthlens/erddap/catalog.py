@@ -176,6 +176,12 @@ class Dataset(BaseModel):
             `op="auto"` reduces them by `"sum"` (the window total) instead
             of `"mean"`. Empty by default — ERDDAP griddap variables are
             overwhelmingly state fields (SST anomaly, DHW, chlorophyll).
+        lon_360: The server stores longitude in the `[0, 360]` convention
+            rather than the framework's `[-180, 180]`. Set `True` for a
+            **tabledap** row on such a server (e.g. the UHSLC tide gauges)
+            so the backend shifts the request's longitude bounds; a
+            `[-180, 180]` bound would otherwise match no rows. No effect on
+            griddap rows.
         title: Human-readable description used in log messages.
         license_note: Licence / attribution note for the dataset.
 
@@ -201,6 +207,7 @@ class Dataset(BaseModel):
     variables: list[str] = Field(default_factory=list)
     dim_names: list[str] = Field(default_factory=lambda: list(_DEFAULT_DIM_NAMES))
     flux_variables: list[str] = Field(default_factory=list)
+    lon_360: bool = False
     title: str = ""
     license_note: str = ""
 

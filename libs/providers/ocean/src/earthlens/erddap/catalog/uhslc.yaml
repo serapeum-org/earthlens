@@ -1,0 +1,80 @@
+# ERDDAP curated catalog - UHSLC / GESLA sea-level slice.
+#
+# Coastal tide-gauge extreme-sea-level records served by the University of
+# Hawaii Sea Level Center ERDDAP (https://uhslc.soest.hawaii.edu/erddap).
+# All rows are `tabledap` station time-series of `sea_level` (mm): the
+# GESLA sub-hourly/hourly product, the JASL/UHSLC Research Quality gauges
+# (hourly + daily), and the Fast Delivery (near-real-time) daily gauges.
+# These are the coastal boundary-condition input for flood work; the UHSLC
+# ERDDAP is the clean scriptable route to ~85% of GESLA-3 (the full GESLA-3
+# archive zip at https://gesla.org is the fallback). See the slice header in
+# coral-reef-watch.yaml for the row schema.
+
+datasets:
+
+  global_hourly_gesla:
+    server_url: https://uhslc.soest.hawaii.edu/erddap
+    dataset_id: global_hourly_gesla
+    protocol: tabledap
+    lon_360: true
+    variables:
+      - sea_level
+      - time
+      - latitude
+      - longitude
+      - station_name
+      - agency_id
+      - station_code
+      - record_id
+    title: GESLA Sea Level, global tide gauges, sub-hourly to hourly
+    license_note: UHSLC / GESLA, free with citation (Haigh et al., 2023)
+
+  global_hourly_rqds:
+    server_url: https://uhslc.soest.hawaii.edu/erddap
+    dataset_id: global_hourly_rqds
+    protocol: tabledap
+    lon_360: true
+    variables:
+      - sea_level
+      - time
+      - latitude
+      - longitude
+      - station_name
+      - uhslc_id
+      - gloss_id
+      - ssc_id
+    title: JASL/UHSLC Research Quality Tide Gauge Data, global, hourly
+    license_note: UHSLC / JASL, free with citation (Caldwell et al., 2015)
+
+  global_daily_rqds:
+    server_url: https://uhslc.soest.hawaii.edu/erddap
+    dataset_id: global_daily_rqds
+    protocol: tabledap
+    lon_360: true
+    variables:
+      - sea_level
+      - time
+      - latitude
+      - longitude
+      - station_name
+      - uhslc_id
+      - gloss_id
+      - ssc_id
+    title: JASL/UHSLC Research Quality Tide Gauge Data, global, daily
+    license_note: UHSLC / JASL, free with citation (Caldwell et al., 2015)
+
+  global_daily_fast:
+    server_url: https://uhslc.soest.hawaii.edu/erddap
+    dataset_id: global_daily_fast
+    protocol: tabledap
+    lon_360: true
+    variables:
+      - sea_level
+      - time
+      - latitude
+      - longitude
+      - station_name
+      - uhslc_id
+      - quality
+    title: UHSLC Fast Delivery Tide Gauge Data, global, daily (near-real-time)
+    license_note: UHSLC Fast Delivery, free with citation (Caldwell et al., 2015)

@@ -150,7 +150,9 @@ class TestErddapRefresher:
 
         monkeypatch.setattr(refresh_mod, "_get_json", fake)
         grouped = _erddap_grouped(load_catalog(_info("erddap")))
-        assert len(grouped) == 1, "the shipped catalog references one server"
+        assert len(grouped) == 2, (
+            "the shipped catalog references two servers (coastwatch + uhslc)"
+        )
         assert all(u.endswith("/tabledap/allDatasets.json?datasetID") for u in calls), (
             f"unexpected endpoint(s): {calls}"
         )
