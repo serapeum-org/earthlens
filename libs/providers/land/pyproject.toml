@@ -58,7 +58,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._land*", "earthlens.bathymetry*", "earthlens.dem*", "earthlens.gbif*", "earthlens.ghsl*", "earthlens.glaciers*", "earthlens.iucn*", "earthlens.soilgrids*", "earthlens.wdpa*", "earthlens.worldpop*"]
+include = ["earthlens._land*", "earthlens.bathymetry*", "earthlens.dem*", "earthlens.fabdem*", "earthlens.gbif*", "earthlens.ghsl*", "earthlens.glaciers*", "earthlens.iucn*", "earthlens.soilgrids*", "earthlens.wdpa*", "earthlens.worldpop*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -83,6 +83,7 @@ markers = [
     "bathymetry: tests for the bathymetry DEM backend (GEBCO 2020 + ETOPO1 ice/bedrock via NOAA ERDDAP griddap; no extra SDK — core requests + pyramids).",
     "dem: tests for the Copernicus DEM backend (GLO-30 / GLO-90; requires the `dem` extra: boto3; anonymous copernicus-dem-30m / -90m buckets; raw COG tiles — no decode, mosaic/crop is pyramids downstream).",
     "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
+    "fabdem: tests for the FABDEM V1-2 bare-earth DEM backend (Forest And Buildings removed Copernicus DEM, ~30m; open HTTPS from the University of Bristol, no extra SDK — core requests + pyramids; CC-BY-NC-SA 4.0 non-commercial).",
     "gbif: tests for the GBIF species-occurrence backend (requires the `gbif` extra: pygbif; search is anonymous).",
     "ghsl: tests for the GHSL backend (JRC Global Human Settlement Layer; open HTTPS, no extra SDK for the direct path; localised via pyramids).",
     "glaciers: tests for the glaciers backend (RGI 7.0 per-region outlines via IHP-WINS + GLIMS WFS time-series outlines + WGMS Fluctuations of Glaciers tabular; no extra SDK — core requests + pandas + pyramids; mixed per-instance OUTPUT_KIND; all sources open, no auth).",

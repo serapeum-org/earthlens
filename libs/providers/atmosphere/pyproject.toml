@@ -64,7 +64,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.catrare*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.nrel*", "earthlens.mswep*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
+include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.catrare*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.nrel*", "earthlens.mswep*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.radklim*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -99,6 +99,7 @@ markers = [
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
     "pvgis: tests for the JRC PVGIS solar-radiation / PV time-series backend (keyless REST via core `requests` + `pandas`; no extra SDK).",
     "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
+    "radklim: tests for the DWD RADKLIM / RADOLAN radar-precipitation backend (no extra SDK — core requests + pyramids; anonymous DWD Open Data HTTPS; RADKLIM yearly NetCDF archives + operational HDF5/binary granules over Germany).",
     "s3: tests for the S3 backend (requires the `s3` extra: boto3).",
     "sensor_community: tests for the Sensor.Community air-quality backend (crowdsourced low-cost sensors; no extra SDK — core `requests` + `pandas`; public archive + live JSON API, ODbL).",
     "slow: mark test as slow.",
