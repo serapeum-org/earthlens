@@ -263,7 +263,6 @@ class Bathymetry(AbstractDataSource):
         """
         row: Dataset = product.metadata["dataset"]
         bbox = bbox_from_extent(self.space)
-        self._log_estimated_size(row, bbox)
         tif_path = self.root_dir / f"{row.id}.tif"
         if row.transport == "wcs":
             self._fetch_wcs(row, bbox, tif_path)
@@ -289,6 +288,7 @@ class Bathymetry(AbstractDataSource):
             ValueError: When the server rejects the request or returns a
                 non-NetCDF body (out-of-coverage / oversize bbox).
         """
+        self._log_estimated_size(row, bbox)
         url = griddap_subset_url(
             row.endpoint, row.dataset_id, row.variable, bbox, row.lon_convention
         )
@@ -322,6 +322,7 @@ class Bathymetry(AbstractDataSource):
         from pyramids.dataset import Dataset as PyramidsDataset
 
         self._guard_wcs_domain(row, bbox)
+        self._log_estimated_size(row, bbox)
         logger.info(
             f"bathymetry {row.id}: WCS GetCoverage {row.endpoint} "
             f"coverage={row.dataset_id} bbox={bbox}"
