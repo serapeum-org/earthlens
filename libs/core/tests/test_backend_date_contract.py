@@ -121,6 +121,7 @@ _NO_WINDOW_REQUIRED = {
     "DEM",
     "EMDAT",
     "FABDEM",
+    "FLODIS",
     "Glaciers",
     "HANZE",
     "JRCFlood",

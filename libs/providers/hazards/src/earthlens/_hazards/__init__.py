@@ -22,7 +22,7 @@ _NSI = "earthlens.nsi"
 _JRC_FLOOD = "earthlens.jrc_flood"
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 32 data-source keys.
+#: distribution's 33 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
@@ -34,6 +34,10 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     # HANZE historical European flood impacts — public Zenodo record
     # (CC-BY-4.0), no extra SDK: the deps are core.
     'hanze': ('earthlens.hanze', 'HANZE', '', {}),
+    # FLODIS global observed flood footprints <-> impacts — public Zenodo record
+    # 8123096 (CC-BY-4.0), no extra SDK: HttpClient + pandas are core. The global
+    # companion to hanze; sibling of emdat (EM-DAT/GDIS/GFD-derived).
+    'flodis': ('earthlens.flodis', 'FLODIS', '', {}),
     # The extras hint covers the gdis:* sources, which need earthaccess. The
     # emdat:events source is anonymous HTTP and needs no extra; the hint is
     # per key, not per dataset, so it is stated once here.

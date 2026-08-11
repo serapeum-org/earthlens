@@ -457,7 +457,7 @@ class EarthLens:
              'deafrica', 'dem', 'digital-earth-africa', 'digital-earth-australia',
              'drought', 'earth-search', 'earthdata', 'ecmwf', 'edo',
              'eea-aq', 'efhm', 'elevation', 'emdat', 'erddap', 'etopo', 'eumetsat',
-             'european-flood-hazard', 'fab-dem', 'fabdem', 'fdsn', 'firms',
+             'european-flood-hazard', 'fab-dem', 'fabdem', 'fdsn', 'firms', 'flodis',
              'g-portal', 'gbif', 'gdacs', 'gdis', 'gdo', 'gebco', 'gee', 'geoboundaries',
              'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
              'global-forest-watch', 'global-solar-atlas',
