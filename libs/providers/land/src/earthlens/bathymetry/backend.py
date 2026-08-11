@@ -344,12 +344,14 @@ class Bathymetry(AbstractDataSource):
     def _guard_wcs_domain(
         self, row: Dataset, bbox: tuple[float, float, float, float]
     ) -> None:
-        """Reject a WCS request whose bbox misses the coverage extent.
+        """Reject or warn about a WCS request that leaves the coverage extent.
 
         The EMODnet WCS server returns a zero-filled grid (not an error) for an
-        AOI outside its coverage, so an explicit intersection check turns a
-        silent all-zeros download into a clear error pointing at the global
-        DEMs.
+        AOI outside its coverage. A **fully disjoint** bbox is turned into a
+        clear error pointing at the global DEMs; a bbox that only **partially**
+        overlaps the coverage is allowed through (the in-coverage cells are
+        real) but logs a warning, because its out-of-coverage cells come back as
+        `0.0` (sea-level) fill indistinguishable from a genuine 0 m reading.
 
         Args:
             row: The resolved `wcs` catalog row (carries `native_bbox`).
@@ -374,6 +376,17 @@ class Bathymetry(AbstractDataSource):
                 f"request bbox {bbox} is outside the {row.id!r} coverage extent "
                 f"{extent} (European seas / NE Atlantic). Use a global DEM "
                 f"(dataset='gebco_2020' or 'etopo1_ice') for this area."
+            )
+        outside = (
+            west < ext_west or east > ext_east or south < ext_south or north > ext_north
+        )
+        if outside:
+            logger.warning(
+                f"bathymetry {row.id}: request bbox {bbox} extends beyond the "
+                f"coverage extent {extent}; cells outside the coverage return as "
+                f"0.0 (sea-level) fill, not real depths. Shrink the bbox to the "
+                f"coverage, or use a global DEM (gebco_2020 / etopo1_ice) for the "
+                f"out-of-domain area."
             )
 
     def _client(self) -> HttpClient:

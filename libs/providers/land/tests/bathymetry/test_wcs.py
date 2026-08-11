@@ -125,6 +125,33 @@ def test_out_of_domain_message_points_at_global_dems(
         backend.download()
 
 
+def test_partial_overlap_warns_but_proceeds(
+    tmp_path: Path, fake_from_wcs: dict, monkeypatch: pytest.MonkeyPatch
+):
+    """An AOI straddling the coverage edge warns about zero-fill but still fetches."""
+    seen: list[str] = []
+    monkeypatch.setattr(backend_module.logger, "warning", seen.append)
+    # East edge of the EMODnet extent is 43.0; this AOI poks past it to 45.0.
+    Bathymetry(
+        dataset="emodnet",
+        lat_lim=[40.0, 42.0],
+        lon_lim=[42.0, 45.0],
+        path=tmp_path,
+    ).download()
+    assert any("extends beyond the coverage extent" in message for message in seen)
+    assert "call" in fake_from_wcs, "a partial-overlap AOI must still fetch"
+
+
+def test_fully_contained_aoi_does_not_warn(
+    tmp_path: Path, fake_from_wcs: dict, monkeypatch: pytest.MonkeyPatch
+):
+    """A fully in-coverage AOI fetches with no out-of-domain warning."""
+    seen: list[str] = []
+    monkeypatch.setattr(backend_module.logger, "warning", seen.append)
+    _make("emodnet", tmp_path).download()
+    assert not any("extends beyond" in message for message in seen)
+
+
 def test_domain_guard_noops_without_native_bbox(tmp_path: Path, fake_from_wcs: dict):
     """The domain guard is a no-op for a row that declares no native_bbox."""
     backend = _make("emodnet", tmp_path)
