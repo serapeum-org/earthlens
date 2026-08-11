@@ -420,6 +420,29 @@ def _validate_catrare(catalog: Any) -> tuple[int, list[str]]:
     return checked, issues
 
 
+def _validate_flodis(catalog: Any) -> tuple[int, list[str]]:
+    """Each FLODIS table needs a description and join keys; the record stays pinned.
+
+    Beyond the per-table lint, the two-product FLODIS catalog carries a pinned
+    Zenodo record and the friendly-to-header column map at the top level; a stanza
+    that dropped either would still load, so they are checked here rather than left
+    to the row model. The `iso3`/`year` column keys are the ones the backend's
+    `_filter_table` reads, so a catalog missing them passes structural load but
+    breaks at fetch time.
+    """
+    checked, issues = _lint(
+        catalog, lambda k, r: _require(k, r, ("file", "description", "key_columns"))
+    )
+    record = getattr(catalog, "record", None)
+    if record is None or not getattr(record, "record", 0):
+        issues.append("record: missing pinned Zenodo record id")
+    columns = getattr(catalog, "columns", None) or {}
+    for required in ("iso3", "year", "disasterno", "gid_1", "gid_2"):
+        if required not in columns:
+            issues.append(f"columns: missing required key {required!r}")
+    return checked, issues
+
+
 #: Drought transports whose output is a raster (vs USDM's vector polygons).
 _DROUGHT_RASTER_TRANSPORTS = frozenset({"edo-wcs", "netcdf-url"})
 
@@ -971,6 +994,7 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "hanze": _validate_hanze,
     "flopros": _validate_flopros,
     "catrare": _validate_catrare,
+    "flodis": _validate_flodis,
     "drought": _validate_drought,
     "argo": _validate_argo,
     "chc": _validate_chc,

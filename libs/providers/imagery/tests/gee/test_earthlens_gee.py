@@ -119,6 +119,7 @@ class TestRegistry:
             "fabdem",
             "fdsn",
             "firms",
+            "flodis",
             "flopros",
             "g-portal",
             "gbif",

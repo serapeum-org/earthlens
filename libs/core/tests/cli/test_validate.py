@@ -14,6 +14,7 @@ from earthlens.cli.validate import (
     _validate_bathymetry,
     _validate_drought,
     _validate_erddap,
+    _validate_flodis,
     _validate_goes,
     _validate_hanze,
     _validate_nrel,
@@ -54,6 +55,7 @@ _CURATED_ENUM = (
     "hanze",
     "flopros",
     "catrare",
+    "flodis",
     "drought",
     "argo",
     "chc",
@@ -156,6 +158,27 @@ class TestValidateHanze:
         assert "geometry: missing shapefile member_stem" in joined
         assert "files: missing required file 'events'" in joined
         assert "columns: missing required key 'regions_nuts3'" in joined
+
+
+class TestValidateFlodis:
+    """Tests for the FLODIS structural lint."""
+
+    def test_flags_missing_row_fields_and_top_level_blocks(self):
+        """A catalog missing per-table fields / record / columns flags each."""
+        catalog = SimpleNamespace(
+            datasets={
+                "damages": SimpleNamespace(file="", description="", key_columns=())
+            },
+            record=None,
+            columns={},
+        )
+        checked, issues = _validate_flodis(catalog)
+        joined = " ".join(issues)
+        assert checked == 1
+        assert "damages: missing description" in joined
+        assert "record: missing pinned Zenodo record id" in joined
+        assert "columns: missing required key 'disasterno'" in joined
+        assert "columns: missing required key 'gid_1'" in joined
 
 
 class TestValidateSoilgrids:
