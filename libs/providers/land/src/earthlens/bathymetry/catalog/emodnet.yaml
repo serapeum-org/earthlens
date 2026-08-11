@@ -22,7 +22,6 @@ datasets:
     dataset_id: "emodnet:mean"
     variable: elevation
     native_resolution: 3.75 arc-second
-    lon_convention: "-180..180"
     wcs_version: "1.0.0"
     crs: EPSG:4326
     native_bbox: [-70.5, 11.0, 43.0, 90.0]
@@ -37,7 +36,6 @@ datasets:
     dataset_id: "emodnet:mean_2022"
     variable: elevation
     native_resolution: 3.75 arc-second
-    lon_convention: "-180..180"
     wcs_version: "1.0.0"
     crs: EPSG:4326
     native_bbox: [-70.5, 11.0, 43.0, 90.0]
@@ -51,7 +49,6 @@ datasets:
     dataset_id: "emodnet:mean_2020"
     variable: elevation
     native_resolution: 3.75 arc-second
-    lon_convention: "-180..180"
     wcs_version: "1.0.0"
     crs: EPSG:4326
     native_bbox: [-70.5, 11.0, 43.0, 90.0]
@@ -65,7 +62,6 @@ datasets:
     dataset_id: "emodnet:mean_2018"
     variable: elevation
     native_resolution: 3.75 arc-second
-    lon_convention: "-180..180"
     wcs_version: "1.0.0"
     crs: EPSG:4326
     native_bbox: [-70.5, 11.0, 43.0, 90.0]
@@ -79,7 +75,6 @@ datasets:
     dataset_id: "emodnet:mean_2016"
     variable: elevation
     native_resolution: 3.75 arc-second
-    lon_convention: "-180..180"
     wcs_version: "1.0.0"
     crs: EPSG:4326
     native_bbox: [-70.5, 11.0, 43.0, 90.0]
