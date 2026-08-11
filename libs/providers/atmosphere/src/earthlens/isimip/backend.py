@@ -375,7 +375,13 @@ class ISIMIP(AbstractDataSource):
                     f"ISIMIP cutout job for {product.id!r} did not finish: "
                     f"status={None if not job else job.get('status')!r}."
                 )
-            out.extend(self._download_extract(client, product, job["file_url"]))
+            file_url = job.get("file_url")
+            if not file_url:
+                raise RuntimeError(
+                    f"ISIMIP cutout job for {product.id!r} finished without a "
+                    "file_url to download."
+                )
+            out.extend(self._download_extract(client, product, file_url))
         return out
 
     def _product_dir(self, product: RemoteProduct) -> Path:
@@ -398,7 +404,14 @@ class ISIMIP(AbstractDataSource):
         """
         window = f"{self.time.start_date.year}_{self.time.end_date.year}"
         bbox = self._bbox()
-        region = "global" if bbox is None else "w{}e{}s{}n{}".format(*bbox)
+        # A whole-globe pull always writes to a `global` region dir, even when a
+        # bbox was also supplied (whole_globe wins) — so raw global granules
+        # never share a directory with a same-bbox cutout run.
+        region = (
+            "global"
+            if (self._whole_globe or bbox is None)
+            else "w{}e{}s{}n{}".format(*bbox)
+        )
         raw = f"{product.id}_{region}_{window}"
         slug = re.sub(r"[^0-9A-Za-z._-]+", "_", raw) or "isimip"
         directory = self._ensure_root_dir() / slug
