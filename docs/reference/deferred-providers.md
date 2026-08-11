@@ -13,7 +13,6 @@ time, not a legal guarantee.
 
 | Provider | Domain | Why deferred | How to get the data |
 |---|---|---|---|
-| **GFM** (Copernicus Global Flood Monitoring) | Flood extent (Sentinel-1 NRT) | **Account-gated** at CEMS/EODC and **not on openEO** — the near-real-time flood-extent, reference-water, and exclusion-mask layers are served only by the dedicated EODC GFM API (`api.gfm.eodc.eu`), which needs a registered GFM account, not an anonymous or openEO route | Register for a GFM account and pull via the [EODC GFM API](https://api.gfm.eodc.eu/) / the [GFM portal](https://portal.gfm.eodc.eu/); a dedicated `gfm` EODC-API backend with account auth is planned separately (`planning/flood-risk/gfm-completion.md`) |
 | **GVP** (Smithsonian Global Volcanism Program) | Volcanoes / eruptions | Reference database, no stable bulk API / maintained Python client; reuse is attribution-bound | Browse or export from the [Volcanoes of the World](https://volcano.si.edu/) site; a WFS/GeoServer endpoint exists for one-off pulls |
 | **GRDC** (Global Runoff Data Centre) | River discharge (in-situ) | Raw portal has **no API** (web map + form → email delivery) and **prohibits redistribution**, so the *full* database stays deferred. **But** GRDC's openly-licensed subset ships as **GRDC-Caravan** (CC-BY-4.0, redistributable) | **Open route (recommended):** `earthlens.caravan` with `dataset="grdc"` (or the `grdc-caravan` facade key) fetches it from Zenodo — DOI [`10.5281/zenodo.15349031`](https://doi.org/10.5281/zenodo.15349031) (v0.6, 5,356 catchments, 1950–2023). The remaining restricted stations are only available manually via the [GRDC portal](https://grdc.bafg.de/) |
 | **IBAT** (Integrated Biodiversity Assessment Tool) | Protected areas / KBA / Red List | **Commercial / subscription** for most access tiers; free tier is limited and NC | Use an [IBAT](https://www.ibat-alliance.org/) subscription; for the underlying open layers use `earthlens.wdpa` (Protected Planet) and `earthlens.iucn` instead |
@@ -36,12 +35,11 @@ time, not a legal guarantee.
   near-real-time) or GloFAS via `earthlens.ecmwf`.
 - **No-stable-client sources** — GVP — could be revisited if a maintained API/Python client and clear bulk-reuse
   terms appear.
-- **Account-gated sources** — **GFM** (Copernicus Global Flood Monitoring) is *not* an openEO collection (it is
-  absent from both CDSE openEO and openeo.cloud); its Sentinel-1 NRT flood-extent layers live only behind the
-  registered-account EODC GFM API (`api.gfm.eodc.eu`). It is therefore a **separate backend** (`gfm`, with EODC
-  account auth), planned on its own rather than added as a batch-2 collection. For open flood-hazard layers in the
-  meantime use `earthlens.aqueduct` (WRI riverine/coastal return-period hazard) or the HANZE/JRC historical
-  impact backends.
+- **GFM (Copernicus Global Flood Monitoring) — no longer deferred.** GFM is served **anonymously** by EODC's
+  public STAC API (`stac.eodc.eu`) as the collection `GFM`, so it ships on the existing `stac` backend under the
+  `eodc` endpoint (`eodc/gfm`) — no account and no openEO entitlement needed. See
+  [STAC → Copernicus GFM](stac/introduction.md). (The earlier read that GFM was reachable only via the
+  registered-account `api.gfm.eodc.eu` was superseded once the public STAC route was confirmed.)
 
 These deferrals are tracked as `L15` in the low-tier roadmap. Re-evaluate a row if its licence or access model
 changes.
