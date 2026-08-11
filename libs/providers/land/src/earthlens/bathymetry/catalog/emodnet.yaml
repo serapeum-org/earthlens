@@ -1,0 +1,88 @@
+# EMODnet Bathymetry DTM — European high-resolution sea-floor depth, served
+# as OGC WCS by the EMODnet Bathymetry GeoServer.
+#
+# The EMODnet Digital Terrain Model harmonises national hydrographic surveys
+# and satellite-derived bathymetry into a continuous ~3.75-arc-second grid of
+# mean depth (metres, negative below sea level) over European seas and the
+# extended NE-Atlantic domain — the coastal / shelf complement to the global
+# GEBCO / ETOPO DEMs. Unlike the ERDDAP-griddap rows, this coverage is read
+# over OGC WCS through pyramids `Dataset.from_wcs`. Pinned live in the A1 gate
+# — see planning/flood-risk/captures/emodnet-bathymetry-wcs-facts.md.
+#
+# GDAL's WCS driver reads this GeoServer only at WCS 1.0.0 with the colon
+# coverage id `emodnet:mean` (the 2.0.1 `emodnet__mean` id fails GDAL
+# subsetting with "Empty intersection after subsetting"). `emodnet` = the
+# latest release (DTM 2024); the year-stamped rows are the older DTM releases
+# (the release is the dataset id, mirroring ETOPO's ice / bedrock split).
+datasets:
+  emodnet:
+    title: "EMODnet Bathymetry DTM (European sea-floor depth, ~3.75 arc-second, latest release)"
+    transport: wcs
+    endpoint: https://ows.emodnet-bathymetry.eu/wcs
+    dataset_id: "emodnet:mean"
+    variable: elevation
+    native_resolution: 3.75 arc-second
+    lon_convention: "-180..180"
+    wcs_version: "1.0.0"
+    crs: EPSG:4326
+    native_bbox: [-70.5, 11.0, 43.0, 90.0]
+    license_note: >-
+      EMODnet Digital Bathymetry (DTM 2024), EMODnet Bathymetry Consortium
+      (doi:10.12770/cf51df64-56f9-4a99-b1aa-36b8d7b743a1); EMODnet use conditions,
+      attribution required — https://emodnet.ec.europa.eu/en/terms-use-emodnet-online-services-data-and-data-products.
+  emodnet_2022:
+    title: "EMODnet Bathymetry DTM 2022 release (European sea-floor depth, ~3.75 arc-second)"
+    transport: wcs
+    endpoint: https://ows.emodnet-bathymetry.eu/wcs
+    dataset_id: "emodnet:mean_2022"
+    variable: elevation
+    native_resolution: 3.75 arc-second
+    lon_convention: "-180..180"
+    wcs_version: "1.0.0"
+    crs: EPSG:4326
+    native_bbox: [-70.5, 11.0, 43.0, 90.0]
+    license_note: >-
+      EMODnet Digital Bathymetry (DTM 2022), EMODnet Bathymetry Consortium; EMODnet use conditions,
+      attribution required — https://emodnet.ec.europa.eu/en/terms-use-emodnet-online-services-data-and-data-products.
+  emodnet_2020:
+    title: "EMODnet Bathymetry DTM 2020 release (European sea-floor depth, ~3.75 arc-second)"
+    transport: wcs
+    endpoint: https://ows.emodnet-bathymetry.eu/wcs
+    dataset_id: "emodnet:mean_2020"
+    variable: elevation
+    native_resolution: 3.75 arc-second
+    lon_convention: "-180..180"
+    wcs_version: "1.0.0"
+    crs: EPSG:4326
+    native_bbox: [-70.5, 11.0, 43.0, 90.0]
+    license_note: >-
+      EMODnet Digital Bathymetry (DTM 2020), EMODnet Bathymetry Consortium; EMODnet use conditions,
+      attribution required — https://emodnet.ec.europa.eu/en/terms-use-emodnet-online-services-data-and-data-products.
+  emodnet_2018:
+    title: "EMODnet Bathymetry DTM 2018 release (European sea-floor depth, ~3.75 arc-second)"
+    transport: wcs
+    endpoint: https://ows.emodnet-bathymetry.eu/wcs
+    dataset_id: "emodnet:mean_2018"
+    variable: elevation
+    native_resolution: 3.75 arc-second
+    lon_convention: "-180..180"
+    wcs_version: "1.0.0"
+    crs: EPSG:4326
+    native_bbox: [-70.5, 11.0, 43.0, 90.0]
+    license_note: >-
+      EMODnet Digital Bathymetry (DTM 2018), EMODnet Bathymetry Consortium; EMODnet use conditions,
+      attribution required — https://emodnet.ec.europa.eu/en/terms-use-emodnet-online-services-data-and-data-products.
+  emodnet_2016:
+    title: "EMODnet Bathymetry DTM 2016 release (European sea-floor depth, ~3.75 arc-second)"
+    transport: wcs
+    endpoint: https://ows.emodnet-bathymetry.eu/wcs
+    dataset_id: "emodnet:mean_2016"
+    variable: elevation
+    native_resolution: 3.75 arc-second
+    lon_convention: "-180..180"
+    wcs_version: "1.0.0"
+    crs: EPSG:4326
+    native_bbox: [-70.5, 11.0, 43.0, 90.0]
+    license_note: >-
+      EMODnet Digital Bathymetry (DTM 2016), EMODnet Bathymetry Consortium; EMODnet use conditions,
+      attribution required — https://emodnet.ec.europa.eu/en/terms-use-emodnet-online-services-data-and-data-products.

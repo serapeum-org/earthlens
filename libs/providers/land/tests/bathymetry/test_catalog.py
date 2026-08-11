@@ -23,9 +23,18 @@ def catalog() -> Catalog:
     return Catalog()
 
 
-def test_catalog_loads_three_dems(catalog: Catalog):
-    """The shipped catalog carries the three curated DEM rows."""
-    assert sorted(catalog.datasets) == ["etopo1_bedrock", "etopo1_ice", "gebco_2020"]
+def test_catalog_loads_curated_dems(catalog: Catalog):
+    """The shipped catalog carries the GEBCO, ETOPO, and EMODnet rows."""
+    assert sorted(catalog.datasets) == [
+        "emodnet",
+        "emodnet_2016",
+        "emodnet_2018",
+        "emodnet_2020",
+        "emodnet_2022",
+        "etopo1_bedrock",
+        "etopo1_ice",
+        "gebco_2020",
+    ]
 
 
 def test_available_datasets_matches_curated(catalog: Catalog):
