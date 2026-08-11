@@ -287,6 +287,17 @@ class TestFetchAndDownload:
         assert "2015_2100" in wide.name
         assert "2030_2031" in narrow.name
 
+    def test_product_dir_keyed_by_bbox(self, make_backend):
+        """Same dataset + window but a different bbox resolves to a different dir."""
+        product = RemoteProduct(id="ds_pr", metadata={})
+        here = make_backend(lat_lim=[51.0, 53.0], lon_lim=[6.0, 8.0])._product_dir(
+            product
+        )
+        there = make_backend(lat_lim=[40.0, 42.0], lon_lim=[0.0, 2.0])._product_dir(
+            product
+        )
+        assert here != there, "a different bbox must not reuse the other bbox's dir"
+
 
 class TestLicense:
     """Tests for the per-dataset licence warning."""

@@ -375,14 +375,16 @@ class ISIMIP(AbstractDataSource):
         return out
 
     def _product_dir(self, product: RemoteProduct) -> Path:
-        """Return a per-product, per-window output subdirectory under the root.
+        """Return a per-product, per-window, per-region output subdirectory.
 
-        Each resolved dataset writes into its own subdirectory keyed by both the
-        dataset id and the requested `[start, end]` window, so that concurrent
-        cutouts never collide on a shared filename, re-running the same request
-        still returns the (overwritten) granules, and re-running with a narrower
-        window never picks up a wider run's out-of-window granules left in a
-        shared dir (:meth:`_download_extract` returns every `*.nc` it finds).
+        Each resolved dataset writes into its own subdirectory keyed by the
+        dataset id, the requested `[start, end]` window, and the bbox region
+        (`global` for a whole-globe request). :meth:`_download_extract` returns
+        every `*.nc` it finds in that directory, so keying on all three means
+        concurrent products never collide, re-running the same request just
+        overwrites in place, and re-running the same dataset/window with a
+        *different* bbox never picks up the earlier run's differently-cut
+        granule (each bbox gets its own directory).
 
         Args:
             product: The product whose output subdirectory to build.
@@ -391,7 +393,10 @@ class ISIMIP(AbstractDataSource):
             Path: The created per-product directory.
         """
         window = f"{self.time.start_date.year}_{self.time.end_date.year}"
-        slug = re.sub(r"[^0-9A-Za-z._-]+", "_", f"{product.id}_{window}") or "isimip"
+        bbox = self._bbox()
+        region = "global" if bbox is None else "w{}e{}s{}n{}".format(*bbox)
+        raw = f"{product.id}_{region}_{window}"
+        slug = re.sub(r"[^0-9A-Za-z._-]+", "_", raw) or "isimip"
         directory = self._ensure_root_dir() / slug
         directory.mkdir(parents=True, exist_ok=True)
         return directory
