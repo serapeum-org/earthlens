@@ -541,6 +541,10 @@
          <lastmod>2026-08-11</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/isimip/quickstart/</loc>
+         <lastmod>2026-08-11</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/iucn/catalog_explorer/</loc>
          <lastmod>2026-08-11</lastmod>
     </url>
@@ -1646,6 +1650,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/hdx/usage/</loc>
+         <lastmod>2026-08-11</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/isimip/introduction/</loc>
+         <lastmod>2026-08-11</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/isimip/isimip/</loc>
+         <lastmod>2026-08-11</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/isimip/usage/</loc>
          <lastmod>2026-08-11</lastmod>
     </url>
     <url>
