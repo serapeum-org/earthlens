@@ -384,6 +384,7 @@ markers = [
     "sensor_community: tests for the Sensor.Community air-quality backend (crowdsourced low-cost sensors; no extra SDK — core `requests` + `pandas`; public archive + live JSON API, ODbL).",
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
     "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
+    "flodis: tests for the FLODIS observed-flood footprints<->impacts backend (public Zenodo record 8123096, CC-BY-4.0, no extra SDK — core HttpClient + pandas; global companion to hanze, sibling of emdat).",
     "mswep: tests for the GloH2O MSWEP / MSWX backend (requires the `mswep` extra).",
     "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
     "cmip6: tests for the CMIP6 backend (raw archive on the open Pangeo gs://cmip6 bucket; anonymous, no extra SDK; reads via pyramids).",

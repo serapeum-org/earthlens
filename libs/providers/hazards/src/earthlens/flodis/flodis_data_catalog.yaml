@@ -1,0 +1,82 @@
+# FLODIS — observed flood footprints <-> human & economic impacts.
+#
+# FLODIS (Mester, Frieler & Schewe, PIK; Scientific Data 10, 482, 2023) links
+# EM-DAT fatalities + economic damages and IDMC displacements to Global Flood
+# Database (GFD) satellite flood footprints, adding per-event affected
+# population (GHSL + GPW), GDP and critical-infrastructure counts. Global,
+# 2000-2018.
+#
+# Two tabular datasets, selected with `dataset=`. This is a small, two-family
+# enumeration, so it lives in one `<pkg>_data_catalog.yaml` (the layout rule)
+# rather than a sharded `catalog/` directory.
+#
+# Source + schema + licence were verified live 2026-08-10 against the pinned
+# Zenodo record 8123096 (byte-identical to GitHub commit
+# bcb651a9a4f6422e6e6ab84d8639b2ed376bee93) — see
+# `planning/flood-risk/captures/A1-flodis-source-schema-licence.md`.
+
+# The pinned Zenodo record FLODIS is fetched from. Zenodo carries an explicit
+# CC-BY-4.0 licence on the data record itself (the GitHub repo declares none),
+# so the Zenodo DOI is the pinned source; the GitHub commit is a byte-identical
+# mirror. Pinning a record id (not a moving branch) keeps a request reproducible.
+record:
+  record: 8123096
+  concept_doi: "10.5281/zenodo.8123096"
+  data_period: "2000-2018"
+  license: CC-BY-4.0
+  attribution: >-
+    Mester, B., Frieler, K. & Schewe, J. Human displacements, fatalities, and
+    economic damages linked to remotely observed floods. Sci Data 10, 482
+    (2023). https://doi.org/10.1038/s41597-023-02376-9. Data CC-BY-4.0 (Zenodo
+    10.5281/zenodo.8123096). Upstream sources: IDMC, EM-DAT (CRED/UCLouvain),
+    Global Flood Database (Tellman et al. 2021).
+
+# The two FLODIS tables. `dataset=` selects one; `damages` is the default. Each
+# carries the Zenodo file name and its join key column(s) — `disasterno` (EM-DAT)
+# for damages, `GID_1`/`GID_2` (GADM) for displacement — so a caller can join the
+# result to the shipped `emdat` (GDIS) footprints and `gee` (Global Flood
+# Database) extents. The two tables share the exposure / infrastructure tail;
+# they differ only in these head columns.
+datasets:
+  damages:
+    file: FLODIS_mortality_damage.csv
+    description: >-
+      EM-DAT fatality & economic-damage events (697 rows) matched to GFD flood
+      footprints, keyed on the EM-DAT `disasterno`.
+    key_columns: [disasterno]
+  displacement:
+    file: FLODIS_displacement.csv
+    description: >-
+      IDMC human-displacement events (335 rows) matched to GFD flood footprints,
+      keyed on the GADM `GID_1` / `GID_2` admin codes.
+    key_columns: [GID_1, GID_2]
+
+# Friendly name -> exact FLODIS CSV header. The output DataFrame keeps FLODIS's
+# documented headers; this map lets the backend locate the selector, join-key and
+# headline-impact columns without hard-coding the spellings at each use site. The
+# ~60 trailing exposure/context `*_mean` columns are passed through untouched and
+# are not mapped here.
+columns:
+  iso3: ISO3
+  year: year
+  # damages head
+  disasterno: disasterno
+  total_deaths: total_deaths
+  no_injured: no_injured
+  no_affected: no_affected_EMDAT
+  total_affected: total_affected_EMDAT
+  total_damages_000_usd: total_damages_(000_USD)
+  # displacement head
+  displacements: displacements
+  gid_1: GID_1
+  gid_2: GID_2
+  num_provinces: num_provinces
+  num_districts: num_districts
+  # shared GFD-match + exposure block
+  gfd_matches: GFD_matches
+  gfd_matches_nr: GFD_matches_nr
+  gfd_duration: GFD_duration
+  matching_type: matching_type
+  pop_affected_ghsl: pop_affected_sum_GHSL
+  pop_affected_gpw: pop_affected_sum_GPW
+  gdp_affected: GDP_affected_sum
