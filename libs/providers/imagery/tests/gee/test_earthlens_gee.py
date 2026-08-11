@@ -111,6 +111,7 @@ class TestRegistry:
             "efhm",
             "elevation",
             "emdat",
+            "eodc",
             "erddap",
             "etopo",
             "eumetsat",
