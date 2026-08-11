@@ -10,6 +10,7 @@ import requests
 
 from earthlens.bathymetry import backend as backend_module
 from earthlens.bathymetry.backend import Bathymetry
+from earthlens.bathymetry.catalog import Dataset
 
 pytestmark = pytest.mark.bathymetry
 
@@ -159,6 +160,24 @@ def test_domain_guard_noops_without_native_bbox(tmp_path: Path, fake_from_wcs: d
     assert griddap_row.native_bbox is None
     # A row with no advertised extent cannot be guarded — this must not raise.
     backend._guard_wcs_domain(griddap_row, (0.0, 0.0, 1.0, 1.0))
+
+
+def test_non_wgs84_row_skips_numeric_guard(tmp_path: Path, fake_from_wcs: dict):
+    """A wcs row in a projected CRS skips the lon/lat guard rather than mis-reject."""
+    projected = Dataset(
+        id="proj",
+        transport="wcs",
+        endpoint="https://x/wcs",
+        dataset_id="proj:mean",
+        variable="elevation",
+        wcs_version="1.0.0",
+        crs="EPSG:3857",
+        native_bbox=(0.0, 0.0, 1.0, 1.0),
+    )
+    backend = _make("emodnet", tmp_path)
+    # This bbox is far outside native_bbox and would be rejected under EPSG:4326;
+    # a projected-CRS row must skip the numeric comparison and not raise.
+    backend._guard_wcs_domain(projected, (100.0, 100.0, 200.0, 200.0))
 
 
 def test_from_wcs_failure_is_wrapped(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):

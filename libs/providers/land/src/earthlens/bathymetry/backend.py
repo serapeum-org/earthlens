@@ -353,6 +353,10 @@ class Bathymetry(AbstractDataSource):
         real) but logs a warning, because its out-of-coverage cells come back as
         `0.0` (sea-level) fill indistinguishable from a genuine 0 m reading.
 
+        The numeric comparison assumes the request bbox and `native_bbox` share
+        `EPSG:4326` lon/lat degrees (true for every shipped row); a future row
+        in a projected CRS is skipped rather than mis-guarded on mixed units.
+
         Args:
             row: The resolved `wcs` catalog row (carries `native_bbox`).
             bbox: `(west, south, east, north)` of the request in `row.crs`.
@@ -362,6 +366,10 @@ class Bathymetry(AbstractDataSource):
         """
         extent = row.native_bbox
         if extent is None:
+            return
+        if row.crs != "EPSG:4326":
+            # native_bbox and the request bbox are only comparable in lon/lat
+            # degrees; skip the numeric guard for any other CRS.
             return
         west, south, east, north = bbox
         ext_west, ext_south, ext_east, ext_north = extent
