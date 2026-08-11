@@ -336,7 +336,8 @@ class Bathymetry(AbstractDataSource):
             raise ValueError(
                 f"bathymetry WCS request for {row.id!r} failed over "
                 f"{self._extent_label()}: {exc}. The bbox may be outside the "
-                f"coverage, or too large for the server (shrink it)."
+                f"coverage or too large for the server (shrink it), or the WCS "
+                f"service may be unavailable."
             ) from exc
         dataset = mask_to_geometry(dataset, self.space)
         dataset.to_file(str(tif_path))
