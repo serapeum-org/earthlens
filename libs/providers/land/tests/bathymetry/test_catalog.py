@@ -167,8 +167,16 @@ def test_wcs_row_blank_version_rejected():
         )
 
 
-def test_wcs_row_degenerate_bbox_rejected():
-    """A wcs row with a zero-area native_bbox fails validation."""
+@pytest.mark.parametrize(
+    "native_bbox",
+    [
+        (0.0, 0.0, 0.0, 0.0),  # zero area
+        (1.0, 0.0, -1.0, 1.0),  # west > east (inverted longitude)
+        (-1.0, 1.0, 1.0, -1.0),  # south > north (inverted latitude)
+    ],
+)
+def test_wcs_row_degenerate_bbox_rejected(native_bbox):
+    """A wcs row with a non-positive-area native_bbox fails validation."""
     with pytest.raises(ValidationError, match="degenerate native_bbox"):
         Dataset(
             transport="wcs",
@@ -176,7 +184,7 @@ def test_wcs_row_degenerate_bbox_rejected():
             dataset_id="c:mean",
             variable="elevation",
             wcs_version="1.0.0",
-            native_bbox=(0.0, 0.0, 0.0, 0.0),
+            native_bbox=native_bbox,
         )
 
 
