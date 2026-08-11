@@ -140,6 +140,25 @@ class TestEodcSearchFetch:
         stac._fetch(stac._search())
         assert fake_pyramids.merge_calls[0][2]["no_data_value"] == 255
 
+    def test_aggregate_flattens_slash_key_in_output_name(self, fake_pyramids, tmp_path):
+        """Aggregating GFM writes a per-window COG with the slash flattened.
+
+        Guards against the aggregate path targeting a non-existent `eodc/`
+        subdirectory when the logical key contains a slash.
+        """
+        from earthlens.aggregate import AggregationConfig
+
+        fake_pyramids.items_by_collection["GFM"] = [
+            make_item("a", "2022-09-10", {"ensemble_flood_extent": "https://h/a.tif"}),
+            make_item("b", "2022-09-28", {"ensemble_flood_extent": "https://h/b.tif"}),
+        ]
+        stac = _build_gfm(tmp_path)
+        paths = stac.download(aggregate=AggregationConfig(freq="1MS", op="mean"))
+        assert paths, "expected at least one per-window COG"
+        for path in paths:
+            assert "/" not in path.name and path.name.startswith("eodc_gfm_")
+            assert path.parent == Path(stac.root_dir)
+
 
 @pytest.mark.stac
 def test_stac_backend_never_imports_xarray():
