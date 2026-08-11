@@ -288,8 +288,9 @@ class Catalog(AbstractCatalog):
             ```python
             >>> from earthlens.stac import Catalog
             >>> cat = Catalog()
-            >>> sorted(cat.endpoints)
-            ['bdc', 'cdse', 'dea', 'deafrica', 'earth-search', 'planetary-computer', 'usgs-landsat', 'veda']
+            >>> sorted(cat.endpoints)  # doctest: +NORMALIZE_WHITESPACE
+            ['bdc', 'cdse', 'dea', 'deafrica', 'earth-search', 'eodc', 'planetary-computer',
+             'usgs-landsat', 'veda']
             >>> cat.get_collection("sentinel-2-l2a").resolution
             10.0
 

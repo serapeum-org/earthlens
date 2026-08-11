@@ -1,0 +1,67 @@
+# Curated collections served by EODC (Earth Observation Data Centre) STAC.
+#
+# Copernicus GFM (Global Flood Monitoring) — Sentinel-1 SAR near-real-time
+# flood mapping, public and anonymous on https://stac.eodc.eu/api/v1. Every
+# layer is a single-band uint8 COG (nodata 255); the ensemble layers are the
+# final GFM product, the dlr/tuw/list layers the per-algorithm intermediates.
+# Licence: proprietary (Copernicus GFM — free, with attribution;
+# https://extwiki.eodc.eu/en/GFM).
+
+collections:
+  eodc/gfm:
+    endpoint: eodc
+    collection_id: GFM
+    resolution: 20.0
+    extent:
+      start_date: '2015-01-01'
+    default_assets:
+    - ensemble_flood_extent
+    assets:
+      ensemble_flood_extent:
+        dtype: uint8
+        nodata: 255
+        title: GFM Observed Flood Extent (Final output - Ensemble algorithm)
+      ensemble_water_extent:
+        dtype: uint8
+        nodata: 255
+        title: GFM Observed Water Extent (Final output - Ensemble algorithm)
+      ensemble_likelihood:
+        dtype: uint8
+        nodata: 255
+        title: GFM Likelihood (Final output - Ensemble algorithm)
+      reference_water_mask:
+        dtype: uint8
+        nodata: 255
+        title: GFM Reference Water Mask
+      exclusion_mask:
+        dtype: uint8
+        nodata: 255
+        title: GFM Exclusion Mask (Final output - Ensemble algorithm)
+      advisory_flags:
+        dtype: uint8
+        nodata: 255
+        title: GFM Advisory Flags
+      dlr_flood_extent:
+        dtype: uint8
+        nodata: 255
+        title: GFM Observed Flood Extent (Intermediate output - DLR algorithm)
+      tuw_flood_extent:
+        dtype: uint8
+        nodata: 255
+        title: GFM Observed Flood Extent (Intermediate output - TUW algorithm)
+      list_flood_extent:
+        dtype: uint8
+        nodata: 255
+        title: GFM Observed Flood Extent (Intermediate output - LIST algorithm)
+      dlr_likelihood:
+        dtype: uint8
+        nodata: 255
+        title: GFM Likelihood (Intermediate output - DLR algorithm)
+      tuw_likelihood:
+        dtype: uint8
+        nodata: 255
+        title: GFM Uncertainties (Intermediate output - TUW algorithm)
+      list_likelihood:
+        dtype: uint8
+        nodata: 255
+        title: GFM Likelihood (Intermediate output - LIST algorithm)

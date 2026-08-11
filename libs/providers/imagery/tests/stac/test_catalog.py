@@ -47,8 +47,8 @@ class TestBundledCatalog:
         assert cat.endpoints["deafrica"].signer == "anonymous"
         assert cat.endpoints["deafrica"].region == "af-south-1"
 
-    def test_all_eight_endpoints_load_together(self):
-        """The 8 bundled per-endpoint yaml files merge under the duplicate-key loader."""
+    def test_all_nine_endpoints_load_together(self):
+        """The 9 bundled per-endpoint yaml files merge under the duplicate-key loader."""
         cat = Catalog()
         assert set(cat.endpoints) == {
             "planetary-computer",
@@ -59,8 +59,9 @@ class TestBundledCatalog:
             "veda",
             "usgs-landsat",
             "bdc",
+            "eodc",
         }
-        # available_collections holds a per-endpoint live index for each of the 8;
+        # available_collections holds a per-endpoint live index for each of the 9;
         # source-coop is documentation-only (no endpoint, no collections).
         for ep in cat.endpoints:
             assert ep in cat.available_collections, ep

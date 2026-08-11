@@ -807,6 +807,7 @@ class TestWrite:
             "veda",
             "usgs-landsat",
             "bdc",
+            "eodc",
         ], "endpoints block preserved"
         assert data["available_collections"]["planetary-computer"] == ["only-one"]
 
