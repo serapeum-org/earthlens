@@ -154,6 +154,32 @@ def test_wcs_row_missing_native_bbox_rejected():
         )
 
 
+def test_wcs_row_blank_version_rejected():
+    """A wcs row whose wcs_version is only whitespace fails validation."""
+    with pytest.raises(ValidationError, match="wcs_version"):
+        Dataset(
+            transport="wcs",
+            endpoint="https://x/wcs",
+            dataset_id="c:mean",
+            variable="elevation",
+            wcs_version="  ",
+            native_bbox=(-1.0, -1.0, 1.0, 1.0),
+        )
+
+
+def test_wcs_row_degenerate_bbox_rejected():
+    """A wcs row with a zero-area native_bbox fails validation."""
+    with pytest.raises(ValidationError, match="degenerate native_bbox"):
+        Dataset(
+            transport="wcs",
+            endpoint="https://x/wcs",
+            dataset_id="c:mean",
+            variable="elevation",
+            wcs_version="1.0.0",
+            native_bbox=(0.0, 0.0, 0.0, 0.0),
+        )
+
+
 def test_griddap_row_needs_no_wcs_fields():
     """A griddap row builds without the WCS-only fields (they stay defaulted)."""
     row = Dataset(

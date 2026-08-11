@@ -129,30 +129,38 @@ class Dataset(BaseModel):
 
         A `transport: wcs` row is read through pyramids `from_wcs`, which
         needs the WCS protocol version and (for the out-of-domain guard) the
-        coverage's advertised extent. Enforce both here so a malformed row
-        fails at catalog load, not mid-download.
+        coverage's advertised extent. Enforce both here — present, and not
+        degenerate (a blank version, or a zero/negative-area `native_bbox`) —
+        so a malformed row fails at catalog load, not mid-download.
 
         Returns:
             Dataset: The validated row (unchanged).
 
         Raises:
-            ValueError: If a `wcs` row is missing `wcs_version` or
-                `native_bbox`.
+            ValueError: If a `wcs` row is missing / blank `wcs_version` or
+                `native_bbox`, or `native_bbox` has non-positive area.
         """
-        if self.transport == "wcs":
-            missing = [
-                name
-                for name, value in (
-                    ("wcs_version", self.wcs_version),
-                    ("native_bbox", self.native_bbox),
-                )
-                if not value
-            ]
-            if missing:
-                raise ValueError(
-                    f"wcs row {self.id or self.dataset_id!r} is missing "
-                    f"required field(s): {', '.join(missing)}."
-                )
+        if self.transport != "wcs":
+            return self
+        missing = [
+            name
+            for name, value in (
+                ("wcs_version", (self.wcs_version or "").strip()),
+                ("native_bbox", self.native_bbox),
+            )
+            if not value
+        ]
+        if missing:
+            raise ValueError(
+                f"wcs row {self.id or self.dataset_id!r} is missing "
+                f"required field(s): {', '.join(missing)}."
+            )
+        bbox = self.native_bbox
+        if bbox is not None and (bbox[0] >= bbox[2] or bbox[1] >= bbox[3]):
+            raise ValueError(
+                f"wcs row {self.id or self.dataset_id!r} has a degenerate "
+                f"native_bbox {bbox}; expected west < east and south < north."
+            )
         return self
 
 
