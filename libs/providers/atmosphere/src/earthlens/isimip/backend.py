@@ -130,6 +130,10 @@ class ISIMIP(AbstractDataSource):
                 "ISIMIP requires a start and end date, e.g. "
                 "start='2030-01-01', end='2040-12-31'."
             )
+        if poll <= 0:
+            raise ValueError(
+                f"ISIMIP poll must be a positive number of seconds, got {poll!r}."
+            )
 
         self._round = dataset
         self._product = product

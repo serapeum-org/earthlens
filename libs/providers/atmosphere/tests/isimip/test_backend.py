@@ -40,6 +40,8 @@ class TestConstruction:
             ({"gcm": None}, "requires a gcm"),
             ({"start": ""}, "start and end"),
             ({"end": ""}, "start and end"),
+            ({"poll": 0}, "poll must be a positive"),
+            ({"poll": -1.0}, "poll must be a positive"),
         ],
     )
     def test_missing_required_raises(self, make_backend, overrides, match):
@@ -137,6 +139,34 @@ class TestSearch:
         b = make_backend(variables=["pr", "tas"])
         products = b._search()
         assert {p.metadata["name"].split("_")[-3] for p in products} == {"pr", "tas"}
+
+    def test_multiple_in_window_granules_resolve_together(self, make_backend):
+        """A window spanning several decade files resolves all of them into one product."""
+        ds = [
+            make_dataset(
+                "pr",
+                files=[
+                    {
+                        "name": "x_pr_global_daily_2015_2020.nc",
+                        "path": "p/2015_2020.nc",
+                        "file_url": "u1",
+                    },
+                    {
+                        "name": "x_pr_global_daily_2021_2030.nc",
+                        "path": "p/2021_2030.nc",
+                        "file_url": "u2",
+                    },
+                ],
+            )
+        ]
+        b = make_backend(
+            client=FakeClient(datasets_by_var={"pr": ds}),
+            start="2018-01-01",
+            end="2025-12-31",
+        )
+        products = b._search()
+        assert len(products) == 1
+        assert len(products[0].metadata["paths"]) == 2, "both decade granules resolved"
 
     def test_missing_variable_raises(self, make_backend):
         """A variable that matches no dataset raises, never silently skipped."""
@@ -337,7 +367,7 @@ class TestMisc:
     def test_aggregate_is_refused(self, make_backend):
         """Passing aggregate= is refused (the backend writes raw NetCDF)."""
         b = make_backend()
-        with pytest.raises(Exception, match="reduce|aggregate|separately"):
+        with pytest.raises(NotImplementedError, match="reduce|aggregate|separately"):
             b.download(aggregate={"reducer": "mean"})
 
     def test_client_or_build_uses_factory(self, make_backend, monkeypatch):
