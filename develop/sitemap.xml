@@ -137,6 +137,10 @@
          <lastmod>2026-08-11</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/catrare/quickstart/</loc>
+         <lastmod>2026-08-11</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/chc/catalog_explorer/</loc>
          <lastmod>2026-08-11</lastmod>
     </url>
@@ -373,7 +377,7 @@
          <lastmod>2026-08-11</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/flodis/quickstart/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/flopros/quickstart/</loc>
          <lastmod>2026-08-11</lastmod>
     </url>
     <url>
@@ -1233,6 +1237,18 @@
          <lastmod>2026-08-11</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/catrare/catrare/</loc>
+         <lastmod>2026-08-11</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/catrare/introduction/</loc>
+         <lastmod>2026-08-11</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/catrare/usage/</loc>
+         <lastmod>2026-08-11</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/chc/catalog/</loc>
          <lastmod>2026-08-11</lastmod>
     </url>
@@ -1477,15 +1493,15 @@
          <lastmod>2026-08-11</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/flodis/flodis/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/flopros/flopros/</loc>
          <lastmod>2026-08-11</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/flodis/introduction/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/flopros/introduction/</loc>
          <lastmod>2026-08-11</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/flodis/usage/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/develop/reference/flopros/usage/</loc>
          <lastmod>2026-08-11</lastmod>
     </url>
     <url>
