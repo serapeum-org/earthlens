@@ -101,7 +101,8 @@ class ISIMIP(AbstractDataSource):
             lon_lim: `[lon_min, lon_max]` in degrees for the cutout bbox.
             whole_globe: Skip the cutout and download the raw whole-globe
                 granules (warned — each is ~1-2 GB). Defaults to `False`; a
-                request must give a bbox or set this.
+                request must give a bbox or set this. When `True` it takes
+                precedence over any `lat_lim` / `lon_lim` (a warning is logged).
             poll: Seconds between cutout-job status polls. Defaults to `4.0`.
             path: Output directory for the written NetCDFs.
             fmt: `strptime` format for `start` / `end`.
@@ -158,6 +159,11 @@ class ISIMIP(AbstractDataSource):
                 "ISIMIP requires a bbox (lat_lim / lon_lim) so the granule is cut "
                 "server-side; pass whole_globe=True to download the raw ~1-2 GB "
                 "global granules instead."
+            )
+        if self._whole_globe and self._bbox() is not None:
+            logger.warning(
+                "isimip: whole_globe=True takes precedence over the given "
+                "lat_lim/lon_lim; downloading the raw global granules, not a cutout."
             )
 
     def _validate_facets(self) -> None:
@@ -346,15 +352,16 @@ class ISIMIP(AbstractDataSource):
             RuntimeError: If a cutout job does not reach `finished`.
         """
         client = self._client_or_build()
-        bbox = self._bbox()
         out: list[Path] = []
         for product in tqdm(
             products, disable=not self._show_progress, desc="isimip", unit="dataset"
         ):
             self._warn_license(product)
-            if bbox is None:
+            if self._whole_globe:
                 out.extend(self._download_whole(client, product))
                 continue
+            bbox = self._bbox()
+            assert bbox is not None  # the constructor requires a bbox here
             west, east, south, north = bbox
             job = client.cutout_bbox(
                 product.metadata["paths"], west, east, south, north, poll=self._poll

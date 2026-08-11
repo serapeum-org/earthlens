@@ -240,6 +240,13 @@ class TestFetchAndDownload:
         assert b._client.cutout_calls == []
         assert b._client.download_calls, "expected a raw download"
 
+    def test_whole_globe_overrides_bbox(self, make_backend):
+        """whole_globe takes precedence over a supplied bbox (raw, no cutout)."""
+        b = make_backend(lat_lim=[51.0, 53.0], lon_lim=[6.0, 8.0], whole_globe=True)
+        out = b.download(progress_bar=False)
+        assert out
+        assert b._client.cutout_calls == [], "bbox must not trigger a cutout here"
+
     def test_whole_globe_all_urls_missing_raises(self, make_backend):
         """A whole-globe request whose granules carry no file_url raises."""
         ds = [
