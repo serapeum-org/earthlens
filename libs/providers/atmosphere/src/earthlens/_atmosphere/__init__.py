@@ -16,7 +16,7 @@ __all__ = ["BACKENDS"]
 _MSWEP = "earthlens.mswep"
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 38 data-source keys.
+#: distribution's 39 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'chc': ('earthlens.chc', 'CHIRPS', '', {}),
     'chirps': ('earthlens.chc', 'CHIRPS', '', {}),
@@ -24,6 +24,7 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'cmip6': ('earthlens.cmip6', 'CMIP6', '', {}),
     'pangeo-cmip6': ('earthlens.cmip6', 'CMIP6', '', {}),
     'climate-projections': ('earthlens.cmip6', 'CMIP6', '', {}),
+    'isimip': ('earthlens.isimip', 'ISIMIP', 'isimip', {}),
     'ecmwf': ('earthlens.ecmwf', 'ECMWF', 'ecmwf', {}),
     'goes': ('earthlens.goes', 'GOES', 's3', {}),
     'openaq': ('earthlens.openaq', 'OpenAQ', '', {}),

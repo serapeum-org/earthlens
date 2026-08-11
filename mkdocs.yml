@@ -201,6 +201,10 @@ nav:
       - Introduction: reference/cmip6/introduction.md
       - Usage: reference/cmip6/usage.md
       - Reference: reference/cmip6/cmip6.md
+    - ISIMIP (bias-adjusted forcing):
+      - Introduction: reference/isimip/introduction.md
+      - Usage: reference/isimip/usage.md
+      - Reference: reference/isimip/isimip.md
     - Earthdata (NASA EOSDIS):
       - Introduction: reference/earthdata/introduction.md
       - Usage: reference/earthdata/usage.md
@@ -531,6 +535,8 @@ nav:
       - Mediterranean — surface temperature map: examples/cmems/mediterranean_sst_map.ipynb
     - CMIP6 (climate projections):
       - Quickstart — tas ssp585 subset (live): examples/cmip6/quickstart.ipynb
+    - ISIMIP (bias-adjusted forcing):
+      - Quickstart — pr ssp585 cutout (live): examples/isimip/quickstart.ipynb
     - ASF (InSAR / SAR):
       - Catalog explorer (no network): examples/asf/catalog_explorer.ipynb
       - Quickstart — anonymous search: examples/asf/quickstart_search.ipynb
