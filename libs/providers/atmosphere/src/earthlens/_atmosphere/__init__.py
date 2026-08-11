@@ -16,7 +16,7 @@ __all__ = ["BACKENDS"]
 _MSWEP = "earthlens.mswep"
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 37 data-source keys.
+#: distribution's 39 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'chc': ('earthlens.chc', 'CHIRPS', '', {}),
     'chirps': ('earthlens.chc', 'CHIRPS', '', {}),
@@ -35,6 +35,8 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'nwp': ('earthlens.nwp', 'NWP', 'nwp', {}),
     'radar': ('earthlens.radar', 'Radar', 'radar', {}),
     'nexrad': ('earthlens.radar', 'Radar', 'radar', {}),
+    'radklim': ('earthlens.radklim', 'RADKLIM', '', {}),
+    'radolan': ('earthlens.radklim', 'RADKLIM', '', {}),
     'solar-wind-atlas': ('earthlens.solar_wind_atlas', 'SolarWindAtlas', '', {}),
     'global-solar-atlas': ('earthlens.solar_wind_atlas', 'SolarWindAtlas', '', {}),
     'global-wind-atlas': ('earthlens.solar_wind_atlas', 'SolarWindAtlas', '', {}),

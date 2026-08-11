@@ -410,6 +410,11 @@ nav:
       - Usage: reference/radar/usage.md
       - Catalog & tooling: reference/radar/catalog.md
       - Reference: reference/radar/radar.md
+    - DWD RADKLIM / RADOLAN:
+      - Introduction: reference/radklim/introduction.md
+      - Usage: reference/radklim/usage.md
+      - Catalog: reference/radklim/catalog.md
+      - Reference: reference/radklim/radklim.md
     - GOES-R ABI (geostationary):
       - Introduction: reference/goes/introduction.md
       - Usage: reference/goes/usage.md
@@ -735,6 +740,8 @@ nav:
       - CONUS granule download (live): examples/goes/conus_granule_download.ipynb
     - NEXRAD radar:
       - Catalog explorer (no network): examples/radar/catalog_explorer.ipynb
+    - DWD RADKLIM / RADOLAN:
+      - Catalog explorer (no network): examples/radklim/catalog_explorer.ipynb
     - USGS Water (NWIS):
       - Quickstart — daily discharge: examples/usgs-water/quickstart_daily_discharge.ipynb
       - Multi-parameter & instantaneous: examples/usgs-water/multi_parameter_and_instantaneous.ipynb

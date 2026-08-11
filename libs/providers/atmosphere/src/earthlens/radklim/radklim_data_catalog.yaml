@@ -1,0 +1,73 @@
+# DWD RADKLIM / RADOLAN gauge-adjusted radar precipitation over Germany.
+#
+# Two streams, four products (keyed by the `dataset=` the facade takes):
+#   * reproc  (RADKLIM) — the climatologically consistent reprocessing, served
+#     as one yearly `{CODE}{version}_{year}_netcdf.tar.gz` archive per year under
+#     the CDC grids tree. Full 2001- archive; use for statistics.
+#   * operational (RADOLAN) — the near-real-time stream, per-timestamp
+#     `raa01-{code}_10000-{YYMMDDHHMM}-dwd---bin.{hdf5|bz2}` granules under the
+#     weather/radar tree, on a rolling ~2-day retention window.
+#
+# earthlens downloads the raw granules (yearly archive / per-timestamp HDF5) and
+# returns their paths; reading them (NetCDF / HDF5 via pyramids) is downstream.
+# Source verified live on opendata.dwd.de, 2026-08-10.
+
+license: CC-BY-4.0/GeoNutzV
+
+grid:
+  id: radolan-polar-stereographic
+  description: >-
+    Fixed DWD RADOLAN polar-stereographic grid over Germany (1 km cells,
+    lat_of_origin 60, central_meridian 10). earthlens ships the native-grid
+    granule; the reader (pyramids) handles the projection.
+
+products:
+  radklim-yw:
+    stream: reproc
+    code: YW
+    cadence: 5-min
+    step_minutes: 5
+    cdc_frequency: 5_minutes
+    version: "2017_002"
+    default_format: nc
+    formats: [nc]
+    data_period: 2001-01-01/
+    description: >-
+      RADKLIM-YW — reprocessed 5-min, 1 km radar precipitation (2001-). The most
+      useful dataset for German sub-hourly extreme rainfall; ~25-yr record (great
+      for structure, short for return periods). One ~13.5 GB yearly archive.
+  radklim-rw:
+    stream: reproc
+    code: RW
+    cadence: hourly
+    step_minutes: 60
+    cdc_frequency: hourly
+    version: "2017_002"
+    default_format: nc
+    formats: [nc]
+    data_period: 2001-01-01/
+    description: >-
+      RADKLIM-RW — reprocessed hourly, 1 km radar precipitation (2001-). One
+      ~836 MB yearly archive per year.
+  radolan-yw:
+    stream: operational
+    code: yw
+    cadence: 5-min
+    step_minutes: 5
+    default_format: hdf5
+    formats: [hdf5, bin]
+    retention_days: 2
+    description: >-
+      RADOLAN-YW — operational 5-min, 1 km radar precipitation, near-real-time on
+      a rolling ~2-day window. Less homogeneous than RADKLIM (no return periods).
+  radolan-rw:
+    stream: operational
+    code: rw
+    cadence: hourly
+    step_minutes: 60
+    default_format: hdf5
+    formats: [hdf5, bin]
+    retention_days: 2
+    description: >-
+      RADOLAN-RW — operational hourly, 1 km radar precipitation, near-real-time on
+      a rolling ~2-day window.
