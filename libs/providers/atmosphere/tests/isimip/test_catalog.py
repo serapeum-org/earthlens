@@ -101,9 +101,9 @@ class TestLookups:
     )
     def test_unknown_key_raises_with_hint(self, getter, key, noun):
         """An unknown forcing / scenario / round raises a did-you-mean ValueError."""
-        cat = Catalog()
+        lookup = getattr(Catalog(), getter)
         with pytest.raises(ValueError, match=f"not a curated ISIMIP {noun}"):
-            getattr(cat, getter)(key)
+            lookup(key)
 
     def test_unknown_variable_raises(self):
         """An unknown variable raises via the base did-you-mean lookup."""
