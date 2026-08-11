@@ -94,6 +94,78 @@ def test_dataset_requires_core_fields():
         Dataset(endpoint="https://x/erddap")
 
 
+def test_emodnet_row_fields(catalog: Catalog):
+    """The EMODnet row carries the live-pinned WCS transport fields."""
+    row = catalog.get("emodnet")
+    assert row.transport == "wcs"
+    assert row.endpoint == "https://ows.emodnet-bathymetry.eu/wcs"
+    assert row.dataset_id == "emodnet:mean"
+    assert row.wcs_version == "1.0.0"
+    assert row.crs == "EPSG:4326"
+    assert row.native_bbox == (-70.5, 11.0, 43.0, 90.0)
+    assert row.variable == "elevation"
+
+
+def test_emodnet_licence_recorded(catalog: Catalog):
+    """The EMODnet row records the required attribution / DOI licence note."""
+    note = catalog.get("emodnet").license_note
+    assert "EMODnet" in note
+    assert "doi:10.12770" in note
+
+
+@pytest.mark.parametrize(
+    "dataset_id, coverage",
+    [
+        ("emodnet_2016", "emodnet:mean_2016"),
+        ("emodnet_2018", "emodnet:mean_2018"),
+        ("emodnet_2020", "emodnet:mean_2020"),
+        ("emodnet_2022", "emodnet:mean_2022"),
+    ],
+)
+def test_emodnet_release_variants(catalog: Catalog, dataset_id: str, coverage: str):
+    """Each year-stamped release resolves to its own colon coverage id."""
+    row = catalog.get(dataset_id)
+    assert row.transport == "wcs"
+    assert row.dataset_id == coverage
+    assert row.wcs_version == "1.0.0"
+
+
+def test_wcs_row_missing_version_rejected():
+    """A wcs row without wcs_version fails validation."""
+    with pytest.raises(ValidationError, match="wcs_version"):
+        Dataset(
+            transport="wcs",
+            endpoint="https://x/wcs",
+            dataset_id="c:mean",
+            variable="elevation",
+            native_bbox=(-1.0, -1.0, 1.0, 1.0),
+        )
+
+
+def test_wcs_row_missing_native_bbox_rejected():
+    """A wcs row without native_bbox fails validation."""
+    with pytest.raises(ValidationError, match="native_bbox"):
+        Dataset(
+            transport="wcs",
+            endpoint="https://x/wcs",
+            dataset_id="c:mean",
+            variable="elevation",
+            wcs_version="1.0.0",
+        )
+
+
+def test_griddap_row_needs_no_wcs_fields():
+    """A griddap row builds without the WCS-only fields (they stay defaulted)."""
+    row = Dataset(
+        transport="erddap-griddap",
+        endpoint="https://x/erddap",
+        dataset_id="A",
+        variable="z",
+    )
+    assert row.wcs_version == ""
+    assert row.native_bbox is None
+
+
 def test_load_from_single_file(tmp_path: Path):
     """The loader accepts a single YAML file, not only a directory."""
     one = tmp_path / "one.yaml"
