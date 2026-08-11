@@ -150,6 +150,7 @@ class TestRegistry:
             "inform",
             "insar",
             "ioos",
+            "isimip",
             "isric",
             "iucn",
             "jaxa",

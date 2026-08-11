@@ -27,6 +27,7 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'cmip6': ('earthlens.cmip6', 'CMIP6', '', {}),
     'pangeo-cmip6': ('earthlens.cmip6', 'CMIP6', '', {}),
     'climate-projections': ('earthlens.cmip6', 'CMIP6', '', {}),
+    'isimip': ('earthlens.isimip', 'ISIMIP', 'isimip', {}),
     'ecmwf': ('earthlens.ecmwf', 'ECMWF', 'ecmwf', {}),
     'goes': ('earthlens.goes', 'GOES', 's3', {}),
     'openaq': ('earthlens.openaq', 'OpenAQ', '', {}),

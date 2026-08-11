@@ -41,6 +41,7 @@ s3 = ["earthlens-core[s3]"]
 ecmwf = ["cdsapi >=0.7.7"]
 ecmwf-modern = ["ecmwf-datastores-client >=0.5.1"]
 cmip6 = []
+isimip = ["isimip-client >=2"]
 nwp = ["herbie-data >=2026.3", "ecmwf-opendata >=0.3", "ecmwflibs; sys_platform == 'win32'"]
 radar = ["earthlens-core[s3]"]
 goes = ["earthlens-core[s3]"]
@@ -64,7 +65,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.catrare*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.nrel*", "earthlens.mswep*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.radklim*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
+include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.catrare*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.isimip*", "earthlens.nrel*", "earthlens.mswep*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.radklim*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -93,6 +94,7 @@ markers = [
     "eea: tests for the EEA (`eea_aq`) air-quality backend (requires the `eea_aq` extra: airbase; European monitor observations via Parquet; public, no auth).",
     "goes: tests for the NOAA GOES-R ABI backend (requires the `goes` extra: boto3; unsigned noaa-goes19/18/16 buckets).",
     "integration: exercises multiple modules together with mocked I/O.",
+    "isimip: tests for the ISIMIP bias-adjusted climate-forcing backend (requires the `isimip` extra: isimip-client; facet search + server-side cutout job on the ISIMIP repository, public/no auth).",
     "nrel: tests for the NREL NSRDB / WIND Toolkit solar-wind time-series backend (keyed REST CSV via core `requests` + `pandas`; no extra SDK; required api_key + email auth).",
     "mswep: tests for the GloH2O MSWEP / MSWX backend (requires the `mswep` extra: google-api-python-client, google-auth; downloads NetCDF granules from the user's approved GloH2O Google-Drive share -- CC-BY-NC, access is a prerequisite).",
     "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",

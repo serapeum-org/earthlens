@@ -1,0 +1,156 @@
+# ISIMIP — bias-adjusted, impact-model-ready climate forcing (CMIP6-derived).
+#
+# This YAML holds the *config* + *curated facet vocabulary* for the ISIMIP backend. ISIMIP is addressed by a
+# *facet set* — `simulation_round`, `climate_forcing` (GCM), `climate_scenario`, `climate_variable`, `time_step`
+# (+ `product`) — which the ISIMIP repository REST API (`data_url`) resolves to the matching per-decade NetCDF
+# granules. Those granules are huge (~1–2 GB each; a whole dataset is ~18 GB global daily), so the backend never
+# pulls them whole: it submits a server-side **cutout job** on the files API (`files_api_url`) that returns the
+# granule cut to the requested bbox.
+#
+# The curated `variables:` / `forcings:` / `scenarios:` / `rounds:` blocks are the validated request vocabulary: the
+# backend checks each requested facet against them and raises a did-you-mean error on an unknown one (G6), so the
+# blocks cover the ISIMIP3b / ISIMIP3a InputData facets. Dataset resolution and the authoritative per-dataset licence
+# still run against the live API.
+
+# The ISIMIP repository REST API (datasets / files search). Public, no auth.
+data_url: https://data.isimip.org/api/v1
+
+# The ISIMIP files API v2 — the async server-side cutout job endpoint (submit bbox -> poll -> download the cut zip).
+files_api_url: https://files.isimip.org/api/v2
+
+# The two request products. `InputData` = the bias-adjusted climate forcing (W5E5); `OutputData` = impact-model
+# results. Most InputData is openly licensed; some OutputData / sectoral inputs are `restricted`.
+products:
+  - InputData
+  - OutputData
+
+# The two temporal resolutions of the bias-adjusted forcing.
+time_steps:
+  - daily
+  - monthly
+
+# --- Curated simulation rounds ------------------------------------------------
+# `default_license` is *documentation only* — the real, authoritative licence is read per-dataset from the live
+# API (`rights.short` / `terms_of_use`), because it varies (ISIMIP3b InputData is CC0 1.0, some OutputData differs).
+rounds:
+  ISIMIP3b:
+    description: >-
+      ISIMIP3b — the CMIP6-derived, bias-adjusted scenario round (GCM x SSP). The pragmatic non-stationary-futures
+      forcing for flood / hydrology impact models.
+    default_license: CC0 1.0 (InputData / W5E5); OutputData varies per dataset
+  ISIMIP3a:
+    description: >-
+      ISIMIP3a — the observation-based round (reanalysis-driven, obsclim / counterclim) for model evaluation and
+      detection-attribution.
+    default_license: CC0 1.0 (InputData / W5E5); OutputData varies per dataset
+
+# --- Curated climate forcings (GCMs for 3b; obs-based reanalyses for 3a) -------
+# Spelled lowercase exactly as the API expects (`climate_forcing`).
+forcings:
+  gfdl-esm4:
+    institution: NOAA-GFDL
+    round: ISIMIP3b
+    description: GFDL-ESM4 CMIP6 model (ISIMIP3b primary GCM).
+  ipsl-cm6a-lr:
+    institution: IPSL
+    round: ISIMIP3b
+    description: IPSL-CM6A-LR CMIP6 model (ISIMIP3b primary GCM).
+  mpi-esm1-2-hr:
+    institution: MPI-M
+    round: ISIMIP3b
+    description: MPI-ESM1-2-HR CMIP6 model (ISIMIP3b primary GCM).
+  mri-esm2-0:
+    institution: MRI
+    round: ISIMIP3b
+    description: MRI-ESM2-0 CMIP6 model (ISIMIP3b primary GCM).
+  ukesm1-0-ll:
+    institution: MOHC
+    round: ISIMIP3b
+    description: UKESM1-0-LL CMIP6 model (ISIMIP3b primary GCM).
+  gswp3-w5e5:
+    institution: ISIMIP
+    round: ISIMIP3a
+    description: GSWP3-W5E5 observational forcing (ISIMIP3a obsclim reference).
+  20crv3:
+    institution: NOAA-CIRES-DOE
+    round: ISIMIP3a
+    description: 20CRv3 reanalysis forcing (ISIMIP3a).
+  20crv3-era5:
+    institution: ISIMIP
+    round: ISIMIP3a
+    description: 20CRv3-ERA5 blended reanalysis forcing (ISIMIP3a).
+  20crv3-w5e5:
+    institution: ISIMIP
+    round: ISIMIP3a
+    description: 20CRv3-W5E5 bias-adjusted reanalysis forcing (ISIMIP3a).
+  chelsa-w5e5:
+    institution: ISIMIP
+    round: ISIMIP3a
+    description: CHELSA-W5E5 high-resolution bias-adjusted forcing (ISIMIP3a).
+
+# --- Curated climate scenarios ------------------------------------------------
+scenarios:
+  historical:
+    round: ISIMIP3b
+    description: All-forcings historical baseline (1850-2014).
+  picontrol:
+    round: ISIMIP3b
+    description: Pre-industrial control forcing.
+  ssp126:
+    round: ISIMIP3b
+    description: SSP1-2.6 — low emissions, ~2 C target.
+  ssp370:
+    round: ISIMIP3b
+    description: SSP3-7.0 — high emissions, weak mitigation.
+  ssp585:
+    round: ISIMIP3b
+    description: SSP5-8.5 — very high emissions, fossil-fuelled growth.
+  obsclim:
+    round: ISIMIP3a
+    description: Observed-climate forcing (ISIMIP3a factual world).
+  counterclim:
+    round: ISIMIP3a
+    description: Counterfactual (no-trend) climate forcing (ISIMIP3a).
+  spinclim:
+    round: ISIMIP3a
+    description: Detrended spin-up forcing preceding the obsclim period (ISIMIP3a).
+  transclim:
+    round: ISIMIP3a
+    description: Transient climate forcing bridging spinclim and obsclim (ISIMIP3a).
+
+# --- Curated climate variables (the `datasets` block) -------------------------
+# Units follow the ISIMIP / CMIP6 CMOR conventions.
+variables:
+  pr:
+    units: kg m-2 s-1
+    long_name: Precipitation (all phases)
+  prsn:
+    units: kg m-2 s-1
+    long_name: Snowfall flux
+  tas:
+    units: K
+    long_name: Near-surface (2 m) air temperature
+  tasmax:
+    units: K
+    long_name: Daily maximum near-surface air temperature
+  tasmin:
+    units: K
+    long_name: Daily minimum near-surface air temperature
+  hurs:
+    units: '%'
+    long_name: Near-surface relative humidity
+  huss:
+    units: '1'
+    long_name: Near-surface specific humidity
+  rsds:
+    units: W m-2
+    long_name: Surface downwelling shortwave radiation
+  rlds:
+    units: W m-2
+    long_name: Surface downwelling longwave radiation
+  ps:
+    units: Pa
+    long_name: Surface air pressure
+  sfcwind:
+    units: m s-1
+    long_name: Near-surface (10 m) wind speed

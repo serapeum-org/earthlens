@@ -459,17 +459,17 @@ class EarthLens:
              'geoboundaries', 'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',
              'global-forest-watch', 'global-solar-atlas', 'global-wind-atlas', 'gloh2o', 'goes', 'google-earth-engine',
              'grdc-caravan', 'gsa', 'gwa', 'hanze', 'hdx', 'himawari',
-             'human-settlement', 'inform', 'insar', 'ioos', 'isric', 'iucn',
-             'jaxa', 'jaxa-earth', 'jrc-flood', 'jrc-flood-hazard', 'landsat', 'mswep',
-             'mswx', 'national-water-model', 'natural-earth', 'nexrad', 'nfhl', 'nfip',
-             'nrel', 'nsi', 'nsrdb', 'nwis', 'nwm', 'nwp',
-             'obis', 'ohsome', 'openaq', 'openeo', 'openstreetmap', 'osm',
-             'overpass', 'overture', 'pangeo-cmip6', 'planetary-computer', 'protected-planet', 'ptree',
-             'pvgis', 'radar', 'radklim', 'radolan', 'redlist', 'rgi',
-             'risk-indicators', 'sensor-community', 'sentinel-hub', 'sentinelhub', 'soilgrids', 'solar-pv',
-             'solar-wind-atlas', 'stac', 'teleconnections', 'thinkhazard', 'tiger', 'tropycal',
-             'usdm', 'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda', 'wdpa',
-             'wgms', 'wind-toolkit', 'world-pop', 'worldpop']
+             'human-settlement', 'inform', 'insar', 'ioos', 'isimip', 'isric',
+             'iucn', 'jaxa', 'jaxa-earth', 'jrc-flood', 'jrc-flood-hazard', 'landsat',
+             'mswep', 'mswx', 'national-water-model', 'natural-earth', 'nexrad', 'nfhl',
+             'nfip', 'nrel', 'nsi', 'nsrdb', 'nwis', 'nwm',
+             'nwp', 'obis', 'ohsome', 'openaq', 'openeo', 'openstreetmap',
+             'osm', 'overpass', 'overture', 'pangeo-cmip6', 'planetary-computer', 'protected-planet',
+             'ptree', 'pvgis', 'radar', 'radklim', 'radolan', 'redlist',
+             'rgi', 'risk-indicators', 'sensor-community', 'sentinel-hub', 'sentinelhub', 'soilgrids',
+             'solar-pv', 'solar-wind-atlas', 'stac', 'teleconnections', 'thinkhazard', 'tiger',
+             'tropycal', 'usdm', 'usgs-landsat', 'usgs-nwis', 'usgs-water', 'veda',
+             'wdpa', 'wgms', 'wind-toolkit', 'world-pop', 'worldpop']
 
             ```
         - Asking for an unknown backend raises `ValueError`:

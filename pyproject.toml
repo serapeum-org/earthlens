@@ -58,6 +58,7 @@ gee = ["earthlens-imagery[gee]"]
 ghsl = ["earthlens-land[ghsl]"]
 goes = ["earthlens-atmosphere[goes]"]
 hdx = ["earthlens-hazards[hdx]"]
+isimip = ["earthlens-atmosphere[isimip]"]
 jaxa = ["earthlens-imagery[jaxa]"]
 mswep = ["earthlens-atmosphere[mswep]"]
 nwm = ["earthlens-ocean[nwm]"]
@@ -98,6 +99,7 @@ all = [
     "earthlens[ghsl]",
     "earthlens[goes]",
     "earthlens[hdx]",
+    "earthlens[isimip]",
     "earthlens[jaxa]",
     "earthlens[mswep]",
     "earthlens[nwm]",
@@ -390,6 +392,7 @@ markers = [
     "mswep: tests for the GloH2O MSWEP / MSWX backend (requires the `mswep` extra).",
     "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
     "cmip6: tests for the CMIP6 backend (raw archive on the open Pangeo gs://cmip6 bucket; anonymous, no extra SDK; reads via pyramids).",
+    "isimip: tests for the ISIMIP bias-adjusted climate-forcing backend (requires the `isimip` extra: isimip-client; facet search + server-side cutout job on the ISIMIP repository, public/no auth).",
     "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
     "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
     "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
