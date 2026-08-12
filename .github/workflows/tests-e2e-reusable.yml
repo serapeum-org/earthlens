@@ -49,8 +49,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Per-theme lane table. Each dedicated row: name | path-regex |
-          # marker | install-groups. The catch-all runs the rest of the theme.
+          # Per-theme lane table. Each dedicated row is a JSON object
+          # (name/path/marker/groups) parsed by jq below; the catch-all runs
+          # the rest of the theme. Assumption: a dedicated backend's code and
+          # tests live under `(src/earthlens|tests)/<backend>/` - a flat
+          # `tests/test_<backend>.py` would miss the dedicated lane's path_re.
           case "$THEME" in
           atmosphere)
             providers=(
@@ -111,7 +114,7 @@ jobs:
           # Any change to core, the lockfile, a manifest, or an e2e workflow
           # file forces every lane in the theme to run.
           global_shared_re='^(libs/core/|uv\.lock|pyproject\.toml|\.github/workflows/tests-e2e-)'
-          theme_shared_re="^libs/providers/$THEME/(src/earthlens/_$THEME/|conftest\.py|tests/conftest\.py|pyproject\.toml)"
+          theme_shared_re="^libs/providers/$THEME/(src/earthlens/_$THEME/|tests/conftest\.py|pyproject\.toml)"
 
           run_all=0
           if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
