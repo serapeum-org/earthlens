@@ -26,7 +26,7 @@ import pandas as pd
 import requests
 from loguru import logger
 
-from earthlens.base.http import HttpClient
+from earthlens.base.http import HttpClient, Timeout
 
 #: Live JSON API: the last ~5 minutes of every sensor, globally.
 LIVE_URL = "https://data.sensor.community/static/v2/data.json"
@@ -76,7 +76,7 @@ class SensorCommunityClient:
         max_retries: Maximum number of `429` retries before raising.
         backoff_factor: Base seconds for exponential back-off when no
             `Retry-After` header is present (wait = factor * 2**attempt).
-        timeout: Per-request timeout in seconds.
+        timeout: Per-request timeout in seconds — a float or a `(connect, read)` pair.
     """
 
     def __init__(
@@ -85,7 +85,7 @@ class SensorCommunityClient:
         session: requests.Session | None = None,
         max_retries: int = 3,
         backoff_factor: float = 1.0,
-        timeout: float = 60.0,
+        timeout: Timeout = 60.0,
         sleep: Callable[[float], None] = time.sleep,
     ) -> None:
         """Build a client over both Sensor.Community hosts.
@@ -95,7 +95,8 @@ class SensorCommunityClient:
                 fresh session. Injectable so tests supply a fake transport.
             max_retries: Maximum `429` retries before raising.
             backoff_factor: Base seconds for exponential back-off.
-            timeout: Per-request timeout in seconds.
+            timeout: Per-request timeout in seconds — a float or a
+                `(connect, read)` pair.
             sleep: The sleep function used between retries. Defaults to
                 `time.sleep`; injectable so tests run without real delays.
         """
@@ -120,8 +121,8 @@ class SensorCommunityClient:
         return self._http.backoff_factor
 
     @property
-    def timeout(self) -> float:
-        """Per-request timeout in seconds."""
+    def timeout(self) -> Timeout:
+        """Per-request timeout in seconds (a float or a `(connect, read)` pair)."""
         return self._http.timeout
 
     def live_snapshot(self) -> list[dict[str, Any]]:

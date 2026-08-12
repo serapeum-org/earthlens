@@ -127,6 +127,33 @@ class TestDownloadAndUnzip:
                 url, tmp_path / "dl", session=session, retries=2, backoff=0.0
             )
 
+    def test_default_split_connect_read_timeout(
+        self, tmp_path, fake_session, make_response
+    ):
+        """The default download passes the split (connect, read) tuple to get."""
+        tif = make_tiny_tif(tmp_path / "src.tif", epsg=4326)
+        zpath = zip_with_tif(tif, tmp_path / "GHS_POP_t_V1_0.zip")
+        payload = zpath.read_bytes()
+        zpath.unlink()
+        url = "https://x/GHS_POP_t_V1_0.zip"
+        session = fake_session({url: make_response(content=payload)})
+        download_and_unzip(url, tmp_path / "dl", session=session)
+        assert session.calls[-1]["timeout"] == _helpers._DOWNLOAD_TIMEOUT
+
+
+@pytest.mark.ghsl
+class TestTimeoutConstants:
+    """The split (connect, read) timeout constants (issue #932)."""
+
+    @pytest.mark.parametrize(
+        "pair", [_helpers._DOWNLOAD_TIMEOUT, _helpers._LISTING_TIMEOUT]
+    )
+    def test_connect_budget_is_shorter_than_read(self, pair):
+        """Each timeout is a (connect, read) pair with a shorter connect budget."""
+        connect, read = pair
+        assert connect == _helpers._CONNECT_TIMEOUT
+        assert connect < read
+
 
 @pytest.mark.ghsl
 class TestRemoteListing:
@@ -145,6 +172,13 @@ class TestRemoteListing:
         names = list_remote_dir(url, session=session)
         assert "V1-0/" in names and "copyright.txt" in names
         assert not any(n.startswith("?") or n.startswith("/") for n in names)
+
+    def test_list_remote_dir_uses_split_timeout(self, fake_session, make_response):
+        """A directory listing passes the split (connect, read) listing tuple."""
+        url = "https://x/fam"
+        session = fake_session({url + "/": make_response(text=self._HTML)})
+        list_remote_dir(url, session=session)
+        assert session.calls[-1]["timeout"] == _helpers._LISTING_TIMEOUT
 
     def test_latest_version_dir(self, fake_session, make_response):
         """The highest V{maj}-{min} directory is returned."""
@@ -173,6 +207,18 @@ class TestRemoteListing:
         names = {p.name for p in out}
         assert names == {"duc.csv", "readme.txt"}
         assert (tmp_path / "ex" / "duc.csv").exists()
+
+    def test_download_and_extract_uses_split_timeout(
+        self, tmp_path, fake_session, make_response
+    ):
+        """The tabular extract path passes the split (connect, read) tuple."""
+        zpath = tmp_path / "table_V2_0.zip"
+        with zipfile.ZipFile(zpath, "w") as archive:
+            archive.writestr("duc.csv", b"a,b\n1,2\n")
+        url = "https://x/table_V2_0.zip"
+        session = fake_session({url: make_response(content=zpath.read_bytes())})
+        download_and_extract(url, tmp_path / "ex", session=session)
+        assert session.calls[-1]["timeout"] == _helpers._DOWNLOAD_TIMEOUT
 
 
 @pytest.mark.ghsl

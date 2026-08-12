@@ -37,6 +37,7 @@ from earthlens.base.http import (
     HttpClient,
     HttpRangeFile,
     RangeReadError,
+    Timeout,
     redact_url,
 )
 from earthlens.base.leaves import FluxableLeaf
@@ -96,6 +97,7 @@ __all__ = [
     "SpatialExtent",
     "split_time",
     "TemporalExtent",
+    "Timeout",
     "to_datetime",
     "warn_if_egress",
     "WHOLE_WINDOW",

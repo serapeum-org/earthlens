@@ -303,6 +303,14 @@ class TestSharedHelpersAreNotReimplemented:
 
         assert callable(close_quietly)
 
+    def test_timeout_is_exported(self):
+        """The public timeout alias is re-exported from the base package."""
+        from earthlens.base import Timeout, __all__
+        from earthlens.base.http import Timeout as HttpTimeout
+
+        assert Timeout is HttpTimeout
+        assert "Timeout" in __all__
+
 
 class TestCatalogParseCacheIsBounded:
     """Every backend's parse cache evicts superseded generations."""
