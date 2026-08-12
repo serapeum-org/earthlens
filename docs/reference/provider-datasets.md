@@ -71,7 +71,7 @@ or station — not a dataset id), noted as such.
 | `worldpop` | WorldPop — population counts, age/sex, density, births/pregnancies, projections, + 54 covariate layers | `pop`, `age_structures`, `pop_density`, `cviirs` | 11 families + 54 covariates |
 | `soilgrids` | ISRIC SoilGrids 2.0 soil properties (250 m, WCS) × 6 depths × 5 quantiles | `clay`, `phh2o`, `soc`, `bdod` | 11 properties |
 | `dem` | Copernicus DEM global land elevation — COG tiles on AWS | `cop-dem-glo-30`, `cop-dem-glo-90` | 2 |
-| `bathymetry` | Global topography/bathymetry DEMs (NOAA ERDDAP) — GEBCO, ETOPO1 | `gebco_2020`, `etopo1_ice`, `etopo1_bedrock` | 3 |
+| `bathymetry` | Global topography/bathymetry DEMs (NOAA ERDDAP GEBCO/ETOPO1) + EMODnet European high-res DTM (OGC WCS) | `gebco_2020`, `etopo1_ice`, `etopo1_bedrock`, `emodnet` (+ `_2016`/`_2018`/`_2020`/`_2022`) | 8 |
 | `glaciers` | Glacier outlines + mass balance — RGI 7.0, GLIMS, WGMS FoG | `rgi:outlines`, `glims:outlines`, `wgms:mass_balance` | 5 |
 | `gbif` | GBIF species occurrences by taxon + bbox + time | `animals`, `plants`, `birds`, `mammals` (or `taxon:<name>`) | *(query service)* |
 | `wdpa` | Protected Planet (WDPA) protected-area polygons by country | `KEN`, `BRA`, `IDN` (ISO3, or a WDPA id) | *(query service)* |

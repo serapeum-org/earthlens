@@ -2,18 +2,23 @@
 
 `Bathymetry` is a download-and-localise raster backend (`OUTPUT_KIND="raster"`).
 A `dataset=<id>` selects a curated :class:`~earthlens.bathymetry.catalog.Dataset`
-row (an ERDDAP `griddap` endpoint + coverage id + elevation band); `download()`
-subsets that global DEM to the request bbox, writes the NetCDF, reads it back
-with `pyramids.netcdf.NetCDF`, and writes a GeoTIFF — returning the list of
-written GeoTIFF paths.
+row and `download()` subsets that DEM to the request bbox, returning the list of
+written GeoTIFF paths. Two transports ship, chosen per row: an ERDDAP `griddap`
+endpoint (GEBCO / ETOPO — subset to a NetCDF read back with
+`pyramids.netcdf.NetCDF`) and an OGC WCS endpoint (EMODnet Bathymetry — read
+through `pyramids.Dataset.from_wcs`). Either path writes a GeoTIFF.
 
 Every shipped DEM is static (no time axis), so the facade-forwarded
-`aggregate=` is rejected: there is no temporal field to reduce. The NetCDF is
+`aggregate=` is rejected: there is no temporal field to reduce. The grid is
 read **only** through pyramids — earthlens never imports a competing array
-stack to touch the NetCDF. An
-out-of-coverage / oversize request surfaces as a clear `ValueError` (a raster
-has no "zero pixels" — and ERDDAP caps response size), never a bare HTTP error
-or a corrupt file.
+stack to touch it. On the griddap path an out-of-coverage / oversize request
+surfaces as a clear `ValueError` (ERDDAP rejects it or returns an HTML error
+body, never data), so the user never sees a bare HTTP error or a corrupt file.
+The WCS path instead guards the request bbox against the coverage's
+`native_bbox` (:meth:`Bathymetry._guard_wcs_domain`) — a fully out-of-coverage
+AOI raises, a partial overlap is allowed through with a warning (its
+out-of-coverage cells come back as `0.0` fill) — because the WCS server returns
+a zero-filled grid, not an error, outside coverage.
 
 The DEMs are public, so there is no auth module.
 """
@@ -57,11 +62,11 @@ _LARGE_PIXEL_THRESHOLD = 250_000_000
 class Bathymetry(AbstractDataSource):
     """Global topography / bathymetry DEM backend (raster GeoTIFF output).
 
-    Fetches a curated static DEM (GEBCO 2020, ETOPO1 ice / bedrock) subset to
-    the request bbox through one uniform ERDDAP `griddap` transport, written
-    as GeoTIFF. The request is a search/fetch split: :meth:`_search` names the
-    single resolved product and :meth:`_fetch` realises it (download → pyramids
-    → GeoTIFF).
+    Fetches a curated static DEM (GEBCO 2020, ETOPO1 ice / bedrock via ERDDAP
+    `griddap`; EMODnet Bathymetry via OGC WCS) subset to the request bbox and
+    written as GeoTIFF. The request is a search/fetch split: :meth:`_search`
+    names the single resolved product and :meth:`_fetch` realises it (download
+    → pyramids → GeoTIFF), dispatching on the row's `transport`.
 
     Attributes:
         OUTPUT_KIND: Fixed `"raster"`; every DEM yields a gridded GeoTIFF.
@@ -121,8 +126,11 @@ class Bathymetry(AbstractDataSource):
             end: Accepted for facade parity; ignored.
             lat_lim: `[lat_min, lat_max]` bounding-box latitudes. Required.
             lon_lim: `[lon_min, lon_max]` bounding-box longitudes. Required.
-            dataset: The curated DEM id to fetch (`"gebco_2020"`,
-                `"etopo1_ice"`, `"etopo1_bedrock"`). Required.
+            dataset: The curated DEM id to fetch — a global ERDDAP DEM
+                (`"gebco_2020"`, `"etopo1_ice"`, `"etopo1_bedrock"`) or an
+                EMODnet Bathymetry WCS row (`"emodnet"` for the latest release,
+                or a year-stamped `"emodnet_2022"` / `"_2020"` / `"_2018"` /
+                `"_2016"`). Required.
             variables: Optional band name(s); defaults to the row's single
                 elevation band. A name other than that band raises with a
                 did-you-mean.
@@ -239,11 +247,11 @@ class Bathymetry(AbstractDataSource):
         return [self._fetch_one_dem(product) for product in products]
 
     def _fetch_one_dem(self, product: RemoteProduct) -> Path:
-        """Subset one DEM to NetCDF, then write a GeoTIFF via pyramids.
+        """Subset one DEM to a GeoTIFF via the row's transport.
 
-        Builds the griddap subset URL, GETs the NetCDF (validating the magic
-        bytes), then `pyramids.netcdf.NetCDF` reads it and writes the
-        elevation band to GeoTIFF.
+        Dispatches on the resolved row's `transport`: `"wcs"` rows are read
+        over OGC WCS through pyramids `Dataset.from_wcs` (:meth:`_fetch_wcs`),
+        every other row over ERDDAP `griddap` (:meth:`_fetch_griddap`).
 
         Args:
             product: The `RemoteProduct` whose `metadata["dataset"]` is the
@@ -253,21 +261,150 @@ class Bathymetry(AbstractDataSource):
             Path: The written GeoTIFF at `<root_dir>/<id>.tif`.
 
         Raises:
-            ValueError: When the server rejects the request or returns a
-                non-NetCDF body (out-of-coverage / oversize bbox).
+            ValueError: When the server rejects the request, returns a
+                non-NetCDF body, or the request falls outside a WCS row's
+                coverage (out-of-coverage / oversize bbox).
         """
         row: Dataset = product.metadata["dataset"]
         bbox = bbox_from_extent(self.space)
+        tif_path = self.root_dir / f"{row.id}.tif"
+        if row.transport == "wcs":
+            self._fetch_wcs(row, bbox, tif_path)
+        else:
+            self._fetch_griddap(row, bbox, tif_path)
+        return tif_path
+
+    def _fetch_griddap(
+        self, row: Dataset, bbox: tuple[float, float, float, float], tif_path: Path
+    ) -> None:
+        """Subset an ERDDAP `griddap` DEM to NetCDF, then write a GeoTIFF.
+
+        Builds the griddap subset URL, GETs the NetCDF (validating the magic
+        bytes), then `pyramids.netcdf.NetCDF` reads it and writes the
+        elevation band to GeoTIFF.
+
+        Args:
+            row: The resolved `griddap` catalog row.
+            bbox: `(west, south, east, north)` of the request in degrees.
+            tif_path: Destination GeoTIFF path.
+
+        Raises:
+            ValueError: When the server rejects the request or returns a
+                non-NetCDF body (out-of-coverage / oversize bbox).
+        """
         self._log_estimated_size(row, bbox)
         url = griddap_subset_url(
             row.endpoint, row.dataset_id, row.variable, bbox, row.lon_convention
         )
         nc_path = self.root_dir / f"{row.id}.nc"
-        tif_path = self.root_dir / f"{row.id}.tif"
         logger.info(f"bathymetry {row.id}: GET {url}")
         self._download(url, row, nc_path)
         self._to_geotiff(nc_path, row.variable, tif_path)
-        return tif_path
+
+    def _fetch_wcs(
+        self, row: Dataset, bbox: tuple[float, float, float, float], tif_path: Path
+    ) -> None:
+        """Read a WCS-transport DEM through pyramids `from_wcs`, write a GeoTIFF.
+
+        Guards the request against the coverage's advertised extent first (a
+        WCS server returns an all-zeros grid, not an error, outside coverage),
+        then delegates the `GetCoverage` request, subset, and read entirely to
+        `pyramids.Dataset.from_wcs` — earthlens supplies only the coverage id,
+        AOI bbox, CRS, and protocol version. A polygon `aoi=` is applied with
+        the shared `mask_to_geometry` (a no-op without one), matching the
+        griddap path.
+
+        Args:
+            row: The resolved `wcs` catalog row.
+            bbox: `(west, south, east, north)` of the request in `row.crs`.
+            tif_path: Destination GeoTIFF path.
+
+        Raises:
+            ValueError: When the bbox is outside the coverage extent, or the
+                WCS request / read fails.
+        """
+        from pyramids.dataset import Dataset as PyramidsDataset
+
+        self._guard_wcs_domain(row, bbox)
+        self._log_estimated_size(row, bbox)
+        logger.info(
+            f"bathymetry {row.id}: WCS GetCoverage {row.endpoint} "
+            f"coverage={row.dataset_id} bbox={bbox}"
+        )
+        try:
+            dataset = PyramidsDataset.from_wcs(
+                row.endpoint,
+                coverage=row.dataset_id,
+                bbox=bbox,
+                crs=row.crs,
+                version=row.wcs_version or None,
+                timeout=self._timeout,
+            )
+        except Exception as exc:
+            raise ValueError(
+                f"bathymetry WCS request for {row.id!r} failed over "
+                f"{self._extent_label()}: {exc}. The bbox may be outside the "
+                f"coverage or too large for the server (shrink it), or the WCS "
+                f"service may be unavailable."
+            ) from exc
+        dataset = mask_to_geometry(dataset, self.space)
+        dataset.to_file(str(tif_path))
+
+    def _guard_wcs_domain(
+        self, row: Dataset, bbox: tuple[float, float, float, float]
+    ) -> None:
+        """Reject or warn about a WCS request that leaves the coverage extent.
+
+        The EMODnet WCS server returns a zero-filled grid (not an error) for an
+        AOI outside its coverage. A **fully disjoint** bbox is turned into a
+        clear error pointing at the global DEMs; a bbox that only **partially**
+        overlaps the coverage is allowed through (the in-coverage cells are
+        real) but logs a warning, because its out-of-coverage cells come back as
+        `0.0` (sea-level) fill indistinguishable from a genuine 0 m reading.
+
+        The numeric comparison assumes the request bbox and `native_bbox` share
+        `EPSG:4326` lon/lat degrees (true for every shipped row); a future row
+        in a projected CRS is skipped rather than mis-guarded on mixed units.
+
+        Args:
+            row: The resolved `wcs` catalog row (carries `native_bbox`).
+            bbox: `(west, south, east, north)` of the request in `row.crs`.
+
+        Raises:
+            ValueError: If the request bbox does not intersect `native_bbox`.
+        """
+        extent = row.native_bbox
+        if extent is None:
+            return
+        if row.crs != "EPSG:4326":
+            # native_bbox and the request bbox are only comparable in lon/lat
+            # degrees; skip the numeric guard for any other CRS.
+            return
+        west, south, east, north = bbox
+        ext_west, ext_south, ext_east, ext_north = extent
+        disjoint = (
+            east <= ext_west
+            or west >= ext_east
+            or north <= ext_south
+            or south >= ext_north
+        )
+        if disjoint:
+            raise ValueError(
+                f"request bbox {bbox} is outside the {row.id!r} coverage extent "
+                f"{extent} (European seas / NE Atlantic). Use a global DEM "
+                f"(dataset='gebco_2020' or 'etopo1_ice') for this area."
+            )
+        outside = (
+            west < ext_west or east > ext_east or south < ext_south or north > ext_north
+        )
+        if outside:
+            logger.warning(
+                f"bathymetry {row.id}: request bbox {bbox} extends beyond the "
+                f"coverage extent {extent}; cells outside the coverage return as "
+                f"0.0 (sea-level) fill, not real depths. Shrink the bbox to the "
+                f"coverage, or use a global DEM (gebco_2020 / etopo1_ice) for the "
+                f"out-of-domain area."
+            )
 
     def _client(self) -> HttpClient:
         """Return this instance's HTTP client, built once.

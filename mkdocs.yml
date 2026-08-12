@@ -644,6 +644,8 @@ nav:
       - GEBCO vs ETOPO1 resolution (live): examples/bathymetry/04_gebco_vs_etopo_resolution.ipynb
       - Shaded relief (live): examples/bathymetry/05_shaded_relief.ipynb
       - Depth distribution (live): examples/bathymetry/06_depth_histogram.ipynb
+      - EMODnet European DTM — OGC WCS (live): examples/bathymetry/07_emodnet_european_bathymetry.ipynb
+      - EMODnet WCS deep dive — transport, releases, domain guard (live): examples/bathymetry/08_emodnet_wcs_deep_dive.ipynb
     - Copernicus DEM (global land elevation):
       - DEM quickstart (live): examples/dem/01_dem_quickstart.ipynb
       - Catalog & tile math (no network): examples/dem/02_catalog_and_tile_math.ipynb
