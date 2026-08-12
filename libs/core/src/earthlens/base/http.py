@@ -1047,7 +1047,7 @@ class HttpRangeFile(io.RawIOBase):
         *,
         client: HttpClient | None = None,
         size: int | None = None,
-        timeout: float | None = None,
+        timeout: Timeout | None = None,
     ) -> None:
         """Open the remote object and resolve its length.
 
@@ -1061,8 +1061,10 @@ class HttpRangeFile(io.RawIOBase):
             size: Total object size when the caller already knows it (e.g.
                 from a catalog row). Skips the size probe entirely — one
                 fewer round trip.
-            timeout: Per-request timeout override in seconds, applied to
-                the size probe and every read.
+            timeout: Per-request timeout override in seconds — a single float
+                or a `(connect, read)` pair — applied to the size probe and
+                every read. The pair fails a dead host on the short connect
+                budget without shortening the read budget a range read needs.
 
         Raises:
             ValueError: When the object's size cannot be determined —
