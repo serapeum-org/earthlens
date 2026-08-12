@@ -97,7 +97,8 @@ def test_polygon_aoi_masks_before_write(tmp_path: Path, fake_from_wcs: dict):
     Bathymetry(dataset="emodnet", aoi=wkt, path=tmp_path).download()
     masked = fake_from_wcs.get("masked")
     assert masked is not None, "crop(mask=) should be applied for a polygon aoi"
-    assert masked["mask"] is not None and masked["touch"] is True
+    assert masked["mask"] is not None, "a polygon mask must be passed to crop()"
+    assert masked["touch"] is True, "touch=True should be forwarded to crop()"
 
 
 def test_out_of_domain_raises_before_request(tmp_path: Path, fake_from_wcs: dict):
@@ -196,8 +197,9 @@ def test_from_wcs_failure_is_wrapped(tmp_path: Path, monkeypatch: pytest.MonkeyP
         raise RuntimeError("server exploded")
 
     monkeypatch.setattr(pyramids_dataset.Dataset, "from_wcs", staticmethod(_boom))
+    backend = _make("emodnet", tmp_path)
     with pytest.raises(ValueError, match="WCS request for 'emodnet'"):
-        _make("emodnet", tmp_path).download()
+        backend.download()
 
 
 def test_griddap_row_never_calls_from_wcs(

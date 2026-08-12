@@ -72,7 +72,8 @@ class TestEmodnetLiveFetch:
         ).download(progress_bar=False)
 
         assert len(paths) == 1, f"expected one GeoTIFF, got {paths}"
-        assert paths[0].suffix == ".tif" and paths[0].exists()
+        assert paths[0].suffix == ".tif", f"expected a .tif, got {paths[0]}"
+        assert paths[0].exists(), f"the GeoTIFF was not written: {paths[0]}"
         low, high = _elevation_stats(paths[0])
         assert -11000 < low <= high < 100, f"implausible depths: {low}..{high}"
         assert low < 0, "a North Sea AOI must carry sub-sea-level depths"
