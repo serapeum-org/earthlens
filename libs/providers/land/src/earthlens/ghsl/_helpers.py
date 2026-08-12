@@ -39,14 +39,17 @@ from earthlens.ghsl.catalog import RES_TO_TOKEN, native_source_crs
 #: Root of the JRC open-data GHSL file tree (anonymous HTTPS, no auth).
 BASE_URL: str = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL"
 
-#: Connect-phase timeout (seconds) for every GHSL request. Kept short so a JRC
-#: host that never completes the TCP handshake — an upstream outage, or egress
-#: blocked from a CI runner — fails in seconds rather than burning the full read
-#: budget on a connection that will never open. Retrying a connect that times
-#: out rarely turns into success, so three attempts of a 120 s connect wait
-#: previously spent ~6 minutes per file waiting on a dead host (issue #932).
-#: 9.15 s follows the `requests` timeout guidance of a value slightly larger
-#: than a multiple of the 3 s TCP packet-retransmission window (3 x 3.05).
+#: Connect-phase timeout (seconds) for every GHSL request. Kept short so each
+#: attempt at a JRC host that never completes the TCP handshake — an upstream
+#: outage, or egress blocked from a CI runner — fails in seconds rather than
+#: burning the full read budget on a connection that will never open. The
+#: `_download` retry loop still makes its usual attempts (a shorter connect
+#: budget does not turn a dead host into a live one), so a dead host costs
+#: ~3 attempts x 9.15 s plus back-off — tens of seconds per file, versus the
+#: ~6 minutes the old 120 s connect budget spent on the same three attempts
+#: (issue #932). 9.15 s follows the `requests` timeout guidance of a value
+#: slightly larger than a multiple of the 3 s TCP packet-retransmission window
+#: (3 x 3.05).
 _CONNECT_TIMEOUT: float = 9.15
 
 #: Read-phase timeout (seconds) for a GHSL file download. Generous on purpose: a
