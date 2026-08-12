@@ -65,7 +65,7 @@ class OpenaqClient:
             response's error is raised.
         backoff_factor: Base seconds for exponential back-off when no
             `Retry-After` header is present (wait = factor * 2**attempt).
-        timeout: Per-request timeout in seconds.
+        timeout: Per-request timeout in seconds — a float or a `(connect, read)` pair.
     """
 
     def __init__(
@@ -75,7 +75,7 @@ class OpenaqClient:
         session: requests.Session | None = None,
         max_retries: int = 5,
         backoff_factor: float = 1.0,
-        timeout: float = 60.0,
+        timeout: Timeout = 60.0,
         sleep: Callable[[float], None] = time.sleep,
     ) -> None:
         """Build a client bound to one API key.
@@ -88,7 +88,7 @@ class OpenaqClient:
             max_retries: Maximum `429` retries before raising.
             backoff_factor: Base seconds for exponential back-off when
                 the response carries no `Retry-After` header.
-            timeout: Per-request timeout in seconds.
+            timeout: Per-request timeout in seconds — a float or a `(connect, read)` pair.
             sleep: The sleep function used between retries. Defaults to
                 :func:`time.sleep`; injectable so tests run without
                 real delays.
