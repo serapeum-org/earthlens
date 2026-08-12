@@ -156,7 +156,8 @@ class TestEodcSearchFetch:
         paths = stac.download(aggregate=AggregationConfig(freq="1MS", op="mean"))
         assert paths, "expected at least one per-window COG"
         for path in paths:
-            assert "/" not in path.name and path.name.startswith("eodc_gfm_")
+            assert "/" not in path.name
+            assert path.name.startswith("eodc_gfm_")
             assert path.parent == Path(stac.root_dir)
 
 
