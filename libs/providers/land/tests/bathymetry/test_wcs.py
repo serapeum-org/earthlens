@@ -73,6 +73,7 @@ def test_emodnet_download_calls_from_wcs_and_writes(
     assert call["bbox"] == (2.0, 53.0, 4.0, 55.0)
     assert call["crs"] == "EPSG:4326"
     assert call["version"] == "1.0.0"
+    assert call["timeout"] == 120.0
     assert result == [tmp_path.absolute() / "emodnet.tif"]
     assert result[0].exists()
 
