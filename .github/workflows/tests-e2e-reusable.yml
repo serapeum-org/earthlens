@@ -200,6 +200,7 @@ jobs:
         # theme's package so a marker cannot pull in another theme's suite.
         # Exit code 5 (no tests collected for the changed area) is treated as a
         # pass; --locked fails rather than silently re-resolving on lock drift.
+        # Values reach bash via env, never interpolated into the run: script.
         env:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
@@ -216,14 +217,17 @@ jobs:
           SENTINELHUB_CLIENT_SECRET: ${{ secrets.SENTINELHUB_CLIENT_SECRET }}
           IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
           WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
+          THEME: ${{ inputs.theme }}
+          MARKER: ${{ matrix.marker }}
+          DESELECT: ${{ matrix.deselect }}
+          ALLOW_EMPTY: ${{ matrix.allow_empty }}
         run: |
-          pkg="libs/providers/${{ inputs.theme }}"
+          pkg="libs/providers/$THEME"
           set +e
-          if [ -n "${{ matrix.deselect }}" ]; then
-            uv run --locked pytest "$pkg" -m "${{ matrix.marker }}" \
-              --deselect "${{ matrix.deselect }}" -v
+          if [ -n "$DESELECT" ]; then
+            uv run --locked pytest "$pkg" -m "$MARKER" --deselect "$DESELECT" -v
           else
-            uv run --locked pytest "$pkg" -m "${{ matrix.marker }}" -v
+            uv run --locked pytest "$pkg" -m "$MARKER" -v
           fi
           code=$?
           set -e
@@ -231,7 +235,7 @@ jobs:
           # lane (allow_empty), whose selected area may hold no e2e tests. A
           # dedicated lane is scheduled because its own backend changed, so
           # collecting nothing there means the marker drifted - fail it.
-          if [ "$code" -eq 5 ] && [ "${{ matrix.allow_empty }}" = "true" ]; then
+          if [ "$code" -eq 5 ] && [ "$ALLOW_EMPTY" = "true" ]; then
             echo "no e2e tests collected for the changed area; treating as pass"
             exit 0
           fi
