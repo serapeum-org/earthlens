@@ -26,7 +26,7 @@ import pandas as pd
 import requests
 from loguru import logger
 
-from earthlens.base.http import HttpClient
+from earthlens.base.http import HttpClient, Timeout
 
 #: Live JSON API: the last ~5 minutes of every sensor, globally.
 LIVE_URL = "https://data.sensor.community/static/v2/data.json"
@@ -120,8 +120,8 @@ class SensorCommunityClient:
         return self._http.backoff_factor
 
     @property
-    def timeout(self) -> float:
-        """Per-request timeout in seconds."""
+    def timeout(self) -> Timeout:
+        """Per-request timeout in seconds (a float or a `(connect, read)` pair)."""
         return self._http.timeout
 
     def live_snapshot(self) -> list[dict[str, Any]]:

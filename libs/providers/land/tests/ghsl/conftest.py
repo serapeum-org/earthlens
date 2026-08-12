@@ -85,10 +85,12 @@ class FakeSession:
     def __init__(self, routes: dict[str, _FakeResponse] | None = None):
         self.routes: dict[str, _FakeResponse] = routes or {}
         self.requested: list[str] = []
+        self.calls: list[dict[str, Any]] = []
 
     def get(self, url: str, **kwargs: Any):
         """Return the canned response for `url` (404 when unrouted)."""
         self.requested.append(url)
+        self.calls.append(kwargs)
         return self.routes.get(url, _FakeResponse(status=404))
 
     def close(self) -> None:

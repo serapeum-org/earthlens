@@ -47,8 +47,15 @@ import requests
 from loguru import logger
 from tqdm import tqdm
 
+#: A `requests`-style timeout: either a single float applied to both the
+#: connect and read phases, or a `(connect, read)` pair that bounds them
+#: separately. A short connect budget fails a dead or blocked host in seconds
+#: — a TCP handshake that will never complete is not worth the read budget —
+#: while a long read budget still lets a large transfer run to completion.
+Timeout = float | tuple[float, float]
+
 #: Per-request timeout (seconds) applied when a call passes no `timeout`.
-DEFAULT_TIMEOUT = 60.0
+DEFAULT_TIMEOUT: Timeout = 60.0
 
 #: Maximum retries for a retryable status before the last response's
 #: error is raised.
@@ -418,7 +425,7 @@ class HttpClient:
         session: requests.Session | None = None,
         user_agent: str | None = None,
         headers: dict[str, str] | None = None,
-        timeout: float = DEFAULT_TIMEOUT,
+        timeout: Timeout = DEFAULT_TIMEOUT,
         max_retries: int = DEFAULT_MAX_RETRIES,
         backoff_factor: float = DEFAULT_BACKOFF_FACTOR,
         status_forcelist: tuple[int, ...] = DEFAULT_STATUS_FORCELIST,
@@ -442,7 +449,10 @@ class HttpClient:
             headers: Extra default headers merged onto every request
                 (e.g. `{"X-API-Key": ...}`). Override per call with a
                 request-level `headers=`.
-            timeout: Per-request timeout in seconds.
+            timeout: Per-request timeout in seconds — a single float bounds
+                both the connect and read phases, or pass a `(connect, read)`
+                pair to bound them separately (a short connect budget fails a
+                dead host fast without shortening the read budget).
             max_retries: Maximum retries on a retryable status before the
                 last response's error is raised.
             backoff_factor: Base seconds for exponential back-off when a
@@ -519,7 +529,7 @@ class HttpClient:
         url: str,
         *,
         headers: dict[str, str] | None = None,
-        timeout: float | None = None,
+        timeout: Timeout | None = None,
         raise_for_status: bool | None = None,
         **kwargs: Any,
     ) -> requests.Response:
@@ -529,8 +539,9 @@ class HttpClient:
             method: HTTP verb (`"GET"`, `"POST"`, ...).
             url: Absolute request URL.
             headers: Per-request headers merged over the client defaults.
-            timeout: Per-request timeout override (seconds). Defaults to
-                the client's `timeout`.
+            timeout: Per-request timeout override (seconds), as a single
+                float or a `(connect, read)` pair. Defaults to the client's
+                `timeout`.
             raise_for_status: Per-request override of the client's
                 `raise_for_status` policy. `None` (default) uses the
                 client setting.
@@ -648,7 +659,7 @@ class HttpClient:
         atomic: bool = True,
         expect_magic: bytes | tuple[bytes, ...] | None = None,
         headers: dict[str, str] | None = None,
-        timeout: float | None = None,
+        timeout: Timeout | None = None,
         **kwargs: Any,
     ) -> Path:
         """Stream `url` to `dest` atomically, optionally showing a `tqdm` bar.
@@ -685,7 +696,10 @@ class HttpClient:
                 discarded, so an HTML error page served with a 200 status never
                 lands as a `.nc`. `None` (the default) skips the check.
             headers: Per-request headers merged over the client defaults.
-            timeout: Per-request timeout override (seconds).
+            timeout: Per-request timeout override (seconds), as a single
+                float or a `(connect, read)` pair — the latter fails a dead
+                host on the short connect budget without shortening the long
+                read budget a large download needs.
             **kwargs: Extra keyword arguments forwarded to `requests`.
 
         Returns:

@@ -12,6 +12,7 @@ Run with:
 
 from __future__ import annotations
 
+import socket
 from pathlib import Path
 
 import pytest
@@ -19,10 +20,30 @@ import pytest
 from earthlens.aggregate import AggregationConfig
 from earthlens.earthlens import EarthLens
 
+#: The JRC host every GHSL fetch talks to.
+_GHSL_HOST = "jeodpp.jrc.ec.europa.eu"
+
 #: A tiny Moroccan-coast AOI inside the verified R6_C18 tile — small enough to
 #: fetch one 100 m tile in seconds and reliably over land.
 _LAT_LIM = [30.5, 30.8]
 _LON_LIM = [-9.0, -8.7]
+
+
+def _host_ok(host: str) -> bool:
+    """Return True when `host` accepts a TCP connection on port 443."""
+    try:
+        socket.create_connection((host, 443), timeout=5).close()
+        return True
+    except OSError:
+        return False
+
+
+#: Skip the live class fast when the JRC host does not answer — an outage or a
+#: runner whose egress is blocked would otherwise exhaust every download's
+#: retries on connect timeouts before failing (issue #932).
+_offline_skip = pytest.mark.skipif(
+    not _host_ok(_GHSL_HOST), reason=f"JRC GHSL host {_GHSL_HOST} unreachable"
+)
 
 
 def _nonempty_geotiff(path: Path) -> bool:
@@ -33,6 +54,7 @@ def _nonempty_geotiff(path: Path) -> bool:
     return dataset.rows > 0 and dataset.columns > 0
 
 
+@_offline_skip
 @pytest.mark.e2e
 @pytest.mark.ghsl
 class TestGhslLiveFetch:

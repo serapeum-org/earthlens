@@ -127,6 +127,21 @@ class TestDownloadAndUnzip:
                 url, tmp_path / "dl", session=session, retries=2, backoff=0.0
             )
 
+    def test_default_split_connect_read_timeout(
+        self, tmp_path, fake_session, make_response
+    ):
+        """The default download passes a short-connect (connect, read) tuple."""
+        tif = make_tiny_tif(tmp_path / "src.tif", epsg=4326)
+        zpath = zip_with_tif(tif, tmp_path / "GHS_POP_t_V1_0.zip")
+        payload = zpath.read_bytes()
+        zpath.unlink()
+        url = "https://x/GHS_POP_t_V1_0.zip"
+        session = fake_session({url: make_response(content=payload)})
+        download_and_unzip(url, tmp_path / "dl", session=session)
+        connect, read = session.calls[-1]["timeout"]
+        assert connect < read, "connect budget must be shorter than the read budget"
+        assert (connect, read) == _helpers._DOWNLOAD_TIMEOUT
+
 
 @pytest.mark.ghsl
 class TestRemoteListing:

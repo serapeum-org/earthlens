@@ -28,7 +28,7 @@ from typing import Any
 
 import requests
 
-from earthlens.base.http import HttpClient
+from earthlens.base.http import HttpClient, Timeout
 
 #: AirNow bounding-box observations endpoint.
 BASE_URL = "https://www.airnowapi.org/aq/data/"
@@ -96,8 +96,8 @@ class AirnowClient:
         return self._http.backoff_factor
 
     @property
-    def timeout(self) -> float:
-        """Per-request timeout in seconds."""
+    def timeout(self) -> Timeout:
+        """Per-request timeout in seconds (a float or a `(connect, read)` pair)."""
         return self._http.timeout
 
     def get_data(self, params: dict[str, Any]) -> list[dict[str, Any]]:

@@ -29,7 +29,7 @@ from typing import Any, cast
 
 import requests
 
-from earthlens.base.http import HttpClient
+from earthlens.base.http import HttpClient, Timeout
 
 #: OpenAQ v3 API base URL. All endpoint paths are joined onto this.
 BASE_URL = "https://api.openaq.org/v3"
@@ -115,8 +115,8 @@ class OpenaqClient:
         return self._http.backoff_factor
 
     @property
-    def timeout(self) -> float:
-        """Per-request timeout in seconds."""
+    def timeout(self) -> Timeout:
+        """Per-request timeout in seconds (a float or a `(connect, read)` pair)."""
         return self._http.timeout
 
     def _request(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
