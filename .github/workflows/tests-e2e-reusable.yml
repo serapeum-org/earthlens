@@ -119,7 +119,8 @@ jobs:
             run_all=1
             changed=""
           else
-            git fetch --no-tags --depth=1 origin "$BASE_SHA" || true
+            # The fetch-depth:0 checkout already has the base commit, so diff
+            # directly (three-dot = changes since the merge base).
             changed="$(git diff --name-only "$BASE_SHA"...HEAD)"
             echo "changed files:"; echo "$changed"
             if echo "$changed" | grep -Eq "$global_shared_re" \
