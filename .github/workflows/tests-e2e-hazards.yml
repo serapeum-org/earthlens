@@ -2,6 +2,11 @@ name: Tests - E2E hazards (on change)
 
 # Thin caller: trigger on hazards's paths and delegate to the reusable
 # per-theme e2e-on-change workflow. All logic lives in tests-e2e-reusable.yml.
+#
+# Advisory, NOT a required status check: because it is path-filtered, a PR that
+# does not touch hazards never starts this workflow, so a branch-protection
+# "required" rule on it would wait forever. To make e2e a required gate, add a
+# separate always-running aggregator job instead of marking this one required.
 
 permissions:
   contents: read

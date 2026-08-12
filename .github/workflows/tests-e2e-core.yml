@@ -6,6 +6,10 @@ name: Tests - E2E core (on change)
 # exercises core - this file closes that gap. The scheduled tests-e2e.yml still
 # runs the whole suite weekly. Standalone (not the reusable), because core is
 # not a provider theme and has no per-backend lanes.
+#
+# Advisory, NOT a required status check: it is path-filtered, so a PR that does
+# not touch core never starts it - a branch-protection "required" rule would
+# wait forever. Use a separate always-running aggregator to gate on e2e.
 
 permissions:
   contents: read
