@@ -9,12 +9,16 @@ endpoint (GEBCO / ETOPO — subset to a NetCDF read back with
 through `pyramids.Dataset.from_wcs`). Either path writes a GeoTIFF.
 
 Every shipped DEM is static (no time axis), so the facade-forwarded
-`aggregate=` is rejected: there is no temporal field to reduce. The NetCDF is
+`aggregate=` is rejected: there is no temporal field to reduce. The grid is
 read **only** through pyramids — earthlens never imports a competing array
-stack to touch the NetCDF. An
-out-of-coverage / oversize request surfaces as a clear `ValueError` (a raster
-has no "zero pixels" — and ERDDAP caps response size), never a bare HTTP error
-or a corrupt file.
+stack to touch it. On the griddap path an out-of-coverage / oversize request
+surfaces as a clear `ValueError` (ERDDAP rejects it or returns an HTML error
+body, never data), so the user never sees a bare HTTP error or a corrupt file.
+The WCS path instead guards the request bbox against the coverage's
+`native_bbox` (:meth:`Bathymetry._guard_wcs_domain`) — a fully out-of-coverage
+AOI raises, a partial overlap is allowed through with a warning (its
+out-of-coverage cells come back as `0.0` fill) — because the WCS server returns
+a zero-filled grid, not an error, outside coverage.
 
 The DEMs are public, so there is no auth module.
 """
