@@ -26,7 +26,9 @@ throttle policy.
 
 `requests` and `tqdm` are already core earthlens dependencies, so this
 module adds none. The public imports are
-`from earthlens.base.http import HttpClient, HttpRangeFile`.
+`from earthlens.base.http import HttpClient, HttpRangeFile, Timeout`
+(`Timeout` is the `float | tuple[float, float]` alias every timeout
+parameter accepts).
 """
 
 from __future__ import annotations
