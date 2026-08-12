@@ -64,4 +64,4 @@ jobs:
           IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
           WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
         run: |
-          uv run --locked pytest libs/core -m e2e -v
+          uv run --locked pytest libs/core -m e2e -rs -v

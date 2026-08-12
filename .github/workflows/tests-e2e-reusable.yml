@@ -235,12 +235,14 @@ jobs:
           # whole package would import sibling backends' test modules (some
           # hard-import an SDK this lane's narrow extra does not install). The
           # catch-all installs extras: all and targets the whole package.
+          # -rs prints each skip's reason, so an upstream-availability skip (see
+          # earthlens.testing.pytest_runtest_call) is legible in the log.
           pkg="$PKG"
           set +e
           if [ -n "$DESELECT" ]; then
-            uv run --locked pytest "$pkg" -m "$MARKER" --deselect "$DESELECT" -v
+            uv run --locked pytest "$pkg" -m "$MARKER" --deselect "$DESELECT" -rs -v
           else
-            uv run --locked pytest "$pkg" -m "$MARKER" -v
+            uv run --locked pytest "$pkg" -m "$MARKER" -rs -v
           fi
           code=$?
           set -e
