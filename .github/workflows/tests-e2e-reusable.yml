@@ -122,16 +122,21 @@ jobs:
             echo "manual dispatch -> running every $THEME lane"
             run_all=1
             changed=""
-          else
-            # The fetch-depth:0 checkout already has the base commit, so diff
-            # directly (three-dot = changes since the merge base).
-            changed="$(git diff --name-only "$BASE_SHA"...HEAD)"
+          # The fetch-depth:0 checkout already has the base commit, so diff
+          # directly (three-dot = changes since the merge base). If the diff
+          # itself fails (e.g. an unreachable base after a force-push), fall
+          # back to running every lane rather than aborting the gate.
+          elif changed="$(git diff --name-only "$BASE_SHA"...HEAD 2>/dev/null)"; then
             echo "changed files:"; echo "$changed"
             if echo "$changed" | grep -Eq "$global_shared_re" \
                || echo "$changed" | grep -Eq "$theme_shared_re"; then
               echo "shared code changed -> running every $THEME lane"
               run_all=1
             fi
+          else
+            echo "base diff failed -> running every $THEME lane"
+            run_all=1
+            changed=""
           fi
 
           includes=()
