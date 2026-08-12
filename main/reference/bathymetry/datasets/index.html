@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -4763,6 +4763,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#emodnet-bathymetry-european-seas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EMODnet Bathymetry (European seas)
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#facade-aliases" class="md-nav__link">
@@ -16837,6 +16848,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/bathymetry/07_emodnet_european_bathymetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EMODnet Bathymetry — European high-resolution DTM (OGC WCS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/bathymetry/08_emodnet_wcs_deep_dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EMODnet Bathymetry over OGC WCS — a guided tour
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -22891,6 +22958,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#emodnet-bathymetry-european-seas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EMODnet Bathymetry (European seas)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#facade-aliases" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -22957,10 +23035,15 @@
 
 
 <h1 id="bathymetry-available-datasets"><a class="toclink" href="#bathymetry-available-datasets">Bathymetry — available datasets</a><a class="headerlink" href="#bathymetry-available-datasets" title="Permanent link">#</a></h1>
-<p>The <code>bathymetry</code> backend ships three curated DEM rows. Pick one with the
-<code>dataset=</code> argument. Every row is a static global elevation grid served as
-a NOAA ERDDAP <code>griddap</code> coverage, with a single elevation band in <strong>metres
-relative to sea level</strong> (negative = below sea level).</p>
+<p>The <code>bathymetry</code> backend ships curated DEM rows across two transports. Pick one
+with the <code>dataset=</code> argument. Every row is a static elevation grid with a single
+band in <strong>metres relative to sea level</strong> (negative = below sea level).</p>
+<ul>
+<li><strong>Global DEMs (ERDDAP <code>griddap</code>)</strong> — GEBCO / ETOPO, served as NOAA ERDDAP
+  coverages, subset server-side to the request bbox.</li>
+<li><strong>European high-resolution DEM (OGC WCS)</strong> — EMODnet Bathymetry, read through
+  pyramids <code>Dataset.from_wcs</code>; the coastal / shelf complement to the global DEMs.</li>
+</ul>
 <table>
 <thead>
 <tr>
@@ -22968,8 +23051,8 @@ relative to sea level</strong> (negative = below sea level).</p>
 <th>DEM</th>
 <th>Native resolution</th>
 <th>Band</th>
-<th>Longitude</th>
-<th>Server</th>
+<th>Transport</th>
+<th>Server / coverage</th>
 </tr>
 </thead>
 <tbody>
@@ -22978,7 +23061,7 @@ relative to sea level</strong> (negative = below sea level).</p>
 <td>GEBCO 2020 (topography + bathymetry)</td>
 <td>15 arc-second</td>
 <td><code>elevation</code></td>
-<td>−180..180</td>
+<td>ERDDAP <code>griddap</code></td>
 <td>NOAA CoastWatch ERDDAP</td>
 </tr>
 <tr>
@@ -22986,7 +23069,7 @@ relative to sea level</strong> (negative = below sea level).</p>
 <td>ETOPO1 global relief, <strong>Ice Surface</strong></td>
 <td>1 arc-minute</td>
 <td><code>z</code></td>
-<td>−180..180</td>
+<td>ERDDAP <code>griddap</code></td>
 <td>NOAA upwell ERDDAP</td>
 </tr>
 <tr>
@@ -22994,14 +23077,69 @@ relative to sea level</strong> (negative = below sea level).</p>
 <td>ETOPO1 global relief, <strong>Bedrock</strong></td>
 <td>1 arc-minute</td>
 <td><code>z</code></td>
-<td>−180..180</td>
+<td>ERDDAP <code>griddap</code></td>
 <td>NOAA upwell ERDDAP</td>
+</tr>
+<tr>
+<td><code>emodnet</code></td>
+<td>EMODnet Bathymetry DTM, <strong>latest release</strong> (DTM 2024)</td>
+<td>~3.75 arc-second</td>
+<td><code>elevation</code></td>
+<td>OGC WCS</td>
+<td>EMODnet Bathymetry WCS (<code>emodnet:mean</code>)</td>
+</tr>
+<tr>
+<td><code>emodnet_2022</code></td>
+<td>EMODnet Bathymetry DTM, 2022 release</td>
+<td>~3.75 arc-second</td>
+<td><code>elevation</code></td>
+<td>OGC WCS</td>
+<td>EMODnet Bathymetry WCS (<code>emodnet:mean_2022</code>)</td>
+</tr>
+<tr>
+<td><code>emodnet_2020</code></td>
+<td>EMODnet Bathymetry DTM, 2020 release</td>
+<td>~3.75 arc-second</td>
+<td><code>elevation</code></td>
+<td>OGC WCS</td>
+<td>EMODnet Bathymetry WCS (<code>emodnet:mean_2020</code>)</td>
+</tr>
+<tr>
+<td><code>emodnet_2018</code></td>
+<td>EMODnet Bathymetry DTM, 2018 release</td>
+<td>~3.75 arc-second</td>
+<td><code>elevation</code></td>
+<td>OGC WCS</td>
+<td>EMODnet Bathymetry WCS (<code>emodnet:mean_2018</code>)</td>
+</tr>
+<tr>
+<td><code>emodnet_2016</code></td>
+<td>EMODnet Bathymetry DTM, 2016 release</td>
+<td>~3.75 arc-second</td>
+<td><code>elevation</code></td>
+<td>OGC WCS</td>
+<td>EMODnet Bathymetry WCS (<code>emodnet:mean_2016</code>)</td>
 </tr>
 </tbody>
 </table>
-<p>The ETOPO variant is the dataset id, not a <code>variables</code> knob: choose
-<code>etopo1_ice</code> for the top of the ice sheets or <code>etopo1_bedrock</code> for their
-base.</p>
+<p>The ETOPO / EMODnet <strong>release is the dataset id, not a <code>variables</code> knob</strong>: choose
+<code>etopo1_ice</code> vs <code>etopo1_bedrock</code>, or <code>emodnet</code> (latest) vs a year-stamped
+<code>emodnet_2022</code> / <code>_2020</code> / <code>_2018</code> / <code>_2016</code>.</p>
+<h2 id="emodnet-bathymetry-european-seas"><a class="toclink" href="#emodnet-bathymetry-european-seas">EMODnet Bathymetry (European seas)</a><a class="headerlink" href="#emodnet-bathymetry-european-seas" title="Permanent link">#</a></h2>
+<p><code>dataset="emodnet"</code> fetches the EMODnet Digital Terrain Model — a high-resolution
+(~3.75 arc-second) grid of mean sea-floor depth harmonised from national
+hydrographic surveys and satellite-derived bathymetry, covering <strong>European seas
+and the extended NE-Atlantic domain</strong> (roughly longitude −70.5°..43°, latitude
+11°..90°). It is read over <strong>OGC WCS</strong> via pyramids <code>Dataset.from_wcs</code> and cropped
+to the request bbox.</p>
+<p>Because the coverage is regional, a request whose bounding box falls entirely
+outside that domain raises a clear error pointing you back at the global DEMs
+(<code>gebco_2020</code> / <code>etopo1_ice</code>) — the WCS server would otherwise return a
+zero-filled grid rather than an error.</p>
+<p><strong>Licence / attribution.</strong> EMODnet Bathymetry is provided under the EMODnet use
+conditions (attribution required). Cite: <em>EMODnet Digital Bathymetry (DTM 2024),
+EMODnet Bathymetry Consortium</em> (doi:10.12770/cf51df64-56f9-4a99-b1aa-36b8d7b743a1).
+See the <a href="https://emodnet.ec.europa.eu/en/terms-use-emodnet-online-services-data-and-data-products">EMODnet terms of use</a>.</p>
 <h2 id="facade-aliases"><a class="toclink" href="#facade-aliases">Facade aliases</a><a class="headerlink" href="#facade-aliases" title="Permanent link">#</a></h2>
 <p>Two friendly aliases route to the same backend, so a script reads the way
 you think about the data:</p>
@@ -23010,21 +23148,26 @@ you think about the data:</p>
 <li><code>data_source="etopo"</code> — then pass <code>dataset="etopo1_ice"</code> or
   <code>dataset="etopo1_bedrock"</code>.</li>
 </ul>
-<p><code>data_source="bathymetry"</code> works with any of the three <code>dataset=</code> ids.</p>
+<p><code>data_source="bathymetry"</code> works with any of the <code>dataset=</code> ids (including the
+<code>emodnet</code> rows).</p>
 <h2 id="listing-the-ids-programmatically"><a class="toclink" href="#listing-the-ids-programmatically">Listing the ids programmatically</a><a class="headerlink" href="#listing-the-ids-programmatically" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.bathymetry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">catalog</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">sorted</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>        <span class="c1"># [&#39;etopo1_bedrock&#39;, &#39;etopo1_ice&#39;, &#39;gebco_2020&#39;]</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gebco_2020&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">variable</span>      <span class="c1"># &#39;elevation&#39;</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;etopo1_ice&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">native_resolution</span>    <span class="c1"># &#39;1 arc-minute&#39;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">sorted</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="c1"># [&#39;emodnet&#39;, &#39;emodnet_2016&#39;, &#39;emodnet_2018&#39;, &#39;emodnet_2020&#39;, &#39;emodnet_2022&#39;,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1">#  &#39;etopo1_bedrock&#39;, &#39;etopo1_ice&#39;, &#39;gebco_2020&#39;]</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gebco_2020&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">variable</span>          <span class="c1"># &#39;elevation&#39;</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emodnet&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">transport</span>            <span class="c1"># &#39;wcs&#39;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emodnet&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">dataset_id</span>           <span class="c1"># &#39;emodnet:mean&#39;</span>
 </code></pre></div>
 <h2 id="versions"><a class="toclink" href="#versions">Versions</a><a class="headerlink" href="#versions" title="Permanent link">#</a></h2>
-<p>These are the versions cleanly subsettable over the public ERDDAP
-<code>griddap</code> transport today (GEBCO 2020 and ETOPO1). Newer releases (ETOPO
-2022, later GEBCO grids) are not exposed as a bbox-subsettable ERDDAP
-coverage on the public hosts; when they are, they can be added as extra
-catalog rows without any backend change.</p>
+<p>The global rows are the versions cleanly subsettable over the public ERDDAP
+<code>griddap</code> transport today (GEBCO 2020 and ETOPO1). For EMODnet, <code>emodnet</code> tracks
+the latest published DTM release while the year-stamped ids pin an earlier one.
+Newer global releases (ETOPO 2022, later GEBCO grids) are not yet exposed as a
+bbox-subsettable ERDDAP coverage on the public hosts; when they are, they can be
+added as extra catalog rows without any backend change.</p>
 
 
 
