@@ -28,6 +28,12 @@ from earthlens.cli.refresh import (
 from earthlens.cli.refresh import (
     _index_writer as index_writer,
 )
+from earthlens.cli.validate import (
+    _lint as lint,
+)
+from earthlens.cli.validate import (
+    _require as require,
+)
 
 __all__ = [
     "BackendInfo",
@@ -35,4 +41,6 @@ __all__ = [
     "flatten",
     "get_json",
     "index_writer",
+    "lint",
+    "require",
 ]

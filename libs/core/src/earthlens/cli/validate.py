@@ -22,6 +22,7 @@ from urllib.parse import urlsplit
 
 import requests
 
+from earthlens._cli_tooling import dispatch_table
 from earthlens.cli.adapter import BackendInfo, load_catalog
 from earthlens.cli.refresh import _TIMEOUT, _get_json
 
@@ -135,21 +136,6 @@ def _validate_ghsl(catalog: Any) -> tuple[int, list[str]]:
     products (e.g. GHS_POP is its own family), so it is not required.
     """
     return _lint(catalog, lambda k, r: _require(k, r, ("code", "releases")))
-
-
-def _validate_overture(catalog: Any) -> tuple[int, list[str]]:
-    """Each Overture theme needs types and a default_type drawn from them."""
-
-    def check(key: str, record: Any) -> list[str]:
-        """Flag a theme missing types/default_type or whose default is unlisted."""
-        issues = _require(key, record, ("types", "default_type"))
-        types = getattr(record, "types", None) or []
-        default = getattr(record, "default_type", None)
-        if default and types and default not in types:
-            issues.append(f"{key}: default_type {default!r} not in types")
-        return issues
-
-    return _lint(catalog, check)
 
 
 def _validate_osm(catalog: Any) -> tuple[int, list[str]]:
@@ -973,6 +959,8 @@ def _validate_caravan(catalog: Any) -> tuple[int, list[str]]:
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
+    # Discovered handlers first; in-core literals are the migration remainder.
+    **dispatch_table("validator"),
     "caravan": _validate_caravan,
     "nwp": _validate_nwp,
     "nwm": _validate_nwm,
@@ -980,7 +968,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "goes": _validate_goes,
     "s3": _validate_s3,
     "ghsl": _validate_ghsl,
-    "overture": _validate_overture,
     "osm": _validate_osm,
     "fdsn": _validate_fdsn,
     "firms": _validate_firms,
@@ -1047,33 +1034,6 @@ def _live_s3(catalog: Any) -> tuple[int, list[str]]:
             continue
         if not keys:
             issues.append(f"{key}: no objects under s3://{record.bucket}")
-    return len(catalog.datasets), issues
-
-
-#: A tiny bbox (Times Square block) for the live Overture fetch.
-_OVERTURE_BBOX = (-73.9876, 40.7561, -73.9851, 40.7577)
-
-
-def _overture_live_sample(overture_type: str) -> tuple[int, bool]:
-    """Fetch a tiny bbox; return `(row_count, has_sources_column)`."""
-    from overturemaps.core import geodataframe
-
-    frame = geodataframe(overture_type, bbox=_OVERTURE_BBOX)
-    return len(frame), "sources" in frame.columns
-
-
-def _live_overture(catalog: Any) -> tuple[int, list[str]]:
-    """Confirm each Overture type resolves live and carries a `sources` column."""
-    issues: list[str] = []
-    for key, record in catalog.datasets.items():
-        overture_type = getattr(record, "default_type", None) or key
-        try:
-            _rows, has_sources = _overture_live_sample(overture_type)
-        except Exception as exc:  # noqa: BLE001 — reported as drift
-            issues.append(f"{key}/{overture_type}: fetch failed ({exc})")
-            continue
-        if not has_sources:
-            issues.append(f"{key}/{overture_type}: no 'sources' column")
     return len(catalog.datasets), issues
 
 
@@ -1472,9 +1432,10 @@ def _live_nwm(catalog: Any) -> tuple[int, list[str]]:
 #: Provider id -> a live reachability validator (the `--live` half). May add
 #: a provider not in :data:`_VALIDATORS` (e.g. openeo / ecmwf are live-only).
 _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
+    # Discovered handlers first; in-core literals are the migration remainder.
+    **dispatch_table("live_validator"),
     "s3": _live_s3,
     "nwm": _live_nwm,
-    "overture": _live_overture,
     "ghsl": _live_ghsl,
     "openeo": _live_openeo,
     "radar": _live_radar,

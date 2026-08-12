@@ -25,6 +25,7 @@ from typing import Any, cast
 
 import requests
 
+from earthlens._cli_tooling import dispatch_table
 from earthlens.cli.adapter import BackendInfo, load_catalog
 from earthlens.cli.refresh import _TIMEOUT, _get_json, _redact
 
@@ -594,39 +595,6 @@ def _worldpop_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
         "values": sorted({str(r.get("popyear")) for r in records if r.get("popyear")}),
     }
     return schema
-
-
-#: A tiny bbox (Times Square block: W, S, E, N) for the Overture probe.
-_OVERTURE_BBOX = (-73.9876, 40.7561, -73.9851, 40.7577)
-
-
-def _overture_columns(overture_type: str) -> dict[str, str]:
-    """Return `{column: dtype}` for a tiny Overture bbox fetch (public SDK)."""
-    from overturemaps import core
-
-    frame = core.geodataframe(overture_type, bbox=_OVERTURE_BBOX)
-    return {str(name): str(dtype) for name, dtype in frame.dtypes.items()}
-
-
-def _overture_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe an Overture feature type's column schema (public `overturemaps`).
-
-    Fetches a tiny bbox for the type and records each column's dtype.
-
-    Args:
-        catalog: The loaded Overture `Catalog` (resolves a theme key's
-            `default_type`).
-        dataset: A curated theme key or an Overture feature type.
-
-    Returns:
-        Mapping of column name to `{dtype}`.
-    """
-    record = catalog.datasets.get(dataset)
-    overture_type = getattr(record, "default_type", None) or dataset
-    return {
-        column: {"dtype": dtype}
-        for column, dtype in _overture_columns(overture_type).items()
-    }
 
 
 def _s3_sample_keys(bucket: str, prefix: str, region: str | None) -> list[str]:
@@ -1502,6 +1470,8 @@ def _iucn_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
 #: Provider id -> a callable taking the loaded catalog and a dataset id and
 #: returning its per-entry schema.
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
+    # Discovered handlers first; in-core literals are the migration remainder.
+    **dispatch_table("prober"),
     "stac": _stac_probe,
     "openeo": _openeo_probe,
     "gee": _gee_probe,
@@ -1512,7 +1482,6 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "firms": _firms_probe,
     "eumetsat": _eumetsat_probe,
     "worldpop": _worldpop_probe,
-    "overture": _overture_probe,
     "s3": _s3_probe,
     "ghsl": _ghsl_probe,
     "ecmwf": _ecmwf_probe,

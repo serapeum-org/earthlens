@@ -560,22 +560,6 @@ class TestFdsnRefresher:
         assert "NEWCENTER" in outcome.new_ids, "an uncurated centre is new"
 
 
-class TestOvertureRefresher:
-    """Tests for the Overture (releases) lister."""
-
-    def test_diffs_releases_not_feature_types(self, monkeypatch):
-        """overture diffs the live releases against available_releases."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_overture_release_ids",
-            lambda: ["2099-01-01.0", "2026-05-20.0"],
-        )
-        outcome = refresh_one(_info("overture"))
-        assert outcome.status == "ok", "overture refresh ran"
-        assert "2099-01-01.0" in outcome.new_ids, "a new release is flagged"
-        assert all("-" in rid for rid in outcome.removed_ids), "diffed vs releases"
-
-
 class TestNwmRefresher:
     """Tests for the NWM (unsigned operational-bucket walk) lister."""
 
@@ -1020,15 +1004,6 @@ class TestIndexWriters:
         assert sorted(catalog.datasets) == ["KABR", "PAEC"], "stations regenerated"
         assert catalog.datasets["KABR"].name == "Aberdeen", "row fields parsed"
         assert catalog.datasets["KABR"].latitude == 45.4558, "latitude parsed"
-
-    def test_overture_writes_releases_keeps_feature_types(self, tmp_path, monkeypatch):
-        """overture --write rewrites available_releases, keeping the type set."""
-        info, module, dst = _catalog_copy("overture", tmp_path, monkeypatch)
-        before = yaml.safe_load(dst.read_text("utf-8"))
-        refresh_mod._WRITERS["overture"](info, {"overture": ["2099-01-01.0"]})
-        after = yaml.safe_load(dst.read_text("utf-8"))
-        assert after["available_releases"] == ["2099-01-01.0"], "releases rewritten"
-        assert after["available_datasets"] == before["available_datasets"], "types kept"
 
 
 class TestHdxWriter:

@@ -314,25 +314,6 @@ class TestWorldpopProbe:
         assert result.assets["popyears"]["values"] == ["2020", "2021"], "years unioned"
 
 
-class TestOvertureProbe:
-    """Tests for the Overture column prober (public SDK)."""
-
-    def test_reads_column_dtypes(self, monkeypatch):
-        """overture probe records each column's dtype from a tiny bbox."""
-        monkeypatch.setattr(
-            curate_mod,
-            "_overture_columns",
-            lambda overture_type: {"id": "object", "height": "float64"},
-        )
-        info = _info("overture")
-        from earthlens.cli.adapter import load_catalog
-
-        key = next(iter(load_catalog(info).datasets))
-        result = probe_dataset(info, key)
-        assert result.status == "ok", "overture probe ran"
-        assert result.assets["height"]["dtype"] == "float64", "dtype recorded"
-
-
 class TestS3Probe:
     """Tests for the S3 bucket prober (unsigned boto3)."""
 
@@ -715,34 +696,6 @@ class TestS3ProberBranches:
 
         monkeypatch.setattr(s3_auth, "S3Auth", FakeAuth)
         assert curate_mod._s3_sample_keys("b", "p", None) == ["k1", "k2"]
-
-
-class TestOvertureProberBranches:
-    """Branch coverage for the Overture column prober."""
-
-    def test_records_column_dtypes(self, monkeypatch):
-        """Each Overture column's dtype is recorded under the column name."""
-        from earthlens.cli.adapter import load_catalog
-
-        monkeypatch.setattr(
-            curate_mod,
-            "_overture_columns",
-            lambda t: {"id": "string", "geom": "geometry"},
-        )
-        dataset = next(iter(load_catalog(_info("overture")).datasets))
-        result = probe_dataset(_info("overture"), dataset)
-        assert result.assets["id"]["dtype"] == "string", "column dtype recorded"
-
-    def test_columns_helper_reads_dtypes(self, monkeypatch):
-        """_overture_columns maps a geodataframe's dtypes to {name: str(dtype)}."""
-        import overturemaps.core as core
-
-        class FakeFrame:
-            dtypes = {"id": "int64", "geometry": "geometry"}
-
-        monkeypatch.setattr(core, "geodataframe", lambda t, bbox: FakeFrame())
-        out = curate_mod._overture_columns("building")
-        assert out == {"id": "int64", "geometry": "geometry"}, "dtypes stringified"
 
 
 class TestFirmsProberBranches:

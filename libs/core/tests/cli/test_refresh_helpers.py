@@ -11,7 +11,7 @@ import yaml
 
 from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.adapter import list_backends
-from earthlens.cli.refresh import _curated_releases, coverage_one
+from earthlens.cli.refresh import coverage_one
 
 pytestmark = pytest.mark.cli
 
@@ -196,23 +196,6 @@ class TestNetworkPrimitives:
         )
         assert refresh_mod._sentinel_hub_grouped(None) == {"sentinel_hub": ["S1", "S2"]}
 
-    def test_overture_release_ids_and_grouped(self, monkeypatch):
-        """release ids unwrap the (releases, latest) tuple; grouped sorts them."""
-        import overturemaps.core as core
-
-        monkeypatch.setattr(
-            core,
-            "get_available_releases",
-            lambda: (["2024-01", "2023-12"], "2024-01"),
-        )
-        assert refresh_mod._overture_release_ids() == ["2024-01", "2023-12"]
-        monkeypatch.setattr(
-            refresh_mod, "_overture_release_ids", lambda: ["2024-01", "2023-12"]
-        )
-        assert refresh_mod._overture_grouped(None) == {
-            "overture": ["2023-12", "2024-01"]
-        }
-
     def test_fdsn_provider_ids_nonempty(self):
         """obspy's URL_MAPPINGS yields a non-empty provider id list."""
         assert refresh_mod._fdsn_provider_ids(), "obspy registry is non-empty"
@@ -251,13 +234,6 @@ class TestNetworkPrimitives:
             datasets={"pop": SimpleNamespace(subaliases=[SimpleNamespace(id="wpgp")])}
         )
         assert refresh_mod._worldpop_curated_ids(cat) == ["wpgp"]
-
-    def test_curated_releases(self):
-        """_curated_releases returns the catalog's sorted release ids."""
-        assert _curated_releases(SimpleNamespace(available_releases=["b", "a"])) == [
-            "a",
-            "b",
-        ]
 
 
 class TestChcWalk:

@@ -16,6 +16,7 @@ group, so core's CLI names no backend and depends on no provider distribution.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from importlib import import_module
 from importlib.metadata import entry_points
 from typing import Any
@@ -94,3 +95,65 @@ def resolve_target(target: str) -> Any:
     for part in attr.split("."):
         obj = getattr(obj, part)
     return obj
+
+
+def _thunk(target: str) -> Callable[..., Any]:
+    """Wrap a `"module:attr"` target so the provider module imports on first call.
+
+    Building a command's dispatch table must not import any provider handler
+    module: the table is built while core's command module is still importing,
+    and a handler module imports `earthlens.cli.toolkit` (hence back into the
+    command module), so eager resolution would be a circular import. The thunk
+    defers `resolve_target` to call time — i.e. when a command actually
+    dispatches to that provider — by which point every module is fully loaded.
+
+    Args:
+        target: The `"module:attr"` handler target to resolve lazily.
+
+    Returns:
+        A callable that resolves `target` and forwards its arguments on the
+        first (and every) call.
+    """
+
+    def handler(*args: Any, **kwargs: Any) -> Any:
+        """Resolve the provider handler and forward the call to it."""
+        return resolve_target(target)(*args, **kwargs)
+
+    return handler
+
+
+def dispatch_table(role: str) -> dict[str, Callable[..., Any]]:
+    """Build a provider-id -> handler dict for one callable role, from discovery.
+
+    Each handler is wrapped in a lazy thunk (see `_thunk`), so building the
+    table imports only the import-light `CLI_TOOLING` tables, never a provider
+    handler module or its SDK.
+
+    Args:
+        role: The tooling role to project (e.g. `"refresher"`, `"validator"`).
+
+    Returns:
+        An `id -> handler` mapping for every provider that publishes `role`.
+    """
+    return {
+        key: _thunk(spec[role])
+        for key, spec in discover_cli_tooling().items()
+        if role in spec
+    }
+
+
+def config_table(role: str) -> dict[str, str]:
+    """Build a provider-id -> literal-value dict for one config role, from discovery.
+
+    The counterpart to `dispatch_table` for the non-callable roles (e.g.
+    `index_attr`): the value is used verbatim, not imported.
+
+    Args:
+        role: The config role to project (e.g. `"index_attr"`).
+
+    Returns:
+        An `id -> value` mapping for every provider that publishes `role`.
+    """
+    return {
+        key: spec[role] for key, spec in discover_cli_tooling().items() if role in spec
+    }

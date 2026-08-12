@@ -45,6 +45,7 @@ import requests
 import yaml
 from loguru import logger
 
+from earthlens._cli_tooling import config_table, dispatch_table
 from earthlens.cli.adapter import BackendInfo, load_catalog
 
 #: HTTP timeout (seconds) for a single live-listing request.
@@ -1088,35 +1089,6 @@ def _fdsn_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"fdsn": sorted(set(_fdsn_provider_ids()))}
 
 
-def _overture_release_ids() -> list[str]:
-    """Return every available Overture release id (`overturemaps` SDK).
-
-    `get_available_releases()` returns a `(all_releases, latest)` tuple;
-    only the release list is taken.
-    """
-    from overturemaps.core import get_available_releases
-
-    result = get_available_releases()
-    releases = result[0] if isinstance(result, tuple) else result
-    return [str(release) for release in releases]
-
-
-def _overture_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List every available Overture release via the `overturemaps` SDK.
-
-    Overture's refreshable axis is its *releases* (date-stamped data
-    versions), not the fixed theme/type set — so this diffs against the
-    catalog's `available_releases:` index, not `available_datasets:`.
-
-    Args:
-        catalog: The loaded Overture `Catalog` (unused; the SDK is the source).
-
-    Returns:
-        A single-group mapping `{"overture": [sorted release ids]}`.
-    """
-    return {"overture": sorted(set(_overture_release_ids()))}
-
-
 #: CHC anonymous-FTP host and the products root walked for coverage.
 _CHC_FTP_HOST = "data.chc.ucsb.edu"
 _CHC_ROOT = "pub/org/chc/products"
@@ -1837,6 +1809,9 @@ def _caravan_grouped(catalog: Any) -> dict[str, list[str]]:
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
 #: credentials; credentialed ones (openaq, firms) read their key from the env.
 _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
+    # Discovered from each provider distribution's `earthlens.cli` table; the
+    # in-core literals below are the not-yet-migrated remainder (issue #863).
+    **dispatch_table("refresher"),
     "stac": _stac_grouped,
     "ecmwf": _ecmwf_grouped,
     "openeo": _openeo_grouped,
@@ -1852,7 +1827,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "radar": _radar_grouped,
     "firms": _firms_grouped,
     "fdsn": _fdsn_grouped,
-    "overture": _overture_grouped,
     "chc": _chc_grouped,
     "s3": _s3_grouped,
     "nwm": _nwm_grouped,
@@ -1871,6 +1845,8 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
 #: load time (openaq, worldpop, usgs_water) have no on-disk block to rewrite
 #: and intentionally report "live read only" instead.
 _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
+    # Discovered handlers first; in-core literals are the migration remainder.
+    **dispatch_table("writer"),
     "stac": _write_stac,
     "ecmwf": _index_writer("available_datasets", grouped=True),
     "openeo": _write_openeo,
@@ -1880,7 +1856,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "gee": _index_writer("available_datasets"),
     "earthdata": _index_writer("available_datasets"),
     "hdx": _write_hdx,
-    "overture": _index_writer("available_releases"),
     "radar": _write_radar,
     "s3": _index_writer("available_datasets"),
     "usgs_water": _write_usgs_water,
@@ -2065,13 +2040,6 @@ def _curated_attr_ids(attr: str) -> Callable[[Any], list[str]]:
     return resolver
 
 
-def _curated_releases(catalog: Any) -> list[str]:
-    """Return the Overture releases the catalog tracks (its refresh axis)."""
-    return sorted(
-        str(release) for release in getattr(catalog, "available_releases", [])
-    )
-
-
 #: Provider id -> a callable returning the upstream ids the catalog curates
 #: (for the `audit` drift check). Falls back to the dataset keys otherwise.
 def _biodiversity_curated_ids(catalog: Any) -> list[str]:
@@ -2091,6 +2059,8 @@ def _biodiversity_curated_ids(catalog: Any) -> list[str]:
 
 
 _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
+    # Discovered handlers first; in-core literals are the migration remainder.
+    **dispatch_table("curated_ids"),
     "stac": _curated_collection_ids,
     "openeo": _curated_collection_ids,
     "hdx": _curated_attr_ids("hdx_id"),
@@ -2100,7 +2070,6 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "worldpop": _worldpop_curated_ids,
     "usgs_water": _curated_attr_ids("code"),
     "fdsn": _curated_attr_ids("fdsn_id"),
-    "overture": _curated_releases,
     "chc": _chc_ftp_bases,
     "nwm": _nwm_curated_configs,
     "gbif": _biodiversity_curated_ids,
@@ -2113,7 +2082,8 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
 #: index. Defaults to `available_datasets`; Overture's refreshable axis is
 #: its date-stamped `available_releases`, NWM's is its `available_configurations`.
 _INDEX_ATTR: dict[str, str] = {
-    "overture": "available_releases",
+    # Discovered config first; in-core literals are the migration remainder.
+    **config_table("index_attr"),
     "nwm": "available_configurations",
 }
 

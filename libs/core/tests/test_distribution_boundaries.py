@@ -1245,3 +1245,145 @@ class TestBoundedResultsDocMatchesTheCode:
             f"docs/reference/base/bounded-results.md, so a reader would think "
             f"the cap is unavailable for them: {missing}"
         )
+
+
+class TestCliIsBackendAgnostic:
+    """#863: core's CLI must not name a backend once tooling migration completes.
+
+    Core defines the catalog-tooling mechanism but must own no per-backend
+    handler: each provider publishes its refresh / probe / validate handlers
+    through the `earthlens.cli` entry-point group, and core's dispatch dicts are
+    projected from that discovery (`earthlens._cli_tooling.dispatch_table`).
+
+    The migration is incremental, so the two allow-lists below name the backends
+    whose tooling still lives in core's `cli/` — as literal dispatch-dict keys
+    (`PENDING`) or as `earthlens.<backend>` imports (`PENDING_IMPORTS`). Each is
+    an exact set: migrating a provider deletes it from both, and adding a new
+    hard-coded backend fails the test. When both reach `frozenset()`, the exact
+    assertions become "core names no backend", which is the closing condition
+    for the issue. The `query.DEFAULT_PROVIDER_PRIORITY` ordering tuple is a
+    deliberate exception (a UX precedence hint, env-overridable, coupling to no
+    provider code), so it is not scanned — only dict keys and imports are.
+    """
+
+    #: Backends still named as dispatch-dict keys in core's CLI (shrinks to
+    #: empty as #863 lands provider by provider).
+    PENDING = frozenset(
+        {
+            "aqueduct",
+            "argo",
+            "asf",
+            "bathymetry",
+            "caravan",
+            "catrare",
+            "chc",
+            "cmems",
+            "drought",
+            "earthdata",
+            "ecmwf",
+            "emdat",
+            "erddap",
+            "eumetsat",
+            "fabdem",
+            "fdsn",
+            "firms",
+            "flodis",
+            "flopros",
+            "gbif",
+            "gdacs",
+            "gee",
+            "ghsl",
+            "glaciers",
+            "goes",
+            "hanze",
+            "hdx",
+            "iucn",
+            "jaxa",
+            "jrc_flood",
+            "mswep",
+            "nrel",
+            "nsi",
+            "nwm",
+            "nwp",
+            "obis",
+            "openaq",
+            "openeo",
+            "osm",
+            "pvgis",
+            "radar",
+            "radklim",
+            "s3",
+            "sentinel_hub",
+            "soilgrids",
+            "stac",
+            "tropycal",
+            "usgs_water",
+            "wdpa",
+            "worldpop",
+        }
+    )
+
+    #: Backends core's CLI still imports directly (`from earthlens.<backend>`),
+    #: also shrinking to empty.
+    PENDING_IMPORTS = frozenset(
+        {
+            "caravan",
+            "ecmwf",
+            "gee",
+            "ghsl",
+            "nwm",
+            "radar",
+            "sentinel_hub",
+            "usgs_water",
+            "worldpop",
+        }
+    )
+
+    def _cli_sources(self):
+        """Yield every core CLI source file, skipping build artefacts."""
+        cli = Path(__file__).resolve().parents[1] / "src" / "earthlens" / "cli"
+        for path in sorted(cli.rglob("*.py")):
+            if "build" not in path.parts:
+                yield path
+
+    def _provider_ids(self) -> set[str]:
+        """The canonical provider ids the dispatch dicts key on."""
+        from earthlens.cli.adapter import list_backends
+
+        return {info.provider for info in list_backends()}
+
+    def test_dispatch_dicts_name_exactly_the_pending_backends(self):
+        """Every provider-id dict key in core's CLI is an unmigrated backend."""
+        provider_ids = self._provider_ids()
+        named: set[str] = set()
+        for path in self._cli_sources():
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                if not isinstance(node, ast.Dict):
+                    continue
+                for key in node.keys:
+                    if isinstance(key, ast.Constant) and key.value in provider_ids:
+                        named.add(key.value)
+        assert named == self.PENDING, (
+            "core CLI dispatch dicts name a set of backends other than the "
+            f"pending allow-list; extra={sorted(named - self.PENDING)}, "
+            f"missing={sorted(self.PENDING - named)}. Migrate the backend to "
+            "earthlens.<backend>.cli and update PENDING (empty = #863 closed)."
+        )
+
+    def test_provider_imports_are_exactly_the_pending_ones(self):
+        """Every `earthlens.<backend>` import in core's CLI is unmigrated."""
+        provider_ids = self._provider_ids()
+        imported: set[str] = set()
+        for path in self._cli_sources():
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                if isinstance(node, ast.ImportFrom) and node.module:
+                    parts = node.module.split(".")
+                    if len(parts) > 1 and parts[0] == "earthlens":
+                        if parts[1] in provider_ids:
+                            imported.add(parts[1])
+        assert imported == self.PENDING_IMPORTS, (
+            "core CLI imports a set of provider packages other than the pending "
+            f"allow-list; extra={sorted(imported - self.PENDING_IMPORTS)}, "
+            f"missing={sorted(self.PENDING_IMPORTS - imported)}. Move the handler "
+            "into the provider and update PENDING_IMPORTS (empty = #863 closed)."
+        )

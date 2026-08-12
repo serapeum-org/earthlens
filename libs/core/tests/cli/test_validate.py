@@ -20,7 +20,6 @@ from earthlens.cli.validate import (
     _validate_nrel,
     _validate_nwp,
     _validate_osm,
-    _validate_overture,
     _validate_radar,
     _validate_soilgrids,
     _validate_tropycal,
@@ -442,16 +441,6 @@ class TestValidateErddap:
 class TestStructuralLints:
     """Negative cases for the structural validators."""
 
-    def test_overture_default_type_must_be_in_types(self):
-        """A default_type not among types is flagged."""
-        catalog = SimpleNamespace(
-            datasets={
-                "x": SimpleNamespace(types=["a", "b"], default_type="c"),
-            }
-        )
-        _checked, issues = _validate_overture(catalog)
-        assert any("default_type" in i for i in issues), "mismatch flagged"
-
     def test_radar_out_of_range_coords_flagged(self):
         """A station with an impossible latitude is flagged."""
         catalog = SimpleNamespace(
@@ -637,12 +626,6 @@ class TestLiveValidators:
         monkeypatch.setattr(validate_mod, "_s3_live_keys", lambda b, p, r: ["k"])
         result = validate_one(_info("s3"), live=True)
         assert result.issues == [], "objects present -> clean"
-
-    def test_overture_live_flags_missing_sources(self, monkeypatch):
-        """An Overture type without a sources column is flagged live."""
-        monkeypatch.setattr(validate_mod, "_overture_live_sample", lambda t: (0, False))
-        result = validate_one(_info("overture"), live=True)
-        assert any("sources" in i for i in result.issues), "missing sources flagged"
 
     def test_ghsl_live_flags_non_200(self, monkeypatch):
         """A GHSL artefact that does not HEAD 200 is flagged live."""
@@ -1059,22 +1042,6 @@ class TestLivePrimitives:
         monkeypatch.setattr(radar_backend, "_s3_client", lambda region: FakeClient())
         assert _radar_feed_stations() == {"KAAA", "KBBB"}, "both pages collected"
 
-    def test_overture_live_sample_reports_sources(self, monkeypatch):
-        """_overture_live_sample returns (row_count, has_sources_column)."""
-        import overturemaps.core as core
-
-        from earthlens.cli.validate import _overture_live_sample
-
-        class FakeFrame:
-            columns = ["id", "sources"]
-
-            def __len__(self):
-                return 2
-
-        monkeypatch.setattr(core, "geodataframe", lambda t, bbox: FakeFrame())
-        rows, has_sources = _overture_live_sample("building")
-        assert rows == 2 and has_sources is True, "rows + sources column reported"
-
 
 class TestLiveValidatorBranches:
     """Branch coverage for the live validators using fake catalogs."""
@@ -1134,16 +1101,6 @@ class TestLiveValidatorBranches:
         monkeypatch.setattr(validate_mod, "_s3_live_keys", boom)
         result = validate_one(_info("s3"), live=True)
         assert any("bucket error" in i for i in result.issues), "error captured"
-
-    def test_live_overture_reports_fetch_failure(self, monkeypatch):
-        """An Overture type whose fetch raises is reported, not raised."""
-
-        def boom(t):
-            raise RuntimeError("network")
-
-        monkeypatch.setattr(validate_mod, "_overture_live_sample", boom)
-        result = validate_one(_info("overture"), live=True)
-        assert any("fetch failed" in i for i in result.issues), "fetch failure reported"
 
     def test_nwp_latest_cycle_none_without_cycles(self):
         """_nwp_latest_cycle returns None for a model with no cycle hours."""
