@@ -194,16 +194,20 @@ class TestEodcGfmE2E:
     """EODC Copernicus GFM — anonymous public STAC, no credentials."""
 
     def test_flood_extent_writes_cog(self, tmp_path: Path):
-        """A one-item GFM ensemble flood-extent pull over the 2022 Indus flood."""
+        """A GFM ensemble flood-extent pull over the 2022 Pakistan (Sindh) flood.
+
+        The AOI + date are chosen so the SAR swath actually carries flood-mapped
+        pixels — GFM flood extent is sparse, and a box over an unobserved swath
+        is legitimately all-nodata (the crop would then find no valid pixels).
+        """
         stac = STAC(
-            start="2022-08-25",
-            end="2022-09-30",
+            start="2022-09-11",
+            end="2022-09-11",
             variables={"eodc/gfm": ["ensemble_flood_extent"]},
-            lat_lim=[26.0, 28.0],
-            lon_lim=[67.0, 69.0],
+            lat_lim=[27.0, 28.0],
+            lon_lim=[67.0, 68.0],
             path=str(tmp_path),
             endpoint="eodc",
-            max_items=1,
         )
         paths = stac.download()
         assert paths, "expected at least one COG written"
