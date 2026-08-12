@@ -78,7 +78,7 @@ jobs:
             '{"name":"sentinel_hub","path":"libs/providers/imagery/(src/earthlens|tests)/sentinel_hub/","marker":"sentinel_hub and e2e","groups":"groups: dev, extras: sentinel-hub"}'
             '{"name":"earthdata","path":"libs/providers/imagery/(src/earthlens|tests)/earthdata/","marker":"e2e and earthdata","groups":"groups: dev, extras: earthdata"}'
             '{"name":"eumetsat","path":"libs/providers/imagery/(src/earthlens|tests)/eumetsat/","marker":"e2e and eumetsat","groups":"groups: dev, extras: eumetsat"}'
-            '{"name":"asf","path":"libs/providers/imagery/(src/earthlens|tests)/asf/","marker":"e2e and asf","groups":"groups: dev, extras: asf,earthdata"}'
+            '{"name":"asf","path":"libs/providers/imagery/(src/earthlens|tests)/asf/","marker":"e2e and asf","groups":"groups: dev, extras: asf"}'
             )
             catchall_marker="e2e and not gee and not stac and not sentinel_hub and not earthdata and not eumetsat and not asf"
             catchall_deselect=""
@@ -96,10 +96,11 @@ jobs:
           hazards)
             providers=(
             '{"name":"emdat","path":"libs/providers/hazards/(src/earthlens|tests)/emdat/","marker":"e2e and emdat and not gdis","groups":"groups: dev, extras: emdat"}'
+            '{"name":"osm","path":"libs/providers/hazards/(src/earthlens|tests)/osm/","marker":"e2e and osm","groups":"groups: dev, extras: osm"}'
             )
             catchall_marker="e2e and not emdat and not osm and not osm_pbf"
             catchall_deselect="tests/admin/test_admin_e2e.py::TestAdminLiveFetch::test_geoboundaries_country_adm1"
-            dedicated_backends="emdat"
+            dedicated_backends="emdat|osm"
             ;;
             *)
               echo "unknown theme: $THEME" >&2
