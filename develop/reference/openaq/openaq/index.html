@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -17382,6 +17382,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/bathymetry/07_emodnet_european_bathymetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EMODnet Bathymetry — European high-resolution DTM (OGC WCS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/bathymetry/08_emodnet_wcs_deep_dive/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EMODnet Bathymetry over OGC WCS — a guided tour
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -31196,7 +31252,7 @@ response's error is raised.</p>
       &lt;small class=&quot;doc doc-label doc-label-property&quot;&gt;&lt;code&gt;property&lt;/code&gt;&lt;/small&gt;
   &lt;/span&gt; (&lt;code&gt;earthlens.openaq.client.OpenaqClient.timeout&lt;/code&gt;)" href="#earthlens.openaq.client.OpenaqClient.timeout">timeout</a></code></td>
             <td>
-                  <code><span title="earthlens.base.http.Timeout">Timeout</span></code>
+                  <code><span title="float">float</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -31499,8 +31555,8 @@ response's error is raised.</p>
 <a id="__codelineno-0-115" name="__codelineno-0-115"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_http</span><span class="o">.</span><span class="n">backoff_factor</span>
 <a id="__codelineno-0-116" name="__codelineno-0-116"></a>
 <a id="__codelineno-0-117" name="__codelineno-0-117"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-118" name="__codelineno-0-118"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Timeout</span><span class="p">:</span>
-<a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Per-request timeout in seconds (a float or a `(connect, read)` pair).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Per-request timeout in seconds.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_http</span><span class="o">.</span><span class="n">timeout</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>
 <a id="__codelineno-0-122" name="__codelineno-0-122"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -31726,7 +31782,7 @@ response's error is raised.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Per-request timeout in seconds (a float or a <code>(connect, read)</code> pair).</p>
+        <p>Per-request timeout in seconds.</p>
 
     </div>
 
