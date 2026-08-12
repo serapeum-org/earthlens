@@ -453,7 +453,7 @@ class EarthLens:
              'climate_indices', 'cmems', 'cmip6', 'cop-dem', 'copernicus-dem', 'dea',
              'deafrica', 'dem', 'digital-earth-africa', 'digital-earth-australia', 'drought', 'earth-search',
              'earthdata', 'ecmwf', 'edo', 'eea-aq', 'efhm', 'elevation',
-             'emdat', 'erddap', 'etopo', 'eumetsat', 'european-flood-hazard', 'fab-dem',
+             'emdat', 'eodc', 'erddap', 'etopo', 'eumetsat', 'european-flood-hazard', 'fab-dem',
              'fabdem', 'fdsn', 'firms', 'flodis', 'flopros', 'g-portal',
              'gbif', 'gdacs', 'gdis', 'gdo', 'gebco', 'gee',
              'geoboundaries', 'gfw', 'ghs', 'ghsl', 'glaciers', 'glims',

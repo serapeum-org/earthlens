@@ -28,7 +28,7 @@ class TestRouting:
     """The facade registers and resolves the STAC keys."""
 
     def test_keys_present(self):
-        """stac plus every endpoint alias (incl. bdc) is registered."""
+        """stac plus every endpoint alias (incl. bdc and eodc) is registered."""
         for key in (
             "stac",
             "planetary-computer",
@@ -43,6 +43,7 @@ class TestRouting:
             "landsat",
             "bdc",
             "brazil-data-cube",
+            "eodc",
         ):
             assert key in EarthLens.DataSources
 
@@ -62,6 +63,7 @@ class TestRouting:
             "landsat",
             "bdc",
             "brazil-data-cube",
+            "eodc",
         ):
             assert EarthLens.DataSources[key] is STAC
 

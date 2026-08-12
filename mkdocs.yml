@@ -605,6 +605,7 @@ nav:
       - Brazil Data Cube — CBERS-4 / AMAZONIA-1: examples/stac/bdc_cbers_amazonia.ipynb
       - NASA VEDA — NLDAS-3 / Black Marble HD / CMIP6: examples/stac/veda_nasa_derived.ipynb
       - USGS LandsatLook — requester-pays: examples/stac/usgs_landsat_requester_pays.ipynb
+      - Copernicus GFM — flood extent (EODC): examples/stac/eodc_gfm_flood_extent.ipynb
     - Disaster alerts (GDACS):
       - Quickstart — recent alerts: examples/gdacs/quickstart.ipynb
       - Global hazard dashboard: examples/gdacs/global_hazard_dashboard.ipynb
