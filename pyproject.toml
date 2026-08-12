@@ -124,8 +124,9 @@ dev = [
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
-    # runtime dep of earthlens itself.
-    "pyramids-gis[viz] >=0.46.0",
+    # runtime dep of earthlens itself. Resolved from the GitHub `main` branch
+    # (see [tool.uv.sources] below); the floor tracks main's current baseline.
+    "pyramids-gis[viz] >=0.50.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -135,9 +136,10 @@ dev = [
     # object (the old kwarg still works as a deprecated alias, but the
     # showcase notebooks already migrated their existing text_loc= calls,
     # and the new dark-canvas notebook uses FrameLabel's color= directly
-    # rather than the also-deprecated label_color=) -- floor pinned to
-    # the latest of these, >=0.26.1.
-    "cleopatra >=0.26.1",
+    # rather than the also-deprecated label_color=) -- 0.30.0 completes the
+    # move to grouped/typed render-parameter objects (glyphs/styling/basemap
+    # subpackages), which pyramids main's typed plot-spec API builds on.
+    "cleopatra >=0.30.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.
@@ -168,8 +170,9 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.46.0",
-    "cleopatra >=0.26.1",
+    # Resolved from the GitHub `main` branch (see [tool.uv.sources]).
+    "pyramids-gis[viz] >=0.50.0",
+    "cleopatra >=0.30.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
 ]
@@ -466,3 +469,10 @@ earthlens-ocean = { workspace = true }
 earthlens-imagery = { workspace = true }
 earthlens-land = { workspace = true }
 earthlens-hazards = { workspace = true }
+# pyramids-gis is tracked from its GitHub `main` branch (not a PyPI release) so
+# earthlens builds against the latest pyramids API. A workspace-root source
+# applies to every member, so all `pyramids-gis[...]` requirements across
+# libs/core and the providers resolve from git main. The extras named in the
+# dependency strings ([viz] / [stac] / [parquet]) are honoured from the git
+# project. Pin back to a PyPI version by removing this entry.
+pyramids-gis = { git = "https://github.com/serapeum-org/pyramids.git", branch = "main" }
