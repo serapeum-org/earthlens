@@ -14,7 +14,7 @@ them all and selects the right signer from the catalog.
 | `planetary-computer` | Microsoft Planetary Computer | broad catalogue (~120 collections) | Azure **SAS** URL signing (no account) |
 | `cdse` | Copernicus Data Space Ecosystem | every Sentinel mission | **S3** credentials (eodata store) |
 | `earth-search` | Element 84 / AWS Open Data | anonymous Sentinel-2 COG, Landsat C2, Copernicus DEM | **anonymous** |
-| `eodc` | Earth Observation Data Centre | Copernicus GFM (Global Flood Monitoring) | **anonymous** |
+| `eodc` | Earth Observation Data Centre | Copernicus GFM + EODC raster collections (SAR σ0/γ0, soil moisture, DEM, land cover, orthophotos) | **anonymous** |
 
 The model extends to USGS Landsat (`aws-requester-pays`) and other public STAC
 catalogues (DE Africa, DEA, Brazil Data Cube, VEDA, EODC) by adding a catalog row.

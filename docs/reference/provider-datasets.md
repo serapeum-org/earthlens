@@ -55,7 +55,7 @@ or station — not a dataset id), noted as such.
 | Provider | What it serves | Example keys | Datasets |
 |---|---|---|---|
 | `gee` | Google Earth Engine — the full EE catalog, auto-grouped (optical, land-cover, hydrology, elevation, climate, atmosphere, precip, SAR) | `COPERNICUS/S2_SR_HARMONIZED`, `LANDSAT/LC08/C02/T1_L2`, `ECMWF/ERA5_LAND/HOURLY` | 1,104 |
-| `stac` | STAC across 9 endpoints — Planetary Computer, CDSE, Earth Search, DE Africa/Australia, BDC, VEDA, USGS Landsat, EODC (Copernicus GFM) | `sentinel-2-l2a`, `landsat-c2-l2`, `cop-dem-glo-30`, `eodc/gfm` | ~253 curated / ~1,140 addressable |
+| `stac` | STAC across 9 endpoints — Planetary Computer, CDSE, Earth Search, DE Africa/Australia, BDC, VEDA, USGS Landsat, EODC (Copernicus GFM + EODC raster collections) | `sentinel-2-l2a`, `landsat-c2-l2`, `cop-dem-glo-30`, `eodc/gfm` | ~304 curated / ~1,130 addressable |
 | `earthdata` | NASA Earthdata — flagship EOSDIS collections across 9 DAACs (GPM, MODIS/VIIRS, GEDI, ICESat-2, ECOSTRESS, EMIT, HLS, SMAP, MUR SST, TEMPO, PACE) | `GPM_3IMERGHHL_07`, `MOD13Q1_061`, `ATL06_006`, `HLSS30_20` | 46 curated / ~8,029 addressable |
 | `eumetsat` | EUMETSAT Data Store — MTG/MSG/MFG, Metop(-SG), Sentinel-3/-5P/-6, OSI SAF | `msg-hrseviri`, `mtg-fci-l1c`, `sentinel5p-l2-no2` | 180 |
 | `jaxa` | JAXA archive — jaxa-earth (STAC/COG), G-Portal (mission products), P-Tree (Himawari) | `aw3d30`, `gsmap`, `sgli-chla-d-daily` | 918 |

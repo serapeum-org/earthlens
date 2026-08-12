@@ -161,6 +161,34 @@ class TestEodcSearchFetch:
 
 
 @pytest.mark.stac
+class TestEodcCollections:
+    """The broader EODC raster-COG catalog beyond GFM."""
+
+    def test_eodc_serves_fifty_two_collections(self):
+        """EODC curates GFM plus the 51 other raster-COG collections."""
+        eodc = [k for k in Catalog().datasets if k.startswith("eodc/")]
+        assert len(eodc) == 52
+
+    def test_sample_collections_resolve_to_upstream_ids(self):
+        """A logical eodc/<id> key resolves to the upstream collection id."""
+        cat = Catalog()
+        assert cat.resolve("eodc", "eodc/CORINE_LAND_COVER") == "CORINE_LAND_COVER"
+        assert cat.resolve("eodc", "eodc/SENTINEL1_SIG0_20M") == "SENTINEL1_SIG0_20M"
+
+    def test_sar_collection_defaults_to_vv(self):
+        """The Sentinel-1 sigma0 collection defaults to the VV polarisation."""
+        sig0 = Catalog().get_collection("eodc/SENTINEL1_SIG0_20M")
+        assert sig0.default_assets == ["VV"]
+        assert set(sig0.assets) == {"VH", "VV"}
+
+    def test_non_raster_collections_are_not_curated(self):
+        """Zarr / NetCDF / SAFE EODC collections are intentionally absent."""
+        keys = set(Catalog().datasets)
+        for uncuratable in ("eodc/SENTINEL2_L2A", "eodc/climatedt-austria"):
+            assert uncuratable not in keys
+
+
+@pytest.mark.stac
 def test_stac_backend_never_imports_xarray():
     """The GFM raster path stays on pyramids — the backend never imports xarray."""
     import earthlens.stac.backend as backend_mod
