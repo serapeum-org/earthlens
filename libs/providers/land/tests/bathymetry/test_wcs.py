@@ -154,6 +154,14 @@ def test_fully_contained_aoi_does_not_warn(
     assert not any("extends beyond" in message for message in seen)
 
 
+def test_http_client_is_built_once_and_reused(tmp_path: Path, fake_from_wcs: dict):
+    """The pooled HttpClient is created once and reused across calls."""
+    backend = _make("emodnet", tmp_path)
+    first = backend._client()
+    second = backend._client()
+    assert first is second, "the client must be cached on the instance, not rebuilt"
+
+
 def test_domain_guard_noops_without_native_bbox(tmp_path: Path, fake_from_wcs: dict):
     """The domain guard is a no-op for a row that declares no native_bbox."""
     backend = _make("emodnet", tmp_path)

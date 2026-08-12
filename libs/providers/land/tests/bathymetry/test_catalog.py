@@ -80,6 +80,13 @@ def test_unknown_id_raises_did_you_mean(catalog: Catalog):
         catalog.get("gebco2020")
 
 
+def test_get_catalog_returns_dataset_map(catalog: Catalog):
+    """get_catalog() returns the id→Dataset map backing the catalog."""
+    mapping = catalog.get_catalog()
+    assert mapping is catalog.datasets
+    assert mapping["emodnet"].transport == "wcs"
+
+
 def test_get_returns_frozen_dataset(catalog: Catalog):
     """get() returns a frozen Dataset row that rejects mutation."""
     row = catalog.get("etopo1_ice")
