@@ -45,6 +45,8 @@ BASE_URL: str = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL"
 #: budget on a connection that will never open. Retrying a connect that times
 #: out rarely turns into success, so three attempts of a 120 s connect wait
 #: previously spent ~6 minutes per file waiting on a dead host (issue #932).
+#: 9.15 s follows the `requests` timeout guidance of a value slightly larger
+#: than a multiple of the 3 s TCP packet-retransmission window (3 x 3.05).
 _CONNECT_TIMEOUT: float = 9.15
 
 #: Read-phase timeout (seconds) for a GHSL file download. Generous on purpose: a
