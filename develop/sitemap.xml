@@ -129,6 +129,10 @@
          <lastmod>2026-08-12</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/bathymetry/07_emodnet_european_bathymetry/</loc>
+         <lastmod>2026-08-12</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/caravan/attributes_geometry_and_base/</loc>
          <lastmod>2026-08-12</lastmod>
     </url>
@@ -930,10 +934,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/stac/bdc_cbers_amazonia/</loc>
-         <lastmod>2026-08-12</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/stac/eodc_gfm_flood_extent/</loc>
          <lastmod>2026-08-12</lastmod>
     </url>
     <url>

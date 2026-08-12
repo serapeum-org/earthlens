@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/stac/eodc_gfm_flood_extent/">
+        <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/examples/bathymetry/07_emodnet_european_bathymetry/">
       
       
-        <link rel="prev" href="../usgs_landsat_requester_pays/">
+        <link rel="prev" href="../06_depth_histogram/">
       
       
-        <link rel="next" href="../../gdacs/quickstart/">
+        <link rel="next" href="../../dem/01_dem_quickstart/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Copernicus GFM — flood extent from Sentinel-1 (EODC STAC) - earthlens</title>
+        <title>EMODnet Bathymetry — European high-resolution DTM (OGC WCS) - earthlens</title>
       
     
     
@@ -87,13 +87,13 @@
     
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="earthlens">
-    <meta property="og:title" content="Copernicus GFM — flood extent from Sentinel-1 (EODC STAC)">
+    <meta property="og:title" content="EMODnet Bathymetry — European high-resolution DTM (OGC WCS)">
     <meta property="og:description" content="One Python facade for 48 Earth-observation data providers">
-    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/examples/stac/eodc_gfm_flood_extent/">
+    <meta property="og:url" content="https://serapeum-org.github.io/earthlens/develop/examples/bathymetry/07_emodnet_european_bathymetry/">
     <meta property="og:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/github-social-preview.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Copernicus GFM — flood extent from Sentinel-1 (EODC STAC)">
+    <meta name="twitter:title" content="EMODnet Bathymetry — European high-resolution DTM (OGC WCS)">
     <meta name="twitter:description" content="One Python facade for 48 Earth-observation data providers">
     <meta name="twitter:image"
           content="https://serapeum-org.github.io/earthlens/develop/_images/branding/earthlens-brand-kit/social/announcement-card.png">
@@ -119,7 +119,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#copernicus-gfm-flood-extent-from-sentinel-1-eodc-stac" class="md-skip">
+        <a href="#emodnet-bathymetry-european-high-resolution-dtm-ogc-wcs" class="md-skip">
           Skip to content
         </a>
       
@@ -158,7 +158,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Copernicus GFM — flood extent from Sentinel-1 (EODC STAC)
+              EMODnet Bathymetry — European high-resolution DTM (OGC WCS)
             
           </span>
         </div>
@@ -15149,8 +15149,6 @@
                 
   
   
-    
-  
   
   
     
@@ -15161,11 +15159,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_18" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_18" >
         
           
           <label class="md-nav__link" for="__nav_5_18" id="__nav_5_18_label" tabindex="0">
@@ -15186,7 +15184,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_18_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_18_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5_18">
             <span class="md-nav__icon md-icon"></span>
             
@@ -15204,7 +15202,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quickstart/" class="md-nav__link">
+      <a href="../../stac/quickstart/" class="md-nav__link">
         
   
   
@@ -15232,7 +15230,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sentinel2_ndvi_timeseries/" class="md-nav__link">
+      <a href="../../stac/sentinel2_ndvi_timeseries/" class="md-nav__link">
         
   
   
@@ -15260,7 +15258,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../mpc_landsat_cdse_sentinel_same_aoi/" class="md-nav__link">
+      <a href="../../stac/mpc_landsat_cdse_sentinel_same_aoi/" class="md-nav__link">
         
   
   
@@ -15288,7 +15286,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../regional_data_cubes/" class="md-nav__link">
+      <a href="../../stac/regional_data_cubes/" class="md-nav__link">
         
   
   
@@ -15316,7 +15314,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../bdc_cbers_amazonia/" class="md-nav__link">
+      <a href="../../stac/bdc_cbers_amazonia/" class="md-nav__link">
         
   
   
@@ -15344,7 +15342,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../veda_nasa_derived/" class="md-nav__link">
+      <a href="../../stac/veda_nasa_derived/" class="md-nav__link">
         
   
   
@@ -15372,7 +15370,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../usgs_landsat_requester_pays/" class="md-nav__link">
+      <a href="../../stac/usgs_landsat_requester_pays/" class="md-nav__link">
         
   
   
@@ -15388,136 +15386,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Copernicus GFM — flood extent from Sentinel-1 (EODC STAC)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Copernicus GFM — flood extent from Sentinel-1 (EODC STAC)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-catalog-no-network" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The catalog (no network)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#download-a-flood-extent-scene-2022-pakistan-sindh-floods" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Download a flood-extent scene — 2022 Pakistan (Sindh) floods
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#inspect-the-written-cog" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inspect the written COG
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#map-the-flood-extent" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Map the flood extent
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#selecting-other-layers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Selecting other layers
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -16673,6 +16541,8 @@
                 
   
   
+    
+  
   
   
     
@@ -16683,11 +16553,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_28" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_28" checked>
         
           
           <label class="md-nav__link" for="__nav_5_28" id="__nav_5_28_label" tabindex="0">
@@ -16708,7 +16578,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_28_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_28_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5_28">
             <span class="md-nav__icon md-icon"></span>
             
@@ -16726,7 +16596,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/01_bathymetry_quickstart/" class="md-nav__link">
+      <a href="../01_bathymetry_quickstart/" class="md-nav__link">
         
   
   
@@ -16754,7 +16624,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/02_catalog_explorer/" class="md-nav__link">
+      <a href="../02_catalog_explorer/" class="md-nav__link">
         
   
   
@@ -16782,7 +16652,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/03_coastal_depth_profile/" class="md-nav__link">
+      <a href="../03_coastal_depth_profile/" class="md-nav__link">
         
   
   
@@ -16810,7 +16680,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/04_gebco_vs_etopo_resolution/" class="md-nav__link">
+      <a href="../04_gebco_vs_etopo_resolution/" class="md-nav__link">
         
   
   
@@ -16838,7 +16708,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/05_shaded_relief/" class="md-nav__link">
+      <a href="../05_shaded_relief/" class="md-nav__link">
         
   
   
@@ -16866,7 +16736,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../bathymetry/06_depth_histogram/" class="md-nav__link">
+      <a href="../06_depth_histogram/" class="md-nav__link">
         
   
   
@@ -16882,6 +16752,147 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EMODnet Bathymetry — European high-resolution DTM (OGC WCS)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EMODnet Bathymetry — European high-resolution DTM (OGC WCS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-emodnet-rows-in-the-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The EMODnet rows in the catalog
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#download-an-emodnet-subset-over-wcs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Download an EMODnet subset over WCS
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-and-map-the-sea-floor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read and map the sea floor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#european-coverage-when-to-reach-for-a-global-dem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        European coverage — when to reach for a global DEM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attribution
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -22941,10 +22952,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-catalog-no-network" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The catalog (no network)
+        Setup
       
     </span>
   </a>
@@ -22952,10 +22963,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download-a-flood-extent-scene-2022-pakistan-sindh-floods" class="md-nav__link">
+  <a href="#the-emodnet-rows-in-the-catalog" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download a flood-extent scene — 2022 Pakistan (Sindh) floods
+        The EMODnet rows in the catalog
       
     </span>
   </a>
@@ -22963,10 +22974,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#inspect-the-written-cog" class="md-nav__link">
+  <a href="#download-an-emodnet-subset-over-wcs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Inspect the written COG
+        Download an EMODnet subset over WCS
       
     </span>
   </a>
@@ -22974,10 +22985,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#map-the-flood-extent" class="md-nav__link">
+  <a href="#read-and-map-the-sea-floor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Map the flood extent
+        Read and map the sea floor
       
     </span>
   </a>
@@ -22985,10 +22996,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#selecting-other-layers" class="md-nav__link">
+  <a href="#european-coverage-when-to-reach-for-a-global-dem" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Selecting other layers
+        European coverage — when to reach for a global DEM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attribution
       
     </span>
   </a>
@@ -23012,7 +23034,7 @@
 
 
   
-    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/stac/eodc_gfm_flood_extent.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/serapeum-org/earthlens/edit/master/docs/examples/bathymetry/07_emodnet_european_bathymetry.ipynb" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -23021,7 +23043,7 @@
     
       
     
-    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/stac/eodc_gfm_flood_extent.ipynb" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/serapeum-org/earthlens/raw/master/docs/examples/bathymetry/07_emodnet_european_bathymetry.ipynb" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
@@ -23755,16 +23777,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="copernicus-gfm-flood-extent-from-sentinel-1-eodc-stac">Copernicus GFM — flood extent from Sentinel-1 (EODC STAC)<a class="anchor-link" href="#copernicus-gfm-flood-extent-from-sentinel-1-eodc-stac">¶</a></h1><p><strong>Global Flood Monitoring (GFM)</strong> is the Copernicus Emergency Management Service's continuous, global,
-near-real-time flood-mapping product. It is derived from <strong>all incoming Sentinel-1 SAR</strong> acquisitions and
-published — publicly and <strong>anonymously</strong> — through the EODC STAC API (<code>stac.eodc.eu</code>). earthlens reaches it
-through the shipped <strong><code>stac</code></strong> backend under the <code>eodc</code> endpoint, as the collection <code>eodc/gfm</code>.</p>
-<p>This notebook runs <strong>real</strong> requests against EODC; a cell that fails (network down, upstream broken) will error
-so you can see why.</p>
-<p>GFM exposes twelve single-band <code>uint8</code> COG layers (nodata <code>255</code>): the final <strong>ensemble</strong> products
-(<code>ensemble_flood_extent</code>, <code>ensemble_water_extent</code>, <code>ensemble_likelihood</code>), a <code>reference_water_mask</code>, an
-<code>exclusion_mask</code>, <code>advisory_flags</code>, and the per-algorithm <code>dlr_</code> / <code>tuw_</code> / <code>list_</code> intermediates. Licence:
-Copernicus (free, attribution — <a href="https://extwiki.eodc.eu/en/GFM">https://extwiki.eodc.eu/en/GFM</a>).</p>
+<h1 id="emodnet-bathymetry-european-high-resolution-dtm-ogc-wcs">EMODnet Bathymetry — European high-resolution DTM (OGC WCS)<a class="anchor-link" href="#emodnet-bathymetry-european-high-resolution-dtm-ogc-wcs">¶</a></h1><p>Fetch a small <strong>EMODnet Bathymetry</strong> Digital Terrain Model (DTM) subset over a
+North Sea AOI, map the sea-floor depth, and see how the European DTM complements
+the global GEBCO / ETOPO grids. Unlike the ERDDAP <code>griddap</code> DEMs, EMODnet is read
+over <strong>OGC WCS</strong> through <code>pyramids.Dataset.from_wcs</code> — <code>earthlens</code> supplies only the
+coverage id, AOI, CRS, and protocol version, and never touches a competing array
+stack.</p>
 </div>
 </div>
 </div>
@@ -23775,8 +23793,8 @@ Copernicus (free, attribution — <a href="https://extwiki.eodc.eu/en/GFM">https
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="the-catalog-no-network">The catalog (no network)<a class="anchor-link" href="#the-catalog-no-network">¶</a></h2><p>The GFM collection is addressed by the logical key <code>eodc/gfm</code>, which the catalog resolves to the upstream id
-<code>GFM</code> on the <code>eodc</code> endpoint. No network access happens here — this is the bundled catalog.</p>
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p><code>earthlens</code> provides the unified <code>EarthLens</code> entry point; <code>pyramids</code> reads the
+written GeoTIFF; downloads go to a temporary directory.</p>
 </div>
 </div>
 </div>
@@ -23799,33 +23817,23 @@ Copernicus (free, attribution — <a href="https://extwiki.eodc.eu/en/GFM">https
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.stac</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 
-<span class="n">cat</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<span class="n">gfm</span> <span class="o">=</span> <span class="n">cat</span><span class="o">.</span><span class="n">get_collection</span><span class="p">(</span><span class="s2">"eodc/gfm"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="s2">"endpoint:"</span><span class="p">,</span>
-    <span class="n">cat</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="s2">"eodc"</span><span class="p">)</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
-    <span class="s2">"| signer:"</span><span class="p">,</span>
-    <span class="n">cat</span><span class="o">.</span><span class="n">get_endpoint</span><span class="p">(</span><span class="s2">"eodc"</span><span class="p">)</span><span class="o">.</span><span class="n">signer</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"resolves to:"</span><span class="p">,</span> <span class="n">cat</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="s2">"eodc"</span><span class="p">,</span> <span class="s2">"eodc/gfm"</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"default asset:"</span><span class="p">,</span> <span class="n">gfm</span><span class="o">.</span><span class="n">default_assets</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"layers:"</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">gfm</span><span class="o">.</span><span class="n">assets</span><span class="p">))</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.bathymetry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from earthlens.stac import Catalog
+<div class="clipboard-copy-txt" id="cell-1">import tempfile
 
-cat = Catalog()
-gfm = cat.get_collection("eodc/gfm")
-print(
-    "endpoint:",
-    cat.get_endpoint("eodc").url,
-    "| signer:",
-    cat.get_endpoint("eodc").signer,
-)
-print("resolves to:", cat.resolve("eodc", "eodc/gfm"))
-print("default asset:", gfm.default_assets)
-print("layers:", list(gfm.assets))</div>
+import matplotlib.pyplot as plt
+import numpy as np
+from pyramids.dataset import Dataset
+
+from earthlens.bathymetry import Catalog
+from earthlens.core import EarthLens</div>
 </div>
 </div>
 </div>
@@ -23838,11 +23846,9 @@ print("layers:", list(gfm.assets))</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="download-a-flood-extent-scene-2022-pakistan-sindh-floods">Download a flood-extent scene — 2022 Pakistan (Sindh) floods<a class="anchor-link" href="#download-a-flood-extent-scene-2022-pakistan-sindh-floods">¶</a></h2><p>GFM flood extent is <strong>sparse</strong>: each layer maps only what a given Sentinel-1 swath observed, so an area outside
-the swath (or not processed that day) is legitimately all-nodata. We therefore pick an area and date where the
-swath carried flood-mapped pixels — the catastrophic <strong>2022 Indus floods</strong> over Sindh on <strong>11 September 2022</strong>.</p>
-<p><code>aoi</code> is <code>[west, south, east, north]</code> in degrees; <code>download()</code> writes one Cloud-Optimized GeoTIFF per
-<code>(collection, acquisition date)</code> and returns the paths.</p>
+<h2 id="the-emodnet-rows-in-the-catalog">The EMODnet rows in the catalog<a class="anchor-link" href="#the-emodnet-rows-in-the-catalog">¶</a></h2><p>The <code>bathymetry</code> catalog carries the latest EMODnet release as <code>emodnet</code> plus
+year-stamped older releases. Each is a <code>wcs</code>-transport row pointing at the EMODnet
+Bathymetry OGC WCS. Reading the catalog is offline.</p>
 </div>
 </div>
 </div>
@@ -23865,37 +23871,15 @@ swath carried flood-mapped pixels — the catastrophic <strong>2022 Indus floods
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-
-<span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"eodc"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2022-09-11"</span><span class="p">,</span>
-    <span class="n">end</span><span class="o">=</span><span class="s2">"2022-09-11"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"eodc/gfm"</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"ensemble_flood_extent"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">67.0</span><span class="p">,</span> <span class="mf">27.0</span><span class="p">,</span> <span class="mf">68.0</span><span class="p">,</span> <span class="mf">28.0</span><span class="p">],</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
-<span class="p">)</span>
-<span class="n">paths</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<span class="n">paths</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">catalog</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">dataset_id</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">catalog</span><span class="o">.</span><span class="n">datasets</span> <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'emodnet'</span><span class="p">)):</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">:</span><span class="s1">14</span><span class="si">}</span><span class="s1"> transport=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">transport</span><span class="si">:</span><span class="s1">4</span><span class="si">}</span><span class="s1"> coverage=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">dataset_id</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">import tempfile
-
-from earthlens.core import EarthLens
-
-el = EarthLens(
-    data_source="eodc",
-    start="2022-09-11",
-    end="2022-09-11",
-    dataset="eodc/gfm",
-    variables=["ensemble_flood_extent"],
-    aoi=[67.0, 27.0, 68.0, 28.0],
-    path=tempfile.mkdtemp(),
-)
-paths = el.download()
-paths</div>
+<div class="clipboard-copy-txt" id="cell-2">catalog = Catalog()
+for dataset_id in sorted(d for d in catalog.datasets if d.startswith('emodnet')):
+    row = catalog.get(dataset_id)
+    print(f'{dataset_id:14} transport={row.transport:4} coverage={row.dataset_id}')</div>
 </div>
 </div>
 </div>
@@ -23908,8 +23892,9 @@ paths</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="inspect-the-written-cog">Inspect the written COG<a class="anchor-link" href="#inspect-the-written-cog">¶</a></h2><p>Open it with <strong>pyramids</strong> and look at the flood-extent encoding: <code>0</code> = no flood observed, <code>1</code> = flood, <code>255</code> =
-nodata (outside the swath / not processed).</p>
+<h2 id="download-an-emodnet-subset-over-wcs">Download an EMODnet subset over WCS<a class="anchor-link" href="#download-an-emodnet-subset-over-wcs">¶</a></h2><p>Build the request — the <code>bathymetry</code> source, the <code>emodnet</code> dataset, and a small
+North Sea AOI (<code>aoi</code> is <code>[min_lon, min_lat, max_lon, max_lat]</code>). <code>download()</code> issues
+the WCS <code>GetCoverage</code>, crops to the AOI, and returns the written GeoTIFF path(s).</p>
 </div>
 </div>
 </div>
@@ -23932,23 +23917,23 @@ nodata (outside the swath / not processed).</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-
-<span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-<span class="n">arr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-<span class="n">values</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"epsg:"</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="p">,</span> <span class="s2">"| shape:"</span><span class="p">,</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"value histogram:"</span><span class="p">,</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">):</span> <span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">counts</span><span class="p">)})</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">out</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+    <span class="n">data_source</span><span class="o">=</span><span class="s1">'bathymetry'</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">=</span><span class="s1">'emodnet'</span><span class="p">,</span>
+    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">53.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">55.0</span><span class="p">],</span>
+    <span class="n">path</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">paths</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">import numpy as np
-from pyramids.dataset import Dataset
-
-ds = Dataset.read_file(str(paths[0]))
-arr = ds.read_array()
-values, counts = np.unique(arr, return_counts=True)
-print("epsg:", ds.epsg, "| shape:", arr.shape)
-print("value histogram:", {int(v): int(c) for v, c in zip(values, counts)})</div>
+<div class="clipboard-copy-txt" id="cell-3">out = tempfile.mkdtemp()
+paths = EarthLens(
+    data_source='bathymetry',
+    dataset='emodnet',
+    aoi=[2.0, 53.0, 4.0, 55.0],
+    path=out,
+).download(progress_bar=False)
+paths</div>
 </div>
 </div>
 </div>
@@ -23961,7 +23946,8 @@ print("value histogram:", {int(v): int(c) for v, c in zip(values, counts)})</div
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="map-the-flood-extent">Map the flood extent<a class="anchor-link" href="#map-the-flood-extent">¶</a></h2><p>Mask the nodata (<code>255</code>) and show the observed no-flood (<code>0</code>) vs flood (<code>1</code>) pixels.</p>
+<h2 id="read-and-map-the-sea-floor">Read and map the sea floor<a class="anchor-link" href="#read-and-map-the-sea-floor">¶</a></h2><p>Read the GeoTIFF with <code>pyramids</code> and map the mean depth — every value in this
+all-water AOI is below sea level, so the depths are negative (metres).</p>
 </div>
 </div>
 </div>
@@ -23984,65 +23970,42 @@ print("value histogram:", {int(v): int(c) for v, c in zip(values, counts)})</div
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListedColormap</span>
-
-<span class="n">band</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">arr</span>
-<span class="n">masked</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_equal</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
-<span class="n">cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">([</span><span class="s2">"#e8e4d8"</span><span class="p">,</span> <span class="s2">"#1f6fb4"</span><span class="p">])</span>  <span class="c1"># 0 = dry land, 1 = flood</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-<span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">masked</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">"nearest"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">"GFM ensemble flood extent — Sindh, Pakistan, 2022-09-11"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
-<span class="n">cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">ticks</span><span class="o">=</span><span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">],</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
-<span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s2">"no flood"</span><span class="p">,</span> <span class="s2">"flood"</span><span class="p">])</span>
-<span class="n">flood_px</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">band</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">flood_px</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> flood pixels mapped in this AOI"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">read_array</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'float32'</span><span class="p">)</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">arr</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s1">'epsg'</span><span class="p">,</span>
+    <span class="n">ds</span><span class="o">.</span><span class="n">epsg</span><span class="p">,</span>
+    <span class="s1">'| shape'</span><span class="p">,</span>
+    <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+    <span class="s1">'| depth range'</span><span class="p">,</span>
+    <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">arr</span><span class="p">))),</span>
+    <span class="s1">'..'</span><span class="p">,</span>
+    <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">arr</span><span class="p">))),</span>
+    <span class="s1">'m'</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib.colors import ListedColormap
-
-band = arr[0] if arr.ndim == 3 else arr
-masked = np.ma.masked_equal(band, 255)
-cmap = ListedColormap(["#e8e4d8", "#1f6fb4"])  # 0 = dry land, 1 = flood
-
-fig, ax = plt.subplots(figsize=(9, 4))
-im = ax.imshow(masked, cmap=cmap, vmin=0, vmax=1, interpolation="nearest")
-ax.set_title("GFM ensemble flood extent — Sindh, Pakistan, 2022-09-11")
-ax.set_xticks([])
-ax.set_yticks([])
-cbar = fig.colorbar(im, ax=ax, ticks=[0.25, 0.75], shrink=0.8)
-cbar.ax.set_yticklabels(["no flood", "flood"])
-flood_px = int((band == 1).sum())
-ax.set_xlabel(f"{flood_px:,} flood pixels mapped in this AOI")
-plt.tight_layout()
-plt.show()</div>
+<div class="clipboard-copy-txt" id="cell-4">ds = Dataset.read_file(str(paths[0]))
+arr = np.asarray(ds.read_array(), dtype='float32')
+arr = arr[0] if arr.ndim == 3 else arr
+print(
+    'epsg',
+    ds.epsg,
+    '| shape',
+    arr.shape,
+    '| depth range',
+    round(float(np.nanmin(arr))),
+    '..',
+    round(float(np.nanmax(arr))),
+    'm',
+)</div>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="selecting-other-layers">Selecting other layers<a class="anchor-link" href="#selecting-other-layers">¶</a></h2><p>Any of the twelve layers is selectable through <code>variables=</code>. For example, the <strong>reference water mask</strong> —
-GFM's permanent-water baseline — is useful to separate seasonal flooding from standing water. Pull it over the
-same AOI:</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -24060,41 +24023,83 @@ same AOI:</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">el_ref</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-    <span class="n">data_source</span><span class="o">=</span><span class="s2">"eodc"</span><span class="p">,</span>
-    <span class="n">start</span><span class="o">=</span><span class="s2">"2022-09-11"</span><span class="p">,</span>
-    <span class="n">end</span><span class="o">=</span><span class="s2">"2022-09-11"</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="o">=</span><span class="s2">"eodc/gfm"</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">"reference_water_mask"</span><span class="p">],</span>
-    <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="mf">67.0</span><span class="p">,</span> <span class="mf">27.0</span><span class="p">,</span> <span class="mf">68.0</span><span class="p">,</span> <span class="mf">28.0</span><span class="p">],</span>
-    <span class="n">path</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">(),</span>
-<span class="p">)</span>
-<span class="n">ref_paths</span> <span class="o">=</span> <span class="n">el_ref</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<span class="n">ref</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ref_paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-<span class="n">ref_band</span> <span class="o">=</span> <span class="n">ref</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">ref</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="n">ref</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="s2">"reference_water_mask values:"</span><span class="p">,</span>
-    <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">):</span> <span class="nb">int</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">ref_band</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">))},</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">'Blues_r'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">'mean depth (m, negative = below sea level)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'EMODnet Bathymetry DTM (~3.75″) — southern North Sea'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">'off'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">el_ref = EarthLens(
-    data_source="eodc",
-    start="2022-09-11",
-    end="2022-09-11",
-    dataset="eodc/gfm",
-    variables=["reference_water_mask"],
-    aoi=[67.0, 27.0, 68.0, 28.0],
-    path=tempfile.mkdtemp(),
-)
-ref_paths = el_ref.download()
-ref = Dataset.read_file(str(ref_paths[0])).read_array()
-ref_band = ref[0] if ref.ndim == 3 else ref
-print(
-    "reference_water_mask values:",
-    {int(v): int(c) for v, c in zip(*np.unique(ref_band, return_counts=True))},
-)</div>
+<div class="clipboard-copy-txt" id="cell-5">plt.figure(figsize=(6, 5))
+plt.imshow(arr, cmap='Blues_r')
+plt.colorbar(label='mean depth (m, negative = below sea level)')
+plt.title('EMODnet Bathymetry DTM (~3.75″) — southern North Sea')
+plt.axis('off')
+plt.show()</div>
 </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="european-coverage-when-to-reach-for-a-global-dem">European coverage — when to reach for a global DEM<a class="anchor-link" href="#european-coverage-when-to-reach-for-a-global-dem">¶</a></h2><p>EMODnet covers European seas and the extended NE-Atlantic domain, advertised as
+the <code>native_bbox</code> below (<code>west, south, east, north</code>). A request whose bbox extends
+beyond it warns that out-of-coverage cells come back as <code>0.0</code> fill, and a request
+entirely outside raises — pointing you at the global <code>gebco_2020</code> / <code>etopo1_ice</code>
+DEMs for those areas.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=11">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">row</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'emodnet'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'coverage extent (W, S, E, N):'</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">native_bbox</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'for areas outside it, use dataset="gebco_2020" or "etopo1_ice"'</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-6">row = catalog.get('emodnet')
+print('coverage extent (W, S, E, N):', row.native_bbox)
+print('for areas outside it, use dataset="gebco_2020" or "etopo1_ice"')</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="attribution">Attribution<a class="anchor-link" href="#attribution">¶</a></h2><ul>
+<li><strong>EMODnet Bathymetry</strong> — EMODnet Digital Bathymetry (DTM 2024), EMODnet
+Bathymetry Consortium (doi:10.12770/cf51df64-56f9-4a99-b1aa-36b8d7b743a1).</li>
+</ul>
+<p>Provided under the EMODnet use conditions (attribution required). A DEM is a static
+grid with no time axis, so <code>download(aggregate=...)</code> is rejected.</p>
 </div>
 </div>
 </div>
@@ -24141,7 +24146,7 @@ print(
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../usgs_landsat_requester_pays/" class="md-footer__link md-footer__link--prev" aria-label="Previous: USGS LandsatLook — Landsat C2 requester-pays">
+          <a href="../06_depth_histogram/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Bathymetry — depth distribution">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -24151,20 +24156,20 @@ print(
                 Previous
               </span>
               <div class="md-ellipsis">
-                USGS LandsatLook — Landsat C2 requester-pays
+                Bathymetry — depth distribution
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../gdacs/quickstart/" class="md-footer__link md-footer__link--next" aria-label="Next: GDACS quickstart — recent disaster alerts">
+          <a href="../../dem/01_dem_quickstart/" class="md-footer__link md-footer__link--next" aria-label="Next: Copernicus DEM — quickstart (anonymous, no account)">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                GDACS quickstart — recent disaster alerts
+                Copernicus DEM — quickstart (anonymous, no account)
               </div>
             </div>
             <div class="md-footer__button md-icon">
