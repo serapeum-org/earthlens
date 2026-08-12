@@ -92,9 +92,9 @@ jobs:
             ;;
           hazards)
             providers=(
-            '{"name":"emdat","path":"libs/providers/hazards/(src/earthlens|tests)/emdat/","marker":"e2e and emdat and not gdis","groups":"groups: dev, extras: emdat,earthdata"}'
+            '{"name":"emdat","path":"libs/providers/hazards/(src/earthlens|tests)/emdat/","marker":"e2e and emdat and not gdis","groups":"groups: dev, extras: emdat"}'
             )
-            catchall_marker="e2e and not emdat"
+            catchall_marker="e2e and not emdat and not osm and not osm_pbf"
             catchall_deselect="tests/admin/test_admin_e2e.py::TestAdminLiveFetch::test_geoboundaries_country_adm1"
             dedicated_backends="emdat"
             ;;
