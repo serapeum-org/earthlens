@@ -53,7 +53,7 @@ jobs:
           case "$THEME" in
           atmosphere)
             providers=(
-            "nwp|libs/providers/atmosphere/(src/earthlens|tests)/nwp/|e2e and nwp|groups: dev, extras: nwp"
+            '{"name":"nwp","path":"libs/providers/atmosphere/(src/earthlens|tests)/nwp/","marker":"e2e and nwp","groups":"groups: dev, extras: nwp"}'
             )
             catchall_marker="e2e and not nwp"
             catchall_deselect=""
@@ -61,7 +61,7 @@ jobs:
             ;;
           ocean)
             providers=(
-            "caravan|libs/providers/ocean/(src/earthlens|tests)/caravan/|e2e and caravan|groups: dev"
+            '{"name":"caravan","path":"libs/providers/ocean/(src/earthlens|tests)/caravan/","marker":"e2e and caravan","groups":"groups: dev"}'
             )
             catchall_marker="e2e and not caravan"
             catchall_deselect=""
@@ -69,12 +69,12 @@ jobs:
             ;;
           imagery)
             providers=(
-            "gee|libs/providers/imagery/(src/earthlens|tests)/gee/|e2e and gee|groups: dev, extras: gee"
-            "stac|libs/providers/imagery/(src/earthlens|tests)/stac/|stac and e2e|groups: dev, extras: stac"
-            "sentinel_hub|libs/providers/imagery/(src/earthlens|tests)/sentinel_hub/|sentinel_hub and e2e|groups: dev, extras: sentinel-hub"
-            "earthdata|libs/providers/imagery/(src/earthlens|tests)/earthdata/|e2e and earthdata|groups: dev, extras: earthdata"
-            "eumetsat|libs/providers/imagery/(src/earthlens|tests)/eumetsat/|e2e and eumetsat|groups: dev, extras: eumetsat"
-            "asf|libs/providers/imagery/(src/earthlens|tests)/asf/|e2e and asf|groups: dev, extras: asf,earthdata"
+            '{"name":"gee","path":"libs/providers/imagery/(src/earthlens|tests)/gee/","marker":"e2e and gee","groups":"groups: dev, extras: gee"}'
+            '{"name":"stac","path":"libs/providers/imagery/(src/earthlens|tests)/stac/","marker":"stac and e2e","groups":"groups: dev, extras: stac"}'
+            '{"name":"sentinel_hub","path":"libs/providers/imagery/(src/earthlens|tests)/sentinel_hub/","marker":"sentinel_hub and e2e","groups":"groups: dev, extras: sentinel-hub"}'
+            '{"name":"earthdata","path":"libs/providers/imagery/(src/earthlens|tests)/earthdata/","marker":"e2e and earthdata","groups":"groups: dev, extras: earthdata"}'
+            '{"name":"eumetsat","path":"libs/providers/imagery/(src/earthlens|tests)/eumetsat/","marker":"e2e and eumetsat","groups":"groups: dev, extras: eumetsat"}'
+            '{"name":"asf","path":"libs/providers/imagery/(src/earthlens|tests)/asf/","marker":"e2e and asf","groups":"groups: dev, extras: asf,earthdata"}'
             )
             catchall_marker="e2e and not gee and not stac and not sentinel_hub and not earthdata and not eumetsat and not asf"
             catchall_deselect=""
@@ -82,8 +82,8 @@ jobs:
             ;;
           land)
             providers=(
-            "iucn|libs/providers/land/(src/earthlens|tests)/iucn/|e2e and iucn|groups: dev"
-            "wdpa|libs/providers/land/(src/earthlens|tests)/wdpa/|e2e and wdpa|groups: dev"
+            '{"name":"iucn","path":"libs/providers/land/(src/earthlens|tests)/iucn/","marker":"e2e and iucn","groups":"groups: dev"}'
+            '{"name":"wdpa","path":"libs/providers/land/(src/earthlens|tests)/wdpa/","marker":"e2e and wdpa","groups":"groups: dev"}'
             )
             catchall_marker="e2e and not iucn and not wdpa"
             catchall_deselect=""
@@ -91,7 +91,7 @@ jobs:
             ;;
           hazards)
             providers=(
-            "emdat|libs/providers/hazards/(src/earthlens|tests)/emdat/|e2e and emdat and not gdis|groups: dev, extras: emdat,earthdata"
+            '{"name":"emdat","path":"libs/providers/hazards/(src/earthlens|tests)/emdat/","marker":"e2e and emdat and not gdis","groups":"groups: dev, extras: emdat,earthdata"}'
             )
             catchall_marker="e2e and not emdat"
             catchall_deselect="tests/admin/test_admin_e2e.py::TestAdminLiveFetch::test_geoboundaries_country_adm1"
@@ -128,12 +128,9 @@ jobs:
 
           includes=()
           for row in "${providers[@]}"; do
-            IFS='|' read -r name path_re marker groups <<< "$row"
+            path_re="$(jq -r '.path' <<< "$row")"
             if [ "$run_all" -eq 1 ] || echo "$changed" | grep -Eq "$path_re"; then
-              includes+=("$(jq -cn \
-                --arg name "$name" --arg marker "$marker" \
-                --arg groups "$groups" --arg deselect "" \
-                '{name:$name, marker:$marker, groups:$groups, deselect:$deselect}')")
+              includes+=("$(jq -c '{name, marker, groups, deselect: ""}' <<< "$row")")
             fi
           done
 
