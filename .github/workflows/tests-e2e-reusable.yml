@@ -103,7 +103,9 @@ jobs:
               ;;
           esac
 
-          theme_re="^libs/providers/$THEME/"
+          # Only code paths gate the catch-all: a non-code change under the
+          # theme (e.g. README.md) must not launch its whole live-e2e suite.
+          theme_code_re="^libs/providers/$THEME/(src/earthlens|tests)/"
           dedicated_re="libs/providers/$THEME/(src/earthlens|tests)/($dedicated_backends)/"
           # Any change to core, the lockfile, a manifest, or an e2e workflow
           # file forces every lane in the theme to run.
@@ -140,7 +142,7 @@ jobs:
           if [ "$run_all" -eq 1 ]; then
             include_catchall=1
           else
-            theme_changed="$(echo "$changed" | grep -E "$theme_re" || true)"
+            theme_changed="$(echo "$changed" | grep -E "$theme_code_re" || true)"
             if [ -n "$theme_changed" ]; then
               nondedic="$(echo "$theme_changed" | grep -Ev "$dedicated_re" || true)"
               [ -n "$nondedic" ] && include_catchall=1
