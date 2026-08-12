@@ -14,12 +14,9 @@ from earthlens.cli.validate import (
     _validate_bathymetry,
     _validate_drought,
     _validate_erddap,
-    _validate_flodis,
     _validate_goes,
-    _validate_hanze,
     _validate_nrel,
     _validate_nwp,
-    _validate_osm,
     _validate_radar,
     _validate_soilgrids,
     _validate_tropycal,
@@ -94,90 +91,6 @@ class TestBundledCatalogsLintClean:
         assert result.status == "ok", f"{provider} validator errored: {result.detail}"
         assert result.issues == [], f"{provider} issues: {result.issues}"
         assert result.checked > 0, f"{provider} checked nothing"
-
-
-class TestValidateOsm:
-    """Tests for the OSM structural lint."""
-
-    def test_flags_overpass_row_missing_query_template(self):
-        """An overpass row without a query_template is flagged."""
-        catalog = SimpleNamespace(
-            datasets={
-                "overpass:x": SimpleNamespace(
-                    protocol="overpass", query_template="", geometry_types=["Point"]
-                )
-            }
-        )
-        checked, issues = _validate_osm(catalog)
-        assert checked == 1
-        assert any("missing query_template" in i for i in issues)
-
-    def test_flags_ohsome_row_missing_filter(self):
-        """An ohsome row without an ohsome_filter is flagged."""
-        catalog = SimpleNamespace(
-            datasets={
-                "ohsome:x": SimpleNamespace(
-                    protocol="ohsome", ohsome_filter="", geometry_types=["Polygon"]
-                )
-            }
-        )
-        checked, issues = _validate_osm(catalog)
-        assert any("missing ohsome_filter" in i for i in issues)
-
-    def test_flags_pbf_row_missing_method(self):
-        """A pbf row without a pyrosm_method is flagged."""
-        catalog = SimpleNamespace(
-            datasets={
-                "pbf:x": SimpleNamespace(
-                    protocol="pbf", pyrosm_method="", geometry_types=["Polygon"]
-                )
-            }
-        )
-        checked, issues = _validate_osm(catalog)
-        assert any("missing pyrosm_method" in i for i in issues)
-
-
-class TestValidateHanze:
-    """Tests for the HANZE structural lint."""
-
-    def test_flags_missing_top_level_blocks(self):
-        """A catalog missing record / geometry / files / columns flags each."""
-        catalog = SimpleNamespace(
-            datasets={"River": SimpleNamespace(description="")},
-            record=None,
-            geometry=None,
-            files={},
-            columns={},
-        )
-        checked, issues = _validate_hanze(catalog)
-        joined = " ".join(issues)
-        assert checked == 1
-        assert "River: missing description" in joined
-        assert "record: missing pinned Zenodo record id" in joined
-        assert "geometry: missing shapefile member_stem" in joined
-        assert "files: missing required file 'events'" in joined
-        assert "columns: missing required key 'regions_nuts3'" in joined
-
-
-class TestValidateFlodis:
-    """Tests for the FLODIS structural lint."""
-
-    def test_flags_missing_row_fields_and_top_level_blocks(self):
-        """A catalog missing per-table fields / record / columns flags each."""
-        catalog = SimpleNamespace(
-            datasets={
-                "damages": SimpleNamespace(file="", description="", key_columns=())
-            },
-            record=None,
-            columns={},
-        )
-        checked, issues = _validate_flodis(catalog)
-        joined = " ".join(issues)
-        assert checked == 1
-        assert "damages: missing description" in joined
-        assert "record: missing pinned Zenodo record id" in joined
-        assert "columns: missing required key 'disasterno'" in joined
-        assert "columns: missing required key 'gid_1'" in joined
 
 
 class TestValidateSoilgrids:

@@ -26,4 +26,13 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "validator": "earthlens.overture.cli:validator",
         "live_validator": "earthlens.overture.cli:live_validator",
     },
+    "aqueduct": {"validator": "earthlens.aqueduct.cli:validator"},
+    "emdat": {"validator": "earthlens.emdat.cli:validator"},
+    "flodis": {"validator": "earthlens.flodis.cli:validator"},
+    "flopros": {"validator": "earthlens.flopros.cli:validator"},
+    "gdacs": {"validator": "earthlens.gdacs.cli:validator"},
+    "hanze": {"validator": "earthlens.hanze.cli:validator"},
+    "jrc_flood": {"validator": "earthlens.jrc_flood.cli:validator"},
+    "nsi": {"validator": "earthlens.nsi.cli:validator"},
+    "osm": {"validator": "earthlens.osm.cli:validator"},
 }

@@ -138,24 +138,6 @@ def _validate_ghsl(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("code", "releases")))
 
 
-def _validate_osm(catalog: Any) -> tuple[int, list[str]]:
-    """Each OSM named query needs a protocol and that protocol's query field."""
-
-    def check(key: str, record: Any) -> list[str]:
-        """Flag a query missing protocol/geometry, or its protocol's query field."""
-        issues = _require(key, record, ("protocol", "geometry_types"))
-        protocol = getattr(record, "protocol", None)
-        if protocol == "overpass" and not getattr(record, "query_template", None):
-            issues.append(f"{key}: overpass row missing query_template")
-        if protocol == "ohsome" and not getattr(record, "ohsome_filter", None):
-            issues.append(f"{key}: ohsome row missing ohsome_filter")
-        if protocol == "pbf" and not getattr(record, "pyrosm_method", None):
-            issues.append(f"{key}: pbf row missing pyrosm_method")
-        return issues
-
-    return _lint(catalog, check)
-
-
 def _validate_fdsn(catalog: Any) -> tuple[int, list[str]]:
     """Each FDSN network needs an fdsn_id."""
     return _lint(catalog, lambda k, r: _require(k, r, ("fdsn_id",)))
@@ -303,90 +285,6 @@ def _validate_tropycal(catalog: Any) -> tuple[int, list[str]]:
     return checked, issues
 
 
-def _validate_emdat(catalog: Any) -> tuple[int, list[str]]:
-    """Each EM-DAT dataset needs the prose its row model does not already force.
-
-    `long_name` and `licence` are required by the pydantic row model, and
-    `hazard_vocabulary` has a default the loader then checks against the
-    `hazard_vocabularies:` block — so a catalog missing any of them never loads
-    far enough to reach validation. `description` and `citation` are the
-    genuinely optional fields worth insisting on.
-    """
-    return _lint(catalog, lambda k, r: _require(k, r, ("description", "citation")))
-
-
-def _validate_gdacs(catalog: Any) -> tuple[int, list[str]]:
-    """Each GDACS hazard type needs a name and a description."""
-    return _lint(catalog, lambda k, r: _require(k, r, ("name", "description")))
-
-
-def _validate_aqueduct(catalog: Any) -> tuple[int, list[str]]:
-    """Each admin level needs a zip + shapefile stem, and every vocab is populated.
-
-    Beyond the admin-level rows, the request path resolves a column name from the
-    `indicators` / `years` / `scenarios` / `return_periods` vocabularies, so an
-    emptied vocabulary would load cleanly yet break every download — flag it here.
-    """
-    checked, issues = _lint(
-        catalog, lambda k, r: _require(k, r, ("zip", "shapefile_stem"))
-    )
-    for vocabulary in ("indicators", "years", "scenarios", "return_periods"):
-        if not getattr(catalog, vocabulary, None):
-            issues.append(f"catalog: the {vocabulary!r} vocabulary is empty")
-    return checked, issues
-
-
-def _validate_nsi(catalog: Any) -> tuple[int, list[str]]:
-    """Each NSI source needs a provider, endpoint, output kind, and field map."""
-    return _lint(
-        catalog,
-        lambda k, r: _require(k, r, ("provider", "endpoint", "output_kind", "fields")),
-    )
-
-
-def _validate_hanze(catalog: Any) -> tuple[int, list[str]]:
-    """Each HANZE flood type needs a description; the record/geometry stay pinned.
-
-    Beyond the per-flood-type lint, the single-product HANZE catalog carries a
-    pinned Zenodo record, a file map, the region-geometry join and the
-    friendly-to-header column map at the top level; a stanza that dropped any of
-    those would still load, so they are checked here rather than left to the row
-    model. The column keys are the ones the backend's `_filter_events` reads, so a
-    catalog missing them passes structural load but breaks at fetch time.
-    """
-    checked, issues = _lint(catalog, lambda k, r: _require(k, r, ("description",)))
-    record = getattr(catalog, "record", None)
-    if record is None or not getattr(record, "record", 0):
-        issues.append("record: missing pinned Zenodo record id")
-    geometry = getattr(catalog, "geometry", None)
-    if geometry is None or not getattr(geometry, "member_stem", ""):
-        issues.append("geometry: missing shapefile member_stem")
-    files = getattr(catalog, "files", None) or {}
-    for required in ("events", "regions"):
-        if required not in files:
-            issues.append(f"files: missing required file {required!r}")
-    columns = getattr(catalog, "columns", None) or {}
-    for required in ("country_code", "type", "year", "regions_nuts3"):
-        if required not in columns:
-            issues.append(f"columns: missing required key {required!r}")
-    return checked, issues
-
-
-def _validate_flopros(catalog: Any) -> tuple[int, list[str]]:
-    """The FLOPROS row needs a URL, shapefile stem, identity columns, and layers.
-
-    The single-shapefile catalog resolves a `layer=` selection against the
-    `layers` map and keeps the `identity_columns` on every returned polygon, so
-    an emptied map would load cleanly yet break the read — flag it here.
-    """
-    return _lint(
-        catalog,
-        lambda k, r: _require(
-            k, r, ("url", "shapefile_stem", "identity_columns", "layers")
-        ),
-    )
-
-
 def _validate_catrare(catalog: Any) -> tuple[int, list[str]]:
     """Each CatRaRE threshold needs a code; the shared version/CRS/columns stay pinned.
 
@@ -403,29 +301,6 @@ def _validate_catrare(catalog: Any) -> tuple[int, list[str]]:
     for mapping in ("geometry_layers", "date_columns", "event_columns"):
         if not getattr(catalog, mapping, None):
             issues.append(f"catalog: the {mapping!r} is empty")
-    return checked, issues
-
-
-def _validate_flodis(catalog: Any) -> tuple[int, list[str]]:
-    """Each FLODIS table needs a description and join keys; the record stays pinned.
-
-    Beyond the per-table lint, the two-product FLODIS catalog carries a pinned
-    Zenodo record and the friendly-to-header column map at the top level; a stanza
-    that dropped either would still load, so they are checked here rather than left
-    to the row model. The `iso3`/`year` column keys are the ones the backend's
-    `_filter_table` reads, so a catalog missing them passes structural load but
-    breaks at fetch time.
-    """
-    checked, issues = _lint(
-        catalog, lambda k, r: _require(k, r, ("file", "description", "key_columns"))
-    )
-    record = getattr(catalog, "record", None)
-    if record is None or not getattr(record, "record", 0):
-        issues.append("record: missing pinned Zenodo record id")
-    columns = getattr(catalog, "columns", None) or {}
-    for required in ("iso3", "year", "disasterno", "gid_1", "gid_2"):
-        if required not in columns:
-            issues.append(f"columns: missing required key {required!r}")
     return checked, issues
 
 
@@ -751,16 +626,6 @@ def _validate_fabdem(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("band", "version")))
 
 
-def _validate_jrc_flood(catalog: Any) -> tuple[int, list[str]]:
-    """Each EFHM row needs a band, base URL, filename template, and return periods."""
-    return _lint(
-        catalog,
-        lambda k, r: _require(
-            k, r, ("band", "base_url", "filename_template", "return_periods")
-        ),
-    )
-
-
 def _validate_pvgis(catalog: Any) -> tuple[int, list[str]]:
     """Each PVGIS product needs a tool, an endpoint, and non-empty columns."""
     return _lint(catalog, lambda k, r: _require(k, r, ("tool", "endpoint", "columns")))
@@ -968,20 +833,13 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "goes": _validate_goes,
     "s3": _validate_s3,
     "ghsl": _validate_ghsl,
-    "osm": _validate_osm,
     "fdsn": _validate_fdsn,
     "firms": _validate_firms,
     "asf": _validate_asf,
     "radar": _validate_radar,
     "radklim": _validate_radklim,
     "tropycal": _validate_tropycal,
-    "gdacs": _validate_gdacs,
-    "aqueduct": _validate_aqueduct,
-    "nsi": _validate_nsi,
-    "hanze": _validate_hanze,
-    "flopros": _validate_flopros,
     "catrare": _validate_catrare,
-    "flodis": _validate_flodis,
     "drought": _validate_drought,
     "argo": _validate_argo,
     "chc": _validate_chc,
@@ -993,11 +851,9 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "wdpa": _validate_wdpa,
     "iucn": _validate_iucn,
     "jaxa": _validate_jaxa,
-    "emdat": _validate_emdat,
     "erddap": _validate_erddap,
     "bathymetry": _validate_bathymetry,
     "fabdem": _validate_fabdem,
-    "jrc_flood": _validate_jrc_flood,
     "pvgis": _validate_pvgis,
     "nrel": _validate_nrel,
     "glaciers": _validate_glaciers,
