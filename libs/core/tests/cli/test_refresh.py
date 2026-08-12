@@ -523,43 +523,6 @@ class TestRadarRefresher:
         assert outcome.bundled_count > 2, "diffed against the curated station set"
 
 
-class TestFirmsRefresher:
-    """Tests for the FIRMS (data_availability) lister."""
-
-    def test_lists_sensor_ids_excluding_burned_area(self, monkeypatch):
-        """firms refresh parses data_id and drops the burned-area products."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_get_text",
-            lambda url: (
-                "data_id,min_date,max_date\n"
-                "VIIRS_SNPP_NRT,2020,2026\nBA_MODIS,2000,2026\nMODIS_NRT,2019,2026\n"
-            ),
-        )
-        outcome = refresh_one(_info("firms"))
-        assert outcome.status == "ok", "firms refresh ran"
-        assert outcome.live_count == 2, "BA_MODIS excluded"
-
-    def test_non_csv_body_is_error(self, monkeypatch):
-        """A non-CSV body (bad key / quota) reports 'error', not raised."""
-        monkeypatch.setattr(refresh_mod, "_get_text", lambda url: "Invalid MAP_KEY")
-        assert refresh_one(_info("firms")).status == "error", "bad body captured"
-
-
-class TestFdsnRefresher:
-    """Tests for the FDSN (obspy URL_MAPPINGS) lister."""
-
-    def test_diffs_obspy_providers_against_curated(self, monkeypatch):
-        """fdsn live providers diff against the curated fdsn_id set."""
-        monkeypatch.setattr(
-            refresh_mod, "_fdsn_provider_ids", lambda: ["USGS", "IRIS", "NEWCENTER"]
-        )
-        outcome = refresh_one(_info("fdsn"))
-        assert outcome.status == "ok", "fdsn refresh ran"
-        assert outcome.live_count == 3, "three obspy providers listed"
-        assert "NEWCENTER" in outcome.new_ids, "an uncurated centre is new"
-
-
 class TestNwmRefresher:
     """Tests for the NWM (unsigned operational-bucket walk) lister."""
 
@@ -905,22 +868,6 @@ class TestRedact:
         from earthlens.cli.refresh import _redact
 
         assert _redact("nothing to hide", "") == "nothing to hide"
-
-
-class TestFirmsKeyRedaction:
-    """The FIRMS map key must never appear in a surfaced refresh error."""
-
-    def test_refresh_firms_error_scrubs_key(self, monkeypatch):
-        """A FIRMS HTTP error (URL holds the key) is reported with the key masked."""
-        monkeypatch.setenv("FIRMS_MAP_KEY", "TOPSECRETKEY")
-
-        def boom(url):
-            raise RuntimeError(f"404 Client Error for url: {url}")
-
-        monkeypatch.setattr(refresh_mod, "_get_text", boom)
-        outcome = refresh_one(_info("firms"))
-        assert outcome.status == "error", "error captured"
-        assert "TOPSECRETKEY" not in outcome.detail, "map key scrubbed from detail"
 
 
 class TestRadarMissingColumns:

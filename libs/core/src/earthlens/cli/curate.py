@@ -27,7 +27,7 @@ import requests
 
 from earthlens._cli_tooling import dispatch_table
 from earthlens.cli.adapter import BackendInfo, load_catalog
-from earthlens.cli.refresh import _TIMEOUT, _get_json, _redact
+from earthlens.cli.refresh import _TIMEOUT, _get_json
 
 
 @dataclass
@@ -381,62 +381,6 @@ def _infer_dtype(value: str | None) -> str:
         return "float"
     except ValueError:
         return "str"
-
-
-def _firms_csv_lines(code: str) -> list[str]:
-    """Return a tiny FIRMS area-CSV sample's lines (needs `FIRMS_MAP_KEY`).
-
-    The map key is carried in the request URL path, so a failed request is
-    re-raised with the key masked — it must never leak into a
-    `ProbeResult.detail` / `--json` output / CI log.
-
-    Args:
-        code: The FIRMS sensor code (e.g. `VIIRS_SNPP_NRT`).
-
-    Returns:
-        The sampled CSV body split into lines.
-
-    Raises:
-        RuntimeError: If the request fails; the message has the
-            `FIRMS_MAP_KEY` redacted.
-    """
-    key = os.environ.get("FIRMS_MAP_KEY", "")
-    url = f"https://firms.modaps.eosdis.nasa.gov/api/area/csv/{key}/{code}/world/1"
-    try:
-        response = requests.get(url, timeout=_TIMEOUT)
-        response.raise_for_status()
-    except requests.RequestException as exc:
-        # The key sits in the URL path; scrub it from the surfaced error so it
-        # cannot leak into a ProbeResult.detail / --json output / CI log.
-        raise RuntimeError(_redact(str(exc), key)) from None
-    return response.text.splitlines()
-
-
-def _firms_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe a FIRMS sensor's live CSV column schema (needs `FIRMS_MAP_KEY`).
-
-    Samples one day of the sensor's global area CSV and records each column
-    and its inferred dtype — the seed for the catalog `columns:` map.
-
-    Args:
-        catalog: The loaded FIRMS `Catalog` (resolves a key's sensor `code`).
-        dataset: A curated key or a FIRMS sensor code.
-
-    Returns:
-        Mapping of column name to `{dtype}`.
-    """
-    record = catalog.datasets.get(dataset)
-    code = getattr(record, "code", None) or dataset
-    lines = _firms_csv_lines(code)
-    if not lines:
-        return {}
-    header = lines[0].split(",")
-    first_row = lines[1].split(",") if len(lines) > 1 else []
-    schema: dict[str, dict[str, Any]] = {}
-    for index, column in enumerate(header):
-        value = first_row[index] if index < len(first_row) else None
-        schema[column.strip()] = {"dtype": _infer_dtype(value)}
-    return schema
 
 
 def _hdx_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
@@ -1479,7 +1423,6 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "cmems": _cmems_probe,
     "earthdata": _earthdata_probe,
     "hdx": _hdx_probe,
-    "firms": _firms_probe,
     "eumetsat": _eumetsat_probe,
     "worldpop": _worldpop_probe,
     "s3": _s3_probe,

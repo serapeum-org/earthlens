@@ -86,24 +86,6 @@ class TestSupportedProviders:
         } <= set(supported_providers())
 
 
-class TestFirmsProbe:
-    """Tests for the FIRMS CSV-column prober."""
-
-    def test_columns_and_inferred_dtypes(self, monkeypatch):
-        """firms probe reads the CSV header and infers each column's dtype."""
-        from earthlens.cli import curate as curate_mod
-
-        monkeypatch.setattr(
-            curate_mod,
-            "_firms_csv_lines",
-            lambda code: ["latitude,frp,satellite", "1.5,10,N"],
-        )
-        result = probe_dataset(_info("firms"), "VIIRS_SNPP_NRT")
-        assert result.status == "ok", "firms probe ran"
-        assert result.assets["latitude"]["dtype"] == "float", "float inferred"
-        assert result.assets["satellite"]["dtype"] == "str", "str inferred"
-
-
 class TestHdxProbe:
     """Tests for the HDX resource prober (public CKAN)."""
 
@@ -698,46 +680,6 @@ class TestS3ProberBranches:
         assert curate_mod._s3_sample_keys("b", "p", None) == ["k1", "k2"]
 
 
-class TestFirmsProberBranches:
-    """Branch coverage for the FIRMS CSV prober."""
-
-    def test_parses_header_and_first_row(self, monkeypatch):
-        """The CSV header columns map to dtypes inferred from the first row."""
-        from earthlens.cli.adapter import load_catalog
-
-        monkeypatch.setattr(
-            curate_mod,
-            "_firms_csv_lines",
-            lambda code: ["latitude,confidence,sat", "1.5,90,N"],
-        )
-        dataset = next(iter(load_catalog(_info("firms")).datasets))
-        result = probe_dataset(_info("firms"), dataset)
-        assert result.assets["latitude"]["dtype"] == "float", "float column inferred"
-        assert result.assets["confidence"]["dtype"] == "int", "int column inferred"
-
-    def test_empty_csv_yields_empty_schema(self, monkeypatch):
-        """An empty CSV sample yields an empty schema, not an error."""
-        from earthlens.cli.adapter import load_catalog
-
-        monkeypatch.setattr(curate_mod, "_firms_csv_lines", lambda code: [])
-        dataset = next(iter(load_catalog(_info("firms")).datasets))
-        result = probe_dataset(_info("firms"), dataset)
-        assert result.status == "ok" and result.assets == {}, "empty -> {}"
-
-    def test_csv_lines_helper_fetches_with_key(self, monkeypatch):
-        """_firms_csv_lines requests the area CSV and splits the body into lines."""
-        import types
-
-        monkeypatch.setenv("FIRMS_MAP_KEY", "K")
-
-        def fake_get(url, timeout=None):
-            assert "/K/" in url, f"map key embedded in URL: {url}"
-            return types.SimpleNamespace(text="a,b\n1,2", raise_for_status=lambda: None)
-
-        monkeypatch.setattr(curate_mod.requests, "get", fake_get)
-        assert curate_mod._firms_csv_lines("VIIRS") == ["a,b", "1,2"]
-
-
 class TestEarthdataProberBranches:
     """Branch coverage for the Earthdata UMM-Var prober."""
 
@@ -1269,25 +1211,6 @@ class TestNwpIdx:
         )
         with pytest.raises(ValueError, match="unsafe model_family"):
             curate_mod._nwp_idx_url(pathlib.Path("/x"), model, "2024-01-01", 0)
-
-
-class TestFirmsKeyRedaction:
-    """The FIRMS map key (in the URL path) must not leak into a surfaced error."""
-
-    def test_csv_lines_error_scrubs_key(self, monkeypatch):
-        """A failed FIRMS request raises with the map key masked out."""
-        import requests as real_requests
-
-        monkeypatch.setenv("FIRMS_MAP_KEY", "TOPSECRETKEY")
-
-        def boom(url, timeout=None):
-            raise real_requests.RequestException(f"500 Server Error for url: {url}")
-
-        monkeypatch.setattr(curate_mod.requests, "get", boom)
-        with pytest.raises(RuntimeError) as exc:
-            curate_mod._firms_csv_lines("VIIRS_SNPP_NRT")
-        assert "TOPSECRETKEY" not in str(exc.value), "map key scrubbed from the error"
-        assert "***" in str(exc.value), "key replaced with a mask"
 
 
 class TestBiodiversityProbers:

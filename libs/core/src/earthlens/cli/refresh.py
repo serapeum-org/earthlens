@@ -1021,74 +1021,6 @@ def _write_radar(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
 
 
 #: FIRMS data-availability listing of every served sensor (needs a MAP_KEY).
-_FIRMS_DATA_AVAIL_URL = (
-    "https://firms.modaps.eosdis.nasa.gov/api/data_availability/csv/{map_key}/all"
-)
-
-#: data_availability also lists burned-area products that are not area-CSV
-#: active-fire sources; they belong to the GEE backend, not the catalog.
-_FIRMS_EXCLUDED = frozenset({"BA_MODIS", "BA_VIIRS"})
-
-
-def _firms_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List every live FIRMS sensor id from the data_availability endpoint.
-
-    Reads the `FIRMS_MAP_KEY` from the environment (without it the request
-    fails and `refresh_one` reports an `"error"`), then parses the
-    `data_id` column, dropping the burned-area products the catalog
-    deliberately excludes. The key is carried in the request URL path, so a
-    failed fetch is re-raised with the key masked (via :func:`_redact`) — it
-    must never reach the surfaced `detail`.
-
-    Args:
-        catalog: The loaded FIRMS `Catalog` (unused; the endpoint is fixed).
-
-    Returns:
-        A single-group mapping `{"firms": [sorted sensor ids]}`.
-
-    Raises:
-        RuntimeError: If the data_availability fetch fails; the message has
-            the `FIRMS_MAP_KEY` redacted.
-    """
-    key = os.environ.get("FIRMS_MAP_KEY", "")
-    try:
-        text = _get_text(_FIRMS_DATA_AVAIL_URL.format(map_key=key))
-    except Exception as exc:  # noqa: BLE001 — scrub the key from the URL in the error
-        raise RuntimeError(_redact(str(exc), key)) from None
-    rows = text.splitlines()
-    if not rows or not rows[0].lower().startswith("data_id"):
-        raise RuntimeError(f"data_availability returned a non-CSV body: {text[:120]}")
-    ids = {
-        code
-        for row in rows[1:]
-        if (code := row.split(",", 1)[0].strip()) and code not in _FIRMS_EXCLUDED
-    }
-    return {"firms": sorted(ids)}
-
-
-def _fdsn_provider_ids() -> list[str]:
-    """Return every FDSN provider id obspy can reach (`URL_MAPPINGS` keys)."""
-    from obspy.clients.fdsn.header import URL_MAPPINGS
-
-    return [str(name) for name in URL_MAPPINGS]
-
-
-def _fdsn_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List every FDSN provider id obspy can reach (SDK enum, no network).
-
-    The universe is obspy's `URL_MAPPINGS` registry — the same source the
-    curated providers are drawn from — so a diff surfaces FDSN data centres
-    obspy has gained or dropped since the catalog was curated.
-
-    Args:
-        catalog: The loaded FDSN `Catalog` (unused; obspy is the source).
-
-    Returns:
-        A single-group mapping `{"fdsn": [sorted provider ids]}`.
-    """
-    return {"fdsn": sorted(set(_fdsn_provider_ids()))}
-
-
 #: CHC anonymous-FTP host and the products root walked for coverage.
 _CHC_FTP_HOST = "data.chc.ucsb.edu"
 _CHC_ROOT = "pub/org/chc/products"
@@ -1825,8 +1757,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "worldpop": _worldpop_grouped,
     "usgs_water": _usgs_water_grouped,
     "radar": _radar_grouped,
-    "firms": _firms_grouped,
-    "fdsn": _fdsn_grouped,
     "chc": _chc_grouped,
     "s3": _s3_grouped,
     "nwm": _nwm_grouped,
@@ -2069,7 +1999,6 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "sentinel_hub": _curated_attr_ids("sh_collection"),
     "worldpop": _worldpop_curated_ids,
     "usgs_water": _curated_attr_ids("code"),
-    "fdsn": _curated_attr_ids("fdsn_id"),
     "chc": _chc_ftp_bases,
     "nwm": _nwm_curated_configs,
     "gbif": _biodiversity_curated_ids,

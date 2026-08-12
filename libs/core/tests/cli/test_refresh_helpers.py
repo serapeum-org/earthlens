@@ -196,10 +196,6 @@ class TestNetworkPrimitives:
         )
         assert refresh_mod._sentinel_hub_grouped(None) == {"sentinel_hub": ["S1", "S2"]}
 
-    def test_fdsn_provider_ids_nonempty(self):
-        """obspy's URL_MAPPINGS yields a non-empty provider id list."""
-        assert refresh_mod._fdsn_provider_ids(), "obspy registry is non-empty"
-
     def test_gee_fetch_id_and_error(self, monkeypatch):
         """_gee_fetch_id reads the doc id; an error degrades to None."""
         monkeypatch.setattr(refresh_mod, "_get_json", lambda url: {"id": "X/Y"})

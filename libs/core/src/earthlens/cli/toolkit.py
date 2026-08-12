@@ -16,6 +16,12 @@ built from.
 from __future__ import annotations
 
 from earthlens.cli.adapter import BackendInfo
+from earthlens.cli.curate import (
+    _infer_dtype as infer_dtype,
+)
+from earthlens.cli.refresh import (
+    _TIMEOUT as HTTP_TIMEOUT,
+)
 from earthlens.cli.refresh import (
     _curated_attr_ids as curated_attr_ids,
 )
@@ -26,7 +32,13 @@ from earthlens.cli.refresh import (
     _get_json as get_json,
 )
 from earthlens.cli.refresh import (
+    _get_text as get_text,
+)
+from earthlens.cli.refresh import (
     _index_writer as index_writer,
+)
+from earthlens.cli.refresh import (
+    _redact as redact,
 )
 from earthlens.cli.validate import (
     _lint as lint,
@@ -36,11 +48,15 @@ from earthlens.cli.validate import (
 )
 
 __all__ = [
+    "HTTP_TIMEOUT",
     "BackendInfo",
     "curated_attr_ids",
     "flatten",
     "get_json",
+    "get_text",
     "index_writer",
+    "infer_dtype",
     "lint",
+    "redact",
     "require",
 ]

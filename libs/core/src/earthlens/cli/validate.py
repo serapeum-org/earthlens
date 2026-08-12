@@ -138,16 +138,6 @@ def _validate_ghsl(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("code", "releases")))
 
 
-def _validate_fdsn(catalog: Any) -> tuple[int, list[str]]:
-    """Each FDSN network needs an fdsn_id."""
-    return _lint(catalog, lambda k, r: _require(k, r, ("fdsn_id",)))
-
-
-def _validate_firms(catalog: Any) -> tuple[int, list[str]]:
-    """Each FIRMS sensor needs a code and a non-empty columns map."""
-    return _lint(catalog, lambda k, r: _require(k, r, ("code", "columns")))
-
-
 def _validate_asf(catalog: Any) -> tuple[int, list[str]]:
     """Every ASF row's PLATFORM/DATASET/PRODUCT_TYPE must exist in `asf_search`.
 
@@ -833,8 +823,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "goes": _validate_goes,
     "s3": _validate_s3,
     "ghsl": _validate_ghsl,
-    "fdsn": _validate_fdsn,
-    "firms": _validate_firms,
     "asf": _validate_asf,
     "radar": _validate_radar,
     "radklim": _validate_radklim,

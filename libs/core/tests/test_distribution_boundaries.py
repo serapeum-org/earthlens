@@ -1283,8 +1283,6 @@ class TestCliIsBackendAgnostic:
             "erddap",
             "eumetsat",
             "fabdem",
-            "fdsn",
-            "firms",
             "gbif",
             "gee",
             "ghsl",

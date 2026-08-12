@@ -28,6 +28,16 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
     },
     "aqueduct": {"validator": "earthlens.aqueduct.cli:validator"},
     "emdat": {"validator": "earthlens.emdat.cli:validator"},
+    "fdsn": {
+        "refresher": "earthlens.fdsn.cli:refresher",
+        "curated_ids": "earthlens.fdsn.cli:curated_ids",
+        "validator": "earthlens.fdsn.cli:validator",
+    },
+    "firms": {
+        "refresher": "earthlens.firms.cli:refresher",
+        "prober": "earthlens.firms.cli:prober",
+        "validator": "earthlens.firms.cli:validator",
+    },
     "flodis": {"validator": "earthlens.flodis.cli:validator"},
     "flopros": {"validator": "earthlens.flopros.cli:validator"},
     "gdacs": {"validator": "earthlens.gdacs.cli:validator"},
