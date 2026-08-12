@@ -30,6 +30,7 @@ permissions:
 jobs:
   detect:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       matrix: ${{ steps.select.outputs.matrix }}
     steps:
@@ -170,6 +171,9 @@ jobs:
       needs.detect.outputs.matrix != '[]' &&
       github.repository == 'serapeum-org/earthlens'
     runs-on: ubuntu-latest
+    # A live provider host can hang (see the scheduled workflow's Dataverse
+    # probe); cap the job rather than hold a runner for the 6-hour default.
+    timeout-minutes: 45
 
     strategy:
       fail-fast: false

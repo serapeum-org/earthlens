@@ -6,6 +6,10 @@ name: Tests - E2E ocean (on change)
 permissions:
   contents: read
 
+# Unlike the scheduled tests-e2e.yml (which never cancels a half-finished live
+# run), this per-PR gate is fast-feedback: a superseding push makes the prior
+# run's results stale, so cancel it rather than stack live requests. The group
+# keys on github.workflow, so the five theme callers do not cancel each other.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
