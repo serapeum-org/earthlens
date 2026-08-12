@@ -130,7 +130,7 @@ jobs:
           for row in "${providers[@]}"; do
             path_re="$(jq -r '.path' <<< "$row")"
             if [ "$run_all" -eq 1 ] || echo "$changed" | grep -Eq "$path_re"; then
-              includes+=("$(jq -c '{name, marker, groups, deselect: ""}' <<< "$row")")
+              includes+=("$(jq -c '{name, marker, groups, deselect: "", allow_empty: false}' <<< "$row")")
             fi
           done
 
@@ -150,7 +150,8 @@ jobs:
             includes+=("$(jq -cn \
               --arg name "rest-of-$THEME" --arg marker "$catchall_marker" \
               --arg groups "groups: dev, extras: all" --arg deselect "$catchall_deselect" \
-              '{name:$name, marker:$marker, groups:$groups, deselect:$deselect}')")
+              --argjson allow_empty true \
+              '{name:$name, marker:$marker, groups:$groups, deselect:$deselect, allow_empty:$allow_empty}')")
           fi
 
           if [ "${#includes[@]}" -eq 0 ]; then
@@ -219,7 +220,11 @@ jobs:
           fi
           code=$?
           set -e
-          if [ "$code" -eq 5 ]; then
+          # Exit code 5 = no tests collected. Legitimate only for the catch-all
+          # lane (allow_empty), whose selected area may hold no e2e tests. A
+          # dedicated lane is scheduled because its own backend changed, so
+          # collecting nothing there means the marker drifted - fail it.
+          if [ "$code" -eq 5 ] && [ "${{ matrix.allow_empty }}" = "true" ]; then
             echo "no e2e tests collected for the changed area; treating as pass"
             exit 0
           fi
