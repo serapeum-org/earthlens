@@ -3299,6 +3299,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Endpoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#copernicus-gfm-flood-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copernicus GFM (flood monitoring)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -15506,6 +15523,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/stac/eodc_gfm_flood_extent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copernicus GFM — flood extent from Sentinel-1 (EODC STAC)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -22988,6 +23033,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Endpoints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#copernicus-gfm-flood-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copernicus GFM (flood monitoring)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -23113,10 +23175,39 @@ them all and selects the right signer from the catalog.</p>
 <td>anonymous Sentinel-2 COG, Landsat C2, Copernicus DEM</td>
 <td><strong>anonymous</strong></td>
 </tr>
+<tr>
+<td><code>eodc</code></td>
+<td>Earth Observation Data Centre</td>
+<td>Copernicus GFM + EODC raster collections (SAR σ0/γ0, soil moisture, DEM, land cover, orthophotos)</td>
+<td><strong>anonymous</strong></td>
+</tr>
 </tbody>
 </table>
 <p>The model extends to USGS Landsat (<code>aws-requester-pays</code>) and other public STAC
-catalogues (DE Africa, DEA, Brazil Data Cube, VEDA) by adding a catalog row.</p>
+catalogues (DE Africa, DEA, Brazil Data Cube, VEDA, EODC) by adding a catalog row.</p>
+<h3 id="copernicus-gfm-flood-monitoring"><a class="toclink" href="#copernicus-gfm-flood-monitoring">Copernicus GFM (flood monitoring)</a><a class="headerlink" href="#copernicus-gfm-flood-monitoring" title="Permanent link">#</a></h3>
+<p>The <code>eodc</code> endpoint serves <strong>Copernicus Global Flood Monitoring</strong> — Sentinel-1
+SAR near-real-time flood mapping — as the collection <code>eodc/gfm</code>, anonymously. It
+exposes twelve single-band <code>uint8</code> COG layers (nodata <code>255</code>): the final ensemble
+products <code>ensemble_flood_extent</code> (the default), <code>ensemble_water_extent</code>,
+<code>ensemble_likelihood</code>, plus <code>reference_water_mask</code>, <code>exclusion_mask</code>,
+<code>advisory_flags</code>, and the per-algorithm <code>dlr_</code> / <code>tuw_</code> / <code>list_</code> flood-extent
+and likelihood intermediates. It is the live-observed flood-extent complement to
+the modelled <code>aqueduct</code>, the return-period <code>jrc_flood</code>, and the impact
+<code>hanze</code> / <code>flodis</code> backends.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">el</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;eodc&quot;</span><span class="p">,</span>  <span class="c1"># or data_source=&quot;stac&quot;, endpoint=&quot;eodc&quot;</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2022-08-25&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2022-09-30&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;eodc/gfm&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;ensemble_flood_extent&quot;</span><span class="p">]},</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">26.0</span><span class="p">,</span> <span class="mf">28.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">67.0</span><span class="p">,</span> <span class="mf">69.0</span><span class="p">],</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;gfm-out&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">el</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  <span class="c1"># one COG per (collection, acquisition date)</span>
+</code></pre></div>
+<p>GFM is free under the Copernicus licence (attribution; see
+<a href="https://extwiki.eodc.eu/en/GFM">extwiki.eodc.eu/en/GFM</a>).</p>
 <h2 id="what-it-returns"><a class="toclink" href="#what-it-returns">What it returns</a><a class="headerlink" href="#what-it-returns" title="Permanent link">#</a></h2>
 <p>Gridded <strong><code>raster</code></strong> output: one COG per <code>(collection, acquisition date)</code> is
 written to your <code>path</code>, and <code>download()</code> returns the list of written COG paths.

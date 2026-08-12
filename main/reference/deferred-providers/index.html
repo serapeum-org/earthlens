@@ -15460,6 +15460,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/stac/eodc_gfm_flood_extent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copernicus GFM — flood extent from Sentinel-1 (EODC STAC)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -23008,12 +23036,6 @@ time, not a legal guarantee.</p>
 </thead>
 <tbody>
 <tr>
-<td><strong>GFM</strong> (Copernicus Global Flood Monitoring)</td>
-<td>Flood extent (Sentinel-1 NRT)</td>
-<td><strong>Account-gated</strong> at CEMS/EODC and <strong>not on openEO</strong> — the near-real-time flood-extent, reference-water, and exclusion-mask layers are served only by the dedicated EODC GFM API (<code>api.gfm.eodc.eu</code>), which needs a registered GFM account, not an anonymous or openEO route</td>
-<td>Register for a GFM account and pull via the <a href="https://api.gfm.eodc.eu/">EODC GFM API</a> / the <a href="https://portal.gfm.eodc.eu/">GFM portal</a>; a dedicated <code>gfm</code> EODC-API backend with account auth is planned separately (<code>planning/flood-risk/gfm-completion.md</code>)</td>
-</tr>
-<tr>
 <td><strong>GVP</strong> (Smithsonian Global Volcanism Program)</td>
 <td>Volcanoes / eruptions</td>
 <td>Reference database, no stable bulk API / maintained Python client; reuse is attribution-bound</td>
@@ -23066,12 +23088,11 @@ time, not a legal guarantee.</p>
   near-real-time) or GloFAS via <code>earthlens.ecmwf</code>.</li>
 <li><strong>No-stable-client sources</strong> — GVP — could be revisited if a maintained API/Python client and clear bulk-reuse
   terms appear.</li>
-<li><strong>Account-gated sources</strong> — <strong>GFM</strong> (Copernicus Global Flood Monitoring) is <em>not</em> an openEO collection (it is
-  absent from both CDSE openEO and openeo.cloud); its Sentinel-1 NRT flood-extent layers live only behind the
-  registered-account EODC GFM API (<code>api.gfm.eodc.eu</code>). It is therefore a <strong>separate backend</strong> (<code>gfm</code>, with EODC
-  account auth), planned on its own rather than added as a batch-2 collection. For open flood-hazard layers in the
-  meantime use <code>earthlens.aqueduct</code> (WRI riverine/coastal return-period hazard) or the HANZE/JRC historical
-  impact backends.</li>
+<li><strong>GFM (Copernicus Global Flood Monitoring) — no longer deferred.</strong> GFM is served <strong>anonymously</strong> by EODC's
+  public STAC API (<code>stac.eodc.eu</code>) as the collection <code>GFM</code>, so it ships on the existing <code>stac</code> backend under the
+  <code>eodc</code> endpoint (<code>eodc/gfm</code>) — no account and no openEO entitlement needed. See
+  <a href="../stac/introduction/">STAC → Copernicus GFM</a>. (The earlier read that GFM was reachable only via the
+  registered-account <code>api.gfm.eodc.eu</code> was superseded once the public STAC route was confirmed.)</li>
 </ul>
 <p>These deferrals are tracked as <code>L15</code> in the low-tier roadmap. Re-evaluate a row if its licence or access model
 changes.</p>
