@@ -14,7 +14,7 @@ from earthlens.bathymetry.catalog import Dataset
 
 pytestmark = pytest.mark.bathymetry
 
-#: A North Sea AOI well inside the EMODnet coverage (west, east / south, north).
+#: A North Sea AOI well inside the EMODnet coverage (lat 53..55, lon 2..4).
 _NORTH_SEA = {"lat_lim": [53.0, 55.0], "lon_lim": [2.0, 4.0]}
 
 
@@ -133,7 +133,7 @@ def test_partial_overlap_warns_but_proceeds(
     """An AOI straddling the coverage edge warns about zero-fill but still fetches."""
     seen: list[str] = []
     monkeypatch.setattr(backend_module.logger, "warning", seen.append)
-    # East edge of the EMODnet extent is 43.0; this AOI poks past it to 45.0.
+    # East edge of the EMODnet extent is 43.0; this AOI pokes past it to 45.0.
     Bathymetry(
         dataset="emodnet",
         lat_lim=[40.0, 42.0],
