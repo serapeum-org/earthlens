@@ -38,14 +38,6 @@ def _host_ok(host: str) -> bool:
         return False
 
 
-#: Skip the live class fast when the JRC host does not answer — an outage or a
-#: runner whose egress is blocked would otherwise exhaust every download's
-#: retries on connect timeouts before failing (issue #932).
-_offline_skip = pytest.mark.skipif(
-    not _host_ok(_GHSL_HOST), reason=f"JRC GHSL host {_GHSL_HOST} unreachable"
-)
-
-
 def _nonempty_geotiff(path: Path) -> bool:
     """Return whether `path` reads back as a non-empty pyramids raster."""
     from pyramids.dataset import Dataset
@@ -54,11 +46,23 @@ def _nonempty_geotiff(path: Path) -> bool:
     return dataset.rows > 0 and dataset.columns > 0
 
 
-@_offline_skip
 @pytest.mark.e2e
 @pytest.mark.ghsl
 class TestGhslLiveFetch:
     """Live GHSL fetches (open HTTPS — no credentials needed)."""
+
+    @pytest.fixture(scope="class", autouse=True)
+    def _require_jrc_host(self):
+        """Skip the live class when the JRC host does not answer.
+
+        A class-scoped autouse fixture rather than a module-level `skipif`, so
+        the reachability probe fires only once, and only when an e2e run
+        actually selects this class — never during collection of the default
+        `not e2e` suite (an outage or blocked-egress runner would otherwise
+        exhaust every download's retries on connect timeouts; issue #932).
+        """
+        if not _host_ok(_GHSL_HOST):
+            pytest.skip(f"JRC GHSL host {_GHSL_HOST} unreachable")
 
     def test_population_100m_lands_cropped_geotiff(self, tmp_path: Path):
         """A small GHS-POP 2020 100 m pull lands one cropped EPSG:4326 GeoTIFF."""
