@@ -401,7 +401,8 @@ class HttpClient:
     subclassing.
 
     Attributes:
-        timeout: Per-request timeout in seconds.
+        timeout: Per-request timeout in seconds — a single float, or a
+            `(connect, read)` pair bounding the two phases separately.
         max_retries: Maximum retries on a retryable status before raising.
         backoff_factor: Base seconds for exponential back-off when no
             `Retry-After` header is present.
