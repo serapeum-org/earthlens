@@ -121,20 +121,32 @@ def test_emodnet_licence_recorded(catalog: Catalog):
 
 
 @pytest.mark.parametrize(
-    "dataset_id, coverage",
+    "dataset_id, coverage, native_bbox",
     [
-        ("emodnet_2016", "emodnet:mean_2016"),
-        ("emodnet_2018", "emodnet:mean_2018"),
-        ("emodnet_2020", "emodnet:mean_2020"),
-        ("emodnet_2022", "emodnet:mean_2022"),
+        ("emodnet_2016", "emodnet:mean_2016", (-36.0, 25.0, 43.0, 85.0)),
+        ("emodnet_2018", "emodnet:mean_2018", (-36.0, 15.0, 43.0, 90.0)),
+        ("emodnet_2020", "emodnet:mean_2020", (-36.0, 15.0, 43.0, 90.0)),
+        ("emodnet_2022", "emodnet:mean_2022", (-70.5, 11.0, 43.0, 90.0)),
     ],
 )
-def test_emodnet_release_variants(catalog: Catalog, dataset_id: str, coverage: str):
-    """Each year-stamped release resolves to its own colon coverage id."""
+def test_emodnet_release_variants(
+    catalog: Catalog,
+    dataset_id: str,
+    coverage: str,
+    native_bbox: tuple[float, float, float, float],
+):
+    """Each release resolves to its own coverage id and advertised extent.
+
+    The per-release `native_bbox` is pinned from each coverage's live WCS
+    `DescribeCoverage` envelope — the older releases cover a smaller domain
+    than the latest, so copying one extent to all rows would fail the guard
+    open for the older ones.
+    """
     row = catalog.get(dataset_id)
     assert row.transport == "wcs"
     assert row.dataset_id == coverage
     assert row.wcs_version == "1.0.0"
+    assert row.native_bbox == native_bbox
 
 
 def test_wcs_row_missing_version_rejected():

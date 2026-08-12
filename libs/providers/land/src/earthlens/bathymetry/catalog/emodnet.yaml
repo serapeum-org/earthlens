@@ -51,7 +51,7 @@ datasets:
     native_resolution: 3.75 arc-second
     wcs_version: "1.0.0"
     crs: EPSG:4326
-    native_bbox: [-70.5, 11.0, 43.0, 90.0]
+    native_bbox: [-36.0, 15.0, 43.0, 90.0]
     license_note: >-
       EMODnet Digital Bathymetry (DTM 2020), EMODnet Bathymetry Consortium; EMODnet use conditions,
       attribution required — https://emodnet.ec.europa.eu/en/terms-use-emodnet-online-services-data-and-data-products.
@@ -64,7 +64,7 @@ datasets:
     native_resolution: 3.75 arc-second
     wcs_version: "1.0.0"
     crs: EPSG:4326
-    native_bbox: [-70.5, 11.0, 43.0, 90.0]
+    native_bbox: [-36.0, 15.0, 43.0, 90.0]
     license_note: >-
       EMODnet Digital Bathymetry (DTM 2018), EMODnet Bathymetry Consortium; EMODnet use conditions,
       attribution required — https://emodnet.ec.europa.eu/en/terms-use-emodnet-online-services-data-and-data-products.
@@ -77,7 +77,7 @@ datasets:
     native_resolution: 3.75 arc-second
     wcs_version: "1.0.0"
     crs: EPSG:4326
-    native_bbox: [-70.5, 11.0, 43.0, 90.0]
+    native_bbox: [-36.0, 25.0, 43.0, 85.0]
     license_note: >-
       EMODnet Digital Bathymetry (DTM 2016), EMODnet Bathymetry Consortium; EMODnet use conditions,
       attribution required — https://emodnet.ec.europa.eu/en/terms-use-emodnet-online-services-data-and-data-products.
