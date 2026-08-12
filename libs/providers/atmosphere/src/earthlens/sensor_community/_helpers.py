@@ -95,7 +95,8 @@ class SensorCommunityClient:
                 fresh session. Injectable so tests supply a fake transport.
             max_retries: Maximum `429` retries before raising.
             backoff_factor: Base seconds for exponential back-off.
-            timeout: Per-request timeout in seconds — a float or a `(connect, read)` pair.
+            timeout: Per-request timeout in seconds — a float or a
+                `(connect, read)` pair.
             sleep: The sleep function used between retries. Defaults to
                 `time.sleep`; injectable so tests run without real delays.
         """

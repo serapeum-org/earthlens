@@ -70,7 +70,8 @@ class AirnowClient:
             max_retries: Maximum `429` retries before raising.
             backoff_factor: Base seconds for exponential back-off when the
                 response carries no `Retry-After` header.
-            timeout: Per-request timeout in seconds — a float or a `(connect, read)` pair.
+            timeout: Per-request timeout in seconds — a float or a
+                `(connect, read)` pair.
             sleep: The sleep function used between retries. Defaults to
                 `time.sleep`; injectable so tests run without real delays.
         """
