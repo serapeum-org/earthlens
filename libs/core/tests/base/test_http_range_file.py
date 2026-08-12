@@ -235,6 +235,16 @@ class TestRead:
 
         assert session.get_calls[0][1]["headers"]["Accept-Encoding"] == "identity"
 
+    def test_split_timeout_reaches_the_probe_and_reads(self):
+        """A (connect, read) timeout is forwarded to the size probe and the read."""
+        session = _RangeSession(b"0123456789")
+        handle = _range_file(session, timeout=(5.0, 30.0))
+
+        handle.read(4)
+
+        assert session.head_kwargs[0]["timeout"] == (5.0, 30.0)
+        assert session.get_calls[0][1]["timeout"] == (5.0, 30.0)
+
     def test_counters_track_requests_and_bytes(self):
         """The cost of a range-read session is observable, probe included."""
         handle = _range_file(_RangeSession(b"0123456789"))
