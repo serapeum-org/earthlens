@@ -118,14 +118,31 @@ def ohsome_http_status(exc: BaseException) -> int | None:
     while current is not None and id(current) not in seen:
         seen.add(id(current))
         error_code = getattr(current, "error_code", None)
-        if isinstance(error_code, int):
+        if _is_http_status(error_code):
             return error_code
         response = getattr(current, "response", None)
         status = getattr(response, "status_code", None)
-        if isinstance(status, int):
+        if _is_http_status(status):
             return status
         current = current.__cause__ or current.__context__
     return None
+
+
+def _is_http_status(value: object) -> bool:
+    """Return whether `value` is a real integer HTTP status (not a `bool`).
+
+    `bool` is a subclass of `int`, so a plain `isinstance(value, int)` would
+    accept `True` / `False` and report a nonsensical status `1` / `0`; this
+    excludes them.
+
+    Args:
+        value: A candidate status pulled off an exception (`error_code` or a
+            response's `status_code`).
+
+    Returns:
+        bool: `True` when `value` is an `int` and not a `bool`.
+    """
+    return isinstance(value, int) and not isinstance(value, bool)
 
 
 def bbox_swne(space: SpatialExtent) -> tuple[float, float, float, float]:
