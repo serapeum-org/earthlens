@@ -66,6 +66,17 @@ def test_walks_the_cause_chain() -> None:
         assert is_upstream_unavailable(exc) is not None
 
 
+def test_suppressed_context_is_not_followed() -> None:
+    """`raise … from None` hides a transient context, so it is not reclassified."""
+    try:
+        try:
+            raise _WithResponse("gateway", 503)
+        except Exception:
+            raise AssertionError("deliberately surfaced") from None
+    except AssertionError as exc:
+        assert is_upstream_unavailable(exc) is None
+
+
 def _drive_hook(item: _Item, exc: Exception) -> None:
     """Advance the wrapper to its yield, then inject `exc` as the test outcome."""
     generator = pytest_runtest_call(item)

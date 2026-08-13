@@ -134,7 +134,16 @@ def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
     while current is not None and id(current) not in seen:
         seen.add(id(current))
         yield current
-        current = current.__cause__ or current.__context__
+        # Honour `raise … from None`: an explicit cause wins; otherwise follow
+        # the implicit context unless the author suppressed it (matching
+        # Python's own traceback display), so a deliberately surfaced failure is
+        # not reclassified via a context it asked to hide.
+        if current.__cause__ is not None:
+            current = current.__cause__
+        elif current.__suppress_context__:
+            current = None
+        else:
+            current = current.__context__
 
 
 def _http_status(exc: BaseException) -> int | None:
