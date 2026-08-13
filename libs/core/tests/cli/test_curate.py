@@ -54,23 +54,6 @@ class TestSupportedProviders:
         } <= set(supported_providers())
 
 
-class TestS3Probe:
-    """Tests for the S3 bucket prober (unsigned boto3)."""
-
-    def test_lists_sample_keys(self, monkeypatch):
-        """s3 probe lists a few object keys under the dataset's bucket."""
-        monkeypatch.setattr(
-            curate_mod, "_s3_sample_keys", lambda b, p, region: ["a/2020.tif"]
-        )
-        info = _info("s3")
-        from earthlens.cli.adapter import load_catalog
-
-        key = next(iter(load_catalog(info).datasets))
-        result = probe_dataset(info, key)
-        assert result.status == "ok", "s3 probe ran"
-        assert "a/2020.tif" in result.assets, "object key listed"
-
-
 class TestGhslProbe:
     """Tests for the GHSL availability prober (offline, from the catalog)."""
 
@@ -376,42 +359,6 @@ class TestGhslProberBranches:
         """An unknown GHSL product reports 'error'."""
         result = probe_dataset(_info("ghsl"), "not-a-ghsl-product")
         assert result.status == "error", "unknown product -> error"
-
-
-class TestS3ProberBranches:
-    """Branch coverage for the S3 bucket-listing prober."""
-
-    def test_lists_sample_keys(self, monkeypatch):
-        """A registered dataset lists a few object keys under its bucket."""
-        from earthlens.cli.adapter import load_catalog
-
-        monkeypatch.setattr(curate_mod, "_s3_sample_keys", lambda b, p, r: ["a", "b"])
-        dataset = next(iter(load_catalog(_info("s3")).datasets))
-        result = probe_dataset(_info("s3"), dataset)
-        assert "a" in result.assets and "b" in result.assets, "keys listed"
-
-    def test_unknown_dataset_is_error(self):
-        """An unregistered S3 dataset reports 'error'."""
-        result = probe_dataset(_info("s3"), "not-a-bucket")
-        assert result.status == "error", "unknown dataset -> error"
-
-    def test_sample_keys_helper_uses_unsigned_client(self, monkeypatch):
-        """_s3_sample_keys returns the Contents keys from an unsigned client."""
-        import earthlens.base.s3 as s3_auth
-
-        class FakeClient:
-            def list_objects_v2(self, **kw):
-                return {"Contents": [{"Key": "k1"}, {"Key": "k2"}]}
-
-        class FakeAuth:
-            def __init__(self, creds):
-                pass
-
-            def client(self):
-                return FakeClient()
-
-        monkeypatch.setattr(s3_auth, "S3Auth", FakeAuth)
-        assert curate_mod._s3_sample_keys("b", "p", None) == ["k1", "k2"]
 
 
 class TestNwpHelpers:

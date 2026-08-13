@@ -1275,7 +1275,6 @@ class TestCliIsBackendAgnostic:
             "nwp",
             "openaq",
             "radar",
-            "s3",
             "tropycal",
         }
     )

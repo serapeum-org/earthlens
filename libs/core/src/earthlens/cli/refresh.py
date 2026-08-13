@@ -612,23 +612,6 @@ def _chc_ftp_bases(catalog: Any) -> list[str]:
     )
 
 
-def _s3_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List the S3 registry's dataset names (its `available_datasets` universe).
-
-    The AWS Open-Data S3 backend has no single live "list all" endpoint — its
-    universe *is* the curated registry — so the refresher returns the curated
-    dataset names. `--write` then regenerates the in-file `available_datasets:`
-    block from them (the `tools/s3/refresh_s3_catalog.py:refresh` step).
-
-    Args:
-        catalog: The loaded S3 `Catalog`.
-
-    Returns:
-        A single-group mapping `{"s3": [sorted registered dataset names]}`.
-    """
-    return {"s3": sorted(str(key) for key in catalog.datasets)}
-
-
 #: Provider id -> a callable regenerating a bundled GIS artefact (not an
 #: `available_*` index). Surfaced by `refresh <provider> --tiles`.
 _TILE_REGENS: dict[str, Callable[[], tuple[str, int]]] = dispatch_table("tile_regen")
@@ -645,7 +628,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "openaq": _openaq_grouped,
     "radar": _radar_grouped,
     "chc": _chc_grouped,
-    "s3": _s3_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -658,7 +640,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     **dispatch_table("writer"),
     "ecmwf": _index_writer("available_datasets", grouped=True),
     "radar": _write_radar,
-    "s3": _index_writer("available_datasets"),
     "openaq": _write_openaq,
 }
 

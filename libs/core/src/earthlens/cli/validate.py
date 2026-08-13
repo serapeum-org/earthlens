@@ -123,11 +123,6 @@ def _require(key: str, record: Any, fields: tuple[str, ...]) -> list[str]:
     ]
 
 
-def _validate_s3(catalog: Any) -> tuple[int, list[str]]:
-    """Each S3 dataset needs a bucket and a format."""
-    return _lint(catalog, lambda k, r: _require(k, r, ("bucket", "format")))
-
-
 def _validate_radar(catalog: Any) -> tuple[int, list[str]]:
     """Each radar station needs a name and in-range latitude / longitude."""
 
@@ -217,7 +212,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("validator"),
     "nwp": _validate_nwp,
-    "s3": _validate_s3,
     "radar": _validate_radar,
     "tropycal": _validate_tropycal,
     "chc": _validate_chc,
@@ -229,33 +223,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
 # still resolves upstream. A superset of the offline lint; opt-in because it
 # goes to the network / SDK. Each live source sits behind a mockable helper.
 # --------------------------------------------------------------------------- #
-def _s3_live_keys(bucket: str, prefix: str, region: str | None) -> list[str]:
-    """Return one object key under `prefix` (unsigned `boto3`)."""
-    from earthlens.base.s3 import S3Auth, S3Credentials
-
-    client = S3Auth(S3Credentials(region=region)).client()
-    response = client.list_objects_v2(Bucket=bucket, Prefix=prefix, MaxKeys=1)
-    return [item["Key"] for item in response.get("Contents", [])]
-
-
-def _live_s3(catalog: Any) -> tuple[int, list[str]]:
-    """Confirm every S3 dataset's bucket still serves an object (unsigned)."""
-    issues: list[str] = []
-    for key, record in catalog.datasets.items():
-        try:
-            keys = _s3_live_keys(
-                record.bucket,
-                getattr(record, "prefix", "") or "",
-                getattr(record, "region", None),
-            )
-        except Exception as exc:  # noqa: BLE001 — reported as drift
-            issues.append(f"{key}: bucket error ({exc})")
-            continue
-        if not keys:
-            issues.append(f"{key}: no objects under s3://{record.bucket}")
-    return len(catalog.datasets), issues
-
-
 def _http_head(url: str) -> int:
     """Return the HTTP status of a HEAD request (following redirects)."""
     return requests.head(url, timeout=_TIMEOUT, allow_redirects=True).status_code
@@ -414,7 +381,6 @@ def _live_ecmwf(catalog: Any) -> tuple[int, list[str]]:
 _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("live_validator"),
-    "s3": _live_s3,
     "radar": _live_radar,
     "nwp": _live_nwp,
     "ecmwf": _live_ecmwf,

@@ -22,4 +22,11 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
     "nrel": {"validator": "earthlens.nrel.cli:validator"},
     "pvgis": {"validator": "earthlens.pvgis.cli:validator"},
     "radklim": {"validator": "earthlens.radklim.cli:validator"},
+    "s3": {
+        "refresher": "earthlens.s3.cli:refresher",
+        "writer": "earthlens.s3.cli:writer",
+        "prober": "earthlens.s3.cli:prober",
+        "validator": "earthlens.s3.cli:validator",
+        "live_validator": "earthlens.s3.cli:live_validator",
+    },
 }

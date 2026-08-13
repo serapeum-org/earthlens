@@ -469,20 +469,6 @@ class TestIndexWriters:
         assert catalog.datasets["KABR"].latitude == 45.4558, "latitude parsed"
 
 
-class TestS3IndexRegen:
-    """Tests for s3 refresh --write (regenerate available_datasets from curated)."""
-
-    def test_write_regenerates_index_from_curated(self, tmp_path, monkeypatch):
-        """s3 --write rewrites available_datasets to the sorted curated names."""
-        info, module, dst = _catalog_copy("s3", tmp_path, monkeypatch)
-        before = sorted(load_catalog(info).datasets)
-        outcome = refresh_one(info, write=True)
-        assert outcome.status == "ok", "s3 refresh ran"
-        assert outcome.written.endswith("s3_data_catalog.yaml"), "in-file index written"
-        module.clear_catalog_cache()
-        assert sorted(load_catalog(info).available_datasets) == before, "index==curated"
-
-
 class TestComputedIndexWriters:
     """Tests for the sibling-index writers (openaq / worldpop / usgs_water)."""
 

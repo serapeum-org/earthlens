@@ -172,18 +172,6 @@ class TestValidateOne:
 class TestLiveValidators:
     """Tests for the `--live` reachability validators (network mocked)."""
 
-    def test_s3_live_flags_empty_bucket(self, monkeypatch):
-        """An S3 dataset whose bucket serves no object is flagged live."""
-        monkeypatch.setattr(validate_mod, "_s3_live_keys", lambda b, p, r: [])
-        result = validate_one(_info("s3"), live=True)
-        assert result.status == "ok" and result.issues, "empty bucket -> issue"
-
-    def test_s3_live_clean_when_objects_present(self, monkeypatch):
-        """A reachable object clears the s3 live check."""
-        monkeypatch.setattr(validate_mod, "_s3_live_keys", lambda b, p, r: ["k"])
-        result = validate_one(_info("s3"), live=True)
-        assert result.issues == [], "objects present -> clean"
-
     def test_supported_providers_live_adds_openeo(self):
         """openeo only appears in the supported set under live."""
         assert "openeo" not in supported_providers()
@@ -303,25 +291,6 @@ class TestLivePrimitives:
         )
         assert _http_head("https://x") == 204, "status code returned"
 
-    def test_s3_live_keys_lists_one(self, monkeypatch):
-        """_s3_live_keys returns the object keys from an unsigned client."""
-        import earthlens.base.s3 as s3_auth
-        from earthlens.cli.validate import _s3_live_keys
-
-        class FakeClient:
-            def list_objects_v2(self, **kw):
-                return {"Contents": [{"Key": "k"}]}
-
-        class FakeAuth:
-            def __init__(self, creds):
-                pass
-
-            def client(self):
-                return FakeClient()
-
-        monkeypatch.setattr(s3_auth, "S3Auth", FakeAuth)
-        assert _s3_live_keys("b", "p", None) == ["k"], "object key returned"
-
     def test_radar_feed_stations_paginates(self, monkeypatch):
         """_radar_feed_stations follows the continuation token across pages."""
         import earthlens.radar.backend as radar_backend
@@ -383,16 +352,6 @@ class TestLiveValidatorBranches:
         catalog = SimpleNamespace(datasets={"d": object()}, minimal_valid_request=boom)
         checked, issues = _live_ecmwf(catalog)
         assert any("constraints fetch failed" in i for i in issues), "failure reported"
-
-    def test_live_s3_reports_bucket_error(self, monkeypatch):
-        """A bucket whose listing raises is reported as drift, not raised."""
-
-        def boom(b, p, r):
-            raise RuntimeError("403")
-
-        monkeypatch.setattr(validate_mod, "_s3_live_keys", boom)
-        result = validate_one(_info("s3"), live=True)
-        assert any("bucket error" in i for i in result.issues), "error captured"
 
     def test_nwp_latest_cycle_none_without_cycles(self):
         """_nwp_latest_cycle returns None for a model with no cycle hours."""

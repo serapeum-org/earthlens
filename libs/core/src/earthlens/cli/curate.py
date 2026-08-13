@@ -103,42 +103,6 @@ def _infer_dtype(value: str | None) -> str:
 #: EUMETSAT public browse collections endpoint (no credentials).
 
 
-def _s3_sample_keys(bucket: str, prefix: str, region: str | None) -> list[str]:
-    """Return up to five object keys under `prefix` (unsigned `boto3`)."""
-    from earthlens.base.s3 import S3Auth, S3Credentials
-
-    client = S3Auth(S3Credentials(region=region)).client()
-    response = client.list_objects_v2(Bucket=bucket, Prefix=prefix, MaxKeys=5)
-    return [item["Key"] for item in response.get("Contents", [])]
-
-
-def _s3_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe an AWS Open-Data dataset's bucket layout (unsigned `boto3`).
-
-    Lists a few object keys under the dataset's bucket — the seed for
-    confirming a dataset's on-disk key layout.
-
-    Args:
-        catalog: The loaded S3 `Catalog` (resolves a key's bucket/prefix).
-        dataset: A registered dataset name.
-
-    Returns:
-        Mapping of object key to `{}`.
-
-    Raises:
-        ValueError: If `dataset` is not a registered S3 dataset.
-    """
-    record = catalog.datasets.get(dataset)
-    if record is None:
-        raise ValueError(f"unknown S3 dataset {dataset!r}")
-    keys = _s3_sample_keys(
-        record.bucket,
-        getattr(record, "prefix", "") or "",
-        getattr(record, "region", None),
-    )
-    return {key: {} for key in keys}
-
-
 def _ecmwf_constraints(dataset: str) -> list[dict[str, Any]]:
     """Return a dataset's public `constraints.json` rows (no creds).
 
@@ -727,7 +691,6 @@ _DEEP_PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("prober"),
-    "s3": _s3_probe,
     "ecmwf": _ecmwf_probe,
     "chc": _chc_probe,
     "tropycal": _tropycal_probe,
