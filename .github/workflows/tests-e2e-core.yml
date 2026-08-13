@@ -1,0 +1,67 @@
+name: Tests - E2E core (on change)
+
+# Run libs/core's own LIVE e2e tests (the EarthLens facade + the NWM live
+# download) when core files change. The five per-theme workflows cover the
+# providers but each only runs `pytest libs/providers/<theme>`, so none of them
+# exercises core - this file closes that gap. The scheduled tests-e2e.yml still
+# runs the whole suite weekly. Standalone (not the reusable), because core is
+# not a provider theme and has no per-backend lanes.
+#
+# Advisory, NOT a required status check: it is path-filtered, so a PR that does
+# not touch core never starts it - a branch-protection "required" rule would
+# wait forever. Use a separate always-running aggregator to gate on e2e.
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    paths:
+      - 'libs/core/**'
+      - 'uv.lock'
+      - 'pyproject.toml'
+      - '.github/workflows/tests-e2e-core.yml'
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    # Forks have no secrets; run only on the main repo (tests self-skip when a
+    # credential is absent).
+    if: github.repository == 'serapeum-org/earthlens'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: serapeum-org/github-actions/actions/python-setup/uv@38c111084f99d5ff5f4a1e63bedce48fe33a10c0 # uv/v1.2.1
+        with:
+          python-version: "3.12"
+          install-groups: "groups: dev, extras: all"
+          verify-lock: true
+          version: "0.11.29"
+
+      - name: Run live core e2e tests
+        env:
+          CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
+          CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
+          GEE_SERVICE_ACCOUNT: ${{ secrets.GEE_SERVICE_ACCOUNT }}
+          GEE_SERVICE_KEY: ${{ secrets.GEE_SERVICE_KEY }}
+          EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
+          EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
+          EARTHDATA_TOKEN: ${{ secrets.EARTHDATA_TOKEN }}
+          EUMETSAT_CONSUMER_KEY: ${{ secrets.EUMETSAT_CONSUMER_KEY }}
+          EUMETSAT_CONSUMER_SECRET: ${{ secrets.EUMETSAT_CONSUMER_SECRET }}
+          CDSE_S3_ACCESS_KEY: ${{ secrets.CDSE_S3_ACCESS_KEY }}
+          CDSE_S3_SECRET_KEY: ${{ secrets.CDSE_S3_SECRET_KEY }}
+          SENTINELHUB_CLIENT_ID: ${{ secrets.SENTINELHUB_CLIENT_ID }}
+          SENTINELHUB_CLIENT_SECRET: ${{ secrets.SENTINELHUB_CLIENT_SECRET }}
+          IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
+          WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
+        run: |
+          uv run --locked pytest libs/core -m e2e -rs -v
