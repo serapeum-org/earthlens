@@ -619,12 +619,12 @@ class OSM(AbstractDataSource):
         """
         try:
             from ohsome import OhsomeClient
+            from urllib3.util.retry import Retry
         except ImportError as exc:  # pragma: no cover - exercised via monkeypatch
             raise ImportError(
-                "The OSM ohsome protocol requires the `ohsome` SDK. Install it "
-                "with `pip install earthlens[osm]`."
+                "The OSM ohsome protocol requires the `ohsome` SDK (and "
+                "`urllib3`). Install them with `pip install earthlens[osm]`."
             ) from exc
-        from urllib3.util.retry import Retry
 
         ohsome_filter = self._filter or dataset.ohsome_filter
         west, south, east, north = bbox_wsen(self.space)
