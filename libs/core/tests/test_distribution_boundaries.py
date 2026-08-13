@@ -1271,7 +1271,6 @@ class TestCliIsBackendAgnostic:
     PENDING = frozenset(
         {
             "ecmwf",
-            "nwp",
         }
     )
 

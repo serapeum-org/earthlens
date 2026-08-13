@@ -14,7 +14,6 @@ Each provider plugs a validator into :data:`_VALIDATORS` returning
 
 from __future__ import annotations
 
-import datetime as dt
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
@@ -69,41 +68,6 @@ class ValidateResult:
         }
 
 
-def _validate_nwp(catalog: Any) -> tuple[int, list[str]]:
-    """Offline structural lint of the curated NWP models.
-
-    Mirrors `tools/nwp/audit_nwp_catalog.py`: flags `direct-https` models
-    with no `url_template`, `herbie` models with no `model_family`, empty
-    band maps, and cycle hours outside 0-23.
-
-    Args:
-        catalog: The loaded NWP `Catalog`.
-
-    Returns:
-        `(checked, issues)` — the model count and one message per problem.
-    """
-    issues: list[str] = []
-    # Backends whose fetcher reads `model.url_template` directly. Adding
-    # a new direct-fetch backend means adding it here so a missing
-    # `url_template` is caught at lint time, not at fetch time.
-    _DIRECT_URL_BACKENDS = ("direct-https", "eccc-msc")
-    models = catalog.datasets
-    for key, record in models.items():
-        backend = getattr(record, "backend", None)
-        if backend in _DIRECT_URL_BACKENDS and not getattr(
-            record, "url_template", None
-        ):
-            issues.append(f"{key}: {backend} model has no url_template")
-        if backend == "herbie" and not getattr(record, "model_family", None):
-            issues.append(f"{key}: herbie model has no model_family")
-        if not (getattr(record, "bands", None) or {}):
-            issues.append(f"{key}: empty band map")
-        for hour in getattr(record, "cycles_utc", None) or []:
-            if isinstance(hour, int) and not 0 <= hour <= 23:
-                issues.append(f"{key}: cycle hour {hour} out of range")
-    return len(models), issues
-
-
 def _lint(
     catalog: Any, check: Callable[[str, Any], list[str]]
 ) -> tuple[int, list[str]]:
@@ -128,7 +92,6 @@ def _require(key: str, record: Any, fields: tuple[str, ...]) -> list[str]:
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("validator"),
-    "nwp": _validate_nwp,
 }
 
 
@@ -143,65 +106,6 @@ def _http_head(url: str) -> int:
 
 
 #: CDSE openEO processes endpoint (public; pairs with the collections one).
-
-
-def _nwp_latest_cycle(model: Any, hours_ago: int = 6) -> dt.datetime | None:
-    """Return a model's most recent expected run datetime (or None).
-
-    Ported from the retired `tools/nwp/refresh_nwp_catalog.py`.
-
-    Args:
-        model: A curated NWP model record (duck-typed: `cycles_utc`).
-        hours_ago: How far back to look for the latest published cycle.
-
-    Returns:
-        The most recent cycle datetime at or before `now - hours_ago`,
-        or None when the model declares no cycle hours.
-    """
-    if not getattr(model, "cycles_utc", None):
-        return None
-    moment = dt.datetime.now(dt.UTC).replace(tzinfo=None) - dt.timedelta(
-        hours=hours_ago
-    )
-    for day_offset in (0, 1):
-        day = moment - dt.timedelta(days=day_offset)
-        for hour in sorted(model.cycles_utc, reverse=True):
-            candidate = day.replace(hour=hour, minute=0, second=0, microsecond=0)
-            if candidate <= moment:
-                return candidate
-    return None
-
-
-def _live_nwp(catalog: Any) -> tuple[int, list[str]]:
-    """HEAD each direct-https NWP model's latest expected cycle URL.
-
-    Folds the retired `refresh_nwp_catalog.py --live`: only `direct-https`
-    models (e.g. DWD ICON) can be checked with a cheap HEAD — Herbie / ECMWF
-    models would need their SDKs to resolve a cycle, so they are skipped.
-    """
-    issues: list[str] = []
-    checked = 0
-    for key, model in catalog.datasets.items():
-        if getattr(model, "backend", None) != "direct-https":
-            continue
-        cycle = _nwp_latest_cycle(model)
-        url_template = getattr(model, "url_template", None)
-        bands = getattr(model, "bands", None)
-        if cycle is None or not url_template or not bands:
-            continue
-        checked += 1
-        var = next(iter(bands.values()))
-        url = url_template.format(
-            cycle=cycle, date=cycle, step=0, var=var, var_lc=str(var).lower()
-        )
-        try:
-            status = _http_head(url)
-        except Exception as exc:  # noqa: BLE001 — reported as drift
-            issues.append(f"{key}: latest cycle unreachable ({type(exc).__name__})")
-            continue
-        if status != 200:
-            issues.append(f"{key}: HTTP {status} for latest cycle {url}")
-    return checked, issues
 
 
 def _live_ecmwf(catalog: Any) -> tuple[int, list[str]]:
@@ -239,7 +143,6 @@ def _live_ecmwf(catalog: Any) -> tuple[int, list[str]]:
 _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("live_validator"),
-    "nwp": _live_nwp,
     "ecmwf": _live_ecmwf,
 }
 
