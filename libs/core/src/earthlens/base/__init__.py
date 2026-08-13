@@ -38,6 +38,7 @@ from earthlens.base.http import (
     HttpRangeFile,
     RangeReadError,
     Timeout,
+    prefer_ipv4,
     redact_url,
 )
 from earthlens.base.leaves import FluxableLeaf
@@ -84,6 +85,7 @@ __all__ = [
     "normalize_aoi",
     "OutputKind",
     "PolygonAoiWarning",
+    "prefer_ipv4",
     "Provider",
     "RangeReadError",
     "redact_url",

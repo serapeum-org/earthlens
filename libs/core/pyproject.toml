@@ -48,6 +48,7 @@ dependencies = [
     "shapely >=2.0.0",
     "tqdm >=4.66.0",
     "typer >=0.12",
+    "urllib3 >=1.26",
     "rich >=13",
 ]
 

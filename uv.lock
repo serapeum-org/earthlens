@@ -2351,6 +2351,7 @@ dependencies = [
     { name = "shapely" },
     { name = "tqdm" },
     { name = "typer" },
+    { name = "urllib3" },
 ]
 
 [package.optional-dependencies]
@@ -2382,6 +2383,7 @@ requires-dist = [
     { name = "shapely", specifier = ">=2.0.0" },
     { name = "tqdm", specifier = ">=4.66.0" },
     { name = "typer", specifier = ">=0.12" },
+    { name = "urllib3", specifier = ">=1.26" },
 ]
 provides-extras = ["s3", "test"]
 

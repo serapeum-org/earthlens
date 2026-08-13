@@ -46,7 +46,7 @@ import requests
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, SecretStr
 
-from earthlens.base import AbstractAuth, AuthenticationError
+from earthlens.base import AbstractAuth, AuthenticationError, prefer_ipv4
 
 #: Attempts at `earthaccess.login` before a transport failure is fatal. EDL is
 #: a remote identity provider reached over the network, so a dropped connection
@@ -281,6 +281,10 @@ class EmdatAuth(AbstractAuth[EmdatCredentials]):
             AuthenticationError: When the login is refused, or when every
                 attempt failed to reach EDL.
         """
+        # urs.earthdata.nasa.gov is dual-stack; on a host with no IPv6 egress a
+        # resolved AAAA connects into a dead route (ENETUNREACH) with no IPv4
+        # fallback. Force IPv4 before the first dial. See issue #926.
+        prefer_ipv4()
         for attempt in range(_LOGIN_ATTEMPTS):
             try:
                 return earthaccess.login(strategy=strategy, persist=True)

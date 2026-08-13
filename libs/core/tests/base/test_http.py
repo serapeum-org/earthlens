@@ -17,6 +17,7 @@ from earthlens.base.http import (
     _default_user_agent,
     _parse_retry_after,
     _progress_total,
+    prefer_ipv4,
     redact_url,
 )
 
@@ -1084,3 +1085,43 @@ class TestThreadLocalSession:
         reset_thread_local_sessions()
 
         assert thread_local_session("demo") is not first
+
+
+class TestPreferIpv4:
+    """`prefer_ipv4` narrows urllib3 to IPv4 without ever restoring IPv6."""
+
+    @pytest.fixture(autouse=True)
+    def _restore_has_ipv6(self):
+        """Save and restore the process-global HAS_IPV6 around each test."""
+        import urllib3.util.connection as connection
+
+        saved = connection.HAS_IPV6
+        try:
+            yield
+        finally:
+            connection.HAS_IPV6 = saved
+
+    def test_sets_has_ipv6_false(self):
+        """It flips the urllib3 flag so getaddrinfo is asked for IPv4 only."""
+        import urllib3.util.connection as connection
+
+        connection.HAS_IPV6 = True
+        prefer_ipv4()
+        assert connection.HAS_IPV6 is False
+
+    def test_is_idempotent(self):
+        """A second call leaves the flag false rather than toggling it back."""
+        import urllib3.util.connection as connection
+
+        prefer_ipv4()
+        prefer_ipv4()
+        assert connection.HAS_IPV6 is False
+
+    def test_allowed_gai_family_becomes_af_inet(self):
+        """urllib3 then resolves connections in the IPv4 address family."""
+        import socket
+
+        import urllib3.util.connection as connection
+
+        prefer_ipv4()
+        assert connection.allowed_gai_family() == socket.AF_INET

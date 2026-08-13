@@ -286,6 +286,32 @@ def _default_user_agent() -> str:
     return f"earthlens/{__version__}"
 
 
+def prefer_ipv4() -> None:
+    """Make every urllib3-based request in this process skip AAAA records.
+
+    urllib3 asks `getaddrinfo` for `AF_UNSPEC` — both IPv4 (A) and IPv6 (AAAA)
+    addresses — only while `urllib3.util.connection.HAS_IPV6` is true. Setting
+    it false narrows resolution to `AF_INET`, so a connection only ever tries
+    an IPv4 address.
+
+    This exists for a host reached over a network with no IPv6 egress, where a
+    resolved AAAA connects into a dead route and raises
+    `OSError: [Errno 101] Network is unreachable` (`ENETUNREACH`) with no IPv4
+    fallback — the failure mode of GitHub-hosted runners against the dual-stack
+    Earthdata Login host `urs.earthdata.nasa.gov`. Forcing IPv4 drops the AAAA
+    from consideration, so the dead route is never dialled.
+
+    The switch is a `urllib3` module global, so it is **process-wide**: it
+    affects every `requests` / `urllib3` connection made afterwards, not only
+    the caller's. It is idempotent — calling it again is a no-op — and only
+    ever removes IPv6, never restores it. Reach for it in one shared place (an
+    auth path against a known dual-stack host), not per request.
+    """
+    import urllib3.util.connection as connection
+
+    connection.HAS_IPV6 = False
+
+
 def new_session() -> requests.Session:
     """Return the pooled transport :class:`HttpClient` uses by default.
 
