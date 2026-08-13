@@ -207,3 +207,46 @@ def test_guard_allows_a_lane_with_a_pass(tmp_path: Path) -> None:
         """,
     )
     assert result.returncode == 0, result.stdout
+
+
+def test_guard_allows_a_credential_skipped_lane(tmp_path: Path) -> None:
+    """A lane all-skipped for missing creds (no availability skip) stays green."""
+    result = _run_guard_lane(
+        tmp_path,
+        """
+        import pytest
+
+        @pytest.mark.e2e
+        def test_no_creds():
+            pytest.skip("credentials not configured")
+
+        @pytest.mark.e2e
+        @pytest.mark.skipif(True, reason="gated off")
+        def test_gated():
+            assert False
+        """,
+    )
+    assert result.returncode == 0, result.stdout
+    assert "masked" not in result.stdout
+
+
+def test_guard_fails_a_lane_mixing_creds_skip_and_availability_skip(
+    tmp_path: Path,
+) -> None:
+    """One availability skip with zero passes fails, even beside a creds skip."""
+    result = _run_guard_lane(
+        tmp_path,
+        """
+        import pytest
+
+        @pytest.mark.e2e
+        def test_no_creds():
+            pytest.skip("credentials not configured")
+
+        @pytest.mark.e2e
+        def test_down():
+            raise Exception("503 Server Error: Service Unavailable")
+        """,
+    )
+    assert result.returncode != 0, result.stdout
+    assert "wholly masked" in result.stdout
