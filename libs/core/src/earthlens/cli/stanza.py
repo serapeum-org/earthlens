@@ -242,80 +242,6 @@ def _emit_gee(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
     return row
 
 
-def _emit_jaxa(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
-    """Seed a JAXA `datasets:` row from a STAC name or G-Portal numeric id.
-
-    The upstream id's shape decides the protocol: a `JAXA.*` / `NASA.*`
-    / `Copernicus.*` string seeds a `jaxa-earth` row (with the default
-    band looked up via `je.ImageCollectionList()`); a 7-9 digit numeric
-    string seeds a `gportal` row (with the description built from
-    `gportal.datasets()`'s mission / level / product path).
-
-    Args:
-        catalog: The loaded JAXA `Catalog` (unused; the SDKs are the
-            authoritative sources).
-        upstream_id: The STAC collection name or G-Portal numeric id.
-        **opts: Unused.
-
-    Returns:
-        A row dict matching the bundled YAML's `datasets:` shape.
-    """
-    del catalog
-    if re.match(r"^\d{7,9}$", upstream_id):
-        # G-Portal numeric id — walk the live tree to find its mission / path.
-        import gportal  # type: ignore[import-not-found]
-
-        tree = gportal.datasets()
-        for mission, level, path in _walk_gportal(tree):
-            if path == upstream_id:
-                return {
-                    "protocol": "gportal",
-                    "short_name": upstream_id,
-                    "description": f"{mission} / {level}",
-                }
-        return {
-            "protocol": "gportal",
-            "short_name": upstream_id,
-            "description": "(unrecognised G-Portal id; verify upstream)",
-        }
-    # jaxa-earth STAC collection.
-    from jaxa.earth import je  # type: ignore[import-not-found]
-
-    ids, bands_per_id = je.ImageCollectionList().filter_name()
-    bands: list[str] = []
-    try:
-        idx = list(ids).index(upstream_id)
-        bands = list(bands_per_id[idx])
-    except ValueError:
-        pass
-    row: dict[str, Any] = {
-        "protocol": "jaxa-earth",
-        "collection": upstream_id,
-    }
-    if bands:
-        row["default_band"] = bands[0]
-    return row
-
-
-def _walk_gportal(node: Any, mission: str = "", level: str = ""):
-    """Yield `(mission, level, leaf_id)` triples from a gportal.datasets() tree.
-
-    The tree's top level is `mission -> level -> sensor -> [ids]`; the
-    middle layers vary. Anything that's a list of leaf strings is treated
-    as the product-id list, parented by whatever level we last saw.
-    """
-    if isinstance(node, dict):
-        for key, value in node.items():
-            next_mission = mission or key
-            next_level = level if mission else ""
-            if mission and not level:
-                next_level = key
-            yield from _walk_gportal(value, next_mission, next_level)
-    elif isinstance(node, list):
-        for item in node:
-            yield (mission, level, str(item))
-
-
 #: Provider id -> a callable taking the loaded catalog, the upstream id, and
 #: per-provider keyword options, returning the seeded curated row.
 # ecmwf — seed from the live CADS `form.json` (CDS / ADS / EWDS).
@@ -457,7 +383,6 @@ _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
     **dispatch_table("emitter"),
     "ecmwf": _emit_ecmwf,
     "gee": _emit_gee,
-    "jaxa": _emit_jaxa,
 }
 
 

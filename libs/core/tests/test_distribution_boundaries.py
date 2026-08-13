@@ -1276,7 +1276,6 @@ class TestCliIsBackendAgnostic:
             "ecmwf",
             "gee",
             "goes",
-            "jaxa",
             "mswep",
             "nrel",
             "nwp",

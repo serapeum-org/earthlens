@@ -351,46 +351,6 @@ def _validate_goes(catalog: Any) -> tuple[int, list[str]]:
     return len(catalog.datasets), issues
 
 
-def _validate_jaxa(catalog: Any) -> tuple[int, list[str]]:
-    """Validate each JAXA row's protocol-specific identifier.
-
-    The `Dataset` pydantic model already enforces the cross-field
-    invariant (`jaxa-earth` needs `collection`, `gportal` needs
-    `short_name`), so a clean catalog load reaches this validator with
-    every row well-formed. This lint adds two cheap cross-row checks the
-    model can't see:
-
-    * a `jaxa-earth` row without a `default_band` is flagged — the
-      backend's branch raises a hard error at fetch time, so catching
-      it offline is friendlier;
-    * any curated `short_name` / `collection` that doesn't appear in
-      the YAML's `available_datasets:` index is flagged — that index is
-      rewritten by `earthlens datasets refresh jaxa --write`, so drift
-      surfaces here without a network round-trip.
-    """
-    available = set(catalog.available_datasets or ())
-    issues: list[str] = []
-    for key, row in catalog.datasets.items():
-        if row.protocol == "jaxa-earth":
-            if not row.default_band:
-                issues.append(
-                    f"{key}: jaxa-earth row missing `default_band` (the branch "
-                    "will reject fetches without an explicit bands= override)"
-                )
-            if available and row.collection not in available:
-                issues.append(
-                    f"{key}: collection {row.collection!r} not in the bundled "
-                    "`available_datasets:` index — refresh may have drifted"
-                )
-        else:
-            if available and row.short_name not in available:
-                issues.append(
-                    f"{key}: short_name {row.short_name!r} not in the bundled "
-                    "`available_datasets:` index — refresh may have drifted"
-                )
-    return len(catalog.datasets), issues
-
-
 def _validate_pvgis(catalog: Any) -> tuple[int, list[str]]:
     """Each PVGIS product needs a tool, an endpoint, and non-empty columns."""
     return _lint(catalog, lambda k, r: _require(k, r, ("tool", "endpoint", "columns")))
@@ -451,7 +411,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "drought": _validate_drought,
     "chc": _validate_chc,
     "sentinel_hub": _validate_sentinel_hub,
-    "jaxa": _validate_jaxa,
     "pvgis": _validate_pvgis,
     "nrel": _validate_nrel,
 }

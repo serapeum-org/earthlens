@@ -31,6 +31,13 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "prober": "earthlens.eumetsat.cli:prober",
         "emitter": "earthlens.eumetsat.cli:emitter",
     },
+    "jaxa": {
+        "refresher": "earthlens.jaxa.cli:refresher",
+        "writer": "earthlens.jaxa.cli:writer",
+        "prober": "earthlens.jaxa.cli:prober",
+        "emitter": "earthlens.jaxa.cli:emitter",
+        "validator": "earthlens.jaxa.cli:validator",
+    },
     "openeo": {
         "refresher": "earthlens.openeo.cli:refresher",
         "writer": "earthlens.openeo.cli:writer",
