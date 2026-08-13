@@ -51,6 +51,11 @@ obis = ["pyobis >=1.6.1"]
 [project.entry-points."earthlens.backends"]
 ocean = "earthlens._ocean:BACKENDS"
 
+# This distribution's slice of the CLI catalog-tooling table (refresh / audit /
+# probe / validate handlers), merged by earthlens._cli_tooling.
+[project.entry-points."earthlens.cli"]
+ocean = "earthlens._ocean_cli:CLI_TOOLING"
+
 [project.urls]
 Homepage = "https://github.com/serapeum-org/earthlens"
 

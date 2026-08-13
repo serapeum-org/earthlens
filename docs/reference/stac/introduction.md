@@ -14,9 +14,38 @@ them all and selects the right signer from the catalog.
 | `planetary-computer` | Microsoft Planetary Computer | broad catalogue (~120 collections) | Azure **SAS** URL signing (no account) |
 | `cdse` | Copernicus Data Space Ecosystem | every Sentinel mission | **S3** credentials (eodata store) |
 | `earth-search` | Element 84 / AWS Open Data | anonymous Sentinel-2 COG, Landsat C2, Copernicus DEM | **anonymous** |
+| `eodc` | Earth Observation Data Centre | Copernicus GFM + EODC raster collections (SAR σ0/γ0, soil moisture, DEM, land cover, orthophotos) | **anonymous** |
 
 The model extends to USGS Landsat (`aws-requester-pays`) and other public STAC
-catalogues (DE Africa, DEA, Brazil Data Cube, VEDA) by adding a catalog row.
+catalogues (DE Africa, DEA, Brazil Data Cube, VEDA, EODC) by adding a catalog row.
+
+### Copernicus GFM (flood monitoring)
+
+The `eodc` endpoint serves **Copernicus Global Flood Monitoring** — Sentinel-1
+SAR near-real-time flood mapping — as the collection `eodc/gfm`, anonymously. It
+exposes twelve single-band `uint8` COG layers (nodata `255`): the final ensemble
+products `ensemble_flood_extent` (the default), `ensemble_water_extent`,
+`ensemble_likelihood`, plus `reference_water_mask`, `exclusion_mask`,
+`advisory_flags`, and the per-algorithm `dlr_` / `tuw_` / `list_` flood-extent
+and likelihood intermediates. It is the live-observed flood-extent complement to
+the modelled `aqueduct`, the return-period `jrc_flood`, and the impact
+`hanze` / `flodis` backends.
+
+```python
+from earthlens.core import EarthLens
+
+el = EarthLens(
+    data_source="eodc",  # or data_source="stac", endpoint="eodc"
+    start="2022-08-25", end="2022-09-30",
+    variables={"eodc/gfm": ["ensemble_flood_extent"]},
+    lat_lim=[26.0, 28.0], lon_lim=[67.0, 69.0],
+    path="gfm-out",
+)
+paths = el.download()  # one COG per (collection, acquisition date)
+```
+
+GFM is free under the Copernicus licence (attribution; see
+[extwiki.eodc.eu/en/GFM](https://extwiki.eodc.eu/en/GFM)).
 
 ## What it returns
 

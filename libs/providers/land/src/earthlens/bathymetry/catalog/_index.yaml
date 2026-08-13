@@ -1,9 +1,14 @@
 # Bathymetry catalog index — every curated DEM id (informational).
 #
 # Each id resolves to a row in one of the per-family files (gebco.yaml,
-# etopo.yaml). The loader checks every curated row appears here, mirroring
-# the ghsl / cmems sharded-catalog contract.
+# etopo.yaml, emodnet.yaml). The loader checks every curated row appears here,
+# mirroring the ghsl / cmems sharded-catalog contract.
 available_datasets:
   - gebco_2020
   - etopo1_ice
   - etopo1_bedrock
+  - emodnet
+  - emodnet_2022
+  - emodnet_2020
+  - emodnet_2018
+  - emodnet_2016

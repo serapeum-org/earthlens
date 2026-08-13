@@ -300,6 +300,18 @@ class TestRequest:
         client.get("http://x", timeout=3.0)
         assert session.calls[0][2]["timeout"] == 3.0
 
+    def test_get_default_tuple_timeout_is_forwarded(self):
+        """A client's (connect, read) default reaches the session unchanged."""
+        client, session, _ = _client([_Resp(body={})], timeout=(3.05, 27.0))
+        client.get("http://x")
+        assert session.calls[0][2]["timeout"] == (3.05, 27.0)
+
+    def test_get_tuple_timeout_override_is_forwarded(self):
+        """A per-request (connect, read) tuple overrides a scalar default."""
+        client, session, _ = _client([_Resp(body={})], timeout=12.0)
+        client.get("http://x", timeout=(5.0, 120.0))
+        assert session.calls[0][2]["timeout"] == (5.0, 120.0)
+
     def test_post_dispatches_to_session_post(self):
         """post() routes to the session's post verb."""
         client, session, _ = _client([_Resp(body={})])
@@ -655,6 +667,22 @@ class TestDownload:
         session = _RecordingSession([_Resp(blocks=[b"a"])])
         HttpClient(session=session).download("http://x", tmp_path / "f", progress=False)
         assert session.calls[0][2]["stream"] is True
+
+    def test_download_forwards_tuple_timeout(self, tmp_path):
+        """download forwards a (connect, read) timeout pair to the streaming GET."""
+        session = _RecordingSession([_Resp(blocks=[b"ok"])])
+        HttpClient(session=session).download(
+            "http://x", tmp_path / "f", progress=False, timeout=(5.0, 120.0)
+        )
+        assert session.calls[0][2]["timeout"] == (5.0, 120.0)
+
+    def test_download_uses_default_tuple_timeout(self, tmp_path):
+        """download streams with the client's default tuple when none is given."""
+        session = _RecordingSession([_Resp(blocks=[b"ok"])])
+        HttpClient(session=session, timeout=(3.05, 60.0)).download(
+            "http://x", tmp_path / "f", progress=False
+        )
+        assert session.calls[0][2]["timeout"] == (3.05, 60.0)
 
     def test_download_closes_response(self, tmp_path):
         """download closes the streaming response when finished."""

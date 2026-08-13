@@ -50,6 +50,9 @@ stac = ["pyramids-gis[stac] >=0.52.0"]
 [project.entry-points."earthlens.backends"]
 imagery = "earthlens._imagery:BACKENDS"
 
+[project.entry-points."earthlens.cli"]
+imagery = "earthlens._imagery_cli:CLI_TOOLING"
+
 [project.urls]
 Homepage = "https://github.com/serapeum-org/earthlens"
 

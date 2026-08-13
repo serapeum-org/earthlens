@@ -90,6 +90,13 @@ class TestConstruction:
         backend = _backend(tmp_path)
         assert backend._bbox() == "-118.5,34.0,-118.1,34.3"
 
+    def test_client_accepts_split_timeout(self):
+        """The client constructor accepts and exposes a (connect, read) timeout."""
+        from earthlens.openaq.client import OpenaqClient
+
+        client = OpenaqClient("key", timeout=(5.0, 30.0))
+        assert client.timeout == (5.0, 30.0)
+
 
 @pytest.mark.openaq
 class TestSearch:

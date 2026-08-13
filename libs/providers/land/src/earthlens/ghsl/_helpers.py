@@ -33,11 +33,36 @@ from typing import cast
 import requests
 
 from earthlens.base.archive import extract_members
-from earthlens.base.http import HttpClient, thread_local_session
+from earthlens.base.http import HttpClient, Timeout, thread_local_session
 from earthlens.ghsl.catalog import RES_TO_TOKEN, native_source_crs
 
 #: Root of the JRC open-data GHSL file tree (anonymous HTTPS, no auth).
 BASE_URL: str = "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL"
+
+#: Connect-phase timeout (seconds) for every GHSL request. Kept short so each
+#: attempt at a JRC host that never completes the TCP handshake — an upstream
+#: outage, or egress blocked from a CI runner — fails in seconds rather than
+#: burning the full read budget on a connection that will never open. The
+#: `_download` retry loop still makes its usual attempts (a shorter connect
+#: budget does not turn a dead host into a live one), so a dead host costs
+#: ~3 attempts x 9.15 s plus back-off — tens of seconds per file, versus the
+#: ~6 minutes the old 120 s connect budget spent on the same three attempts
+#: (issue #932). 9.15 s follows the `requests` timeout guidance of a value
+#: slightly larger than a multiple of the 3 s TCP packet-retransmission window
+#: (3 x 3.05).
+_CONNECT_TIMEOUT: float = 9.15
+
+#: Read-phase timeout (seconds) for a GHSL file download. Generous on purpose: a
+#: whole-globe artefact is hundreds of megabytes, so a slow-but-live transfer
+#: must not be cut off mid-stream.
+_DOWNLOAD_READ_TIMEOUT: float = 120.0
+
+#: `(connect, read)` timeout for a GHSL `.zip` download.
+_DOWNLOAD_TIMEOUT: tuple[float, float] = (_CONNECT_TIMEOUT, _DOWNLOAD_READ_TIMEOUT)
+
+#: `(connect, read)` timeout for a JRC Apache-autoindex directory listing — a
+#: small response, so its read budget is shorter than a file download's.
+_LISTING_TIMEOUT: tuple[float, float] = (_CONNECT_TIMEOUT, 60.0)
 
 #: Path to the bundled 18×36 Mollweide land tile schema (375 tiles, ESRI:54009).
 TILE_SCHEMA_PATH: Path = Path(__file__).parent / "tile_schema.geojson"
@@ -213,7 +238,7 @@ def download_and_unzip(
     session: requests.Session | None = None,
     retries: int = 3,
     backoff: float = 2.0,
-    timeout: float = 120.0,
+    timeout: Timeout = _DOWNLOAD_TIMEOUT,
     chunk_size: int = 1 << 20,
 ) -> Path:
     """Stream a GHSL `.zip` to `dest_dir`, unzip it, return the `.tif` inside.
@@ -227,7 +252,10 @@ def download_and_unzip(
         session: Optional shared `requests.Session` for connection reuse.
         retries: Number of attempts before giving up.
         backoff: Base seconds for exponential backoff between retries.
-        timeout: Per-request timeout in seconds.
+        timeout: Per-request timeout in seconds — a single float, or a
+            `(connect, read)` pair (the default) that fails a dead host on the
+            short connect budget without shortening the long read budget a
+            large download needs.
         chunk_size: Streaming chunk size in bytes.
 
     Returns:
@@ -261,14 +289,19 @@ _HREF_RE = re.compile(r'href="([^"?][^"]*)"')
 
 
 def list_remote_dir(
-    url: str, *, session: requests.Session | None = None, timeout: float = 60.0
+    url: str,
+    *,
+    session: requests.Session | None = None,
+    timeout: Timeout = _LISTING_TIMEOUT,
 ) -> list[str]:
     """List the entry names in a JRC Apache-autoindex directory.
 
     Args:
         url: Directory URL (with or without a trailing slash).
         session: Optional shared `requests.Session`.
-        timeout: Request timeout in seconds.
+        timeout: Request timeout in seconds — a single float, or a
+            `(connect, read)` pair (the default) so an unreachable host fails
+            on the short connect budget.
 
     Returns:
         list[str]: The `href` entry names (sub-directories keep their trailing
@@ -328,7 +361,7 @@ def download_and_extract(
     session: requests.Session | None = None,
     retries: int = 3,
     backoff: float = 2.0,
-    timeout: float = 120.0,
+    timeout: Timeout = _DOWNLOAD_TIMEOUT,
     chunk_size: int = 1 << 20,
 ) -> list[Path]:
     """Stream a `.zip` to `dest_dir` and extract **all** members (tabular path).
@@ -343,7 +376,8 @@ def download_and_extract(
         session: Optional shared `requests.Session`.
         retries: Attempts before giving up.
         backoff: Base backoff seconds.
-        timeout: Per-request timeout.
+        timeout: Per-request timeout — a single float, or a `(connect, read)`
+            pair (the default).
         chunk_size: Streaming chunk size.
 
     Returns:
@@ -366,7 +400,7 @@ def _download(
     session: requests.Session | None,
     retries: int,
     backoff: float,
-    timeout: float,
+    timeout: Timeout,
     chunk_size: int,
 ) -> None:
     """Stream `url` to `zip_path` with retry + exponential backoff.
@@ -388,7 +422,8 @@ def _download(
         session: Optional shared session.
         retries: Attempts before giving up.
         backoff: Base backoff seconds.
-        timeout: Per-request timeout.
+        timeout: Per-request timeout — a single float, or a `(connect, read)`
+            pair.
         chunk_size: Streaming chunk size.
 
     Raises:

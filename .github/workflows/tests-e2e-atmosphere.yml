@@ -1,0 +1,38 @@
+name: Tests - E2E atmosphere (on change)
+
+# Thin caller: trigger on atmosphere's paths and delegate to the reusable
+# per-theme e2e-on-change workflow. All logic lives in tests-e2e-reusable.yml.
+#
+# Advisory, NOT a required status check: because it is path-filtered, a PR that
+# does not touch atmosphere never starts this workflow, so a branch-protection
+# "required" rule on it would wait forever. To make e2e a required gate, add a
+# separate always-running aggregator job instead of marking this one required.
+
+permissions:
+  contents: read
+
+# Unlike the scheduled tests-e2e.yml (which never cancels a half-finished live
+# run), this per-PR gate is fast-feedback: a superseding push makes the prior
+# run's results stale, so cancel it rather than stack live requests. The group
+# keys on github.workflow, so the five theme callers do not cancel each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    paths:
+      - 'libs/providers/atmosphere/**'
+      - 'libs/core/**'
+      - 'uv.lock'
+      - 'pyproject.toml'
+      - '.github/workflows/tests-e2e-atmosphere.yml'
+      - '.github/workflows/tests-e2e-reusable.yml'
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    uses: ./.github/workflows/tests-e2e-reusable.yml
+    with:
+      theme: atmosphere
+    secrets: inherit

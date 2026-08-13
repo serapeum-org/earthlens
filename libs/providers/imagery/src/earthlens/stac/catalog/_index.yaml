@@ -38,8 +38,81 @@ endpoints:
   bdc:
     url: https://data.inpe.br/bdc/stac/v1
     signer: anonymous
+  eodc:
+    url: https://stac.eodc.eu/api/v1
+    signer: anonymous
 
 available_collections:
+  eodc:
+  - AI4SAR_SIG0
+  - ASA_IMP_1P
+  - ASA_IMS_1P
+  - AUSTRIA_GROUND_MOTION
+  - AUT_DEM
+  - BOA_LANDSAT_8
+  - BOA_SENTINEL_2
+  - CEOS_ARD_NRB_S1_SAMPLES
+  - CGLS_SSM_1KM
+  - COP_DEM
+  - CORINE_LAND_COVER
+  - DOP_AUT_K_KLAGENFURT
+  - DOP_AUT_K_OSTTIROL
+  - DOP_AUT_K_TAMSWEG
+  - DOP_AUT_K_VILLACH
+  - DOP_AUT_K_WOLFSBERG
+  - DOP_AUT_K_ZELL_AM_SEE
+  - DOP_AUT_K_ZELTWEG
+  - DOP_AUT_ST_BISCHOFSHOFEN
+  - DOP_AUT_ST_GRAZ
+  - DOP_AUT_ST_KLAGENFURT
+  - DOP_AUT_ST_MARIAZELL
+  - DOP_AUT_ST_MURTAL
+  - DOP_AUT_ST_SUEDBURGENLAND
+  - DOP_AUT_ST_VILLACH
+  - DOP_AUT_ST_WINDISCHGARSTEN
+  - DROUGHT_VULNERABILITY
+  - DSM_AUT
+  - ERS_ENVISAT_NRB
+  - GFM
+  - INTRA_FIELD_CROP_GROWTH_POTENTIAL
+  - RUCIO_SENTINEL2_MFCOVER
+  - SAR_IMP_1P
+  - SAR_IMS_1P
+  - SENTINEL1_ALPS_WETSNOW
+  - SENTINEL1_GMR0
+  - SENTINEL1_GRD
+  - SENTINEL1_GRD_COVERAGE
+  - SENTINEL1_HPAR
+  - SENTINEL1_MPLIA
+  - SENTINEL1_SCENE_GMR0
+  - SENTINEL1_SIG0_20M
+  - SENTINEL1_SLC
+  - SENTINEL2_GRI_L1C
+  - SENTINEL2_L1C
+  - SENTINEL2_L1C_COVERAGE
+  - SENTINEL2_L2A
+  - SENTINEL2_MFCOVER
+  - SENTINEL3_SRAL_L2
+  - SENTINEL5P_DAILY_AUT
+  - SSM-RT0-SIG0-R-EXTR
+  - Sentinel-1_Lacken_Extent
+  - Sentinel-1_Reed_Extent
+  - Sentinel-2-Greenness-Austria
+  - VEGETATION_CHANGE_AUSTRIA
+  - climatedt-austria
+  - climatedt-vsw
+  - clms-st
+  - clms-vpp
+  - incal-hourly
+  - sentinel2-landsat8-l2f
+  - spartacus-daily
+  - topo-dc-austria-dsm
+  - topo-dc-austria-dsm-utm
+  - topo-dc-austria-dtm
+  - topo-dc-austria-dtm-utm
+  - topo-dc-austria-ndsm
+  - topo-dc-austria-ndsm-utm
+  - topo-dc-austria-op-utm
   planetary-computer:
   - 3dep-lidar-classification
   - 3dep-lidar-copc

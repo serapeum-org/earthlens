@@ -303,6 +303,14 @@ class TestSharedHelpersAreNotReimplemented:
 
         assert callable(close_quietly)
 
+    def test_timeout_is_exported(self):
+        """The public timeout alias is re-exported from the base package."""
+        from earthlens.base import Timeout, __all__
+        from earthlens.base.http import Timeout as HttpTimeout
+
+        assert Timeout is HttpTimeout
+        assert "Timeout" in __all__
+
 
 class TestCatalogParseCacheIsBounded:
     """Every backend's parse cache evicts superseded generations."""
@@ -1236,4 +1244,181 @@ class TestBoundedResultsDocMatchesTheCode:
             f"these backends accept limit= but are not named on "
             f"docs/reference/base/bounded-results.md, so a reader would think "
             f"the cap is unavailable for them: {missing}"
+        )
+
+
+class TestCliIsBackendAgnostic:
+    """#863: core's CLI must not name a backend once tooling migration completes.
+
+    Core defines the catalog-tooling mechanism but must own no per-backend
+    handler: each provider publishes its refresh / probe / validate handlers
+    through the `earthlens.cli` entry-point group, and core's dispatch dicts are
+    projected from that discovery (`earthlens._cli_tooling.dispatch_table`).
+
+    The migration is incremental, so the two allow-lists below name the backends
+    whose tooling still lives in core's `cli/` — as literal dispatch-dict keys
+    (`PENDING`) or as `earthlens.<backend>` imports (`PENDING_IMPORTS`). Each is
+    an exact set: migrating a provider deletes it from both, and adding a new
+    hard-coded backend fails the test. When both reach `frozenset()`, the exact
+    assertions become "core names no backend", which is the closing condition
+    for the issue. The `query.DEFAULT_PROVIDER_PRIORITY` ordering tuple is a
+    deliberate exception (a UX precedence hint, env-overridable, coupling to no
+    provider code), so it is not scanned — only dict keys and imports are.
+    """
+
+    #: Backends still named as dispatch-dict keys in core's CLI (shrinks to
+    #: empty as #863 lands provider by provider).
+    PENDING: frozenset[str] = frozenset()
+
+    #: Backends core's CLI still imports directly (`from earthlens.<backend>`),
+    #: also shrinking to empty.
+    PENDING_IMPORTS: frozenset[str] = frozenset()
+
+    def _cli_sources(self):
+        """Yield every core CLI source file, skipping build artefacts.
+
+        Covers the `cli/` package plus `earthlens/_cli_tooling.py` — the
+        discovery mechanism sits one level above `cli/` but is exactly the
+        module that defines provider dispatch, so a hard-coded fallback added
+        there must be caught too.
+        """
+        src = Path(__file__).resolve().parents[1] / "src" / "earthlens"
+        paths = [*sorted((src / "cli").rglob("*.py")), src / "_cli_tooling.py"]
+        for path in paths:
+            if "build" not in path.parts:
+                yield path
+
+    def _provider_ids(self) -> set[str]:
+        """The canonical provider ids (the `earthlens.<id>` package names)."""
+        from earthlens.cli.adapter import list_backends
+
+        return {info.provider for info in list_backends()}
+
+    def _provider_keys(self) -> set[str]:
+        """Every facade key a hard-coded branch might name — canonical + aliases.
+
+        Keying the dict-key / comparison scans off this (rather than the
+        canonical ids only) closes the alias hole: a branch written against an
+        alias (`"chirps"` for chc, `"amazon-s3"` for s3) is still recognised as
+        naming a backend.
+        """
+        from earthlens.cli.adapter import known_provider_keys
+
+        return set(known_provider_keys())
+
+    def test_dispatch_dicts_name_exactly_the_pending_backends(self):
+        """Every provider-id dict key in core's CLI is an unmigrated backend."""
+        provider_keys = self._provider_keys()
+        named: set[str] = set()
+        for path in self._cli_sources():
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                if not isinstance(node, ast.Dict):
+                    continue
+                for key in node.keys:
+                    if isinstance(key, ast.Constant) and key.value in provider_keys:
+                        named.add(key.value)
+        assert named == self.PENDING, (
+            "core CLI dispatch dicts name a set of backends other than the "
+            f"pending allow-list; extra={sorted(named - self.PENDING)}, "
+            f"missing={sorted(self.PENDING - named)}. Migrate the backend to "
+            "earthlens.<backend>.cli and update PENDING (empty = #863 closed)."
+        )
+
+    def test_no_provider_id_comparisons_in_core_cli(self):
+        """No core CLI branch compares against a backend id / alias string.
+
+        Catches the coupling forms the dict-key scan cannot see: a
+        `provider == "gee"` equality, an `!=`, or a membership test against a
+        set/list/tuple literal (`provider in {"gee", "ecmwf"}`) — the shapes a
+        reintroduced `if`/`elif` dispatch would take. Docstring examples are
+        exempt automatically: they parse as a single string constant, never as
+        `ast.Compare` nodes.
+        """
+        provider_keys = self._provider_keys()
+        offenders: set[str] = set()
+        for path in self._cli_sources():
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                if not isinstance(node, ast.Compare):
+                    continue
+                operands = [node.left, *node.comparators]
+                literals: list[ast.expr] = []
+                for operand in operands:
+                    if isinstance(operand, ast.Set | ast.List | ast.Tuple):
+                        literals.extend(operand.elts)
+                    else:
+                        literals.append(operand)
+                for literal in literals:
+                    if (
+                        isinstance(literal, ast.Constant)
+                        and literal.value in provider_keys
+                    ):
+                        offenders.add(literal.value)
+        allowed = self.PENDING | self.PENDING_IMPORTS
+        assert offenders <= allowed, (
+            "core CLI compares against backend id / alias string(s) "
+            f"{sorted(offenders - allowed)} — a hard-coded provider branch. "
+            "Dispatch on a role via earthlens._cli_tooling instead."
+        )
+
+    def test_no_provider_id_dispatch_shapes_in_core_cli(self):
+        """No core CLI branch dispatches on a backend id via subscript/call/match.
+
+        Complements the dict-key and comparison scans by catching the remaining
+        shapes a hand-rolled dispatch could take: a constant subscript against a
+        name-bound registry (`REGISTRY["gee"]`), a backend id passed as a call
+        argument (`table.get("gee")`, `f("ecmwf", ...)`), or a structural
+        `match` / `case "gee":`. Docstring examples are exempt automatically
+        (they parse as a single string constant, not as these nodes).
+        """
+        provider_keys = self._provider_keys()
+        offenders: set[str] = set()
+
+        def flag(node: ast.expr | None) -> None:
+            if isinstance(node, ast.Constant) and node.value in provider_keys:
+                offenders.add(node.value)
+
+        for path in self._cli_sources():
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                if isinstance(node, ast.Subscript):
+                    flag(node.slice)
+                elif isinstance(node, ast.Call):
+                    for arg in node.args:
+                        flag(arg)
+                    for kw in node.keywords:
+                        flag(kw.value)
+                elif isinstance(node, ast.MatchValue):
+                    flag(node.value)
+        allowed = self.PENDING | self.PENDING_IMPORTS
+        assert offenders <= allowed, (
+            "core CLI dispatches on backend id / alias string(s) "
+            f"{sorted(offenders - allowed)} via a subscript / call arg / match "
+            "case — a hard-coded provider branch. Use a role via "
+            "earthlens._cli_tooling instead."
+        )
+
+    def test_provider_imports_are_exactly_the_pending_ones(self):
+        """Every `earthlens.<backend>` import in core's CLI is unmigrated.
+
+        Scans both `from earthlens.<backend> import …` (`ast.ImportFrom`) and
+        the plain `import earthlens.<backend>[.…]` form (`ast.Import`).
+        """
+        provider_ids = self._provider_ids()
+        imported: set[str] = set()
+        for path in self._cli_sources():
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                modules: list[str] = []
+                if isinstance(node, ast.ImportFrom) and node.module:
+                    modules.append(node.module)
+                elif isinstance(node, ast.Import):
+                    modules.extend(alias.name for alias in node.names)
+                for module in modules:
+                    parts = module.split(".")
+                    if len(parts) > 1 and parts[0] == "earthlens":
+                        if parts[1] in provider_ids:
+                            imported.add(parts[1])
+        assert imported == self.PENDING_IMPORTS, (
+            "core CLI imports a set of provider packages other than the pending "
+            f"allow-list; extra={sorted(imported - self.PENDING_IMPORTS)}, "
+            f"missing={sorted(self.PENDING_IMPORTS - imported)}. Move the handler "
+            "into the provider and update PENDING_IMPORTS (empty = #863 closed)."
         )

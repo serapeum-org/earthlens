@@ -108,13 +108,13 @@ def test_get_catalog_returns_datasets() -> None:
 
 def test_cli_validator_flags_empty_vocabulary() -> None:
     """The datasets-validate validator passes a full catalog but flags an empty vocab."""
-    from earthlens.cli.validate import _validate_aqueduct
+    from earthlens.aqueduct.cli import validator
 
-    checked, issues = _validate_aqueduct(Catalog())
+    checked, issues = validator(Catalog())
     assert checked == 3
     assert issues == []
     emptied = Catalog().model_copy(update={"return_periods": {}})
-    _, broken = _validate_aqueduct(emptied)
+    _, broken = validator(emptied)
     assert any("return_periods" in issue for issue in broken)
 
 

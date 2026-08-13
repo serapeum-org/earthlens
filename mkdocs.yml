@@ -605,6 +605,7 @@ nav:
       - Brazil Data Cube — CBERS-4 / AMAZONIA-1: examples/stac/bdc_cbers_amazonia.ipynb
       - NASA VEDA — NLDAS-3 / Black Marble HD / CMIP6: examples/stac/veda_nasa_derived.ipynb
       - USGS LandsatLook — requester-pays: examples/stac/usgs_landsat_requester_pays.ipynb
+      - Copernicus GFM — flood extent (EODC): examples/stac/eodc_gfm_flood_extent.ipynb
     - Disaster alerts (GDACS):
       - Quickstart — recent alerts: examples/gdacs/quickstart.ipynb
       - Global hazard dashboard: examples/gdacs/global_hazard_dashboard.ipynb
@@ -643,6 +644,8 @@ nav:
       - GEBCO vs ETOPO1 resolution (live): examples/bathymetry/04_gebco_vs_etopo_resolution.ipynb
       - Shaded relief (live): examples/bathymetry/05_shaded_relief.ipynb
       - Depth distribution (live): examples/bathymetry/06_depth_histogram.ipynb
+      - EMODnet European DTM — OGC WCS (live): examples/bathymetry/07_emodnet_european_bathymetry.ipynb
+      - EMODnet WCS deep dive — transport, releases, domain guard (live): examples/bathymetry/08_emodnet_wcs_deep_dive.ipynb
     - Copernicus DEM (global land elevation):
       - DEM quickstart (live): examples/dem/01_dem_quickstart.ipynb
       - Catalog & tile math (no network): examples/dem/02_catalog_and_tile_math.ipynb

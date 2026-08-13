@@ -163,7 +163,7 @@ The following GEE assets have no `earthlens.stac` equivalent today:
 
 ## See also
 
-* [Introduction](introduction.md) — the eight endpoints + when each one wins.
+* [Introduction](introduction.md) — the nine endpoints + when each one wins.
 * [Usage](usage.md) — the request shape (`variables={collection: [asset]}`, `aggregate=`, antimeridian).
 * [Authentication](authentication.md) — the auth model per endpoint (anonymous / SAS / S3 keys /
   requester-pays / EDL bearer).

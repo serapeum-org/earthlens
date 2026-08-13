@@ -1,0 +1,976 @@
+# Curated collections served by EODC (Earth Observation Data Centre) STAC —
+# public and anonymous on https://stac.eodc.eu/api/v1.
+#
+# `eodc/gfm` is Copernicus GFM (Global Flood Monitoring): Sentinel-1 SAR
+# near-real-time flood mapping, twelve single-band uint8 COG layers (nodata
+# 255); the ensemble layers are the final product, the dlr/tuw/list layers the
+# per-algorithm intermediates. Licence: proprietary (Copernicus GFM — free,
+# with attribution; https://extwiki.eodc.eu/en/GFM).
+#
+# The remaining rows are the other raster-COG collections EODC serves (SAR
+# sigma0 / gamma0, soil moisture, land cover, DEM/topography, Austrian
+# orthophotos, and derived layers). Asset dtype / nodata / resolution are the
+# values EODC advertises, filled from a live item where the collection metadata
+# omits them; assets without a declared nodata fall back to the backend default.
+# The 17 non-raster EODC collections (Zarr, NetCDF, SAFE .tar, octet-stream —
+# e.g. SENTINEL2_L2A/L1C, SENTINEL3_SRAL_L2, climatedt-*, clms-*) are not
+# curated here because the STAC + COG backend cannot fetch them as rasters.
+
+collections:
+  eodc/gfm:
+    endpoint: eodc
+    collection_id: GFM
+    resolution: 20.0
+    extent:
+      start_date: '2015-01-01'
+    default_assets:
+    - ensemble_flood_extent
+    assets:
+      ensemble_flood_extent:
+        dtype: uint8
+        nodata: 255
+        title: GFM Observed Flood Extent (Final output - Ensemble algorithm)
+      ensemble_water_extent:
+        dtype: uint8
+        nodata: 255
+        title: GFM Observed Water Extent (Final output - Ensemble algorithm)
+      ensemble_likelihood:
+        dtype: uint8
+        nodata: 255
+        title: GFM Likelihood (Final output - Ensemble algorithm)
+      reference_water_mask:
+        dtype: uint8
+        nodata: 255
+        title: GFM Reference Water Mask
+      exclusion_mask:
+        dtype: uint8
+        nodata: 255
+        title: GFM Exclusion Mask (Final output - Ensemble algorithm)
+      advisory_flags:
+        dtype: uint8
+        nodata: 255
+        title: GFM Advisory Flags
+      dlr_flood_extent:
+        dtype: uint8
+        nodata: 255
+        title: GFM Observed Flood Extent (Intermediate output - DLR algorithm)
+      tuw_flood_extent:
+        dtype: uint8
+        nodata: 255
+        title: GFM Observed Flood Extent (Intermediate output - TUW algorithm)
+      list_flood_extent:
+        dtype: uint8
+        nodata: 255
+        title: GFM Observed Flood Extent (Intermediate output - LIST algorithm)
+      dlr_likelihood:
+        dtype: uint8
+        nodata: 255
+        title: GFM Likelihood (Intermediate output - DLR algorithm)
+      tuw_likelihood:
+        dtype: uint8
+        nodata: 255
+        title: GFM Uncertainties (Intermediate output - TUW algorithm)
+      list_likelihood:
+        dtype: uint8
+        nodata: 255
+        title: GFM Likelihood (Intermediate output - LIST algorithm)
+  eodc/AI4SAR_SIG0:
+    endpoint: eodc
+    collection_id: AI4SAR_SIG0
+    resolution: 20.0
+    extent:
+      start_date: '2014-10-01'
+    default_assets:
+    - VV
+    assets:
+      VH:
+        dtype: int16
+        nodata: -9999
+        title: 'VH Polarization'
+      VV:
+        dtype: int16
+        nodata: -9999
+        title: 'VV Polarization'
+  eodc/AUSTRIA_GROUND_MOTION:
+    endpoint: eodc
+    collection_id: AUSTRIA_GROUND_MOTION
+    resolution: 100.0
+    extent:
+      start_date: '2016-01-01'
+    default_assets:
+    - rmse
+    assets:
+      rmse:
+        dtype: float32
+        nodata: -99999
+        title: 'RMSE'
+      merge-shift:
+        title: 'Merge: Shift'
+      seasonality:
+        title: 'Seasonality'
+      mean-velocity:
+        title: 'Mean Velocity'
+      merge-n-outlier:
+        title: 'Merge: Number of Outliers'
+      merge-shift-std:
+        title: 'Merge: Standard Deviation of Shift'
+  eodc/AUT_DEM:
+    endpoint: eodc
+    collection_id: AUT_DEM
+    resolution: 10.0
+    extent:
+      start_date: '2018-01-01'
+    default_assets:
+    - DEM
+    assets:
+      DEM:
+        dtype: float32
+        title: 'Austrian High Resolution DEM'
+  eodc/BOA_LANDSAT_8:
+    endpoint: eodc
+    collection_id: BOA_LANDSAT_8
+    resolution: 30.0
+    extent:
+      start_date: '2015-01-04'
+    default_assets:
+    - data
+    assets:
+      data:
+        dtype: int16
+        nodata: -9999
+        title: 'data'
+  eodc/BOA_SENTINEL_2:
+    endpoint: eodc
+    collection_id: BOA_SENTINEL_2
+    resolution: 10.0
+    extent:
+      start_date: '2020-01-01'
+    default_assets:
+    - data
+    assets:
+      data:
+        dtype: int16
+        nodata: -9999
+        title: 'data'
+  eodc/CEOS_ARD_NRB_S1_SAMPLES:
+    endpoint: eodc
+    collection_id: CEOS_ARD_NRB_S1_SAMPLES
+    extent:
+      start_date: '2014-10-01'
+    default_assets:
+    - VV
+    assets:
+      HH:
+        title: 'Gamma-0 (HH)'
+      HV:
+        title: 'Gamma-0 (HV)'
+      VH:
+        title: 'Gamma-0 (VH)'
+      VV:
+        title: 'Gamma-0 (VV)'
+      EIA:
+        title: 'Ellipsoidal Incident Angle Image'
+      LIA:
+        title: 'Local Incident Angle Image'
+      MASK:
+        title: 'Data Mask Image'
+  eodc/CGLS_SSM_1KM:
+    endpoint: eodc
+    collection_id: CGLS_SSM_1KM
+    resolution: 1000.0
+    extent:
+      start_date: '2018-12-16'
+    default_assets:
+    - SSM
+    assets:
+      SSM:
+        dtype: uint8
+        nodata: 255
+        title: 'SSM'
+  eodc/COP_DEM:
+    endpoint: eodc
+    collection_id: COP_DEM
+    extent:
+      start_date: '2011-01-01'
+    default_assets:
+    - DEM
+    assets:
+      DEM:
+        dtype: float32
+        title: 'Copernicuse DEM'
+  eodc/CORINE_LAND_COVER:
+    endpoint: eodc
+    collection_id: CORINE_LAND_COVER
+    resolution: 10.0
+    extent:
+      start_date: '1990-12-15'
+    default_assets:
+    - clc
+    assets:
+      clc:
+        dtype: uint8
+        nodata: 48
+        title: 'clc'
+  eodc/DOP_AUT_K_KLAGENFURT:
+    endpoint: eodc
+    collection_id: DOP_AUT_K_KLAGENFURT
+    resolution: 0.2
+    extent:
+      start_date: '2022-05-19'
+    default_assets:
+    - cog/tif
+    assets:
+      tif:
+        title: '5716-68: GeoTIFF image'
+      cog/tif:
+        dtype: uint8
+        title: '5716-68_COG: Cloud-Optimized GeoTIFF image'
+  eodc/DOP_AUT_K_OSTTIROL:
+    endpoint: eodc
+    collection_id: DOP_AUT_K_OSTTIROL
+    resolution: 0.2
+    extent:
+      start_date: '2021-09-02'
+    default_assets:
+    - cog/tif
+    assets:
+      tif:
+        title: '4321-61: GeoTIFF image'
+      cog/tif:
+        dtype: uint8
+        title: '4321-61_COG: Cloud-Optimized GeoTIFF image'
+  eodc/DOP_AUT_K_TAMSWEG:
+    endpoint: eodc
+    collection_id: DOP_AUT_K_TAMSWEG
+    resolution: 0.2
+    extent:
+      start_date: '2021-09-02'
+    default_assets:
+    - cog/tif
+    assets:
+      tif:
+        title: '4622-12: GeoTIFF image'
+      cog/tif:
+        dtype: uint8
+        title: '4622-12_COG: Cloud-Optimized GeoTIFF image'
+  eodc/DOP_AUT_K_VILLACH:
+    endpoint: eodc
+    collection_id: DOP_AUT_K_VILLACH
+    resolution: 0.2
+    extent:
+      start_date: '2022-06-18'
+    default_assets:
+    - cog/tif
+    assets:
+      tif:
+        title: '5120-73: GeoTIFF image'
+      cog/tif:
+        dtype: uint8
+        title: '5120-73_COG: Cloud-Optimized GeoTIFF image'
+  eodc/DOP_AUT_K_WOLFSBERG:
+    endpoint: eodc
+    collection_id: DOP_AUT_K_WOLFSBERG
+    resolution: 0.2
+    extent:
+      start_date: '2022-07-13'
+    default_assets:
+    - cog/tif
+    assets:
+      tif:
+        title: '5821-79: GeoTIFF image'
+      cog/tif:
+        dtype: uint8
+        title: '5821-79_COG: Cloud-Optimized GeoTIFF image'
+  eodc/DOP_AUT_K_ZELL_AM_SEE:
+    endpoint: eodc
+    collection_id: DOP_AUT_K_ZELL_AM_SEE
+    resolution: 0.2
+    extent:
+      start_date: '2022-09-12'
+    default_assets:
+    - cog/tif
+    assets:
+      tif:
+        title: '4322-77: GeoTIFF image'
+      cog/tif:
+        dtype: uint8
+        title: '4322-77_COG: Cloud-Optimized GeoTIFF image'
+  eodc/DOP_AUT_K_ZELTWEG:
+    endpoint: eodc
+    collection_id: DOP_AUT_K_ZELTWEG
+    resolution: 0.2
+    extent:
+      start_date: '2022-09-23'
+    default_assets:
+    - cog/tif
+    assets:
+      tif:
+        title: '5622-53: GeoTIFF image'
+      cog/tif:
+        dtype: uint8
+        title: '5622-53_COG: Cloud-Optimized GeoTIFF image'
+  eodc/DOP_AUT_ST_BISCHOFSHOFEN:
+    endpoint: eodc
+    collection_id: DOP_AUT_ST_BISCHOFSHOFEN
+    resolution: 0.2
+    extent:
+      start_date: '2016-01-01'
+    default_assets:
+    - rgb
+    assets:
+      rgb:
+        dtype: uint8
+        title: 'RGB Image'
+      cir3:
+        title: 'CIR3 Image'
+  eodc/DOP_AUT_ST_GRAZ:
+    endpoint: eodc
+    collection_id: DOP_AUT_ST_GRAZ
+    resolution: 0.2
+    extent:
+      start_date: '2016-01-01'
+    default_assets:
+    - rgb
+    assets:
+      rgb:
+        dtype: uint8
+        title: 'RGB Image'
+      cir3:
+        title: 'CIR3 Image'
+  eodc/DOP_AUT_ST_KLAGENFURT:
+    endpoint: eodc
+    collection_id: DOP_AUT_ST_KLAGENFURT
+    resolution: 0.2
+    extent:
+      start_date: '2016-01-01'
+    default_assets:
+    - rgb
+    assets:
+      rgb:
+        dtype: uint8
+        title: 'RGB Image'
+      cir3:
+        title: 'CIR3 Image'
+  eodc/DOP_AUT_ST_MARIAZELL:
+    endpoint: eodc
+    collection_id: DOP_AUT_ST_MARIAZELL
+    resolution: 0.2
+    extent:
+      start_date: '2016-01-01'
+    default_assets:
+    - rgb
+    assets:
+      rgb:
+        dtype: uint8
+        title: 'RGB Image'
+      cir3:
+        title: 'CIR3 Image'
+  eodc/DOP_AUT_ST_MURTAL:
+    endpoint: eodc
+    collection_id: DOP_AUT_ST_MURTAL
+    resolution: 0.2
+    extent:
+      start_date: '2016-01-01'
+    default_assets:
+    - rgb
+    assets:
+      rgb:
+        dtype: uint8
+        title: 'RGB Image'
+      cir3:
+        title: 'CIR3 Image'
+  eodc/DOP_AUT_ST_SUEDBURGENLAND:
+    endpoint: eodc
+    collection_id: DOP_AUT_ST_SUEDBURGENLAND
+    resolution: 0.2
+    extent:
+      start_date: '2016-01-01'
+    default_assets:
+    - rgb
+    assets:
+      rgb:
+        dtype: uint8
+        title: 'RGB Image'
+      cir3:
+        title: 'CIR3 Image'
+  eodc/DOP_AUT_ST_VILLACH:
+    endpoint: eodc
+    collection_id: DOP_AUT_ST_VILLACH
+    resolution: 0.2
+    extent:
+      start_date: '2016-01-01'
+    default_assets:
+    - rgb
+    assets:
+      rgb:
+        dtype: uint8
+        title: 'RGB Image'
+      cir3:
+        title: 'CIR3 Image'
+  eodc/DOP_AUT_ST_WINDISCHGARSTEN:
+    endpoint: eodc
+    collection_id: DOP_AUT_ST_WINDISCHGARSTEN
+    resolution: 0.2
+    extent:
+      start_date: '2016-01-01'
+    default_assets:
+    - rgb
+    assets:
+      rgb:
+        dtype: uint8
+        title: 'RGB Image'
+      cir3:
+        title: 'CIR3 Image'
+  eodc/DROUGHT_VULNERABILITY:
+    endpoint: eodc
+    collection_id: DROUGHT_VULNERABILITY
+    extent:
+      start_date: '2003-01-01'
+    default_assets:
+    - drought_vulnerability
+    assets:
+      drought_vulnerability:
+        dtype: uint8
+        nodata: 255
+        title: 'drought_vulnerability'
+  eodc/DSM_AUT:
+    endpoint: eodc
+    collection_id: DSM_AUT
+    extent:
+      start_date: '2023-07-16'
+    default_assets:
+    - dsm
+    assets:
+      dsm:
+        title: 'Digital Surface Model'
+      dsm_stdev:
+        title: 'Digital Surface Model (Standard Deviation)'
+  eodc/ERS_ENVISAT_NRB:
+    endpoint: eodc
+    collection_id: ERS_ENVISAT_NRB
+    extent:
+      start_date: '1991-07-31'
+    default_assets:
+    - hh
+    assets:
+      hh:
+        dtype: float32
+        title: 'HH backscatter data'
+  eodc/INTRA_FIELD_CROP_GROWTH_POTENTIAL:
+    endpoint: eodc
+    collection_id: INTRA_FIELD_CROP_GROWTH_POTENTIAL
+    resolution: 10.0
+    extent:
+      start_date: '2017-01-01'
+    default_assets:
+    - yield_potential
+    assets:
+      yield_potential:
+        dtype: uint8
+        nodata: 255
+        title: 'yield_potential'
+  eodc/RUCIO_SENTINEL2_MFCOVER:
+    endpoint: eodc
+    collection_id: RUCIO_SENTINEL2_MFCOVER
+    resolution: 10.0
+    extent:
+      start_date: '2017-01-01'
+    default_assets:
+    - mfcover
+    assets:
+      mfcover:
+        dtype: int16
+        nodata: 32767
+        title: 'mfcover'
+  eodc/SENTINEL1_ALPS_WETSNOW:
+    endpoint: eodc
+    collection_id: SENTINEL1_ALPS_WETSNOW
+    resolution: 100.0
+    extent:
+      start_date: '2019-03-01'
+    default_assets:
+    - WSM
+    assets:
+      WSM:
+        dtype: uint8
+        nodata: 255
+        title: 'WSM'
+  eodc/SENTINEL1_GMR0:
+    endpoint: eodc
+    collection_id: SENTINEL1_GMR0
+    resolution: 10.0
+    extent:
+      start_date: '2014-10-01'
+    default_assets:
+    - VV
+    assets:
+      HH:
+        title: 'Gamma0 (HH)'
+      HV:
+        title: 'Gamma0 (HV)'
+      VH:
+        dtype: int16
+        nodata: -9999
+        title: 'Gamma0 (VH)'
+      VV:
+        dtype: int16
+        nodata: -9999
+        title: 'Gamma0 (VV)'
+      LIA:
+        title: 'Local Incidence Angle'
+      Mask:
+        title: 'Mask image'
+  eodc/SENTINEL1_GRD:
+    endpoint: eodc
+    collection_id: SENTINEL1_GRD
+    extent:
+      start_date: '2014-10-03'
+    default_assets:
+    - vv
+    assets:
+      hh:
+        title: 'HH Data'
+      hv:
+        title: 'HV Data'
+      vh:
+        title: 'VH Data'
+      vv:
+        title: 'VV Data'
+  eodc/SENTINEL1_GRD_COVERAGE:
+    endpoint: eodc
+    collection_id: SENTINEL1_GRD_COVERAGE
+    extent:
+      start_date: '2014-10-03'
+    default_assets:
+    - COG
+    assets:
+      COG:
+        dtype: uint16
+        title: 'COG'
+  eodc/SENTINEL1_HPAR:
+    endpoint: eodc
+    collection_id: SENTINEL1_HPAR
+    resolution: 20.0
+    extent:
+      start_date: '2019-01-01'
+    default_assets:
+    - C1
+    assets:
+      C1:
+        dtype: int16
+        nodata: -9999
+        title: 'Cosine Coefficient 1'
+      C2:
+        dtype: int16
+        nodata: -9999
+        title: 'Cosine Coefficient 2'
+      C3:
+        dtype: int16
+        nodata: -9999
+        title: 'Cosine Coefficient 3'
+      M0:
+        dtype: int16
+        nodata: -9999
+        title: 'Effective Mean'
+      S1:
+        dtype: int16
+        nodata: -9999
+        title: 'Sine Coefficient 1'
+      S2:
+        dtype: int16
+        nodata: -9999
+        title: 'Sine Coefficient 2'
+      S3:
+        dtype: int16
+        nodata: -9999
+        title: 'Sine Coefficient 3'
+      STD:
+        dtype: int16
+        nodata: -9999
+        title: 'Standard Deviation'
+      NOBS:
+        dtype: int16
+        nodata: -9999
+        title: 'Number of Observations'
+  eodc/SENTINEL1_MPLIA:
+    endpoint: eodc
+    collection_id: SENTINEL1_MPLIA
+    resolution: 20.0
+    extent:
+      start_date: '2020-01-01'
+    default_assets:
+    - NOBS
+    assets:
+      NOBS:
+        dtype: int16
+        nodata: -9999
+        title: 'Number of Observations'
+      MPLIA:
+        dtype: int16
+        nodata: -9999
+        title: 'Mean PLIA'
+  eodc/SENTINEL1_SCENE_GMR0:
+    endpoint: eodc
+    collection_id: SENTINEL1_SCENE_GMR0
+    resolution: 10.0
+    extent:
+      start_date: '2014-10-01'
+    default_assets:
+    - VV
+    assets:
+      HH:
+        title: 'Gamma0 (HH)'
+      HV:
+        title: 'Gamma0 (HV)'
+      VH:
+        dtype: int16
+        nodata: -9999
+        title: 'Gamma0 (VH)'
+      VV:
+        dtype: int16
+        nodata: -9999
+        title: 'Gamma0 (VV)'
+      LIA:
+        dtype: int16
+        nodata: -9999
+        title: 'Local Incidence Angle'
+      Mask:
+        dtype: uint8
+        nodata: 255
+        title: 'Mask image'
+  eodc/SENTINEL1_SIG0_20M:
+    endpoint: eodc
+    collection_id: SENTINEL1_SIG0_20M
+    extent:
+      start_date: '2014-10-01'
+    default_assets:
+    - VV
+    assets:
+      VH:
+        dtype: int16
+        nodata: -9999
+        title: 'VH Polarization'
+      VV:
+        dtype: int16
+        nodata: -9999
+        title: 'VV Polarization'
+  eodc/SENTINEL1_SLC:
+    endpoint: eodc
+    collection_id: SENTINEL1_SLC
+    extent:
+      start_date: '2014-10-10'
+    default_assets:
+    - s1-hh
+    assets:
+      s1-hh:
+        title: 'S1 HH Data'
+      s1-hv:
+        title: 'S1 HV Data'
+      s1-vh:
+        title: 'S1 VH Data'
+      s1-vv:
+        title: 'S1 VV Data'
+      s2-hh:
+        title: 'S2 HH Data'
+      s2-hv:
+        title: 'S2 HV Data'
+      s2-vh:
+        title: 'S2 VH Data'
+      s2-vv:
+        title: 'S2 VV Data'
+      s3-hh:
+        title: 'S3 HH Data'
+      s3-hv:
+        title: 'S3 HV Data'
+      s3-vh:
+        title: 'S3 VH Data'
+      s3-vv:
+        title: 'S3 VV Data'
+      s4-hh:
+        title: 'S4 HH Data'
+      s4-hv:
+        title: 'S4 HV Data'
+      s4-vh:
+        title: 'S4 VH Data'
+      s4-vv:
+        title: 'S4 VV Data'
+      s5-hh:
+        title: 'S5 HH Data'
+      s5-hv:
+        title: 'S5 HV Data'
+      s5-vh:
+        title: 'S5 VH Data'
+      s5-vv:
+        title: 'S5 VV Data'
+      s6-hh:
+        title: 'S6 HH Data'
+      s6-hv:
+        title: 'S6 HV Data'
+      s6-vh:
+        title: 'S6 VH Data'
+      s6-vv:
+        title: 'S6 VV Data'
+      ew1-hh:
+        title: 'EW1 HH Data'
+      ew1-hv:
+        title: 'EW1 HV Data'
+      ew1-vh:
+        title: 'EW1 VH Data'
+      ew1-vv:
+        title: 'EW1 VV Data'
+      ew2-hh:
+        title: 'EW2 HH Data'
+      ew2-hv:
+        title: 'EW2 HV Data'
+      ew2-vh:
+        title: 'EW2 VH Data'
+      ew2-vv:
+        title: 'EW2 VV Data'
+      ew3-hh:
+        title: 'EW3 HH Data'
+      ew3-hv:
+        title: 'EW3 HV Data'
+      ew3-vh:
+        title: 'EW3 VH Data'
+      ew3-vv:
+        title: 'EW3 VV Data'
+      ew4-hh:
+        title: 'EW4 HH Data'
+      ew4-hv:
+        title: 'EW4 HV Data'
+      ew4-vh:
+        title: 'EW4 VH Data'
+      ew4-vv:
+        title: 'EW4 VV Data'
+      ew5-hh:
+        title: 'EW5 HH Data'
+      ew5-hv:
+        title: 'EW5 HV Data'
+      ew5-vh:
+        title: 'EW5 VH Data'
+      ew5-vv:
+        title: 'EW5 VV Data'
+      iw1-hh:
+        title: 'IW1 HH Data'
+      iw1-hv:
+        title: 'IW1 HV Data'
+      iw1-vh:
+        title: 'IW1 VH Data'
+      iw1-vv:
+        title: 'IW1 VV Data'
+      iw2-hh:
+        title: 'IW2 HH Data'
+      iw2-hv:
+        title: 'IW2 HV Data'
+      iw2-vh:
+        title: 'IW2 VH Data'
+      iw2-vv:
+        title: 'IW2 VV Data'
+      iw3-hh:
+        title: 'IW3 HH Data'
+      iw3-hv:
+        title: 'IW3 HV Data'
+      iw3-vh:
+        title: 'IW3 VH Data'
+      iw3-vv:
+        title: 'IW3 VV Data'
+      wv1-hh:
+        title: 'WV1 HH Data'
+      wv1-hv:
+        title: 'WV1 HV Data'
+      wv1-vh:
+        title: 'WV1 VH Data'
+      wv1-vv:
+        title: 'WV1 VV Data'
+      wv2-hh:
+        title: 'WV2 HH Data'
+      wv2-hv:
+        title: 'WV2 HV Data'
+      wv2-vh:
+        title: 'WV2 VH Data'
+      wv2-vv:
+        title: 'WV2 VV Data'
+  eodc/SENTINEL2_MFCOVER:
+    endpoint: eodc
+    collection_id: SENTINEL2_MFCOVER
+    resolution: 10.0
+    extent:
+      start_date: '2017-01-01'
+    default_assets:
+    - mfcover
+    assets:
+      mfcover:
+        dtype: int16
+        nodata: 32767
+        title: 'mfcover'
+  eodc/Sentinel-1_Lacken_Extent:
+    endpoint: eodc
+    collection_id: Sentinel-1_Lacken_Extent
+    extent:
+      start_date: '2016-01-01'
+    default_assets:
+    - image
+    assets:
+      image:
+        title: 'image'
+  eodc/Sentinel-1_Reed_Extent:
+    endpoint: eodc
+    collection_id: Sentinel-1_Reed_Extent
+    extent:
+      start_date: '2016-01-01'
+    default_assets:
+    - image
+    assets:
+      image:
+        title: 'image'
+  eodc/Sentinel-2-Greenness-Austria:
+    endpoint: eodc
+    collection_id: Sentinel-2-Greenness-Austria
+    resolution: 10.0
+    extent:
+      start_date: '2018-01-01'
+    default_assets:
+    - raster_1
+    assets:
+      raster_1:
+        dtype: float64
+        title: 'greenness_max_id66915_2022.tiff'
+      raster_2:
+        dtype: float64
+        title: 'greenness_stddev_id66915_2022.tiff'
+      raster_3:
+        dtype: float64
+        title: 'vegetation_percentage_id66915_2022.tiff'
+  eodc/VEGETATION_CHANGE_AUSTRIA:
+    endpoint: eodc
+    collection_id: VEGETATION_CHANGE_AUSTRIA
+    resolution: 10.0
+    extent:
+      start_date: '2018-01-01'
+    default_assets:
+    - raster_1
+    assets:
+      raster_1:
+        dtype: float32
+        nodata: -9999
+        title: 'GeoTIFF'
+  eodc/sentinel2-landsat8-l2f:
+    endpoint: eodc
+    collection_id: sentinel2-landsat8-l2f
+    resolution: 10.0
+    extent:
+      start_date: '2024-01-01'
+    default_assets:
+    - B01
+    assets:
+      B01:
+        dtype: float32
+        title: 'B01'
+      B02:
+        dtype: float32
+        title: 'B02'
+      B03:
+        dtype: float32
+        title: 'B03'
+      B04:
+        dtype: float32
+        title: 'B04'
+      B11:
+        dtype: float32
+        title: 'B11'
+      B12:
+        dtype: float32
+        title: 'B12'
+      B8A:
+        dtype: float32
+        title: 'B8A'
+  eodc/topo-dc-austria-dsm:
+    endpoint: eodc
+    collection_id: topo-dc-austria-dsm
+    resolution: 1.0
+    extent:
+      start_date: '2006-01-01'
+    default_assets:
+    - data
+    assets:
+      data:
+        dtype: float32
+        nodata: -9999
+        title: 'data'
+  eodc/topo-dc-austria-dsm-utm:
+    endpoint: eodc
+    collection_id: topo-dc-austria-dsm-utm
+    resolution: 1.0
+    extent:
+      start_date: '2006-01-01'
+    default_assets:
+    - DSM
+    assets:
+      DSM:
+        dtype: float32
+        title: 'DSM'
+  eodc/topo-dc-austria-dtm:
+    endpoint: eodc
+    collection_id: topo-dc-austria-dtm
+    resolution: 1.0
+    extent:
+      start_date: '2006-01-01'
+    default_assets:
+    - data
+    assets:
+      data:
+        dtype: float32
+        nodata: -9999
+        title: 'data'
+  eodc/topo-dc-austria-dtm-utm:
+    endpoint: eodc
+    collection_id: topo-dc-austria-dtm-utm
+    resolution: 1.0
+    extent:
+      start_date: '2006-01-01'
+    default_assets:
+    - DTM
+    assets:
+      DTM:
+        dtype: float32
+        title: 'DTM'
+  eodc/topo-dc-austria-ndsm:
+    endpoint: eodc
+    collection_id: topo-dc-austria-ndsm
+    resolution: 1.0
+    extent:
+      start_date: '2006-01-01'
+    default_assets:
+    - data
+    assets:
+      data:
+        dtype: float32
+        nodata: -9999
+        title: 'data'
+  eodc/topo-dc-austria-ndsm-utm:
+    endpoint: eodc
+    collection_id: topo-dc-austria-ndsm-utm
+    resolution: 1.0
+    extent:
+      start_date: '2006-01-01'
+    default_assets:
+    - NDSM
+    assets:
+      NDSM:
+        dtype: float32
+        nodata: -9999
+        title: 'NDSM'
+  eodc/topo-dc-austria-op-utm:
+    endpoint: eodc
+    collection_id: topo-dc-austria-op-utm
+    resolution: 0.2
+    extent:
+      start_date: '2021-07-24'
+    default_assets:
+    - RGB
+    assets:
+      NIR:
+        title: 'NIR'
+      RGB:
+        dtype: uint8
+        title: 'RGB'
