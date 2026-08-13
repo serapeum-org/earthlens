@@ -61,9 +61,9 @@ class OhsomeUnavailableError(RuntimeError):
     Raised by the OSM backend when `api.ohsome.org` answers a `403` (its front
     proxy blocking / throttling this client — the endpoint is public and
     keyless, so it is never a credential problem) or a `429` that outlived the
-    SDK's automatic retries. Carries the HTTP `status_code` so a caller (or the
-    live e2e test) can tell a transient public-endpoint throttle apart from a
-    genuine request error and back off rather than fail hard.
+    SDK's automatic retries. Carries the HTTP `status_code` so a caller can tell
+    a transient public-endpoint throttle apart from a genuine request error and
+    back off rather than fail hard.
     """
 
     def __init__(self, message: str, status_code: int | None = None) -> None:
