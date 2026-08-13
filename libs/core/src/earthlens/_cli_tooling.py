@@ -16,6 +16,7 @@ group, so core's CLI names no backend and depends on no provider distribution.
 
 from __future__ import annotations
 
+import functools
 from collections.abc import Callable
 from importlib import import_module
 from importlib.metadata import entry_points
@@ -42,6 +43,7 @@ CLI_ENTRY_POINT_GROUP = "earthlens.cli"
 CliToolingSpec = dict[str, str]
 
 
+@functools.lru_cache(maxsize=1)
 def discover_cli_tooling() -> dict[str, CliToolingSpec]:
     """Merge the CLI-tooling tables published by every installed provider.
 
@@ -51,10 +53,17 @@ def discover_cli_tooling() -> dict[str, CliToolingSpec]:
     entry points and the winner, rather than resolved silently — the same rule
     `discover_backends` applies to backend keys.
 
+    Memoized: entry points are fixed for a process lifetime, so the merge runs
+    once (the module-level dispatch dicts alone call it ~16× at import, and
+    `datasets.py` re-calls it per command). Tests that monkeypatch
+    `entry_points` must call `discover_cli_tooling.cache_clear()` first — the
+    `test_cli_tooling` suite does so via an autouse fixture.
+
     Returns:
         An `id -> CliToolingSpec` mapping union of every entry point in the
         `earthlens.cli` group. On a duplicate id the later entry wins, and the
-        collision is warned about.
+        collision is warned about. The returned dict is shared across callers,
+        which read it (build new tables) but never mutate it.
     """
     merged: dict[str, CliToolingSpec] = {}
     source: dict[str, str] = {}
