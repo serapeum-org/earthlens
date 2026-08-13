@@ -335,31 +335,6 @@ def _validate_chc(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, check)
 
 
-def _validate_usgs_water(catalog: Any) -> tuple[int, list[str]]:
-    """Each USGS Water parameter's `services` must be known service names.
-
-    Mirrors `tools/usgs_water/refresh_usgs_catalog.py:validate`: every
-    declared service must be in `earthlens.usgs_water.backend.SERVICES`.
-
-    Args:
-        catalog: The loaded USGS Water `Catalog`.
-
-    Returns:
-        `(checked, issues)`.
-    """
-    from earthlens.usgs_water.backend import SERVICES
-
-    def check(key: str, record: Any) -> list[str]:
-        """Flag a parameter declaring a service that is not a known service name."""
-        return [
-            f"{key}: unknown service {service!r}"
-            for service in getattr(record, "services", None) or []
-            if service not in SERVICES
-        ]
-
-    return _lint(catalog, check)
-
-
 def _validate_sentinel_hub(catalog: Any) -> tuple[int, list[str]]:
     """Each Sentinel Hub recipe's evalscript `.js` must be well-formed.
 
@@ -703,7 +678,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "catrare": _validate_catrare,
     "drought": _validate_drought,
     "chc": _validate_chc,
-    "usgs_water": _validate_usgs_water,
     "sentinel_hub": _validate_sentinel_hub,
     "worldpop": _validate_worldpop,
     "gbif": _validate_gbif,

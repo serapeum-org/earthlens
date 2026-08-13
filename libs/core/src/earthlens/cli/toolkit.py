@@ -43,6 +43,9 @@ from earthlens.cli.refresh import (
 from earthlens.cli.refresh import (
     _redact as redact,
 )
+from earthlens.cli.refresh import (
+    _write_sibling_index as write_sibling_index,
+)
 from earthlens.cli.validate import (
     _lint as lint,
 )
@@ -63,4 +66,5 @@ __all__ = [
     "lint",
     "redact",
     "require",
+    "write_sibling_index",
 ]

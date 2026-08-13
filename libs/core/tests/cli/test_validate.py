@@ -506,12 +506,6 @@ class TestValidateOne:
 class TestOfflineExtensions:
     """Tests for the usgs_water + sentinel_hub offline validators."""
 
-    def test_usgs_water_validates_clean(self):
-        """Every curated USGS parameter's services are known service names."""
-        result = validate_one(_info("usgs_water"))
-        assert result.status == "ok" and result.issues == []
-        assert result.checked > 0, "parameters were checked"
-
     def test_sentinel_hub_validates_clean(self):
         """Every curated Sentinel Hub recipe's evalscript is well-formed."""
         result = validate_one(_info("sentinel_hub"))
@@ -660,16 +654,6 @@ class TestOfflineValidatorBranches:
         )
         _checked, issues = _validate_nwp(catalog)
         assert any("model_family" in i for i in issues), "herbie family flagged"
-
-    def test_usgs_water_unknown_service_flagged(self):
-        """A parameter declaring an unknown service is flagged."""
-        from earthlens.cli.validate import _validate_usgs_water
-
-        catalog = SimpleNamespace(
-            datasets={"q": SimpleNamespace(services=["daily", "not-a-service"])}
-        )
-        _checked, issues = _validate_usgs_water(catalog)
-        assert any("not-a-service" in i for i in issues), "unknown service flagged"
 
     def test_sentinel_hub_bad_evalscript_flagged(self, monkeypatch):
         """A recipe whose evalscript lacks //VERSION=3 + dataMask is flagged."""

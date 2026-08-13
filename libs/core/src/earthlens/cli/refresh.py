@@ -756,48 +756,6 @@ def _worldpop_curated_ids(catalog: Any) -> list[str]:
     )
 
 
-def _usgs_parameter_codes() -> list[str]:
-    """Return every USGS parameter code from the live reference table (SDK)."""
-    from dataretrieval import waterdata
-
-    result = waterdata.get_reference_table(collection="parameter-codes")
-    frame = result[0] if isinstance(result, tuple) else result
-    return [str(code) for code in frame["parameter_code"]]
-
-
-def _usgs_water_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List every USGS parameter code, live (public `dataretrieval` SDK).
-
-    Args:
-        catalog: The loaded USGS Water `Catalog` (unused; the SDK is the source).
-
-    Returns:
-        A single-group mapping `{"usgs_water": [sorted parameter codes]}`.
-    """
-    return {"usgs_water": sorted(set(_usgs_parameter_codes()))}
-
-
-def _usgs_parameter_rows() -> dict[str, dict[str, str]]:
-    """Return the live USGS parameter table keyed by code (name/group/unit)."""
-    from dataretrieval import waterdata
-
-    result = waterdata.get_reference_table(collection="parameter-codes")
-    frame = result[0] if isinstance(result, tuple) else result
-    rows: dict[str, dict[str, str]] = {}
-    for _, row in frame.iterrows():
-        code = str(
-            row.get("parameter_code") or row.get("parameterCode") or row.get("id") or ""
-        ).strip()
-        if not code:
-            continue
-        rows[code] = {
-            "name": str(row.get("parameter_name") or row.get("name") or ""),
-            "group": str(row.get("parameter_group_code") or row.get("group") or ""),
-            "unit": str(row.get("unit_of_measure") or row.get("unit") or ""),
-        }
-    return dict(sorted(rows.items()))
-
-
 def _write_sibling_index(info: BackendInfo, filename: str, payload: Any) -> str:
     """Write an informational `available_*` index file next to the catalog.
 
@@ -820,15 +778,6 @@ def _write_sibling_index(info: BackendInfo, filename: str, payload: Any) -> str:
         encoding="utf-8",
     )
     return str(path)
-
-
-def _write_usgs_water(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
-    """Rewrite USGS Water's sibling `available_parameters.yaml` (full table)."""
-    return _write_sibling_index(
-        info,
-        "available_parameters.yaml",
-        {"available_parameters": _usgs_parameter_rows()},
-    )
 
 
 def _write_worldpop(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
@@ -1338,7 +1287,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "sentinel_hub": _sentinel_hub_grouped,
     "gee": _gee_grouped,
     "worldpop": _worldpop_grouped,
-    "usgs_water": _usgs_water_grouped,
     "radar": _radar_grouped,
     "chc": _chc_grouped,
     "s3": _s3_grouped,
@@ -1368,7 +1316,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "earthdata": _index_writer("available_datasets"),
     "radar": _write_radar,
     "s3": _index_writer("available_datasets"),
-    "usgs_water": _write_usgs_water,
     "worldpop": _write_worldpop,
     "openaq": _write_openaq,
     # JAXA's catalog YAML carries an `available_datasets:` block that lists
@@ -1577,7 +1524,6 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "eumetsat": _curated_collection_ids,
     "sentinel_hub": _curated_attr_ids("sh_collection"),
     "worldpop": _worldpop_curated_ids,
-    "usgs_water": _curated_attr_ids("code"),
     "chc": _chc_ftp_bases,
     "gbif": _biodiversity_curated_ids,
     "obis": _biodiversity_curated_ids,

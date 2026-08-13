@@ -1302,7 +1302,6 @@ class TestCliIsBackendAgnostic:
             "soilgrids",
             "stac",
             "tropycal",
-            "usgs_water",
             "wdpa",
             "worldpop",
         }
@@ -1317,7 +1316,6 @@ class TestCliIsBackendAgnostic:
             "ghsl",
             "radar",
             "sentinel_hub",
-            "usgs_water",
             "worldpop",
         }
     )

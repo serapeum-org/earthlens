@@ -257,34 +257,6 @@ class TestErddapEmitter:
         assert "not found" in result.detail.lower()
 
 
-class TestUsgsWaterEmitter:
-    """Tests for the USGS Water emitter (pure args, no network)."""
-
-    def test_seeds_row_from_args(self):
-        """The row is built from the code + options without any fetch."""
-        result = emit_stanza(
-            _info("usgs_water"),
-            "00060",
-            key="discharge",
-            name="Discharge",
-            units="ft3/s",
-            services=["daily"],
-        )
-        assert result.status == "ok", "usgs emitter ran"
-        assert result.row == {
-            "code": "00060",
-            "name": "Discharge",
-            "units": "ft3/s",
-            "group": "Physical",
-            "services": ["daily"],
-        }
-
-    def test_name_defaults_from_key(self):
-        """An omitted name is titled from the key."""
-        result = emit_stanza(_info("usgs_water"), "00010", key="water_temp")
-        assert result.row["name"] == "Water Temp", "key titled into a name"
-
-
 class TestEarthdataEmitter:
     """Tests for the Earthdata emitter (public CMR)."""
 

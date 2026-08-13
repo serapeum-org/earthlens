@@ -26,7 +26,7 @@ from urllib.parse import quote
 
 import yaml
 
-from earthlens._cli_tooling import dispatch_table
+from earthlens._cli_tooling import config_table, dispatch_table
 from earthlens.cli._gee_categories import categorise_asset
 from earthlens.cli.adapter import BackendInfo, load_catalog
 from earthlens.cli.refresh import _get_json
@@ -213,30 +213,6 @@ def _emit_earthdata(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, An
 # --------------------------------------------------------------------------- #
 # usgs_water — a pure friendly-name -> parameter-code row (no fetch).
 # --------------------------------------------------------------------------- #
-def _emit_usgs_water(
-    catalog: Any, upstream_id: str, *, key: str, **opts: Any
-) -> dict[str, Any]:
-    """Seed a USGS Water parameter row from a parameter code (no network).
-
-    Args:
-        catalog: The loaded USGS Water `Catalog` (unused).
-        upstream_id: The 5-digit NWIS parameter code (e.g. `"00060"`).
-        key: The friendly catalog key.
-        **opts: `name`, `units`, `group`, `services`.
-
-    Returns:
-        The seeded row.
-    """
-    services = opts.get("services") or ["daily", "instantaneous"]
-    return {
-        "code": upstream_id,
-        "name": str(opts.get("name") or key.replace("_", " ").title()),
-        "units": str(opts.get("units") or ""),
-        "group": str(opts.get("group") or "Physical"),
-        "services": list(services),
-    }
-
-
 # --------------------------------------------------------------------------- #
 # eumetsat — seed from the public browse endpoint (no credentials).
 # --------------------------------------------------------------------------- #
@@ -793,7 +769,6 @@ _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
     **dispatch_table("emitter"),
     "ecmwf": _emit_ecmwf,
     "earthdata": _emit_earthdata,
-    "usgs_water": _emit_usgs_water,
     "eumetsat": _emit_eumetsat,
     "gee": _emit_gee,
     "jaxa": _emit_jaxa,
@@ -888,7 +863,11 @@ def emit_stanza(
 
 
 #: Provider id -> the YAML block its curated rows live under.
-_STANZA_BLOCK: dict[str, str] = {"usgs_water": "parameters", **_BIODIVERSITY_BLOCKS}
+_STANZA_BLOCK: dict[str, str] = {
+    # Discovered config first; in-core literals are the migration remainder.
+    **config_table("stanza_block"),
+    **_BIODIVERSITY_BLOCKS,
+}
 
 
 def _append_to_block(path: Path, block: str, key: str, row: dict[str, Any]) -> None:

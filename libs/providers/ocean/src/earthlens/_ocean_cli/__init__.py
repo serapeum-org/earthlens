@@ -28,4 +28,12 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "validator": "earthlens.nwm.cli:validator",
         "live_validator": "earthlens.nwm.cli:live_validator",
     },
+    "usgs_water": {
+        "refresher": "earthlens.usgs_water.cli:refresher",
+        "writer": "earthlens.usgs_water.cli:writer",
+        "curated_ids": "earthlens.usgs_water.cli:curated_ids",
+        "validator": "earthlens.usgs_water.cli:validator",
+        "emitter": "earthlens.usgs_water.cli:emitter",
+        "stanza_block": "parameters",
+    },
 }

@@ -462,27 +462,6 @@ class TestWorldpopRefresher:
         assert outcome.live_count == 2, "deduped sub-alias ids across aliases"
 
 
-class TestUsgsWaterRefresher:
-    """Tests for the USGS Water (dataretrieval) lister."""
-
-    def test_lists_parameter_codes(self, monkeypatch):
-        """usgs_water refresh reads the reference-table parameter codes."""
-        monkeypatch.setattr(
-            refresh_mod, "_usgs_parameter_codes", lambda: ["00060", "00065", "00060"]
-        )
-        outcome = refresh_one(_info("usgs_water"))
-        assert outcome.status == "ok", "usgs_water refresh ran"
-        assert outcome.live_count == 2, "deduped codes"
-
-    def test_audit_curated_codes_not_broken(self, monkeypatch):
-        """Curated codes present live are not flagged broken."""
-        monkeypatch.setattr(
-            refresh_mod, "_usgs_parameter_codes", lambda: ["00060", "00065", "00010"]
-        )
-        outcome = audit_one(_info("usgs_water"))
-        assert "00060" not in outcome.broken, "a live curated code is not broken"
-
-
 _RADAR_TABLE = (
     "NCDCID   ICAO  NAME            ST LAT      LON\n"
     "-------- ----- --------------- -- -------- ---------\n"
@@ -858,18 +837,6 @@ class TestComputedIndexWriters:
         data = yaml.safe_load(pathlib.Path(path).read_text("utf-8"))
         assert data["available_parameters"] == ["o3", "pm25"], "flat list written"
 
-    def test_usgs_water_writes_parameter_table_sibling(self, tmp_path, monkeypatch):
-        """usgs_water --write persists the full reference table to a sibling."""
-        info, module, dst = _catalog_copy("usgs_water", tmp_path, monkeypatch)
-        monkeypatch.setattr(
-            refresh_mod,
-            "_usgs_parameter_rows",
-            lambda: {"00060": {"name": "Discharge", "group": "PHY", "unit": "ft3/s"}},
-        )
-        path = refresh_mod._WRITERS["usgs_water"](info, {"usgs_water": ["00060"]})
-        data = yaml.safe_load(pathlib.Path(path).read_text("utf-8"))
-        assert data["available_parameters"]["00060"]["unit"] == "ft3/s", "table written"
-
     def test_refresh_one_write_reports_sibling_path(self, tmp_path, monkeypatch):
         """refresh_one(write=True) returns the sibling path for openaq."""
         info, module, dst = _catalog_copy("openaq", tmp_path, monkeypatch)
@@ -1113,48 +1080,6 @@ class TestCmrPage:
         names, cursor = refresh_mod._cmr_page("GES_DISC", None)
         assert names == ["GPM"], "only items with a ShortName are kept"
         assert cursor == "cursor2", "next cursor carried"
-
-
-class TestUsgsParameterTable:
-    """Tests for the USGS reference-table parsers (dataretrieval mocked)."""
-
-    def _patch_frame(self, monkeypatch, rows):
-        """Patch dataretrieval to return a tiny pandas frame of `rows`."""
-        import pandas as pd
-        from dataretrieval import waterdata
-
-        monkeypatch.setattr(
-            waterdata, "get_reference_table", lambda collection=None: pd.DataFrame(rows)
-        )
-
-    def test_codes_listed(self, monkeypatch):
-        """_usgs_parameter_codes returns every parameter_code as a string."""
-        self._patch_frame(monkeypatch, [{"parameter_code": 60}, {"parameter_code": 10}])
-        assert refresh_mod._usgs_parameter_codes() == ["60", "10"], "codes stringified"
-
-    def test_rows_keyed_by_code(self, monkeypatch):
-        """_usgs_parameter_rows keys name/group/unit by the parameter code."""
-        self._patch_frame(
-            monkeypatch,
-            [
-                {
-                    "parameter_code": "00060",
-                    "parameter_name": "Discharge",
-                    "parameter_group_code": "PHY",
-                    "unit_of_measure": "ft3/s",
-                }
-            ],
-        )
-        rows = refresh_mod._usgs_parameter_rows()
-        assert rows["00060"]["name"] == "Discharge", "name parsed"
-        assert rows["00060"]["unit"] == "ft3/s", "unit parsed"
-
-    def test_blank_codes_skipped(self, monkeypatch):
-        """A row with no usable code is dropped."""
-        self._patch_frame(
-            monkeypatch, [{"parameter_code": ""}, {"parameter_code": "1"}]
-        )
-        assert list(refresh_mod._usgs_parameter_rows()) == ["1"], "blank code dropped"
 
 
 class TestBiodiversityRefreshers:
