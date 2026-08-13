@@ -237,7 +237,7 @@ class TestParseIdx:
         """All-malformed ECMWF body collapses to the empty canonical frame."""
         from earthlens.nwp._helpers import _IDX_COLUMNS, _parse_idx
 
-        frame = _parse_idx('{not json\n{still not\n')
+        frame = _parse_idx("{not json\n{still not\n")
         assert tuple(frame.columns) == _IDX_COLUMNS
         assert frame.empty
 

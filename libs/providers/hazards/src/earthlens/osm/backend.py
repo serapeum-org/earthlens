@@ -13,9 +13,11 @@ query protocols and returns the result as a pyramids
   `overpy.Overpass().query(...)` deliberately: overpy 0.7 sends no custom UA,
   so its `.query()` cannot reach overpass-api.de (see the A1 capture).
 * **ohsome** (`ohsome`) — OSM **history + analytics** via the
-  `elements/geometry` endpoint. `OhsomeClient().elements.geometry.post(...)
-  .as_dataframe()` already returns a geopandas `GeoDataFrame`, wrapped straight
-  into a `FeatureCollection` (no `xarray`, `G7`).
+  `elements/geometry` endpoint. `OhsomeClient(...).post(endpoint=
+  "elements/geometry", ...).as_dataframe()` already returns a geopandas
+  `GeoDataFrame`, wrapped straight into a `FeatureCollection` (no `xarray`,
+  `G7`); a `403` / `429` throttle from the public endpoint is surfaced as a
+  typed `OhsomeUnavailableError` (`_fetch_ohsome`).
 * **pbf** (`pyrosm` / `pyosmium`) — **bulk / regional** reads from a Geofabrik
   `.osm.pbf` extract (`G9`, `G10`). The backend fetch-and-caches the extract
   for the request's `region=` (via `download_extract`) and reads the row's
@@ -60,9 +62,11 @@ from earthlens.base import (
 from earthlens.base.http import DEFAULT_TIMEOUT, HttpClient
 from earthlens.osm._helpers import (
     LicenseWarning,
+    OhsomeUnavailableError,
     bbox_swne,
     bbox_wsen,
     empty_fc,
+    ohsome_http_status,
     overpy_to_gdf,
     to_fc,
 )
@@ -168,6 +172,24 @@ class OSM(AbstractDataSource):
     #: HttpClient and no call site ever set it, so nothing in earthlens
     #: paced itself against any provider.
     MIN_REQUEST_INTERVAL: float = 1.0
+
+    #: Retry budget for the ohsome `elements/geometry` request. `api.ohsome.org`
+    #: throttles anonymous callers with `429` (and can `5xx` transiently), so the
+    #: SDK's transport is handed a urllib3 `Retry` with this many retries,
+    #: exponential `backoff_factor` growth, and `Retry-After` honoured — the same
+    #: policy the repo-wide `HttpClient` applies. `403` is deliberately *not*
+    #: retried: on a public, keyless endpoint it is a hard block, not transient.
+    #: (The ohsome SDK adds one final no-retry attempt of its own after a
+    #: `RetryError`, so the effective request count is this budget plus one.)
+    MAX_OHSOME_RETRIES: int = 5
+    OHSOME_BACKOFF_FACTOR: float = 1.0
+
+    #: Ceiling (whole seconds) on any single ohsome retry wait — the exponential
+    #: backoff and a server-sent `Retry-After` alike — mirroring HttpClient's
+    #: `DEFAULT_MAX_BACKOFF` (300 s) so a hostile/misconfigured `Retry-After`
+    #: cannot pin the calling thread for an unbounded interval. Kept an `int`
+    #: because urllib3's `retry_after_max` is integer-typed.
+    OHSOME_MAX_BACKOFF: int = 300
 
     AGGREGATE_REFUSAL_REASON = "OSM features are vector, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
@@ -565,12 +587,26 @@ class OSM(AbstractDataSource):
     def _fetch_ohsome(self, query_id: str, dataset: Dataset) -> FeatureCollection:
         """Fetch one ohsome `elements/geometry` query into a FeatureCollection.
 
-        Calls `OhsomeClient().elements.geometry.post(bboxes=..., time=...,
-        filter=...)` with the bbox in ohsome order `W,S,E,N` and the request
-        time window, then wraps the `.as_dataframe()` `GeoDataFrame` directly
-        (no `xarray`, `G7`). The result's `(@osmId, @snapshotTimestamp)`
-        MultiIndex is reset into columns so the history fields survive into
-        the `FeatureCollection`.
+        POSTs to the ohsome `elements/geometry` endpoint with the bbox in
+        ohsome order `W,S,E,N` and the request time window, then wraps the
+        `.as_dataframe()` `GeoDataFrame` directly (no `xarray`, `G7`). The
+        result's `(@osmId, @snapshotTimestamp)` MultiIndex is reset into columns
+        so the history fields survive into the `FeatureCollection`.
+
+        The request is issued via `OhsomeClient(...).post(endpoint=
+        "elements/geometry")` rather than the chained `.elements.geometry.post`:
+        the chained form spawns a fresh sub-client that silently drops the
+        `retry` and `user_agent` set on the root client, so only the direct
+        `post(endpoint=...)` actually applies our transport policy. That policy
+        gives the SDK's session a urllib3 `Retry` (`MAX_OHSOME_RETRIES` retries,
+        exponential `OHSOME_BACKOFF_FACTOR` growth, `Retry-After` honoured) so a
+        `429`/`5xx` throttle is retried with backoff — matching the repo-wide
+        `HttpClient`. A `403` (and any leftover `429` after the retries) is *not*
+        a transient error on this public, keyless endpoint, so it is turned into
+        a clear, typed `OhsomeUnavailableError` (via `_raise_ohsome_unavailable`)
+        instead of the SDK's opaque failure — which exposes the status
+        inconsistently, sometimes as an `OhsomeException` and sometimes as a bare
+        leaked `JSONDecodeError`.
 
         Args:
             query_id: The named-query id (for logging).
@@ -582,15 +618,19 @@ class OSM(AbstractDataSource):
 
         Raises:
             ImportError: If `ohsome` is not installed (`earthlens[osm]`).
+            OhsomeUnavailableError: If `api.ohsome.org` blocks/throttles the
+                request with a `403` (or a `429` outlasting the retries) — a
+                public-endpoint denial, not a credential error.
             ValueError: If no `start` (and `time`) was supplied — ohsome
                 requires a time.
         """
         try:
             from ohsome import OhsomeClient
+            from urllib3.util.retry import Retry
         except ImportError as exc:  # pragma: no cover - exercised via monkeypatch
             raise ImportError(
-                "The OSM ohsome protocol requires the `ohsome` SDK. Install it "
-                "with `pip install earthlens[osm]`."
+                "The OSM ohsome protocol requires the `ohsome` SDK (and "
+                "`urllib3`). Install them with `pip install earthlens[osm]`."
             ) from exc
 
         ohsome_filter = self._filter or dataset.ohsome_filter
@@ -600,15 +640,78 @@ class OSM(AbstractDataSource):
         logger.info(
             f"Querying ohsome for {query_id!r} over bbox ({bboxes}) at time {time!r}"
         )
-        response = OhsomeClient().elements.geometry.post(
-            bboxes=bboxes, time=time, filter=ohsome_filter
+        retry = Retry(
+            total=self.MAX_OHSOME_RETRIES,
+            status_forcelist=(429, 500, 502, 503, 504),
+            allowed_methods=frozenset({"GET", "POST"}),
+            backoff_factor=self.OHSOME_BACKOFF_FACTOR,
+            respect_retry_after_header=True,
+            # Ceiling on any single wait — the exponential backoff *and* a
+            # server-sent `Retry-After` — so a hostile/misconfigured `Retry-After`
+            # cannot pin the calling thread. Mirrors HttpClient's DEFAULT_MAX_BACKOFF.
+            backoff_max=self.OHSOME_MAX_BACKOFF,
+            retry_after_max=self.OHSOME_MAX_BACKOFF,
         )
-        gdf = response.as_dataframe()
+        # `log=False` keeps the SDK from writing an `ohsome_log/` directory into
+        # the caller's CWD on every failed query.
+        client = OhsomeClient(user_agent=self._user_agent, retry=retry, log=False)
+        try:
+            response = client.post(
+                bboxes=bboxes,
+                time=time,
+                filter=ohsome_filter,
+                endpoint="elements/geometry",
+            )
+            gdf = response.as_dataframe()
+        # Broad by design: classify a throttle/block into a typed error, else
+        # re-raise the original failure unchanged.
+        except Exception as exc:  # noqa: BLE001
+            self._raise_ohsome_unavailable(exc)
+            raise
         # `as_dataframe()` carries a (@osmId, @snapshotTimestamp) MultiIndex;
         # reset it so the history fields become ordinary columns on the FC.
         if gdf.index.names and any(name is not None for name in gdf.index.names):
             gdf = gdf.reset_index()
         return to_fc(gdf)
+
+    def _raise_ohsome_unavailable(self, exc: Exception) -> None:
+        """Re-raise an ohsome throttle/block as a typed `OhsomeUnavailableError`.
+
+        Inspects the SDK failure for an HTTP status (`ohsome_http_status`
+        recovers it whether the SDK wrapped the failure into an `OhsomeException`
+        or leaked a bare `JSONDecodeError`). A `403`, or a `429`
+        that outlived the retries, becomes a clear, actionable
+        `OhsomeUnavailableError`; any other failure — including a `401`, which on
+        this keyless endpoint signals a real auth-contract change, not a
+        throttle — is left for the caller to re-raise unchanged so a genuine
+        regression still surfaces loudly.
+
+        Args:
+            exc: The exception raised by the ohsome SDK call.
+
+        Raises:
+            OhsomeUnavailableError: When the status is a public-endpoint
+                throttle/block (`403` / `429`).
+        """
+        status = ohsome_http_status(exc)
+        if status == 403:
+            raise OhsomeUnavailableError(
+                "ohsome refused the elements/geometry request with HTTP 403. "
+                "api.ohsome.org is a public, keyless endpoint, so this is its "
+                "front proxy blocking or throttling this client (an IP / "
+                "rate-limit block), not a credential problem. Wait and retry "
+                "later, shrink the bbox or time window, or try from a different "
+                "network.",
+                status_code=status,
+            ) from exc
+        if status == 429:
+            raise OhsomeUnavailableError(
+                "ohsome refused the elements/geometry request with HTTP 429 (Too "
+                "Many Requests) after automatic retries. api.ohsome.org is "
+                "rate-limiting this client; wait before retrying, or reduce the "
+                "request frequency and size.",
+                status_code=status,
+            ) from exc
 
     def _fetch_pbf(self, query_id: str, dataset: Dataset) -> FeatureCollection:
         """Fetch one `pbf` layer: resolve region, fetch-cache, read, bbox-clip.

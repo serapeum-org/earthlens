@@ -12,6 +12,7 @@ from earthlens.osm._helpers import (
     bbox_swne,
     bbox_wsen,
     empty_fc,
+    ohsome_http_status,
     overpy_to_gdf,
     shapely_bbox,
     to_fc,
@@ -136,6 +137,54 @@ class TestEmptyFc:
         assert len(fc) == 0
         assert {"osm_id", "osm_type"} <= set(fc.columns)
         assert fc.crs.to_epsg() == 4326
+
+
+class TestOhsomeHttpStatus:
+    """Recovering the HTTP status behind an ohsome SDK failure."""
+
+    def test_reads_error_code_directly(self):
+        """An OhsomeException-like error exposes its error_code."""
+
+        class _Err(Exception):
+            error_code = 429
+
+        assert ohsome_http_status(_Err()) == 429
+
+    def test_reads_response_status_code(self):
+        """An error carrying a response object yields its status_code."""
+        import types
+
+        exc = RuntimeError("boom")
+        exc.response = types.SimpleNamespace(status_code=503)
+        assert ohsome_http_status(exc) == 503
+
+    def test_walks_context_chain_to_http_error(self):
+        """A leaked JSONDecodeError exposes the 403 via its __context__ chain."""
+        import types
+
+        http_error = RuntimeError("403 Forbidden")
+        http_error.response = types.SimpleNamespace(status_code=403)
+        leaked = ValueError("Expecting value")
+        leaked.__context__ = http_error
+        assert ohsome_http_status(leaked) == 403
+
+    def test_returns_none_without_a_status(self):
+        """A plain error with no status anywhere yields None."""
+        assert ohsome_http_status(RuntimeError("no status here")) is None
+
+    def test_bool_error_code_is_not_a_status(self):
+        """A bool error_code is rejected (bool is an int subclass), yielding None."""
+        exc = RuntimeError("weird")
+        exc.error_code = True
+        assert ohsome_http_status(exc) is None
+
+    def test_survives_a_cyclic_chain(self):
+        """A self-referential __context__ cycle terminates instead of looping."""
+        first = RuntimeError("a")
+        second = RuntimeError("b")
+        first.__context__ = second
+        second.__context__ = first
+        assert ohsome_http_status(first) is None
 
 
 class TestWayGeometry:
