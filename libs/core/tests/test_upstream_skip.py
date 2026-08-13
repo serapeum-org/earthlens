@@ -5,6 +5,7 @@ from __future__ import annotations
 import subprocess
 import sys
 import textwrap
+import urllib.error
 from pathlib import Path
 
 import pytest
@@ -50,7 +51,27 @@ _CASES = [
     # not skip (message-sniffing is limited to third-party/wrapped exceptions).
     (AssertionError("body was 'Service Unavailable', expected features"), False),
     (ValueError("WCS returned a non-XML body; the service may be unavailable"), False),
+    # urllib.error.HTTPError is a URLError subclass — a real 4xx must NOT skip,
+    # a 5xx must; read the status from `.code`, not the network type.
+    (urllib.error.HTTPError("http://x", 404, "Not Found", {}, None), False),
+    (urllib.error.HTTPError("http://x", 400, "Bad Request", {}, None), False),
+    (urllib.error.HTTPError("http://x", 503, "Unavailable", {}, None), True),
 ]
+
+
+@pytest.mark.parametrize(
+    "exc, needle",
+    [
+        (_WithResponse("x", 503), "HTTP 503"),
+        (urllib.error.HTTPError("http://x", 502, "Bad Gateway", {}, None), "HTTP 502"),
+        (ConnectionError("boom"), "unreachable"),
+        (Exception("CURL error: Empty reply from server"), "empty reply from server"),
+    ],
+)
+def test_reason_text_identifies_the_signal(exc: Exception, needle: str) -> None:
+    """The skip reason names the concrete availability signal it matched."""
+    reason = is_upstream_unavailable(exc)
+    assert reason is not None and needle in reason
 
 
 @pytest.mark.parametrize("exc, expect_skip", _CASES)
@@ -107,6 +128,15 @@ def test_hook_ignores_non_e2e_tests() -> None:
         _drive_hook(
             _Item(e2e=False), Exception("503 Server Error: Service Unavailable")
         )
+
+
+def test_hook_passes_through_a_passing_test() -> None:
+    """The hook returns the wrapped result untouched when the test does not raise."""
+    generator = pytest_runtest_call(_Item(e2e=True))
+    next(generator)
+    with pytest.raises(StopIteration) as raised:
+        generator.send("wrapped-result")
+    assert raised.value.value == "wrapped-result"
 
 
 def _run_guard_lane(tmp_path: Path, body: str) -> subprocess.CompletedProcess[str]:
