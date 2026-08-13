@@ -11907,7 +11907,7 @@
   <span class="md-ellipsis">
     
   
-    Showcase — the GERD reservoir filling on the Blue Nile (2020 → 2024)
+    The Grand Ethiopian Renaissance Dam filling, 2013 -&gt; 2025
   
 
     
@@ -23854,7 +23854,7 @@ the copy bundled with <code>imageio-ffmpeg</code> — so no separate install is 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
@@ -23871,7 +23871,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from cleopatra.array_glyph import FrameLabel
+from cleopatra.glyphs.gridded.array_glyph import FrameLabel
 from IPython.display import HTML
 from pyramids.dataset import Dataset
 from pyramids.dataset.collection import DatasetCollection
@@ -24037,13 +24037,10 @@ advances past frame 0 (see the code comment below).</p>
 <span class="c1"># Geostationary visible bands only work in daylight, so we sample a few daytime</span>
 <span class="c1"># hours (UTC) on each day and let the night gaps fall out — the storm's growth and</span>
 <span class="c1"># track carry across the day-to-day jumps. `bbox` is wide enough to hold the whole</span>
-<span class="c1"># track (Ida spins up in the Caribbean, Milton in the south-western Gulf). `crop`</span>
-<span class="c1"># trims cleopatra's figure margins down to a tight border on the saved MP4 --</span>
-<span class="c1"># measured per storm (200 dpi) since Milton's bbox is a very different aspect</span>
-<span class="c1"># ratio from Ida's, so their tick-label margins don't crop identically. The</span>
-<span class="c1"># checks below re-derive the rendered frame and axes position from the live</span>
-<span class="c1"># figure each run and raise if `crop` no longer matches, instead of silently</span>
-<span class="c1"># clipping content or leaving a mismatched border.</span>
+<span class="c1"># track (Ida spins up in the Caribbean, Milton in the south-western Gulf). The</span>
+<span class="c1"># saved MP4 is trimmed to a tight border with an ffmpeg crop that is computed</span>
+<span class="c1"># from the axes' actual rendered position each run (below), so it adapts to</span>
+<span class="c1"># whatever margins the current cleopatra layout produces.</span>
 <span class="n">STORMS</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span>
         <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Ida"</span><span class="p">,</span>
@@ -24051,7 +24048,6 @@ advances past frame 0 (see the code comment below).</p>
         <span class="s2">"days"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2021-08-24"</span><span class="p">,</span> <span class="s2">"2021-09-02"</span><span class="p">),</span>
         <span class="s2">"hours"</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
         <span class="s2">"bbox"</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">99.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">66.0</span><span class="p">,</span> <span class="mf">46.0</span><span class="p">],</span>
-        <span class="s2">"crop"</span><span class="p">:</span> <span class="s2">"crop=1796:1724:202:310"</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="p">{</span>
         <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"Milton"</span><span class="p">,</span>
@@ -24059,7 +24055,6 @@ advances past frame 0 (see the code comment below).</p>
         <span class="s2">"days"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"2024-10-04"</span><span class="p">,</span> <span class="s2">"2024-10-11"</span><span class="p">),</span>
         <span class="s2">"hours"</span><span class="p">:</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span>
         <span class="s2">"bbox"</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">98.0</span><span class="p">,</span> <span class="mf">16.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">64.0</span><span class="p">,</span> <span class="mf">36.0</span><span class="p">],</span>
-        <span class="s2">"crop"</span><span class="p">:</span> <span class="s2">"crop=1794:1124:203:184"</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">]</span>
 <span class="n">DPI</span> <span class="o">=</span> <span class="mi">200</span>
@@ -24099,7 +24094,7 @@ advances past frame 0 (see the code comment below).</p>
     <span class="n">fig_w</span> <span class="o">=</span> <span class="mf">11.0</span>
     <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="n">fig_w</span><span class="p">,</span> <span class="n">fig_w</span> <span class="o">*</span> <span class="p">(</span><span class="n">north</span> <span class="o">-</span> <span class="n">south</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">east</span> <span class="o">-</span> <span class="n">west</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.905</span> <span class="o">+</span> <span class="mf">0.32</span><span class="p">)</span>
 
-    <span class="n">cube</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_multiple_files</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">cube</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
     <span class="n">glyph</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
         <span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">255</span><span class="p">},</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span>
     <span class="p">)</span>
@@ -24120,7 +24115,6 @@ advances past frame 0 (see the code comment below).</p>
         <span class="n">labels</span><span class="p">,</span>
         <span class="n">interval</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span>
         <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="n">label_location</span><span class="p">),</span>
-        <span class="n">cbar_label_size</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="c1"># Dress the frames as an ECMWF-style reference map in one call (cleopatra &gt;=0.22):</span>
@@ -24129,7 +24123,7 @@ advances past frame 0 (see the code comment below).</p>
     <span class="c1"># the dark satellite background; `extent=` georeferences the RGB/animate axes</span>
     <span class="c1"># (which are otherwise in pixel coordinates). Called after animate() -- see the</span>
     <span class="c1"># blit note above.</span>
-    <span class="n">glyph</span><span class="o">.</span><span class="n">add_reference_map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"ecmwf-dark"</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="p">])</span>
+    <span class="n">glyph</span><span class="o">.</span><span class="n">add_reference_map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"dark"</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="p">])</span>
 
     <span class="c1"># cleopatra's internal tight_layout() (inside animate()) only tightens, it</span>
     <span class="c1"># doesn't centre -- the y-axis °N tick labels eat space on the left with</span>
@@ -24139,38 +24133,23 @@ advances past frame 0 (see the code comment below).</p>
     <span class="c1"># down to a thin, LinkedIn-tight border on all four sides.</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.121</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.879</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.92</span><span class="p">)</span>
 
-    <span class="c1"># `crop` was hand-measured against a specific rendered frame; verify it still</span>
-    <span class="c1"># (1) fits inside the rendered frame at all, and (2) still fully contains the</span>
-    <span class="c1"># axes' actual rendered position -- a future change to subplots_adjust, the</span>
-    <span class="c1"># reference-map style, or cleopatra's internal tight_layout() could shift</span>
-    <span class="c1"># where the map panel sits within an unchanged-size frame, which (1) alone</span>
-    <span class="c1"># would not catch. Raise explicitly rather than a bare assert, which python</span>
-    <span class="c1"># -O/PYTHONOPTIMIZE would silently compile away.</span>
+    <span class="c1"># Compute the ffmpeg crop rectangle from the axes' ACTUAL rendered position</span>
+    <span class="c1"># each run, so it tracks whatever margins the current cleopatra layout and</span>
+    <span class="c1"># reference-map style produce (the previous hand-measured crop broke whenever</span>
+    <span class="c1"># a cleopatra release shifted the panel). Pad a few px, clamp to the frame,</span>
+    <span class="c1"># and keep both dimensions even for the yuv420p encoder.</span>
     <span class="n">frame_w</span><span class="p">,</span> <span class="n">frame_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">get_size_inches</span><span class="p">()</span> <span class="o">*</span> <span class="n">DPI</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">crop_w</span><span class="p">,</span> <span class="n">crop_h</span><span class="p">,</span> <span class="n">crop_x</span><span class="p">,</span> <span class="n">crop_y</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">storm</span><span class="p">[</span><span class="s2">"crop"</span><span class="p">]</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"crop="</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">":"</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="n">ax_box</span> <span class="o">=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>  <span class="c1"># figure-fraction, y=0 at the bottom</span>
-    <span class="n">ax_left</span><span class="p">,</span> <span class="n">ax_top</span><span class="p">,</span> <span class="n">ax_right</span><span class="p">,</span> <span class="n">ax_bottom</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">ax_box</span><span class="o">.</span><span class="n">x0</span> <span class="o">*</span> <span class="n">frame_w</span><span class="p">,</span>
-        <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ax_box</span><span class="o">.</span><span class="n">y1</span><span class="p">)</span> <span class="o">*</span> <span class="n">frame_h</span><span class="p">,</span>
-        <span class="n">ax_box</span><span class="o">.</span><span class="n">x1</span> <span class="o">*</span> <span class="n">frame_w</span><span class="p">,</span>
-        <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ax_box</span><span class="o">.</span><span class="n">y0</span><span class="p">)</span> <span class="o">*</span> <span class="n">frame_h</span><span class="p">,</span>
-    <span class="p">)</span>  <span class="c1"># image pixel coordinates, y=0 at the top</span>
-    <span class="n">fits_frame</span> <span class="o">=</span> <span class="n">crop_x</span> <span class="o">+</span> <span class="n">crop_w</span> <span class="o">&lt;=</span> <span class="n">frame_w</span> <span class="ow">and</span> <span class="n">crop_y</span> <span class="o">+</span> <span class="n">crop_h</span> <span class="o">&lt;=</span> <span class="n">frame_h</span>
-    <span class="n">contains_axes</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">crop_x</span> <span class="o">&lt;=</span> <span class="n">ax_left</span>
-        <span class="ow">and</span> <span class="n">crop_y</span> <span class="o">&lt;=</span> <span class="n">ax_top</span>
-        <span class="ow">and</span> <span class="n">crop_x</span> <span class="o">+</span> <span class="n">crop_w</span> <span class="o">&gt;=</span> <span class="n">ax_right</span>
-        <span class="ow">and</span> <span class="n">crop_y</span> <span class="o">+</span> <span class="n">crop_h</span> <span class="o">&gt;=</span> <span class="n">ax_bottom</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">fits_frame</span> <span class="ow">and</span> <span class="n">contains_axes</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">storm</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="si">}</span><span class="s2">: crop rectangle </span><span class="si">{</span><span class="n">crop_w</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">crop_h</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">crop_x</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">crop_y</span><span class="si">}</span><span class="s2"> no longer matches the "</span>
-            <span class="sa">f</span><span class="s2">"rendered frame </span><span class="si">{</span><span class="n">frame_w</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">frame_h</span><span class="si">}</span><span class="s2"> (axes at pixel bbox "</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">ax_left</span><span class="p">),</span><span class="w"> </span><span class="nb">round</span><span class="p">(</span><span class="n">ax_top</span><span class="p">),</span><span class="w"> </span><span class="nb">round</span><span class="p">(</span><span class="n">ax_right</span><span class="p">),</span><span class="w"> </span><span class="nb">round</span><span class="p">(</span><span class="n">ax_bottom</span><span class="p">))</span><span class="si">}</span><span class="s2">) -- re-measure 'crop' "</span>
-            <span class="sa">f</span><span class="s2">"for the current figure pipeline."</span>
-        <span class="p">)</span>
+    <span class="n">ax_box</span> <span class="o">=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>  <span class="c1"># figure fractions, y=0 at the bottom</span>
+    <span class="n">ax_left</span><span class="p">,</span> <span class="n">ax_right</span> <span class="o">=</span> <span class="n">ax_box</span><span class="o">.</span><span class="n">x0</span> <span class="o">*</span> <span class="n">frame_w</span><span class="p">,</span> <span class="n">ax_box</span><span class="o">.</span><span class="n">x1</span> <span class="o">*</span> <span class="n">frame_w</span>
+    <span class="n">ax_top</span><span class="p">,</span> <span class="n">ax_bottom</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ax_box</span><span class="o">.</span><span class="n">y1</span><span class="p">)</span> <span class="o">*</span> <span class="n">frame_h</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ax_box</span><span class="o">.</span><span class="n">y0</span><span class="p">)</span> <span class="o">*</span> <span class="n">frame_h</span>
+    <span class="n">pad</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">crop_x</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">ax_left</span><span class="p">)</span> <span class="o">-</span> <span class="n">pad</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">crop_y</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">ax_top</span><span class="p">)</span> <span class="o">-</span> <span class="n">pad</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">crop_w</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">ax_right</span> <span class="o">-</span> <span class="n">ax_left</span><span class="p">))</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pad</span><span class="p">,</span> <span class="n">frame_w</span> <span class="o">-</span> <span class="n">crop_x</span><span class="p">)</span>
+    <span class="n">crop_h</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">ax_bottom</span> <span class="o">-</span> <span class="n">ax_top</span><span class="p">))</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pad</span><span class="p">,</span> <span class="n">frame_h</span> <span class="o">-</span> <span class="n">crop_y</span><span class="p">)</span>
+    <span class="n">crop_w</span> <span class="o">-=</span> <span class="n">crop_w</span> <span class="o">%</span> <span class="mi">2</span>
+    <span class="n">crop_h</span> <span class="o">-=</span> <span class="n">crop_h</span> <span class="o">%</span> <span class="mi">2</span>
+    <span class="n">crop</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"crop=</span><span class="si">{</span><span class="n">crop_w</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">crop_h</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">crop_x</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">crop_y</span><span class="si">}</span><span class="s2">"</span>
 
     <span class="c1"># Write a crisp, LinkedIn-ready MP4: 200 dpi (roughly 2200 px wide) for a</span>
     <span class="c1"># sharp look on large feeds, crf=20 (visually near-lossless, still a small</span>
@@ -24185,7 +24164,7 @@ advances past frame 0 (see the code comment below).</p>
         <span class="n">dpi</span><span class="o">=</span><span class="n">DPI</span><span class="p">,</span>
         <span class="n">crf</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
         <span class="n">preset</span><span class="o">=</span><span class="s2">"slow"</span><span class="p">,</span>
-        <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-vf"</span><span class="p">,</span> <span class="n">storm</span><span class="p">[</span><span class="s2">"crop"</span><span class="p">]],</span>
+        <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-vf"</span><span class="p">,</span> <span class="n">crop</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
     <span class="n">videos</span><span class="p">[</span><span class="n">storm</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">mp4_path</span>
@@ -24195,13 +24174,10 @@ advances past frame 0 (see the code comment below).</p>
 # Geostationary visible bands only work in daylight, so we sample a few daytime
 # hours (UTC) on each day and let the night gaps fall out — the storm's growth and
 # track carry across the day-to-day jumps. `bbox` is wide enough to hold the whole
-# track (Ida spins up in the Caribbean, Milton in the south-western Gulf). `crop`
-# trims cleopatra's figure margins down to a tight border on the saved MP4 --
-# measured per storm (200 dpi) since Milton's bbox is a very different aspect
-# ratio from Ida's, so their tick-label margins don't crop identically. The
-# checks below re-derive the rendered frame and axes position from the live
-# figure each run and raise if `crop` no longer matches, instead of silently
-# clipping content or leaving a mismatched border.
+# track (Ida spins up in the Caribbean, Milton in the south-western Gulf). The
+# saved MP4 is trimmed to a tight border with an ffmpeg crop that is computed
+# from the axes' actual rendered position each run (below), so it adapts to
+# whatever margins the current cleopatra layout produces.
 STORMS = [
     {
         "name": "Ida",
@@ -24209,7 +24185,6 @@ STORMS = [
         "days": ("2021-08-24", "2021-09-02"),
         "hours": [14, 16, 18, 20],
         "bbox": [-99.0, 15.0, -66.0, 46.0],
-        "crop": "crop=1796:1724:202:310",
     },
     {
         "name": "Milton",
@@ -24217,7 +24192,6 @@ STORMS = [
         "days": ("2024-10-04", "2024-10-11"),
         "hours": [14, 16, 18, 20],
         "bbox": [-98.0, 16.0, -64.0, 36.0],
-        "crop": "crop=1794:1124:203:184",
     },
 ]
 DPI = 200
@@ -24257,7 +24231,7 @@ for storm in STORMS:
     fig_w = 11.0
     figsize = (fig_w, fig_w * (north - south) / (east - west) / 0.905 + 0.32)
 
-    cube = DatasetCollection.read_multiple_files(paths, date=False)
+    cube = DatasetCollection.from_files(paths)
     glyph = cube.plot(
         rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 255}, figsize=figsize
     )
@@ -24278,7 +24252,6 @@ for storm in STORMS:
         labels,
         interval=250,
         frame_label=FrameLabel(location=label_location),
-        cbar_label_size=19,
     )
 
     # Dress the frames as an ECMWF-style reference map in one call (cleopatra &gt;=0.22):
@@ -24287,7 +24260,7 @@ for storm in STORMS:
     # the dark satellite background; `extent=` georeferences the RGB/animate axes
     # (which are otherwise in pixel coordinates). Called after animate() -- see the
     # blit note above.
-    glyph.add_reference_map(style="ecmwf-dark", extent=[west, south, east, north])
+    glyph.add_reference_map(style="dark", extent=[west, south, east, north])
 
     # cleopatra's internal tight_layout() (inside animate()) only tightens, it
     # doesn't centre -- the y-axis °N tick labels eat space on the left with
@@ -24297,38 +24270,23 @@ for storm in STORMS:
     # down to a thin, LinkedIn-tight border on all four sides.
     glyph.fig.subplots_adjust(left=0.121, right=0.879, bottom=0.05, top=0.92)
 
-    # `crop` was hand-measured against a specific rendered frame; verify it still
-    # (1) fits inside the rendered frame at all, and (2) still fully contains the
-    # axes' actual rendered position -- a future change to subplots_adjust, the
-    # reference-map style, or cleopatra's internal tight_layout() could shift
-    # where the map panel sits within an unchanged-size frame, which (1) alone
-    # would not catch. Raise explicitly rather than a bare assert, which python
-    # -O/PYTHONOPTIMIZE would silently compile away.
+    # Compute the ffmpeg crop rectangle from the axes' ACTUAL rendered position
+    # each run, so it tracks whatever margins the current cleopatra layout and
+    # reference-map style produce (the previous hand-measured crop broke whenever
+    # a cleopatra release shifted the panel). Pad a few px, clamp to the frame,
+    # and keep both dimensions even for the yuv420p encoder.
     frame_w, frame_h = (glyph.fig.get_size_inches() * DPI).round().astype(int)
-    crop_w, crop_h, crop_x, crop_y = (
-        int(v) for v in storm["crop"].removeprefix("crop=").split(":")
-    )
-    ax_box = glyph.ax.get_position()  # figure-fraction, y=0 at the bottom
-    ax_left, ax_top, ax_right, ax_bottom = (
-        ax_box.x0 * frame_w,
-        (1 - ax_box.y1) * frame_h,
-        ax_box.x1 * frame_w,
-        (1 - ax_box.y0) * frame_h,
-    )  # image pixel coordinates, y=0 at the top
-    fits_frame = crop_x + crop_w &lt;= frame_w and crop_y + crop_h &lt;= frame_h
-    contains_axes = (
-        crop_x &lt;= ax_left
-        and crop_y &lt;= ax_top
-        and crop_x + crop_w &gt;= ax_right
-        and crop_y + crop_h &gt;= ax_bottom
-    )
-    if not (fits_frame and contains_axes):
-        raise ValueError(
-            f"{storm['name']}: crop rectangle {crop_w}x{crop_h}+{crop_x}+{crop_y} no longer matches the "
-            f"rendered frame {frame_w}x{frame_h} (axes at pixel bbox "
-            f"{(round(ax_left), round(ax_top), round(ax_right), round(ax_bottom))}) -- re-measure 'crop' "
-            f"for the current figure pipeline."
-        )
+    ax_box = glyph.ax.get_position()  # figure fractions, y=0 at the bottom
+    ax_left, ax_right = ax_box.x0 * frame_w, ax_box.x1 * frame_w
+    ax_top, ax_bottom = (1 - ax_box.y1) * frame_h, (1 - ax_box.y0) * frame_h
+    pad = 8
+    crop_x = max(int(ax_left) - pad, 0)
+    crop_y = max(int(ax_top) - pad, 0)
+    crop_w = min(int(round(ax_right - ax_left)) + 2 * pad, frame_w - crop_x)
+    crop_h = min(int(round(ax_bottom - ax_top)) + 2 * pad, frame_h - crop_y)
+    crop_w -= crop_w % 2
+    crop_h -= crop_h % 2
+    crop = f"crop={crop_w}:{crop_h}:{crop_x}:{crop_y}"
 
     # Write a crisp, LinkedIn-ready MP4: 200 dpi (roughly 2200 px wide) for a
     # sharp look on large feeds, crf=20 (visually near-lossless, still a small
@@ -24343,7 +24301,7 @@ for storm in STORMS:
         dpi=DPI,
         crf=20,
         preset="slow",
-        extra_args=["-vf", storm["crop"]],
+        extra_args=["-vf", crop],
     )
     plt.close("all")
     videos[storm["name"]] = mp4_path
