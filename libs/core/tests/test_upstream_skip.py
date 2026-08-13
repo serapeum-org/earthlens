@@ -71,7 +71,8 @@ _CASES = [
 def test_reason_text_identifies_the_signal(exc: Exception, needle: str) -> None:
     """The skip reason names the concrete availability signal it matched."""
     reason = is_upstream_unavailable(exc)
-    assert reason is not None and needle in reason
+    assert reason is not None
+    assert needle in reason
 
 
 @pytest.mark.parametrize("exc, expect_skip", _CASES)
