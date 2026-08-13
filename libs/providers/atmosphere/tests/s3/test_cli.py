@@ -79,7 +79,7 @@ class TestProber:
 
     def test_sample_keys_helper_uses_unsigned_client(self, monkeypatch):
         """_s3_sample_keys returns the Contents keys from an unsigned client."""
-        _FakeAuth.contents = [{"Key": "k1"}, {"Key": "k2"}]
+        monkeypatch.setattr(_FakeAuth, "contents", [{"Key": "k1"}, {"Key": "k2"}])
         monkeypatch.setattr(s3_auth, "S3Auth", _FakeAuth)
         assert s3_cli._s3_sample_keys("b", "p", None) == ["k1", "k2"]
 
@@ -131,6 +131,6 @@ class TestLiveValidator:
 
     def test_live_keys_lists_one(self, monkeypatch):
         """_s3_live_keys returns the object keys from an unsigned client."""
-        _FakeAuth.contents = [{"Key": "k"}]
+        monkeypatch.setattr(_FakeAuth, "contents", [{"Key": "k"}])
         monkeypatch.setattr(s3_auth, "S3Auth", _FakeAuth)
         assert s3_cli._s3_live_keys("b", "p", None) == ["k"], "object key returned"
