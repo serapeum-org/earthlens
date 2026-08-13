@@ -20,6 +20,9 @@ from earthlens.cli.curate import (
     _infer_dtype as infer_dtype,
 )
 from earthlens.cli.refresh import (
+    _COVERAGE_BUCKETS as COVERAGE_BUCKETS,
+)
+from earthlens.cli.refresh import (
     _TIMEOUT as HTTP_TIMEOUT,
 )
 from earthlens.cli.refresh import (
@@ -54,6 +57,7 @@ from earthlens.cli.validate import (
 )
 
 __all__ = [
+    "COVERAGE_BUCKETS",
     "HTTP_TIMEOUT",
     "BackendInfo",
     "curated_attr_ids",

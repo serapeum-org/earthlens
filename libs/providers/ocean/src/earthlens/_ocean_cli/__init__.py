@@ -27,6 +27,13 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "prober": "earthlens.cmems.cli:prober",
         "deep_prober": "earthlens.cmems.cli:deep_prober",
     },
+    "erddap": {
+        "refresher": "earthlens.erddap.cli:refresher",
+        "writer": "earthlens.erddap.cli:writer",
+        "coverage": "earthlens.erddap.cli:coverage",
+        "validator": "earthlens.erddap.cli:validator",
+        "emitter": "earthlens.erddap.cli:emitter",
+    },
     "nwm": {
         "refresher": "earthlens.nwm.cli:refresher",
         "curated_ids": "earthlens.nwm.cli:curated_ids",

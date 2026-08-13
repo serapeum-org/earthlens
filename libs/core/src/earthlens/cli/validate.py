@@ -507,39 +507,6 @@ def _validate_jaxa(catalog: Any) -> tuple[int, list[str]]:
     return len(catalog.datasets), issues
 
 
-def _validate_erddap(catalog: Any) -> tuple[int, list[str]]:
-    """Lint each ERDDAP row beyond the model's load-time checks.
-
-    The `Dataset` model already enforces `server_url` / `dataset_id` /
-    `protocol` at load (`extra="forbid"`, `protocol` is a `Literal`), and
-    the loader rejects a curated key absent from `available_datasets:`.
-    These cross-row lints add what the model can't see:
-
-    * a server_url that is not an `http(s)` URL (the griddap path builds a
-      URL from it and the tabledap path hands it to erddapy);
-    * a griddap row with empty `dim_names` — `build_griddap_url` would have
-      no axes to subset, producing a malformed request;
-    * a `flux_variables` entry that is not one of the row's default
-      `variables` — a likely typo, since the flux marker would then never
-      apply to the row's default request.
-    """
-    issues: list[str] = []
-    for key, row in catalog.datasets.items():
-        if not row.server_url.startswith(("http://", "https://")):
-            issues.append(f"{key}: server_url {row.server_url!r} is not an http(s) URL")
-        if row.protocol == "griddap" and not row.dim_names:
-            issues.append(
-                f"{key}: griddap row has empty `dim_names` (no axes to subset)"
-            )
-        unknown_flux = [v for v in row.flux_variables if v not in row.variables]
-        if unknown_flux:
-            issues.append(
-                f"{key}: flux_variables {unknown_flux} not in the row's default "
-                f"variables {row.variables} (likely a typo)"
-            )
-    return len(catalog.datasets), issues
-
-
 def _validate_bathymetry(catalog: Any) -> tuple[int, list[str]]:
     """Each bathymetry DEM row needs an endpoint, coverage id, and band.
 
@@ -685,7 +652,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "wdpa": _validate_wdpa,
     "iucn": _validate_iucn,
     "jaxa": _validate_jaxa,
-    "erddap": _validate_erddap,
     "bathymetry": _validate_bathymetry,
     "fabdem": _validate_fabdem,
     "pvgis": _validate_pvgis,
