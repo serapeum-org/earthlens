@@ -33,7 +33,6 @@ import importlib
 import os
 import re
 from collections.abc import Callable, Iterable
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from ftplib import FTP, error_perm  # nosec B402  # noqa: S402
 from pathlib import Path
@@ -346,113 +345,6 @@ def _openaq_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"openaq": names}
 
 
-#: Public Earth Engine STAC catalog root (no credentials for the catalog).
-_GEE_STAC_ROOT = "https://storage.googleapis.com/earthengine-stac/catalog/catalog.json"
-
-
-def _gee_dataset_hrefs() -> list[str]:
-    """Walk the public EE STAC tree and return every dataset STAC-doc href.
-
-    BFS over `rel="child"` links from the root (absolute hrefs); links to
-    `…/catalog.json` are sub-catalogs to recurse, the rest are dataset docs.
-
-    Returns:
-        The dataset STAC-document hrefs (one per Earth Engine asset).
-    """
-    hrefs: list[str] = []
-    queue = [_GEE_STAC_ROOT]
-    seen: set[str] = set()
-    while queue:
-        url = queue.pop()
-        if url in seen:
-            continue
-        seen.add(url)
-        try:
-            node = _get_json(url)
-        except Exception:  # noqa: BLE001 — skip an unreachable sub-catalog  # nosec B112
-            continue
-        for link in node.get("links", []):
-            if link.get("rel") != "child":
-                continue
-            href = link.get("href")
-            if not href:
-                continue
-            (queue if href.endswith("/catalog.json") else hrefs).append(href)
-    return hrefs
-
-
-def _gee_fetch_id(href: str) -> str | None:
-    """Return a dataset STAC doc's `id` (its EE asset id), or None on error."""
-    try:
-        return _get_json(href).get("id")
-    except Exception:  # noqa: BLE001 — a single unreachable doc is skipped
-        return None
-
-
-def _gee_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List every Earth Engine asset id from the public STAC catalog.
-
-    Walks the STAC tree for dataset docs, then fetches each doc's `id`
-    concurrently (pure HTTP, no SDK / credentials).
-
-    Args:
-        catalog: The loaded GEE `Catalog` (unused; the STAC tree is the source).
-
-    Returns:
-        A single-group mapping `{"gee": [sorted asset ids]}`.
-    """
-    hrefs = _gee_dataset_hrefs()
-    with ThreadPoolExecutor(max_workers=16) as pool:
-        ids = {str(cid) for cid in pool.map(_gee_fetch_id, hrefs) if cid}
-    return {"gee": sorted(ids)}
-
-
-#: Public per-asset STAC-doc URL base (the id -> doc filename convention).
-_GEE_STAC_DOC_BASE = "https://storage.googleapis.com/earthengine-stac/catalog"
-
-
-def _gee_stac_or_none(asset_id: str) -> dict[str, Any] | None:
-    """Fetch one Earth Engine asset's public STAC document, or None on error.
-
-    Args:
-        asset_id: The Earth Engine asset id (e.g. `LANDSAT/LC09/C02/T1_L2`).
-
-    Returns:
-        The parsed STAC document, or None when it 404s / is unreadable.
-    """
-    provider = asset_id.split("/", 1)[0]
-    url = f"{_GEE_STAC_DOC_BASE}/{provider}/{asset_id.replace('/', '_')}.json"
-    try:
-        return _get_json(url)
-    except Exception:  # noqa: BLE001 — a missing/unreadable doc -> "missing"
-        return None
-
-
-def _gee_classify(asset_id: str, curated: set[str]) -> str:
-    """Bucket one asset id for the curation-coverage report.
-
-    Args:
-        asset_id: The Earth Engine asset id to classify.
-        curated: The set of asset ids already in the curated `datasets:` map.
-
-    Returns:
-        One of `"DONE"` (already curated), `"table"` (a FeatureCollection,
-        out of raster scope), `"addressable"` (has bands carrying usable
-        metadata — a `gee:units` / `gee:scale`), `"thin"` (no usable band
-        metadata, needs hand-modelling), or `"missing"` (no STAC doc).
-    """
-    if asset_id in curated:
-        return "DONE"
-    doc = _gee_stac_or_none(asset_id)
-    if doc is None:
-        return "missing"
-    if doc.get("gee:type") == "table":
-        return "table"
-    bands = (doc.get("summaries", {}) or {}).get("eo:bands") or []
-    has_meta = any(b.get("gee:units") or b.get("gee:scale") is not None for b in bands)
-    return "addressable" if (bands and has_meta) else "thin"
-
-
 #: WorldPop public REST data hub (alias -> sub-alias crawl, no credentials).
 _WORLDPOP_REST_URL = "https://hub.worldpop.org/rest/data"
 
@@ -751,7 +643,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     **dispatch_table("refresher"),
     "ecmwf": _ecmwf_grouped,
     "openaq": _openaq_grouped,
-    "gee": _gee_grouped,
     "radar": _radar_grouped,
     "chc": _chc_grouped,
     "s3": _s3_grouped,
@@ -766,7 +657,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("writer"),
     "ecmwf": _index_writer("available_datasets", grouped=True),
-    "gee": _index_writer("available_datasets"),
     "radar": _write_radar,
     "s3": _index_writer("available_datasets"),
     "openaq": _write_openaq,
@@ -1105,32 +995,6 @@ class CoverageOutcome:
         }
 
 
-def _gee_coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
-    """Classify every `available_datasets:` id of the GEE catalog.
-
-    Args:
-        catalog: The loaded GEE `Catalog`.
-
-    Returns:
-        `(counts, todo)` — per-bucket counts and the sorted `addressable`
-        ids not yet curated.
-
-    Raises:
-        ValueError: If the `available_datasets:` index is empty.
-    """
-    available = [str(ident) for ident in getattr(catalog, "available_datasets", [])]
-    if not available:
-        raise ValueError(
-            "available_datasets: is empty — run `refresh gee --write` first"
-        )
-    curated = set(catalog.datasets)
-    buckets: dict[str, list[str]] = {}
-    for asset_id in available:
-        buckets.setdefault(_gee_classify(asset_id, curated), []).append(asset_id)
-    counts = {bucket: len(buckets.get(bucket, [])) for bucket in _COVERAGE_BUCKETS}
-    return counts, sorted(buckets.get("addressable", []))
-
-
 def _ecmwf_coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
     """Classify every `available_datasets:` id across the three Copernicus stores.
 
@@ -1168,7 +1032,6 @@ def _ecmwf_coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
 _COVERAGE: dict[str, Callable[[Any], tuple[dict[str, int], list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("coverage"),
-    "gee": _gee_coverage,
     "ecmwf": _ecmwf_coverage,
 }
 

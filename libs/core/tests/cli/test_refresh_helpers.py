@@ -84,59 +84,6 @@ class TestRadarParse:
         assert "KABR" in data["stations"], "HOMR rows written"
 
 
-class TestGeeCoverageBody:
-    """Tests for the _gee_coverage classifier body + coverage_one error path."""
-
-    def test_buckets_available_universe(self, monkeypatch):
-        """Each available id is classified; addressable ids feed the todo list."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_gee_classify",
-            lambda aid, cur: "DONE" if aid in cur else "addressable",
-        )
-        cat = SimpleNamespace(available_datasets=["A", "B"], datasets={"A": None})
-        counts, todo = refresh_mod._gee_coverage(cat)
-        assert counts["DONE"] == 1 and counts["addressable"] == 1, counts
-        assert todo == ["B"], "uncurated addressable id queued"
-
-    def test_empty_index_raises(self):
-        """An empty available_datasets index raises a clear ValueError."""
-        with pytest.raises(ValueError, match="available_datasets"):
-            refresh_mod._gee_coverage(
-                SimpleNamespace(available_datasets=[], datasets={})
-            )
-
-    def test_coverage_one_reports_error(self, monkeypatch):
-        """coverage_one captures a classifier failure as an error outcome."""
-
-        def boom(catalog):
-            raise RuntimeError("offline")
-
-        monkeypatch.setitem(refresh_mod._COVERAGE, "gee", boom)
-        assert coverage_one(_info("gee")).status == "error"
-
-
-class TestNetworkPrimitives:
-    """Tests for the thin network/SDK list helpers (mocked)."""
-
-    def test_gee_fetch_id_and_error(self, monkeypatch):
-        """_gee_fetch_id reads the doc id; an error degrades to None."""
-        monkeypatch.setattr(refresh_mod, "_get_json", lambda url: {"id": "X/Y"})
-        assert refresh_mod._gee_fetch_id("h") == "X/Y"
-
-        def boom(url):
-            raise RuntimeError("offline")
-
-        monkeypatch.setattr(refresh_mod, "_get_json", boom)
-        assert refresh_mod._gee_fetch_id("h") is None
-
-    def test_gee_grouped_fetches_each_id(self, monkeypatch):
-        """gee grouped maps each dataset href to its fetched id."""
-        monkeypatch.setattr(refresh_mod, "_gee_dataset_hrefs", lambda: ["h1", "h2"])
-        monkeypatch.setattr(refresh_mod, "_gee_fetch_id", lambda href: href.upper())
-        assert refresh_mod._gee_grouped(None) == {"gee": ["H1", "H2"]}
-
-
 class TestChcWalk:
     """Tests for the CHC FTP product-tree walk."""
 

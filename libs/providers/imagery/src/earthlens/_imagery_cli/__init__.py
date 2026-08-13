@@ -31,6 +31,15 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "prober": "earthlens.eumetsat.cli:prober",
         "emitter": "earthlens.eumetsat.cli:emitter",
     },
+    "gee": {
+        "refresher": "earthlens.gee.cli:refresher",
+        "writer": "earthlens.gee.cli:writer",
+        "prober": "earthlens.gee.cli:prober",
+        "emitter": "earthlens.gee.cli:emitter",
+        "coverage": "earthlens.gee.cli:coverage",
+        "hydrator": "earthlens.gee.cli:hydrator",
+        "categoriser": "earthlens.gee.cli:categorise_asset",
+    },
     "jaxa": {
         "refresher": "earthlens.jaxa.cli:refresher",
         "writer": "earthlens.jaxa.cli:writer",

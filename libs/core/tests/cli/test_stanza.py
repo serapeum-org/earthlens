@@ -181,61 +181,6 @@ class TestEcmwfRequestKind:
         assert stanza_mod._ecmwf_request_kind(form, "cems-glofas-forecast") == "form"
 
 
-class TestGeeEmitter:
-    """Tests for the GEE emitter (public EE STAC)."""
-
-    def test_seeds_bands_and_extent(self, monkeypatch):
-        """The STAC doc seeds title / cadence / resolution / bands."""
-        monkeypatch.setattr(
-            stanza_mod,
-            "_get_json",
-            lambda url, **kw: {
-                "title": "GDDP-CMIP6\nsecond line",
-                "gee:type": "image_collection",
-                "gee:interval": {"interval": 1, "unit": "day"},
-                "extent": {
-                    "temporal": {"interval": [["2015-01-01T00:00:00Z", None]]},
-                    "spatial": {"bbox": [[-180, -90, 180, 90]]},
-                },
-                "summaries": {
-                    "eo:bands": [
-                        {
-                            "name": "tas",
-                            "description": "temp",
-                            "gee:units": "K",
-                            "gsd": [27830],
-                        }
-                    ]
-                },
-                "providers": [{"name": "NASA"}],
-            },
-        )
-        result = emit_stanza(_info("gee"), "NASA/GDDP-CMIP6")
-        assert result.status == "ok", "gee emitter ran"
-        assert result.row["title"] == "GDDP-CMIP6", "first title line only"
-        assert result.row["cadence"] == {"interval": 1, "unit": "day"}
-        assert result.row["spatial_resolution"] == 27830.0, "gsd unwrapped"
-        assert result.row["bands"]["tas"]["units"] == "K", "band units kept"
-        assert "bbox" not in result.row["extent"], "global bbox dropped"
-
-    def test_minimal_skips_fetch(self):
-        """--minimal emits a placeholder row with empty bands and no network."""
-        result = emit_stanza(_info("gee"), "projects/foo/bar", minimal=True)
-        assert result.status == "ok" and result.row["bands"] == {}
-
-    def test_hydrate_reads_bands_from_earth_engine(self, monkeypatch):
-        """--hydrate seeds bands from a live Earth Engine query (creds-gated)."""
-        monkeypatch.setattr(
-            stanza_mod,
-            "_gee_live_bands",
-            lambda asset_id: ("image", {"B1": {}, "B2": {}}),
-        )
-        result = emit_stanza(_info("gee"), "projects/foo/bar", hydrate=True)
-        assert result.status == "ok", "gee hydrate ran"
-        assert result.row["ee_type"] == "image", "ee_type from EE asset"
-        assert sorted(result.row["bands"]) == ["B1", "B2"], "live bands seeded"
-
-
 class TestEmitStanza:
     """Tests for emit_stanza dispatch."""
 
@@ -358,47 +303,6 @@ class TestStanzaResult:
     def test_to_yaml_empty_when_no_row(self):
         """An unsupported/error result renders no YAML."""
         assert StanzaResult("chc", "x", "x", "unsupported").to_yaml() == ""
-
-
-class TestGeeLiveBands:
-    """Tests for _gee_live_bands (Earth Engine mocked)."""
-
-    def test_reads_bands_off_first_image(self, monkeypatch):
-        """An image-collection asset resolves its first image's band names."""
-        import sys
-        import types
-
-        import earthlens.gee.auth as auth_mod
-
-        fake_ee = types.ModuleType("ee")
-
-        class _Img:
-            def bandNames(self):
-                return self
-
-            def getInfo(self):
-                return ["B1", "B2"]
-
-        class _IC:
-            def first(self):
-                return _Img()
-
-        fake_ee.data = types.SimpleNamespace(
-            getAsset=lambda aid: {"type": "IMAGE_COLLECTION"}
-        )
-        fake_ee.Image = lambda x: _Img()
-        fake_ee.ImageCollection = lambda aid: _IC()
-        monkeypatch.setitem(sys.modules, "ee", fake_ee)
-
-        class FakeAuth:
-            @staticmethod
-            def initialize(service_account, service_key, project=None):
-                pass
-
-        monkeypatch.setattr(auth_mod, "EarthEngineAuth", FakeAuth)
-        ee_type, bands = stanza_mod._gee_live_bands("projects/x/y")
-        assert ee_type == "image_collection", "asset type lowercased"
-        assert sorted(bands) == ["B1", "B2"], "live band names read"
 
 
 class TestBiodiversityEmitters:

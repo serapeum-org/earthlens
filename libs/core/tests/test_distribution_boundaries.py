@@ -1274,7 +1274,6 @@ class TestCliIsBackendAgnostic:
             "chc",
             "drought",
             "ecmwf",
-            "gee",
             "goes",
             "mswep",
             "nrel",
@@ -1293,7 +1292,6 @@ class TestCliIsBackendAgnostic:
     PENDING_IMPORTS = frozenset(
         {
             "ecmwf",
-            "gee",
             "radar",
         }
     )

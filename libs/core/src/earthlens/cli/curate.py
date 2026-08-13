@@ -27,7 +27,7 @@ import requests
 
 from earthlens._cli_tooling import dispatch_table
 from earthlens.cli.adapter import BackendInfo, load_catalog
-from earthlens.cli.refresh import _TIMEOUT, _get_json
+from earthlens.cli.refresh import _TIMEOUT
 
 
 @dataclass
@@ -82,36 +82,6 @@ def _bands_from_summaries(body: dict[str, Any]) -> list[dict[str, Any]]:
     """Return a STAC doc's `summaries.eo:bands` (or `gee:bands`) list."""
     summaries = body.get("summaries", {}) or {}
     return summaries.get("eo:bands") or summaries.get("gee:bands") or []
-
-
-def _gee_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe a GEE asset's band schema from its public EE STAC document.
-
-    Args:
-        catalog: The loaded GEE `Catalog` (unused; the STAC doc is the source).
-        dataset: The Earth Engine asset id (e.g. `NASA/GDDP-CMIP6`).
-
-    Returns:
-        Mapping of band name to `{units, gsd, description}`.
-    """
-    provider = dataset.split("/", 1)[0]
-    filename = dataset.replace("/", "_") + ".json"
-    url = (
-        f"https://storage.googleapis.com/earthengine-stac/catalog/{provider}/{filename}"
-    )
-    body = _get_json(url)
-    schema: dict[str, dict[str, Any]] = {}
-    for band in _bands_from_summaries(body):
-        name = band.get("name")
-        if not name:
-            continue
-        gsd = band.get("gsd")
-        schema[str(name)] = {
-            "units": band.get("gee:units"),
-            "gsd": gsd[0] if isinstance(gsd, list) and gsd else gsd,
-            "description": (band.get("description") or "").strip()[:60],
-        }
-    return schema
 
 
 def _infer_dtype(value: str | None) -> str:
@@ -757,7 +727,6 @@ _DEEP_PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("prober"),
-    "gee": _gee_probe,
     "s3": _s3_probe,
     "ecmwf": _ecmwf_probe,
     "chc": _chc_probe,

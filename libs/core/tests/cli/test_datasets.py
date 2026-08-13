@@ -8,13 +8,13 @@ import pytest
 from typer.testing import CliRunner
 
 import earthlens.stac.cli as stac_cli
-from earthlens.cli import _gee_hydrate as hydrate_mod
 from earthlens.cli import curate as curate_mod
 from earthlens.cli import datasets as datasets_mod
 from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.app import app
 from earthlens.cli.refresh import CoverageOutcome
 from earthlens.cli.table import build_table
+from earthlens.gee import _hydrate as hydrate_mod
 
 pytestmark = pytest.mark.cli
 
@@ -711,7 +711,7 @@ class TestProbe:
 
     def test_schema_json_with_mocked_sample(self, monkeypatch):
         """--json emits the parsed band/asset schema."""
-        monkeypatch.setattr(curate_mod, "_get_json", lambda url: self._SAMPLE)
+        monkeypatch.setattr(stac_cli, "get_json", lambda url: self._SAMPLE)
         result = runner.invoke(
             app, ["datasets", "probe", "stac", "sentinel-2-l2a", "--json"]
         )
@@ -721,7 +721,7 @@ class TestProbe:
 
     def test_table_lists_assets(self, monkeypatch):
         """The default table lists each probed entry under the NAME column."""
-        monkeypatch.setattr(curate_mod, "_get_json", lambda url: self._SAMPLE)
+        monkeypatch.setattr(stac_cli, "get_json", lambda url: self._SAMPLE)
         result = runner.invoke(app, ["datasets", "probe", "stac", "sentinel-2-l2a"])
         assert result.exit_code == 0, f"probe failed: {result.output}"
         assert "NAME" in result.output and "B04" in result.output

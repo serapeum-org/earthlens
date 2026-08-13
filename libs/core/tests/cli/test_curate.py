@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+import earthlens.stac.cli as stac_cli
 from earthlens.cli import curate as curate_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.curate import (
@@ -51,28 +52,6 @@ class TestSupportedProviders:
             "firms",
             "jaxa",
         } <= set(supported_providers())
-
-
-class TestGeeProbe:
-    """Tests for the GEE band prober."""
-
-    def test_extracts_band_schema(self, monkeypatch):
-        """gee probe reads its STAC doc's eo:bands (gee:units / gsd)."""
-        from earthlens.cli import curate as curate_mod
-
-        monkeypatch.setattr(
-            curate_mod,
-            "_get_json",
-            lambda url, **kw: {
-                "summaries": {
-                    "eo:bands": [{"name": "hurs", "gee:units": "%", "gsd": [27830]}]
-                }
-            },
-        )
-        result = probe_dataset(_info("gee"), "NASA/GDDP-CMIP6")
-        assert result.status == "ok", "gee probe ran"
-        assert result.assets["hurs"]["units"] == "%", "units parsed"
-        assert result.assets["hurs"]["gsd"] == 27830, "gsd unwrapped from list"
 
 
 class TestS3Probe:
@@ -234,7 +213,7 @@ class TestDeepProbers:
 
     def test_deep_falls_back_to_light_prober(self, monkeypatch):
         """--deep on a provider with no deep sampler uses the light prober."""
-        monkeypatch.setattr(curate_mod, "_get_json", lambda url: _SAMPLE_ITEM)
+        monkeypatch.setattr(stac_cli, "get_json", lambda url: _SAMPLE_ITEM)
         result = probe_dataset(_info("stac"), "sentinel-2-l2a", deep=True)
         assert result.status == "ok", "stac --deep fell back to the light prober"
 
@@ -314,14 +293,14 @@ class TestProbeDataset:
 
     def test_ok_with_mocked_sample(self, monkeypatch):
         """A live sample item is parsed into the asset schema."""
-        monkeypatch.setattr(curate_mod, "_get_json", lambda url: _SAMPLE_ITEM)
+        monkeypatch.setattr(stac_cli, "get_json", lambda url: _SAMPLE_ITEM)
         result = probe_dataset(_info("stac"), "sentinel-2-l2a")
         assert result.status == "ok", "probe succeeded"
         assert result.assets["B04"]["common_name"] == "red", "band metadata parsed"
 
     def test_no_items_is_error(self, monkeypatch):
         """A collection that yields no sample item reports 'error'."""
-        monkeypatch.setattr(curate_mod, "_get_json", lambda url: {"features": []})
+        monkeypatch.setattr(stac_cli, "get_json", lambda url: {"features": []})
         result = probe_dataset(_info("stac"), "empty-collection")
         assert result.status == "error", "no sample -> error"
         assert "no sample item" in result.detail, "reason preserved"

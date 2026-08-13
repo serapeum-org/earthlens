@@ -23,7 +23,6 @@ from earthlens.cli.refresh import (
     _curated_collection_ids,
     _diff,
     _flatten,
-    _gee_classify,
     _replace_index_block,
     audit_one,
     coverage_one,
@@ -145,79 +144,8 @@ class TestOpenaqRefresher:
         assert "pm25" not in outcome.untracked, "curated live id is not untracked"
 
 
-class TestGeeRefresher:
-    """Tests for the GEE (EE STAC walk) lister."""
-
-    def test_fetches_ids_for_each_dataset_href(self, monkeypatch):
-        """gee refresh walks the tree then fetches each dataset doc's id."""
-        monkeypatch.setattr(
-            refresh_mod, "_gee_dataset_hrefs", lambda: ["h/a", "h/b", "h/c"]
-        )
-        monkeypatch.setattr(
-            refresh_mod, "_gee_fetch_id", lambda href: href.rsplit("/", 1)[1].upper()
-        )
-        outcome = refresh_one(_info("gee"))
-        assert outcome.status == "ok", "gee refresh ran"
-        assert outcome.live_count == 3, "A/B/C ids fetched"
-
-
-class TestGeeClassify:
-    """Tests for the gee curation-coverage classifier (network mocked)."""
-
-    def test_curated_id_is_done(self, monkeypatch):
-        """An already-curated asset is bucketed DONE without a fetch."""
-        monkeypatch.setattr(
-            refresh_mod, "_gee_stac_or_none", lambda aid: pytest.fail("no fetch")
-        )
-        assert _gee_classify("X/Y", {"X/Y"}) == "DONE"
-
-    def test_bands_with_metadata_are_addressable(self, monkeypatch):
-        """An image with a band carrying gee:units is addressable."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_gee_stac_or_none",
-            lambda aid: {"summaries": {"eo:bands": [{"name": "B1", "gee:units": "K"}]}},
-        )
-        assert _gee_classify("X/Y", set()) == "addressable"
-
-    def test_bare_bands_are_thin(self, monkeypatch):
-        """An image whose bands carry no usable metadata is thin."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_gee_stac_or_none",
-            lambda aid: {"summaries": {"eo:bands": [{"name": "B1"}]}},
-        )
-        assert _gee_classify("X/Y", set()) == "thin"
-
-    def test_feature_collection_is_table(self, monkeypatch):
-        """A FeatureCollection is bucketed table (out of raster scope)."""
-        monkeypatch.setattr(
-            refresh_mod, "_gee_stac_or_none", lambda aid: {"gee:type": "table"}
-        )
-        assert _gee_classify("X/Y", set()) == "table"
-
-    def test_no_doc_is_missing(self, monkeypatch):
-        """An asset with no STAC document is bucketed missing."""
-        monkeypatch.setattr(refresh_mod, "_gee_stac_or_none", lambda aid: None)
-        assert _gee_classify("X/Y", set()) == "missing"
-
-
 class TestCoverageOne:
     """Tests for coverage_one (the `audit --coverage` driver)."""
-
-    def test_gee_buckets_available_universe(self, monkeypatch):
-        """coverage_one classifies each available id and lists the addressable todo."""
-        monkeypatch.setitem(
-            refresh_mod._COVERAGE,
-            "gee",
-            lambda catalog: (
-                {"DONE": 1, "addressable": 1, "thin": 1, "table": 0, "missing": 0},
-                ["B"],
-            ),
-        )
-        outcome = coverage_one(_info("gee"))
-        assert outcome.status == "ok", "gee coverage ran"
-        assert outcome.counts["addressable"] == 1 and outcome.todo == ["B"]
 
     def test_ecmwf_reports_done_and_addressable_across_stores(self):
         """ecmwf coverage buckets the 3-store universe into DONE vs addressable."""
@@ -750,44 +678,6 @@ class TestRefreshOne:
         outcome = refresh_one(_info("stac"))
         assert outcome.status == "error", "failure captured, not raised"
         assert "connection refused" in outcome.detail, "reason preserved"
-
-
-class TestGeeDatasetHrefs:
-    """Tests for the EE STAC tree walk."""
-
-    def test_bfs_collects_dataset_hrefs(self, monkeypatch):
-        """The walk recurses sub-catalogs and collects dataset doc hrefs."""
-        tree = {
-            refresh_mod._GEE_STAC_ROOT: {
-                "links": [
-                    {"rel": "child", "href": "https://x/sub/catalog.json"},
-                    {"rel": "child", "href": "https://x/ds_a.json"},
-                    {"rel": "self", "href": "ignored"},
-                    {"rel": "child"},
-                ]
-            },
-            "https://x/sub/catalog.json": {
-                "links": [{"rel": "child", "href": "https://x/ds_b.json"}]
-            },
-        }
-
-        def fake_get(url):
-            if url == "https://x/unreachable":
-                raise RuntimeError("boom")
-            return tree[url]
-
-        monkeypatch.setattr(refresh_mod, "_get_json", fake_get)
-        hrefs = refresh_mod._gee_dataset_hrefs()
-        assert set(hrefs) == {"https://x/ds_a.json", "https://x/ds_b.json"}, hrefs
-
-    def test_unreachable_subcatalog_skipped(self, monkeypatch):
-        """An unreachable sub-catalog is skipped rather than raising."""
-
-        def fake_get(url):
-            raise RuntimeError("offline")
-
-        monkeypatch.setattr(refresh_mod, "_get_json", fake_get)
-        assert refresh_mod._gee_dataset_hrefs() == [], "all unreachable -> []"
 
 
 class TestBiodiversityRefreshers:

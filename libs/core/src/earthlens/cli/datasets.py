@@ -13,6 +13,7 @@ import json
 
 import typer
 
+from earthlens._cli_tooling import dispatch_table
 from earthlens.cli.adapter import BackendInfo, known_provider_keys, list_backends
 from earthlens.cli.curate import probe_dataset
 from earthlens.cli.query import (
@@ -847,10 +848,10 @@ def _curate_fill_empty(
     """
     if not write:
         raise typer.BadParameter("--fill-empty rewrites the catalog; pass --write")
-    if info.provider == "gee":
-        from earthlens.cli._gee_hydrate import bulk_hydrate_empty as gee_hydrate
-
-        summary = gee_hydrate(limit=limit)
+    # Discovered hydrator first; ecmwf's in-core hydrator is the migration remainder.
+    hydrate = dispatch_table("hydrator").get(info.provider)
+    if hydrate is not None:
+        summary = hydrate(limit=limit, timeout=timeout or None)
     elif info.provider == "ecmwf":
         from earthlens.cli._ecmwf_hydrate import bulk_hydrate_empty as ecmwf_hydrate
 

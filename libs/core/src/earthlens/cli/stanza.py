@@ -26,7 +26,6 @@ from typing import Any, cast
 import yaml
 
 from earthlens._cli_tooling import config_table, dispatch_table
-from earthlens.cli._gee_categories import categorise_asset
 from earthlens.cli.adapter import BackendInfo, load_catalog
 from earthlens.cli.refresh import _get_json
 
@@ -115,131 +114,6 @@ class StanzaResult:
 # --------------------------------------------------------------------------- #
 # usgs_water — a pure friendly-name -> parameter-code row (no fetch).
 # --------------------------------------------------------------------------- #
-
-
-# --------------------------------------------------------------------------- #
-# gee — seed from the public Earth Engine STAC document.
-# --------------------------------------------------------------------------- #
-_GEE_STAC_BASE = "https://storage.googleapis.com/earthengine-stac/catalog"
-_GEE_GLOBAL_BBOX = [-180.0, -90.0, 180.0, 90.0]
-
-
-def _gee_stac_doc(asset_id: str) -> dict[str, Any]:
-    """Return an Earth Engine asset's public STAC document."""
-    provider = asset_id.split("/", 1)[0]
-    filename = asset_id.replace("/", "_") + ".json"
-    return _get_json(f"{_GEE_STAC_BASE}/{provider}/{filename}")
-
-
-def _gee_live_bands(asset_id: str) -> tuple[str, dict[str, dict[str, Any]]]:
-    """Query Earth Engine live for an asset's `(ee_type, bands)` (needs creds).
-
-    The credentialed fallback for assets the public STAC tree can't reach
-    (mainly community `projects/...` ids). Authenticates the service
-    account (`GEE_SERVICE_ACCOUNT` / `GEE_SERVICE_KEY`) and reads the band
-    names off the asset's first image.
-
-    Args:
-        asset_id: The Earth Engine asset id.
-
-    Returns:
-        `(ee_type, {band: {}})` — the asset type (lowercased) and its bands.
-    """
-    import os
-
-    import ee
-
-    from earthlens.gee.auth import EarthEngineAuth
-
-    EarthEngineAuth.initialize(
-        os.environ.get("GEE_SERVICE_ACCOUNT", ""),
-        os.environ.get("GEE_SERVICE_KEY", ""),
-        os.environ.get("GEE_PROJECT"),
-    )
-    ee_type = (ee.data.getAsset(asset_id).get("type") or "IMAGE_COLLECTION").lower()
-    image = (
-        ee.Image(asset_id)
-        if ee_type == "image"
-        else ee.ImageCollection(asset_id).first()
-    )
-    bands = ee.Image(image).bandNames().getInfo() or []
-    return ee_type, {str(band): {} for band in bands}
-
-
-def _gsd_to_metres(gsd: Any) -> float | None:
-    """Return a band `gsd` as a float (unwrapping a `[value]` list)."""
-    value = gsd[0] if isinstance(gsd, list) and gsd else gsd
-    return float(value) if isinstance(value, (int, float)) else None
-
-
-def _emit_gee(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
-    """Seed a GEE `datasets:` row from the asset's public STAC document.
-
-    Args:
-        catalog: The loaded GEE `Catalog` (unused; STAC is the source).
-        upstream_id: The Earth Engine asset id (e.g. `NASA/GDDP-CMIP6`).
-        **opts: `minimal` emits a placeholder row with empty bands;
-            `hydrate` reads the bands live from Earth Engine (needs creds —
-            the fallback for assets the public STAC tree can't reach).
-
-    Returns:
-        The seeded row (title / ee_type / cadence / extent / bands).
-    """
-    if opts.get("minimal"):
-        return {
-            "title": upstream_id,
-            "ee_type": "image_collection",
-            "default_reducer": "median",
-            "bands": {},
-        }
-    if opts.get("hydrate"):
-        ee_type, live_bands = _gee_live_bands(upstream_id)
-        return {
-            "title": upstream_id,
-            "ee_type": ee_type,
-            "default_reducer": "median",
-            "bands": live_bands,
-        }
-    doc = _gee_stac_doc(upstream_id)
-    extent = doc.get("extent", {})
-    temporal = (extent.get("temporal", {}).get("interval") or [[None, None]])[0]
-    spatial_bbox = (extent.get("spatial", {}).get("bbox") or [None])[0]
-    bands = doc.get("summaries", {}).get("eo:bands") or []
-    resolutions = [r for r in (_gsd_to_metres(b.get("gsd")) for b in bands) if r]
-    providers = doc.get("providers") or []
-    interval = doc.get("gee:interval") or {}
-
-    row: dict[str, Any] = {
-        "title": (doc.get("title") or upstream_id).splitlines()[0],
-        "ee_type": doc.get("gee:type", "image_collection"),
-    }
-    if providers:
-        row["provider"] = providers[0].get("name", "") or ""
-    if interval.get("interval") and interval.get("unit"):
-        row["cadence"] = {"interval": interval["interval"], "unit": interval["unit"]}
-    if resolutions:
-        row["spatial_resolution"] = min(resolutions)
-    start = (temporal[0] or "")[:10] if temporal and temporal[0] else "1970-01-01"
-    row["extent"] = {"start_date": start, "end_date": None}
-    if spatial_bbox and list(spatial_bbox) != _GEE_GLOBAL_BBOX:
-        row["extent"]["bbox"] = list(spatial_bbox)
-    row["default_reducer"] = "median"
-    row["bands"] = {
-        band["name"]: {
-            "description": (
-                band.get("description") or band.get("name", "")
-            ).splitlines()[0],
-            **({"units": band["gee:units"]} if band.get("gee:units") else {}),
-            **(
-                {"scale": band["gee:scale"]}
-                if band.get("gee:scale") is not None
-                else {}
-            ),
-        }
-        for band in bands
-        if band.get("name")
-    }
-    return row
 
 
 #: Provider id -> a callable taking the loaded catalog, the upstream id, and
@@ -382,7 +256,6 @@ _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("emitter"),
     "ecmwf": _emit_ecmwf,
-    "gee": _emit_gee,
 }
 
 
@@ -530,14 +403,18 @@ def write_stanza(info: BackendInfo, result: StanzaResult, target: str | None) ->
     base = importlib.import_module(f"{info.module}.catalog").CATALOG_PATH
     block = _STANZA_BLOCK.get(info.provider, "datasets")
     if base.is_dir():
-        if not target and info.provider == "gee":
-            target = categorise_asset(
-                result.upstream_id, str(result.row.get("title", ""))
-            )
-        if not target and info.provider == "ecmwf":
-            from earthlens.cli._ecmwf_categories import categorise_dataset
+        if not target:
+            # Discovered categoriser (asset_id, title -> per-family stem) first;
+            # ecmwf's in-core categoriser is the migration remainder.
+            categoriser = dispatch_table("categoriser").get(info.provider)
+            if categoriser is not None:
+                target = categoriser(
+                    result.upstream_id, str(result.row.get("title", ""))
+                )
+            elif info.provider == "ecmwf":
+                from earthlens.cli._ecmwf_categories import categorise_dataset
 
-            target = categorise_dataset(result.upstream_id)
+                target = categorise_dataset(result.upstream_id)
         if not target:
             raise ValueError(
                 f"{info.provider} has a sharded catalog; pass --target <file-stem> "
