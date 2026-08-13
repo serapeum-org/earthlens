@@ -19,7 +19,6 @@ Requires pytest, which is why it is behind the `test` extra
 from __future__ import annotations
 
 import re
-import socket
 import urllib.error
 from collections.abc import Generator, Iterator
 
@@ -108,16 +107,10 @@ try:  # requests is a core dependency; the guard only keeps a bare import workin
         _requests.exceptions.Timeout,
         ConnectionError,
         TimeoutError,
-        socket.timeout,
         urllib.error.URLError,
     )
 except ImportError:  # pragma: no cover - requests is always present under test
-    _NETWORK_EXC = (
-        ConnectionError,
-        TimeoutError,
-        socket.timeout,
-        urllib.error.URLError,
-    )
+    _NETWORK_EXC = (ConnectionError, TimeoutError, urllib.error.URLError)
 
 
 def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
