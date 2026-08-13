@@ -1275,9 +1275,16 @@ class TestCliIsBackendAgnostic:
     PENDING_IMPORTS: frozenset[str] = frozenset()
 
     def _cli_sources(self):
-        """Yield every core CLI source file, skipping build artefacts."""
-        cli = Path(__file__).resolve().parents[1] / "src" / "earthlens" / "cli"
-        for path in sorted(cli.rglob("*.py")):
+        """Yield every core CLI source file, skipping build artefacts.
+
+        Covers the `cli/` package plus `earthlens/_cli_tooling.py` — the
+        discovery mechanism sits one level above `cli/` but is exactly the
+        module that defines provider dispatch, so a hard-coded fallback added
+        there must be caught too.
+        """
+        src = Path(__file__).resolve().parents[1] / "src" / "earthlens"
+        paths = [*sorted((src / "cli").rglob("*.py")), src / "_cli_tooling.py"]
+        for path in paths:
             if "build" not in path.parts:
                 yield path
 
