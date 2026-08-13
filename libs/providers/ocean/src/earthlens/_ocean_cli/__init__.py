@@ -17,6 +17,10 @@ __all__ = ["CLI_TOOLING"]
 #: a literal value.
 CLI_TOOLING: dict[str, dict[str, str]] = {
     "argo": {"validator": "earthlens.argo.cli:validator"},
+    "caravan": {
+        "refresher": "earthlens.caravan.cli:refresher",
+        "validator": "earthlens.caravan.cli:validator",
+    },
     "nwm": {
         "refresher": "earthlens.nwm.cli:refresher",
         "curated_ids": "earthlens.nwm.cli:curated_ids",

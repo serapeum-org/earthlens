@@ -1272,7 +1272,6 @@ class TestCliIsBackendAgnostic:
         {
             "asf",
             "bathymetry",
-            "caravan",
             "catrare",
             "chc",
             "cmems",
@@ -1313,7 +1312,6 @@ class TestCliIsBackendAgnostic:
     #: also shrinking to empty.
     PENDING_IMPORTS = frozenset(
         {
-            "caravan",
             "ecmwf",
             "gee",
             "ghsl",
