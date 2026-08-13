@@ -11,13 +11,11 @@ from earthlens.cli.adapter import list_backends
 from earthlens.cli.validate import (
     ValidateResult,
     _live_ecmwf,
-    _validate_bathymetry,
     _validate_drought,
     _validate_goes,
     _validate_nrel,
     _validate_nwp,
     _validate_radar,
-    _validate_soilgrids,
     _validate_tropycal,
     supported_providers,
     validate_one,
@@ -92,51 +90,6 @@ class TestBundledCatalogsLintClean:
         assert result.checked > 0, f"{provider} checked nothing"
 
 
-class TestValidateSoilgrids:
-    """Tests for the soilgrids structural lint."""
-
-    def test_flags_non_isric_endpoint_and_missing_mean(self):
-        """A row with a non-ISRIC endpoint and no mean quantile is flagged."""
-        catalog = SimpleNamespace(
-            datasets={
-                "clay": SimpleNamespace(
-                    endpoint="https://example.com/wcs",
-                    depths=["0-5cm"],
-                    quantiles=["Q0.5"],
-                )
-            }
-        )
-        checked, issues = _validate_soilgrids(catalog)
-        assert checked == 1
-        assert any("endpoint host is not" in i for i in issues)
-        assert any("mean" in i for i in issues)
-
-    def test_flags_spoofed_isric_host(self):
-        """A look-alike host (maps.isric.org.evil.com) is rejected, not accepted."""
-        catalog = SimpleNamespace(
-            datasets={
-                "clay": SimpleNamespace(
-                    endpoint="https://maps.isric.org.evil.com/wcs",
-                    depths=["0-5cm"],
-                    quantiles=["mean"],
-                )
-            }
-        )
-        checked, issues = _validate_soilgrids(catalog)
-        assert any("endpoint host is not" in i for i in issues)
-
-    def test_flags_missing_endpoint_and_depths(self):
-        """A row missing its endpoint and depths is flagged for each."""
-        catalog = SimpleNamespace(
-            datasets={
-                "bad": SimpleNamespace(endpoint="", depths=[], quantiles=["mean"])
-            }
-        )
-        checked, issues = _validate_soilgrids(catalog)
-        assert any("missing endpoint" in i for i in issues)
-        assert any("missing depths" in i for i in issues)
-
-
 class TestValidateDrought:
     """Tests for the drought structural lint."""
 
@@ -209,34 +162,6 @@ class TestValidateDrought:
         )
         _checked, issues = _validate_drought(catalog)
         assert any("must be output_kind=vector" in i for i in issues)
-
-
-class TestValidateBathymetry:
-    """Tests for the bathymetry structural lint."""
-
-    def test_flags_missing_endpoint_and_band(self):
-        """A row missing its endpoint and band is flagged for each."""
-        catalog = SimpleNamespace(
-            available_datasets=["bad"],
-            datasets={"bad": SimpleNamespace(endpoint="", dataset_id="X", variable="")},
-        )
-        checked, issues = _validate_bathymetry(catalog)
-        assert checked == 1
-        assert any("missing endpoint" in i for i in issues)
-        assert any("missing variable" in i for i in issues)
-
-    def test_flags_id_absent_from_index(self):
-        """A curated id missing from the available_datasets index is flagged."""
-        catalog = SimpleNamespace(
-            available_datasets=["other"],
-            datasets={
-                "row": SimpleNamespace(
-                    endpoint="https://x/erddap", dataset_id="X", variable="z"
-                )
-            },
-        )
-        _checked, issues = _validate_bathymetry(catalog)
-        assert any("available_datasets" in i for i in issues)
 
 
 class TestValidateNrel:

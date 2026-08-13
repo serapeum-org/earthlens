@@ -16,6 +16,10 @@ __all__ = ["CLI_TOOLING"]
 #: string core imports lazily on dispatch; a config role (`stanza_block`)
 #: carries a literal value.
 CLI_TOOLING: dict[str, dict[str, str]] = {
+    "bathymetry": {"validator": "earthlens.bathymetry.cli:validator"},
+    "fabdem": {"validator": "earthlens.fabdem.cli:validator"},
+    "glaciers": {"validator": "earthlens.glaciers.cli:validator"},
+    "soilgrids": {"validator": "earthlens.soilgrids.cli:validator"},
     "gbif": {
         "refresher": "earthlens.gbif.cli:refresher",
         "curated_ids": "earthlens.gbif.cli:curated_ids",

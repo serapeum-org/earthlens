@@ -18,7 +18,6 @@ import datetime as dt
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
-from urllib.parse import urlsplit
 
 import requests
 
@@ -462,28 +461,6 @@ def _validate_jaxa(catalog: Any) -> tuple[int, list[str]]:
     return len(catalog.datasets), issues
 
 
-def _validate_bathymetry(catalog: Any) -> tuple[int, list[str]]:
-    """Each bathymetry DEM row needs an endpoint, coverage id, and band.
-
-    The `Dataset` model already enforces those required fields, so a clean
-    load reaches this validator well-formed; the lint additionally flags any
-    curated id missing from the bundled `available_datasets:` index (the
-    `_index.yaml`), which a hand-edit could desync.
-    """
-    available = set(catalog.available_datasets or ())
-    issues: list[str] = []
-    for key, row in catalog.datasets.items():
-        issues.extend(_require(key, row, ("endpoint", "dataset_id", "variable")))
-        if available and key not in available:
-            issues.append(f"{key}: id not in the bundled `available_datasets:` index")
-    return len(catalog.datasets), issues
-
-
-def _validate_fabdem(catalog: Any) -> tuple[int, list[str]]:
-    """Each FABDEM row needs a band and a data version (for the tile URLs)."""
-    return _lint(catalog, lambda k, r: _require(k, r, ("band", "version")))
-
-
 def _validate_pvgis(catalog: Any) -> tuple[int, list[str]]:
     """Each PVGIS product needs a tool, an endpoint, and non-empty columns."""
     return _lint(catalog, lambda k, r: _require(k, r, ("tool", "endpoint", "columns")))
@@ -494,61 +471,6 @@ def _validate_nrel(catalog: Any) -> tuple[int, list[str]]:
     return _lint(
         catalog, lambda k, r: _require(k, r, ("source", "endpoint", "columns"))
     )
-
-
-def _glaciers_row_issues(key: str, record: Any) -> list[str]:
-    """Lint one glaciers row: common fields + per-source request detail.
-
-    Args:
-        key: The dataset id.
-        record: The `earthlens.glaciers.Dataset` row.
-
-    Returns:
-        One issue string per missing field — the common `source` /
-        `output_kind` / `long_name` / `citation`, plus `table` / `archive_url`
-        for a `wgms` row and `wfs_url` / `wfs_typename` for a `glims` row.
-    """
-    issues = _require(key, record, ("source", "output_kind", "long_name", "citation"))
-    source = getattr(record, "source", None)
-    if source == "wgms":
-        issues += _require(key, record, ("table", "archive_url"))
-    elif source == "glims":
-        issues += _require(key, record, ("wfs_url", "wfs_typename"))
-    return issues
-
-
-def _validate_glaciers(catalog: Any) -> tuple[int, list[str]]:
-    """Each glaciers row needs a source + output kind + the per-source detail."""
-    return _lint(catalog, _glaciers_row_issues)
-
-
-def _soilgrids_row_issues(key: str, record: Any) -> list[str]:
-    """Lint one soilgrids property: WCS endpoint, depths, quantiles + `mean`.
-
-    Args:
-        key: The property id.
-        record: The `earthlens.soilgrids.Property` row.
-
-    Returns:
-        One issue string per problem — a missing `endpoint` / `depths` /
-        `quantiles`, an endpoint that is not an ISRIC WCS URL, or a
-        `quantiles` list that omits the default `mean` layer.
-    """
-    issues = _require(key, record, ("endpoint", "depths", "quantiles"))
-    endpoint = getattr(record, "endpoint", "") or ""
-    # Compare the parsed host exactly, not a substring — a substring check would
-    # accept a spoofed host like `maps.isric.org.example.com`.
-    if endpoint and urlsplit(endpoint).hostname != "maps.isric.org":
-        issues.append(f"{key}: endpoint host is not maps.isric.org")
-    quantiles = getattr(record, "quantiles", None) or []
-    if quantiles and "mean" not in quantiles:
-        issues.append(f"{key}: quantiles missing the default 'mean' layer")
-    return issues
-
-
-def _validate_soilgrids(catalog: Any) -> tuple[int, list[str]]:
-    """Each soilgrids property needs a WCS endpoint, depths, and quantiles."""
-    return _lint(catalog, _soilgrids_row_issues)
 
 
 def _validate_mswep(catalog: Any) -> tuple[int, list[str]]:
@@ -603,12 +525,8 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "sentinel_hub": _validate_sentinel_hub,
     "worldpop": _validate_worldpop,
     "jaxa": _validate_jaxa,
-    "bathymetry": _validate_bathymetry,
-    "fabdem": _validate_fabdem,
     "pvgis": _validate_pvgis,
     "nrel": _validate_nrel,
-    "glaciers": _validate_glaciers,
-    "soilgrids": _validate_soilgrids,
 }
 
 
