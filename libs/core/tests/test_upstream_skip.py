@@ -170,6 +170,7 @@ def _run_guard_lane(tmp_path: Path, body: str) -> subprocess.CompletedProcess[st
     )
 
 
+@pytest.mark.slow
 def test_guard_fails_a_wholly_masked_lane(tmp_path: Path) -> None:
     """A lane whose only e2e tests all availability-skip fails, not passes green."""
     result = _run_guard_lane(
@@ -190,6 +191,7 @@ def test_guard_fails_a_wholly_masked_lane(tmp_path: Path) -> None:
     assert "wholly masked" in result.stdout
 
 
+@pytest.mark.slow
 def test_guard_allows_a_lane_with_a_pass(tmp_path: Path) -> None:
     """A lane with at least one passing e2e test stays green despite a skip."""
     result = _run_guard_lane(
@@ -209,6 +211,7 @@ def test_guard_allows_a_lane_with_a_pass(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout
 
 
+@pytest.mark.slow
 def test_guard_allows_a_credential_skipped_lane(tmp_path: Path) -> None:
     """A lane all-skipped for missing creds (no availability skip) stays green."""
     result = _run_guard_lane(
@@ -230,6 +233,7 @@ def test_guard_allows_a_credential_skipped_lane(tmp_path: Path) -> None:
     assert "masked" not in result.stdout
 
 
+@pytest.mark.slow
 def test_guard_fails_a_lane_mixing_creds_skip_and_availability_skip(
     tmp_path: Path,
 ) -> None:
