@@ -40,6 +40,9 @@ Public surface (re-exported from this package):
 * `download_extract` / `read_pbf` / `geofabrik_url` / `GEOFABRIK_BASE_URL` —
   the `pbf` fetch-and-cache + layer-read helpers (`G13` / `G14`).
 * `LicenseWarning` — the ODbL share-alike warning (`G5`).
+* `OhsomeUnavailableError` / `ohsome_http_status` — the typed public-endpoint
+  throttle/block error the ohsome path raises on a `403` / `429`, and the
+  helper that recovers the HTTP status from the SDK's opaque failure.
 * `CATALOG_PATH` — path to the bundled named-query YAML; monkey-patchable in
   tests.
 
@@ -59,9 +62,11 @@ from __future__ import annotations
 
 from earthlens.osm._helpers import (
     LicenseWarning,
+    OhsomeUnavailableError,
     bbox_swne,
     bbox_wsen,
     empty_fc,
+    ohsome_http_status,
     overpy_to_gdf,
     shapely_bbox,
     to_fc,
@@ -82,11 +87,13 @@ __all__ = [
     "Dataset",
     "LicenseWarning",
     "OSM",
+    "OhsomeUnavailableError",
     "bbox_swne",
     "bbox_wsen",
     "download_extract",
     "empty_fc",
     "geofabrik_url",
+    "ohsome_http_status",
     "overpy_to_gdf",
     "read_pbf",
     "shapely_bbox",

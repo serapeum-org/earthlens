@@ -16,6 +16,12 @@ Three concerns are factored here so `osm/backend.py` only routes:
   `FeatureCollection` (`G7`), normalising the CRS to EPSG:4326. The ohsome
   path's `.as_dataframe()` is already a `GeoDataFrame`, so it goes straight to
   `to_fc`.
+* `OhsomeUnavailableError` / `ohsome_http_status` — turn the `ohsome` SDK's
+  opaque failure on a throttled/blocked public endpoint into a clear, typed,
+  actionable error. The SDK does not surface a clean status on a non-JSON error
+  body (the HTML `403` an overloaded `api.ohsome.org` front proxy returns makes
+  it leak a bare `requests.exceptions.JSONDecodeError`), so the status is dug
+  out of the exception chain here.
 
 All GIS containerisation stays inside the pyramids `FeatureCollection` per the
 repository's pyramids policy; earthlens only assembles the plain attribute rows
@@ -47,6 +53,72 @@ OSM_CRS = "EPSG:4326"
 #: The minimal identity columns every overpy-built row carries, ahead of the
 #: element's own tags.
 _ID_COLUMNS = ["osm_id", "osm_type"]
+
+
+class OhsomeUnavailableError(RuntimeError):
+    """The public ohsome endpoint refused a request with a retry-worthy status.
+
+    Raised by the OSM backend when `api.ohsome.org` answers a `403` (its front
+    proxy blocking / throttling this client — the endpoint is public and
+    keyless, so it is never a credential problem) or a `429` that outlived the
+    SDK's automatic retries. Carries the HTTP `status_code` so a caller (or the
+    live e2e test) can tell a transient public-endpoint throttle apart from a
+    genuine request error and back off rather than fail hard.
+    """
+
+    def __init__(self, message: str, status_code: int | None = None) -> None:
+        """Store the actionable message and the originating HTTP status.
+
+        Args:
+            message: Human-facing explanation — what happened and what to do.
+            status_code: The HTTP status that triggered it (`403` / `429`), or
+                `None` when it could not be recovered from the SDK error.
+        """
+        super().__init__(message)
+        self.status_code = status_code
+
+
+def ohsome_http_status(exc: BaseException) -> int | None:
+    """Best-effort HTTP status behind an `ohsome` SDK failure.
+
+    The SDK does not surface a clean status on every error: an `OhsomeException`
+    carries `error_code`, but a non-JSON error body — such as the HTML `403` an
+    overloaded `api.ohsome.org` front proxy returns — makes it leak a bare
+    `requests.exceptions.JSONDecodeError` whose originating `requests.HTTPError`
+    (and its `403` status) is only reachable through the exception chain. This
+    walks `exc` and its `__cause__` / `__context__` predecessors and returns
+    the first HTTP status it finds.
+
+    Args:
+        exc: The exception raised by an `ohsome` SDK call.
+
+    Returns:
+        int | None: The HTTP status code, or `None` when none is discoverable.
+
+    Examples:
+        - An `OhsomeException`-like error exposes its `error_code` directly:
+            ```python
+            >>> from earthlens.osm import ohsome_http_status
+            >>> class _Err(Exception):
+            ...     error_code = 429
+            >>> ohsome_http_status(_Err())
+            429
+
+            ```
+    """
+    seen: set[int] = set()
+    current: BaseException | None = exc
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        error_code = getattr(current, "error_code", None)
+        if isinstance(error_code, int):
+            return error_code
+        response = getattr(current, "response", None)
+        status = getattr(response, "status_code", None)
+        if isinstance(status, int):
+            return status
+        current = current.__cause__ or current.__context__
+    return None
 
 
 def bbox_swne(space: SpatialExtent) -> tuple[float, float, float, float]:

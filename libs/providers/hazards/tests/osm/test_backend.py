@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import types
 from pathlib import Path
 
 import pytest
@@ -181,6 +182,85 @@ class TestOhsomeRoute:
         ).download()
         assert "index" not in fc.columns
         assert len(fc) == 1
+
+    def test_request_targets_elements_geometry_endpoint(self, osm_kwargs, fake_ohsome):
+        """The request goes through the root client's post(endpoint=...) form."""
+        OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        ).download()
+        assert fake_ohsome.post_kwargs["endpoint"] == "elements/geometry"
+
+    def test_retry_and_user_agent_policy_applied(self, osm_kwargs, fake_ohsome):
+        """The client carries our UA, log=False, and a 429/5xx (not 403) retry."""
+        from earthlens.osm.backend import USER_AGENT
+
+        OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        ).download()
+        client_kwargs = fake_ohsome.client_kwargs
+        assert client_kwargs["user_agent"] == USER_AGENT
+        assert client_kwargs["log"] is False
+        retry = client_kwargs["retry"]
+        assert retry.total == 5
+        assert 429 in retry.status_forcelist
+        assert 403 not in retry.status_forcelist
+
+    def test_forbidden_becomes_unavailable_error(self, osm_kwargs, fake_ohsome):
+        """A 403 (leaked through the SDK's chain) surfaces as a typed skip signal."""
+        import requests
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        # Mirror the real leak: the SDK's HTML-403 handling raises a bare
+        # JSONDecodeError whose originating HTTPError (status 403) is only in
+        # the __context__ chain.
+        http_error = requests.HTTPError("403 Forbidden")
+        http_error.response = types.SimpleNamespace(status_code=403)
+        leaked = ValueError("Expecting value: line 1 column 1 (char 0)")
+        leaked.__context__ = http_error
+        fake_ohsome.error = leaked
+
+        with pytest.raises(OhsomeUnavailableError) as excinfo:
+            OSM(
+                **{
+                    **osm_kwargs(),
+                    "variables": ["ohsome:buildings"],
+                    "start": "2020-01-01",
+                }
+            ).download()
+        assert excinfo.value.status_code == 403
+        assert "public" in str(excinfo.value)
+        assert excinfo.value.__cause__ is leaked
+
+    def test_rate_limited_becomes_unavailable_error(self, osm_kwargs, fake_ohsome):
+        """A 429 outliving the retries surfaces as a typed skip signal."""
+        from earthlens.osm import OhsomeUnavailableError
+
+        ohsome_error = RuntimeError("Too Many Requests")
+        ohsome_error.error_code = 429
+        fake_ohsome.error = ohsome_error
+
+        with pytest.raises(OhsomeUnavailableError) as excinfo:
+            OSM(
+                **{
+                    **osm_kwargs(),
+                    "variables": ["ohsome:buildings"],
+                    "start": "2020-01-01",
+                }
+            ).download()
+        assert excinfo.value.status_code == 429
+
+    def test_non_throttle_error_propagates_unchanged(self, osm_kwargs, fake_ohsome):
+        """An error with no throttle status propagates as-is (not masked)."""
+        fake_ohsome.error = RuntimeError("some genuine bug")
+        with pytest.raises(RuntimeError, match="some genuine bug"):
+            OSM(
+                **{
+                    **osm_kwargs(),
+                    "variables": ["ohsome:buildings"],
+                    "start": "2020-01-01",
+                }
+            ).download()
 
 
 class TestDownloadContract:

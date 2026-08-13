@@ -52,7 +52,12 @@ emdat = ["earthaccess >=0.17.0"]
 fdsn = ["obspy >=1.5.0"]
 hdx = ["hdx-python-api >=6,<7"]
 overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
-osm = ["overpy >=0.7", "ohsome >=0.4.0"]
+# `urllib3` is imported directly by the ohsome path (backend.py builds a
+# `urllib3.util.retry.Retry` to give the SDK's transport a repo-standard
+# 429/5xx retry policy), so it is a declared direct dependency here — never
+# relied on transitively — per the repository's hard dependency rule. `>=1.26`
+# for the `allowed_methods` Retry argument (it replaced `method_whitelist`).
+osm = ["overpy >=0.7", "ohsome >=0.4.0", "urllib3 >=1.26"]
 osm-pbf = ["pyrosm >=0.11.0", "osmium >=4.3.1"]
 
 # This distribution's slice of the facade's data-source table.
