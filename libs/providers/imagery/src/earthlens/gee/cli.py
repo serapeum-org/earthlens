@@ -32,6 +32,10 @@ _GEE_STAC_DOC_BASE = "https://storage.googleapis.com/earthengine-stac/catalog"
 #: The whole-globe bbox a per-asset extent is dropped as redundant against.
 _GEE_GLOBAL_BBOX = [-180.0, -90.0, 180.0, 90.0]
 
+#: STAC `eo:bands` metadata keys the emitter / classifier read repeatedly.
+_GEE_UNITS_KEY = "gee:units"
+_GEE_SCALE_KEY = "gee:scale"
+
 #: Persist a live fetch back into the bundled `available_datasets` index.
 writer = index_writer("available_datasets")
 
@@ -114,7 +118,7 @@ def prober(_catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
             continue
         gsd = band.get("gsd")
         schema[str(name)] = {
-            "units": band.get("gee:units"),
+            "units": band.get(_GEE_UNITS_KEY),
             "gsd": gsd[0] if isinstance(gsd, list) and gsd else gsd,
             "description": (band.get("description") or "").strip()[:60],
         }
@@ -224,10 +228,10 @@ def emitter(_catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
             "description": (
                 band.get("description") or band.get("name", "")
             ).splitlines()[0],
-            **({"units": band["gee:units"]} if band.get("gee:units") else {}),
+            **({"units": band[_GEE_UNITS_KEY]} if band.get(_GEE_UNITS_KEY) else {}),
             **(
-                {"scale": band["gee:scale"]}
-                if band.get("gee:scale") is not None
+                {"scale": band[_GEE_SCALE_KEY]}
+                if band.get(_GEE_SCALE_KEY) is not None
                 else {}
             ),
         }
@@ -275,7 +279,7 @@ def _gee_classify(asset_id: str, curated: set[str]) -> str:
     if doc.get("gee:type") == "table":
         return "table"
     bands = (doc.get("summaries", {}) or {}).get("eo:bands") or []
-    has_meta = any(b.get("gee:units") or b.get("gee:scale") is not None for b in bands)
+    has_meta = any(b.get(_GEE_UNITS_KEY) or b.get(_GEE_SCALE_KEY) is not None for b in bands)
     return "addressable" if (bands and has_meta) else "thin"
 
 
