@@ -181,44 +181,6 @@ class TestEcmwfRequestKind:
         assert stanza_mod._ecmwf_request_kind(form, "cems-glofas-forecast") == "form"
 
 
-class TestEarthdataEmitter:
-    """Tests for the Earthdata emitter (public CMR)."""
-
-    def test_infers_format_and_output_kind(self, monkeypatch):
-        """The CMR collection seeds format + output_kind."""
-        monkeypatch.setattr(
-            stanza_mod,
-            "_get_json",
-            lambda url, **kw: {
-                "items": [
-                    {
-                        "umm": {
-                            "EntryTitle": "GPM IMERG",
-                            "ArchiveAndDistributionInformation": "x.nc4",
-                        }
-                    }
-                ]
-            },
-        )
-        result = emit_stanza(
-            _info("earthdata"),
-            "GPM_3IMERGHH",
-            key="imerg",
-            version="07",
-            cmr_provider="GES_DISC",
-        )
-        assert result.status == "ok", "earthdata emitter ran"
-        assert result.row["format"] == "netcdf4", "extension mapped"
-        assert result.row["output_kind"] == "raster", "gridded -> raster"
-        assert result.row["daac"] == "GES_DISC", "daac defaults to provider"
-
-    def test_vector_hint_overrides_output_kind(self, monkeypatch):
-        """A GEDI short name seeds a vector output_kind."""
-        monkeypatch.setattr(stanza_mod, "_get_json", lambda url, **kw: {"items": []})
-        result = emit_stanza(_info("earthdata"), "GEDI04_A", cmr_provider="ORNL_DAAC")
-        assert result.row["output_kind"] == "vector", "GEDI -> vector"
-
-
 class TestGeeEmitter:
     """Tests for the GEE emitter (public EE STAC)."""
 
@@ -396,34 +358,6 @@ class TestStanzaResult:
     def test_to_yaml_empty_when_no_row(self):
         """An unsupported/error result renders no YAML."""
         assert StanzaResult("chc", "x", "x", "unsupported").to_yaml() == ""
-
-
-class TestInferOutputKind:
-    """Tests for the Earthdata output-kind heuristic."""
-
-    def test_geojson_format_is_vector(self):
-        """A geojson format maps to a vector output kind."""
-        from earthlens.cli.stanza import _infer_output_kind
-
-        assert _infer_output_kind("X", "geojson") == "vector", "geojson -> vector"
-
-    def test_csv_format_is_tabular(self):
-        """A csv format maps to a tabular output kind."""
-        from earthlens.cli.stanza import _infer_output_kind
-
-        assert _infer_output_kind("X", "csv") == "tabular", "csv -> tabular"
-
-    def test_vector_short_name_hint(self):
-        """A GEDI short name maps to vector even with no format hint."""
-        from earthlens.cli.stanza import _infer_output_kind
-
-        assert _infer_output_kind("GEDI02_A") == "vector", "GEDI -> vector"
-
-    def test_default_is_raster(self):
-        """An unhinted gridded product defaults to raster."""
-        from earthlens.cli.stanza import _infer_output_kind
-
-        assert _infer_output_kind("MOD11A1", "cog") == "raster", "default raster"
 
 
 class TestGeeLiveBands:

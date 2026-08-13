@@ -119,20 +119,6 @@ class TestEcmwfRefresher:
         assert outcome.live_count == 1, "one CDS dataset id listed"
 
 
-class TestEarthdataRefresher:
-    """Tests for the earthdata (CMR) lister."""
-
-    def test_walks_providers_and_paginates(self, monkeypatch):
-        """Each provider's CMR pages are gathered into the short-name set."""
-        pages = {None: (["A", "B"], "cursor"), "cursor": (["C"], None)}
-        monkeypatch.setattr(
-            refresh_mod, "_cmr_page", lambda provider, after: pages[after]
-        )
-        outcome = refresh_one(_info("earthdata"))
-        assert outcome.status == "ok", "earthdata refresh ran"
-        assert outcome.live_count == 3, "A/B/C gathered across two pages"
-
-
 class TestOpenaqRefresher:
     """Tests for the OpenAQ lister."""
 
@@ -815,26 +801,6 @@ class TestGeeDatasetHrefs:
 
         monkeypatch.setattr(refresh_mod, "_get_json", fake_get)
         assert refresh_mod._gee_dataset_hrefs() == [], "all unreachable -> []"
-
-
-class TestCmrPage:
-    """Tests for the Earthdata CMR pagination helper."""
-
-    def test_reads_short_names_and_cursor(self, monkeypatch):
-        """A CMR page yields its ShortNames and the next search-after cursor."""
-        import types
-
-        def fake_get(url, params=None, headers=None, timeout=None):
-            return types.SimpleNamespace(
-                json=lambda: {"items": [{"umm": {"ShortName": "GPM"}}, {"umm": {}}]},
-                headers={"CMR-Search-After": "cursor2"},
-                raise_for_status=lambda: None,
-            )
-
-        monkeypatch.setattr(refresh_mod.requests, "get", fake_get)
-        names, cursor = refresh_mod._cmr_page("GES_DISC", None)
-        assert names == ["GPM"], "only items with a ShortName are kept"
-        assert cursor == "cursor2", "next cursor carried"
 
 
 class TestBiodiversityRefreshers:

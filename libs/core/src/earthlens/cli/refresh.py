@@ -318,64 +318,6 @@ def _ecmwf_grouped(catalog: Any) -> dict[str, list[str]]:
     return grouped
 
 
-#: NASA CMR collection search (public, anonymous; UMM-JSON).
-_CMR_COLLECTIONS_URL = "https://cmr.earthdata.nasa.gov/search/collections.umm_json"
-
-
-def _cmr_page(provider: str, search_after: str | None) -> tuple[list[str], str | None]:
-    """Fetch one CMR collections page for `provider`.
-
-    Args:
-        provider: A CMR provider code (e.g. `"GES_DISC"`).
-        search_after: The `CMR-Search-After` cursor from the previous page,
-            or `None` for the first page.
-
-    Returns:
-        `(short_names, next_search_after)` — the page's collection short
-        names and the cursor for the next page (`None` when exhausted).
-    """
-    headers = {"CMR-Search-After": search_after} if search_after else {}
-    params: dict[str, str | int] = {"provider": provider, "page_size": 2000}
-    response = requests.get(
-        _CMR_COLLECTIONS_URL,
-        params=params,
-        headers=headers,
-        timeout=_TIMEOUT,
-    )
-    response.raise_for_status()
-    names = [
-        short
-        for item in response.json().get("items", [])
-        if (short := item.get("umm", {}).get("ShortName"))
-    ]
-    return names, response.headers.get("CMR-Search-After")
-
-
-def _earthdata_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List collection short names per CMR provider, live (public, anonymous).
-
-    Walks `CMR-Search-After` pagination for each provider in the catalog's
-    registry (bounded by :data:`_MAX_PAGES` pages per provider).
-
-    Args:
-        catalog: The loaded Earthdata `Catalog` (exposes `providers`).
-
-    Returns:
-        A mapping of CMR provider code to its sorted collection short names.
-    """
-    grouped: dict[str, list[str]] = {}
-    for code in sorted(catalog.providers):
-        names: set[str] = set()
-        search_after: str | None = None
-        for _ in range(_MAX_PAGES):
-            page, search_after = _cmr_page(code, search_after)
-            names.update(str(name) for name in page)
-            if not search_after:
-                break
-        grouped[code] = sorted(names)
-    return grouped
-
-
 #: OpenAQ parameters endpoint (needs an `OPENAQ_API_KEY` header).
 _OPENAQ_PARAMETERS_URL = "https://api.openaq.org/v3/parameters"
 
@@ -887,7 +829,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     # in-core literals below are the not-yet-migrated remainder (issue #863).
     **dispatch_table("refresher"),
     "ecmwf": _ecmwf_grouped,
-    "earthdata": _earthdata_grouped,
     "openaq": _openaq_grouped,
     "sentinel_hub": _sentinel_hub_grouped,
     "gee": _gee_grouped,
@@ -908,7 +849,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "ecmwf": _index_writer("available_datasets", grouped=True),
     "sentinel_hub": _index_writer("available_collections"),
     "gee": _index_writer("available_datasets"),
-    "earthdata": _index_writer("available_datasets"),
     "radar": _write_radar,
     "s3": _index_writer("available_datasets"),
     "openaq": _write_openaq,
@@ -1107,7 +1047,6 @@ def _biodiversity_curated_ids(catalog: Any) -> list[str]:
 _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("curated_ids"),
-    "earthdata": _curated_attr_ids("short_name"),
     "sentinel_hub": _curated_attr_ids("sh_collection"),
     "chc": _chc_ftp_bases,
 }

@@ -1273,7 +1273,6 @@ class TestCliIsBackendAgnostic:
             "catrare",
             "chc",
             "drought",
-            "earthdata",
             "ecmwf",
             "gee",
             "goes",

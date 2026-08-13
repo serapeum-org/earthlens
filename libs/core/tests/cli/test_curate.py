@@ -53,47 +53,6 @@ class TestSupportedProviders:
         } <= set(supported_providers())
 
 
-class TestEarthdataProbe:
-    """Tests for the Earthdata UMM-Var prober (public CMR)."""
-
-    def test_resolves_collection_then_variables(self, monkeypatch):
-        """earthdata probe follows associations.variables to UMM-Var records."""
-        from earthlens.cli import curate as curate_mod
-
-        def fake(url, **kw):
-            if "collections" in url:
-                return {"items": [{"meta": {"associations": {"variables": ["V1"]}}}]}
-            return {
-                "items": [
-                    {
-                        "umm": {
-                            "Name": "precipitation",
-                            "LongName": "Precipitation rate",
-                            "Units": "mm/hr",
-                            "DataType": "float32",
-                        }
-                    }
-                ]
-            }
-
-        monkeypatch.setattr(curate_mod, "_get_json", fake)
-        result = probe_dataset(_info("earthdata"), "GPM_3IMERGHH")
-        assert result.status == "ok", "earthdata probe ran"
-        assert result.assets["precipitation"]["units"] == "mm/hr", "UMM-Var parsed"
-
-    def test_collection_with_no_variables_is_empty(self, monkeypatch):
-        """A collection with no associated variables yields an empty schema."""
-        from earthlens.cli import curate as curate_mod
-
-        monkeypatch.setattr(
-            curate_mod,
-            "_get_json",
-            lambda url, **kw: {"items": [{"meta": {"associations": {}}}]},
-        )
-        result = probe_dataset(_info("earthdata"), "SOME_COLLECTION")
-        assert result.status == "ok" and result.assets == {}, "empty UMM-Var"
-
-
 class TestSentinelHubProbe:
     """Tests for the Sentinel Hub band prober (offline SDK)."""
 
@@ -276,20 +235,6 @@ class TestNwpProbe:
 
 class TestDeepProbers:
     """Tests for the credentialed `--deep` samplers (creds/network mocked)."""
-
-    def test_earthdata_deep_samples_granule(self, monkeypatch):
-        """earthdata --deep records a sampled granule's format."""
-        from earthlens.cli.adapter import load_catalog
-
-        monkeypatch.setattr(
-            curate_mod,
-            "_earthdata_deep_sample",
-            lambda sn, v, p: {"g.nc4": {"format": "netcdf4", "output_kind": "raster"}},
-        )
-        dataset = next(iter(load_catalog(_info("earthdata")).datasets))
-        result = probe_dataset(_info("earthdata"), dataset, deep=True)
-        assert result.status == "ok", "earthdata deep probe ran"
-        assert result.assets["g.nc4"]["format"] == "netcdf4", "granule format read"
 
     def test_ecmwf_deep_reads_retrieved_netcdf(self, monkeypatch):
         """ecmwf --deep reads long_name/units from a retrieved NetCDF."""
@@ -507,56 +452,6 @@ class TestS3ProberBranches:
         assert curate_mod._s3_sample_keys("b", "p", None) == ["k1", "k2"]
 
 
-class TestEarthdataProberBranches:
-    """Branch coverage for the Earthdata UMM-Var prober."""
-
-    def test_reads_variable_records(self, monkeypatch):
-        """A collection with associated variables yields their UMM-Var schema."""
-        from earthlens.cli.adapter import load_catalog
-
-        def fake_get(url, params=None):
-            if "collections" in url:
-                return {"items": [{"meta": {"associations": {"variables": ["V1"]}}}]}
-            return {
-                "items": [
-                    {
-                        "umm": {
-                            "Name": "precip",
-                            "LongName": "Precipitation",
-                            "Units": "mm",
-                            "DataType": "float32",
-                        }
-                    }
-                ]
-            }
-
-        monkeypatch.setattr(curate_mod, "_get_json", fake_get)
-        dataset = next(iter(load_catalog(_info("earthdata")).datasets))
-        result = probe_dataset(_info("earthdata"), dataset)
-        assert result.assets["precip"]["units"] == "mm", "variable units read"
-
-    def test_no_collection_is_error(self, monkeypatch):
-        """A short name CMR does not know reports 'error'."""
-        monkeypatch.setattr(
-            curate_mod, "_get_json", lambda url, params=None: {"items": []}
-        )
-        result = probe_dataset(_info("earthdata"), "NOPE")
-        assert result.status == "error", "no collection -> error"
-
-    def test_no_variables_yields_empty(self, monkeypatch):
-        """A collection with no associated variables yields an empty schema."""
-        from earthlens.cli.adapter import load_catalog
-
-        monkeypatch.setattr(
-            curate_mod,
-            "_get_json",
-            lambda url, params=None: {"items": [{"meta": {"associations": {}}}]},
-        )
-        dataset = next(iter(load_catalog(_info("earthdata")).datasets))
-        result = probe_dataset(_info("earthdata"), dataset)
-        assert result.status == "ok" and result.assets == {}, "no vars -> {}"
-
-
 class TestNwpHelpers:
     """Tests for the NWP availability dispatch + cycle helpers."""
 
@@ -673,31 +568,6 @@ class TestChcSampleFiles:
 
 class TestDeepSamplers:
     """Cover the credentialed deep-sample SDK bodies (SDKs faked)."""
-
-    def test_earthdata_deep_sample_reads_granule(self, monkeypatch):
-        """_earthdata_deep_sample logs in, searches, and reads a granule link."""
-        import sys
-        import types
-
-        fake = types.ModuleType("earthaccess")
-        fake.login = lambda strategy=None: None
-        fake.search_data = lambda **kw: [
-            types.SimpleNamespace(data_links=lambda: ["https://h/g.nc4"])
-        ]
-        monkeypatch.setitem(sys.modules, "earthaccess", fake)
-        out = curate_mod._earthdata_deep_sample("GPM", "07", "GES_DISC")
-        assert out["g.nc4"]["format"] == "netcdf4", "granule format inferred"
-
-    def test_earthdata_deep_sample_empty(self, monkeypatch):
-        """No granules yields an empty schema."""
-        import sys
-        import types
-
-        fake = types.ModuleType("earthaccess")
-        fake.login = lambda strategy=None: None
-        fake.search_data = lambda **kw: []
-        monkeypatch.setitem(sys.modules, "earthaccess", fake)
-        assert curate_mod._earthdata_deep_sample("X", "", "") == {}
 
     def test_ecmwf_deep_sample_reads_netcdf(self, monkeypatch):
         """_ecmwf_deep_sample retrieves a tiny NetCDF and reads var metadata."""

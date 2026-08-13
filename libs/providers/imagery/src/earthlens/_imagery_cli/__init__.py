@@ -16,6 +16,14 @@ __all__ = ["CLI_TOOLING"]
 #: string core imports lazily on dispatch; a config role carries a literal value.
 CLI_TOOLING: dict[str, dict[str, str]] = {
     "asf": {"validator": "earthlens.asf.cli:validator"},
+    "earthdata": {
+        "refresher": "earthlens.earthdata.cli:refresher",
+        "writer": "earthlens.earthdata.cli:writer",
+        "curated_ids": "earthlens.earthdata.cli:curated_ids",
+        "prober": "earthlens.earthdata.cli:prober",
+        "deep_prober": "earthlens.earthdata.cli:deep_prober",
+        "emitter": "earthlens.earthdata.cli:emitter",
+    },
     "eumetsat": {
         "refresher": "earthlens.eumetsat.cli:refresher",
         "writer": "earthlens.eumetsat.cli:writer",

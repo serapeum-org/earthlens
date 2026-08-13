@@ -154,60 +154,6 @@ def _sentinel_hub_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]
     return schema
 
 
-#: NASA CMR search endpoints (public, anonymous).
-_CMR_COLLECTIONS_URL = "https://cmr.earthdata.nasa.gov/search/collections.umm_json"
-_CMR_VARIABLES_URL = "https://cmr.earthdata.nasa.gov/search/variables.umm_json"
-
-
-def _earthdata_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe an Earthdata collection's UMM-Var variables (public CMR).
-
-    Resolves the dataset to its CMR collection, reads the collection's
-    associated variable concept-ids (`meta.associations.variables`), and
-    fetches their UMM-Var records. Many collections register no variables —
-    then the schema is empty, which is accurate.
-
-    Args:
-        catalog: The loaded Earthdata `Catalog` (resolves a key's short_name
-            / provider).
-        dataset: A curated key or a CMR collection short name.
-
-    Returns:
-        Mapping of variable name to `{long_name, units, data_type}`.
-
-    Raises:
-        ValueError: If no CMR collection matches the dataset.
-    """
-    record = catalog.datasets.get(dataset)
-    short_name = getattr(record, "short_name", None) or dataset
-    params: dict[str, Any] = {"short_name": short_name, "page_size": 1}
-    provider = getattr(record, "provider", None)
-    if provider:
-        params["provider"] = provider
-    collections = _get_json(_CMR_COLLECTIONS_URL, params=params).get("items", [])
-    if not collections:
-        raise ValueError(f"no CMR collection for {short_name!r}")
-    variable_ids = (
-        collections[0].get("meta", {}).get("associations", {}).get("variables", [])
-    )
-    if not variable_ids:
-        return {}
-    body = _get_json(
-        _CMR_VARIABLES_URL, params={"concept_id": variable_ids, "page_size": 2000}
-    )
-    schema: dict[str, dict[str, Any]] = {}
-    for item in body.get("items", []):
-        umm = item.get("umm", {})
-        name = umm.get("Name")
-        if name:
-            schema[str(name)] = {
-                "long_name": umm.get("LongName"),
-                "units": umm.get("Units"),
-                "data_type": umm.get("DataType"),
-            }
-    return schema
-
-
 def _infer_dtype(value: str | None) -> str:
     """Infer a coarse dtype (`int` / `float` / `str`) from a sample value."""
     if value is None or value == "":
@@ -563,57 +509,6 @@ def _nwp_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
 # --------------------------------------------------------------------------- #
 
 
-def _earthdata_deep_sample(
-    short_name: str, version: str, provider: str
-) -> dict[str, dict[str, Any]]:
-    """Search one recent granule and record its format / output_kind (creds)."""
-    import datetime as dt
-
-    import earthaccess
-
-    from earthlens.cli.stanza import _format_from_extension, _infer_output_kind
-
-    earthaccess.login(strategy="environment")
-    end = dt.datetime.now(dt.UTC)
-    start = end - dt.timedelta(days=30)
-    granules = earthaccess.search_data(
-        short_name=short_name,
-        version=version or None,
-        provider=provider or None,
-        temporal=(start.isoformat(), end.isoformat()),
-        count=1,
-    )
-    if not granules:
-        return {}
-    links = getattr(granules[0], "data_links", list)() or [""]
-    url = links[0]
-    fmt = _format_from_extension(url) or "unknown"
-    name = url.rsplit("/", 1)[-1] or short_name
-    return {
-        name: {
-            "format": fmt,
-            "output_kind": _infer_output_kind(short_name, fmt),
-            "url": url,
-        }
-    }
-
-
-def _earthdata_deep_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Deep-probe an Earthdata collection by sampling a real granule (creds).
-
-    Unlike the light UMM-Var prober, this searches CMR for one recent
-    granule and records its on-disk format + inferred output_kind. Needs
-    `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD`.
-    """
-    record = catalog.datasets.get(dataset)
-    short_name = getattr(record, "short_name", None) or dataset
-    return _earthdata_deep_sample(
-        short_name,
-        str(getattr(record, "version", "") or ""),
-        str(getattr(record, "provider", "") or ""),
-    )
-
-
 def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     """Read each NetCDF variable's `long_name` / `units` via GDAL.
 
@@ -892,7 +787,6 @@ def _nwp_deep_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
 _DEEP_PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("deep_prober"),
-    "earthdata": _earthdata_deep_probe,
     "ecmwf": _ecmwf_deep_probe,
     "nwp": _nwp_deep_probe,
 }
@@ -946,7 +840,6 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     **dispatch_table("prober"),
     "gee": _gee_probe,
     "sentinel_hub": _sentinel_hub_probe,
-    "earthdata": _earthdata_probe,
     "s3": _s3_probe,
     "ecmwf": _ecmwf_probe,
     "chc": _chc_probe,

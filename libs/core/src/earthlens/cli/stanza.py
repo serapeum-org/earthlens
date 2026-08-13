@@ -113,103 +113,6 @@ class StanzaResult:
 
 
 # --------------------------------------------------------------------------- #
-# earthdata — seed from a CMR collection (public umm_json).
-# --------------------------------------------------------------------------- #
-_FORMAT_BY_EXT: dict[str, str] = {
-    ".nc": "netcdf4",
-    ".nc4": "netcdf4",
-    ".h5": "hdf5",
-    ".he5": "hdf-eos5",
-    ".hdf": "hdf-eos2",
-    ".tif": "cog",
-    ".tiff": "cog",
-    ".csv": "csv",
-    ".json": "geojson",
-    ".geojson": "geojson",
-    ".gpkg": "geopackage",
-    ".zip": "zip",
-}
-#: Short-name substrings that imply a point/profile (vector) product.
-_VECTOR_HINTS = ("GEDI", "ATL0", "ATL1", "GLAH")
-#: Substrings that imply a plain tabular product.
-_TABULAR_HINTS = ("CSV", "_TABLE", "FLUXNET")
-
-
-def _format_from_extension(filename: str) -> str:
-    """Infer a coarse catalog `format` label from a granule filename."""
-    suffix = Path(filename.split("?", 1)[0]).suffix.lower()
-    return _FORMAT_BY_EXT.get(suffix, "")
-
-
-def _infer_output_kind(short_name: str, fmt: str = "", title: str = "") -> str:
-    """Seed an Earthdata row's `output_kind` from its name / format / title.
-
-    Favours `raster` (the bulk of Earthdata holdings); point/profile
-    products map to `vector` and plain tables to `tabular`. A seed — vet
-    by hand.
-
-    Args:
-        short_name: CMR collection short name.
-        fmt: Coarse format label (e.g. from :func:`_format_from_extension`).
-        title: Collection title, if available.
-
-    Returns:
-        One of `"raster"`, `"vector"`, `"tabular"`.
-    """
-    haystack = f"{short_name} {title}".upper()
-    if fmt in {"csv", "geojson", "geopackage"} or any(
-        hint in haystack for hint in _TABULAR_HINTS
-    ):
-        return "vector" if fmt in {"geojson", "geopackage"} else "tabular"
-    if any(hint in short_name.upper() for hint in _VECTOR_HINTS):
-        return "vector"
-    return "raster"
-
-
-#: NASA CMR collection search (public, anonymous; UMM-JSON).
-_CMR_COLLECTIONS_URL = "https://cmr.earthdata.nasa.gov/search/collections.umm_json"
-
-
-def _earthdata_collection_umm(short_name: str, version: str) -> dict[str, Any]:
-    """Return one CMR collection's UMM body (or `{}` when none matches)."""
-    params: dict[str, Any] = {"short_name": short_name, "page_size": 1}
-    if version:
-        params["version"] = version
-    items = _get_json(_CMR_COLLECTIONS_URL, params=params).get("items", [])
-    return items[0].get("umm", {}) if items else {}
-
-
-def _emit_earthdata(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
-    """Seed an Earthdata `datasets:` row from a CMR collection.
-
-    Args:
-        catalog: The loaded Earthdata `Catalog` (unused; CMR is the source).
-        upstream_id: The collection short name.
-        **opts: `version`, `cmr_provider`, `daac`, `cloud_hosted`.
-
-    Returns:
-        The seeded row.
-    """
-    version = str(opts.get("version") or "")
-    provider = str(opts.get("cmr_provider") or "")
-    umm = {} if opts.get("minimal") else _earthdata_collection_umm(upstream_id, version)
-    title = umm.get("EntryTitle", "")
-    fmt = _format_from_extension(str(umm.get("ArchiveAndDistributionInformation", {})))
-    return {
-        "short_name": upstream_id,
-        "version": version,
-        "daac": str(opts.get("daac") or provider),
-        "provider": provider,
-        "cadence": "irregular",
-        "format": fmt or "unknown",
-        "output_kind": _infer_output_kind(upstream_id, fmt, title),
-        "cloud_hosted": bool(opts.get("cloud_hosted")),
-        "requires_harmony_for_subset": False,
-        "supports_harmony": False,
-    }
-
-
-# --------------------------------------------------------------------------- #
 # usgs_water — a pure friendly-name -> parameter-code row (no fetch).
 # --------------------------------------------------------------------------- #
 
@@ -553,7 +456,6 @@ _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("emitter"),
     "ecmwf": _emit_ecmwf,
-    "earthdata": _emit_earthdata,
     "gee": _emit_gee,
     "jaxa": _emit_jaxa,
 }
