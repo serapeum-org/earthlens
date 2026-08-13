@@ -663,7 +663,9 @@ class OSM(AbstractDataSource):
                 endpoint="elements/geometry",
             )
             gdf = response.as_dataframe()
-        except Exception as exc:  # noqa: BLE001 - classify -> typed raise, else propagate
+        # Broad by design: classify a throttle/block into a typed error, else
+        # re-raise the original failure unchanged.
+        except Exception as exc:  # noqa: BLE001
             self._raise_ohsome_unavailable(exc)
             raise
         # `as_dataframe()` carries a (@osmId, @snapshotTimestamp) MultiIndex;
