@@ -1270,18 +1270,11 @@ class TestCliIsBackendAgnostic:
     #: empty as #863 lands provider by provider).
     PENDING = frozenset(
         {
-            "catrare",
             "chc",
-            "drought",
             "ecmwf",
-            "goes",
-            "mswep",
-            "nrel",
             "nwp",
             "openaq",
-            "pvgis",
             "radar",
-            "radklim",
             "s3",
             "tropycal",
         }

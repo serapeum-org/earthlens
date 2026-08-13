@@ -128,38 +128,6 @@ def _validate_s3(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("bucket", "format")))
 
 
-def _check_radklim_row(key: str, record: Any) -> list[str]:
-    """Lint one RADKLIM product: stream fields + a served default format.
-
-    A `reproc` product must carry the reprocessing `version` and the CDC path
-    token `cdc_frequency`; an `operational` product must carry a positive
-    `retention_days`; and `default_format` must be one of the row's `formats`.
-
-    Args:
-        key: The product id.
-        record: The `earthlens.radklim.RadklimProduct` row.
-
-    Returns:
-        One issue string per problem found.
-    """
-    issues = _require(key, record, ("stream", "code", "default_format", "formats"))
-    stream = getattr(record, "stream", None)
-    if stream == "reproc":
-        issues += _require(key, record, ("version", "cdc_frequency"))
-    elif stream == "operational" and not getattr(record, "retention_days", 0):
-        issues.append(f"{key}: operational row needs a positive retention_days")
-    fmt = getattr(record, "default_format", None)
-    formats = getattr(record, "formats", None) or []
-    if fmt and formats and fmt not in formats:
-        issues.append(f"{key}: default_format {fmt!r} not in formats {formats}")
-    return issues
-
-
-def _validate_radklim(catalog: Any) -> tuple[int, list[str]]:
-    """Each RADKLIM / RADOLAN product needs its stream fields + a served format."""
-    return _lint(catalog, _check_radklim_row)
-
-
 def _validate_radar(catalog: Any) -> tuple[int, list[str]]:
     """Each radar station needs a name and in-range latitude / longitude."""
 
@@ -227,50 +195,6 @@ def _validate_tropycal(catalog: Any) -> tuple[int, list[str]]:
     return checked, issues
 
 
-def _validate_catrare(catalog: Any) -> tuple[int, list[str]]:
-    """Each CatRaRE threshold needs a code; the shared version/CRS/columns stay pinned.
-
-    Beyond the per-threshold lint, the catalog composes the download URL and the
-    FileGDB layer name from `base_url` / `version` / `version_tag` / `years` and
-    reprojects the geometry from `source_crs`; the date filter and the returned
-    columns read `date_columns` / `event_columns` / `geometry_layers`. A stanza
-    dropping any of those loads cleanly but breaks at fetch time.
-    """
-    checked, issues = _lint(catalog, lambda k, r: _require(k, r, ("threshold",)))
-    for attr in ("base_url", "version", "version_tag", "years", "source_crs"):
-        if not getattr(catalog, attr, ""):
-            issues.append(f"catalog: missing {attr!r}")
-    for mapping in ("geometry_layers", "date_columns", "event_columns"):
-        if not getattr(catalog, mapping, None):
-            issues.append(f"catalog: the {mapping!r} is empty")
-    return checked, issues
-
-
-#: Drought transports whose output is a raster (vs USDM's vector polygons).
-_DROUGHT_RASTER_TRANSPORTS = frozenset({"edo-wcs", "netcdf-url"})
-
-
-def _check_drought_row(key: str, record: Any) -> list[str]:
-    """Flag a drought row missing a core field or with a transport mismatch."""
-    issues = _require(
-        key, record, ("source", "endpoint", "output_kind", "cadence", "native_crs")
-    )
-    transport = getattr(record, "transport", None)
-    output_kind = getattr(record, "output_kind", None)
-    if transport == "usdm-geojson" and output_kind != "vector":
-        issues.append(f"{key}: usdm-geojson transport must be output_kind=vector")
-    if transport in _DROUGHT_RASTER_TRANSPORTS and output_kind != "raster":
-        issues.append(f"{key}: {transport} transport must be output_kind=raster")
-    if transport == "edo-wcs":
-        issues.extend(_require(key, record, ("coverage", "timescale")))
-    return issues
-
-
-def _validate_drought(catalog: Any) -> tuple[int, list[str]]:
-    """Each drought row needs its core fields; edo-wcs rows a coverage + timescale."""
-    return _lint(catalog, _check_drought_row)
-
-
 def _validate_chc(catalog: Any) -> tuple[int, list[str]]:
     """Each CHC dataset needs FTP bases, a file pattern, and variables."""
 
@@ -287,98 +211,16 @@ def _validate_chc(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, check)
 
 
-def _validate_goes(catalog: Any) -> tuple[int, list[str]]:
-    """Structural lint of the curated GOES ABI products.
-
-    Every product needs a `product_group` and a non-empty `domains` list
-    whose entries are all known domain keys, a `default_domain` drawn from
-    that list, and — for a band-split product — a non-empty `bands` list.
-
-    Args:
-        catalog: The loaded GOES `Catalog`.
-
-    Returns:
-        `(checked, issues)` — the product count and one message per problem.
-    """
-    known_domains = set(catalog.domains)
-    issues: list[str] = []
-    for key, product in catalog.datasets.items():
-        issues.extend(_require(key, product, ("product_group", "domains")))
-        domains = getattr(product, "domains", None) or []
-        unknown = [d for d in domains if d not in known_domains]
-        if unknown:
-            issues.append(f"{key}: unknown domain(s) {unknown}")
-        default = getattr(product, "default_domain", None)
-        if domains and default not in domains:
-            issues.append(f"{key}: default_domain {default!r} not in domains {domains}")
-        if getattr(product, "band_split", False) and not getattr(
-            product, "bands", None
-        ):
-            issues.append(f"{key}: band_split product needs a non-empty bands list")
-    return len(catalog.datasets), issues
-
-
-def _validate_pvgis(catalog: Any) -> tuple[int, list[str]]:
-    """Each PVGIS product needs a tool, an endpoint, and non-empty columns."""
-    return _lint(catalog, lambda k, r: _require(k, r, ("tool", "endpoint", "columns")))
-
-
-def _validate_nrel(catalog: Any) -> tuple[int, list[str]]:
-    """Each NREL product needs a source, a CSV endpoint, and non-empty columns."""
-    return _lint(
-        catalog, lambda k, r: _require(k, r, ("source", "endpoint", "columns"))
-    )
-
-
-def _validate_mswep(catalog: Any) -> tuple[int, list[str]]:
-    """Structural lint of the curated MSWEP / MSWX products.
-
-    Each product needs an analysis `path_template`, a `default_version` that
-    is registered, and non-empty `versions` / `variants` / `resolutions` /
-    `variables` blocks. A product with forecast variants (MSWX's `Mid` /
-    `Long`) must also declare a `forecast_path_template`.
-
-    Args:
-        catalog: The loaded MSWEP `Catalog`.
-
-    Returns:
-        `(checked, issues)` — the product count and one message per problem.
-    """
-    products = catalog.datasets
-    issues: list[str] = []
-    for key, product in products.items():
-        issues.extend(_require(key, product, ("path_template", "default_version")))
-        for block in ("versions", "variants", "resolutions", "variables"):
-            if not getattr(product, block, None):
-                issues.append(f"{key}: empty {block}")
-        versions = getattr(product, "versions", None) or {}
-        default = getattr(product, "default_version", None)
-        if default and default not in versions:
-            issues.append(f"{key}: default_version {default!r} not in versions")
-        variants = getattr(product, "variants", None) or {}
-        has_forecast = any(getattr(v, "is_forecast", False) for v in variants.values())
-        if has_forecast and not getattr(product, "forecast_path_template", ""):
-            issues.append(f"{key}: has forecast variants but no forecast_path_template")
-    return len(products), issues
-
-
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("validator"),
     "nwp": _validate_nwp,
-    "mswep": _validate_mswep,
-    "goes": _validate_goes,
     "s3": _validate_s3,
     "radar": _validate_radar,
-    "radklim": _validate_radklim,
     "tropycal": _validate_tropycal,
-    "catrare": _validate_catrare,
-    "drought": _validate_drought,
     "chc": _validate_chc,
-    "pvgis": _validate_pvgis,
-    "nrel": _validate_nrel,
 }
 
 

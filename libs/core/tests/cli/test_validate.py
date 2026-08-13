@@ -11,9 +11,6 @@ from earthlens.cli.adapter import list_backends
 from earthlens.cli.validate import (
     ValidateResult,
     _live_ecmwf,
-    _validate_drought,
-    _validate_goes,
-    _validate_nrel,
     _validate_nwp,
     _validate_radar,
     _validate_tropycal,
@@ -90,106 +87,6 @@ class TestBundledCatalogsLintClean:
         assert result.checked > 0, f"{provider} checked nothing"
 
 
-class TestValidateDrought:
-    """Tests for the drought structural lint."""
-
-    def test_clean_rows_pass(self):
-        """A well-formed edo-wcs raster row and a usdm vector row report nothing."""
-        catalog = SimpleNamespace(
-            datasets={
-                "edo-spaST": SimpleNamespace(
-                    source="EDO",
-                    endpoint="https://x/wcs",
-                    output_kind="raster",
-                    cadence="10day",
-                    native_crs="EPSG:4326",
-                    transport="edo-wcs",
-                    coverage="spaST",
-                    timescale="01",
-                ),
-                "usdm": SimpleNamespace(
-                    source="USDM",
-                    endpoint="https://x/{ymd}.json",
-                    output_kind="vector",
-                    cadence="weekly",
-                    native_crs="EPSG:4326",
-                    transport="usdm-geojson",
-                    coverage=None,
-                    timescale=None,
-                ),
-            }
-        )
-        checked, issues = _validate_drought(catalog)
-        assert checked == 2
-        assert issues == []
-
-    def test_flags_edo_wcs_row_missing_coverage_and_timescale(self):
-        """An edo-wcs row without a coverage or timescale is flagged for each."""
-        catalog = SimpleNamespace(
-            datasets={
-                "edo-bad": SimpleNamespace(
-                    source="EDO",
-                    endpoint="https://x/wcs",
-                    output_kind="raster",
-                    cadence="10day",
-                    native_crs="EPSG:4326",
-                    transport="edo-wcs",
-                    coverage=None,
-                    timescale=None,
-                )
-            }
-        )
-        checked, issues = _validate_drought(catalog)
-        assert checked == 1
-        assert any("missing coverage" in i for i in issues)
-        assert any("missing timescale" in i for i in issues)
-
-    def test_flags_transport_output_kind_mismatch(self):
-        """A usdm-geojson row declared raster (or edo-wcs declared vector) is flagged."""
-        catalog = SimpleNamespace(
-            datasets={
-                "usdm": SimpleNamespace(
-                    source="USDM",
-                    endpoint="https://x",
-                    output_kind="raster",
-                    cadence="weekly",
-                    native_crs="EPSG:4326",
-                    transport="usdm-geojson",
-                    coverage=None,
-                    timescale=None,
-                )
-            }
-        )
-        _checked, issues = _validate_drought(catalog)
-        assert any("must be output_kind=vector" in i for i in issues)
-
-
-class TestValidateNrel:
-    """Tests for the nrel structural lint."""
-
-    def test_good_rows_pass(self):
-        """A row with source, endpoint, and columns reports no issues."""
-        catalog = SimpleNamespace(
-            datasets={
-                "nsrdb-psm3": SimpleNamespace(
-                    source="nsrdb", endpoint="/api/x.csv", columns=["time", "GHI"]
-                )
-            }
-        )
-        checked, issues = _validate_nrel(catalog)
-        assert checked == 1
-        assert issues == []
-
-    def test_flags_missing_source_and_columns(self):
-        """A row missing its source and columns is flagged for each."""
-        catalog = SimpleNamespace(
-            datasets={"bad": SimpleNamespace(source="", endpoint="/x.csv", columns=[])}
-        )
-        _checked, issues = _validate_nrel(catalog)
-        assert any("missing source" in i for i in issues)
-        assert any("missing columns" in i for i in issues)
-
-
 class TestValidateNwp:
     """Tests for the nwp structural lint."""
 
@@ -244,62 +141,6 @@ class TestStructuralLints:
         )
         _checked, issues = _validate_radar(catalog)
         assert any("latitude" in i for i in issues), "bad latitude flagged"
-
-    def test_goes_clean_catalog_passes(self):
-        """A well-formed GOES product yields no issues."""
-        catalog = SimpleNamespace(
-            domains={"C": None, "F": None, "M1": None, "M2": None},
-            datasets={
-                "abi-l2-mcmip": SimpleNamespace(
-                    product_group="ABI-L2-MCMIP",
-                    domains=["C", "F"],
-                    default_domain="C",
-                    band_split=False,
-                    bands=[],
-                ),
-            },
-        )
-        checked, issues = _validate_goes(catalog)
-        assert (checked, issues) == (1, []), "a clean product lints clean"
-
-    def test_goes_flags_missing_product_group(self):
-        """A GOES product missing product_group / domains is flagged (_require branch)."""
-        catalog = SimpleNamespace(
-            domains={"C": None, "F": None},
-            datasets={
-                "bare": SimpleNamespace(
-                    product_group="",
-                    domains=[],
-                    default_domain="C",
-                    band_split=False,
-                    bands=[],
-                ),
-            },
-        )
-        _checked, issues = _validate_goes(catalog)
-        assert any("product_group" in i for i in issues), (
-            "missing product_group flagged"
-        )
-        assert any("domains" in i for i in issues), "empty domains flagged"
-
-    def test_goes_flags_unknown_domain_and_empty_bands(self):
-        """An unknown domain, a stray default, and empty band-split bands are flagged."""
-        catalog = SimpleNamespace(
-            domains={"C": None, "F": None},
-            datasets={
-                "bad": SimpleNamespace(
-                    product_group="ABI-L2-BAD",
-                    domains=["C", "Z"],
-                    default_domain="F",
-                    band_split=True,
-                    bands=[],
-                ),
-            },
-        )
-        _checked, issues = _validate_goes(catalog)
-        assert any("unknown domain" in i for i in issues), "bad domain flagged"
-        assert any("default_domain" in i for i in issues), "stray default flagged"
-        assert any("bands" in i for i in issues), "empty band-split bands flagged"
 
     def test_tropycal_unknown_basin_and_bad_source_flagged(self):
         """A non-SDK basin and an unsupported (basin, source) pair are flagged."""
