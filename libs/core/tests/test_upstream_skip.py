@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
+import textwrap
+from pathlib import Path
+
 import pytest
 
 from earthlens.testing import is_upstream_unavailable, pytest_runtest_call
@@ -102,3 +107,62 @@ def test_hook_ignores_non_e2e_tests() -> None:
         _drive_hook(
             _Item(e2e=False), Exception("503 Server Error: Service Unavailable")
         )
+
+
+def _run_guard_lane(tmp_path: Path, body: str) -> subprocess.CompletedProcess[str]:
+    """Run a throwaway lane wired to the hooks in a subprocess; return the result."""
+    (tmp_path / "conftest.py").write_text(
+        "from earthlens.testing import (  # noqa: F401\n"
+        "    pytest_runtest_call,\n"
+        "    pytest_sessionfinish,\n"
+        ")\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "pytest.ini").write_text(
+        "[pytest]\nmarkers =\n    e2e: live end-to-end test\n", encoding="utf-8"
+    )
+    (tmp_path / "test_lane.py").write_text(textwrap.dedent(body), encoding="utf-8")
+    return subprocess.run(
+        [sys.executable, "-m", "pytest", str(tmp_path), "-p", "no:cacheprovider", "-q"],
+        capture_output=True,
+        text=True,
+    )
+
+
+def test_guard_fails_a_wholly_masked_lane(tmp_path: Path) -> None:
+    """A lane whose only e2e tests all availability-skip fails, not passes green."""
+    result = _run_guard_lane(
+        tmp_path,
+        """
+        import pytest
+
+        @pytest.mark.e2e
+        def test_a():
+            raise Exception("503 Server Error: Service Unavailable")
+
+        @pytest.mark.e2e
+        def test_b():
+            raise Exception("504 Server Error: Gateway Timeout")
+        """,
+    )
+    assert result.returncode != 0, result.stdout
+    assert "wholly masked" in result.stdout
+
+
+def test_guard_allows_a_lane_with_a_pass(tmp_path: Path) -> None:
+    """A lane with at least one passing e2e test stays green despite a skip."""
+    result = _run_guard_lane(
+        tmp_path,
+        """
+        import pytest
+
+        @pytest.mark.e2e
+        def test_ok():
+            assert True
+
+        @pytest.mark.e2e
+        def test_down():
+            raise Exception("503 Server Error: Service Unavailable")
+        """,
+    )
+    assert result.returncode == 0, result.stdout

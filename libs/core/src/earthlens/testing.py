@@ -205,6 +205,11 @@ def is_upstream_unavailable(exc: BaseException) -> str | None:
     return None
 
 
+#: Prefix stamped on every availability-skip reason, so the session-finish guard
+#: can tell a hook-induced skip from an ordinary `pytest.skip` (missing creds, …).
+_LIVE_SKIP_PREFIX = "live e2e skipped — "
+
+
 @pytest.hookimpl(wrapper=True)
 def pytest_runtest_call(item: pytest.Item) -> Generator[None, object, object]:
     """Turn an upstream-availability failure in a live `e2e` test into a skip.
@@ -227,5 +232,49 @@ def pytest_runtest_call(item: pytest.Item) -> Generator[None, object, object]:
         if item.get_closest_marker("e2e") is not None:
             reason = is_upstream_unavailable(exc)
             if reason is not None:
-                pytest.skip(f"live e2e skipped — {reason}")
+                pytest.skip(f"{_LIVE_SKIP_PREFIX}{reason}")
         raise
+
+
+def _skip_reason(report: pytest.TestReport) -> str:
+    """Return a skip report's reason text (`longrepr` is a `(path, line, reason)`)."""
+    longrepr = getattr(report, "longrepr", None)
+    if isinstance(longrepr, tuple) and len(longrepr) == 3:
+        return str(longrepr[2])
+    return str(longrepr or "")
+
+
+def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
+    """Fail a lane whose every e2e test was availability-skipped (masked-run guard).
+
+    The per-test hook turns a flaky-upstream failure into a skip, which is the
+    right call when *some* of a lane's tests still ran. But if a lane collected
+    tests, none passed, and at least one was skipped for upstream unavailability,
+    the whole lane is masked — a green report that exercised nothing. That is the
+    worst case the skip behaviour can produce, so convert an otherwise-passing
+    session into a failure. Ordinary skips (missing credentials, marker gates) do
+    not carry the availability prefix, so an all-skipped-for-other-reasons run
+    stays green.
+
+    Args:
+        session: The finished pytest session.
+        exitstatus: The exit code pytest computed for the run.
+    """
+    if exitstatus != pytest.ExitCode.OK:
+        return
+    reporter = session.config.pluginmanager.getplugin("terminalreporter")
+    if reporter is None or reporter.stats.get("passed"):
+        return
+    masked = sum(
+        1
+        for report in reporter.stats.get("skipped", [])
+        if _LIVE_SKIP_PREFIX in _skip_reason(report)
+    )
+    if masked:
+        session.exitstatus = pytest.ExitCode.TESTS_FAILED
+        reporter.write_line(
+            f"ERROR: all e2e tests were skipped for upstream availability "
+            f"({masked} skip(s)) and none passed — failing the lane so a wholly "
+            "masked run does not report green.",
+            red=True,
+        )
