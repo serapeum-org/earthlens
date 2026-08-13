@@ -1273,7 +1273,6 @@ class TestCliIsBackendAgnostic:
             "chc",
             "ecmwf",
             "nwp",
-            "openaq",
         }
     )
 

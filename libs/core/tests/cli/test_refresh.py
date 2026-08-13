@@ -118,32 +118,6 @@ class TestEcmwfRefresher:
         assert outcome.live_count == 1, "one CDS dataset id listed"
 
 
-class TestOpenaqRefresher:
-    """Tests for the OpenAQ lister."""
-
-    def test_lists_parameter_names(self, monkeypatch):
-        """openaq refresh reads the v3 /parameters name list."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
-            lambda url, **kw: {"results": [{"name": "pm25"}, {"name": "o3"}]},
-        )
-        outcome = refresh_one(_info("openaq"))
-        assert outcome.status == "ok", "openaq refresh ran"
-        assert outcome.live_count == 2, "two parameter names listed"
-
-    def test_audit_no_untracked_when_curated_covers_live(self, monkeypatch):
-        """A provider whose index lives elsewhere reports no false untracked."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
-            lambda url, **kw: {"results": [{"name": "pm25"}]},
-        )
-        outcome = audit_one(_info("openaq"))
-        assert outcome.status == "ok", "audit ran"
-        assert "pm25" not in outcome.untracked, "curated live id is not untracked"
-
-
 class TestCoverageOne:
     """Tests for coverage_one (the `audit --coverage` driver)."""
 
@@ -406,27 +380,6 @@ class TestIndexWriters:
         after = sorted(load_catalog(info).available_datasets)
         assert after == before, f"{provider} index drifted on round-trip"
         assert path.endswith("_index.yaml"), "wrote the sharded index file"
-
-
-class TestComputedIndexWriters:
-    """Tests for the sibling-index writers (openaq / worldpop / usgs_water)."""
-
-    def test_openaq_writes_available_parameters_sibling(self, tmp_path, monkeypatch):
-        """openaq --write persists the flat live parameter list to a sibling."""
-        info, module, dst = _catalog_copy("openaq", tmp_path, monkeypatch)
-        path = refresh_mod._WRITERS["openaq"](info, {"openaq": ["o3", "pm25"]})
-        data = yaml.safe_load(pathlib.Path(path).read_text("utf-8"))
-        assert data["available_parameters"] == ["o3", "pm25"], "flat list written"
-
-    def test_refresh_one_write_reports_sibling_path(self, tmp_path, monkeypatch):
-        """refresh_one(write=True) returns the sibling path for openaq."""
-        info, module, dst = _catalog_copy("openaq", tmp_path, monkeypatch)
-        monkeypatch.setattr(
-            refresh_mod, "_get_json", lambda url, **kw: {"results": [{"name": "pm25"}]}
-        )
-        outcome = refresh_one(info, write=True)
-        assert outcome.status == "ok", "openaq write ran"
-        assert outcome.written.endswith("available_parameters.yaml"), "sibling path"
 
 
 def _ecmwf_per_store_get_json(url, **kw):

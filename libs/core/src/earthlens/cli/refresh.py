@@ -30,7 +30,6 @@ machine-writable index at all (chc's curated slugs, fdsn / firms whose
 from __future__ import annotations
 
 import importlib
-import os
 import re
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
@@ -317,38 +316,6 @@ def _ecmwf_grouped(catalog: Any) -> dict[str, list[str]]:
     return grouped
 
 
-#: OpenAQ parameters endpoint (needs an `OPENAQ_API_KEY` header).
-_OPENAQ_PARAMETERS_URL = "https://api.openaq.org/v3/parameters"
-
-
-def _openaq_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List the OpenAQ parameter names, live (needs `OPENAQ_API_KEY`).
-
-    The key is read from the environment; without it the request fails and
-    `refresh_one` reports an `"error"` outcome.
-
-    Args:
-        catalog: The loaded OpenAQ `Catalog` (unused; the endpoint is fixed).
-
-    Returns:
-        A single-group mapping `{"openaq": [sorted parameter names]}`.
-    """
-    key = os.environ.get("OPENAQ_API_KEY", "")
-    body = _get_json(
-        _OPENAQ_PARAMETERS_URL,
-        headers={"X-API-Key": key} if key else None,
-        params={"limit": 1000},
-    )
-    names = sorted(
-        {str(row["name"]) for row in body.get("results", []) if row.get("name")}
-    )
-    return {"openaq": names}
-
-
-#: WorldPop public REST data hub (alias -> sub-alias crawl, no credentials).
-_WORLDPOP_REST_URL = "https://hub.worldpop.org/rest/data"
-
-
 def _write_sibling_index(info: BackendInfo, filename: str, payload: Any) -> str:
     """Write an informational `available_*` index file next to the catalog.
 
@@ -371,13 +338,6 @@ def _write_sibling_index(info: BackendInfo, filename: str, payload: Any) -> str:
         encoding="utf-8",
     )
     return str(path)
-
-
-def _write_openaq(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
-    """Rewrite OpenAQ's sibling `available_parameters.yaml` (full live list)."""
-    return _write_sibling_index(
-        info, "available_parameters.yaml", {"available_parameters": _flatten(grouped)}
-    )
 
 
 def _get_text(url: str) -> str:
@@ -514,7 +474,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     # in-core literals below are the not-yet-migrated remainder (issue #863).
     **dispatch_table("refresher"),
     "ecmwf": _ecmwf_grouped,
-    "openaq": _openaq_grouped,
     "chc": _chc_grouped,
 }
 
@@ -527,7 +486,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("writer"),
     "ecmwf": _index_writer("available_datasets", grouped=True),
-    "openaq": _write_openaq,
 }
 
 
