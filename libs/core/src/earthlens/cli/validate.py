@@ -436,11 +436,6 @@ def _validate_gbif(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, _check_gbif_taxon)
 
 
-def _validate_obis(catalog: Any) -> tuple[int, list[str]]:
-    """Each curated OBIS species needs a scientific name."""
-    return _lint(catalog, lambda k, r: _require(k, r, ("scientific_name",)))
-
-
 def _check_wdpa_country(key: str, record: Any) -> list[str]:
     """Flag a WDPA country missing a name or with a malformed ISO3 key."""
     issues = _require(key, record, ("name",))
@@ -648,7 +643,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "sentinel_hub": _validate_sentinel_hub,
     "worldpop": _validate_worldpop,
     "gbif": _validate_gbif,
-    "obis": _validate_obis,
     "wdpa": _validate_wdpa,
     "iucn": _validate_iucn,
     "jaxa": _validate_jaxa,

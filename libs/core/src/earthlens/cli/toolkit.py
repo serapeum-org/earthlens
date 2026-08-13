@@ -26,6 +26,9 @@ from earthlens.cli.refresh import (
     _TIMEOUT as HTTP_TIMEOUT,
 )
 from earthlens.cli.refresh import (
+    _biodiversity_curated_ids as biodiversity_curated_ids,
+)
+from earthlens.cli.refresh import (
     _curated_attr_ids as curated_attr_ids,
 )
 from earthlens.cli.refresh import (
@@ -60,6 +63,7 @@ __all__ = [
     "COVERAGE_BUCKETS",
     "HTTP_TIMEOUT",
     "BackendInfo",
+    "biodiversity_curated_ids",
     "curated_attr_ids",
     "flatten",
     "get_json",

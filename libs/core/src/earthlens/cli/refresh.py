@@ -1143,24 +1143,6 @@ def _gbif_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"gbif": sorted(ids)}
 
 
-def _obis_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List OBIS's curated marine-taxa index — the universe IS the catalog.
-
-    Like `_gbif_grouped`, OBIS has no anonymous "list every taxon" endpoint;
-    the universe earthlens tracks is the curated `available_datasets:` index
-    of common marine higher-rank taxa plus the friendly species aliases. The
-    refresher returns that combined sorted set.
-
-    Args:
-        catalog: The loaded OBIS `Catalog`.
-
-    Returns:
-        A single-group mapping `{"obis": [sorted available + friendly ids]}`.
-    """
-    ids = set(catalog.available_datasets) | set(catalog.datasets)
-    return {"obis": sorted(ids)}
-
-
 def _wdpa_grouped(catalog: Any) -> dict[str, list[str]]:
     """List the WDPA country axis — the universe IS the curated ISO3 set.
 
@@ -1217,7 +1199,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "s3": _s3_grouped,
     "jaxa": _jaxa_grouped,
     "gbif": _gbif_grouped,
-    "obis": _obis_grouped,
     "wdpa": _wdpa_grouped,
     "iucn": _iucn_grouped,
 }
@@ -1444,7 +1425,6 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "worldpop": _worldpop_curated_ids,
     "chc": _chc_ftp_bases,
     "gbif": _biodiversity_curated_ids,
-    "obis": _biodiversity_curated_ids,
     "wdpa": _biodiversity_curated_ids,
     "iucn": _biodiversity_curated_ids,
 }

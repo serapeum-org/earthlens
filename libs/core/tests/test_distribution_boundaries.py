@@ -1289,7 +1289,6 @@ class TestCliIsBackendAgnostic:
             "mswep",
             "nrel",
             "nwp",
-            "obis",
             "openaq",
             "openeo",
             "pvgis",

@@ -475,26 +475,6 @@ def _emit_gbif(
     }
 
 
-def _emit_obis(
-    catalog: Any, upstream_id: str, *, key: str, **opts: Any
-) -> dict[str, Any]:
-    """Seed an OBIS `species:` row from a scientific name (no network).
-
-    Args:
-        catalog: The loaded OBIS `Catalog` (unused).
-        upstream_id: The OBIS `scientificname` (e.g. `"Mola mola"`).
-        key: The friendly catalog key.
-        **opts: `title`.
-
-    Returns:
-        The seeded row.
-    """
-    return {
-        "scientific_name": upstream_id,
-        "title": str(opts.get("title") or key.replace("-", " ").title()),
-    }
-
-
 def _emit_wdpa(
     catalog: Any, upstream_id: str, *, key: str, **opts: Any
 ) -> dict[str, Any]:
@@ -680,7 +660,6 @@ _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
     "gee": _emit_gee,
     "jaxa": _emit_jaxa,
     "gbif": _emit_gbif,
-    "obis": _emit_obis,
     "wdpa": _emit_wdpa,
     "iucn": _emit_iucn,
 }
@@ -688,7 +667,6 @@ _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
 #: Provider id -> the YAML block its curated rows live under.
 _BIODIVERSITY_BLOCKS = {
     "gbif": "taxa",
-    "obis": "species",
     "wdpa": "countries",
     "iucn": "countries",
 }

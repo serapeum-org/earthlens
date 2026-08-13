@@ -1142,20 +1142,6 @@ class TestBiodiversityProbers:
         with pytest.raises(ValueError, match="unknown GBIF taxon"):
             curate_mod._gbif_probe(G(), "nope")
 
-    def test_obis_returns_dispatch_row(self):
-        """The OBIS probe returns the curated scientific_name + title."""
-        from earthlens.obis import Catalog as O
-
-        result = curate_mod._obis_probe(O(), "blue-whale")
-        assert result["blue-whale"]["scientific_name"] == "Balaenoptera musculus"
-
-    def test_obis_raises_on_unknown_species(self):
-        """An unknown species raises with a clear message."""
-        from earthlens.obis import Catalog as O
-
-        with pytest.raises(ValueError, match="unknown OBIS species"):
-            curate_mod._obis_probe(O(), "nope")
-
     def test_wdpa_returns_country_row(self):
         """The WDPA probe returns the curated name + region."""
         from earthlens.wdpa import Catalog as W

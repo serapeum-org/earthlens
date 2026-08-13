@@ -1247,33 +1247,6 @@ def _gbif_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     }
 
 
-def _obis_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Report an OBIS curated species' dispatch metadata (offline).
-
-    Symmetric to `_gbif_probe` — reads the curated `scientific_name` / `title`
-    straight from the bundled row.
-
-    Args:
-        catalog: The loaded OBIS `Catalog`.
-        dataset: A curated friendly name (e.g. `"blue-whale"`).
-
-    Returns:
-        Single-entry mapping `{dataset: {scientific_name, title}}`.
-
-    Raises:
-        ValueError: If `dataset` is not a curated OBIS species.
-    """
-    record = catalog.datasets.get(dataset)
-    if record is None:
-        raise ValueError(f"unknown OBIS species {dataset!r}")
-    return {
-        dataset: {
-            "scientific_name": record.scientific_name,
-            "title": record.title,
-        }
-    }
-
-
 def _wdpa_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     """Report a WDPA curated country's dispatch metadata (offline).
 
@@ -1337,7 +1310,6 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "chc": _chc_probe,
     "tropycal": _tropycal_probe,
     "gbif": _gbif_probe,
-    "obis": _obis_probe,
     "wdpa": _wdpa_probe,
     "iucn": _iucn_probe,
     "nwp": _nwp_probe,

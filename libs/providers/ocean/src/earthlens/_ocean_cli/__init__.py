@@ -34,6 +34,14 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "validator": "earthlens.erddap.cli:validator",
         "emitter": "earthlens.erddap.cli:emitter",
     },
+    "obis": {
+        "refresher": "earthlens.obis.cli:refresher",
+        "curated_ids": "earthlens.obis.cli:curated_ids",
+        "prober": "earthlens.obis.cli:prober",
+        "validator": "earthlens.obis.cli:validator",
+        "emitter": "earthlens.obis.cli:emitter",
+        "stanza_block": "species",
+    },
     "nwm": {
         "refresher": "earthlens.nwm.cli:refresher",
         "curated_ids": "earthlens.nwm.cli:curated_ids",
