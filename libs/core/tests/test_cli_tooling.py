@@ -8,7 +8,9 @@ import pytest
 
 from earthlens._cli_tooling import (
     CLI_ENTRY_POINT_GROUP,
+    config_table,
     discover_cli_tooling,
+    dispatch_table,
     resolve_target,
 )
 
@@ -29,6 +31,19 @@ class _FakeEntryPoint:
 
 _SPEC_A = {"refresher": "earthlens.alpha.cli:refresher"}
 _SPEC_B = {"validator": "earthlens.beta.cli:validator", "index_attr": "available"}
+
+
+@pytest.fixture(autouse=True)
+def _clear_discovery_cache():
+    """Reset the memoized discovery around each test that repoints entry_points.
+
+    `discover_cli_tooling` is `lru_cache`d, so a real-entry-points result cached
+    by import (or a previous test) would leak into a test that monkeypatches
+    `entry_points`. Clear before and after so every test sees its own view.
+    """
+    discover_cli_tooling.cache_clear()
+    yield
+    discover_cli_tooling.cache_clear()
 
 
 @pytest.mark.unit
@@ -149,3 +164,66 @@ class TestResolveTarget:
         """A target missing the module or the attr half raises."""
         with pytest.raises(ValueError, match="module:attr"):
             resolve_target(bad)
+
+
+@pytest.mark.unit
+class TestDispatchAndConfigTables:
+    """Tests for the `dispatch_table` / `config_table` / `_thunk` projection."""
+
+    def test_dispatch_table_projects_only_the_role(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Only providers publishing the role appear in the table."""
+        monkeypatch.setattr(
+            "earthlens._cli_tooling.entry_points",
+            lambda group: [
+                _FakeEntryPoint("alpha", {"a": _SPEC_A}),  # refresher only
+                _FakeEntryPoint("beta", {"b": _SPEC_B}),  # validator + index_attr
+            ],
+        )
+        assert set(dispatch_table("refresher")) == {"a"}
+        assert set(dispatch_table("validator")) == {"b"}
+
+    def test_dispatch_table_thunks_resolve_lazily(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Building the table imports no handler module; the thunk resolves on call."""
+        import sys
+
+        monkeypatch.setattr(
+            "earthlens._cli_tooling.entry_points",
+            lambda group: [
+                _FakeEntryPoint("x", {"x": {"refresher": "earthlens.nope.cli:go"}})
+            ],
+        )
+        table = dispatch_table("refresher")  # must not import earthlens.nope
+        assert "earthlens.nope.cli" not in sys.modules, "handler module not imported"
+        with pytest.raises(ModuleNotFoundError):
+            table["x"]()  # resolution is deferred to the first call
+
+    def test_dispatch_table_thunk_forwards_arguments(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A resolved thunk forwards its arguments to the real handler."""
+        monkeypatch.setattr(
+            "earthlens._cli_tooling.entry_points",
+            lambda group: [
+                _FakeEntryPoint(
+                    "x", {"x": {"writer": "earthlens.base.naming:safe_filename"}}
+                )
+            ],
+        )
+        assert dispatch_table("writer")["x"]("a/b:c") == "a_b_c"
+
+    def test_config_table_passes_values_through(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A config role's literal value is returned verbatim, not imported."""
+        monkeypatch.setattr(
+            "earthlens._cli_tooling.entry_points",
+            lambda group: [
+                _FakeEntryPoint("alpha", {"a": _SPEC_A}),  # no index_attr
+                _FakeEntryPoint("beta", {"b": _SPEC_B}),  # index_attr: available
+            ],
+        )
+        assert config_table("index_attr") == {"b": "available"}
