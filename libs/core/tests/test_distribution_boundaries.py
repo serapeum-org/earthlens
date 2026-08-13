@@ -1282,21 +1282,33 @@ class TestCliIsBackendAgnostic:
                 yield path
 
     def _provider_ids(self) -> set[str]:
-        """The canonical provider ids the dispatch dicts key on."""
+        """The canonical provider ids (the `earthlens.<id>` package names)."""
         from earthlens.cli.adapter import list_backends
 
         return {info.provider for info in list_backends()}
 
+    def _provider_keys(self) -> set[str]:
+        """Every facade key a hard-coded branch might name — canonical + aliases.
+
+        Keying the dict-key / comparison scans off this (rather than the
+        canonical ids only) closes the alias hole: a branch written against an
+        alias (`"chirps"` for chc, `"amazon-s3"` for s3) is still recognised as
+        naming a backend.
+        """
+        from earthlens.cli.adapter import known_provider_keys
+
+        return set(known_provider_keys())
+
     def test_dispatch_dicts_name_exactly_the_pending_backends(self):
         """Every provider-id dict key in core's CLI is an unmigrated backend."""
-        provider_ids = self._provider_ids()
+        provider_keys = self._provider_keys()
         named: set[str] = set()
         for path in self._cli_sources():
             for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
                 if not isinstance(node, ast.Dict):
                     continue
                 for key in node.keys:
-                    if isinstance(key, ast.Constant) and key.value in provider_ids:
+                    if isinstance(key, ast.Constant) and key.value in provider_keys:
                         named.add(key.value)
         assert named == self.PENDING, (
             "core CLI dispatch dicts name a set of backends other than the "
@@ -1305,14 +1317,59 @@ class TestCliIsBackendAgnostic:
             "earthlens.<backend>.cli and update PENDING (empty = #863 closed)."
         )
 
+    def test_no_provider_id_comparisons_in_core_cli(self):
+        """No core CLI branch compares against a backend id / alias string.
+
+        Catches the coupling forms the dict-key scan cannot see: a
+        `provider == "gee"` equality, an `!=`, or a membership test against a
+        set/list/tuple literal (`provider in {"gee", "ecmwf"}`) — the shapes a
+        reintroduced `if`/`elif` dispatch would take. Docstring examples are
+        exempt automatically: they parse as a single string constant, never as
+        `ast.Compare` nodes.
+        """
+        provider_keys = self._provider_keys()
+        offenders: set[str] = set()
+        for path in self._cli_sources():
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                if not isinstance(node, ast.Compare):
+                    continue
+                operands = [node.left, *node.comparators]
+                literals: list[ast.expr] = []
+                for operand in operands:
+                    if isinstance(operand, ast.Set | ast.List | ast.Tuple):
+                        literals.extend(operand.elts)
+                    else:
+                        literals.append(operand)
+                for literal in literals:
+                    if (
+                        isinstance(literal, ast.Constant)
+                        and literal.value in provider_keys
+                    ):
+                        offenders.add(literal.value)
+        allowed = self.PENDING | self.PENDING_IMPORTS
+        assert offenders <= allowed, (
+            "core CLI compares against backend id / alias string(s) "
+            f"{sorted(offenders - allowed)} — a hard-coded provider branch. "
+            "Dispatch on a role via earthlens._cli_tooling instead."
+        )
+
     def test_provider_imports_are_exactly_the_pending_ones(self):
-        """Every `earthlens.<backend>` import in core's CLI is unmigrated."""
+        """Every `earthlens.<backend>` import in core's CLI is unmigrated.
+
+        Scans both `from earthlens.<backend> import …` (`ast.ImportFrom`) and
+        the plain `import earthlens.<backend>[.…]` form (`ast.Import`).
+        """
         provider_ids = self._provider_ids()
         imported: set[str] = set()
         for path in self._cli_sources():
             for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                modules: list[str] = []
                 if isinstance(node, ast.ImportFrom) and node.module:
-                    parts = node.module.split(".")
+                    modules.append(node.module)
+                elif isinstance(node, ast.Import):
+                    modules.extend(alias.name for alias in node.names)
+                for module in modules:
+                    parts = module.split(".")
                     if len(parts) > 1 and parts[0] == "earthlens":
                         if parts[1] in provider_ids:
                             imported.add(parts[1])
