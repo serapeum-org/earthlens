@@ -279,7 +279,9 @@ def _gee_classify(asset_id: str, curated: set[str]) -> str:
     if doc.get("gee:type") == "table":
         return "table"
     bands = (doc.get("summaries", {}) or {}).get("eo:bands") or []
-    has_meta = any(b.get(_GEE_UNITS_KEY) or b.get(_GEE_SCALE_KEY) is not None for b in bands)
+    has_meta = any(
+        b.get(_GEE_UNITS_KEY) or b.get(_GEE_SCALE_KEY) is not None for b in bands
+    )
     return "addressable" if (bands and has_meta) else "thin"
 
 
