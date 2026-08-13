@@ -1284,7 +1284,6 @@ class TestCliIsBackendAgnostic:
             "radar",
             "radklim",
             "s3",
-            "sentinel_hub",
             "tropycal",
         }
     )
@@ -1296,7 +1295,6 @@ class TestCliIsBackendAgnostic:
             "ecmwf",
             "gee",
             "radar",
-            "sentinel_hub",
         }
     )
 

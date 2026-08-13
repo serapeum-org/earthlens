@@ -53,23 +53,6 @@ class TestSupportedProviders:
         } <= set(supported_providers())
 
 
-class TestSentinelHubProbe:
-    """Tests for the Sentinel Hub band prober (offline SDK)."""
-
-    def test_resolves_curated_key_to_bands(self):
-        """A curated key resolves to the SDK collection's bands (offline)."""
-        result = probe_dataset(_info("sentinel_hub"), "sentinel-2-l2a")
-        assert result.status == "ok", f"sentinel_hub probe failed: {result.detail}"
-        assert "B04" in result.assets, "Sentinel-2 bands probed"
-        assert result.assets["B04"]["units"], "band units recorded"
-
-    def test_curated_key_adds_collection_row(self):
-        """A curated key also surfaces a collection: row with sh_collection."""
-        result = probe_dataset(_info("sentinel_hub"), "sentinel-2-l2a")
-        row = result.assets.get("collection:sentinel-2-l2a")
-        assert row and row["sh_collection"], "collection summary row present"
-
-
 class TestGeeProbe:
     """Tests for the GEE band prober."""
 

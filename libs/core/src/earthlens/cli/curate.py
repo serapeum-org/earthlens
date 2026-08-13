@@ -114,46 +114,6 @@ def _gee_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return schema
 
 
-def _sentinel_hub_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe a Sentinel Hub collection's bands from the SDK (offline, no auth).
-
-    Args:
-        catalog: The loaded Sentinel Hub `Catalog` (used to resolve a curated
-            key to its `sh_collection` name).
-        dataset: A curated key (e.g. `sentinel-2-l2a`) or an SDK collection
-            name (e.g. `SENTINEL2_L2A`).
-
-    Returns:
-        Mapping of band name to `{units, output_types}`, plus — when
-        `dataset` is a curated key — a `collection:<key>` row carrying the
-        bound `sh_collection`, native `resolution`, and `cadence`.
-
-    Raises:
-        KeyError: If `dataset` resolves to no known `DataCollection`.
-    """
-    from earthlens.sentinel_hub._helpers import import_sentinelhub
-
-    sentinelhub = import_sentinelhub()
-    record = catalog.datasets.get(dataset)
-    name = getattr(record, "sh_collection", None) or dataset
-    collection = sentinelhub.DataCollection[name]
-    schema: dict[str, dict[str, Any]] = {}
-    if record is not None:
-        schema[f"collection:{dataset}"] = {
-            "sh_collection": name,
-            "resolution": getattr(record, "resolution", None),
-            "cadence": getattr(record, "cadence", None),
-        }
-    for band in getattr(collection, "bands", None) or []:
-        units = getattr(band, "units", None) or ()
-        types = getattr(band, "output_types", None) or ()
-        schema[str(band.name)] = {
-            "units": ", ".join(str(getattr(u, "value", u)) for u in units),
-            "output_types": ", ".join(getattr(t, "__name__", str(t)) for t in types),
-        }
-    return schema
-
-
 def _infer_dtype(value: str | None) -> str:
     """Infer a coarse dtype (`int` / `float` / `str`) from a sample value."""
     if value is None or value == "":
@@ -798,7 +758,6 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("prober"),
     "gee": _gee_probe,
-    "sentinel_hub": _sentinel_hub_probe,
     "s3": _s3_probe,
     "ecmwf": _ecmwf_probe,
     "chc": _chc_probe,

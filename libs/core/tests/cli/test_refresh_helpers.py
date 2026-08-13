@@ -119,13 +119,6 @@ class TestGeeCoverageBody:
 class TestNetworkPrimitives:
     """Tests for the thin network/SDK list helpers (mocked)."""
 
-    def test_sentinel_hub_grouped(self, monkeypatch):
-        """sentinel_hub grouped wraps the DataCollection enum names, sorted."""
-        monkeypatch.setattr(
-            refresh_mod, "_sh_data_collection_names", lambda: ["S2", "S1"]
-        )
-        assert refresh_mod._sentinel_hub_grouped(None) == {"sentinel_hub": ["S1", "S2"]}
-
     def test_gee_fetch_id_and_error(self, monkeypatch):
         """_gee_fetch_id reads the doc id; an error degrades to None."""
         monkeypatch.setattr(refresh_mod, "_get_json", lambda url: {"id": "X/Y"})

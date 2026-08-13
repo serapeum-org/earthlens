@@ -346,34 +346,6 @@ def _openaq_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"openaq": names}
 
 
-#: EUMETSAT public browse collections endpoint (no credentials).
-
-
-def _sh_data_collection_names() -> list[str]:
-    """Return the `sentinelhub.DataCollection` enum member names (no auth)."""
-    from earthlens.sentinel_hub._helpers import import_sentinelhub
-
-    return [member.name for member in import_sentinelhub().DataCollection]
-
-
-def _sentinel_hub_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List Sentinel Hub collections from the SDK's `DataCollection` enum.
-
-    Listing the supported collections needs no credentials — it is the
-    sentinelhub SDK's authoritative registry (the same source the bundled
-    `available_collections` index was built from); data *access* is what
-    needs CDSE OAuth.
-
-    Args:
-        catalog: The loaded Sentinel Hub `Catalog` (unused; the SDK is the
-            source).
-
-    Returns:
-        A single-group mapping `{"sentinel_hub": [sorted collection names]}`.
-    """
-    return {"sentinel_hub": sorted(set(_sh_data_collection_names()))}
-
-
 #: Public Earth Engine STAC catalog root (no credentials for the catalog).
 _GEE_STAC_ROOT = "https://storage.googleapis.com/earthengine-stac/catalog/catalog.json"
 
@@ -779,7 +751,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     **dispatch_table("refresher"),
     "ecmwf": _ecmwf_grouped,
     "openaq": _openaq_grouped,
-    "sentinel_hub": _sentinel_hub_grouped,
     "gee": _gee_grouped,
     "radar": _radar_grouped,
     "chc": _chc_grouped,
@@ -795,7 +766,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("writer"),
     "ecmwf": _index_writer("available_datasets", grouped=True),
-    "sentinel_hub": _index_writer("available_collections"),
     "gee": _index_writer("available_datasets"),
     "radar": _write_radar,
     "s3": _index_writer("available_datasets"),
@@ -987,7 +957,6 @@ def _biodiversity_curated_ids(catalog: Any) -> list[str]:
 _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("curated_ids"),
-    "sentinel_hub": _curated_attr_ids("sh_collection"),
     "chc": _chc_ftp_bases,
 }
 

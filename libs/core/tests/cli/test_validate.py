@@ -328,16 +328,6 @@ class TestValidateOne:
         assert result.checked > 0, "models were checked"
 
 
-class TestOfflineExtensions:
-    """Tests for the usgs_water + sentinel_hub offline validators."""
-
-    def test_sentinel_hub_validates_clean(self):
-        """Every curated Sentinel Hub recipe's evalscript is well-formed."""
-        result = validate_one(_info("sentinel_hub"))
-        assert result.status == "ok" and result.issues == []
-        assert result.checked > 0, "recipes were checked"
-
-
 class TestLiveValidators:
     """Tests for the `--live` reachability validators (network mocked)."""
 
@@ -455,26 +445,6 @@ class TestOfflineValidatorBranches:
         _checked, issues = _validate_nwp(catalog)
         assert any("model_family" in i for i in issues), "herbie family flagged"
 
-    def test_sentinel_hub_bad_evalscript_flagged(self, monkeypatch):
-        """A recipe whose evalscript lacks //VERSION=3 + dataMask is flagged."""
-        from earthlens.cli import validate as vm
-        from earthlens.cli.validate import _validate_sentinel_hub
-
-        monkeypatch.setattr(
-            "earthlens.sentinel_hub.read_evalscript",
-            lambda name: "// not versioned\nreturn x;",
-        )
-        catalog = SimpleNamespace(
-            recipes={
-                "r": SimpleNamespace(evalscript="r.js", kind="stats"),
-                "blank": SimpleNamespace(evalscript=None, kind="render"),
-            }
-        )
-        _checked, issues = _validate_sentinel_hub(catalog)
-        assert any("//VERSION=3" in i for i in issues), "version header flagged"
-        assert any("dataMask" in i for i in issues), "stats dataMask flagged"
-        assert vm is not None
-
 
 class TestLivePrimitives:
     """Cover the thin live-reachability primitive helpers (SDK mocked)."""
@@ -572,20 +542,6 @@ class TestLiveValidatorBranches:
         catalog = SimpleNamespace(datasets={"d": object()}, minimal_valid_request=boom)
         checked, issues = _live_ecmwf(catalog)
         assert any("constraints fetch failed" in i for i in issues), "failure reported"
-
-    def test_sentinel_hub_missing_evalscript_file(self, monkeypatch):
-        """A recipe whose evalscript file is missing is flagged."""
-        from earthlens.cli.validate import _validate_sentinel_hub
-
-        def missing(name):
-            raise FileNotFoundError(f"{name} not found")
-
-        monkeypatch.setattr("earthlens.sentinel_hub.read_evalscript", missing)
-        catalog = SimpleNamespace(
-            recipes={"r": SimpleNamespace(evalscript="gone.js", kind="render")}
-        )
-        _checked, issues = _validate_sentinel_hub(catalog)
-        assert any("gone.js" in i for i in issues), "missing file flagged"
 
     def test_live_s3_reports_bucket_error(self, monkeypatch):
         """A bucket whose listing raises is reported as drift, not raised."""

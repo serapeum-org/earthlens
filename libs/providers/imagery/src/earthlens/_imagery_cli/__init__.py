@@ -45,6 +45,13 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "prober": "earthlens.openeo.cli:prober",
         "live_validator": "earthlens.openeo.cli:live_validator",
     },
+    "sentinel_hub": {
+        "refresher": "earthlens.sentinel_hub.cli:refresher",
+        "writer": "earthlens.sentinel_hub.cli:writer",
+        "curated_ids": "earthlens.sentinel_hub.cli:curated_ids",
+        "prober": "earthlens.sentinel_hub.cli:prober",
+        "validator": "earthlens.sentinel_hub.cli:validator",
+    },
     "stac": {
         "refresher": "earthlens.stac.cli:refresher",
         "writer": "earthlens.stac.cli:writer",

@@ -145,19 +145,6 @@ class TestOpenaqRefresher:
         assert "pm25" not in outcome.untracked, "curated live id is not untracked"
 
 
-class TestSentinelHubRefresher:
-    """Tests for the Sentinel Hub (SDK enum) lister."""
-
-    def test_lists_data_collection_names(self, monkeypatch):
-        """sentinel_hub refresh reads the DataCollection enum names."""
-        monkeypatch.setattr(
-            refresh_mod, "_sh_data_collection_names", lambda: ["SENTINEL2_L2A", "DEM"]
-        )
-        outcome = refresh_one(_info("sentinel_hub"))
-        assert outcome.status == "ok", "sentinel_hub refresh ran"
-        assert outcome.live_count == 2, "two collection names listed"
-
-
 class TestGeeRefresher:
     """Tests for the GEE (EE STAC walk) lister."""
 

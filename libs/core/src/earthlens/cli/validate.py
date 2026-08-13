@@ -287,39 +287,6 @@ def _validate_chc(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, check)
 
 
-def _validate_sentinel_hub(catalog: Any) -> tuple[int, list[str]]:
-    """Each Sentinel Hub recipe's evalscript `.js` must be well-formed.
-
-    Mirrors `tools/sentinel_hub/refresh_sh_catalog.py:validate-recipe`
-    (offline): the bundled `.js` must exist, start with `//VERSION=3`, and
-    a `"stats"` recipe must declare a `dataMask` band.
-
-    Args:
-        catalog: The loaded Sentinel Hub `Catalog` (exposes `recipes`).
-
-    Returns:
-        `(checked, issues)` — the recipe count and one message per problem.
-    """
-    from earthlens.sentinel_hub import read_evalscript
-
-    recipes = getattr(catalog, "recipes", None) or {}
-    issues: list[str] = []
-    for key, recipe in recipes.items():
-        script_name = getattr(recipe, "evalscript", None)
-        if not script_name:
-            continue
-        try:
-            script = read_evalscript(script_name)
-        except FileNotFoundError as exc:
-            issues.append(f"{key}: {exc}")
-            continue
-        if script.splitlines()[0].strip() != "//VERSION=3":
-            issues.append(f"{key}: {script_name} does not start with //VERSION=3")
-        if getattr(recipe, "kind", None) == "stats" and "dataMask" not in script:
-            issues.append(f"{key}: {script_name} stats recipe has no dataMask band")
-    return len(recipes), issues
-
-
 def _validate_goes(catalog: Any) -> tuple[int, list[str]]:
     """Structural lint of the curated GOES ABI products.
 
@@ -410,7 +377,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "catrare": _validate_catrare,
     "drought": _validate_drought,
     "chc": _validate_chc,
-    "sentinel_hub": _validate_sentinel_hub,
     "pvgis": _validate_pvgis,
     "nrel": _validate_nrel,
 }
