@@ -1274,7 +1274,6 @@ class TestCliIsBackendAgnostic:
             "bathymetry",
             "catrare",
             "chc",
-            "cmems",
             "drought",
             "earthdata",
             "ecmwf",

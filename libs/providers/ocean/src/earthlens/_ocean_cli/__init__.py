@@ -21,6 +21,12 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "refresher": "earthlens.caravan.cli:refresher",
         "validator": "earthlens.caravan.cli:validator",
     },
+    "cmems": {
+        "refresher": "earthlens.cmems.cli:refresher",
+        "writer": "earthlens.cmems.cli:writer",
+        "prober": "earthlens.cmems.cli:prober",
+        "deep_prober": "earthlens.cmems.cli:deep_prober",
+    },
     "nwm": {
         "refresher": "earthlens.nwm.cli:refresher",
         "curated_ids": "earthlens.nwm.cli:curated_ids",

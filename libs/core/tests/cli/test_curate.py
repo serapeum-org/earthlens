@@ -127,31 +127,6 @@ class TestEarthdataProbe:
         assert result.status == "ok" and result.assets == {}, "empty UMM-Var"
 
 
-class TestCmemsProbe:
-    """Tests for the CMEMS variable prober (SDK describe)."""
-
-    def test_walks_nested_variables(self, monkeypatch):
-        """cmems probe flattens the nested products→…→variables to a schema."""
-        from types import SimpleNamespace
-
-        from earthlens.cli import curate as curate_mod
-
-        variable = SimpleNamespace(
-            short_name="thetao", standard_name="sea_water_temp", units="degC"
-        )
-        service = SimpleNamespace(variables=[variable])
-        part = SimpleNamespace(services=[service])
-        version = SimpleNamespace(parts=[part])
-        entry = SimpleNamespace(versions=[version])
-        catalogue = SimpleNamespace(products=[SimpleNamespace(datasets=[entry])])
-        monkeypatch.setattr(
-            curate_mod, "_cmems_describe_dataset", lambda dataset_id: catalogue
-        )
-        result = probe_dataset(_info("cmems"), "cmems_mod_glo_phy")
-        assert result.status == "ok", "cmems probe ran"
-        assert result.assets["thetao"]["units"] == "degC", "variable units parsed"
-
-
 class TestSentinelHubProbe:
     """Tests for the Sentinel Hub band prober (offline SDK)."""
 
@@ -418,17 +393,6 @@ class TestNwpProbe:
 
 class TestDeepProbers:
     """Tests for the credentialed `--deep` samplers (creds/network mocked)."""
-
-    def test_cmems_deep_reads_netcdf_vars(self, monkeypatch):
-        """cmems --deep reads the real NetCDF variable schema."""
-        monkeypatch.setattr(
-            curate_mod,
-            "_cmems_deep_sample",
-            lambda dsid: {"thetao": {"units": "degC", "dtype": "float32"}},
-        )
-        result = probe_dataset(_info("cmems"), "cmems_mod_glo_phy", deep=True)
-        assert result.status == "ok", "cmems deep probe ran"
-        assert result.assets["thetao"]["units"] == "degC", "real var units read"
 
     def test_earthdata_deep_samples_granule(self, monkeypatch):
         """earthdata --deep records a sampled granule's format."""
@@ -856,39 +820,6 @@ class TestChcSampleFiles:
 
 class TestDeepSamplers:
     """Cover the credentialed deep-sample SDK bodies (SDKs faked)."""
-
-    def test_cmems_deep_sample_reads_data_vars(self, monkeypatch):
-        """_cmems_deep_sample reads each NetCDF data_var's attrs + dtype."""
-        import sys
-        import types
-
-        fake = types.ModuleType("copernicusmarine")
-
-        class _Var:
-            attrs = {
-                "units": "degC",
-                "standard_name": "sea_water_temp",
-                "long_name": "Temp",
-            }
-            dtype = "float32"
-
-        fake.open_dataset = lambda dataset_id=None: types.SimpleNamespace(
-            data_vars={"thetao": _Var()}
-        )
-        monkeypatch.setitem(sys.modules, "copernicusmarine", fake)
-        out = curate_mod._cmems_deep_sample("x")
-        assert out["thetao"]["units"] == "degC", "units read"
-        assert out["thetao"]["dtype"] == "float32", "dtype stringified"
-
-    def test_cmems_describe_dataset_delegates(self, monkeypatch):
-        """_cmems_describe_dataset calls the SDK describe and returns it."""
-        import sys
-        import types
-
-        fake = types.ModuleType("copernicusmarine")
-        fake.describe = lambda dataset_id=None, disable_progress_bar=None: "CAT"
-        monkeypatch.setitem(sys.modules, "copernicusmarine", fake)
-        assert curate_mod._cmems_describe_dataset("x") == "CAT"
 
     def test_earthdata_deep_sample_reads_granule(self, monkeypatch):
         """_earthdata_deep_sample logs in, searches, and reads a granule link."""

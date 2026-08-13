@@ -531,34 +531,6 @@ def _openaq_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"openaq": names}
 
 
-def _cmems_describe() -> Any:
-    """Return the live Copernicus Marine catalogue (SDK call, public)."""
-    import copernicusmarine
-
-    return copernicusmarine.describe(disable_progress_bar=True)
-
-
-def _cmems_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List every CMEMS dataset id across the live catalogue (public SDK).
-
-    Walks `copernicusmarine.describe().products[].datasets[].dataset_id`.
-
-    Args:
-        catalog: The loaded CMEMS `Catalog` (unused; the SDK is the source).
-
-    Returns:
-        A single-group mapping `{"cmems": [sorted dataset ids]}`.
-    """
-    result = _cmems_describe()
-    ids = {
-        did
-        for product in getattr(result, "products", []) or []
-        for dataset in getattr(product, "datasets", []) or []
-        if (did := getattr(dataset, "dataset_id", None))
-    }
-    return {"cmems": sorted(str(i) for i in ids)}
-
-
 #: EUMETSAT public browse collections endpoint (no credentials).
 _EUMETSAT_BROWSE_URL = "https://api.eumetsat.int/data/browse/collections"
 
@@ -1282,7 +1254,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "openeo": _openeo_grouped,
     "earthdata": _earthdata_grouped,
     "openaq": _openaq_grouped,
-    "cmems": _cmems_grouped,
     "eumetsat": _eumetsat_grouped,
     "sentinel_hub": _sentinel_hub_grouped,
     "gee": _gee_grouped,
@@ -1309,7 +1280,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "stac": _write_stac,
     "ecmwf": _index_writer("available_datasets", grouped=True),
     "openeo": _write_openeo,
-    "cmems": _index_writer("available_datasets"),
     "eumetsat": _index_writer("available_datasets"),
     "sentinel_hub": _index_writer("available_collections"),
     "gee": _index_writer("available_datasets"),

@@ -383,46 +383,6 @@ def _infer_dtype(value: str | None) -> str:
         return "str"
 
 
-def _cmems_describe_dataset(dataset_id: str) -> Any:
-    """Return the live Copernicus Marine catalogue for one dataset (SDK)."""
-    import copernicusmarine
-
-    return copernicusmarine.describe(dataset_id=dataset_id, disable_progress_bar=True)
-
-
-def _cmems_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe a CMEMS dataset's variables (public `copernicusmarine.describe`).
-
-    Walks the nested catalogue
-    (`products[].datasets[].versions[].parts[].services[].variables[]`) and
-    records each variable's standard name and units.
-
-    Args:
-        catalog: The loaded CMEMS `Catalog` (unused; the SDK is the source).
-        dataset: The CMEMS dataset id.
-
-    Returns:
-        Mapping of variable short name to `{standard_name, units}`.
-    """
-    result = _cmems_describe_dataset(dataset)
-    schema: dict[str, dict[str, Any]] = {}
-    for product in getattr(result, "products", []) or []:
-        for entry in getattr(product, "datasets", []) or []:
-            for version in getattr(entry, "versions", []) or []:
-                for part in getattr(version, "parts", []) or []:
-                    for service in getattr(part, "services", []) or []:
-                        for variable in getattr(service, "variables", []) or []:
-                            name = getattr(variable, "short_name", None)
-                            if name:
-                                schema[str(name)] = {
-                                    "standard_name": getattr(
-                                        variable, "standard_name", None
-                                    ),
-                                    "units": getattr(variable, "units", None),
-                                }
-    return schema
-
-
 #: EUMETSAT public browse collections endpoint (no credentials).
 _EUMETSAT_BROWSE_URL = "https://api.eumetsat.int/data/browse/collections"
 
@@ -879,32 +839,6 @@ def _nwp_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
 # above. Each live call sits behind a mockable helper; the credentials come
 # from the environment (copernicusmarine / earthaccess) or ~/.cdsapirc.
 # --------------------------------------------------------------------------- #
-def _cmems_deep_sample(dataset_id: str) -> dict[str, dict[str, Any]]:
-    """Open a CMEMS dataset lazily and read its real NetCDF variables (creds)."""
-    import copernicusmarine
-
-    dataset = copernicusmarine.open_dataset(dataset_id=dataset_id)
-    schema: dict[str, dict[str, Any]] = {}
-    for name, variable in dataset.data_vars.items():
-        attrs = variable.attrs
-        schema[str(name)] = {
-            "units": attrs.get("units"),
-            "standard_name": attrs.get("standard_name"),
-            "long_name": attrs.get("long_name"),
-            "dtype": str(variable.dtype),
-        }
-    return schema
-
-
-def _cmems_deep_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Deep-probe a CMEMS dataset's true NetCDF variable schema (credentialed).
-
-    Unlike the light `describe` prober, this opens the dataset (lazily, no
-    full download) to read the variable names / units / dtype as they
-    actually appear in the served NetCDF. Needs
-    `COPERNICUSMARINE_SERVICE_USERNAME` / `_PASSWORD`.
-    """
-    return _cmems_deep_sample(dataset)
 
 
 def _earthdata_deep_sample(
@@ -1234,7 +1168,8 @@ def _nwp_deep_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
 
 #: Provider id -> a credentialed deep sampler (the `--deep` half of probe).
 _DEEP_PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
-    "cmems": _cmems_deep_probe,
+    # Discovered handlers first; in-core literals are the migration remainder.
+    **dispatch_table("deep_prober"),
     "earthdata": _earthdata_deep_probe,
     "ecmwf": _ecmwf_deep_probe,
     "nwp": _nwp_deep_probe,
@@ -1393,7 +1328,6 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "openeo": _openeo_probe,
     "gee": _gee_probe,
     "sentinel_hub": _sentinel_hub_probe,
-    "cmems": _cmems_probe,
     "earthdata": _earthdata_probe,
     "eumetsat": _eumetsat_probe,
     "worldpop": _worldpop_probe,

@@ -128,31 +128,6 @@ class TestNetworkPrimitives:
         )
         assert refresh_mod._openeo_process_ids() == ["ndvi"]
 
-    def test_cmems_describe_delegates(self, monkeypatch):
-        """_cmems_describe calls the SDK describe and returns the catalogue."""
-        import sys
-        import types
-
-        fake = types.ModuleType("copernicusmarine")
-        fake.describe = lambda disable_progress_bar=None: "CAT"
-        monkeypatch.setitem(sys.modules, "copernicusmarine", fake)
-        assert refresh_mod._cmems_describe() == "CAT"
-
-    def test_cmems_grouped_flattens(self, monkeypatch):
-        """cmems grouped flattens products[].datasets[].dataset_id."""
-        cat = SimpleNamespace(
-            products=[
-                SimpleNamespace(
-                    datasets=[
-                        SimpleNamespace(dataset_id="a"),
-                        SimpleNamespace(dataset_id="b"),
-                    ]
-                )
-            ]
-        )
-        monkeypatch.setattr(refresh_mod, "_cmems_describe", lambda: cat)
-        assert refresh_mod._cmems_grouped(None) == {"cmems": ["a", "b"]}
-
     def test_eumetsat_grouped_reads_link_titles(self, monkeypatch):
         """Each browse link's title is taken as the collection id."""
         monkeypatch.setattr(
