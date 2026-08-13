@@ -1360,6 +1360,42 @@ class TestCliIsBackendAgnostic:
             "Dispatch on a role via earthlens._cli_tooling instead."
         )
 
+    def test_no_provider_id_dispatch_shapes_in_core_cli(self):
+        """No core CLI branch dispatches on a backend id via subscript/call/match.
+
+        Complements the dict-key and comparison scans by catching the remaining
+        shapes a hand-rolled dispatch could take: a constant subscript against a
+        name-bound registry (`REGISTRY["gee"]`), a backend id passed as a call
+        argument (`table.get("gee")`, `f("ecmwf", ...)`), or a structural
+        `match` / `case "gee":`. Docstring examples are exempt automatically
+        (they parse as a single string constant, not as these nodes).
+        """
+        provider_keys = self._provider_keys()
+        offenders: set[str] = set()
+
+        def flag(node: ast.expr | None) -> None:
+            if isinstance(node, ast.Constant) and node.value in provider_keys:
+                offenders.add(node.value)
+
+        for path in self._cli_sources():
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                if isinstance(node, ast.Subscript):
+                    flag(node.slice)
+                elif isinstance(node, ast.Call):
+                    for arg in node.args:
+                        flag(arg)
+                    for kw in node.keywords:
+                        flag(kw.value)
+                elif isinstance(node, ast.MatchValue):
+                    flag(node.value)
+        allowed = self.PENDING | self.PENDING_IMPORTS
+        assert offenders <= allowed, (
+            "core CLI dispatches on backend id / alias string(s) "
+            f"{sorted(offenders - allowed)} via a subscript / call arg / match "
+            "case — a hard-coded provider branch. Use a role via "
+            "earthlens._cli_tooling instead."
+        )
+
     def test_provider_imports_are_exactly_the_pending_ones(self):
         """Every `earthlens.<backend>` import in core's CLI is unmigrated.
 
