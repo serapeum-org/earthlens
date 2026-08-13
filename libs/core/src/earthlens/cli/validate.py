@@ -128,44 +128,6 @@ def _validate_s3(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("bucket", "format")))
 
 
-def _validate_asf(catalog: Any) -> tuple[int, list[str]]:
-    """Every ASF row's PLATFORM/DATASET/PRODUCT_TYPE must exist in `asf_search`.
-
-    The catalog is hand-curated against the SDK's enum modules; if a
-    constant is renamed or removed upstream, the row would silently
-    break only at first live query. This validator imports the SDK and
-    checks every row's `platform` / `dataset` / `product_type` member
-    name still exists on the matching module.
-
-    Args:
-        catalog: The loaded ASF :class:`earthlens.asf.Catalog`.
-
-    Returns:
-        `(checked, issues)` — the product count and one message per
-            row whose constants no longer resolve.
-    """
-    try:
-        import asf_search as asf
-    except ImportError:
-        # Report zero checked rows — nothing was inspected — and surface
-        # the install hint as the issue so JSON consumers can distinguish
-        # "ran clean" from "skipped because the SDK was missing".
-        return 0, [
-            f"asf_search is not installed; install the `asf` extra to "
-            f"validate {len(catalog.datasets)} curated row(s)"
-        ]
-    issues: list[str] = []
-    products = catalog.datasets
-    for key, row in products.items():
-        if row.platform is not None and not hasattr(asf.PLATFORM, row.platform):
-            issues.append(f"{key}: PLATFORM.{row.platform} not in asf_search")
-        if row.dataset is not None and not hasattr(asf.DATASET, row.dataset):
-            issues.append(f"{key}: DATASET.{row.dataset} not in asf_search")
-        if not hasattr(asf.PRODUCT_TYPE, row.product_type):
-            issues.append(f"{key}: PRODUCT_TYPE.{row.product_type} not in asf_search")
-    return len(products), issues
-
-
 def _check_radklim_row(key: str, record: Any) -> list[str]:
     """Lint one RADKLIM product: stream fields + a served default format.
 
@@ -482,7 +444,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "mswep": _validate_mswep,
     "goes": _validate_goes,
     "s3": _validate_s3,
-    "asf": _validate_asf,
     "radar": _validate_radar,
     "radklim": _validate_radklim,
     "tropycal": _validate_tropycal,

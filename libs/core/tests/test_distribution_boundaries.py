@@ -1270,7 +1270,6 @@ class TestCliIsBackendAgnostic:
     #: empty as #863 lands provider by provider).
     PENDING = frozenset(
         {
-            "asf",
             "catrare",
             "chc",
             "drought",
