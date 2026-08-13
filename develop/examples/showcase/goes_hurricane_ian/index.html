@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11907,7 +11907,7 @@
   <span class="md-ellipsis">
     
   
-    The Grand Ethiopian Renaissance Dam filling, 2013 -&gt; 2025
+    Showcase — the GERD reservoir filling on the Blue Nile (2020 → 2024)
   
 
     
@@ -23925,10 +23925,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayGlyph</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArrayGlyph</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColorBar</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 
@@ -23940,10 +23939,9 @@ import tempfile
 
 import matplotlib.pyplot as plt
 import numpy as np
-from cleopatra.glyphs.gridded.array_glyph import ArrayGlyph
+from cleopatra.array_glyph import ArrayGlyph
 from loguru import logger
 from pyramids.dataset import Dataset
-from pyramids.plot import ColorBar
 
 from earthlens.core import EarthLens
 
@@ -24143,12 +24141,7 @@ else:
         <span class="n">bt</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
         <span class="n">title</span><span class="o">=</span><span class="s2">"GOES-16 ABI band 13 (clean IR) — Hurricane Ian over Florida, 29 Sep 2022"</span><span class="p">,</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-        <span class="n">cmap</span><span class="o">=</span><span class="s2">"turbo_r"</span><span class="p">,</span>
-        <span class="n">vmin</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-        <span class="n">vmax</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
-        <span class="n">colorbar</span><span class="o">=</span><span class="n">ColorBar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">"brightness temperature (K)"</span><span class="p">),</span>
-    <span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">"turbo_r"</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">cbar_label</span><span class="o">=</span><span class="s2">"brightness temperature (K)"</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span>
         <span class="sa">f</span><span class="s2">"coldest cloud-top brightness temperature in scene: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">bt</span><span class="p">)</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> K "</span>
@@ -24162,12 +24155,7 @@ else:
         bt,
         figsize=(7, 8),
         title="GOES-16 ABI band 13 (clean IR) — Hurricane Ian over Florida, 29 Sep 2022",
-    ).plot(
-        cmap="turbo_r",
-        vmin=200,
-        vmax=300,
-        colorbar=ColorBar(label="brightness temperature (K)"),
-    )
+    ).plot(cmap="turbo_r", vmin=200, vmax=300, cbar_label="brightness temperature (K)")
     plt.show()
     print(
         f"coldest cloud-top brightness temperature in scene: {np.nanmin(bt):.0f} K "

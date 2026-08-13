@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -11907,7 +11907,7 @@
   <span class="md-ellipsis">
     
   
-    The Grand Ethiopian Renaissance Dam filling, 2013 -&gt; 2025
+    Showcase — the GERD reservoir filling on the Blue Nile (2020 → 2024)
   
 
     
@@ -23979,9 +23979,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.primitives.scatter_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScatterGlyph</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.colorbar</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColorBar</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.styling.palettes</span><span class="w"> </span><span class="kn">import</span> <span class="n">FLAME_COLORMAPS</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -23992,9 +23989,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="clipboard-copy-txt" id="cell-1">import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from cleopatra.glyphs.primitives.scatter_glyph import ScatterGlyph
-from cleopatra.styling.colorbar import ColorBar
-from cleopatra.styling.palettes import FLAME_COLORMAPS
 from loguru import logger
 
 from earthlens.core import EarthLens
@@ -24104,44 +24098,48 @@ except Exception as exc:  # noqa: BLE001
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">if</span> <span class="n">quakes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">quakes</span><span class="p">):</span>
     <span class="n">q</span> <span class="o">=</span> <span class="n">quakes</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"magnitude"</span><span class="p">)</span>
-    <span class="c1"># cleopatra ScatterGlyph: colour AND marker size both encode magnitude, coloured</span>
-    <span class="c1"># through the "flame" amber energy ramp.</span>
-    <span class="n">glyph</span> <span class="o">=</span> <span class="n">ScatterGlyph</span><span class="p">(</span>
-        <span class="n">q</span><span class="o">.</span><span class="n">longitude</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-        <span class="n">q</span><span class="o">.</span><span class="n">latitude</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-        <span class="n">values</span><span class="o">=</span><span class="n">q</span><span class="o">.</span><span class="n">magnitude</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-        <span class="n">sizes</span><span class="o">=</span><span class="n">q</span><span class="o">.</span><span class="n">magnitude</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-        <span class="n">cmap</span><span class="o">=</span><span class="n">FLAME_COLORMAPS</span><span class="p">[</span><span class="s2">"amber"</span><span class="p">],</span>
-        <span class="n">size_limits</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">320</span><span class="p">),</span>
-        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"T</span><span class="se">\u00fc</span><span class="s2">rkiye</span><span class="se">\u2013</span><span class="s2">Syria, Feb</span><span class="se">\u2013</span><span class="s2">Mar 2023 </span><span class="se">\u2014</span><span class="s2"> </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="si">}</span><span class="s2"> events M&gt;=4.0"</span><span class="p">,</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">7</span><span class="p">))</span>
+    <span class="n">sc</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+        <span class="n">q</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span>
+        <span class="n">q</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span>
+        <span class="n">c</span><span class="o">=</span><span class="n">q</span><span class="o">.</span><span class="n">magnitude</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="s2">"hot_r"</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="n">q</span><span class="o">.</span><span class="n">magnitude</span><span class="p">,</span>
+        <span class="n">edgecolor</span><span class="o">=</span><span class="s2">"k"</span><span class="p">,</span>
+        <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">glyph</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">colorbar</span><span class="o">=</span><span class="n">ColorBar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">"magnitude"</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">q</span><span class="p">[</span><span class="n">q</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">&gt;=</span> <span class="mf">7.0</span><span class="p">]</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="sa">f</span><span class="s2">"M</span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">magnitude</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">latitude</span><span class="p">),</span> <span class="n">fontweight</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"longitude"</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"latitude"</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+        <span class="n">xlabel</span><span class="o">=</span><span class="s2">"longitude"</span><span class="p">,</span>
+        <span class="n">ylabel</span><span class="o">=</span><span class="s2">"latitude"</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Türkiye–Syria, Feb–Mar 2023 — </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="si">}</span><span class="s2"> events M&gt;=4.0"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"magnitude"</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">if quakes is not None and len(quakes):
     q = quakes.sort_values("magnitude")
-    # cleopatra ScatterGlyph: colour AND marker size both encode magnitude, coloured
-    # through the "flame" amber energy ramp.
-    glyph = ScatterGlyph(
-        q.longitude.to_numpy(),
-        q.latitude.to_numpy(),
-        values=q.magnitude.to_numpy(),
-        sizes=q.magnitude.to_numpy(),
-        cmap=FLAME_COLORMAPS["amber"],
-        size_limits=(5, 320),
-        figsize=(8, 7),
-        title=f"T\u00fcrkiye\u2013Syria, Feb\u2013Mar 2023 \u2014 {len(q)} events M&gt;=4.0",
+    fig, ax = plt.subplots(figsize=(8, 7))
+    sc = ax.scatter(
+        q.longitude,
+        q.latitude,
+        c=q.magnitude,
+        cmap="hot_r",
+        s=2**q.magnitude,
+        edgecolor="k",
+        linewidth=0.3,
+        alpha=0.8,
     )
-    fig, ax, _ = glyph.plot(colorbar=ColorBar(label="magnitude"))
     for _, r in q[q.magnitude &gt;= 7.0].iterrows():
         ax.annotate(f"M{r.magnitude:.1f}", (r.longitude, r.latitude), fontweight="bold")
-    ax.set_xlabel("longitude")
-    ax.set_ylabel("latitude")
+    ax.set(
+        xlabel="longitude",
+        ylabel="latitude",
+        title=f"Türkiye–Syria, Feb–Mar 2023 — {len(q)} events M&gt;=4.0",
+    )
+    fig.colorbar(sc, ax=ax, label="magnitude")
     plt.show()</div>
 </div>
 </div>
