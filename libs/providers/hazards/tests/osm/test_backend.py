@@ -191,7 +191,7 @@ class TestOhsomeRoute:
         assert fake_ohsome.post_kwargs["endpoint"] == "elements/geometry"
 
     def test_retry_and_user_agent_policy_applied(self, osm_kwargs, fake_ohsome):
-        """The client carries our UA, log=False, and a 429/5xx (not 403) retry."""
+        """The client carries our UA, log=False, and a capped 429/5xx (not 403) retry."""
         from earthlens.osm.backend import USER_AGENT
 
         OSM(
@@ -201,9 +201,14 @@ class TestOhsomeRoute:
         assert client_kwargs["user_agent"] == USER_AGENT
         assert client_kwargs["log"] is False
         retry = client_kwargs["retry"]
-        assert retry.total == 5
+        assert retry.total == OSM.MAX_OHSOME_RETRIES
+        assert retry.backoff_factor == OSM.OHSOME_BACKOFF_FACTOR
         assert 429 in retry.status_forcelist
         assert 403 not in retry.status_forcelist
+        # The wait ceiling matches HttpClient's, so a hostile Retry-After cannot
+        # pin the thread — both the backoff and the Retry-After are capped.
+        assert retry.backoff_max == OSM.OHSOME_MAX_BACKOFF
+        assert retry.retry_after_max == OSM.OHSOME_MAX_BACKOFF
 
     def test_forbidden_via_leaked_jsondecodeerror_becomes_unavailable(
         self, osm_kwargs, fake_ohsome
