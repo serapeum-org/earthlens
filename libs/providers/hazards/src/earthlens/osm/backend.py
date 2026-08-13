@@ -184,6 +184,13 @@ class OSM(AbstractDataSource):
     MAX_OHSOME_RETRIES: int = 5
     OHSOME_BACKOFF_FACTOR: float = 1.0
 
+    #: Ceiling (whole seconds) on any single ohsome retry wait — the exponential
+    #: backoff and a server-sent `Retry-After` alike — mirroring HttpClient's
+    #: `DEFAULT_MAX_BACKOFF` (300 s) so a hostile/misconfigured `Retry-After`
+    #: cannot pin the calling thread for an unbounded interval. Kept an `int`
+    #: because urllib3's `retry_after_max` is integer-typed.
+    OHSOME_MAX_BACKOFF: int = 300
+
     AGGREGATE_REFUSAL_REASON = "OSM features are vector, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     #: An Overpass current-state query has no window; ohsome supplies its own, so a
@@ -639,6 +646,11 @@ class OSM(AbstractDataSource):
             allowed_methods=frozenset({"GET", "POST"}),
             backoff_factor=self.OHSOME_BACKOFF_FACTOR,
             respect_retry_after_header=True,
+            # Ceiling on any single wait — the exponential backoff *and* a
+            # server-sent `Retry-After` — so a hostile/misconfigured `Retry-After`
+            # cannot pin the calling thread. Mirrors HttpClient's DEFAULT_MAX_BACKOFF.
+            backoff_max=self.OHSOME_MAX_BACKOFF,
+            retry_after_max=self.OHSOME_MAX_BACKOFF,
         )
         # `log=False` keeps the SDK from writing an `ohsome_log/` directory into
         # the caller's CWD on every failed query.

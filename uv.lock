@@ -2432,7 +2432,7 @@ requires-dist = [
     { name = "overpy", marker = "extra == 'osm'", specifier = ">=0.7" },
     { name = "overturemaps", marker = "extra == 'overture'", specifier = ">=1.0.0" },
     { name = "pyrosm", marker = "extra == 'osm-pbf'", specifier = ">=0.11.0" },
-    { name = "urllib3", marker = "extra == 'osm'", specifier = ">=1.26" },
+    { name = "urllib3", marker = "extra == 'osm'", specifier = ">=2" },
 ]
 provides-extras = ["emdat", "fdsn", "hdx", "overture", "osm", "osm-pbf"]
 
