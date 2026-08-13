@@ -140,7 +140,11 @@ def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
 
 
 def _http_status(exc: BaseException) -> int | None:
-    """Return the HTTP status `exc` carries, from a `response` object or its text.
+    """Return the HTTP status `exc` carries, from its type, a `response`, or text.
+
+    Handles the two stdlib/SDK shapes: `urllib.error.HTTPError` carries the status
+    on `.code`, `requests.HTTPError` on `.response.status_code`. Falls back to
+    parsing a leading `NNN Server/Client Error` out of the message.
 
     Args:
         exc: The exception to inspect.
@@ -148,6 +152,8 @@ def _http_status(exc: BaseException) -> int | None:
     Returns:
         The status code, or `None` if none is discernible.
     """
+    if isinstance(exc, urllib.error.HTTPError):
+        return exc.code
     response = getattr(exc, "response", None)
     code = getattr(response, "status_code", None)
     if isinstance(code, int):
@@ -175,11 +181,17 @@ def is_upstream_unavailable(exc: BaseException) -> str | None:
         problem.
     """
     for link in _exception_chain(exc):
+        # Status first: a `urllib.error.HTTPError` is also a `URLError` (in
+        # `_NETWORK_EXC`), so classifying it by type would skip a real 4xx as
+        # "unreachable". Read the status, and let a definite non-transient status
+        # (400 / 403 / 404 / ...) stay a failure instead of falling through.
+        status = _http_status(link)
+        if status is not None:
+            if status in _TRANSIENT_HTTP_STATUS:
+                return f"upstream returned HTTP {status}"
+            continue
         if isinstance(link, _NETWORK_EXC):
             return f"upstream unreachable ({type(link).__name__})"
-        status = _http_status(link)
-        if status in _TRANSIENT_HTTP_STATUS:
-            return f"upstream returned HTTP {status}"
         message = str(link).lower()
         for signature in _TRANSIENT_SIGNATURES:
             if signature in message:
