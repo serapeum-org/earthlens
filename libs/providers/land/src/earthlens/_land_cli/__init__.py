@@ -17,6 +17,12 @@ __all__ = ["CLI_TOOLING"]
 #: carries a literal value.
 CLI_TOOLING: dict[str, dict[str, str]] = {
     "bathymetry": {"validator": "earthlens.bathymetry.cli:validator"},
+    "ghsl": {
+        "prober": "earthlens.ghsl.cli:prober",
+        "validator": "earthlens.ghsl.cli:validator",
+        "live_validator": "earthlens.ghsl.cli:live_validator",
+        "tile_regen": "earthlens.ghsl.cli:tile_regen",
+    },
     "fabdem": {"validator": "earthlens.fabdem.cli:validator"},
     "glaciers": {"validator": "earthlens.glaciers.cli:validator"},
     "soilgrids": {"validator": "earthlens.soilgrids.cli:validator"},

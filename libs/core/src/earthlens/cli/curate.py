@@ -510,37 +510,6 @@ def _s3_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return {key: {} for key in keys}
 
 
-def _ghsl_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Report a GHSL product's curated (epoch, resolution) matrix (offline).
-
-    GHSL has no per-dataset sample endpoint; its availability is the curated
-    `releases` matrix, so this enumerates each release's epoch x resolution
-    blocks (and the source CRS each resolution implies) straight from the
-    bundled catalog.
-
-    Args:
-        catalog: The loaded GHSL `Catalog`.
-        dataset: A curated product code / alias.
-
-    Returns:
-        Mapping of `"{epoch}@{resolution}"` to `{release, crs}`.
-
-    Raises:
-        ValueError: If `dataset` is not a curated GHSL product.
-    """
-    record = catalog.datasets.get(dataset)
-    if record is None:
-        raise ValueError(f"unknown GHSL product {dataset!r}")
-    schema: dict[str, dict[str, Any]] = {}
-    for release, blocks in (getattr(record, "releases", None) or {}).items():
-        for block in blocks:
-            crs = ", ".join(sorted(block.source_crs()))
-            for epoch in block.epochs:
-                for resolution in block.resolutions:
-                    schema[f"{epoch}@{resolution}"] = {"release": release, "crs": crs}
-    return schema
-
-
 def _ecmwf_constraints(dataset: str) -> list[dict[str, Any]]:
     """Return a dataset's public `constraints.json` rows (no creds).
 
@@ -1230,7 +1199,6 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "eumetsat": _eumetsat_probe,
     "worldpop": _worldpop_probe,
     "s3": _s3_probe,
-    "ghsl": _ghsl_probe,
     "ecmwf": _ecmwf_probe,
     "chc": _chc_probe,
     "tropycal": _tropycal_probe,

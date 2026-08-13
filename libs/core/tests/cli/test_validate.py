@@ -415,18 +415,6 @@ class TestLiveValidators:
         result = validate_one(_info("s3"), live=True)
         assert result.issues == [], "objects present -> clean"
 
-    def test_ghsl_live_flags_non_200(self, monkeypatch):
-        """A GHSL artefact that does not HEAD 200 is flagged live."""
-        monkeypatch.setattr(validate_mod, "_http_head", lambda url: 404)
-        result = validate_one(_info("ghsl"), live=True)
-        assert result.status == "ok" and result.issues, "404 -> issue"
-
-    def test_ghsl_live_clean_at_200(self, monkeypatch):
-        """All artefacts HEADing 200 clear the ghsl live check."""
-        monkeypatch.setattr(validate_mod, "_http_head", lambda url: 200)
-        result = validate_one(_info("ghsl"), live=True)
-        assert result.issues == [], "all 200 -> clean"
-
     def test_openeo_is_live_only(self, monkeypatch):
         """openeo has no offline validator; --live checks recipes vs live."""
         assert validate_one(_info("openeo")).status == "unsupported"

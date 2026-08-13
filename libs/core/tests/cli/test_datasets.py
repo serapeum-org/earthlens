@@ -277,7 +277,11 @@ class TestRefresh:
             },
             crs="ESRI:54009",
         )
-        monkeypatch.setattr(refresh_mod, "_ghsl_tile_frame", lambda: frame)
+        monkeypatch.setattr(
+            __import__("earthlens.ghsl.cli", fromlist=["_tile_frame"]),
+            "_tile_frame",
+            lambda: frame,
+        )
         monkeypatch.setattr(
             ghsl_helpers, "TILE_SCHEMA_PATH", tmp_path / "tile_schema.geojson"
         )

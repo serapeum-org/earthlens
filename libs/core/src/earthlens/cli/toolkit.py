@@ -53,6 +53,9 @@ from earthlens.cli.refresh import (
     _write_sibling_index as write_sibling_index,
 )
 from earthlens.cli.validate import (
+    _http_head as http_head,
+)
+from earthlens.cli.validate import (
     _lint as lint,
 )
 from earthlens.cli.validate import (
@@ -68,6 +71,7 @@ __all__ = [
     "flatten",
     "get_json",
     "get_text",
+    "http_head",
     "index_path",
     "index_writer",
     "infer_dtype",

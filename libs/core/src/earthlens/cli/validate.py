@@ -128,15 +128,6 @@ def _validate_s3(catalog: Any) -> tuple[int, list[str]]:
     return _lint(catalog, lambda k, r: _require(k, r, ("bucket", "format")))
 
 
-def _validate_ghsl(catalog: Any) -> tuple[int, list[str]]:
-    """Each GHSL product needs a code and at least one release.
-
-    `family` is a soft grouping that is legitimately empty for top-level
-    products (e.g. GHS_POP is its own family), so it is not required.
-    """
-    return _lint(catalog, lambda k, r: _require(k, r, ("code", "releases")))
-
-
 def _validate_asf(catalog: Any) -> tuple[int, list[str]]:
     """Every ASF row's PLATFORM/DATASET/PRODUCT_TYPE must exist in `asf_search`.
 
@@ -514,7 +505,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "mswep": _validate_mswep,
     "goes": _validate_goes,
     "s3": _validate_s3,
-    "ghsl": _validate_ghsl,
     "asf": _validate_asf,
     "radar": _validate_radar,
     "radklim": _validate_radklim,
@@ -565,49 +555,6 @@ def _live_s3(catalog: Any) -> tuple[int, list[str]]:
 def _http_head(url: str) -> int:
     """Return the HTTP status of a HEAD request (following redirects)."""
     return requests.head(url, timeout=_TIMEOUT, allow_redirects=True).status_code
-
-
-def _live_ghsl(catalog: Any) -> tuple[int, list[str]]:
-    """HEAD one whole-globe artefact per GHSL product/release.
-
-    Skips releases whose every resolution ships only as tiles (real-tile
-    sampling stays in `tools/ghsl/refresh_ghsl_catalog.py`).
-    """
-    from earthlens.ghsl._helpers import RES_TO_TOKEN, ghsl_url
-
-    issues: list[str] = []
-    for code, product in catalog.datasets.items():
-        # Tabular products (resolution "table") have no raster artefact URL —
-        # their live check is the maintainer table-zip path in tools/ghsl.
-        if getattr(product, "kind", "raster") == "tabular":
-            continue
-        for release, blocks in (getattr(product, "releases", None) or {}).items():
-            block = blocks[0]
-            whole_globe = [
-                r
-                for r in block.resolutions
-                if r not in block.tiled() and r in RES_TO_TOKEN
-            ]
-            if not whole_globe:
-                continue
-            try:
-                url = ghsl_url(
-                    product.family or code,
-                    code,
-                    block.epochs[0],
-                    release,
-                    whole_globe[0],
-                    version=block.version,
-                    region=block.region,
-                    nested=block.nested,
-                )
-                status = _http_head(url)
-            except Exception as exc:  # noqa: BLE001 — reported as drift
-                issues.append(f"{code} ({release}): {exc}")
-                continue
-            if status != 200:
-                issues.append(f"{code} ({release}): HTTP {status} for {url}")
-    return len(catalog.datasets), issues
 
 
 #: CDSE openEO processes endpoint (public; pairs with the collections one).
@@ -799,7 +746,6 @@ _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("live_validator"),
     "s3": _live_s3,
-    "ghsl": _live_ghsl,
     "openeo": _live_openeo,
     "radar": _live_radar,
     "nwp": _live_nwp,

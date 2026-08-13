@@ -1066,61 +1066,9 @@ def _s3_grouped(catalog: Any) -> dict[str, list[str]]:
     return {"s3": sorted(str(key) for key in catalog.datasets)}
 
 
-#: JRC 54009 land tile-schema shapefile (the GHSL Mollweide tile grid source).
-_GHSL_TILE_SCHEMA_ZIP = (
-    "https://ghsl.jrc.ec.europa.eu/download/GHSL_data_54009_shapefile.zip"
-)
-
-
-def _ghsl_tile_frame() -> Any:
-    """Download the JRC tile shapefile and return its `(tile_id, bounds)` frame.
-
-    Fetches the JRC 54009 land tile-schema zip, extracts it to a temp dir,
-    reads the `*tile_schema_land*.shp` with geopandas, and keeps the tile id,
-    integer bounds, and geometry. (GIS read kept local to this maintainer op.)
-
-    Returns:
-        A `geopandas.GeoDataFrame` of the tile grid.
-    """
-    import io
-    import tempfile
-    import zipfile
-
-    import geopandas as gpd
-
-    response = requests.get(_GHSL_TILE_SCHEMA_ZIP, timeout=120)
-    response.raise_for_status()
-    with tempfile.TemporaryDirectory() as workdir:
-        with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
-            archive.extractall(workdir)  # nosec B202 — trusted JRC zip
-        shapefile = next(Path(workdir).glob("*tile_schema_land*.shp"))
-        frame = gpd.read_file(shapefile)[
-            ["tile_id", "left", "top", "right", "bottom", "geometry"]
-        ]
-    for column in ("left", "top", "right", "bottom"):
-        frame[column] = frame[column].astype(int)
-    return frame
-
-
-def refresh_ghsl_tiles() -> tuple[str, int]:
-    """Regenerate GHSL's bundled `tile_schema.geojson` from the JRC shapefile.
-
-    The GIS analogue of an `available_*` refresh: rewrites the 18x36 Mollweide
-    tile index the GHSL backend reads to map a bbox to its covering tiles.
-
-    Returns:
-        `(written_path, tile_count)`.
-    """
-    from earthlens.ghsl._helpers import TILE_SCHEMA_PATH
-
-    frame = _ghsl_tile_frame()
-    frame.to_file(TILE_SCHEMA_PATH, driver="GeoJSON")
-    return str(TILE_SCHEMA_PATH), len(frame)
-
-
 #: Provider id -> a callable regenerating a bundled GIS artefact (not an
 #: `available_*` index). Surfaced by `refresh <provider> --tiles`.
-_TILE_REGENS: dict[str, Callable[[], tuple[str, int]]] = {"ghsl": refresh_ghsl_tiles}
+_TILE_REGENS: dict[str, Callable[[], tuple[str, int]]] = dispatch_table("tile_regen")
 
 
 #: Provider id -> a callable taking the loaded catalog and returning its

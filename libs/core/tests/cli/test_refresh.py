@@ -641,35 +641,6 @@ class TestS3IndexRegen:
         assert sorted(load_catalog(info).available_datasets) == before, "index==curated"
 
 
-class TestGhslTileRegen:
-    """Tests for refresh_ghsl_tiles (GIS tile-grid regeneration)."""
-
-    def test_writes_tile_geojson(self, tmp_path, monkeypatch):
-        """The tile frame is written to TILE_SCHEMA_PATH as GeoJSON."""
-        import geopandas as gpd
-        from shapely.geometry import box
-
-        import earthlens.ghsl._helpers as ghsl_helpers
-
-        frame = gpd.GeoDataFrame(
-            {
-                "tile_id": ["R1_C1"],
-                "left": [0],
-                "top": [1],
-                "right": [1],
-                "bottom": [0],
-                "geometry": [box(0, 0, 1, 1)],
-            },
-            crs="ESRI:54009",
-        )
-        monkeypatch.setattr(refresh_mod, "_ghsl_tile_frame", lambda: frame)
-        dest = tmp_path / "tile_schema.geojson"
-        monkeypatch.setattr(ghsl_helpers, "TILE_SCHEMA_PATH", dest)
-        path, count = refresh_mod.refresh_ghsl_tiles()
-        assert count == 1 and dest.exists(), "tile geojson written"
-        assert path.endswith("tile_schema.geojson"), "wrote the bundled tile index"
-
-
 class TestComputedIndexWriters:
     """Tests for the sibling-index writers (openaq / worldpop / usgs_water)."""
 

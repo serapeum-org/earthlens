@@ -1278,7 +1278,6 @@ class TestCliIsBackendAgnostic:
             "ecmwf",
             "eumetsat",
             "gee",
-            "ghsl",
             "goes",
             "jaxa",
             "mswep",
@@ -1303,7 +1302,6 @@ class TestCliIsBackendAgnostic:
         {
             "ecmwf",
             "gee",
-            "ghsl",
             "radar",
             "sentinel_hub",
             "worldpop",
