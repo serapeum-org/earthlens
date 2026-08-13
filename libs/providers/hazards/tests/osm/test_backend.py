@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import types
 from pathlib import Path
 
 import pytest
@@ -181,6 +182,117 @@ class TestOhsomeRoute:
         ).download()
         assert "index" not in fc.columns
         assert len(fc) == 1
+
+    def test_request_targets_elements_geometry_endpoint(self, osm_kwargs, fake_ohsome):
+        """The request goes through the root client's post(endpoint=...) form."""
+        OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        ).download()
+        assert fake_ohsome.post_kwargs["endpoint"] == "elements/geometry"
+
+    def test_retry_and_user_agent_policy_applied(self, osm_kwargs, fake_ohsome):
+        """The client carries our UA, log=False, and a capped 429/5xx (not 403) retry."""
+        from earthlens.osm.backend import USER_AGENT
+
+        OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        ).download()
+        client_kwargs = fake_ohsome.client_kwargs
+        assert client_kwargs["user_agent"] == USER_AGENT
+        assert client_kwargs["log"] is False
+        retry = client_kwargs["retry"]
+        assert retry.total == OSM.MAX_OHSOME_RETRIES
+        assert retry.backoff_factor == OSM.OHSOME_BACKOFF_FACTOR
+        assert 429 in retry.status_forcelist
+        assert 403 not in retry.status_forcelist
+        # The wait ceiling matches HttpClient's, so a hostile Retry-After cannot
+        # pin the thread — both the backoff and the Retry-After are capped.
+        assert retry.backoff_max == OSM.OHSOME_MAX_BACKOFF
+        assert retry.retry_after_max == OSM.OHSOME_MAX_BACKOFF
+
+    def test_forbidden_via_leaked_jsondecodeerror_becomes_unavailable(
+        self, osm_kwargs, fake_ohsome
+    ):
+        """A 403 leaked as a bare JSONDecodeError is recovered via the chain."""
+        import requests
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        # One of the two SDK shapes: the HTML-403 body leaks a bare
+        # JSONDecodeError whose originating HTTPError (status 403) is only in the
+        # __context__ chain.
+        http_error = requests.HTTPError("403 Forbidden")
+        http_error.response = types.SimpleNamespace(status_code=403)
+        leaked = ValueError("Expecting value: line 1 column 1 (char 0)")
+        leaked.__context__ = http_error
+        fake_ohsome.error = leaked
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeUnavailableError) as excinfo:
+            backend.download()
+        assert excinfo.value.status_code == 403
+        assert "public" in str(excinfo.value)
+        assert excinfo.value.__cause__ is leaked
+
+    def test_forbidden_via_ohsome_exception_becomes_unavailable(
+        self, osm_kwargs, fake_ohsome
+    ):
+        """A 403 wrapped as OhsomeException(error_code=403) is also classified."""
+        from earthlens.osm import OhsomeUnavailableError
+
+        # The other SDK shape: the failure is wrapped into an OhsomeException-like
+        # error exposing error_code directly (no leaked JSONDecodeError).
+        ohsome_error = RuntimeError("Forbidden")
+        ohsome_error.error_code = 403
+        fake_ohsome.error = ohsome_error
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeUnavailableError) as excinfo:
+            backend.download()
+        assert excinfo.value.status_code == 403
+
+    def test_unauthorized_propagates_unchanged(self, osm_kwargs, fake_ohsome):
+        """A 401 is a real auth-contract change, not a throttle, so it propagates."""
+        from earthlens.osm import OhsomeUnavailableError
+
+        ohsome_error = RuntimeError("Unauthorized")
+        ohsome_error.error_code = 401
+        fake_ohsome.error = ohsome_error
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(RuntimeError, match="Unauthorized") as excinfo:
+            backend.download()
+        assert not isinstance(excinfo.value, OhsomeUnavailableError)
+
+    def test_rate_limited_becomes_unavailable_error(self, osm_kwargs, fake_ohsome):
+        """A 429 outliving the retries surfaces as a typed skip signal."""
+        from earthlens.osm import OhsomeUnavailableError
+
+        ohsome_error = RuntimeError("Too Many Requests")
+        ohsome_error.error_code = 429
+        fake_ohsome.error = ohsome_error
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeUnavailableError) as excinfo:
+            backend.download()
+        assert excinfo.value.status_code == 429
+
+    def test_non_throttle_error_propagates_unchanged(self, osm_kwargs, fake_ohsome):
+        """An error with no throttle status propagates as-is (not masked)."""
+        fake_ohsome.error = RuntimeError("some genuine bug")
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(RuntimeError, match="some genuine bug"):
+            backend.download()
 
 
 class TestDownloadContract:

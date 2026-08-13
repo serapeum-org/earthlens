@@ -16,6 +16,11 @@ Three concerns are factored here so `osm/backend.py` only routes:
   `FeatureCollection` (`G7`), normalising the CRS to EPSG:4326. The ohsome
   path's `.as_dataframe()` is already a `GeoDataFrame`, so it goes straight to
   `to_fc`.
+* `OhsomeUnavailableError` / `ohsome_http_status` — turn the `ohsome` SDK's
+  opaque failure on a throttled/blocked public endpoint into a clear, typed,
+  actionable error. The SDK exposes the HTTP status inconsistently (see
+  `ohsome_http_status` for the two shapes), so the status is recovered from the
+  exception chain here.
 
 All GIS containerisation stays inside the pyramids `FeatureCollection` per the
 repository's pyramids policy; earthlens only assembles the plain attribute rows
@@ -47,6 +52,92 @@ OSM_CRS = "EPSG:4326"
 #: The minimal identity columns every overpy-built row carries, ahead of the
 #: element's own tags.
 _ID_COLUMNS = ["osm_id", "osm_type"]
+
+
+class OhsomeUnavailableError(RuntimeError):
+    """The public ohsome endpoint refused a request with a retry-worthy status.
+
+    Raised by the OSM backend when `api.ohsome.org` answers a `403` (its front
+    proxy blocking / throttling this client — the endpoint is public and
+    keyless, so it is never a credential problem) or a `429` that outlived the
+    SDK's automatic retries. Carries the HTTP `status_code` so a caller can tell
+    a transient public-endpoint throttle apart from a genuine request error and
+    back off rather than fail hard.
+    """
+
+    def __init__(self, message: str, status_code: int | None = None) -> None:
+        """Store the actionable message and the originating HTTP status.
+
+        Args:
+            message: Human-facing explanation — what happened and what to do.
+            status_code: The HTTP status that triggered it (`403` / `429`), or
+                `None` when it could not be recovered from the SDK error.
+        """
+        super().__init__(message)
+        self.status_code = status_code
+
+
+def ohsome_http_status(exc: BaseException) -> int | None:
+    """Best-effort HTTP status behind an `ohsome` SDK failure.
+
+    The SDK exposes the status inconsistently. Usually it wraps the failure into
+    an `OhsomeException` carrying `error_code` (recovered by the first check
+    below). But on the HTML `403` an overloaded `api.ohsome.org` front proxy
+    returns, its non-JSON-body handling can misfire (its
+    `except json.decoder.JSONDecodeError` misses the `simplejson`-based
+    `requests.exceptions.JSONDecodeError`) and leak a bare `JSONDecodeError`
+    whose originating `requests.HTTPError` — and its `403` status — is only
+    reachable through the exception chain. This walks `exc` and its `__cause__` /
+    `__context__` predecessors and returns the first HTTP status it finds, so
+    both shapes are handled.
+
+    Args:
+        exc: The exception raised by an `ohsome` SDK call.
+
+    Returns:
+        int | None: The HTTP status code, or `None` when none is discoverable.
+
+    Examples:
+        - An `OhsomeException`-like error exposes its `error_code` directly:
+            ```python
+            >>> from earthlens.osm import ohsome_http_status
+            >>> class _Err(Exception):
+            ...     error_code = 429
+            >>> ohsome_http_status(_Err())
+            429
+
+            ```
+    """
+    seen: set[int] = set()
+    current: BaseException | None = exc
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        error_code = getattr(current, "error_code", None)
+        if _is_http_status(error_code):
+            return error_code
+        response = getattr(current, "response", None)
+        status = getattr(response, "status_code", None)
+        if _is_http_status(status):
+            return status
+        current = current.__cause__ or current.__context__
+    return None
+
+
+def _is_http_status(value: object) -> bool:
+    """Return whether `value` is a real integer HTTP status (not a `bool`).
+
+    `bool` is a subclass of `int`, so a plain `isinstance(value, int)` would
+    accept `True` / `False` and report a nonsensical status `1` / `0`; this
+    excludes them.
+
+    Args:
+        value: A candidate status pulled off an exception (`error_code` or a
+            response's `status_code`).
+
+    Returns:
+        bool: `True` when `value` is an `int` and not a `bool`.
+    """
+    return isinstance(value, int) and not isinstance(value, bool)
 
 
 def bbox_swne(space: SpatialExtent) -> tuple[float, float, float, float]:
