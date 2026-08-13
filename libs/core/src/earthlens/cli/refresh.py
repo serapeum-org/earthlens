@@ -128,7 +128,7 @@ def _get_json(
     Returns:
         The parsed JSON body. Typed as a mapping for the common case; the
         CADS `form.json` is sometimes a top-level list, which its one caller
-        (`stanza._emit_ecmwf`) narrows with an `isinstance` check.
+        (the ecmwf emitter) narrows with an `isinstance` check.
     """
     response = requests.get(url, headers=headers, params=params, timeout=_TIMEOUT)
     response.raise_for_status()
@@ -267,54 +267,6 @@ def _index_writer(
     return writer
 
 
-#: The three Copernicus Data Store public STAC catalogues, by `endpoint` slug.
-#: Listing each `/collections` needs no credentials (only data *retrieval*
-#: does); the slugs match `earthlens.ecmwf.endpoints.ENDPOINTS`.
-_ECMWF_STORE_COLLECTIONS_URLS: dict[str, str] = {
-    "cds": "https://cds.climate.copernicus.eu/api/catalogue/v1/collections",
-    "ads": "https://ads.atmosphere.copernicus.eu/api/catalogue/v1/collections",
-    "ewds": "https://ewds.climate.copernicus.eu/api/catalogue/v1/collections",
-}
-
-
-def _ecmwf_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List Copernicus dataset ids per store (CDS + ADS + EWDS), live (public).
-
-    Enumerates each store's `/catalogue/v1/collections`, following `rel="next"`
-    pagination (bounded by :data:`_MAX_PAGES`). Each collection's `id` is a
-    dataset name for that store. Listing needs no credentials.
-
-    Args:
-        catalog: The loaded ECMWF `Catalog` (unused; the endpoints are fixed).
-
-    Returns:
-        A per-store mapping `{"cds": [...], "ads": [...], "ewds": [...]}` of
-        sorted, de-duplicated dataset ids.
-    """
-    grouped: dict[str, list[str]] = {}
-    for store, base in _ECMWF_STORE_COLLECTIONS_URLS.items():
-        ids: set[str] = set()
-        url: str | None = base
-        pages = 0
-        while url and pages < _MAX_PAGES:
-            body = _get_json(url)
-            for collection in body.get("collections", []):
-                cid = collection.get("id")
-                if cid:
-                    ids.add(str(cid))
-            url = next(
-                (
-                    link.get("href")
-                    for link in body.get("links", [])
-                    if link.get("rel") == "next"
-                ),
-                None,
-            )
-            pages += 1
-        grouped[store] = sorted(ids)
-    return grouped
-
-
 def _write_sibling_index(info: BackendInfo, filename: str, payload: Any) -> str:
     """Write an informational `available_*` index file next to the catalog.
 
@@ -358,7 +310,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     # Discovered from each provider distribution's `earthlens.cli` table; the
     # in-core literals below are the not-yet-migrated remainder (issue #863).
     **dispatch_table("refresher"),
-    "ecmwf": _ecmwf_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -369,7 +320,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
 _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("writer"),
-    "ecmwf": _index_writer("available_datasets", grouped=True),
 }
 
 
@@ -707,44 +657,12 @@ class CoverageOutcome:
         }
 
 
-def _ecmwf_coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
-    """Classify every `available_datasets:` id across the three Copernicus stores.
-
-    The per-store availability index (CDS + ADS + EWDS, written by
-    `refresh ecmwf --write`) is unioned into `catalog.available_datasets`. A
-    dataset with a curated row is `DONE`; every other id is `addressable`
-    (reachable now via the raw-request passthrough, curatable on demand).
-
-    Args:
-        catalog: The loaded ECMWF `Catalog`.
-
-    Returns:
-        `(counts, todo)` — per-bucket counts and the sorted uncurated ids.
-
-    Raises:
-        ValueError: If the `available_datasets:` index is empty.
-    """
-    available = [str(ident) for ident in getattr(catalog, "available_datasets", [])]
-    if not available:
-        raise ValueError(
-            "available_datasets: is empty — run `refresh ecmwf --write` first"
-        )
-    curated = set(catalog.datasets)
-    buckets: dict[str, list[str]] = {}
-    for dataset_id in available:
-        bucket = "DONE" if dataset_id in curated else "addressable"
-        buckets.setdefault(bucket, []).append(dataset_id)
-    counts = {bucket: len(buckets.get(bucket, [])) for bucket in _COVERAGE_BUCKETS}
-    return counts, sorted(buckets.get("addressable", []))
-
-
 #: Provider id -> a callable returning `(counts, todo)` for `audit --coverage`.
 #: Only providers with a discoverable available-universe distinct from their
 #: curated rows (gee's STAC index, erddap's `allDatasets` crawl) qualify.
 _COVERAGE: dict[str, Callable[[Any], tuple[dict[str, int], list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("coverage"),
-    "ecmwf": _ecmwf_coverage,
 }
 
 

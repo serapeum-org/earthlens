@@ -70,36 +70,8 @@ class TestGhslProbe:
         assert "release" in entry and "crs" in entry, "release + crs recorded"
 
 
-class TestEcmwfProbe:
-    """Tests for the ECMWF constraints prober (public, no creds)."""
-
-    def test_unions_variables_from_constraints(self, monkeypatch):
-        """ecmwf probe unions the `variable` values across constraint rows."""
-        monkeypatch.setattr(
-            curate_mod,
-            "_ecmwf_constraints",
-            lambda d: [{"variable": ["2m_temperature", "tp"]}, {"variable": ["tp"]}],
-        )
-        result = probe_dataset(_info("ecmwf"), "reanalysis-era5-single-levels")
-        assert result.status == "ok", "ecmwf probe ran"
-        assert sorted(result.assets) == ["2m_temperature", "tp"], "vars unioned"
-
-
 class TestDeepProbers:
     """Tests for the credentialed `--deep` samplers (creds/network mocked)."""
-
-    def test_ecmwf_deep_reads_retrieved_netcdf(self, monkeypatch):
-        """ecmwf --deep reads long_name/units from a retrieved NetCDF."""
-        monkeypatch.setattr(
-            curate_mod,
-            "_ecmwf_deep_sample",
-            lambda d: {"t2m": {"long_name": "2 metre temperature", "units": "K"}},
-        )
-        result = probe_dataset(
-            _info("ecmwf"), "reanalysis-era5-single-levels", deep=True
-        )
-        assert result.status == "ok", "ecmwf deep probe ran"
-        assert result.assets["t2m"]["units"] == "K", "retrieved var units read"
 
     def test_deep_falls_back_to_light_prober(self, monkeypatch):
         """--deep on a provider with no deep sampler uses the light prober."""
@@ -168,31 +140,6 @@ class TestInferDtype:
         assert curate_mod._infer_dtype(value) == expected, f"{value!r}->{expected}"
 
 
-class TestEcmwfProberBranches:
-    """Branch coverage for the ECMWF constraints prober."""
-
-    def test_unions_variables_across_rows(self, monkeypatch):
-        """The variable values across all constraint rows are unioned + sorted."""
-        monkeypatch.setattr(
-            curate_mod,
-            "_ecmwf_constraints",
-            lambda d: [{"variable": ["t2m", "sp"]}, {"variable": ["t2m", "msl"]}],
-        )
-        result = probe_dataset(_info("ecmwf"), "reanalysis-era5-single-levels")
-        assert sorted(result.assets) == ["msl", "sp", "t2m"], "vars unioned + sorted"
-
-    def test_constraints_helper_delegates(self, monkeypatch):
-        """_ecmwf_constraints delegates to the package fetch_constraints."""
-        import earthlens.ecmwf.constraints as constraints
-
-        monkeypatch.setattr(
-            constraints,
-            "fetch_constraints",
-            lambda d, base_url=None: [{"variable": []}],
-        )
-        assert curate_mod._ecmwf_constraints("x") == [{"variable": []}]
-
-
 class TestGhslProberBranches:
     """Branch coverage for the offline GHSL matrix prober."""
 
@@ -210,121 +157,6 @@ class TestGhslProberBranches:
         """An unknown GHSL product reports 'error'."""
         result = probe_dataset(_info("ghsl"), "not-a-ghsl-product")
         assert result.status == "error", "unknown product -> error"
-
-
-class TestDeepSamplers:
-    """Cover the credentialed deep-sample SDK bodies (SDKs faked)."""
-
-    def test_ecmwf_deep_sample_reads_netcdf(self, monkeypatch):
-        """_ecmwf_deep_sample retrieves a tiny NetCDF and reads var metadata."""
-        import sys
-        import types
-
-        monkeypatch.setattr(
-            curate_mod,
-            "_ecmwf_constraints",
-            lambda d: [{"variable": ["2m_temperature"], "year": ["2020"]}],
-        )
-        cdsapi = types.ModuleType("cdsapi")
-        cdsapi.Client = lambda: types.SimpleNamespace(
-            retrieve=lambda ds, req, target: open(target, "w").close()
-        )
-        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
-        monkeypatch.setattr(
-            curate_mod,
-            "_read_netcdf_var_meta",
-            lambda path: {"t2m": {"long_name": "2 metre temperature", "units": "K"}},
-        )
-        out = curate_mod._ecmwf_deep_sample("reanalysis-era5-single-levels")
-        assert out["t2m"]["units"] == "K", "retrieved var units read"
-
-    def test_ecmwf_deep_sample_carries_family_selectors(self, monkeypatch):
-        """The sampled request forwards every selector of the chosen entry.
-
-        A satellite CDR needs its sensor / version / aggregation selectors, not
-        just year/month/day, or CDS rejects the combination. The sampler pins
-        one value per enumerated selector and fabricates no key the entry omits.
-        """
-        import sys
-        import types
-
-        entry = {
-            "variable": ["surface_soil_moisture"],
-            "type_of_sensor": ["passive"],
-            "time_aggregation": ["month_average"],
-            "version": ["v202212"],
-            "year": ["2023"],
-            "month": ["01"],
-            "day": ["01"],
-        }
-        monkeypatch.setattr(curate_mod, "_ecmwf_constraints", lambda d: [entry])
-        captured: dict[str, object] = {}
-        cdsapi = types.ModuleType("cdsapi")
-        cdsapi.Client = lambda: types.SimpleNamespace(
-            retrieve=lambda ds, req, target: (
-                captured.update(req),
-                open(target, "w").close(),
-            )
-        )
-        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
-        monkeypatch.setattr(curate_mod, "_read_netcdf_var_meta", lambda path: {})
-        curate_mod._ecmwf_deep_sample("satellite-soil-moisture")
-        assert captured["type_of_sensor"] == ["passive"]
-        assert captured["version"] == ["v202212"]
-        assert captured["time_aggregation"] == ["month_average"]
-        assert captured["data_format"] == "netcdf"
-        assert "time" not in captured  # the entry enumerates none — fabricate none
-
-    def test_ecmwf_deep_sample_defaults_variable_when_absent(self, monkeypatch):
-        """An entry with no variable dimension still sends the widget's `all`."""
-        import sys
-        import types
-
-        monkeypatch.setattr(
-            curate_mod, "_ecmwf_constraints", lambda d: [{"lake": ["achit"]}]
-        )
-        captured: dict[str, object] = {}
-        cdsapi = types.ModuleType("cdsapi")
-        cdsapi.Client = lambda: types.SimpleNamespace(
-            retrieve=lambda ds, req, target: (
-                captured.update(req),
-                open(target, "w").close(),
-            )
-        )
-        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
-        monkeypatch.setattr(curate_mod, "_read_netcdf_var_meta", lambda path: {})
-        curate_mod._ecmwf_deep_sample("satellite-lake-water-level")
-        assert captured["variable"] == ["all"]
-        assert captured["lake"] == ["achit"]
-
-    def test_read_netcdf_var_meta_via_gdal(self, tmp_path):
-        """_read_netcdf_var_meta reads long_name/units from a NetCDF via GDAL."""
-        import numpy as np
-        import xarray as xr
-
-        path = tmp_path / "probe.nc"
-        xr.Dataset(
-            {
-                "t2m": (
-                    ("lat", "lon"),
-                    np.ones((2, 2), "f4"),
-                    {"units": "K", "long_name": "2 metre temperature"},
-                )
-            },
-            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
-        ).to_netcdf(path)
-        meta = curate_mod._read_netcdf_var_meta(str(path))
-        assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
-
-    def test_ecmwf_deep_sample_no_constraints(self, monkeypatch):
-        """No constraints rows yields an empty schema (after the SDK imports)."""
-        import sys
-        import types
-
-        monkeypatch.setitem(sys.modules, "cdsapi", types.ModuleType("cdsapi"))
-        monkeypatch.setitem(sys.modules, "netCDF4", types.ModuleType("netCDF4"))
-        monkeypatch.setattr(curate_mod, "_ecmwf_constraints", lambda d: [])
-        assert curate_mod._ecmwf_deep_sample("x") == {}
 
 
 class TestBiodiversityProbers:

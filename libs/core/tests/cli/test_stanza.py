@@ -39,163 +39,12 @@ class TestSupportedProviders:
         }
 
 
-class TestEcmwfEmitter:
-    """Tests for the ECMWF emitter (seeds from the live CADS form.json, mocked)."""
-
-    _HINDCAST_FORM = [
-        {"name": "hyear", "details": {}},
-        {"name": "hmonth", "details": {}},
-        {"name": "hday", "details": {}},
-        {"name": "leadtime_hour", "details": {}},
-        {
-            "name": "variable",
-            "details": {"values": ["river_discharge_in_the_last_24_hours"]},
-        },
-    ]
-
-    def test_seeds_hindcast_row_with_ewds_endpoint(self, monkeypatch):
-        """A `hyear`/`hday` form seeds a glofas_hindcast row on the ewds store."""
-        monkeypatch.setattr(
-            stanza_mod, "_get_json", lambda url, **kw: self._HINDCAST_FORM
-        )
-        result = emit_stanza(_info("ecmwf"), "cems-glofas-reforecast")
-        assert result.status == "ok"
-        assert result.row["endpoint"] == "ewds"
-        assert result.row["request_kind"] == "glofas_hindcast"
-        assert "river-discharge-in-the-last-24-hours" in result.row["variables"]
-
-    def test_cams_date_form_seeds_ads_endpoint(self, monkeypatch):
-        """A `date`-range form on a `cams-*` id seeds a cams_date row on ads."""
-        form = [
-            {"name": "date", "details": {}},
-            {"name": "variable", "details": {"values": ["total_column_ozone"]}},
-        ]
-        monkeypatch.setattr(stanza_mod, "_get_json", lambda url, **kw: form)
-        result = emit_stanza(_info("ecmwf"), "cams-global-reanalysis-eac4")
-        assert result.status == "ok"
-        assert result.row["endpoint"] == "ads"
-        assert result.row["request_kind"] == "cams_date"
-
-    def test_fire_form_seeds_fire_not_satellite(self, monkeypatch):
-        """A grid + `dataset_type` form (no leadtime_hour) seeds a `fire` row."""
-        form = [
-            {"name": "dataset_type", "details": {}},
-            {"name": "grid", "details": {}},
-            {"name": "variable", "details": {"values": ["fire_weather_index"]}},
-        ]
-        monkeypatch.setattr(stanza_mod, "_get_json", lambda url, **kw: form)
-        result = emit_stanza(_info("ecmwf"), "cems-fire-historical-v1")
-        assert result.status == "ok"
-        assert result.row["request_kind"] == "fire"
-
-    def test_satellite_id_seeds_satellite_cdr(self, monkeypatch):
-        """A `satellite-*` id seeds satellite_cdr from its real (grid-less) form."""
-        form = [
-            {"name": "type_of_sensor", "details": {}},
-            {"name": "time_aggregation", "details": {}},
-            {"name": "year", "details": {}},
-            {"name": "month", "details": {}},
-            {"name": "day", "details": {}},
-            {
-                "name": "variable",
-                "details": {"values": ["surface_soil_moisture_volumetric"]},
-            },
-        ]
-        monkeypatch.setattr(stanza_mod, "_get_json", lambda url, **kw: form)
-        result = emit_stanza(_info("ecmwf"), "satellite-soil-moisture")
-        assert result.row["request_kind"] == "satellite_cdr"
-
-    def test_seeds_every_variable_the_form_exposes(self, monkeypatch):
-        """A multi-variable form seeds one row per variable, all as placeholders."""
-        form = [
-            {"name": "year", "details": {}},
-            {"name": "month", "details": {}},
-            {"name": "day", "details": {}},
-            {"name": "time", "details": {}},
-            {
-                "name": "variable",
-                "details": {"values": ["2m_temperature", "total_precipitation"]},
-            },
-        ]
-        monkeypatch.setattr(stanza_mod, "_get_json", lambda url, **kw: form)
-        result = emit_stanza(_info("ecmwf"), "reanalysis-era5-single-levels")
-        assert result.status == "ok"
-        variables = result.row["variables"]
-        assert set(variables) == {"2m-temperature", "total-precipitation"}
-        assert variables["2m-temperature"]["cds_variable"] == "2m_temperature"
-        assert all(v["units"] == "unknown" for v in variables.values())
-
-
-class TestEcmwfRequestKind:
-    """`_ecmwf_request_kind` maps a form's fields (+ dataset id) to a request kind."""
-
-    @pytest.mark.parametrize(
-        "upstream_id, field_names, expected",
-        [
-            (
-                "satellite-soil-moisture",
-                ["type_of_sensor", "year", "day"],
-                "satellite_cdr",
-            ),
-            ("cems-glofas-reforecast", ["hyear", "hmonth", "hday"], "glofas_hindcast"),
-            ("efas-seasonal-reforecast", ["hyear", "hmonth"], "seasonal_hindcast"),
-            ("cams-global-reanalysis-eac4", ["date", "variable"], "cams_date"),
-            ("cams-ghg-inversion", ["quantity", "year", "month"], "cams_inversion"),
-            (
-                "cams-europe-air-quality-reanalyses",
-                ["year", "month", "model"],
-                "cams_inversion",
-            ),
-            ("cems-glofas-seasonal", ["leadtime_month", "year", "month"], "seasonal"),
-            # A year/month-only form with no leadtime_month is NOT seasonal (was
-            # mis-seeded as `seasonal`); a projections-* `model` is not CAMS.
-            ("cams-global-emission-inventories", ["year", "month"], "form"),
-            ("projections-cmip6", ["year", "month", "model"], "form"),
-            (
-                "cems-fire-historical-v1",
-                ["grid", "dataset_type", "year", "day"],
-                "fire",
-            ),
-            ("cems-fire-seasonal", ["leadtime_hour", "year", "month"], "fire"),
-            ("grid-only-cdr", ["grid", "year", "day"], "satellite_cdr"),
-            ("reanalysis-era5-single-levels", ["year", "month", "day", "time"], "form"),
-        ],
-    )
-    def test_kind_from_id_and_fields(self, upstream_id, field_names, expected):
-        """Each id/field-set combination maps to the documented request kind.
-
-        Args:
-            upstream_id: The dataset id (a `satellite-*` id short-circuits).
-            field_names: The `form.json` field names present.
-            expected: The request kind the heuristic should return.
-        """
-        form = [{"name": name} for name in field_names]
-        result = stanza_mod._ecmwf_request_kind(form, upstream_id)
-        assert result == expected, (
-            f"{upstream_id}/{field_names} → {result}, want {expected}"
-        )
-
-    def test_glofas_forecast_grid_absent_falls_through_to_form(self):
-        """A leadtime_hour form with no grid is not misread as a grid kind."""
-        form = [{"name": "year"}, {"name": "day"}, {"name": "leadtime_hour"}]
-        assert stanza_mod._ecmwf_request_kind(form, "cems-glofas-forecast") == "form"
-
-
 class TestEmitStanza:
     """Tests for emit_stanza dispatch."""
 
     def test_unsupported_provider(self):
         """A provider with no emitter reports 'unsupported' (no network)."""
         assert emit_stanza(_info("chc"), "anything").status == "unsupported"
-
-    def test_error_is_captured(self, monkeypatch):
-        """A failed fetch reports 'error', not raised."""
-
-        def boom(url, **kw):
-            raise RuntimeError("connection refused")
-
-        monkeypatch.setattr(stanza_mod, "_get_json", boom)
-        assert emit_stanza(_info("hdx"), "x").status == "error"
 
     def test_key_defaults_to_upstream_id(self):
         """An omitted key falls back to the upstream id."""
@@ -253,24 +102,6 @@ class TestWriteStanza:
         written = stanza_mod.write_stanza(info, result, None)
         assert written.endswith("sar-radar.yaml"), "SAR asset routed to sar-radar"
         assert (tmp_path / "sar-radar.yaml").exists(), "the category file was written"
-
-    def test_ecmwf_auto_categorises_target(self, tmp_path, monkeypatch):
-        """ecmwf without --target auto-picks the per-family shard from the id."""
-        import importlib
-
-        info = _info("ecmwf")
-        module = importlib.import_module(f"{info.module}.catalog")
-        monkeypatch.setattr(module, "CATALOG_PATH", tmp_path)
-        result = StanzaResult(
-            "ecmwf",
-            "reanalysis-era5-complete",
-            "reanalysis-era5-complete",
-            "ok",
-            row={"endpoint": "cds", "request_kind": "form"},
-        )
-        written = stanza_mod.write_stanza(info, result, None)
-        assert written.endswith("era5.yaml"), "era5 id routed to era5.yaml"
-        assert (tmp_path / "era5.yaml").exists(), "the shard file was written"
 
     def test_duplicate_key_rejected(self, tmp_path, monkeypatch):
         """Writing a key that already exists raises rather than duplicating."""

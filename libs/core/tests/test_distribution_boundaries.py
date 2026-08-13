@@ -1268,19 +1268,11 @@ class TestCliIsBackendAgnostic:
 
     #: Backends still named as dispatch-dict keys in core's CLI (shrinks to
     #: empty as #863 lands provider by provider).
-    PENDING = frozenset(
-        {
-            "ecmwf",
-        }
-    )
+    PENDING: frozenset[str] = frozenset()
 
     #: Backends core's CLI still imports directly (`from earthlens.<backend>`),
     #: also shrinking to empty.
-    PENDING_IMPORTS = frozenset(
-        {
-            "ecmwf",
-        }
-    )
+    PENDING_IMPORTS: frozenset[str] = frozenset()
 
     def _cli_sources(self):
         """Yield every core CLI source file, skipping build artefacts."""

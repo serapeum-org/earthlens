@@ -108,42 +108,11 @@ def _http_head(url: str) -> int:
 #: CDSE openEO processes endpoint (public; pairs with the collections one).
 
 
-def _live_ecmwf(catalog: Any) -> tuple[int, list[str]]:
-    """Confirm each ECMWF dataset can build a constraint-valid minimal request.
-
-    Folds the local gate of the retired `tools/ecmwf/probe_open_datasets.py`:
-    for every curated dataset, build a minimal request from its public
-    `constraints.json` and run the same `RequestValidator` the backend uses
-    before a retrieve. Datasets that publish no constraints (so no request can
-    be built) are skipped, not flagged. Stateless — no CDS credentials or
-    queue submission (per-dataset live retrieval stays `probe ecmwf --deep`).
-    """
-    from earthlens.ecmwf.constraints import RequestValidator
-
-    issues: list[str] = []
-    checked = 0
-    for key in catalog.datasets:
-        try:
-            request = catalog.minimal_valid_request(key)
-        except Exception as exc:  # noqa: BLE001 — reported as drift
-            issues.append(f"{key}: constraints fetch failed ({exc})")
-            continue
-        if set(request) <= {"data_format"}:
-            continue  # no published constraints -> nothing to validate
-        checked += 1
-        try:
-            RequestValidator(key, request).check()
-        except ValueError as exc:
-            issues.append(f"{key}: {str(exc).splitlines()[0][:90]}")
-    return checked, issues
-
-
 #: Provider id -> a live reachability validator (the `--live` half). May add
 #: a provider not in :data:`_VALIDATORS` (e.g. openeo / ecmwf are live-only).
 _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("live_validator"),
-    "ecmwf": _live_ecmwf,
 }
 
 

@@ -1,4 +1,4 @@
-"""Unit tests for `earthlens.cli._ecmwf_hydrate` (CDS retrieve mocked)."""
+"""Unit tests for `earthlens.ecmwf._hydrate` (CDS retrieve mocked)."""
 
 from __future__ import annotations
 
@@ -8,8 +8,8 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
-from earthlens.cli import _ecmwf_hydrate as hydrate_mod
-from earthlens.cli._ecmwf_hydrate import (
+from earthlens.ecmwf import _hydrate as hydrate_mod
+from earthlens.ecmwf._hydrate import (
     _find_file_for_dataset,
     _match_variables,
     _retrieve_with_timeout,

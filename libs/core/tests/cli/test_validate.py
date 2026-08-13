@@ -10,7 +10,6 @@ from earthlens.cli import validate as validate_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.validate import (
     ValidateResult,
-    _live_ecmwf,
     supported_providers,
     validate_one,
 )
@@ -100,32 +99,6 @@ class TestLiveValidators:
         assert "openeo" not in supported_providers()
         assert "openeo" in supported_providers(live=True)
 
-    def test_ecmwf_live_flags_invalid_request(self, monkeypatch):
-        """An ECMWF dataset whose minimal request fails the validator is flagged."""
-        import earthlens.ecmwf.constraints as constraints
-
-        catalog = SimpleNamespace(
-            datasets={"good": object(), "nocon": object(), "bad": object()},
-            minimal_valid_request=lambda key: {
-                "good": {"data_format": "netcdf", "variable": ["x"]},
-                "nocon": {"data_format": "netcdf"},
-                "bad": {"data_format": "netcdf", "variable": ["y"]},
-            }[key],
-        )
-
-        class FakeValidator:
-            def __init__(self, dataset, request):
-                self.dataset = dataset
-
-            def check(self):
-                if self.dataset == "bad":
-                    raise ValueError("missing required selector 'level'")
-
-        monkeypatch.setattr(constraints, "RequestValidator", FakeValidator)
-        checked, issues = _live_ecmwf(catalog)
-        assert checked == 2, "the no-constraints dataset is skipped"
-        assert any("bad" in i for i in issues), "invalid request flagged"
-
     def test_supported_providers_live_adds_ecmwf_and_nwp(self):
         """ecmwf gains a live-only validator; nwp gains a live one on top."""
         assert "ecmwf" in supported_providers(live=True)
@@ -171,14 +144,3 @@ class TestLiveValidatorBranches:
         monkeypatch.setattr(helpers, "ghsl_url", boom)
         result = validate_one(_info("ghsl"), live=True)
         assert result.status == "ok", "errors captured, not raised"
-
-    def test_live_ecmwf_reports_fetch_failure(self):
-        """A dataset whose constraints fetch raises is reported, not raised."""
-        from earthlens.cli.validate import _live_ecmwf
-
-        def boom(key):
-            raise RuntimeError("offline")
-
-        catalog = SimpleNamespace(datasets={"d": object()}, minimal_valid_request=boom)
-        checked, issues = _live_ecmwf(catalog)
-        assert any("constraints fetch failed" in i for i in issues), "failure reported"

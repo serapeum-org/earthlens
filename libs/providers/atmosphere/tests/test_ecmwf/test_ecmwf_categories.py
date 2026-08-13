@@ -1,10 +1,10 @@
-"""Unit tests for `earthlens.cli._ecmwf_categories`."""
+"""Unit tests for `earthlens.ecmwf._categories`."""
 
 from __future__ import annotations
 
 import pytest
 
-from earthlens.cli._ecmwf_categories import _RULES, CATEGORIES, categorise_dataset
+from earthlens.ecmwf._categories import _RULES, CATEGORIES, categorise_dataset
 
 pytestmark = pytest.mark.cli
 

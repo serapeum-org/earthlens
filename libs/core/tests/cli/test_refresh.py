@@ -103,32 +103,8 @@ class TestSupportedProviders:
             assert key in supported_providers(), f"{key} cluster backend is wired up"
 
 
-class TestEcmwfRefresher:
-    """Tests for the ECMWF (CDS catalogue) lister."""
-
-    def test_lists_cds_collection_ids(self, monkeypatch):
-        """ecmwf refresh reads the public CDS catalogue collection ids."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
-            lambda url, **kw: {"collections": [{"id": "reanalysis-era5-land"}]},
-        )
-        outcome = refresh_one(_info("ecmwf"))
-        assert outcome.status == "ok", "ecmwf refresh ran"
-        assert outcome.live_count == 1, "one CDS dataset id listed"
-
-
 class TestCoverageOne:
     """Tests for coverage_one (the `audit --coverage` driver)."""
-
-    def test_ecmwf_reports_done_and_addressable_across_stores(self):
-        """ecmwf coverage buckets the 3-store universe into DONE vs addressable."""
-        outcome = coverage_one(_info("ecmwf"))
-        assert outcome.status == "ok", "ecmwf coverage is supported"
-        assert outcome.counts["DONE"] > 0, "curated rows are DONE"
-        assert outcome.counts["addressable"] > 0, "uncurated ids are addressable"
-        # a curated ADS row is DONE, not in the addressable todo
-        assert "cams-global-reanalysis-eac4" not in outcome.todo
 
     def test_unsupported_provider(self):
         """A provider with no classifier reports unsupported."""
@@ -330,70 +306,6 @@ class TestIndexWriters:
         after = sorted(load_catalog(info).available_datasets)
         assert after == before, f"{provider} index drifted on round-trip"
         assert path.endswith("_index.yaml"), "wrote the sharded index file"
-
-
-def _ecmwf_per_store_get_json(url, **kw):
-    """Return a distinct single collection id per Copernicus store host."""
-    if "ads.atmosphere" in url:
-        cid = "cams-global-reanalysis-eac4"
-    elif "ewds" in url:
-        cid = "cems-glofas-forecast"
-    else:
-        cid = "reanalysis-era5-land"
-    return {"collections": [{"id": cid}], "links": []}
-
-
-def _ecmwf_paginated_get_json(url, **kw):
-    """Two pages per Copernicus store — page 1 links to page 2 via `rel=next`."""
-    store = "ads" if "ads.atmosphere" in url else "ewds" if "ewds" in url else "cds"
-    prefix = {"cds": "reanalysis", "ads": "cams", "ewds": "cems"}[store]
-    if "page2" in url:
-        return {"collections": [{"id": f"{prefix}-two"}], "links": []}
-    return {
-        "collections": [{"id": f"{prefix}-one"}],
-        "links": [{"rel": "next", "href": url + "?page2"}],
-    }
-
-
-class TestWriteEcmwfThroughRefreshOne:
-    """Tests for refresh_one(write=True) on a generic-writer provider."""
-
-    def test_writes_per_store_index_from_live_fetch(self, tmp_path, monkeypatch):
-        """ecmwf --write persists per-store (cds/ads/ewds) ids into available_datasets."""
-        info, module, dst = _catalog_copy("ecmwf", tmp_path, monkeypatch)
-        monkeypatch.setattr(refresh_mod, "_get_json", _ecmwf_per_store_get_json)
-        outcome = refresh_one(info, write=True)
-        assert outcome.status == "ok", "write succeeded"
-        assert outcome.written.endswith("_index.yaml"), "index file written"
-        module.clear_catalog_cache()
-        data = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
-        assert data["available_datasets"] == {
-            "cds": ["reanalysis-era5-land"],
-            "ads": ["cams-global-reanalysis-eac4"],
-            "ewds": ["cems-glofas-forecast"],
-        }, "per-store ids persisted"
-        # the loader unions every store's ids into the flat availability list
-        catalog = load_catalog(info)
-        for expected in (
-            "reanalysis-era5-land",
-            "cams-global-reanalysis-eac4",
-            "cems-glofas-forecast",
-        ):
-            assert expected in catalog.available_datasets, f"{expected} unioned"
-
-    def test_pagination_follows_rel_next_across_pages(self, tmp_path, monkeypatch):
-        """`rel=next` is followed, so every page's ids land in the per-store index."""
-        info, module, dst = _catalog_copy("ecmwf", tmp_path, monkeypatch)
-        monkeypatch.setattr(refresh_mod, "_get_json", _ecmwf_paginated_get_json)
-        outcome = refresh_one(info, write=True)
-        assert outcome.status == "ok", "write succeeded"
-        module.clear_catalog_cache()
-        data = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
-        assert data["available_datasets"] == {
-            "cds": ["reanalysis-one", "reanalysis-two"],
-            "ads": ["cams-one", "cams-two"],
-            "ewds": ["cems-one", "cems-two"],
-        }, "both pages' ids per store persisted"
 
 
 class TestCuratedCollectionIds:

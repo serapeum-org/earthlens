@@ -27,7 +27,6 @@ import yaml
 
 from earthlens._cli_tooling import config_table, dispatch_table
 from earthlens.cli.adapter import BackendInfo, load_catalog
-from earthlens.cli.refresh import _get_json
 
 
 @dataclass
@@ -118,144 +117,9 @@ class StanzaResult:
 
 #: Provider id -> a callable taking the loaded catalog, the upstream id, and
 #: per-provider keyword options, returning the seeded curated row.
-# ecmwf — seed from the live CADS `form.json` (CDS / ADS / EWDS).
-
-#: The three Copernicus store API roots, by `endpoint` slug.
-_ECMWF_STORE_URLS = {
-    "cds": "https://cds.climate.copernicus.eu/api",
-    "ads": "https://ads.atmosphere.copernicus.eu/api",
-    "ewds": "https://ewds.climate.copernicus.eu/api",
-}
-
-
-def _ecmwf_token() -> str | None:
-    """Return the shared CDS Personal Access Token from `~/.cdsapirc`, if any."""
-    rc = Path.home() / ".cdsapirc"
-    if not rc.is_file():
-        return None
-    for line in rc.read_text().splitlines():
-        if line.strip().startswith("key"):
-            return line.partition(":")[2].strip() or None
-    return None
-
-
-def _ecmwf_endpoint_for(catalog: Any, dataset_id: str) -> str:
-    """Resolve which store hosts `dataset_id` (per-store index, else prefix)."""
-    store = getattr(catalog, "store_for", lambda _id: None)(dataset_id)
-    if store:
-        return str(store)
-    if dataset_id.startswith("cams-"):
-        return "ads"
-    if dataset_id.startswith(("cems-", "efas-")):
-        return "ewds"
-    return "cds"
-
-
-def _collect_variable_values(node: Any, out: list[str]) -> None:
-    """Recurse a `variable` widget's (possibly grouped) values into `out`."""
-    if isinstance(node, dict):
-        for value in node.get("values", []) or []:
-            if isinstance(value, str):
-                out.append(value)
-        for group in node.get("groups", []) or []:
-            _collect_variable_values(group, out)
-
-
-def _ecmwf_form_variables(form: list[Any]) -> list[str]:
-    """Enumerate the `variable` widget's allowed values from a `form.json`."""
-    out: list[str] = []
-    for entry in form:
-        if isinstance(entry, dict) and entry.get("name") == "variable":
-            _collect_variable_values(entry.get("details", {}) or {}, out)
-    return out
-
-
-def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
-    """Guess the `request_kind` from a dataset id + its `form.json` fields.
-
-    The ESA-CCI satellite CDRs are all `satellite-*` ids and their forms carry
-    no `grid` widget, so the id is the reliable signal for `satellite_cdr`;
-    every other kind is inferred from the form's date / selector fields.
-    """
-    if upstream_id.startswith("satellite-"):
-        return "satellite_cdr"
-    if upstream_id.startswith("cems-fire"):
-        # Both fire-danger datasets are `cems-fire-*`; the historical form has a
-        # grid but the seasonal form keys on `leadtime_hour`, so the field
-        # heuristic alone would seed seasonal fire as `form` — key on the id.
-        return "fire"
-    fields = {f.get("name") for f in form if isinstance(f, dict)}
-    if "hyear" in fields:
-        return "glofas_hindcast" if "hday" in fields else "seasonal_hindcast"
-    # A real seasonal forecast keys on `leadtime_month`. Without it, a
-    # year/month-only form is a monthly reanalysis / emission inventory /
-    # radiative-forcing product, not a seasonal forecast — so require the lead
-    # field rather than firing on `year` + no `day` (which over-caught ~15
-    # non-seasonal families).
-    if "leadtime_month" in fields:
-        return "seasonal"
-    if "date" in fields:
-        return "cams_date"
-    # `cams_inversion` (CAMS GHG inversion / EU air-quality reanalyses) is
-    # CAMS-only: a `quantity` widget, or a `cams-*` id carrying a model/level
-    # selector with no `day`. A `model` widget on a `projections-*` id is a
-    # climate model, not a CAMS inversion — do not misread it.
-    if "quantity" in fields or (
-        upstream_id.startswith("cams-") and "model" in fields and "day" not in fields
-    ):
-        return "cams_inversion"
-    if "grid" in fields and "leadtime_hour" not in fields:
-        # CEMS fire-danger forms carry a `dataset_type` selector alongside the
-        # grid; the satellite CDRs are matched by id above.
-        return "fire" if "dataset_type" in fields else "satellite_cdr"
-    return "form"
-
-
-def _emit_ecmwf(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
-    """Seed an ECMWF `datasets:` row from the live CADS `form.json`.
-
-    Resolves the dataset's store (CDS / ADS / EWDS) from the per-store index,
-    fetches its `form.json`, guesses the `request_kind` from the date/selector
-    fields, and enumerates every variable the `variable` widget exposes.
-    `nc_variable` / `units` are placeholders (the form does not carry them) —
-    confirm them from a live retrieve (`curate ecmwf --fill-empty`).
-
-    Args:
-        catalog: The loaded ECMWF `Catalog` (its per-store index resolves the
-            endpoint).
-        upstream_id: The Copernicus dataset id.
-        **opts: Unused.
-
-    Returns:
-        The seeded row (`endpoint` / `request_kind` / `variables`).
-    """
-    endpoint = _ecmwf_endpoint_for(catalog, upstream_id)
-    token = _ecmwf_token()
-    headers = {"PRIVATE-TOKEN": token} if token else None
-    url = f"{_ECMWF_STORE_URLS[endpoint]}/catalogue/v1/collections/{upstream_id}/form.json"
-    raw: Any = _get_json(url, headers=headers)
-    # CADS form.json is usually {"form": [...]} but is sometimes the bare
-    # [...] list; `raw` is Any so both shapes narrow without a mypy conflict.
-    fields = raw.get("form") or [] if isinstance(raw, dict) else raw
-    variables = _ecmwf_form_variables(cast("list[Any]", fields)) or ["all"]
-    return {
-        "endpoint": endpoint,
-        "request_kind": _ecmwf_request_kind(cast("list[Any]", fields), upstream_id),
-        "variables": {
-            v.replace("_", "-"): {
-                "cds_variable": v,
-                "nc_variable": v,
-                "units": "unknown",
-            }
-            for v in variables
-        },
-    }
-
-
 _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("emitter"),
-    "ecmwf": _emit_ecmwf,
 }
 
 
@@ -404,17 +268,13 @@ def write_stanza(info: BackendInfo, result: StanzaResult, target: str | None) ->
     block = _STANZA_BLOCK.get(info.provider, "datasets")
     if base.is_dir():
         if not target:
-            # Discovered categoriser (asset_id, title -> per-family stem) first;
-            # ecmwf's in-core categoriser is the migration remainder.
+            # A provider that ships a categoriser (upstream_id, title -> shard
+            # stem) auto-picks its per-family file; discovered via `earthlens.cli`.
             categoriser = dispatch_table("categoriser").get(info.provider)
             if categoriser is not None:
                 target = categoriser(
                     result.upstream_id, str(result.row.get("title", ""))
                 )
-            elif info.provider == "ecmwf":
-                from earthlens.cli._ecmwf_categories import categorise_dataset
-
-                target = categorise_dataset(result.upstream_id)
         if not target:
             raise ValueError(
                 f"{info.provider} has a sharded catalog; pass --target <file-stem> "

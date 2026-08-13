@@ -821,13 +821,12 @@ def _curate_all(info, *, write: bool, limit: int | None) -> None:
         write: `--all` mutates the catalog shards, so `--write` is required.
         limit: Only seed the first N uncurated datasets (None = all).
     """
-    if info.provider != "ecmwf":
+    seed = dispatch_table("seeder").get(info.provider)
+    if seed is None:
         raise typer.BadParameter("--all is only supported for ecmwf")
     if not write:
         raise typer.BadParameter("--all writes the catalog shards; pass --write")
-    from earthlens.cli._ecmwf_seed import bulk_seed_uncurated
-
-    summary = bulk_seed_uncurated(limit=limit)
+    summary = seed(limit=limit)
     out_console().print(
         f"[green]seeded {summary['seeded']}[/green] / "
         f"{summary['candidates']} uncurated "
@@ -848,16 +847,10 @@ def _curate_fill_empty(
     """
     if not write:
         raise typer.BadParameter("--fill-empty rewrites the catalog; pass --write")
-    # Discovered hydrator first; ecmwf's in-core hydrator is the migration remainder.
     hydrate = dispatch_table("hydrator").get(info.provider)
-    if hydrate is not None:
-        summary = hydrate(limit=limit, timeout=timeout or None)
-    elif info.provider == "ecmwf":
-        from earthlens.cli._ecmwf_hydrate import bulk_hydrate_empty as ecmwf_hydrate
-
-        summary = ecmwf_hydrate(limit=limit, timeout=timeout or None)
-    else:
+    if hydrate is None:
         raise typer.BadParameter("--fill-empty is only supported for gee / ecmwf")
+    summary = hydrate(limit=limit, timeout=timeout or None)
 
     timed_out = summary.get("timed_out") or 0
     tail = f", {timed_out} timed out" if timed_out else ""
