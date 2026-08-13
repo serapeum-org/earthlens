@@ -69,7 +69,8 @@ class TestProber:
         if eccc is None:
             pytest.skip("no ECCC model in the catalog")
         result = probe_dataset(_info(), eccc)
-        assert result.status == "error" and "no .idx" in result.detail
+        assert result.status == "error"
+        assert "no .idx" in result.detail
 
 
 class TestDeepProber:
@@ -115,7 +116,8 @@ class TestAvailability:
             bands={"temperature_2m": "T_2M"},
         )
         result = nwp_cli._nwp_availability(model, dt.datetime(2024, 6, 1, 0), 0)
-        assert "HTTP 200" in result and calls["url"] == "https://x/t_2m/f000_T_2M.bz2"
+        assert "HTTP 200" in result
+        assert calls["url"] == "https://x/t_2m/f000_T_2M.bz2"
 
     def test_herbie_unavailable(self, monkeypatch):
         """_nwp_availability reports herbie missing rather than raising."""
@@ -284,7 +286,8 @@ class TestValidator:
     def test_clean_catalog_has_no_issues(self):
         """The bundled nwp catalog passes its own structural lint."""
         checked, issues = nwp_cli.validator(_load())
-        assert checked > 0 and issues == [], f"unexpected nwp issues: {issues}"
+        assert checked > 0, f"unexpected nwp issues: {issues}"
+        assert issues == [], f"unexpected nwp issues: {issues}"
 
     def test_flags_missing_url_template(self):
         """A direct-https model with no url_template is flagged."""
@@ -300,7 +303,8 @@ class TestValidator:
             }
         )
         checked, issues = nwp_cli.validator(catalog)
-        assert checked == 1 and any("url_template" in i for i in issues)
+        assert checked == 1
+        assert any(("url_template" in i for i in issues))
 
     def test_flags_empty_bands_and_bad_cycle(self):
         """An empty band map and an out-of-range cycle hour are flagged."""
@@ -338,14 +342,16 @@ class TestValidator:
     def test_validate_one_ok(self):
         """nwp validates clean end-to-end."""
         result = validate_one(_info())
-        assert result.status == "ok" and result.issues == []
+        assert result.status == "ok"
+        assert result.issues == []
         assert result.checked > 0, "models were checked"
 
     def test_live_flags_non_200_cycle(self, monkeypatch):
         """A direct-https model whose latest cycle does not HEAD 200 is flagged."""
         monkeypatch.setattr(nwp_cli, "http_head", lambda url: 404)
         result = validate_one(_info(), live=True)
-        assert result.status == "ok" and result.issues, "404 cycle -> issue"
+        assert result.status == "ok", "404 cycle -> issue"
+        assert result.issues, "404 cycle -> issue"
 
     def test_live_clean_at_200(self, monkeypatch):
         """All direct-https latest cycles HEADing 200 clear the nwp live check."""
@@ -359,7 +365,8 @@ class TestValidator:
             datasets={"h": SimpleNamespace(backend="herbie", cycles_utc=[0])}
         )
         checked, issues = nwp_cli.live_validator(catalog)
-        assert checked == 0 and issues == [], "herbie model skipped"
+        assert checked == 0, "herbie model skipped"
+        assert issues == [], "herbie model skipped"
 
     def test_live_skips_model_without_url(self):
         """A direct-https model with no url_template/bands is skipped, not flagged."""
@@ -371,7 +378,8 @@ class TestValidator:
             }
         )
         checked, issues = nwp_cli.live_validator(catalog)
-        assert checked == 0 and issues == [], "incomplete model skipped"
+        assert checked == 0, "incomplete model skipped"
+        assert issues == [], "incomplete model skipped"
 
     def test_latest_cycle_none_without_cycles(self):
         """_nwp_latest_cycle returns None for a model with no cycle hours."""

@@ -77,7 +77,8 @@ class TestParse:
         rows = radar_cli._radar_station_rows(_homr())
         assert list(rows) == ["KABR"], rows
         assert rows["KABR"]["name"] == "Aberdeen", "name title-cased"
-        assert rows["KABR"]["state"] == "SD" and rows["KABR"]["latitude"] == 45.4558
+        assert rows["KABR"]["state"] == "SD"
+        assert rows["KABR"]["latitude"] == 45.4558
 
     def test_short_table_is_empty(self):
         """A table with fewer than three lines yields no rows."""
@@ -160,7 +161,8 @@ class TestValidator:
         """An unreachable / empty NEXRAD chunk feed is flagged live."""
         monkeypatch.setattr(radar_cli, "_radar_feed_stations", lambda: set())
         result = validate_one(_info(), live=True)
-        assert result.status == "ok" and result.issues, "empty feed -> issue"
+        assert result.status == "ok", "empty feed -> issue"
+        assert result.issues, "empty feed -> issue"
 
     def test_live_clean_when_streaming(self, monkeypatch):
         """A feed containing a catalogued station clears the radar live check."""

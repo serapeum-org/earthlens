@@ -151,7 +151,8 @@ class TestCoverage:
         )
         cat = SimpleNamespace(available_datasets=["A", "B"], datasets={"A": None})
         counts, todo = gee_cli.coverage(cat)
-        assert counts["DONE"] == 1 and counts["addressable"] == 1, counts
+        assert counts["DONE"] == 1, counts
+        assert counts["addressable"] == 1, counts
         assert todo == ["B"], "uncurated addressable id queued"
 
     def test_empty_index_raises(self):
@@ -171,7 +172,8 @@ class TestCoverage:
         )
         outcome = coverage_one(_info())
         assert outcome.status == "ok", "gee coverage ran"
-        assert outcome.counts["addressable"] == 1 and outcome.todo == ["B"]
+        assert outcome.counts["addressable"] == 1
+        assert outcome.todo == ["B"]
 
     def test_coverage_one_reports_error(self, monkeypatch):
         """coverage_one captures a classifier failure as an error outcome."""
@@ -243,7 +245,8 @@ class TestEmitter:
     def test_minimal_skips_fetch(self):
         """--minimal emits a placeholder row with empty bands and no network."""
         result = emit_stanza(_info(), "projects/foo/bar", minimal=True)
-        assert result.status == "ok" and result.row["bands"] == {}
+        assert result.status == "ok"
+        assert result.row["bands"] == {}
 
     def test_hydrate_reads_bands_from_earth_engine(self, monkeypatch):
         """--hydrate seeds bands from a live Earth Engine query (creds-gated)."""

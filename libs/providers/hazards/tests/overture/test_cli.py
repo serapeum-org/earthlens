@@ -136,7 +136,8 @@ class TestValidator:
 
         monkeypatch.setattr(core, "geodataframe", lambda t, bbox: FakeFrame())
         rows, has_sources = overture_cli._live_sample("building")
-        assert rows == 2 and has_sources is True, "rows + sources column reported"
+        assert rows == 2, "rows + sources column reported"
+        assert has_sources is True, "rows + sources column reported"
 
     def test_live_flags_missing_sources(self, monkeypatch):
         """An Overture type without a sources column is flagged live."""

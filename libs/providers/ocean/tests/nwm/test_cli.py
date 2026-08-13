@@ -256,7 +256,8 @@ class TestValidateInternals:
             configurations={"short_range": SimpleNamespace(products=["chrtout"])},
         )
         checked, issues = nwm_cli.validator(catalog)
-        assert checked == 1 and issues == [], f"coherent catalog is clean: {issues}"
+        assert checked == 1, f"coherent catalog is clean: {issues}"
+        assert issues == [], f"coherent catalog is clean: {issues}"
 
     def test_live_flags_only_the_absent_product(self, monkeypatch):
         """`live_validator` flags exactly the product whose token no carrier serves."""
@@ -272,7 +273,8 @@ class TestValidateInternals:
         monkeypatch.setattr(nwm_cli, "_sample_tokens", lambda c, d, dir_: {"ta"})
         checked, issues = nwm_cli.live_validator(catalog)
         assert checked == 2, "both products inspected"
-        assert len(issues) == 1 and "b" in issues[0], f"only 'b' flagged: {issues}"
+        assert len(issues) == 1, f"only 'b' flagged: {issues}"
+        assert "b" in issues[0], f"only 'b' flagged: {issues}"
 
     def test_live_ensemble_carrier_matches_member_token(self, monkeypatch):
         """An ensemble-only carrier's `{token}_{member}` file satisfies the check."""

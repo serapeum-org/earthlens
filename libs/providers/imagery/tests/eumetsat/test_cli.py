@@ -80,4 +80,5 @@ class TestEmitter:
         result = emit_stanza(_info(), "EO:EUM:DAT:MSG:HRSEVIRI", key="msg", group="MSG")
         assert result.status == "ok", "eumetsat emitter ran"
         assert result.row["collection_id"] == "EO:EUM:DAT:MSG:HRSEVIRI"
-        assert result.row["group"] == "MSG" and result.row["output_kind"] == "raster"
+        assert result.row["group"] == "MSG"
+        assert result.row["output_kind"] == "raster"

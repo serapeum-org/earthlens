@@ -45,7 +45,8 @@ class TestTileRegen:
         dest = tmp_path / "tile_schema.geojson"
         monkeypatch.setattr(ghsl_helpers, "TILE_SCHEMA_PATH", dest)
         path, count = ghsl_cli.tile_regen()
-        assert count == 1 and dest.exists(), "tile geojson written"
+        assert count == 1, "tile geojson written"
+        assert dest.exists(), "tile geojson written"
         assert path.endswith("tile_schema.geojson"), "wrote the bundled tile index"
 
 
@@ -56,7 +57,8 @@ class TestLiveValidator:
         """A GHSL artefact that does not HEAD 200 is flagged live."""
         monkeypatch.setattr(ghsl_cli, "http_head", lambda url: 404)
         result = validate_one(_info(), live=True)
-        assert result.status == "ok" and result.issues, "404 -> issue"
+        assert result.status == "ok", "404 -> issue"
+        assert result.issues, "404 -> issue"
 
     def test_clean_at_200(self, monkeypatch):
         """All artefacts HEADing 200 clear the ghsl live check."""

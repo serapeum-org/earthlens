@@ -584,4 +584,5 @@ class TestCommands:
         import json
 
         payload = json.loads(result.output)
-        assert payload["status"] == "ok" and payload["assets"]["t2m"]["units"] == "K"
+        assert payload["status"] == "ok"
+        assert payload["assets"]["t2m"]["units"] == "K"

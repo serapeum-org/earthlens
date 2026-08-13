@@ -127,4 +127,5 @@ class TestLiveValidator:
 
         monkeypatch.setattr(openeo_cli, "get_json", fake_get)
         collections, processes = openeo_cli._live_lists()
-        assert collections == {"S2"} and processes == {"ndvi"}, "ids unioned"
+        assert collections == {"S2"}, "ids unioned"
+        assert processes == {"ndvi"}, "ids unioned"

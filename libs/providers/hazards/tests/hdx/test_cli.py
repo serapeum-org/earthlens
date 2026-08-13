@@ -139,4 +139,5 @@ class TestEmitter:
             app, ["datasets", "curate", "hdx", "kontur-population", "--json"]
         )
         payload = json.loads(result.output)
-        assert payload["status"] == "ok" and payload["row"]["hdx_id"]
+        assert payload["status"] == "ok"
+        assert payload["row"]["hdx_id"]

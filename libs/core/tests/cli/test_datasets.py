@@ -438,7 +438,8 @@ class TestCurate:
             ],
         )
         payload = json.loads(result.output)
-        assert payload["status"] == "ok" and payload["row"]["collection_id"]
+        assert payload["status"] == "ok"
+        assert payload["row"]["collection_id"]
 
     def test_write_appends_to_catalog(self, tmp_path, monkeypatch):
         """curate --write inserts the row into the (temp) catalog file."""

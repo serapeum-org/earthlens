@@ -69,7 +69,8 @@ class TestProber:
         monkeypatch.setattr(s3_cli, "_s3_sample_keys", lambda b, p, r: ["a", "b"])
         dataset = next(iter(load_catalog(_info()).datasets))
         result = probe_dataset(_info(), dataset)
-        assert "a" in result.assets and "b" in result.assets, "keys listed"
+        assert "a" in result.assets, "keys listed"
+        assert "b" in result.assets, "keys listed"
 
     def test_unknown_dataset_is_error(self):
         """An unregistered S3 dataset reports 'error'."""
@@ -109,7 +110,8 @@ class TestLiveValidator:
         """An S3 dataset whose bucket serves no object is flagged live."""
         monkeypatch.setattr(s3_cli, "_s3_live_keys", lambda b, p, r: [])
         result = validate_one(_info(), live=True)
-        assert result.status == "ok" and result.issues, "empty bucket -> issue"
+        assert result.status == "ok", "empty bucket -> issue"
+        assert result.issues, "empty bucket -> issue"
 
     def test_clean_when_objects_present(self, monkeypatch):
         """A reachable object clears the s3 live check."""

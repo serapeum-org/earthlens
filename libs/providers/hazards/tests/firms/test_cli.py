@@ -90,7 +90,8 @@ class TestProber:
         monkeypatch.setattr(firms_cli, "_csv_lines", lambda code: [])
         dataset = next(iter(load_catalog(_info()).datasets))
         result = probe_dataset(_info(), dataset)
-        assert result.status == "ok" and result.assets == {}, "empty -> {}"
+        assert result.status == "ok", "empty -> {}"
+        assert result.assets == {}, "empty -> {}"
 
     def test_csv_lines_helper_fetches_with_key(self, monkeypatch):
         """_csv_lines requests the area CSV and splits the body into lines."""

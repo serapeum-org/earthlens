@@ -68,7 +68,8 @@ class TestRefresher:
         """CHC's curated-slug index can't be machine-written: live read only."""
         monkeypatch.setattr(chc_cli, "_chc_discovered_paths", lambda: [])
         outcome = refresh_one(_info(), write=True)
-        assert outcome.status == "ok" and "not supported" in outcome.detail
+        assert outcome.status == "ok"
+        assert "not supported" in outcome.detail
 
 
 class TestWalk:

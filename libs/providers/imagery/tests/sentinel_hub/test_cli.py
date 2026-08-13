@@ -56,7 +56,8 @@ class TestProber:
         """A curated key also surfaces a collection: row with sh_collection."""
         result = probe_dataset(_info(), "sentinel-2-l2a")
         row = result.assets.get("collection:sentinel-2-l2a")
-        assert row and row["sh_collection"], "collection summary row present"
+        assert row, "collection summary row present"
+        assert row["sh_collection"], "collection summary row present"
 
 
 class TestValidator:
@@ -65,7 +66,8 @@ class TestValidator:
     def test_validates_clean(self):
         """Every curated Sentinel Hub recipe's evalscript is well-formed."""
         result = validate_one(_info())
-        assert result.status == "ok" and result.issues == []
+        assert result.status == "ok"
+        assert result.issues == []
         assert result.checked > 0, "recipes were checked"
 
     def test_bad_evalscript_flagged(self, monkeypatch):

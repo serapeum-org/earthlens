@@ -34,12 +34,14 @@ class TestRefresherAndValidator:
     def test_iso2_codes_are_universe(self):
         """iucn refresher returns the curated ISO2 country codes (including 'NO')."""
         grouped = iucn_cli.refresher(Catalog())
-        assert "KE" in grouped["iucn"] and "NO" in grouped["iucn"], "Norway preserved"
+        assert "KE" in grouped["iucn"], "Norway preserved"
+        assert "NO" in grouped["iucn"], "Norway preserved"
 
     def test_validator_clean_on_bundled_catalog(self):
         """The shipped IUCN catalog lints clean."""
         checked, issues = iucn_cli.validator(Catalog())
-        assert checked > 0 and issues == [], f"clean catalog: {issues}"
+        assert checked > 0, f"clean catalog: {issues}"
+        assert issues == [], f"clean catalog: {issues}"
 
 
 class TestEmitter:

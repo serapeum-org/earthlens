@@ -115,7 +115,8 @@ class TestValidator:
     def test_validates_clean(self):
         """Every curated USGS parameter's services are known service names."""
         result = validate_one(_info())
-        assert result.status == "ok" and result.issues == []
+        assert result.status == "ok"
+        assert result.issues == []
         assert result.checked > 0, "parameters were checked"
 
     def test_unknown_service_flagged(self):

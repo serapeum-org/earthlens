@@ -34,12 +34,14 @@ class TestRefresherAndValidator:
     def test_iso3_codes_are_universe(self):
         """wdpa refresher returns the curated ISO3 country codes."""
         grouped = wdpa_cli.refresher(Catalog())
-        assert "KEN" in grouped["wdpa"] and "USA" in grouped["wdpa"]
+        assert "KEN" in grouped["wdpa"]
+        assert "USA" in grouped["wdpa"]
 
     def test_validator_clean_on_bundled_catalog(self):
         """The shipped WDPA catalog lints clean."""
         checked, issues = wdpa_cli.validator(Catalog())
-        assert checked > 0 and issues == [], f"clean catalog: {issues}"
+        assert checked > 0, f"clean catalog: {issues}"
+        assert issues == [], f"clean catalog: {issues}"
 
 
 class TestEmitter:

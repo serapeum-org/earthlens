@@ -93,7 +93,8 @@ class TestProber:
             lambda url, **kw: {"items": [{"meta": {"associations": {}}}]},
         )
         result = probe_dataset(_info(), "SOME_COLLECTION")
-        assert result.status == "ok" and result.assets == {}, "empty UMM-Var"
+        assert result.status == "ok", "empty UMM-Var"
+        assert result.assets == {}, "empty UMM-Var"
 
     def test_reads_variable_records(self, monkeypatch):
         """A collection with associated variables yields their UMM-Var schema."""
@@ -136,7 +137,8 @@ class TestProber:
         )
         dataset = next(iter(load_catalog(_info()).datasets))
         result = probe_dataset(_info(), dataset)
-        assert result.status == "ok" and result.assets == {}, "no vars -> {}"
+        assert result.status == "ok", "no vars -> {}"
+        assert result.assets == {}, "no vars -> {}"
 
 
 class TestDeepProber:

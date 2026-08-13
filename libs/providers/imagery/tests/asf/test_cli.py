@@ -63,5 +63,6 @@ class TestValidator:
         )
         checked, issues = validator(catalog)
         assert checked == 0
-        assert issues and "asf_search" in issues[0]
+        assert issues
+        assert "asf_search" in issues[0]
         assert "2 curated" in issues[0]

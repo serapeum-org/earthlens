@@ -125,5 +125,6 @@ class TestValidator:
     def test_validates_clean(self):
         """The shipped WorldPop catalog lints clean."""
         result = validate_one(_info())
-        assert result.status == "ok" and result.issues == [], f"issues: {result.issues}"
+        assert result.status == "ok", f"issues: {result.issues}"
+        assert result.issues == [], f"issues: {result.issues}"
         assert result.checked > 0, "products were checked"

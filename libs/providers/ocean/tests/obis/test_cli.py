@@ -39,7 +39,8 @@ class TestRefresherAndValidator:
     def test_validator_clean_on_bundled_catalog(self):
         """The shipped OBIS catalog lints clean."""
         checked, issues = obis_cli.validator(Catalog())
-        assert checked > 0 and issues == [], f"clean catalog: {issues}"
+        assert checked > 0, f"clean catalog: {issues}"
+        assert issues == [], f"clean catalog: {issues}"
 
 
 class TestEmitter:
