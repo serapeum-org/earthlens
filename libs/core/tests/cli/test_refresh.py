@@ -956,26 +956,3 @@ class TestBiodiversityRefreshers:
         assert outcome.status == "ok", f"{provider} audit ran: {outcome.detail}"
         assert outcome.broken == [], f"{provider} curated rows resolve upstream"
         assert outcome.untracked == [], f"{provider} no untracked drift"
-
-    def test_gbif_includes_friendly_aliases_and_index(self):
-        """gbif's refresh axis is the union of friendly aliases + available index."""
-        from earthlens.gbif import Catalog as G
-
-        cat = G()
-        grouped = refresh_mod._gbif_grouped(cat)
-        ids = set(grouped["gbif"])
-        assert {"birds", "mammals", "kingdom:Animalia"} <= ids, "union returned"
-
-    def test_wdpa_iso3_codes_are_universe(self):
-        """wdpa refresher returns the curated ISO3 country codes."""
-        from earthlens.wdpa import Catalog as W
-
-        grouped = refresh_mod._wdpa_grouped(W())
-        assert "KEN" in grouped["wdpa"] and "USA" in grouped["wdpa"]
-
-    def test_iucn_iso2_codes_are_universe(self):
-        """iucn refresher returns the curated ISO2 country codes (including 'NO')."""
-        from earthlens.iucn import Catalog as I
-
-        grouped = refresh_mod._iucn_grouped(I())
-        assert "KE" in grouped["iucn"] and "NO" in grouped["iucn"], "Norway preserved"

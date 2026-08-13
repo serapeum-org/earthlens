@@ -448,73 +448,6 @@ def _walk_gportal(node: Any, mission: str = "", level: str = ""):
             yield (mission, level, str(item))
 
 
-# --------------------------------------------------------------------------- #
-# biodiversity cluster — gbif / obis / wdpa / iucn (no live emit).
-# --------------------------------------------------------------------------- #
-def _emit_gbif(
-    catalog: Any, upstream_id: str, *, key: str, **opts: Any
-) -> dict[str, Any]:
-    """Seed a GBIF `taxa:` row from a backbone `taxonKey` (no network).
-
-    The `Taxon` row carries `taxon_key` / `title` / `rank`; the maintainer
-    passes the backbone key as `upstream_id` and the rank / title as opts.
-
-    Args:
-        catalog: The loaded GBIF `Catalog` (unused).
-        upstream_id: The GBIF backbone `taxonKey` (digit string or integer).
-        key: The friendly catalog key.
-        **opts: `title`, `rank`.
-
-    Returns:
-        The seeded row.
-    """
-    return {
-        "taxon_key": int(upstream_id),
-        "title": str(opts.get("title") or key.replace("-", " ").title()),
-        "rank": str(opts.get("rank") or ""),
-    }
-
-
-def _emit_wdpa(
-    catalog: Any, upstream_id: str, *, key: str, **opts: Any
-) -> dict[str, Any]:
-    """Seed a WDPA `countries:` row from an ISO3 code (no network).
-
-    Args:
-        catalog: The loaded WDPA `Catalog` (unused).
-        upstream_id: The ISO3 alpha-3 code (e.g. `"KEN"`).
-        key: The friendly catalog key (typically the same alpha-3 code).
-        **opts: `name`, `region`.
-
-    Returns:
-        The seeded row.
-    """
-    return {
-        "name": str(opts.get("name") or key),
-        "region": str(opts.get("region") or ""),
-    }
-
-
-def _emit_iucn(
-    catalog: Any, upstream_id: str, *, key: str, **opts: Any
-) -> dict[str, Any]:
-    """Seed an IUCN `countries:` row from an ISO2 code (no network).
-
-    Args:
-        catalog: The loaded IUCN `Catalog` (unused).
-        upstream_id: The ISO2 alpha-2 code (e.g. `"KE"`).
-        key: The friendly catalog key (typically the same alpha-2 code).
-        **opts: `name`, `region`.
-
-    Returns:
-        The seeded row.
-    """
-    return {
-        "name": str(opts.get("name") or key),
-        "region": str(opts.get("region") or ""),
-    }
-
-
 #: Provider id -> a callable taking the loaded catalog, the upstream id, and
 #: per-provider keyword options, returning the seeded curated row.
 # ecmwf — seed from the live CADS `form.json` (CDS / ADS / EWDS).
@@ -659,16 +592,6 @@ _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
     "eumetsat": _emit_eumetsat,
     "gee": _emit_gee,
     "jaxa": _emit_jaxa,
-    "gbif": _emit_gbif,
-    "wdpa": _emit_wdpa,
-    "iucn": _emit_iucn,
-}
-
-#: Provider id -> the YAML block its curated rows live under.
-_BIODIVERSITY_BLOCKS = {
-    "gbif": "taxa",
-    "wdpa": "countries",
-    "iucn": "countries",
 }
 
 
@@ -747,11 +670,7 @@ def emit_stanza(
 
 
 #: Provider id -> the YAML block its curated rows live under.
-_STANZA_BLOCK: dict[str, str] = {
-    # Discovered config first; in-core literals are the migration remainder.
-    **config_table("stanza_block"),
-    **_BIODIVERSITY_BLOCKS,
-}
+_STANZA_BLOCK: dict[str, str] = config_table("stanza_block")
 
 
 def _append_to_block(path: Path, block: str, key: str, row: dict[str, Any]) -> None:

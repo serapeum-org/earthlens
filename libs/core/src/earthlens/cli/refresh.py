@@ -1123,61 +1123,6 @@ def refresh_ghsl_tiles() -> tuple[str, int]:
 _TILE_REGENS: dict[str, Callable[[], tuple[str, int]]] = {"ghsl": refresh_ghsl_tiles}
 
 
-def _gbif_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List GBIF's curated biodiversity index — the universe IS the catalog.
-
-    GBIF's backbone has 3+ billion occurrences across an unbounded taxonomic
-    tree; no anonymous endpoint enumerates "every taxon", so the universe
-    earthlens tracks is the curated `available_datasets:` index of common
-    higher-rank taxa (kingdoms, classes, orders) plus the friendly aliases
-    in `taxa:`. The refresher returns that combined sorted set so the audit
-    can confirm nothing has been removed by hand.
-
-    Args:
-        catalog: The loaded GBIF `Catalog`.
-
-    Returns:
-        A single-group mapping `{"gbif": [sorted available + friendly ids]}`.
-    """
-    ids = set(catalog.available_datasets) | set(catalog.datasets)
-    return {"gbif": sorted(ids)}
-
-
-def _wdpa_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List the WDPA country axis — the universe IS the curated ISO3 set.
-
-    Protected Planet v4 needs a `WDPA_TOKEN` (UNEP-WCMC manual approval) for
-    every request, so refreshing against the live country dictionary is not
-    a no-credential operation. The catalog mirrors the curated codes as the
-    informational index and the refresher returns them — the same pattern as
-    s3 / fdsn.
-
-    Args:
-        catalog: The loaded WDPA `Catalog`.
-
-    Returns:
-        A single-group mapping `{"wdpa": [sorted ISO3 codes]}`.
-    """
-    return {"wdpa": sorted(set(catalog.available_datasets) | set(catalog.datasets))}
-
-
-def _iucn_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List the IUCN country axis — the universe IS the curated ISO2 set.
-
-    Red List v4 needs an `IUCN_TOKEN` for every request, so the live country
-    dictionary is not anonymous. The catalog mirrors the curated codes as
-    the informational index and the refresher returns them — same pattern as
-    s3 / wdpa.
-
-    Args:
-        catalog: The loaded IUCN `Catalog`.
-
-    Returns:
-        A single-group mapping `{"iucn": [sorted ISO2 codes]}`.
-    """
-    return {"iucn": sorted(set(catalog.available_datasets) | set(catalog.datasets))}
-
-
 #: Provider id -> a callable taking the loaded catalog and returning its
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
 #: credentials; credentialed ones (openaq, firms) read their key from the env.
@@ -1198,9 +1143,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "chc": _chc_grouped,
     "s3": _s3_grouped,
     "jaxa": _jaxa_grouped,
-    "gbif": _gbif_grouped,
-    "wdpa": _wdpa_grouped,
-    "iucn": _iucn_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -1424,9 +1366,6 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "sentinel_hub": _curated_attr_ids("sh_collection"),
     "worldpop": _worldpop_curated_ids,
     "chc": _chc_ftp_bases,
-    "gbif": _biodiversity_curated_ids,
-    "wdpa": _biodiversity_curated_ids,
-    "iucn": _biodiversity_curated_ids,
 }
 
 #: Provider id -> the catalog attribute holding its persisted informational

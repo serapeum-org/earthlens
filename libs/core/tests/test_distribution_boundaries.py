@@ -1279,12 +1279,10 @@ class TestCliIsBackendAgnostic:
             "ecmwf",
             "eumetsat",
             "fabdem",
-            "gbif",
             "gee",
             "ghsl",
             "glaciers",
             "goes",
-            "iucn",
             "jaxa",
             "mswep",
             "nrel",
@@ -1299,7 +1297,6 @@ class TestCliIsBackendAgnostic:
             "soilgrids",
             "stac",
             "tropycal",
-            "wdpa",
             "worldpop",
         }
     )

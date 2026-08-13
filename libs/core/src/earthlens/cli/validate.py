@@ -422,46 +422,6 @@ def _validate_goes(catalog: Any) -> tuple[int, list[str]]:
     return len(catalog.datasets), issues
 
 
-def _check_gbif_taxon(key: str, record: Any) -> list[str]:
-    """Flag a GBIF taxon missing its key or carrying a non-positive one."""
-    issues = _require(key, record, ("taxon_key",))
-    taxon_key = getattr(record, "taxon_key", None)
-    if taxon_key is not None and taxon_key <= 0:
-        issues.append(f"{key}: taxon_key must be positive, got {taxon_key!r}")
-    return issues
-
-
-def _validate_gbif(catalog: Any) -> tuple[int, list[str]]:
-    """Each curated GBIF taxon needs a positive integer backbone taxonKey."""
-    return _lint(catalog, _check_gbif_taxon)
-
-
-def _check_wdpa_country(key: str, record: Any) -> list[str]:
-    """Flag a WDPA country missing a name or with a malformed ISO3 key."""
-    issues = _require(key, record, ("name",))
-    if not (len(key) == 3 and key.isalpha() and key.isupper()):
-        issues.append(f"{key}: catalog key must be an upper-case ISO3 alpha-3 code")
-    return issues
-
-
-def _validate_wdpa(catalog: Any) -> tuple[int, list[str]]:
-    """Each curated WDPA country needs a name and an ISO3 alpha-3 key."""
-    return _lint(catalog, _check_wdpa_country)
-
-
-def _check_iucn_country(key: str, record: Any) -> list[str]:
-    """Flag an IUCN country missing a name or with a malformed ISO2 key."""
-    issues = _require(key, record, ("name",))
-    if not (len(key) == 2 and key.isalpha() and key.isupper()):
-        issues.append(f"{key}: catalog key must be an upper-case ISO2 alpha-2 code")
-    return issues
-
-
-def _validate_iucn(catalog: Any) -> tuple[int, list[str]]:
-    """Each curated IUCN country needs a name and an ISO2 alpha-2 key."""
-    return _lint(catalog, _check_iucn_country)
-
-
 def _validate_jaxa(catalog: Any) -> tuple[int, list[str]]:
     """Validate each JAXA row's protocol-specific identifier.
 
@@ -642,9 +602,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "chc": _validate_chc,
     "sentinel_hub": _validate_sentinel_hub,
     "worldpop": _validate_worldpop,
-    "gbif": _validate_gbif,
-    "wdpa": _validate_wdpa,
-    "iucn": _validate_iucn,
     "jaxa": _validate_jaxa,
     "bathymetry": _validate_bathymetry,
     "fabdem": _validate_fabdem,
