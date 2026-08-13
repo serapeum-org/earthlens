@@ -18,14 +18,9 @@ Three concerns are factored here so `osm/backend.py` only routes:
   `to_fc`.
 * `OhsomeUnavailableError` / `ohsome_http_status` — turn the `ohsome` SDK's
   opaque failure on a throttled/blocked public endpoint into a clear, typed,
-  actionable error. On the HTML `403` an overloaded `api.ohsome.org` front proxy
-  returns, the SDK exposes the status inconsistently: usually it wraps the
-  failure into an `OhsomeException` carrying `error_code`, but on some
-  environments its non-JSON-body handling misfires (its
-  `except json.decoder.JSONDecodeError` does not catch the `simplejson`-based
-  `requests.exceptions.JSONDecodeError`) and it leaks a bare `JSONDecodeError`
-  whose status is only reachable through the exception chain. `ohsome_http_status`
-  handles both shapes, so the status is recovered either way here.
+  actionable error. The SDK exposes the HTTP status inconsistently (see
+  `ohsome_http_status` for the two shapes), so the status is recovered from the
+  exception chain here.
 
 All GIS containerisation stays inside the pyramids `FeatureCollection` per the
 repository's pyramids policy; earthlens only assembles the plain attribute rows
