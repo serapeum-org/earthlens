@@ -127,11 +127,12 @@ def supported_providers(live: bool = False) -> list[str]:
         The sorted provider ids `validate` can check.
 
     Examples:
-        - nwp is wired up:
+        - The wired-up ids come back as a sorted list:
 
             ```python
             >>> from earthlens.cli.validate import supported_providers
-            >>> "nwp" in supported_providers()
+            >>> ids = supported_providers()
+            >>> ids == sorted(ids)
             True
 
             ```

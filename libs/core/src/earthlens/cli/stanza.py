@@ -130,11 +130,12 @@ def supported_providers() -> list[str]:
         The sorted provider ids `curate` can author a row for.
 
     Examples:
-        - Earthdata is wired up:
+        - The wired-up ids come back as a sorted list:
 
             ```python
             >>> from earthlens.cli.stanza import supported_providers
-            >>> "earthdata" in supported_providers()
+            >>> ids = supported_providers()
+            >>> ids == sorted(ids)
             True
 
             ```

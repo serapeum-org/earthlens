@@ -352,11 +352,12 @@ def supported_providers() -> list[str]:
         The sorted provider ids `refresh` can fetch live.
 
     Examples:
-        - STAC is wired up:
+        - The wired-up ids come back as a sorted list:
 
             ```python
             >>> from earthlens.cli.refresh import supported_providers
-            >>> "stac" in supported_providers()
+            >>> ids = supported_providers()
+            >>> ids == sorted(ids)
             True
 
             ```

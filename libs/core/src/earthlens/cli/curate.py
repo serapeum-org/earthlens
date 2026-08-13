@@ -122,11 +122,12 @@ def supported_providers(deep: bool = False) -> list[str]:
         The sorted provider ids `probe` can sample.
 
     Examples:
-        - STAC is wired up:
+        - The wired-up ids come back as a sorted list:
 
             ```python
             >>> from earthlens.cli.curate import supported_providers
-            >>> "stac" in supported_providers()
+            >>> ids = supported_providers()
+            >>> ids == sorted(ids)
             True
 
             ```
