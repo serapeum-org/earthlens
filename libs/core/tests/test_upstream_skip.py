@@ -123,22 +123,26 @@ def _drive_hook(item: _Item, exc: Exception) -> None:
 
 def test_hook_skips_e2e_on_upstream_error() -> None:
     """The hook converts an availability failure in an e2e test into a skip."""
+    item = _Item(e2e=True)
+    exc = Exception("503 Server Error: Service Unavailable")
     with pytest.raises(pytest.skip.Exception):
-        _drive_hook(_Item(e2e=True), Exception("503 Server Error: Service Unavailable"))
+        _drive_hook(item, exc)
 
 
 def test_hook_reraises_e2e_real_failure() -> None:
     """The hook lets a genuine failure in an e2e test propagate unchanged."""
+    item = _Item(e2e=True)
+    exc = AssertionError("real bug")
     with pytest.raises(AssertionError):
-        _drive_hook(_Item(e2e=True), AssertionError("real bug"))
+        _drive_hook(item, exc)
 
 
 def test_hook_ignores_non_e2e_tests() -> None:
     """The hook never rewrites the outcome of a non-e2e test."""
+    item = _Item(e2e=False)
+    exc = Exception("503 Server Error: Service Unavailable")
     with pytest.raises(Exception, match="503"):
-        _drive_hook(
-            _Item(e2e=False), Exception("503 Server Error: Service Unavailable")
-        )
+        _drive_hook(item, exc)
 
 
 def test_hook_passes_through_a_passing_test() -> None:
