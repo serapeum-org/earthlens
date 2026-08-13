@@ -1,0 +1,588 @@
+"""Tests for the ECMWF catalog-tooling handlers (`earthlens.ecmwf.cli`).
+
+Moved out of core's CLI test suite when the ECMWF handlers moved into this
+distribution (issue #863).
+"""
+
+from __future__ import annotations
+
+import importlib
+import shutil
+import sys
+import types
+from types import SimpleNamespace
+
+import pytest
+import yaml
+from typer.testing import CliRunner
+
+import earthlens.ecmwf._hydrate as hydrate_mod
+import earthlens.ecmwf._seed as seed_mod
+import earthlens.ecmwf.cli as ecmwf_cli
+from earthlens.cli.adapter import list_backends, load_catalog
+from earthlens.cli.app import app
+from earthlens.cli.curate import probe_dataset
+from earthlens.cli.refresh import coverage_one, refresh_one
+from earthlens.cli.stanza import StanzaResult, emit_stanza, write_stanza
+from earthlens.cli.validate import validate_one
+
+pytestmark = pytest.mark.cli
+
+runner = CliRunner()
+
+
+def _info():
+    """Return the BackendInfo for the ecmwf backend."""
+    return next(b for b in list_backends() if b.provider == "ecmwf")
+
+
+def _catalog_copy(tmp_path, monkeypatch):
+    """Copy ecmwf's catalog dir and repoint CATALOG_PATH."""
+    info = _info()
+    module = importlib.import_module(f"{info.module}.catalog")
+    src = module.CATALOG_PATH
+    dst = tmp_path / src.name
+    if src.is_dir():
+        shutil.copytree(src, dst)
+    else:
+        shutil.copy(src, dst)
+    monkeypatch.setattr(module, "CATALOG_PATH", dst)
+    module.clear_catalog_cache()
+    return info, module, dst
+
+
+def _per_store_get_json(url, **kw):
+    """Return a distinct single collection id per Copernicus store host."""
+    if "ads.atmosphere" in url:
+        cid = "cams-global-reanalysis-eac4"
+    elif "ewds" in url:
+        cid = "cems-glofas-forecast"
+    else:
+        cid = "reanalysis-era5-land"
+    return {"collections": [{"id": cid}], "links": []}
+
+
+def _paginated_get_json(url, **kw):
+    """Two pages per Copernicus store — page 1 links to page 2 via `rel=next`."""
+    store = "ads" if "ads.atmosphere" in url else "ewds" if "ewds" in url else "cds"
+    prefix = {"cds": "reanalysis", "ads": "cams", "ewds": "cems"}[store]
+    if "page2" in url:
+        return {"collections": [{"id": f"{prefix}-two"}], "links": []}
+    return {
+        "collections": [{"id": f"{prefix}-one"}],
+        "links": [{"rel": "next", "href": url + "?page2"}],
+    }
+
+
+class TestRefresher:
+    """Tests for the ECMWF (CDS catalogue) lister + per-store writer."""
+
+    def test_lists_cds_collection_ids(self, monkeypatch):
+        """ecmwf refresh reads the public CDS catalogue collection ids."""
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "get_json",
+            lambda url, **kw: {"collections": [{"id": "reanalysis-era5-land"}]},
+        )
+        outcome = refresh_one(_info())
+        assert outcome.status == "ok", "ecmwf refresh ran"
+        assert outcome.live_count == 1, "one CDS dataset id listed"
+
+    def test_writes_per_store_index_from_live_fetch(self, tmp_path, monkeypatch):
+        """ecmwf --write persists per-store (cds/ads/ewds) ids into available_datasets."""
+        info, module, dst = _catalog_copy(tmp_path, monkeypatch)
+        monkeypatch.setattr(ecmwf_cli, "get_json", _per_store_get_json)
+        outcome = refresh_one(info, write=True)
+        assert outcome.status == "ok", "write succeeded"
+        assert outcome.written.endswith("_index.yaml"), "index file written"
+        module.clear_catalog_cache()
+        data = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
+        assert data["available_datasets"] == {
+            "cds": ["reanalysis-era5-land"],
+            "ads": ["cams-global-reanalysis-eac4"],
+            "ewds": ["cems-glofas-forecast"],
+        }, "per-store ids persisted"
+        catalog = load_catalog(info)
+        for expected in (
+            "reanalysis-era5-land",
+            "cams-global-reanalysis-eac4",
+            "cems-glofas-forecast",
+        ):
+            assert expected in catalog.available_datasets, f"{expected} unioned"
+
+    def test_pagination_follows_rel_next_across_pages(self, tmp_path, monkeypatch):
+        """`rel=next` is followed, so every page's ids land in the per-store index."""
+        info, module, dst = _catalog_copy(tmp_path, monkeypatch)
+        monkeypatch.setattr(ecmwf_cli, "get_json", _paginated_get_json)
+        outcome = refresh_one(info, write=True)
+        assert outcome.status == "ok", "write succeeded"
+        module.clear_catalog_cache()
+        data = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
+        assert data["available_datasets"] == {
+            "cds": ["reanalysis-one", "reanalysis-two"],
+            "ads": ["cams-one", "cams-two"],
+            "ewds": ["cems-one", "cems-two"],
+        }, "both pages' ids per store persisted"
+
+
+class TestCoverage:
+    """Tests for the ecmwf coverage classifier."""
+
+    def test_reports_done_and_addressable_across_stores(self):
+        """ecmwf coverage buckets the 3-store universe into DONE vs addressable."""
+        outcome = coverage_one(_info())
+        assert outcome.status == "ok", "ecmwf coverage is supported"
+        assert outcome.counts["DONE"] > 0, "curated rows are DONE"
+        assert outcome.counts["addressable"] > 0, "uncurated ids are addressable"
+        assert "cams-global-reanalysis-eac4" not in outcome.todo
+
+
+class TestProber:
+    """Tests for the ECMWF constraints prober (public, no creds)."""
+
+    def test_unions_variables_from_constraints(self, monkeypatch):
+        """ecmwf probe unions the `variable` values across constraint rows."""
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_ecmwf_constraints",
+            lambda d: [{"variable": ["2m_temperature", "tp"]}, {"variable": ["tp"]}],
+        )
+        result = probe_dataset(_info(), "reanalysis-era5-single-levels")
+        assert result.status == "ok", "ecmwf probe ran"
+        assert sorted(result.assets) == ["2m_temperature", "tp"], "vars unioned"
+
+    def test_unions_variables_across_rows(self, monkeypatch):
+        """The variable values across all constraint rows are unioned + sorted."""
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_ecmwf_constraints",
+            lambda d: [{"variable": ["t2m", "sp"]}, {"variable": ["t2m", "msl"]}],
+        )
+        result = probe_dataset(_info(), "reanalysis-era5-single-levels")
+        assert sorted(result.assets) == ["msl", "sp", "t2m"], "vars unioned + sorted"
+
+    def test_constraints_helper_delegates(self, monkeypatch):
+        """_ecmwf_constraints delegates to the package fetch_constraints."""
+        import earthlens.ecmwf.constraints as constraints
+
+        monkeypatch.setattr(
+            constraints,
+            "fetch_constraints",
+            lambda d, base_url=None: [{"variable": []}],
+        )
+        assert ecmwf_cli._ecmwf_constraints("x") == [{"variable": []}]
+
+
+class TestDeepProber:
+    """Tests for the credentialed ecmwf `--deep` sampler."""
+
+    def test_deep_reads_retrieved_netcdf(self, monkeypatch):
+        """ecmwf --deep reads long_name/units from a retrieved NetCDF."""
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_ecmwf_deep_sample",
+            lambda d: {"t2m": {"long_name": "2 metre temperature", "units": "K"}},
+        )
+        result = probe_dataset(_info(), "reanalysis-era5-single-levels", deep=True)
+        assert result.status == "ok", "ecmwf deep probe ran"
+        assert result.assets["t2m"]["units"] == "K", "retrieved var units read"
+
+    def test_deep_sample_reads_netcdf(self, monkeypatch):
+        """_ecmwf_deep_sample retrieves a tiny NetCDF and reads var metadata."""
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_ecmwf_constraints",
+            lambda d: [{"variable": ["2m_temperature"], "year": ["2020"]}],
+        )
+        cdsapi = types.ModuleType("cdsapi")
+        cdsapi.Client = lambda: types.SimpleNamespace(
+            retrieve=lambda ds, req, target: open(target, "w").close()
+        )
+        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        monkeypatch.setattr(
+            ecmwf_cli,
+            "_read_netcdf_var_meta",
+            lambda path: {"t2m": {"long_name": "2 metre temperature", "units": "K"}},
+        )
+        out = ecmwf_cli._ecmwf_deep_sample("reanalysis-era5-single-levels")
+        assert out["t2m"]["units"] == "K", "retrieved var units read"
+
+    def test_deep_sample_carries_family_selectors(self, monkeypatch):
+        """The sampled request forwards every selector of the chosen entry."""
+        entry = {
+            "variable": ["surface_soil_moisture"],
+            "type_of_sensor": ["passive"],
+            "time_aggregation": ["month_average"],
+            "version": ["v202212"],
+            "year": ["2023"],
+            "month": ["01"],
+            "day": ["01"],
+        }
+        monkeypatch.setattr(ecmwf_cli, "_ecmwf_constraints", lambda d: [entry])
+        captured: dict[str, object] = {}
+        cdsapi = types.ModuleType("cdsapi")
+        cdsapi.Client = lambda: types.SimpleNamespace(
+            retrieve=lambda ds, req, target: (
+                captured.update(req),
+                open(target, "w").close(),
+            )
+        )
+        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
+        ecmwf_cli._ecmwf_deep_sample("satellite-soil-moisture")
+        assert captured["type_of_sensor"] == ["passive"]
+        assert captured["version"] == ["v202212"]
+        assert captured["time_aggregation"] == ["month_average"]
+        assert captured["data_format"] == "netcdf"
+        assert "time" not in captured  # the entry enumerates none — fabricate none
+
+    def test_deep_sample_defaults_variable_when_absent(self, monkeypatch):
+        """An entry with no variable dimension still sends the widget's `all`."""
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda d: [{"lake": ["achit"]}]
+        )
+        captured: dict[str, object] = {}
+        cdsapi = types.ModuleType("cdsapi")
+        cdsapi.Client = lambda: types.SimpleNamespace(
+            retrieve=lambda ds, req, target: (
+                captured.update(req),
+                open(target, "w").close(),
+            )
+        )
+        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
+        ecmwf_cli._ecmwf_deep_sample("satellite-lake-water-level")
+        assert captured["variable"] == ["all"]
+        assert captured["lake"] == ["achit"]
+
+    def test_read_netcdf_var_meta_via_gdal(self, tmp_path):
+        """_read_netcdf_var_meta reads long_name/units from a NetCDF via GDAL."""
+        import numpy as np
+        import xarray as xr
+
+        path = tmp_path / "probe.nc"
+        xr.Dataset(
+            {
+                "t2m": (
+                    ("lat", "lon"),
+                    np.ones((2, 2), "f4"),
+                    {"units": "K", "long_name": "2 metre temperature"},
+                )
+            },
+            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
+        ).to_netcdf(path)
+        meta = ecmwf_cli._read_netcdf_var_meta(str(path))
+        assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
+
+    def test_deep_sample_no_constraints(self, monkeypatch):
+        """No constraints rows yields an empty schema (after the SDK imports)."""
+        monkeypatch.setitem(sys.modules, "cdsapi", types.ModuleType("cdsapi"))
+        monkeypatch.setitem(sys.modules, "netCDF4", types.ModuleType("netCDF4"))
+        monkeypatch.setattr(ecmwf_cli, "_ecmwf_constraints", lambda d: [])
+        assert ecmwf_cli._ecmwf_deep_sample("x") == {}
+
+
+class TestEmitter:
+    """Tests for the ECMWF emitter (seeds from the live CADS form.json, mocked)."""
+
+    _HINDCAST_FORM = [
+        {"name": "hyear", "details": {}},
+        {"name": "hmonth", "details": {}},
+        {"name": "hday", "details": {}},
+        {"name": "leadtime_hour", "details": {}},
+        {
+            "name": "variable",
+            "details": {"values": ["river_discharge_in_the_last_24_hours"]},
+        },
+    ]
+
+    def test_seeds_hindcast_row_with_ewds_endpoint(self, monkeypatch):
+        """A `hyear`/`hday` form seeds a glofas_hindcast row on the ewds store."""
+        monkeypatch.setattr(
+            ecmwf_cli, "get_json", lambda url, **kw: self._HINDCAST_FORM
+        )
+        result = emit_stanza(_info(), "cems-glofas-reforecast")
+        assert result.status == "ok"
+        assert result.row["endpoint"] == "ewds"
+        assert result.row["request_kind"] == "glofas_hindcast"
+        assert "river-discharge-in-the-last-24-hours" in result.row["variables"]
+
+    def test_cams_date_form_seeds_ads_endpoint(self, monkeypatch):
+        """A `date`-range form on a `cams-*` id seeds a cams_date row on ads."""
+        form = [
+            {"name": "date", "details": {}},
+            {"name": "variable", "details": {"values": ["total_column_ozone"]}},
+        ]
+        monkeypatch.setattr(ecmwf_cli, "get_json", lambda url, **kw: form)
+        result = emit_stanza(_info(), "cams-global-reanalysis-eac4")
+        assert result.status == "ok"
+        assert result.row["endpoint"] == "ads"
+        assert result.row["request_kind"] == "cams_date"
+
+    def test_fire_form_seeds_fire_not_satellite(self, monkeypatch):
+        """A grid + `dataset_type` form (no leadtime_hour) seeds a `fire` row."""
+        form = [
+            {"name": "dataset_type", "details": {}},
+            {"name": "grid", "details": {}},
+            {"name": "variable", "details": {"values": ["fire_weather_index"]}},
+        ]
+        monkeypatch.setattr(ecmwf_cli, "get_json", lambda url, **kw: form)
+        result = emit_stanza(_info(), "cems-fire-historical-v1")
+        assert result.status == "ok"
+        assert result.row["request_kind"] == "fire"
+
+    def test_satellite_id_seeds_satellite_cdr(self, monkeypatch):
+        """A `satellite-*` id seeds satellite_cdr from its real (grid-less) form."""
+        form = [
+            {"name": "type_of_sensor", "details": {}},
+            {"name": "time_aggregation", "details": {}},
+            {"name": "year", "details": {}},
+            {"name": "month", "details": {}},
+            {"name": "day", "details": {}},
+            {
+                "name": "variable",
+                "details": {"values": ["surface_soil_moisture_volumetric"]},
+            },
+        ]
+        monkeypatch.setattr(ecmwf_cli, "get_json", lambda url, **kw: form)
+        result = emit_stanza(_info(), "satellite-soil-moisture")
+        assert result.row["request_kind"] == "satellite_cdr"
+
+    def test_seeds_every_variable_the_form_exposes(self, monkeypatch):
+        """A multi-variable form seeds one row per variable, all as placeholders."""
+        form = [
+            {"name": "year", "details": {}},
+            {"name": "month", "details": {}},
+            {"name": "day", "details": {}},
+            {"name": "time", "details": {}},
+            {
+                "name": "variable",
+                "details": {"values": ["2m_temperature", "total_precipitation"]},
+            },
+        ]
+        monkeypatch.setattr(ecmwf_cli, "get_json", lambda url, **kw: form)
+        result = emit_stanza(_info(), "reanalysis-era5-single-levels")
+        assert result.status == "ok"
+        variables = result.row["variables"]
+        assert set(variables) == {"2m-temperature", "total-precipitation"}
+        assert variables["2m-temperature"]["cds_variable"] == "2m_temperature"
+        assert all(v["units"] == "unknown" for v in variables.values())
+
+    def test_error_is_captured(self, monkeypatch):
+        """A failed fetch reports 'error', not raised."""
+
+        def boom(url, **kw):
+            raise RuntimeError("connection refused")
+
+        monkeypatch.setattr(ecmwf_cli, "get_json", boom)
+        assert emit_stanza(_info(), "reanalysis-era5-single-levels").status == "error"
+
+
+class TestRequestKind:
+    """`_ecmwf_request_kind` maps a form's fields (+ dataset id) to a request kind."""
+
+    @pytest.mark.parametrize(
+        "upstream_id, field_names, expected",
+        [
+            (
+                "satellite-soil-moisture",
+                ["type_of_sensor", "year", "day"],
+                "satellite_cdr",
+            ),
+            ("cems-glofas-reforecast", ["hyear", "hmonth", "hday"], "glofas_hindcast"),
+            ("efas-seasonal-reforecast", ["hyear", "hmonth"], "seasonal_hindcast"),
+            ("cams-global-reanalysis-eac4", ["date", "variable"], "cams_date"),
+            ("cams-ghg-inversion", ["quantity", "year", "month"], "cams_inversion"),
+            (
+                "cams-europe-air-quality-reanalyses",
+                ["year", "month", "model"],
+                "cams_inversion",
+            ),
+            ("cems-glofas-seasonal", ["leadtime_month", "year", "month"], "seasonal"),
+            ("cams-global-emission-inventories", ["year", "month"], "form"),
+            ("projections-cmip6", ["year", "month", "model"], "form"),
+            (
+                "cems-fire-historical-v1",
+                ["grid", "dataset_type", "year", "day"],
+                "fire",
+            ),
+            ("cems-fire-seasonal", ["leadtime_hour", "year", "month"], "fire"),
+            ("grid-only-cdr", ["grid", "year", "day"], "satellite_cdr"),
+            ("reanalysis-era5-single-levels", ["year", "month", "day", "time"], "form"),
+        ],
+    )
+    def test_kind_from_id_and_fields(self, upstream_id, field_names, expected):
+        """Each id/field-set combination maps to the documented request kind."""
+        form = [{"name": name} for name in field_names]
+        result = ecmwf_cli._ecmwf_request_kind(form, upstream_id)
+        assert result == expected, (
+            f"{upstream_id}/{field_names} → {result}, want {expected}"
+        )
+
+    def test_glofas_forecast_grid_absent_falls_through_to_form(self):
+        """A leadtime_hour form with no grid is not misread as a grid kind."""
+        form = [{"name": "year"}, {"name": "day"}, {"name": "leadtime_hour"}]
+        assert ecmwf_cli._ecmwf_request_kind(form, "cems-glofas-forecast") == "form"
+
+
+class TestWriteStanza:
+    """Tests for the ecmwf categoriser via write_stanza."""
+
+    def test_auto_categorises_target(self, tmp_path, monkeypatch):
+        """ecmwf without --target auto-picks the per-family shard from the id."""
+        info = _info()
+        module = importlib.import_module(f"{info.module}.catalog")
+        monkeypatch.setattr(module, "CATALOG_PATH", tmp_path)
+        result = StanzaResult(
+            "ecmwf",
+            "reanalysis-era5-complete",
+            "reanalysis-era5-complete",
+            "ok",
+            row={"endpoint": "cds", "request_kind": "form"},
+        )
+        written = write_stanza(info, result, None)
+        assert written.endswith("era5.yaml"), "era5 id routed to era5.yaml"
+        assert (tmp_path / "era5.yaml").exists(), "the shard file was written"
+
+
+class TestLiveValidator:
+    """Tests for the ecmwf constraints-based live validator."""
+
+    def test_flags_invalid_request(self, monkeypatch):
+        """An ECMWF dataset whose minimal request fails the validator is flagged."""
+        import earthlens.ecmwf.constraints as constraints
+
+        catalog = SimpleNamespace(
+            datasets={"good": object(), "nocon": object(), "bad": object()},
+            minimal_valid_request=lambda key: {
+                "good": {"data_format": "netcdf", "variable": ["x"]},
+                "nocon": {"data_format": "netcdf"},
+                "bad": {"data_format": "netcdf", "variable": ["y"]},
+            }[key],
+        )
+
+        class FakeValidator:
+            def __init__(self, dataset, request):
+                self.dataset = dataset
+
+            def check(self):
+                if self.dataset == "bad":
+                    raise ValueError("missing required selector 'level'")
+
+        monkeypatch.setattr(constraints, "RequestValidator", FakeValidator)
+        checked, issues = ecmwf_cli.live_validator(catalog)
+        assert checked == 2, "the no-constraints dataset is skipped"
+        assert any("bad" in i for i in issues), "invalid request flagged"
+
+    def test_reports_fetch_failure(self):
+        """A dataset whose constraints fetch raises is reported, not raised."""
+
+        def boom(key):
+            raise RuntimeError("offline")
+
+        catalog = SimpleNamespace(datasets={"d": object()}, minimal_valid_request=boom)
+        checked, issues = ecmwf_cli.live_validator(catalog)
+        assert any("constraints fetch failed" in i for i in issues), "failure reported"
+
+    def test_supported_under_live(self):
+        """ecmwf gains a live-only validator via discovery."""
+        assert validate_one(_info()).status == "unsupported"
+        assert validate_one(_info(), live=True).status in {"ok", "error"}
+
+
+class TestCommands:
+    """Command-level tests for the ecmwf hydrate / seed passes (SDKs mocked)."""
+
+    def test_fill_empty_runs_bulk_hydrate(self, monkeypatch):
+        """ecmwf --fill-empty --write drives the ecmwf hydrate and reports a summary."""
+        calls = {}
+
+        def fake_hydrate(limit=None, timeout=None):
+            calls["limit"] = limit
+            calls["timeout"] = timeout
+            return {
+                "candidates": 4,
+                "hydrated": 3,
+                "skipped": 1,
+                "timed_out": 0,
+                "filled": ["a", "b", "c"],
+            }
+
+        monkeypatch.setattr(hydrate_mod, "bulk_hydrate_empty", fake_hydrate)
+        result = runner.invoke(
+            app, ["datasets", "curate", "ecmwf", "--fill-empty", "--write"]
+        )
+        assert result.exit_code == 0, f"ecmwf fill-empty failed: {result.output}"
+        assert "hydrated 3" in result.output
+        assert "/ 4" in result.output
+        assert calls["timeout"] == 180, "the default --timeout is threaded through"
+
+    def test_fill_empty_threads_custom_timeout(self, monkeypatch):
+        """A custom --timeout is passed to the ecmwf hydrate; 0 means no deadline."""
+        calls = {}
+
+        def fake_hydrate(limit=None, timeout=None):
+            calls["timeout"] = timeout
+            return {
+                "candidates": 1,
+                "hydrated": 0,
+                "skipped": 1,
+                "timed_out": 1,
+                "filled": [],
+            }
+
+        monkeypatch.setattr(hydrate_mod, "bulk_hydrate_empty", fake_hydrate)
+        result = runner.invoke(
+            app,
+            [
+                "datasets",
+                "curate",
+                "ecmwf",
+                "--fill-empty",
+                "--write",
+                "--timeout",
+                "0",
+            ],
+        )
+        assert result.exit_code == 0, f"ecmwf fill-empty failed: {result.output}"
+        assert calls["timeout"] is None, "--timeout 0 becomes no deadline (None)"
+        assert "1 timed out" in result.output, "timed-out count is surfaced"
+
+    def test_all_runs_bulk_seed(self, monkeypatch):
+        """ecmwf --all --write drives the bulk seed and reports a summary."""
+        monkeypatch.setattr(
+            seed_mod,
+            "bulk_seed_uncurated",
+            lambda limit=None: {
+                "candidates": 5,
+                "seeded": 4,
+                "skipped": 1,
+                "failed": [("x", "boom")],
+            },
+        )
+        result = runner.invoke(app, ["datasets", "curate", "ecmwf", "--all", "--write"])
+        assert result.exit_code == 0, f"--all failed: {result.output}"
+        assert "seeded 4" in result.output
+        assert "/ 5" in result.output
+
+    def test_deep_flag_routes_to_credentialed_sampler(self, monkeypatch):
+        """probe --deep uses the deep sampler (creds mocked)."""
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_deep_sample", lambda d: {"t2m": {"units": "K"}}
+        )
+        result = runner.invoke(
+            app,
+            [
+                "datasets",
+                "probe",
+                "ecmwf",
+                "reanalysis-era5-single-levels",
+                "--deep",
+                "--json",
+            ],
+        )
+        import json
+
+        payload = json.loads(result.output)
+        assert payload["status"] == "ok"
+        assert payload["assets"]["t2m"]["units"] == "K"
