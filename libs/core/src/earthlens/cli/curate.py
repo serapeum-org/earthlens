@@ -142,79 +142,6 @@ def _ecmwf_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return {str(variable): {} for variable in variables}
 
 
-def _chc_sample_files(ftp_base: str, limit: int = 10) -> list[str]:
-    """Return a sample of filenames under a CHC FTP directory (anonymous)."""
-    from ftplib import FTP  # nosec B402
-
-    with FTP("data.chc.ucsb.edu", timeout=_TIMEOUT) as ftp:  # nosec B321
-        ftp.login()
-        ftp.cwd(ftp_base)
-        return sorted(ftp.nlst())[:limit]
-
-
-def _suggest_pattern(filenames: list[str]) -> str:
-    """Infer a `{year}.{month}.{day}`-style template from a sample filename.
-
-    Ported from the retired `tools/chc/probe_chirps_gefs.py`: tags 4-digit
-    years, 3-digit day-of-year runs, then the first two dotted 2-digit
-    segments as month / day. A seed for the catalog `file_patterns` — the
-    maintainer eyeballs it against the listing and refines.
-
-    Args:
-        filenames: The sampled directory listing.
-
-    Returns:
-        The first filename transformed into a template, or `""` when empty.
-    """
-    if not filenames:
-        return ""
-    pattern = re.sub(r"\b(19|20)\d{2}\b", "{year}", filenames[0])
-    pattern = re.sub(r"(?<!\d)(\d{3})(?!\d)", "{doy}", pattern)
-    seen_month = False
-    out: list[str] = []
-    for piece in re.split(r"(\{year\})", pattern):
-        if piece == "{year}":
-            out.append(piece)
-            continue
-        new_piece = piece
-        if not seen_month:
-            new_piece, hits = re.subn(
-                r"(?<=\.)(\d{2})(?=\.|$)", "{month}", new_piece, count=1
-            )
-            seen_month = bool(hits)
-        if seen_month and "{day}" not in new_piece:
-            new_piece = re.sub(r"(?<=\.)(\d{2})(?=\.|$)", "{day}", new_piece, count=1)
-        out.append(new_piece)
-    return "".join(out)
-
-
-def _chc_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe a CHC dataset's FTP directory for a sample of filenames.
-
-    Args:
-        catalog: The loaded CHC `Catalog` (resolves the dataset's `ftp_bases`).
-        dataset: A curated CHC dataset key.
-
-    Returns:
-        Mapping of sample filename to `{}`, plus a `(suggested pattern)` row
-        carrying a `{pattern}` template inferred from the listing (the seed
-        for the catalog `file_patterns`).
-
-    Raises:
-        ValueError: If the dataset has no `ftp_bases`.
-    """
-    record = catalog.datasets.get(dataset)
-    bases = list(getattr(record, "ftp_bases", {}).values()) if record else []
-    if not bases:
-        raise ValueError(f"no ftp_bases for {dataset!r}")
-    files = _chc_sample_files(bases[0])
-    schema: dict[str, dict[str, Any]] = {name: {} for name in files}
-    pattern = _suggest_pattern(files)
-    if pattern:
-        schema["(suggested pattern)"] = {"pattern": pattern}
-    return schema
-
-
 #: ECCC models ship one whole GRIB per variable (no `.idx` byte-index), so the
 #: idx-token check can't apply; template families whose URL also needs
 #: domain / member / resolution aren't synthesised here either.
@@ -660,7 +587,6 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("prober"),
     "ecmwf": _ecmwf_probe,
-    "chc": _chc_probe,
     "nwp": _nwp_probe,
 }
 

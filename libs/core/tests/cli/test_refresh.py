@@ -140,56 +140,6 @@ class TestCoverageOne:
         assert data["counts"] == {"DONE": 2}
 
 
-class _FakeFTP:
-    """A minimal in-memory FTP stand-in for the CHC walk test."""
-
-    def __init__(self, tree):
-        self._tree = tree
-        self._cwd = ""
-
-    def cwd(self, path):
-        self._cwd = "" if path == "/" else path
-
-    def nlst(self):
-        return self._tree.get(self._cwd.rstrip("/"), [])
-
-
-class TestChcRefresher:
-    """Tests for the CHC (anonymous-FTP product-tree walk) lister."""
-
-    def test_walk_classifies_product_dirs(self):
-        """A dir of data files / year-subdirs is a product dir; others descend."""
-        tree = {
-            "pub/org/chc/products": ["CHIRPS", "README.txt"],
-            "pub/org/chc/products/CHIRPS": ["daily", "monthly"],
-            "pub/org/chc/products/CHIRPS/daily": ["1981", "1982", "x.tif"],
-            "pub/org/chc/products/CHIRPS/monthly": ["data.nc"],
-        }
-        found = refresh_mod._chc_walk(_FakeFTP(tree), "pub/org/chc/products", 6)
-        assert found == [
-            "pub/org/chc/products/CHIRPS/daily/",
-            "pub/org/chc/products/CHIRPS/monthly/",
-        ], "both leaf product dirs discovered, README skipped"
-
-    def test_refresh_diffs_against_ftp_bases(self, monkeypatch):
-        """CHC diffs the live tree against catalog ftp_bases, not the slugs."""
-        bases = refresh_mod._chc_ftp_bases(load_catalog(_info("chc")))
-        live = bases[:-1] + ["pub/org/chc/products/NEW_PRODUCT/daily/"]
-        monkeypatch.setattr(refresh_mod, "_chc_discovered_paths", lambda: live)
-        outcome = refresh_one(_info("chc"))
-        assert outcome.status == "ok", "chc refresh ran"
-        assert outcome.new_ids == ["pub/org/chc/products/NEW_PRODUCT/daily/"], (
-            "only-on-ftp surfaced as new"
-        )
-        assert len(outcome.removed_ids) == 1, "the dropped base is only-in-yaml"
-
-    def test_refresh_has_no_writer(self, monkeypatch):
-        """CHC's curated-slug index can't be machine-written: live read only."""
-        monkeypatch.setattr(refresh_mod, "_chc_discovered_paths", lambda: [])
-        outcome = refresh_one(_info("chc"), write=True)
-        assert outcome.status == "ok" and "not supported" in outcome.detail
-
-
 @pytest.fixture
 def stac_catalog_copy(tmp_path, monkeypatch):
     """Redirect the STAC catalog dir to a writable temp copy.

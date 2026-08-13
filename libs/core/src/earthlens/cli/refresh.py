@@ -33,7 +33,6 @@ import importlib
 import re
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
-from ftplib import FTP, error_perm  # nosec B402  # noqa: S402
 from pathlib import Path
 from typing import Any, cast
 
@@ -347,120 +346,6 @@ def _get_text(url: str) -> str:
     return response.text
 
 
-#: FIRMS data-availability listing of every served sensor (needs a MAP_KEY).
-#: CHC anonymous-FTP host and the products root walked for coverage.
-_CHC_FTP_HOST = "data.chc.ucsb.edu"
-_CHC_ROOT = "pub/org/chc/products"
-#: How far the BFS descends below the root before giving up on a branch.
-_CHC_MAX_DEPTH = 6
-#: Suffixes that mark a leaf "data file" (so its directory is a product dir).
-_CHC_DATA_SUFFIXES = (
-    ".tif",
-    ".tif.gz",
-    ".tiff",
-    ".nc",
-    ".nc4",
-    ".bil",
-    ".bil.gz",
-    ".bin",
-    ".cog",
-    ".png",
-    ".grb",
-    ".grib",
-)
-_CHC_YEAR_RE = re.compile(r"^(19|20)\d{2}$")
-
-
-def _chc_is_product_listing(entries: list[str]) -> bool:
-    """Return whether a directory listing marks a CHC product directory.
-
-    A product directory is one whose children are data files (`.tif`,
-    `.nc`, `.bil`, ...) or year-named subdirectories; anything else is an
-    intermediate directory to descend into.
-
-    Args:
-        entries: The directory's child names.
-
-    Returns:
-        `True` if the listing looks like a product directory.
-    """
-    has_data = any(name.lower().endswith(_CHC_DATA_SUFFIXES) for name in entries)
-    has_years = any(_CHC_YEAR_RE.fullmatch(name) for name in entries)
-    return has_data or has_years
-
-
-def _chc_walk(ftp: FTP, root: str, max_depth: int) -> list[str]:
-    """BFS-walk `root` and return every discovered CHC product directory.
-
-    Mirrors `tools/chc/refresh_chc_catalog.py`: descends intermediate
-    directories until a product directory is reached or `max_depth` levels
-    below `root`. Unreachable / permission-denied directories are skipped.
-
-    Args:
-        ftp: A logged-in FTP connection.
-        root: The products root to walk from (no trailing slash).
-        max_depth: Maximum levels to descend below `root`.
-
-    Returns:
-        The sorted product-directory paths (each `.../`-terminated).
-    """
-    discovered: list[str] = []
-    queue: list[tuple[str, int]] = [(root, 0)]
-    while queue:
-        path, depth = queue.pop(0)
-        try:
-            ftp.cwd("/")
-            ftp.cwd(path)
-            entries = sorted(ftp.nlst())
-        except (error_perm, OSError):
-            continue
-        if _chc_is_product_listing(entries):
-            discovered.append(path.rstrip("/") + "/")
-            continue
-        if depth >= max_depth:
-            continue
-        for entry in entries:
-            if "." in entry:  # an unrecognised file (e.g. README.txt)
-                continue
-            queue.append((f"{path.rstrip('/')}/{entry}/", depth + 1))
-    return sorted(discovered)
-
-
-def _chc_discovered_paths() -> list[str]:
-    """Return every CHC product directory from a live anonymous-FTP walk."""
-    with FTP(_CHC_FTP_HOST, timeout=_TIMEOUT) as ftp:  # nosec B321
-        ftp.login()
-        return _chc_walk(ftp, _CHC_ROOT, _CHC_MAX_DEPTH)
-
-
-def _chc_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List every CHC product directory from the live FTP tree (anonymous).
-
-    CHC's refreshable axis is the set of FTP product directories, diffed
-    against the distinct `ftp_bases` the catalog references (see
-    :func:`_chc_ftp_bases`) — not the hand-curated `available_datasets:`
-    slugs, which are a human-curation artefact the diff cannot derive.
-
-    Args:
-        catalog: The loaded CHC `Catalog` (unused; the FTP tree is the source).
-
-    Returns:
-        A single-group mapping `{"chc": [sorted product directories]}`.
-    """
-    return {"chc": sorted({p.rstrip("/") + "/" for p in _chc_discovered_paths()})}
-
-
-def _chc_ftp_bases(catalog: Any) -> list[str]:
-    """Return the distinct `ftp_bases` paths the CHC catalog references."""
-    return sorted(
-        {
-            base.rstrip("/") + "/"
-            for dataset in catalog.datasets.values()
-            for base in dataset.ftp_bases.values()
-        }
-    )
-
-
 #: Provider id -> a callable regenerating a bundled GIS artefact (not an
 #: `available_*` index). Surfaced by `refresh <provider> --tiles`.
 _TILE_REGENS: dict[str, Callable[[], tuple[str, int]]] = dispatch_table("tile_regen")
@@ -474,7 +359,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     # in-core literals below are the not-yet-migrated remainder (issue #863).
     **dispatch_table("refresher"),
     "ecmwf": _ecmwf_grouped,
-    "chc": _chc_grouped,
 }
 
 #: Provider id -> a callable that persists a grouped live fetch back into
@@ -673,7 +557,6 @@ def _biodiversity_curated_ids(catalog: Any) -> list[str]:
 _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("curated_ids"),
-    "chc": _chc_ftp_bases,
 }
 
 #: Provider id -> the catalog attribute holding its persisted informational
@@ -688,7 +571,10 @@ _INDEX_ATTR: dict[str, str] = {
 #: backends whose refresh axis is neither `available_datasets` nor a simple
 #: attribute. CHC diffs the live FTP tree against its `ftp_bases` paths (not
 #: the hand-curated `available_datasets:` slugs the diff cannot derive).
-_BUNDLED_IDS: dict[str, Callable[[Any], list[str]]] = {"chc": _chc_ftp_bases}
+_BUNDLED_IDS: dict[str, Callable[[Any], list[str]]] = {
+    # Discovered handlers only; core names no backend.
+    **dispatch_table("bundled_ids"),
+}
 
 
 def _bundled_ids(catalog: Any, provider: str) -> list[str]:

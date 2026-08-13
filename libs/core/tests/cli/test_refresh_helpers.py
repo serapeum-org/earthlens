@@ -34,35 +34,3 @@ class TestGetText:
             ),
         )
         assert refresh_mod._get_text("https://x") == "BODY"
-
-
-class TestChcWalk:
-    """Tests for the CHC FTP product-tree walk."""
-
-    def test_descends_to_product_dirs(self):
-        """The BFS descends intermediates and stops at product directories."""
-
-        class FakeFTP:
-            listings = {
-                "pub/org/chc/products": ["chirps", "readme.txt"],
-                "pub/org/chc/products/chirps": ["2020", "2021"],
-            }
-
-            def cwd(self, path):
-                self._cwd = "" if path == "/" else path.rstrip("/")
-                if self._cwd and self._cwd not in self.listings:
-                    from ftplib import error_perm
-
-                    raise error_perm("550")
-
-            def nlst(self):
-                return self.listings[self._cwd]
-
-        paths = refresh_mod._chc_walk(FakeFTP(), "pub/org/chc/products", 6)
-        assert any(p.endswith("chirps/") for p in paths), paths
-
-    def test_is_product_listing(self):
-        """A listing with data files or year subdirs is a product directory."""
-        assert refresh_mod._chc_is_product_listing(["x.tif"]) is True
-        assert refresh_mod._chc_is_product_listing(["2020"]) is True
-        assert refresh_mod._chc_is_product_listing(["sub", "readme"]) is False

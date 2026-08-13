@@ -123,29 +123,12 @@ def _require(key: str, record: Any, fields: tuple[str, ...]) -> list[str]:
     ]
 
 
-def _validate_chc(catalog: Any) -> tuple[int, list[str]]:
-    """Each CHC dataset needs FTP bases, a file pattern, and variables."""
-
-    def check(key: str, record: Any) -> list[str]:
-        """Flag a dataset missing ftp_bases, variables, or a file pattern."""
-        issues = _require(key, record, ("ftp_bases", "variables"))
-        if not (
-            getattr(record, "file_patterns", None)
-            or getattr(record, "discrete_files", None)
-        ):
-            issues.append(f"{key}: no file_patterns or discrete_files")
-        return issues
-
-    return _lint(catalog, check)
-
-
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("validator"),
     "nwp": _validate_nwp,
-    "chc": _validate_chc,
 }
 
 

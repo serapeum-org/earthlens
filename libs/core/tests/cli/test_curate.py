@@ -85,40 +85,6 @@ class TestEcmwfProbe:
         assert sorted(result.assets) == ["2m_temperature", "tp"], "vars unioned"
 
 
-class TestChcProbe:
-    """Tests for the CHC FTP-sample prober (anonymous FTP)."""
-
-    def test_lists_sample_filenames(self, monkeypatch):
-        """chc probe lists a sample of filenames under the dataset's ftp_base."""
-        from earthlens.cli.adapter import load_catalog
-
-        monkeypatch.setattr(
-            curate_mod, "_chc_sample_files", lambda base, limit=10: ["a.tif", "b.tif"]
-        )
-        dataset = next(iter(load_catalog(_info("chc")).datasets))
-        result = probe_dataset(_info("chc"), dataset)
-        assert result.status == "ok", "chc probe ran"
-        assert "a.tif" in result.assets, "sample filename listed"
-
-    def test_suggests_a_filename_pattern(self, monkeypatch):
-        """chc probe adds a (suggested pattern) row inferred from the listing."""
-        from earthlens.cli.adapter import load_catalog
-
-        monkeypatch.setattr(
-            curate_mod,
-            "_chc_sample_files",
-            lambda base, limit=10: ["chirps-v2.0.2009.01.01.tif"],
-        )
-        dataset = next(iter(load_catalog(_info("chc")).datasets))
-        result = probe_dataset(_info("chc"), dataset)
-        suggestion = result.assets.get("(suggested pattern)", {}).get("pattern", "")
-        assert suggestion == "chirps-v2.0.{year}.{month}.{day}.tif", suggestion
-
-    def test_suggest_pattern_empty_listing(self):
-        """The pattern suggester returns empty for an empty listing."""
-        assert curate_mod._suggest_pattern([]) == ""
-
-
 class TestNwpProbe:
     """Tests for the NWP `.idx` band prober (Herbie template, no eccodes)."""
 
@@ -400,37 +366,8 @@ class TestNwpHelpers:
         assert "1234 bytes" in out, "head_object size reported"
 
 
-class TestChcSampleFiles:
-    """Tests for the anonymous-FTP CHC sampler."""
-
-    def test_lists_directory(self, monkeypatch):
-        """_chc_sample_files logs in, cds to the base, and returns sorted names."""
-        import earthlens.cli.curate as cm
-
-        class FakeFTP:
-            def __init__(self, host, timeout=None):
-                pass
-
-            def __enter__(self):
-                return self
-
-            def __exit__(self, *a):
-                return False
-
-            def login(self):
-                pass
-
-            def cwd(self, base):
-                pass
-
-            def nlst(self):
-                return ["b.tif", "a.tif"]
-
-        monkeypatch.setattr(cm, "FTP", FakeFTP, raising=False)
-        import ftplib
-
-        monkeypatch.setattr(ftplib, "FTP", FakeFTP)
-        assert cm._chc_sample_files("/x", limit=1) == ["a.tif"], "sorted + capped"
+class TestNwpAvailabilityBranches:
+    """Branch coverage for the NWP availability probe."""
 
     def test_availability_meteofrance_needs_key(self, monkeypatch):
         """A meteofrance model with no API key reports the missing-credential."""
