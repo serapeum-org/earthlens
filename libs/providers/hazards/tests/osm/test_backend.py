@@ -227,14 +227,11 @@ class TestOhsomeRoute:
         leaked.__context__ = http_error
         fake_ohsome.error = leaked
 
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
         with pytest.raises(OhsomeUnavailableError) as excinfo:
-            OSM(
-                **{
-                    **osm_kwargs(),
-                    "variables": ["ohsome:buildings"],
-                    "start": "2020-01-01",
-                }
-            ).download()
+            backend.download()
         assert excinfo.value.status_code == 403
         assert "public" in str(excinfo.value)
         assert excinfo.value.__cause__ is leaked
@@ -251,14 +248,11 @@ class TestOhsomeRoute:
         ohsome_error.error_code = 403
         fake_ohsome.error = ohsome_error
 
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
         with pytest.raises(OhsomeUnavailableError) as excinfo:
-            OSM(
-                **{
-                    **osm_kwargs(),
-                    "variables": ["ohsome:buildings"],
-                    "start": "2020-01-01",
-                }
-            ).download()
+            backend.download()
         assert excinfo.value.status_code == 403
 
     def test_unauthorized_propagates_unchanged(self, osm_kwargs, fake_ohsome):
@@ -269,14 +263,11 @@ class TestOhsomeRoute:
         ohsome_error.error_code = 401
         fake_ohsome.error = ohsome_error
 
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
         with pytest.raises(RuntimeError, match="Unauthorized") as excinfo:
-            OSM(
-                **{
-                    **osm_kwargs(),
-                    "variables": ["ohsome:buildings"],
-                    "start": "2020-01-01",
-                }
-            ).download()
+            backend.download()
         assert not isinstance(excinfo.value, OhsomeUnavailableError)
 
     def test_rate_limited_becomes_unavailable_error(self, osm_kwargs, fake_ohsome):
@@ -287,27 +278,21 @@ class TestOhsomeRoute:
         ohsome_error.error_code = 429
         fake_ohsome.error = ohsome_error
 
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
         with pytest.raises(OhsomeUnavailableError) as excinfo:
-            OSM(
-                **{
-                    **osm_kwargs(),
-                    "variables": ["ohsome:buildings"],
-                    "start": "2020-01-01",
-                }
-            ).download()
+            backend.download()
         assert excinfo.value.status_code == 429
 
     def test_non_throttle_error_propagates_unchanged(self, osm_kwargs, fake_ohsome):
         """An error with no throttle status propagates as-is (not masked)."""
         fake_ohsome.error = RuntimeError("some genuine bug")
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
         with pytest.raises(RuntimeError, match="some genuine bug"):
-            OSM(
-                **{
-                    **osm_kwargs(),
-                    "variables": ["ohsome:buildings"],
-                    "start": "2020-01-01",
-                }
-            ).download()
+            backend.download()
 
 
 class TestDownloadContract:
