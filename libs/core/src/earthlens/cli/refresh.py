@@ -307,8 +307,7 @@ _TILE_REGENS: dict[str, Callable[[], tuple[str, int]]] = dispatch_table("tile_re
 #: live ids grouped (e.g. per STAC endpoint). Public providers need no
 #: credentials; credentialed ones (openaq, firms) read their key from the env.
 _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
-    # Discovered from each provider distribution's `earthlens.cli` table; the
-    # in-core literals below are the not-yet-migrated remainder (issue #863).
+    # Wholly discovery-driven: merged from each provider's `earthlens.cli` table.
     **dispatch_table("refresher"),
 }
 
@@ -318,7 +317,7 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
 #: load time (openaq, worldpop, usgs_water) have no on-disk block to rewrite
 #: and intentionally report "live read only" instead.
 _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
-    # Discovered handlers first; in-core literals are the migration remainder.
+    # Wholly discovery-driven: merged from each provider's `earthlens.cli` table.
     **dispatch_table("writer"),
 }
 
@@ -506,7 +505,7 @@ def _biodiversity_curated_ids(catalog: Any) -> list[str]:
 
 
 _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
-    # Discovered handlers first; in-core literals are the migration remainder.
+    # Wholly discovery-driven: merged from each provider's `earthlens.cli` table.
     **dispatch_table("curated_ids"),
 }
 
@@ -514,7 +513,7 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
 #: index. Defaults to `available_datasets`; Overture's refreshable axis is
 #: its date-stamped `available_releases`, NWM's is its `available_configurations`.
 _INDEX_ATTR: dict[str, str] = {
-    # Discovered config first; in-core literals are the migration remainder.
+    # Wholly discovery-driven: merged from each provider's `earthlens.cli` table.
     **config_table("index_attr"),
 }
 
@@ -662,7 +661,7 @@ class CoverageOutcome:
 #: Only providers with a discoverable available-universe distinct from their
 #: curated rows (gee's STAC index, erddap's `allDatasets` crawl) qualify.
 _COVERAGE: dict[str, Callable[[Any], tuple[dict[str, int], list[str]]]] = {
-    # Discovered handlers first; in-core literals are the migration remainder.
+    # Wholly discovery-driven: merged from each provider's `earthlens.cli` table.
     **dispatch_table("coverage"),
 }
 

@@ -90,7 +90,7 @@ def _require(key: str, record: Any, fields: tuple[str, ...]) -> list[str]:
 #: Provider id -> a callable taking the loaded catalog and returning
 #: `(checked, issues)`. Providers without one report `"unsupported"`.
 _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
-    # Discovered handlers first; in-core literals are the migration remainder.
+    # Wholly discovery-driven: merged from each provider's `earthlens.cli` table.
     **dispatch_table("validator"),
 }
 
@@ -111,7 +111,7 @@ def _http_head(url: str) -> int:
 #: Provider id -> a live reachability validator (the `--live` half). May add
 #: a provider not in :data:`_VALIDATORS` (e.g. openeo / ecmwf are live-only).
 _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
-    # Discovered handlers first; in-core literals are the migration remainder.
+    # Wholly discovery-driven: merged from each provider's `earthlens.cli` table.
     **dispatch_table("live_validator"),
 }
 

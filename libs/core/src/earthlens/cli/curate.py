@@ -97,7 +97,7 @@ def _infer_dtype(value: str | None) -> str:
 
 #: Provider id -> a credentialed deep sampler (the `--deep` half of probe).
 _DEEP_PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
-    # Discovered handlers first; in-core literals are the migration remainder.
+    # Wholly discovery-driven: merged from each provider's `earthlens.cli` table.
     **dispatch_table("deep_prober"),
 }
 
@@ -105,7 +105,7 @@ _DEEP_PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
 #: Provider id -> a callable taking the loaded catalog and a dataset id and
 #: returning its per-entry schema.
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
-    # Discovered handlers first; in-core literals are the migration remainder.
+    # Wholly discovery-driven: merged from each provider's `earthlens.cli` table.
     **dispatch_table("prober"),
 }
 

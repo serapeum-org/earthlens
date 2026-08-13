@@ -118,7 +118,7 @@ class StanzaResult:
 #: Provider id -> a callable taking the loaded catalog, the upstream id, and
 #: per-provider keyword options, returning the seeded curated row.
 _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
-    # Discovered handlers first; in-core literals are the migration remainder.
+    # Wholly discovery-driven: merged from each provider's `earthlens.cli` table.
     **dispatch_table("emitter"),
 }
 
