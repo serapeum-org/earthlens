@@ -455,26 +455,6 @@ def _openaq_grouped(catalog: Any) -> dict[str, list[str]]:
 
 
 #: EUMETSAT public browse collections endpoint (no credentials).
-_EUMETSAT_BROWSE_URL = "https://api.eumetsat.int/data/browse/collections"
-
-
-def _eumetsat_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List EUMETSAT collection ids from the public browse endpoint.
-
-    Listing collections needs no credentials (only data *access* does); each
-    browse link's `title` is the `EO:EUM:...` collection id.
-
-    Args:
-        catalog: The loaded EUMETSAT `Catalog` (unused; the endpoint is fixed).
-
-    Returns:
-        A single-group mapping `{"eumetsat": [sorted collection ids]}`.
-    """
-    body = _get_json(_EUMETSAT_BROWSE_URL, params={"format": "json"})
-    ids = sorted(
-        {str(link["title"]) for link in body.get("links", []) if link.get("title")}
-    )
-    return {"eumetsat": ids}
 
 
 def _sh_data_collection_names() -> list[str]:
@@ -960,7 +940,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "openeo": _openeo_grouped,
     "earthdata": _earthdata_grouped,
     "openaq": _openaq_grouped,
-    "eumetsat": _eumetsat_grouped,
     "sentinel_hub": _sentinel_hub_grouped,
     "gee": _gee_grouped,
     "radar": _radar_grouped,
@@ -979,7 +958,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     **dispatch_table("writer"),
     "ecmwf": _index_writer("available_datasets", grouped=True),
     "openeo": _write_openeo,
-    "eumetsat": _index_writer("available_datasets"),
     "sentinel_hub": _index_writer("available_collections"),
     "gee": _index_writer("available_datasets"),
     "earthdata": _index_writer("available_datasets"),
@@ -1183,7 +1161,6 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     **dispatch_table("curated_ids"),
     "openeo": _curated_collection_ids,
     "earthdata": _curated_attr_ids("short_name"),
-    "eumetsat": _curated_collection_ids,
     "sentinel_hub": _curated_attr_ids("sh_collection"),
     "chc": _chc_ftp_bases,
 }

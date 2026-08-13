@@ -177,24 +177,6 @@ class TestGeeProbe:
         assert result.assets["hurs"]["gsd"] == 27830, "gsd unwrapped from list"
 
 
-class TestEumetsatProbe:
-    """Tests for the EUMETSAT browse prober (public, no auth)."""
-
-    def test_reads_browse_metadata(self, monkeypatch):
-        """eumetsat probe reads the public browse title/abstract/date."""
-        monkeypatch.setattr(
-            curate_mod,
-            "_get_json",
-            lambda url, **kw: {
-                "collection": {"properties": {"title": "HRSEVIRI", "date": "2020"}}
-            },
-        )
-        result = probe_dataset(_info("eumetsat"), "EO:EUM:DAT:MSG:HRSEVIRI")
-        assert result.status == "ok", "eumetsat probe ran"
-        entry = next(iter(result.assets.values()))
-        assert entry["title"] == "HRSEVIRI", "title parsed"
-
-
 class TestS3Probe:
     """Tests for the S3 bucket prober (unsigned boto3)."""
 

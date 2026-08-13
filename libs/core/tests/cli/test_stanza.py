@@ -219,24 +219,6 @@ class TestEarthdataEmitter:
         assert result.row["output_kind"] == "vector", "GEDI -> vector"
 
 
-class TestEumetsatEmitter:
-    """Tests for the EUMETSAT emitter (public browse)."""
-
-    def test_seeds_collection_row(self, monkeypatch):
-        """The browse fetch validates the id and the row carries the group."""
-        monkeypatch.setattr(
-            stanza_mod,
-            "_get_json",
-            lambda url, **kw: {"collection": {"properties": {"title": "HRSEVIRI"}}},
-        )
-        result = emit_stanza(
-            _info("eumetsat"), "EO:EUM:DAT:MSG:HRSEVIRI", key="msg", group="MSG"
-        )
-        assert result.status == "ok", "eumetsat emitter ran"
-        assert result.row["collection_id"] == "EO:EUM:DAT:MSG:HRSEVIRI"
-        assert result.row["group"] == "MSG" and result.row["output_kind"] == "raster"
-
-
 class TestGeeEmitter:
     """Tests for the GEE emitter (public EE STAC)."""
 

@@ -1275,7 +1275,6 @@ class TestCliIsBackendAgnostic:
             "drought",
             "earthdata",
             "ecmwf",
-            "eumetsat",
             "gee",
             "goes",
             "jaxa",

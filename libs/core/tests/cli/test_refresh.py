@@ -174,23 +174,6 @@ class TestOpenaqRefresher:
         assert "pm25" not in outcome.untracked, "curated live id is not untracked"
 
 
-class TestEumetsatRefresher:
-    """Tests for the EUMETSAT (public browse) lister."""
-
-    def test_lists_collection_ids_from_links(self, monkeypatch):
-        """eumetsat refresh reads each browse link's title as the id."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
-            lambda url, **kw: {
-                "links": [{"title": "EO:EUM:DAT:1"}, {"title": "EO:EUM:DAT:2"}]
-            },
-        )
-        outcome = refresh_one(_info("eumetsat"))
-        assert outcome.status == "ok", "eumetsat refresh ran"
-        assert outcome.live_count == 2, "two collection ids listed"
-
-
 class TestSentinelHubRefresher:
     """Tests for the Sentinel Hub (SDK enum) lister."""
 

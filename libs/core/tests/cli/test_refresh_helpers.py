@@ -128,15 +128,6 @@ class TestNetworkPrimitives:
         )
         assert refresh_mod._openeo_process_ids() == ["ndvi"]
 
-    def test_eumetsat_grouped_reads_link_titles(self, monkeypatch):
-        """Each browse link's title is taken as the collection id."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
-            lambda url, **kw: {"links": [{"title": "EO:1"}, {"title": "EO:2"}]},
-        )
-        assert refresh_mod._eumetsat_grouped(None) == {"eumetsat": ["EO:1", "EO:2"]}
-
     def test_sentinel_hub_grouped(self, monkeypatch):
         """sentinel_hub grouped wraps the DataCollection enum names, sorted."""
         monkeypatch.setattr(

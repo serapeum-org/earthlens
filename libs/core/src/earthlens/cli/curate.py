@@ -276,38 +276,6 @@ def _infer_dtype(value: str | None) -> str:
 
 
 #: EUMETSAT public browse collections endpoint (no credentials).
-_EUMETSAT_BROWSE_URL = "https://api.eumetsat.int/data/browse/collections"
-
-
-def _eumetsat_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe an EUMETSAT collection's public browse metadata (no auth).
-
-    Args:
-        catalog: The loaded EUMETSAT `Catalog` (resolves a key's
-            `collection_id`).
-        dataset: A curated key or an `EO:EUM:DAT:…` collection id.
-
-    Returns:
-        A single-entry mapping `{collection_id: {title, abstract, date,
-        updated}}`.
-    """
-    from urllib.parse import quote
-
-    record = catalog.datasets.get(dataset)
-    collection_id = getattr(record, "collection_id", None) or dataset
-    body = _get_json(
-        f"{_EUMETSAT_BROWSE_URL}/{quote(collection_id, safe='')}",
-        params={"format": "json"},
-    )
-    props = (body.get("collection") or {}).get("properties") or {}
-    return {
-        collection_id: {
-            "title": props.get("title"),
-            "abstract": (props.get("abstract") or "")[:200],
-            "date": props.get("date"),
-            "updated": props.get("updated"),
-        }
-    }
 
 
 def _s3_sample_keys(bucket: str, prefix: str, region: str | None) -> list[str]:
@@ -1031,7 +999,6 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "gee": _gee_probe,
     "sentinel_hub": _sentinel_hub_probe,
     "earthdata": _earthdata_probe,
-    "eumetsat": _eumetsat_probe,
     "s3": _s3_probe,
     "ecmwf": _ecmwf_probe,
     "chc": _chc_probe,

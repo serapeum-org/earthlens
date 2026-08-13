@@ -22,7 +22,6 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
-from urllib.parse import quote
 
 import yaml
 
@@ -213,40 +212,6 @@ def _emit_earthdata(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, An
 # --------------------------------------------------------------------------- #
 # usgs_water — a pure friendly-name -> parameter-code row (no fetch).
 # --------------------------------------------------------------------------- #
-# --------------------------------------------------------------------------- #
-# eumetsat — seed from the public browse endpoint (no credentials).
-# --------------------------------------------------------------------------- #
-_EUMETSAT_BROWSE_URL = "https://api.eumetsat.int/data/browse/collections"
-
-
-def _eumetsat_detail(collection_id: str) -> dict[str, Any]:
-    """Return one EUMETSAT collection's public browse metadata."""
-    url = f"{_EUMETSAT_BROWSE_URL}/{quote(collection_id, safe='')}"
-    return _get_json(url, params={"format": "json"})
-
-
-def _emit_eumetsat(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
-    """Seed an EUMETSAT `datasets:` row from the public browse metadata.
-
-    Args:
-        catalog: The loaded EUMETSAT `Catalog` (unused).
-        upstream_id: The `EO:EUM:DAT:…` collection id.
-        **opts: `group` (Data Store group label).
-
-    Returns:
-        The seeded row; the maintainer fills `format` / `selectors` /
-        `tailor_product_type` after vetting.
-    """
-    if not opts.get("minimal"):
-        _eumetsat_detail(upstream_id)  # fail loud if the id is unreachable
-    return {
-        "collection_id": upstream_id,
-        "group": str(opts.get("group") or "MSG"),
-        "output_kind": "raster",
-        "format": "",
-        "selectors": [],
-        "tailor_product_type": None,
-    }
 
 
 # --------------------------------------------------------------------------- #
@@ -589,7 +554,6 @@ _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
     **dispatch_table("emitter"),
     "ecmwf": _emit_ecmwf,
     "earthdata": _emit_earthdata,
-    "eumetsat": _emit_eumetsat,
     "gee": _emit_gee,
     "jaxa": _emit_jaxa,
 }
