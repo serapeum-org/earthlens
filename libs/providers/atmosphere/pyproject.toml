@@ -69,7 +69,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._atmosphere*", "earthlens._atmosphere_cli*", "earthlens.airnow*", "earthlens.catrare*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.isimip*", "earthlens.nrel*", "earthlens.mswep*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.radklim*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
+include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.catrare*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.isimip*", "earthlens.nrel*", "earthlens.mswep*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.radklim*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
