@@ -821,9 +821,11 @@ def _curate_all(info, *, write: bool, limit: int | None) -> None:
         write: `--all` mutates the catalog shards, so `--write` is required.
         limit: Only seed the first N uncurated datasets (None = all).
     """
-    seed = dispatch_table("seeder").get(info.provider)
+    seeders = dispatch_table("seeder")
+    seed = seeders.get(info.provider)
     if seed is None:
-        raise typer.BadParameter("--all is only supported for ecmwf")
+        supported = ", ".join(sorted(seeders)) or "no providers"
+        raise typer.BadParameter(f"--all is only supported for {supported}")
     if not write:
         raise typer.BadParameter("--all writes the catalog shards; pass --write")
     summary = seed(limit=limit)
@@ -847,9 +849,11 @@ def _curate_fill_empty(
     """
     if not write:
         raise typer.BadParameter("--fill-empty rewrites the catalog; pass --write")
-    hydrate = dispatch_table("hydrator").get(info.provider)
+    hydrators = dispatch_table("hydrator")
+    hydrate = hydrators.get(info.provider)
     if hydrate is None:
-        raise typer.BadParameter("--fill-empty is only supported for gee / ecmwf")
+        supported = ", ".join(sorted(hydrators)) or "no providers"
+        raise typer.BadParameter(f"--fill-empty is only supported for {supported}")
     summary = hydrate(limit=limit, timeout=timeout or None)
 
     timed_out = summary.get("timed_out") or 0
