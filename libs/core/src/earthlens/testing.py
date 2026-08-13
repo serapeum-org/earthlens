@@ -244,26 +244,46 @@ def _skip_reason(report: pytest.TestReport) -> str:
     return str(longrepr or "")
 
 
+#: Marks that the masked-lane guard already ran this session, so importing the
+#: hook into every member conftest cannot fire it more than once.
+_GUARD_RAN = pytest.StashKey[bool]()
+
+
 def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     """Fail a lane whose every e2e test was availability-skipped (masked-run guard).
 
     The per-test hook turns a flaky-upstream failure into a skip, which is the
     right call when *some* of a lane's tests still ran. But if a lane collected
-    tests, none passed, and at least one was skipped for upstream unavailability,
-    the whole lane is masked — a green report that exercised nothing. That is the
-    worst case the skip behaviour can produce, so convert an otherwise-passing
-    session into a failure. Ordinary skips (missing credentials, marker gates) do
-    not carry the availability prefix, so an all-skipped-for-other-reasons run
-    stays green.
+    tests, nothing succeeded, and at least one test was skipped for upstream
+    unavailability, the whole lane is masked — a green report that exercised
+    nothing. That is the worst case the skip behaviour can produce, so convert an
+    otherwise-passing session into a failure. Ordinary skips (missing credentials,
+    marker gates) do not carry the availability prefix, so an
+    all-skipped-for-other-reasons run stays green.
+
+    Scope: this is a *session*-level hook, so its "did anything succeed?" check
+    reads session-global stats. That is exact for the shipped CI model, where each
+    lane runs exactly one member per session (`pytest libs/providers/<theme>` /
+    `pytest libs/core`). In a combined repo-root run across all members a pass in
+    one member would hide another's masking — acceptable because the guard is a
+    per-lane CI safety net, not a local-run gate. It relies on the terminal
+    reporter (always present under CI's `-rs -v`); a `-p no:terminal` run disables
+    it, which is fine for an advisory net. A session stash key keeps it single-shot
+    even though every member conftest imports it.
 
     Args:
         session: The finished pytest session.
         exitstatus: The exit code pytest computed for the run.
     """
-    if exitstatus != pytest.ExitCode.OK:
+    if exitstatus != pytest.ExitCode.OK or session.stash.get(_GUARD_RAN, False):
         return
+    session.stash[_GUARD_RAN] = True
     reporter = session.config.pluginmanager.getplugin("terminalreporter")
-    if reporter is None or reporter.stats.get("passed"):
+    if reporter is None:
+        return
+    # xpassed / xfailed also mean a test ran to a non-skip outcome, so they count
+    # as "something succeeded" and must not be treated as a masked lane.
+    if any(reporter.stats.get(kind) for kind in ("passed", "xpassed", "xfailed")):
         return
     masked = sum(
         1
