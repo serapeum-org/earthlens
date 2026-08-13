@@ -1289,7 +1289,6 @@ class TestCliIsBackendAgnostic:
             "radklim",
             "s3",
             "sentinel_hub",
-            "stac",
             "tropycal",
         }
     )

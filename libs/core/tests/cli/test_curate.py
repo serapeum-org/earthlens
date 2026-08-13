@@ -8,8 +8,6 @@ from earthlens.cli import curate as curate_mod
 from earthlens.cli.adapter import list_backends
 from earthlens.cli.curate import (
     ProbeResult,
-    _asset_fields,
-    _asset_schema,
     probe_dataset,
     supported_providers,
 )
@@ -35,37 +33,6 @@ _SAMPLE_ITEM = {
 def _info(provider):
     """Return the BackendInfo for a provider id."""
     return next(b for b in list_backends() if b.provider == provider)
-
-
-class TestAssetSchema:
-    """Tests for _asset_schema."""
-
-    def test_extracts_band_metadata(self):
-        """media type / common name / dtype / nodata are recovered per asset."""
-        schema = _asset_schema(_SAMPLE_ITEM["features"][0])
-        assert schema["B04"] == {
-            "media_type": "image/tiff",
-            "common_name": "red",
-            "dtype": "uint16",
-            "nodata": 0,
-        }
-
-    def test_absent_extensions_are_none(self):
-        """An asset with no band extensions yields None fields."""
-        schema = _asset_schema(_SAMPLE_ITEM["features"][0])
-        assert schema["thumbnail"]["dtype"] is None, "no raster:bands -> None"
-
-    def test_pystac_like_asset_is_normalised(self):
-        """A pystac-style asset (media_type/extra_fields) is read like a dict."""
-        from types import SimpleNamespace
-
-        asset = SimpleNamespace(
-            media_type="image/tiff",
-            extra_fields={"raster:bands": [{"data_type": "int16"}]},
-        )
-        fields = _asset_fields(asset)
-        assert fields["type"] == "image/tiff", "media_type folded into 'type'"
-        assert fields["raster:bands"][0]["data_type"] == "int16", "extra_fields kept"
 
 
 class TestSupportedProviders:
@@ -495,11 +462,12 @@ class TestProbeDataset:
 
     def test_network_error_is_captured(self, monkeypatch):
         """A failed request (every endpoint) reports 'error', not raised."""
+        import earthlens.stac.cli as stac_cli
 
         def boom(url):
             raise RuntimeError("connection refused")
 
-        monkeypatch.setattr(curate_mod, "_get_json", boom)
+        monkeypatch.setattr(stac_cli, "get_json", boom)
         result = probe_dataset(_info("stac"), "sentinel-2-l2a")
         assert result.status == "error", "failure captured"
 

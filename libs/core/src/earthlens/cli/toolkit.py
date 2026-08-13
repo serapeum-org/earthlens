@@ -32,6 +32,9 @@ from earthlens.cli.refresh import (
     _curated_attr_ids as curated_attr_ids,
 )
 from earthlens.cli.refresh import (
+    _curated_collection_ids as curated_collection_ids,
+)
+from earthlens.cli.refresh import (
     _flatten as flatten,
 )
 from earthlens.cli.refresh import (
@@ -68,6 +71,7 @@ __all__ = [
     "BackendInfo",
     "biodiversity_curated_ids",
     "curated_attr_ids",
+    "curated_collection_ids",
     "flatten",
     "get_json",
     "get_text",

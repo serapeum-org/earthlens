@@ -173,83 +173,6 @@ def _redact(text: str, secret: str) -> str:
     return text.replace(secret, "***") if secret else text
 
 
-def _stac_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List collection ids per STAC endpoint, live.
-
-    Hits `{endpoint.url}/collections` for each configured endpoint and
-    follows `rel="next"` pagination links (bounded by :data:`_MAX_PAGES`).
-    The per-endpoint grouping is what `--write` persists back into the
-    `available_collections:` block; callers wanting a flat list use
-    :func:`_flatten`.
-
-    Args:
-        catalog: The loaded STAC `Catalog` (exposes `endpoints`).
-
-    Returns:
-        A mapping of endpoint name to its sorted, de-duplicated collection
-        ids, in the catalog's endpoint order.
-    """
-    grouped: dict[str, list[str]] = {}
-    for name, endpoint in catalog.endpoints.items():
-        ids: set[str] = set()
-        url: str | None = endpoint.url.rstrip("/") + "/collections"
-        pages = 0
-        while url and pages < _MAX_PAGES:
-            body = _get_json(url)
-            for collection in body.get("collections", []):
-                cid = collection.get("id")
-                if cid:
-                    ids.add(str(cid))
-            url = next(
-                (
-                    link.get("href")
-                    for link in body.get("links", [])
-                    if link.get("rel") == "next"
-                ),
-                None,
-            )
-            pages += 1
-        grouped[name] = sorted(ids)
-    return grouped
-
-
-def _write_stac(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
-    """Rewrite STAC's `available_collections:` block from a live fetch.
-
-    Replaces only the `available_collections:` block of the bundled
-    `_index.yaml`, preserving the header comments and the `endpoints:`
-    block above it verbatim. Meaningful in an editable / source checkout
-    (it rewrites the package's catalog file); in an installed wheel it
-    rewrites the copy under `site-packages`.
-
-    Args:
-        info: The STAC backend.
-        grouped: Endpoint-name -> live collection ids (see :func:`_stac_grouped`).
-
-    Returns:
-        The path of the file rewritten.
-
-    Raises:
-        ValueError: If the index file has no `available_collections:` block.
-    """
-    module = importlib.import_module(f"{info.module}.catalog")
-    index_path = module.CATALOG_PATH / "_index.yaml"
-    text = index_path.read_text(encoding="utf-8")
-    marker = "\navailable_collections:"
-    if marker not in text:
-        raise ValueError(f"no available_collections block in {index_path}")
-    head = text.split(marker, 1)[0].rstrip("\n")
-    block = yaml.safe_dump(
-        {"available_collections": grouped},
-        sort_keys=False,
-        default_flow_style=False,
-        allow_unicode=True,
-        width=10000,
-    )
-    index_path.write_text(f"{head}\n\n{block}", encoding="utf-8")
-    return str(index_path)
-
-
 def _index_path(info: BackendInfo) -> Path:
     """Return the bundled index file a provider's `--write` rewrites.
 
@@ -1033,7 +956,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     # Discovered from each provider distribution's `earthlens.cli` table; the
     # in-core literals below are the not-yet-migrated remainder (issue #863).
     **dispatch_table("refresher"),
-    "stac": _stac_grouped,
     "ecmwf": _ecmwf_grouped,
     "openeo": _openeo_grouped,
     "earthdata": _earthdata_grouped,
@@ -1055,7 +977,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
 _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("writer"),
-    "stac": _write_stac,
     "ecmwf": _index_writer("available_datasets", grouped=True),
     "openeo": _write_openeo,
     "eumetsat": _index_writer("available_datasets"),
@@ -1260,7 +1181,6 @@ def _biodiversity_curated_ids(catalog: Any) -> list[str]:
 _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("curated_ids"),
-    "stac": _curated_collection_ids,
     "openeo": _curated_collection_ids,
     "earthdata": _curated_attr_ids("short_name"),
     "eumetsat": _curated_collection_ids,

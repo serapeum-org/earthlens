@@ -13,6 +13,7 @@ import pytest
 import yaml
 
 import earthlens.stac.catalog as stac_catalog
+import earthlens.stac.cli as stac_cli
 from earthlens.cli import refresh as refresh_mod
 from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.refresh import (
@@ -394,8 +395,8 @@ class TestWrite:
     def test_rewrites_available_collections_block(self, stac_catalog_copy, monkeypatch):
         """--write rewrites available_collections, preserving endpoints."""
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "only-one"}], "links": []},
         )
         outcome = refresh_one(_info("stac"), write=True)
@@ -418,7 +419,7 @@ class TestWrite:
     def test_preserves_header_comment(self, stac_catalog_copy, monkeypatch):
         """The file's leading comment block survives the rewrite."""
         monkeypatch.setattr(
-            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+            stac_cli, "get_json", lambda url: {"collections": [], "links": []}
         )
         refresh_one(_info("stac"), write=True)
         text = (stac_catalog_copy / "_index.yaml").read_text("utf-8")
@@ -427,7 +428,7 @@ class TestWrite:
     def test_unsupported_writer_reports_detail(self, monkeypatch):
         """A provider that can read live but not write reports it in detail."""
         monkeypatch.setattr(
-            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+            stac_cli, "get_json", lambda url: {"collections": [], "links": []}
         )
         monkeypatch.delitem(refresh_mod._WRITERS, "stac")
         outcome = refresh_one(_info("stac"), write=True)
@@ -437,8 +438,8 @@ class TestWrite:
     def test_write_error_is_captured(self, monkeypatch):
         """A write failure reports 'error' rather than raising."""
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "x"}], "links": []},
         )
 
@@ -453,7 +454,7 @@ class TestWrite:
     def test_empty_live_fetch_refuses_to_write(self, monkeypatch):
         """An empty live fetch must not overwrite the index; the writer is skipped."""
         monkeypatch.setattr(
-            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+            stac_cli, "get_json", lambda url: {"collections": [], "links": []}
         )
         called = {"wrote": False}
 
@@ -731,8 +732,8 @@ class TestAuditOne:
     def test_reports_broken_and_untracked(self, monkeypatch):
         """Curated ids absent live are 'broken'; live ids off-index 'untracked'."""
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "only-live"}], "links": []},
         )
         outcome = audit_one(_info("stac"))
@@ -746,7 +747,7 @@ class TestAuditOne:
         def boom(url):
             raise RuntimeError("connection refused")
 
-        monkeypatch.setattr(refresh_mod, "_get_json", boom)
+        monkeypatch.setattr(stac_cli, "get_json", boom)
         assert audit_one(_info("stac")).status == "error", "failure captured"
 
 
@@ -782,8 +783,8 @@ class TestRefreshOne:
     def test_ok_with_mocked_live_index(self, monkeypatch):
         """A live fetch diffs against the bundled index and reports 'ok'."""
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {
                 "collections": [{"id": "new-x"}, {"id": "new-y"}],
                 "links": [],
@@ -805,7 +806,7 @@ class TestRefreshOne:
                 }
             return {"collections": [{"id": "b"}], "links": []}
 
-        monkeypatch.setattr(refresh_mod, "_get_json", fake)
+        monkeypatch.setattr(stac_cli, "get_json", fake)
         outcome = refresh_one(_info("stac"))
         assert {"a", "b"} <= set(outcome.new_ids), "both pages gathered"
 
@@ -815,7 +816,7 @@ class TestRefreshOne:
         def boom(url):
             raise RuntimeError("connection refused")
 
-        monkeypatch.setattr(refresh_mod, "_get_json", boom)
+        monkeypatch.setattr(stac_cli, "get_json", boom)
         outcome = refresh_one(_info("stac"))
         assert outcome.status == "error", "failure captured, not raised"
         assert "connection refused" in outcome.detail, "reason preserved"

@@ -78,114 +78,6 @@ class ProbeResult:
         }
 
 
-def _asset_fields(asset: Any) -> dict[str, Any]:
-    """Return a plain field dict for a raw STAC asset (or a pystac `Asset`)."""
-    if isinstance(asset, dict):
-        return asset
-    fields: dict[str, Any] = dict(getattr(asset, "extra_fields", {}) or {})
-    media_type = getattr(asset, "media_type", None)
-    if media_type is not None:
-        fields.setdefault("type", media_type)
-    return fields
-
-
-def _asset_schema(item: Any) -> dict[str, dict[str, Any]]:
-    """Extract a per-asset `{media_type, common_name, dtype, nodata}` schema.
-
-    Reads each asset's media type and the first `raster:bands` / `eo:bands`
-    entry — the fields the catalog `Asset` model curates.
-
-    Args:
-        item: A raw STAC item dict (or a pystac `Item`) with an `assets` map.
-
-    Returns:
-        Mapping of asset key to its schema (fields `None` when absent).
-
-    Examples:
-        - Recover the band schema from a STAC item's assets:
-
-            ```python
-            >>> from earthlens.cli.curate import _asset_schema
-            >>> item = {"assets": {"B04": {"type": "image/tiff",
-            ...     "eo:bands": [{"common_name": "red"}],
-            ...     "raster:bands": [{"data_type": "uint16", "nodata": 0}]}}}
-            >>> _asset_schema(item)["B04"]["common_name"]
-            'red'
-            >>> _asset_schema(item)["B04"]["dtype"]
-            'uint16'
-
-            ```
-        - An asset without band extensions yields `None` fields:
-
-            ```python
-            >>> from earthlens.cli.curate import _asset_schema
-            >>> _asset_schema({"assets": {"d": {"type": "image/tiff"}}})["d"]["dtype"] is None
-            True
-
-            ```
-    """
-    assets = getattr(item, "assets", None)
-    if assets is None and isinstance(item, dict):
-        assets = item.get("assets", {})
-    schema: dict[str, dict[str, Any]] = {}
-    for key, asset in (assets or {}).items():
-        fields = _asset_fields(asset)
-        first_raster = (fields.get("raster:bands") or [{}])[0]
-        first_eo = (fields.get("eo:bands") or [{}])[0]
-        schema[key] = {
-            "media_type": fields.get("type"),
-            "common_name": first_eo.get("common_name"),
-            "dtype": first_raster.get("data_type"),
-            "nodata": first_raster.get("nodata"),
-        }
-    return schema
-
-
-def _stac_endpoint_candidates(catalog: Any, dataset: str) -> list[tuple[Any, str]]:
-    """Resolve `(endpoint, collection_id)` pairs to try for `dataset`.
-
-    A curated catalog key resolves to its single endpoint + upstream id; a
-    bare collection id is tried against every endpoint.
-    """
-    record = catalog.datasets.get(dataset)
-    endpoint_name = getattr(record, "endpoint", None)
-    collection_id = getattr(record, "collection_id", None)
-    if endpoint_name in getattr(catalog, "endpoints", {}) and collection_id:
-        return [(catalog.endpoints[endpoint_name], collection_id)]
-    return [(endpoint, dataset) for endpoint in catalog.endpoints.values()]
-
-
-def _stac_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Fetch one sample item for a STAC collection and extract its schema.
-
-    Tries each candidate endpoint's `/collections/{id}/items?limit=1` until
-    one yields an item.
-
-    Args:
-        catalog: The loaded STAC `Catalog`.
-        dataset: A collection id (or curated catalog key).
-
-    Returns:
-        The per-asset schema from the sample item.
-
-    Raises:
-        ValueError: If no endpoint yields a sample item for `dataset`.
-    """
-    last_error: Exception | None = None
-    for endpoint, collection_id in _stac_endpoint_candidates(catalog, dataset):
-        url = endpoint.url.rstrip("/") + f"/collections/{collection_id}/items?limit=1"
-        try:
-            body = _get_json(url)
-        except Exception as exc:  # noqa: BLE001 — try the next endpoint
-            last_error = exc
-            continue
-        features = body.get("features") or []
-        if features:
-            return _asset_schema(features[0])
-    suffix = f" (last error: {last_error})" if last_error else ""
-    raise ValueError(f"no sample item found for {dataset!r}{suffix}")
-
-
 def _bands_from_summaries(body: dict[str, Any]) -> list[dict[str, Any]]:
     """Return a STAC doc's `summaries.eo:bands` (or `gee:bands`) list."""
     summaries = body.get("summaries", {}) or {}
@@ -1135,7 +1027,6 @@ def _jaxa_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("prober"),
-    "stac": _stac_probe,
     "openeo": _openeo_probe,
     "gee": _gee_probe,
     "sentinel_hub": _sentinel_hub_probe,

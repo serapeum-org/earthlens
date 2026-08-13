@@ -7,6 +7,7 @@ import json
 import pytest
 from typer.testing import CliRunner
 
+import earthlens.stac.cli as stac_cli
 from earthlens.cli import _gee_hydrate as hydrate_mod
 from earthlens.cli import curate as curate_mod
 from earthlens.cli import datasets as datasets_mod
@@ -238,8 +239,8 @@ class TestRefresh:
     def test_stac_json_reports_new_ids(self, monkeypatch):
         """A live id absent from the bundle shows up as new (mocked)."""
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "new-z"}], "links": []},
         )
         result = runner.invoke(app, ["datasets", "refresh", "stac", "--json"])
@@ -250,8 +251,8 @@ class TestRefresh:
     def test_show_ids_lists_new_ids(self, monkeypatch):
         """--show-ids prints each new upstream id under the table."""
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "brand-new-collection"}], "links": []},
         )
         result = runner.invoke(app, ["datasets", "refresh", "stac", "--show-ids"])
@@ -310,8 +311,8 @@ class TestRefresh:
         shutil.copytree(stac_catalog.CATALOG_PATH, dst)
         monkeypatch.setattr(stac_catalog, "CATALOG_PATH", dst)
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "x"}], "links": []},
         )
         result = runner.invoke(app, ["datasets", "refresh", "stac", "--write"])
@@ -335,8 +336,8 @@ class TestRefresh:
         shutil.copytree(stac_catalog.CATALOG_PATH, dst)
         monkeypatch.setattr(stac_catalog, "CATALOG_PATH", dst)
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "x"}], "links": []},
         )
         buf = io.StringIO()
@@ -366,8 +367,8 @@ class TestAudit:
     def test_json_reports_broken(self, monkeypatch):
         """--json carries the broken/untracked drift lists."""
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "only-live"}], "links": []},
         )
         result = runner.invoke(app, ["datasets", "audit", "stac", "--json"])
@@ -378,7 +379,7 @@ class TestAudit:
     def test_strict_exits_nonzero_on_drift(self, monkeypatch):
         """--strict exits 1 when a curated dataset is no longer served live."""
         monkeypatch.setattr(
-            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+            stac_cli, "get_json", lambda url: {"collections": [], "links": []}
         )
         result = runner.invoke(app, ["datasets", "audit", "stac", "--strict"])
         assert result.exit_code == 1, "drift under --strict -> exit 1"
