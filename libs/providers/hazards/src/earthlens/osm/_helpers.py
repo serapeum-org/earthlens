@@ -18,10 +18,14 @@ Three concerns are factored here so `osm/backend.py` only routes:
   `to_fc`.
 * `OhsomeUnavailableError` / `ohsome_http_status` — turn the `ohsome` SDK's
   opaque failure on a throttled/blocked public endpoint into a clear, typed,
-  actionable error. The SDK does not surface a clean status on a non-JSON error
-  body (the HTML `403` an overloaded `api.ohsome.org` front proxy returns makes
-  it leak a bare `requests.exceptions.JSONDecodeError`), so the status is dug
-  out of the exception chain here.
+  actionable error. On the HTML `403` an overloaded `api.ohsome.org` front proxy
+  returns, the SDK exposes the status inconsistently: usually it wraps the
+  failure into an `OhsomeException` carrying `error_code`, but on some
+  environments its non-JSON-body handling misfires (its
+  `except json.decoder.JSONDecodeError` does not catch the `simplejson`-based
+  `requests.exceptions.JSONDecodeError`) and it leaks a bare `JSONDecodeError`
+  whose status is only reachable through the exception chain. `ohsome_http_status`
+  handles both shapes, so the status is recovered either way here.
 
 All GIS containerisation stays inside the pyramids `FeatureCollection` per the
 repository's pyramids policy; earthlens only assembles the plain attribute rows
@@ -81,13 +85,16 @@ class OhsomeUnavailableError(RuntimeError):
 def ohsome_http_status(exc: BaseException) -> int | None:
     """Best-effort HTTP status behind an `ohsome` SDK failure.
 
-    The SDK does not surface a clean status on every error: an `OhsomeException`
-    carries `error_code`, but a non-JSON error body — such as the HTML `403` an
-    overloaded `api.ohsome.org` front proxy returns — makes it leak a bare
-    `requests.exceptions.JSONDecodeError` whose originating `requests.HTTPError`
-    (and its `403` status) is only reachable through the exception chain. This
-    walks `exc` and its `__cause__` / `__context__` predecessors and returns
-    the first HTTP status it finds.
+    The SDK exposes the status inconsistently. Usually it wraps the failure into
+    an `OhsomeException` carrying `error_code` (recovered by the first check
+    below). But on the HTML `403` an overloaded `api.ohsome.org` front proxy
+    returns, its non-JSON-body handling can misfire (its
+    `except json.decoder.JSONDecodeError` misses the `simplejson`-based
+    `requests.exceptions.JSONDecodeError`) and leak a bare `JSONDecodeError`
+    whose originating `requests.HTTPError` — and its `403` status — is only
+    reachable through the exception chain. This walks `exc` and its `__cause__` /
+    `__context__` predecessors and returns the first HTTP status it finds, so
+    both shapes are handled.
 
     Args:
         exc: The exception raised by an `ohsome` SDK call.

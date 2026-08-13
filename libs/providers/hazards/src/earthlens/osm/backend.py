@@ -175,10 +175,12 @@ class OSM(AbstractDataSource):
 
     #: Retry budget for the ohsome `elements/geometry` request. `api.ohsome.org`
     #: throttles anonymous callers with `429` (and can `5xx` transiently), so the
-    #: SDK's transport is handed a urllib3 `Retry` with this many attempts,
+    #: SDK's transport is handed a urllib3 `Retry` with this many retries,
     #: exponential `backoff_factor` growth, and `Retry-After` honoured — the same
     #: policy the repo-wide `HttpClient` applies. `403` is deliberately *not*
     #: retried: on a public, keyless endpoint it is a hard block, not transient.
+    #: (The ohsome SDK adds one final no-retry attempt of its own after a
+    #: `RetryError`, so the effective request count is this budget plus one.)
     MAX_OHSOME_RETRIES: int = 5
     OHSOME_BACKOFF_FACTOR: float = 1.0
 
@@ -589,14 +591,15 @@ class OSM(AbstractDataSource):
         the chained form spawns a fresh sub-client that silently drops the
         `retry` and `user_agent` set on the root client, so only the direct
         `post(endpoint=...)` actually applies our transport policy. That policy
-        gives the SDK's session a urllib3 `Retry` (`MAX_OHSOME_RETRIES` attempts,
+        gives the SDK's session a urllib3 `Retry` (`MAX_OHSOME_RETRIES` retries,
         exponential `OHSOME_BACKOFF_FACTOR` growth, `Retry-After` honoured) so a
         `429`/`5xx` throttle is retried with backoff — matching the repo-wide
         `HttpClient`. A `403` (and any leftover `429` after the retries) is *not*
         a transient error on this public, keyless endpoint, so it is turned into
-        a clear, typed `OhsomeUnavailableError` instead of the SDK's opaque
-        failure (an HTML `403` body makes the SDK leak a bare
-        `requests.exceptions.JSONDecodeError`).
+        a clear, typed `OhsomeUnavailableError` (via `_raise_ohsome_unavailable`)
+        instead of the SDK's opaque failure — which exposes the status
+        inconsistently, sometimes as an `OhsomeException` and sometimes as a bare
+        leaked `JSONDecodeError`.
 
         Args:
             query_id: The named-query id (for logging).
@@ -660,9 +663,9 @@ class OSM(AbstractDataSource):
     def _raise_ohsome_unavailable(self, exc: Exception) -> None:
         """Re-raise an ohsome throttle/block as a typed `OhsomeUnavailableError`.
 
-        Inspects the SDK failure for an HTTP status (`ohsome_http_status` digs
-        it out of the exception chain, since a non-JSON error body makes the SDK
-        leak a bare `requests.exceptions.JSONDecodeError`). A `403`, or a `429`
+        Inspects the SDK failure for an HTTP status (`ohsome_http_status`
+        recovers it whether the SDK wrapped the failure into an `OhsomeException`
+        or leaked a bare `JSONDecodeError`). A `403`, or a `429`
         that outlived the retries, becomes a clear, actionable
         `OhsomeUnavailableError`; any other failure — including a `401`, which on
         this keyless endpoint signals a real auth-contract change, not a
