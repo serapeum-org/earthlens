@@ -172,6 +172,12 @@ class TestOhsomeHttpStatus:
         """A plain error with no status anywhere yields None."""
         assert ohsome_http_status(RuntimeError("no status here")) is None
 
+    def test_bool_error_code_is_not_a_status(self):
+        """A bool error_code is rejected (bool is an int subclass), yielding None."""
+        exc = RuntimeError("weird")
+        exc.error_code = True
+        assert ohsome_http_status(exc) is None
+
     def test_survives_a_cyclic_chain(self):
         """A self-referential __context__ cycle terminates instead of looping."""
         first = RuntimeError("a")
