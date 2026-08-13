@@ -662,22 +662,24 @@ class OSM(AbstractDataSource):
 
         Inspects the SDK failure for an HTTP status (`ohsome_http_status` digs
         it out of the exception chain, since a non-JSON error body makes the SDK
-        leak a bare `requests.exceptions.JSONDecodeError`). A `401`/`403`, or a
-        `429` that outlived the retries, becomes a clear, actionable
-        `OhsomeUnavailableError`; any other failure is left for the caller to
-        re-raise unchanged.
+        leak a bare `requests.exceptions.JSONDecodeError`). A `403`, or a `429`
+        that outlived the retries, becomes a clear, actionable
+        `OhsomeUnavailableError`; any other failure — including a `401`, which on
+        this keyless endpoint signals a real auth-contract change, not a
+        throttle — is left for the caller to re-raise unchanged so a genuine
+        regression still surfaces loudly.
 
         Args:
             exc: The exception raised by the ohsome SDK call.
 
         Raises:
             OhsomeUnavailableError: When the status is a public-endpoint
-                throttle/block (`401` / `403` / `429`).
+                throttle/block (`403` / `429`).
         """
         status = ohsome_http_status(exc)
-        if status in (401, 403):
+        if status == 403:
             raise OhsomeUnavailableError(
-                f"ohsome refused the elements/geometry request with HTTP {status}. "
+                "ohsome refused the elements/geometry request with HTTP 403. "
                 "api.ohsome.org is a public, keyless endpoint, so this is its "
                 "front proxy blocking or throttling this client (an IP / "
                 "rate-limit block), not a credential problem. Wait and retry "
