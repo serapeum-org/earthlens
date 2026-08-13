@@ -215,38 +215,6 @@ def _chc_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return schema
 
 
-def _tropycal_fields(basin: str, source: str) -> dict[str, dict[str, Any]]:
-    """Return a basin's `Storm.to_dataframe()` field schema (samples a season)."""
-    import datetime as dt
-
-    import tropycal.tracks as tracks
-
-    track_dataset = tracks.TrackDataset(basin=basin, source=source)
-    year = dt.datetime.now(dt.UTC).year - 1
-    storm_ids = list(track_dataset.get_season(year).summary().get("id") or [])[:3]
-    fields: dict[str, dict[str, Any]] = {}
-    for storm_id in storm_ids:
-        frame = track_dataset.get_storm(storm_id).to_dataframe(attrs_as_columns=True)
-        for column in frame.columns:
-            fields.setdefault(str(column), {"dtype": str(frame[column].dtype)})
-    return fields
-
-
-def _tropycal_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe a Tropycal basin's live `to_dataframe()` field schema (SDK).
-
-    Args:
-        catalog: The loaded Tropycal `Catalog` (resolves the basin's sources).
-        dataset: A basin code (e.g. `north_atlantic`).
-
-    Returns:
-        Mapping of field name to `{dtype}`.
-    """
-    record = catalog.datasets.get(dataset)
-    sources = getattr(record, "sources", None) or ["hurdat"]
-    return _tropycal_fields(dataset, sources[0])
-
-
 #: ECCC models ship one whole GRIB per variable (no `.idx` byte-index), so the
 #: idx-token check can't apply; template families whose URL also needs
 #: domain / member / resolution aren't synthesised here either.
@@ -693,7 +661,6 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     **dispatch_table("prober"),
     "ecmwf": _ecmwf_probe,
     "chc": _chc_probe,
-    "tropycal": _tropycal_probe,
     "nwp": _nwp_probe,
 }
 

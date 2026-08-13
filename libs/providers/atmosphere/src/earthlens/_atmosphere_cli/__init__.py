@@ -28,6 +28,10 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "live_validator": "earthlens.radar.cli:live_validator",
     },
     "radklim": {"validator": "earthlens.radklim.cli:validator"},
+    "tropycal": {
+        "prober": "earthlens.tropycal.cli:prober",
+        "validator": "earthlens.tropycal.cli:validator",
+    },
     "s3": {
         "refresher": "earthlens.s3.cli:refresher",
         "writer": "earthlens.s3.cli:writer",

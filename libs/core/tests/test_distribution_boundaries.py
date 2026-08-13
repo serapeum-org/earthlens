@@ -1274,7 +1274,6 @@ class TestCliIsBackendAgnostic:
             "ecmwf",
             "nwp",
             "openaq",
-            "tropycal",
         }
     )
 

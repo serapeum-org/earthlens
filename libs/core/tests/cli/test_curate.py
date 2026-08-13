@@ -119,22 +119,6 @@ class TestChcProbe:
         assert curate_mod._suggest_pattern([]) == ""
 
 
-class TestTropycalProbe:
-    """Tests for the Tropycal basin prober (SDK)."""
-
-    def test_reads_field_schema(self, monkeypatch):
-        """tropycal probe records the to_dataframe() field dtypes."""
-        from earthlens.cli.adapter import load_catalog
-
-        monkeypatch.setattr(
-            curate_mod, "_tropycal_fields", lambda b, s: {"vmax": {"dtype": "int64"}}
-        )
-        basin = next(iter(load_catalog(_info("tropycal")).datasets))
-        result = probe_dataset(_info("tropycal"), basin)
-        assert result.status == "ok", "tropycal probe ran"
-        assert result.assets["vmax"]["dtype"] == "int64", "field dtype recorded"
-
-
 class TestNwpProbe:
     """Tests for the NWP `.idx` band prober (Herbie template, no eccodes)."""
 
@@ -646,33 +630,6 @@ class TestNwpAvailabilityBackends:
         )
         out = curate_mod._nwp_availability(model, dt.datetime(2024, 1, 1), 0)
         assert "unreachable" in out, "HEAD failure reported"
-
-    def test_tropycal_fields_samples_season(self, monkeypatch):
-        """_tropycal_fields samples a season's storms and records column dtypes."""
-        import sys
-        import types
-
-        class _Frame:
-            columns = ["vmax", "mslp"]
-
-            def __getitem__(self, key):
-                return types.SimpleNamespace(dtype="int64")
-
-        td = types.SimpleNamespace(
-            get_season=lambda year: types.SimpleNamespace(
-                summary=lambda: {"id": ["AL012020"]}
-            ),
-            get_storm=lambda sid: types.SimpleNamespace(
-                to_dataframe=lambda attrs_as_columns=False: _Frame()
-            ),
-        )
-        tropycal = types.ModuleType("tropycal")
-        tracks = types.ModuleType("tropycal.tracks")
-        tracks.TrackDataset = lambda basin=None, source=None: td
-        monkeypatch.setitem(sys.modules, "tropycal", tropycal)
-        monkeypatch.setitem(sys.modules, "tropycal.tracks", tracks)
-        out = curate_mod._tropycal_fields("north_atlantic", "hurdat")
-        assert out["vmax"]["dtype"] == "int64", "column dtype recorded"
 
 
 class TestNwpIdx:

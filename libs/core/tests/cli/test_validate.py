@@ -12,7 +12,6 @@ from earthlens.cli.validate import (
     ValidateResult,
     _live_ecmwf,
     _validate_nwp,
-    _validate_tropycal,
     supported_providers,
     validate_one,
 )
@@ -126,22 +125,6 @@ class TestValidateNwp:
         _checked, issues = _validate_nwp(catalog)
         assert any("empty band map" in i for i in issues), "empty bands flagged"
         assert any("out of range" in i for i in issues), "bad cycle flagged"
-
-
-class TestStructuralLints:
-    """Negative cases for the structural validators."""
-
-    def test_tropycal_unknown_basin_and_bad_source_flagged(self):
-        """A non-SDK basin and an unsupported (basin, source) pair are flagged."""
-        catalog = SimpleNamespace(
-            datasets={
-                "north_atlantic": SimpleNamespace(sources=["jtwc"]),
-                "mars_basin": SimpleNamespace(sources=["ibtracs"]),
-            }
-        )
-        _checked, issues = _validate_tropycal(catalog)
-        assert any("mars_basin" in i and "not in" in i for i in issues), "bad basin"
-        assert any("jtwc" in i for i in issues), "unsupported source flagged"
 
 
 class TestValidateOne:

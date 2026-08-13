@@ -123,56 +123,6 @@ def _require(key: str, record: Any, fields: tuple[str, ...]) -> list[str]:
     ]
 
 
-#: tropycal's basin universe and which sources serve each (no `jtwc` source;
-#: `both` is HURDAT NA+EP, `all` is IBTrACS global). Ported from the retired
-#: `tools/tropycal/audit_tropycal_catalog.py`.
-_SDK_BASIN_SOURCES: dict[str, list[str]] = {
-    "north_atlantic": ["ibtracs", "hurdat"],
-    "east_pacific": ["ibtracs", "hurdat"],
-    "both": ["hurdat"],
-    "west_pacific": ["ibtracs"],
-    "north_indian": ["ibtracs"],
-    "south_indian": ["ibtracs"],
-    "australia": ["ibtracs"],
-    "south_pacific": ["ibtracs"],
-    "south_atlantic": ["ibtracs"],
-    "all": ["ibtracs"],
-}
-
-
-def _validate_tropycal(catalog: Any) -> tuple[int, list[str]]:
-    """Each Tropycal basin needs a source, and must match the SDK universe.
-
-    Beyond the per-row `sources` requirement, this diffs the catalog against
-    tropycal's supported basin/source universe (the offline check the retired
-    `audit_tropycal_catalog.py` ran): a curated basin tropycal no longer
-    serves, a tropycal basin missing from the catalog, or a declared
-    `(basin, source)` pair tropycal does not support.
-
-    Args:
-        catalog: The loaded Tropycal `Catalog`.
-
-    Returns:
-        `(checked, issues)`.
-    """
-    checked, issues = _lint(catalog, lambda k, r: _require(k, r, ("sources",)))
-    catalog_basins = set(catalog.datasets)
-    sdk_basins = set(_SDK_BASIN_SOURCES)
-    issues += [
-        f"{code}: basin not in tropycal's supported universe"
-        for code in sorted(catalog_basins - sdk_basins)
-    ]
-    issues += [
-        f"{code}: tropycal basin missing from the catalog"
-        for code in sorted(sdk_basins - catalog_basins)
-    ]
-    for code in sorted(catalog_basins & sdk_basins):
-        declared = set(getattr(catalog.datasets[code], "sources", None) or [])
-        for bad in sorted(declared - set(_SDK_BASIN_SOURCES[code])):
-            issues.append(f"{code}: source {bad!r} not supported by tropycal")
-    return checked, issues
-
-
 def _validate_chc(catalog: Any) -> tuple[int, list[str]]:
     """Each CHC dataset needs FTP bases, a file pattern, and variables."""
 
@@ -195,7 +145,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("validator"),
     "nwp": _validate_nwp,
-    "tropycal": _validate_tropycal,
     "chc": _validate_chc,
 }
 
