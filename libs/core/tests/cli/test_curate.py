@@ -228,28 +228,6 @@ class TestEumetsatProbe:
         assert entry["title"] == "HRSEVIRI", "title parsed"
 
 
-class TestWorldpopProbe:
-    """Tests for the WorldPop REST prober (public)."""
-
-    def test_samples_record_fields(self, monkeypatch):
-        """worldpop probe records each REST record field's dtype + popyears."""
-        monkeypatch.setattr(
-            curate_mod,
-            "_worldpop_records",
-            lambda alias, sub, iso3: [
-                {"id": 1, "title": "t", "popyear": "2020"},
-                {"id": 2, "popyear": "2021"},
-            ],
-        )
-        info = _info("worldpop")
-        from earthlens.cli.adapter import load_catalog
-
-        alias = next(iter(load_catalog(info).datasets))
-        result = probe_dataset(info, alias)
-        assert result.status == "ok", "worldpop probe ran"
-        assert result.assets["popyears"]["values"] == ["2020", "2021"], "years unioned"
-
-
 class TestS3Probe:
     """Tests for the S3 bucket prober (unsigned boto3)."""
 
@@ -671,37 +649,6 @@ class TestEarthdataProberBranches:
         dataset = next(iter(load_catalog(_info("earthdata")).datasets))
         result = probe_dataset(_info("earthdata"), dataset)
         assert result.status == "ok" and result.assets == {}, "no vars -> {}"
-
-
-class TestWorldpopResolve:
-    """Tests for _worldpop_resolve + the records helper."""
-
-    def test_resolves_subalias_to_parent(self):
-        """A sub-alias id resolves to its (parent_alias, sub_alias)."""
-        from earthlens.cli.adapter import load_catalog
-
-        catalog = load_catalog(_info("worldpop"))
-        alias, row = next(
-            (a, r)
-            for a, r in catalog.datasets.items()
-            if getattr(r, "subaliases", None)
-        )
-        sub_id = row.subaliases[0].id
-        assert curate_mod._worldpop_resolve(catalog, sub_id) == (alias, sub_id)
-
-    def test_unknown_dataset_raises(self):
-        """A dataset matching no product or sub-alias raises ValueError."""
-        from earthlens.cli.adapter import load_catalog
-
-        with pytest.raises(ValueError, match="no WorldPop"):
-            curate_mod._worldpop_resolve(load_catalog(_info("worldpop")), "nope")
-
-    def test_records_helper_delegates(self, monkeypatch):
-        """_worldpop_records delegates to the package rest_records."""
-        import earthlens.worldpop.rest as rest
-
-        monkeypatch.setattr(rest, "rest_records", lambda a, s, i: [{"id": 1}])
-        assert curate_mod._worldpop_records("a", "s", "USA") == [{"id": 1}]
 
 
 class TestNwpHelpers:

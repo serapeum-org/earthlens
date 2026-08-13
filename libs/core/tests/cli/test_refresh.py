@@ -296,23 +296,6 @@ class TestCoverageOne:
         assert data["counts"] == {"DONE": 2}
 
 
-class TestWorldpopRefresher:
-    """Tests for the WorldPop (REST sub-alias crawl) lister."""
-
-    def test_crawls_aliases_to_subaliases(self, monkeypatch):
-        """worldpop refresh crawls top aliases then each alias's sub-aliases."""
-
-        def fake(url, **kw):
-            if url.endswith("/rest/data"):
-                return {"data": [{"alias": "pop"}, {"alias": "births"}]}
-            return {"data": [{"alias": "wpgp"}, {"alias": "G2_BUILT_S"}]}
-
-        monkeypatch.setattr(refresh_mod, "_get_json", fake)
-        outcome = refresh_one(_info("worldpop"))
-        assert outcome.status == "ok", "worldpop refresh ran"
-        assert outcome.live_count == 2, "deduped sub-alias ids across aliases"
-
-
 _RADAR_TABLE = (
     "NCDCID   ICAO  NAME            ST LAT      LON\n"
     "-------- ----- --------------- -- -------- ---------\n"
@@ -643,14 +626,6 @@ class TestS3IndexRegen:
 
 class TestComputedIndexWriters:
     """Tests for the sibling-index writers (openaq / worldpop / usgs_water)."""
-
-    def test_worldpop_writes_available_products_sibling(self, tmp_path, monkeypatch):
-        """worldpop --write persists the grouped crawl to a sibling YAML."""
-        info, module, dst = _catalog_copy("worldpop", tmp_path, monkeypatch)
-        path = refresh_mod._WRITERS["worldpop"](info, {"pop": ["wpgp", "wpgp1km"]})
-        data = yaml.safe_load(pathlib.Path(path).read_text("utf-8"))
-        assert pathlib.Path(path).name == "available_products.yaml", "sibling written"
-        assert data["available_products"]["pop"] == ["wpgp", "wpgp1km"], "crawl kept"
 
     def test_openaq_writes_available_parameters_sibling(self, tmp_path, monkeypatch):
         """openaq --write persists the flat live parameter list to a sibling."""

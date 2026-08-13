@@ -161,24 +161,6 @@ class TestNetworkPrimitives:
         monkeypatch.setattr(refresh_mod, "_gee_fetch_id", lambda href: href.upper())
         assert refresh_mod._gee_grouped(None) == {"gee": ["H1", "H2"]}
 
-    def test_worldpop_grouped_crawls(self, monkeypatch):
-        """worldpop grouped crawls the top alias then each alias's sub-aliases."""
-
-        def fake(url, **kw):
-            if url.rsplit("/", 1)[-1] == "data":
-                return {"data": [{"alias": "pop"}]}
-            return {"data": [{"alias": "wpgp"}, {"alias": "G2"}]}
-
-        monkeypatch.setattr(refresh_mod, "_get_json", fake)
-        assert refresh_mod._worldpop_grouped(None) == {"pop": ["G2", "wpgp"]}
-
-    def test_worldpop_curated_ids(self):
-        """_worldpop_curated_ids flattens each record's sub-alias ids."""
-        cat = SimpleNamespace(
-            datasets={"pop": SimpleNamespace(subaliases=[SimpleNamespace(id="wpgp")])}
-        )
-        assert refresh_mod._worldpop_curated_ids(cat) == ["wpgp"]
-
 
 class TestChcWalk:
     """Tests for the CHC FTP product-tree walk."""

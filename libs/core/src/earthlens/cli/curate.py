@@ -418,62 +418,6 @@ def _eumetsat_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     }
 
 
-def _worldpop_resolve(catalog: Any, dataset: str) -> tuple[str, str]:
-    """Resolve `dataset` to a `(product_alias, sub_alias)` pair.
-
-    Accepts a product alias (uses its first sub-alias) or a sub-alias id
-    (finds its parent product).
-
-    Raises:
-        ValueError: If `dataset` matches no product or sub-alias.
-    """
-    record = catalog.datasets.get(dataset)
-    if record is not None:
-        subs = getattr(record, "subaliases", None) or []
-        if subs:
-            return dataset, getattr(subs[0], "id", dataset)
-    for alias, row in catalog.datasets.items():
-        for sub in getattr(row, "subaliases", None) or []:
-            if getattr(sub, "id", None) == dataset:
-                return alias, dataset
-    raise ValueError(f"no WorldPop product or sub-alias matches {dataset!r}")
-
-
-def _worldpop_records(alias: str, sub_alias: str, iso3: str) -> list[dict[str, Any]]:
-    """Return the live WorldPop records for one `(alias, sub_alias, iso3)`."""
-    from earthlens.worldpop.rest import rest_records
-
-    return rest_records(alias, sub_alias, iso3)
-
-
-def _worldpop_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe a WorldPop sub-alias's live REST record shape (public).
-
-    Samples one country's records and records each record field's dtype —
-    the seed for the catalog's sub-alias maps.
-
-    Args:
-        catalog: The loaded WorldPop `Catalog` (resolves the product alias).
-        dataset: A product alias or a sub-alias id.
-
-    Returns:
-        Mapping of record field name to `{dtype}` (`popyears` carries the
-        sampled year spread).
-    """
-    alias, sub_alias = _worldpop_resolve(catalog, dataset)
-    records = _worldpop_records(alias, sub_alias, "USA")
-    if not records:
-        return {}
-    schema: dict[str, dict[str, Any]] = {
-        field: {"dtype": type(value).__name__} for field, value in records[0].items()
-    }
-    schema["popyears"] = {
-        "dtype": "list",
-        "values": sorted({str(r.get("popyear")) for r in records if r.get("popyear")}),
-    }
-    return schema
-
-
 def _s3_sample_keys(bucket: str, prefix: str, region: str | None) -> list[str]:
     """Return up to five object keys under `prefix` (unsigned `boto3`)."""
     from earthlens.base.s3 import S3Auth, S3Credentials
@@ -1197,7 +1141,6 @@ _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     "sentinel_hub": _sentinel_hub_probe,
     "earthdata": _earthdata_probe,
     "eumetsat": _eumetsat_probe,
-    "worldpop": _worldpop_probe,
     "s3": _s3_probe,
     "ecmwf": _ecmwf_probe,
     "chc": _chc_probe,

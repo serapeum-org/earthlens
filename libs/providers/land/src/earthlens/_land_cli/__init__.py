@@ -26,6 +26,13 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
     "fabdem": {"validator": "earthlens.fabdem.cli:validator"},
     "glaciers": {"validator": "earthlens.glaciers.cli:validator"},
     "soilgrids": {"validator": "earthlens.soilgrids.cli:validator"},
+    "worldpop": {
+        "refresher": "earthlens.worldpop.cli:refresher",
+        "writer": "earthlens.worldpop.cli:writer",
+        "curated_ids": "earthlens.worldpop.cli:curated_ids",
+        "prober": "earthlens.worldpop.cli:prober",
+        "validator": "earthlens.worldpop.cli:validator",
+    },
     "gbif": {
         "refresher": "earthlens.gbif.cli:refresher",
         "curated_ids": "earthlens.gbif.cli:curated_ids",

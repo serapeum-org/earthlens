@@ -358,29 +358,6 @@ def _validate_sentinel_hub(catalog: Any) -> tuple[int, list[str]]:
     return len(recipes), issues
 
 
-def _validate_worldpop(catalog: Any) -> tuple[int, list[str]]:
-    """Structural lint of the curated WorldPop products.
-
-    Reuses the backend's own `Catalog.health()` (mirrors
-    `tools/worldpop/refresh_worldpop_catalog.py:validate_structure`):
-    flags products with no sub-aliases, `demographic` products whose `kind`
-    is not `"mixed"`, and sub-aliases with an unknown generation or an
-    unparseable years spec.
-
-    Args:
-        catalog: The loaded WorldPop `Catalog`.
-
-    Returns:
-        `(checked, issues)` — the product count and one message per offender.
-    """
-    issues = [
-        f"{offender}: {check}"
-        for check, offenders in catalog.health().items()
-        for offender in offenders
-    ]
-    return len(catalog.datasets), issues
-
-
 def _validate_goes(catalog: Any) -> tuple[int, list[str]]:
     """Structural lint of the curated GOES ABI products.
 
@@ -513,7 +490,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     "drought": _validate_drought,
     "chc": _validate_chc,
     "sentinel_hub": _validate_sentinel_hub,
-    "worldpop": _validate_worldpop,
     "jaxa": _validate_jaxa,
     "pvgis": _validate_pvgis,
     "nrel": _validate_nrel,

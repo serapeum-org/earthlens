@@ -690,44 +690,6 @@ def _gee_classify(asset_id: str, curated: set[str]) -> str:
 _WORLDPOP_REST_URL = "https://hub.worldpop.org/rest/data"
 
 
-def _worldpop_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List WorldPop sub-alias ids per product alias, live (public REST).
-
-    Fetches the top-level alias list, then each alias's sub-alias rows; a
-    row's `alias` field is the sub-alias id (e.g. `G2_BUILT_S`, `wpgp`) —
-    the same namespace the curated records and `available_datasets` use.
-
-    Args:
-        catalog: The loaded WorldPop `Catalog` (unused; the REST is the source).
-
-    Returns:
-        A mapping of product alias to its sorted sub-alias ids.
-    """
-    top = _get_json(_WORLDPOP_REST_URL).get("data", [])
-    grouped: dict[str, list[str]] = {}
-    for entry in top:
-        alias = entry.get("alias")
-        if not alias:
-            continue
-        rows = _get_json(f"{_WORLDPOP_REST_URL}/{alias}").get("data", [])
-        grouped[str(alias)] = sorted(
-            {sub for row in rows if (sub := str(row.get("alias", "")).strip())}
-        )
-    return grouped
-
-
-def _worldpop_curated_ids(catalog: Any) -> list[str]:
-    """Return the sub-alias ids the WorldPop catalog curates (flattened)."""
-    return sorted(
-        {
-            sid
-            for record in catalog.datasets.values()
-            for sub in (getattr(record, "subaliases", None) or [])
-            if (sid := getattr(sub, "id", None))
-        }
-    )
-
-
 def _write_sibling_index(info: BackendInfo, filename: str, payload: Any) -> str:
     """Write an informational `available_*` index file next to the catalog.
 
@@ -750,13 +712,6 @@ def _write_sibling_index(info: BackendInfo, filename: str, payload: Any) -> str:
         encoding="utf-8",
     )
     return str(path)
-
-
-def _write_worldpop(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
-    """Rewrite WorldPop's sibling `available_products.yaml` (alias -> sub-aliases)."""
-    return _write_sibling_index(
-        info, "available_products.yaml", {"available_products": grouped}
-    )
 
 
 def _write_openaq(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
@@ -1086,7 +1041,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     "eumetsat": _eumetsat_grouped,
     "sentinel_hub": _sentinel_hub_grouped,
     "gee": _gee_grouped,
-    "worldpop": _worldpop_grouped,
     "radar": _radar_grouped,
     "chc": _chc_grouped,
     "s3": _s3_grouped,
@@ -1110,7 +1064,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     "earthdata": _index_writer("available_datasets"),
     "radar": _write_radar,
     "s3": _index_writer("available_datasets"),
-    "worldpop": _write_worldpop,
     "openaq": _write_openaq,
     # JAXA's catalog YAML carries an `available_datasets:` block that lists
     # every live id across all three protocols (jaxa-earth + gportal +
@@ -1312,7 +1265,6 @@ _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     "earthdata": _curated_attr_ids("short_name"),
     "eumetsat": _curated_collection_ids,
     "sentinel_hub": _curated_attr_ids("sh_collection"),
-    "worldpop": _worldpop_curated_ids,
     "chc": _chc_ftp_bases,
 }
 

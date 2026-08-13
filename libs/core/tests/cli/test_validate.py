@@ -393,12 +393,6 @@ class TestOfflineExtensions:
         assert result.status == "ok" and result.issues == []
         assert result.checked > 0, "recipes were checked"
 
-    def test_worldpop_validates_clean(self):
-        """The worldpop structural lint (via Catalog.health) passes the bundle."""
-        result = validate_one(_info("worldpop"))
-        assert result.status == "ok" and result.issues == []
-        assert result.checked > 0, "products were checked"
-
 
 class TestLiveValidators:
     """Tests for the `--live` reachability validators (network mocked)."""

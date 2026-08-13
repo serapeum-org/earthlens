@@ -1292,7 +1292,6 @@ class TestCliIsBackendAgnostic:
             "sentinel_hub",
             "stac",
             "tropycal",
-            "worldpop",
         }
     )
 
@@ -1304,7 +1303,6 @@ class TestCliIsBackendAgnostic:
             "gee",
             "radar",
             "sentinel_hub",
-            "worldpop",
         }
     )
 
