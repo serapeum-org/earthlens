@@ -76,9 +76,7 @@ def real_pooled_session(monkeypatch: pytest.MonkeyPatch) -> None:
 # public endpoint throttling a CI runner), and masking an auth failure in a gate
 # is worse than an occasional throttle false-red — a throttled endpoint should
 # return 429 or be handled by that test.
-_TRANSIENT_HTTP_STATUS: frozenset[int] = frozenset(
-    {408, 425, 429, 500, 502, 503, 504}
-)
+_TRANSIENT_HTTP_STATUS: frozenset[int] = frozenset({408, 425, 429, 500, 502, 503, 504})
 
 # Substrings (matched case-insensitively) that mark an availability failure in a
 # wrapped or third-party exception whose type/status we cannot read directly
@@ -166,12 +164,12 @@ def is_upstream_unavailable(exc: BaseException) -> str | None:
     """Classify `exc` as an external-service availability failure, or not.
 
     Walks the exception's cause/context chain and returns a short reason when the
-    failure looks like the upstream service being unreachable, refusing, or
-    rate-limiting the caller — a connection/timeout error, an HTTP `403` / `408` /
-    `429` / `5xx`, or a known transient message such as `Empty reply from server`.
-    It returns `None` for anything else, so an assertion on the returned data, a
-    `400 Bad Request`, or a request-shaping error (for example a CDS constraint
-    mismatch) stays a real failure.
+    failure looks like the upstream service being unreachable or rate-limiting the
+    caller — a connection/timeout error, an HTTP `408` / `425` / `429` / `5xx`, or
+    a known transient message such as `Empty reply from server`. It returns `None`
+    for anything else, so an assertion on the returned data, a `400`/`403`/`404`
+    (including a `urllib.error.HTTPError`, read via `.code`), or a request-shaping
+    error (for example a CDS constraint mismatch) stays a real failure.
 
     Args:
         exc: The exception raised by a live call.
