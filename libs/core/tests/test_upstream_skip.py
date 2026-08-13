@@ -30,10 +30,11 @@ class _Item:
 _CASES = [
     (Exception("504 Server Error: Gateway Timeout for url: https://x"), True),
     (_WithResponse("boom", 503), True),
-    (_WithResponse("forbidden", 403), True),
+    # 403 / AccessDenied are treated as real failures (auth-safe), not skips.
+    (_WithResponse("forbidden", 403), False),
     (ConnectionError("Failed to establish a new connection"), True),
     (TimeoutError("read timed out"), True),
-    (RuntimeError("AccessDenied: Access Denied"), True),
+    (RuntimeError("AccessDenied: Access Denied"), False),
     (Exception("CURL error: Empty reply from server"), True),
     (Exception("429 Client Error: Too Many Requests"), True),
     (ValueError("Request for 'eac4' does not match any constraint entry"), False),

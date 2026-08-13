@@ -73,10 +73,12 @@ def real_pooled_session(monkeypatch: pytest.MonkeyPatch) -> None:
 
 # HTTP statuses that mean "the service, not the request, is the problem":
 # 408 request timeout, 425 too early, 429 rate limited, and every 5xx. 403 is
-# included because the public endpoints these live tests hit (Overpass, ohsome,
-# object stores) return it when they block or throttle a CI runner.
+# deliberately excluded: it is ambiguous (a real auth/permission regression vs a
+# public endpoint throttling a CI runner), and masking an auth failure in a gate
+# is worse than an occasional throttle false-red — a throttled endpoint should
+# return 429 or be handled by that test.
 _TRANSIENT_HTTP_STATUS: frozenset[int] = frozenset(
-    {403, 408, 425, 429, 500, 502, 503, 504}
+    {408, 425, 429, 500, 502, 503, 504}
 )
 
 # Substrings (matched case-insensitively) that mark an availability failure in a
@@ -97,8 +99,6 @@ _TRANSIENT_SIGNATURES: tuple[str, ...] = (
     "remote end closed connection",
     "read timed out",
     "timed out",
-    "access denied",
-    "accessdenied",
     "too many requests",
 )
 
