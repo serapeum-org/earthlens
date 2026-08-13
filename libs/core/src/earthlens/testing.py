@@ -98,8 +98,6 @@ _TRANSIENT_SIGNATURES: tuple[str, ...] = (
     "connection aborted",
     "remote end closed connection",
     "read timed out",
-    "timed out",
-    "too many requests",
 )
 
 try:  # requests is a core dependency; the guard only keeps a bare import working
@@ -192,6 +190,12 @@ def is_upstream_unavailable(exc: BaseException) -> str | None:
             continue
         if isinstance(link, _NETWORK_EXC):
             return f"upstream unreachable ({type(link).__name__})"
+        # Message-sniff only third-party/wrapped exceptions. An AssertionError
+        # (pytest rewrites its message to include response text) or a ValueError
+        # (a real request/logic error, e.g. a CRS or CDS-constraint failure)
+        # could echo a service phrase and be skipped by mistake.
+        if isinstance(link, (AssertionError, ValueError)):
+            continue
         message = str(link).lower()
         for signature in _TRANSIENT_SIGNATURES:
             if signature in message:

@@ -41,6 +41,10 @@ _CASES = [
     (AssertionError("expected at least one feature"), False),
     (Exception("400 Client Error: Bad Request for url: https://x"), False),
     (_WithResponse("nope", 404), False),
+    # A real assertion/ValueError whose text echoes a service phrase must fail,
+    # not skip (message-sniffing is limited to third-party/wrapped exceptions).
+    (AssertionError("body was 'Service Unavailable', expected features"), False),
+    (ValueError("WCS returned a non-XML body; the service may be unavailable"), False),
 ]
 
 
