@@ -43,7 +43,7 @@ _ECMWF_STORE_URLS = {
 writer = index_writer("available_datasets", grouped=True)
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List Copernicus dataset ids per store (CDS + ADS + EWDS), live (public).
 
     Enumerates each store's `/catalogue/v1/collections`, following `rel="next"`
@@ -51,7 +51,7 @@ def refresher(catalog: Any) -> dict[str, list[str]]:
     dataset name for that store. Listing needs no credentials.
 
     Args:
-        catalog: The loaded ECMWF `Catalog` (unused; the endpoints are fixed).
+        _catalog: The loaded ECMWF `Catalog` (unused; the endpoints are fixed).
 
     Returns:
         A per-store mapping `{"cds": [...], "ads": [...], "ewds": [...]}` of
@@ -235,7 +235,7 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     return _read_netcdf_var_meta(str(target))
 
 
-def deep_prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+def deep_prober(_catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     """Deep-probe an ECMWF/CDS dataset by retrieving a tiny NetCDF (creds).
 
     Unlike the light constraints prober (variable *names* only), this
@@ -329,7 +329,7 @@ def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
     return "form"
 
 
-def emitter(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
+def emitter(catalog: Any, upstream_id: str, **_opts: Any) -> dict[str, Any]:
     """Seed an ECMWF `datasets:` row from the live CADS `form.json`.
 
     Resolves the dataset's store (CDS / ADS / EWDS) from the per-store index,

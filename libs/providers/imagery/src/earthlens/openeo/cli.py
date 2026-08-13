@@ -26,11 +26,11 @@ _PROCESSES_URL = "https://openeo.dataspace.copernicus.eu/openeo/1.2/processes"
 curated_ids = curated_collection_ids
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List the CDSE openEO collection ids, live (public, anonymous).
 
     Args:
-        catalog: The loaded openEO `Catalog` (unused; the endpoint is fixed).
+        _catalog: The loaded openEO `Catalog` (unused; the endpoint is fixed).
 
     Returns:
         A single-group mapping `{"openeo": [sorted collection ids]}`.
@@ -66,11 +66,11 @@ def writer(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
     return str(path)
 
 
-def prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+def prober(_catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     """Probe an openEO collection's band schema (public `/collections/{id}`).
 
     Args:
-        catalog: The loaded openEO `Catalog` (unused; the endpoint is fixed).
+        _catalog: The loaded openEO `Catalog` (unused; the endpoint is fixed).
         dataset: The collection id.
 
     Returns:

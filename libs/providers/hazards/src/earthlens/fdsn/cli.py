@@ -23,11 +23,11 @@ def _provider_ids() -> list[str]:
     return [str(name) for name in URL_MAPPINGS]
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List every FDSN provider id obspy can reach (SDK enum, no network).
 
     Args:
-        catalog: The loaded FDSN `Catalog` (unused; obspy is the source).
+        _catalog: The loaded FDSN `Catalog` (unused; obspy is the source).
 
     Returns:
         A single-group mapping `{"fdsn": [sorted provider ids]}`.

@@ -25,11 +25,11 @@ writer = index_writer("available_datasets")
 curated_ids = curated_collection_ids
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List EUMETSAT collection ids from the public browse endpoint.
 
     Args:
-        catalog: The loaded EUMETSAT `Catalog` (unused; the endpoint is fixed).
+        _catalog: The loaded EUMETSAT `Catalog` (unused; the endpoint is fixed).
 
     Returns:
         A single-group mapping `{"eumetsat": [sorted collection ids]}`.
@@ -74,11 +74,11 @@ def _detail(collection_id: str) -> dict[str, Any]:
     return get_json(url, params={"format": "json"})
 
 
-def emitter(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
+def emitter(_catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
     """Seed an EUMETSAT `datasets:` row from the public browse metadata.
 
     Args:
-        catalog: The loaded EUMETSAT `Catalog` (unused).
+        _catalog: The loaded EUMETSAT `Catalog` (unused).
         upstream_id: The `EO:EUM:DAT:…` collection id.
         **opts: `group` (Data Store group label).
 

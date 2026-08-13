@@ -33,11 +33,11 @@ _TABULAR = {"csv", "xlsx", "xls", "json", "tsv", "parquet"}
 curated_ids = curated_attr_ids("hdx_id")
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List every HDX (CKAN) dataset name, live (public, anonymous).
 
     Args:
-        catalog: The loaded HDX `Catalog` (unused; the endpoint is fixed).
+        _catalog: The loaded HDX `Catalog` (unused; the endpoint is fixed).
 
     Returns:
         A single-group mapping `{"hdx": [sorted dataset names]}`.
@@ -126,11 +126,11 @@ def _package(hdx_id: str) -> dict[str, Any]:
     return body.get("result") or {}
 
 
-def emitter(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
+def emitter(_catalog: Any, upstream_id: str, **_opts: Any) -> dict[str, Any]:
     """Seed an HDX `datasets:` row from a dataset's CKAN resources.
 
     Args:
-        catalog: The loaded HDX `Catalog` (unused; CKAN is the source).
+        _catalog: The loaded HDX `Catalog` (unused; CKAN is the source).
         upstream_id: The HDX dataset id (CKAN name).
         **opts: Unused.
 

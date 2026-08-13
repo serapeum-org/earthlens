@@ -66,12 +66,14 @@ def validator(catalog: Any) -> tuple[int, list[str]]:
     return lint(catalog, _check_country)
 
 
-def emitter(catalog: Any, upstream_id: str, *, key: str, **opts: Any) -> dict[str, Any]:
+def emitter(
+    catalog: Any, _upstream_id: str, *, key: str, **opts: Any
+) -> dict[str, Any]:
     """Seed a WDPA `countries:` row from an ISO3 code (no network).
 
     Args:
         catalog: The loaded WDPA `Catalog` (unused).
-        upstream_id: The ISO3 alpha-3 code (e.g. `"KEN"`).
+        _upstream_id: The ISO3 alpha-3 code (e.g. `"KEN"`).
         key: The friendly catalog key (typically the same alpha-3 code).
         **opts: `name`, `region`.
 

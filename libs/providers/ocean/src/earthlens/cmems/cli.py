@@ -24,11 +24,11 @@ def _describe() -> Any:
     return copernicusmarine.describe(disable_progress_bar=True)
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List every CMEMS dataset id across the live catalogue (public SDK).
 
     Args:
-        catalog: The loaded CMEMS `Catalog` (unused; the SDK is the source).
+        _catalog: The loaded CMEMS `Catalog` (unused; the SDK is the source).
 
     Returns:
         A single-group mapping `{"cmems": [sorted dataset ids]}`.
@@ -50,7 +50,7 @@ def _describe_dataset(dataset_id: str) -> Any:
     return copernicusmarine.describe(dataset_id=dataset_id, disable_progress_bar=True)
 
 
-def prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+def prober(_catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     """Probe a CMEMS dataset's variables (public `copernicusmarine.describe`).
 
     Walks the nested catalogue
@@ -58,7 +58,7 @@ def prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     records each variable's standard name and units.
 
     Args:
-        catalog: The loaded CMEMS `Catalog` (unused; the SDK is the source).
+        _catalog: The loaded CMEMS `Catalog` (unused; the SDK is the source).
         dataset: The CMEMS dataset id.
 
     Returns:
@@ -100,7 +100,7 @@ def _deep_sample(dataset_id: str) -> dict[str, dict[str, Any]]:
     return schema
 
 
-def deep_prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+def deep_prober(_catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     """Deep-probe a CMEMS dataset's true NetCDF variable schema (credentialed).
 
     Unlike the light `describe` prober, this opens the dataset (lazily, no full
@@ -108,7 +108,7 @@ def deep_prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     in the served NetCDF. Needs `COPERNICUSMARINE_SERVICE_USERNAME` / `_PASSWORD`.
 
     Args:
-        catalog: The loaded CMEMS `Catalog` (unused; the SDK is the source).
+        _catalog: The loaded CMEMS `Catalog` (unused; the SDK is the source).
         dataset: The CMEMS dataset id.
 
     Returns:

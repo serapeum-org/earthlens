@@ -40,11 +40,11 @@ def _release_ids() -> list[str]:
     return [str(release) for release in releases]
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List every available Overture release via the `overturemaps` SDK.
 
     Args:
-        catalog: The loaded Overture `Catalog` (unused; the SDK is the source).
+        _catalog: The loaded Overture `Catalog` (unused; the SDK is the source).
 
     Returns:
         A single-group mapping `{"overture": [sorted release ids]}`.

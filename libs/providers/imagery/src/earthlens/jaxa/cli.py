@@ -130,7 +130,7 @@ def _walk_gportal(node: Any, mission: str = "", level: str = ""):
             yield (mission, level, str(item))
 
 
-def emitter(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
+def emitter(catalog: Any, upstream_id: str, **_opts: Any) -> dict[str, Any]:
     """Seed a JAXA `datasets:` row from a STAC name or G-Portal numeric id.
 
     The upstream id's shape decides the protocol: a `JAXA.*` / `NASA.*`

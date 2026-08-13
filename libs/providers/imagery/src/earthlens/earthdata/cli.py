@@ -248,11 +248,11 @@ def _collection_umm(short_name: str, version: str) -> dict[str, Any]:
     return items[0].get("umm", {}) if items else {}
 
 
-def emitter(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
+def emitter(_catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
     """Seed an Earthdata `datasets:` row from a CMR collection.
 
     Args:
-        catalog: The loaded Earthdata `Catalog` (unused; CMR is the source).
+        _catalog: The loaded Earthdata `Catalog` (unused; CMR is the source).
         upstream_id: The collection short name.
         **opts: `version`, `cmr_provider`, `daac`, `cloud_hosted`.
 

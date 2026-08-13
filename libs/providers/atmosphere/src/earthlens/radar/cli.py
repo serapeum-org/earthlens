@@ -96,11 +96,11 @@ def _radar_station_ids(text: str) -> list[str]:
     return sorted(_radar_station_rows(text))
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List every live NEXRAD ICAO id from the public NOAA HOMR registry.
 
     Args:
-        catalog: The loaded radar `Catalog` (unused; the registry is fixed).
+        _catalog: The loaded radar `Catalog` (unused; the registry is fixed).
 
     Returns:
         A single-group mapping `{"radar": [sorted ICAO ids]}`.
@@ -108,7 +108,7 @@ def refresher(catalog: Any) -> dict[str, list[str]]:
     return {"radar": _radar_station_ids(get_text(_RADAR_STATIONS_URL))}
 
 
-def writer(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
+def writer(info: BackendInfo, _grouped: dict[str, list[str]]) -> str:
     """Regenerate radar's curated `stations:` block from NOAA HOMR.
 
     Unlike the `available_*` writers, this rewrites the *curated* station
@@ -118,7 +118,7 @@ def writer(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
 
     Args:
         info: The radar backend.
-        grouped: The live id fetch (unused; the full table is re-fetched).
+        _grouped: The live id fetch (unused; the full table is re-fetched).
 
     Returns:
         The path of the rewritten catalog file.

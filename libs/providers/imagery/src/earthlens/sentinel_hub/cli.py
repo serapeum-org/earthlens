@@ -26,7 +26,7 @@ def _sh_data_collection_names() -> list[str]:
     return [member.name for member in import_sentinelhub().DataCollection]
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List Sentinel Hub collections from the SDK's `DataCollection` enum.
 
     Listing the supported collections needs no credentials — it is the
@@ -35,7 +35,7 @@ def refresher(catalog: Any) -> dict[str, list[str]]:
     needs CDSE OAuth.
 
     Args:
-        catalog: The loaded Sentinel Hub `Catalog` (unused; the SDK is the
+        _catalog: The loaded Sentinel Hub `Catalog` (unused; the SDK is the
             source).
 
     Returns:

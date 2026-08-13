@@ -22,14 +22,14 @@ from earthlens.cli.toolkit import (
 _OPENAQ_PARAMETERS_URL = "https://api.openaq.org/v3/parameters"
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List the OpenAQ parameter names, live (needs `OPENAQ_API_KEY`).
 
     The key is read from the environment; without it the request fails and
     `refresh_one` reports an `"error"` outcome.
 
     Args:
-        catalog: The loaded OpenAQ `Catalog` (unused; the endpoint is fixed).
+        _catalog: The loaded OpenAQ `Catalog` (unused; the endpoint is fixed).
 
     Returns:
         A single-group mapping `{"openaq": [sorted parameter names]}`.

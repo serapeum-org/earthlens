@@ -75,14 +75,14 @@ def _gee_fetch_id(href: str) -> str | None:
         return None
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List every Earth Engine asset id from the public STAC catalog.
 
     Walks the STAC tree for dataset docs, then fetches each doc's `id`
     concurrently (pure HTTP, no SDK / credentials).
 
     Args:
-        catalog: The loaded GEE `Catalog` (unused; the STAC tree is the source).
+        _catalog: The loaded GEE `Catalog` (unused; the STAC tree is the source).
 
     Returns:
         A single-group mapping `{"gee": [sorted asset ids]}`.
@@ -93,11 +93,11 @@ def refresher(catalog: Any) -> dict[str, list[str]]:
     return {"gee": sorted(ids)}
 
 
-def prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
+def prober(_catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     """Probe a GEE asset's band schema from its public EE STAC document.
 
     Args:
-        catalog: The loaded GEE `Catalog` (unused; the STAC doc is the source).
+        _catalog: The loaded GEE `Catalog` (unused; the STAC doc is the source).
         dataset: The Earth Engine asset id (e.g. `NASA/GDDP-CMIP6`).
 
     Returns:
@@ -167,11 +167,11 @@ def _gsd_to_metres(gsd: Any) -> float | None:
     return float(value) if isinstance(value, (int, float)) else None
 
 
-def emitter(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
+def emitter(_catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
     """Seed a GEE `datasets:` row from the asset's public STAC document.
 
     Args:
-        catalog: The loaded GEE `Catalog` (unused; STAC is the source).
+        _catalog: The loaded GEE `Catalog` (unused; STAC is the source).
         upstream_id: The Earth Engine asset id (e.g. `NASA/GDDP-CMIP6`).
         **opts: `minimal` emits a placeholder row with empty bands;
             `hydrate` reads the bands live from Earth Engine (needs creds —

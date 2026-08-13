@@ -31,11 +31,11 @@ def _parameter_codes() -> list[str]:
     return [str(code) for code in frame["parameter_code"]]
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List every USGS parameter code, live (public `dataretrieval` SDK).
 
     Args:
-        catalog: The loaded USGS Water `Catalog` (unused; the SDK is the source).
+        _catalog: The loaded USGS Water `Catalog` (unused; the SDK is the source).
 
     Returns:
         A single-group mapping `{"usgs_water": [sorted parameter codes]}`.
@@ -64,7 +64,7 @@ def _parameter_rows() -> dict[str, dict[str, str]]:
     return dict(sorted(rows.items()))
 
 
-def writer(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
+def writer(info: BackendInfo, _grouped: dict[str, list[str]]) -> str:
     """Rewrite USGS Water's sibling `available_parameters.yaml` (full table)."""
     return write_sibling_index(
         info,

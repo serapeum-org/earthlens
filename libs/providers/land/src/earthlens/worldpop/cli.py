@@ -16,11 +16,11 @@ from earthlens.cli.toolkit import BackendInfo, get_json, write_sibling_index
 _REST_URL = "https://hub.worldpop.org/rest/data"
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List WorldPop sub-alias ids per product alias, live (public REST).
 
     Args:
-        catalog: The loaded WorldPop `Catalog` (unused; the REST is the source).
+        _catalog: The loaded WorldPop `Catalog` (unused; the REST is the source).
 
     Returns:
         A mapping of product alias to its sorted sub-alias ids.

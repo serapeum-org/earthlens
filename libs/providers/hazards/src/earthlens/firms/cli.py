@@ -32,11 +32,11 @@ _DATA_AVAIL_URL = (
 _EXCLUDED = frozenset({"BA_MODIS", "BA_VIIRS"})
 
 
-def refresher(catalog: Any) -> dict[str, list[str]]:
+def refresher(_catalog: Any) -> dict[str, list[str]]:
     """List every live FIRMS sensor id from the data_availability endpoint.
 
     Args:
-        catalog: The loaded FIRMS `Catalog` (unused; the endpoint is fixed).
+        _catalog: The loaded FIRMS `Catalog` (unused; the endpoint is fixed).
 
     Returns:
         A single-group mapping `{"firms": [sorted sensor ids]}`.
