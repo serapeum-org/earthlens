@@ -17,6 +17,9 @@ from __future__ import annotations
 
 from earthlens.cli.adapter import BackendInfo
 from earthlens.cli.curate import (
+    _bands_from_summaries as bands_from_summaries,
+)
+from earthlens.cli.curate import (
     _infer_dtype as infer_dtype,
 )
 from earthlens.cli.refresh import (
@@ -53,6 +56,9 @@ from earthlens.cli.refresh import (
     _redact as redact,
 )
 from earthlens.cli.refresh import (
+    _replace_index_block as replace_index_block,
+)
+from earthlens.cli.refresh import (
     _write_sibling_index as write_sibling_index,
 )
 from earthlens.cli.validate import (
@@ -69,6 +75,7 @@ __all__ = [
     "COVERAGE_BUCKETS",
     "HTTP_TIMEOUT",
     "BackendInfo",
+    "bands_from_summaries",
     "biodiversity_curated_ids",
     "curated_attr_ids",
     "curated_collection_ids",
@@ -81,6 +88,7 @@ __all__ = [
     "infer_dtype",
     "lint",
     "redact",
+    "replace_index_block",
     "require",
     "write_sibling_index",
 ]

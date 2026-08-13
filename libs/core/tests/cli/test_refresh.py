@@ -119,21 +119,6 @@ class TestEcmwfRefresher:
         assert outcome.live_count == 1, "one CDS dataset id listed"
 
 
-class TestOpeneoRefresher:
-    """Tests for the openEO lister."""
-
-    def test_lists_collection_ids(self, monkeypatch):
-        """openeo refresh reads the public /collections id list."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
-            lambda url: {"collections": [{"id": "SENTINEL2_L2A"}, {"id": "S1_GRD"}]},
-        )
-        outcome = refresh_one(_info("openeo"))
-        assert outcome.status == "ok", "openeo refresh ran"
-        assert outcome.live_count == 2, "two collection ids listed"
-
-
 class TestEarthdataRefresher:
     """Tests for the earthdata (CMR) lister."""
 
@@ -564,17 +549,6 @@ class TestIndexWriters:
         after = sorted(load_catalog(info).available_datasets)
         assert after == before, f"{provider} index drifted on round-trip"
         assert path.endswith("_index.yaml"), "wrote the sharded index file"
-
-    def test_openeo_writes_both_collections_and_processes(self, tmp_path, monkeypatch):
-        """openeo --write rewrites available_collections AND available_processes."""
-        info, module, dst = _catalog_copy("openeo", tmp_path, monkeypatch)
-        monkeypatch.setattr(
-            refresh_mod, "_openeo_process_ids", lambda: ["load_collection", "ndvi"]
-        )
-        refresh_mod._WRITERS["openeo"](info, {"openeo": ["ONLY_ONE"]})
-        after = yaml.safe_load((dst / "_index.yaml").read_text("utf-8"))
-        assert after["available_collections"] == ["ONLY_ONE"], "collections rewritten"
-        assert after["available_processes"] == ["load_collection", "ndvi"], "procs too"
 
     def test_radar_regenerates_stations_block(self, tmp_path, monkeypatch):
         """radar --write re-parses HOMR into the full curated stations: block."""

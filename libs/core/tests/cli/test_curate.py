@@ -111,50 +111,6 @@ class TestSentinelHubProbe:
         assert row and row["sh_collection"], "collection summary row present"
 
 
-class TestOpeneoProbe:
-    """Tests for the openEO band prober."""
-
-    def test_extracts_band_schema(self, monkeypatch):
-        """openeo probe reads summaries.eo:bands into a band schema."""
-        from earthlens.cli import curate as curate_mod
-
-        monkeypatch.setattr(
-            curate_mod,
-            "_get_json",
-            lambda url, **kw: {
-                "summaries": {
-                    "eo:bands": [
-                        {"name": "B04", "common_name": "red", "data_type": "int16"}
-                    ]
-                }
-            },
-        )
-        result = probe_dataset(_info("openeo"), "SENTINEL2_L2A")
-        assert result.status == "ok", "openeo probe ran"
-        assert result.assets["B04"]["common_name"] == "red", "band parsed"
-
-    def test_surfaces_cube_dimensions(self, monkeypatch):
-        """Non-band cube axes appear as dim: rows carrying type + extent."""
-        from earthlens.cli import curate as curate_mod
-
-        monkeypatch.setattr(
-            curate_mod,
-            "_get_json",
-            lambda url, **kw: {
-                "summaries": {"eo:bands": [{"name": "B04"}]},
-                "cube:dimensions": {
-                    "t": {"type": "temporal", "extent": ["2015-01-01", None]},
-                    "bands": {"type": "bands", "values": ["B04"]},
-                },
-            },
-        )
-        result = probe_dataset(_info("openeo"), "SENTINEL2_L2A")
-        assert "B04" in result.assets, "band still listed"
-        assert result.assets["dim:t"]["type"] == "temporal", "temporal axis surfaced"
-        assert result.assets["dim:t"]["extent"] == ["2015-01-01", None], "extent kept"
-        assert "dim:bands" not in result.assets, "bands axis not duplicated"
-
-
 class TestGeeProbe:
     """Tests for the GEE band prober."""
 

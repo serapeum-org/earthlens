@@ -23,6 +23,13 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
         "prober": "earthlens.eumetsat.cli:prober",
         "emitter": "earthlens.eumetsat.cli:emitter",
     },
+    "openeo": {
+        "refresher": "earthlens.openeo.cli:refresher",
+        "writer": "earthlens.openeo.cli:writer",
+        "curated_ids": "earthlens.openeo.cli:curated_ids",
+        "prober": "earthlens.openeo.cli:prober",
+        "live_validator": "earthlens.openeo.cli:live_validator",
+    },
     "stac": {
         "refresher": "earthlens.stac.cli:refresher",
         "writer": "earthlens.stac.cli:writer",

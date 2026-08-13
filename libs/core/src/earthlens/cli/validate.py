@@ -23,7 +23,7 @@ import requests
 
 from earthlens._cli_tooling import dispatch_table
 from earthlens.cli.adapter import BackendInfo, load_catalog
-from earthlens.cli.refresh import _TIMEOUT, _get_json
+from earthlens.cli.refresh import _TIMEOUT
 
 
 @dataclass
@@ -495,41 +495,6 @@ def _http_head(url: str) -> int:
 
 
 #: CDSE openEO processes endpoint (public; pairs with the collections one).
-_OPENEO_PROCESSES_URL = "https://openeo.dataspace.copernicus.eu/openeo/1.2/processes"
-
-
-def _openeo_live_lists() -> tuple[set[str], set[str]]:
-    """Return the live `(collection_ids, process_ids)` sets (public CDSE)."""
-    from earthlens.cli.refresh import _OPENEO_COLLECTIONS_URL
-
-    collections = {
-        c["id"]
-        for c in _get_json(_OPENEO_COLLECTIONS_URL).get("collections", [])
-        if c.get("id")
-    }
-    processes = {
-        p["id"]
-        for p in _get_json(_OPENEO_PROCESSES_URL).get("processes", [])
-        if p.get("id")
-    }
-    return collections, processes
-
-
-def _live_openeo(catalog: Any) -> tuple[int, list[str]]:
-    """Confirm each openEO recipe's base collection + processes exist live."""
-    recipes = getattr(catalog, "recipes", None) or {}
-    if not recipes:
-        return 0, []
-    collections, processes = _openeo_live_lists()
-    issues: list[str] = []
-    for key, recipe in recipes.items():
-        base = getattr(recipe, "base_collection", None)
-        if base and base not in collections:
-            issues.append(f"{key}: base_collection {base!r} not served live")
-        for process in getattr(recipe, "processes", None) or []:
-            if process not in processes:
-                issues.append(f"{key}: process {process!r} not served live")
-    return len(recipes), issues
 
 
 def _radar_feed_stations(region: str = "us-east-1") -> set[str]:
@@ -683,7 +648,6 @@ _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("live_validator"),
     "s3": _live_s3,
-    "openeo": _live_openeo,
     "radar": _live_radar,
     "nwp": _live_nwp,
     "ecmwf": _live_ecmwf,

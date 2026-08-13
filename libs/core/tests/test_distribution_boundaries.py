@@ -1282,7 +1282,6 @@ class TestCliIsBackendAgnostic:
             "nrel",
             "nwp",
             "openaq",
-            "openeo",
             "pvgis",
             "radar",
             "radklim",

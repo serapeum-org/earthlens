@@ -353,13 +353,6 @@ class TestLiveValidators:
         result = validate_one(_info("s3"), live=True)
         assert result.issues == [], "objects present -> clean"
 
-    def test_openeo_is_live_only(self, monkeypatch):
-        """openeo has no offline validator; --live checks recipes vs live."""
-        assert validate_one(_info("openeo")).status == "unsupported"
-        monkeypatch.setattr(validate_mod, "_openeo_live_lists", lambda: (set(), set()))
-        result = validate_one(_info("openeo"), live=True)
-        assert result.status == "ok", "live openeo validator ran"
-
     def test_supported_providers_live_adds_openeo(self):
         """openeo only appears in the supported set under live."""
         assert "openeo" not in supported_providers()
@@ -498,19 +491,6 @@ class TestLivePrimitives:
             ),
         )
         assert _http_head("https://x") == 204, "status code returned"
-
-    def test_openeo_live_lists_unions_ids(self, monkeypatch):
-        """_openeo_live_lists collects collection + process ids from the API."""
-        from earthlens.cli.validate import _openeo_live_lists
-
-        def fake_get(url):
-            if "processes" in url:
-                return {"processes": [{"id": "ndvi"}, {"no": "id"}]}
-            return {"collections": [{"id": "S2"}]}
-
-        monkeypatch.setattr(validate_mod, "_get_json", fake_get)
-        collections, processes = _openeo_live_lists()
-        assert collections == {"S2"} and processes == {"ndvi"}, "ids unioned"
 
     def test_s3_live_keys_lists_one(self, monkeypatch):
         """_s3_live_keys returns the object keys from an unsigned client."""

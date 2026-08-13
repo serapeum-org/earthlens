@@ -84,57 +84,6 @@ def _bands_from_summaries(body: dict[str, Any]) -> list[dict[str, Any]]:
     return summaries.get("eo:bands") or summaries.get("gee:bands") or []
 
 
-def _openeo_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
-    """Probe an openEO collection's band schema (public `/collections/{id}`).
-
-    Args:
-        catalog: The loaded openEO `Catalog` (unused; the endpoint is fixed).
-        dataset: The collection id.
-
-    Returns:
-        Mapping of band name to `{common_name, dtype, gsd, unit}` (falling
-        back to the `cube:dimensions` band names when the collection carries
-        no `eo:bands`), plus one `dim:<axis>` row per non-band cube axis
-        carrying `{type, extent, step}` (the spatial bbox / temporal interval).
-    """
-    url = f"https://openeo.dataspace.copernicus.eu/openeo/1.2/collections/{dataset}"
-    body = _get_json(url)
-    schema: dict[str, dict[str, Any]] = {}
-    bands = _bands_from_summaries(body)
-    dimensions = body.get("cube:dimensions", {}) or {}
-    if bands:
-        for band in bands:
-            if band.get("name"):
-                schema[str(band["name"])] = {
-                    "common_name": band.get("common_name"),
-                    "dtype": band.get("data_type"),
-                    "gsd": band.get("gsd"),
-                    "unit": band.get("unit"),
-                }
-    else:
-        band_names: list[Any] = next(
-            (
-                dim.get("values", [])
-                for dim in dimensions.values()
-                if dim.get("type") == "bands"
-            ),
-            [],
-        )
-        schema = {str(name): {} for name in band_names}
-    # Enrich with the non-band cube axes so the spatial bbox + temporal
-    # interval + axis steps show up too (what the retired probe tool added
-    # over the plain band list).
-    for name, dim in dimensions.items():
-        if dim.get("type") == "bands":
-            continue
-        schema[f"dim:{name}"] = {
-            "type": dim.get("type") or dim.get("axis"),
-            "extent": dim.get("extent"),
-            "step": dim.get("step"),
-        }
-    return schema
-
-
 def _gee_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     """Probe a GEE asset's band schema from its public EE STAC document.
 
@@ -995,7 +944,6 @@ def _jaxa_probe(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
 _PROBERS: dict[str, Callable[[Any, str], dict[str, dict[str, Any]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("prober"),
-    "openeo": _openeo_probe,
     "gee": _gee_probe,
     "sentinel_hub": _sentinel_hub_probe,
     "earthdata": _earthdata_probe,

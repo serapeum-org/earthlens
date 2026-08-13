@@ -119,15 +119,6 @@ class TestGeeCoverageBody:
 class TestNetworkPrimitives:
     """Tests for the thin network/SDK list helpers (mocked)."""
 
-    def test_openeo_process_ids(self, monkeypatch):
-        """Process ids with an id are collected + sorted; others dropped."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
-            lambda url: {"processes": [{"id": "ndvi"}, {"no": "id"}]},
-        )
-        assert refresh_mod._openeo_process_ids() == ["ndvi"]
-
     def test_sentinel_hub_grouped(self, monkeypatch):
         """sentinel_hub grouped wraps the DataCollection enum names, sorted."""
         monkeypatch.setattr(

@@ -318,56 +318,6 @@ def _ecmwf_grouped(catalog: Any) -> dict[str, list[str]]:
     return grouped
 
 
-#: CDSE openEO collections endpoint (public; the backend's default host).
-_OPENEO_COLLECTIONS_URL = (
-    "https://openeo.dataspace.copernicus.eu/openeo/1.2/collections"
-)
-
-
-def _openeo_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List the CDSE openEO collection ids, live (public, anonymous).
-
-    Args:
-        catalog: The loaded openEO `Catalog` (unused; the endpoint is fixed).
-
-    Returns:
-        A single-group mapping `{"openeo": [sorted collection ids]}`.
-    """
-    body = _get_json(_OPENEO_COLLECTIONS_URL)
-    ids = sorted({str(c["id"]) for c in body.get("collections", []) if c.get("id")})
-    return {"openeo": ids}
-
-
-#: CDSE openEO processes endpoint (public; pairs with the collections one).
-_OPENEO_PROCESSES_URL = "https://openeo.dataspace.copernicus.eu/openeo/1.2/processes"
-
-
-def _openeo_process_ids() -> list[str]:
-    """List the live CDSE openEO process ids (public, anonymous)."""
-    body = _get_json(_OPENEO_PROCESSES_URL)
-    return sorted({str(p["id"]) for p in body.get("processes", []) if p.get("id")})
-
-
-def _write_openeo(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
-    """Rewrite openEO's `available_collections` AND `available_processes`.
-
-    The collection index comes from the live fetch (`grouped`); the process
-    index is fetched separately — so `--write` keeps both informational
-    blocks of `_index.yaml` current (the generic writer only does one).
-
-    Args:
-        info: The openEO backend.
-        grouped: Group name -> live collection ids (see :func:`_openeo_grouped`).
-
-    Returns:
-        The path of the rewritten `_index.yaml`.
-    """
-    path = _index_path(info)
-    _replace_index_block(path, "available_collections", _flatten(grouped))
-    _replace_index_block(path, "available_processes", _openeo_process_ids())
-    return str(path)
-
-
 #: NASA CMR collection search (public, anonymous; UMM-JSON).
 _CMR_COLLECTIONS_URL = "https://cmr.earthdata.nasa.gov/search/collections.umm_json"
 
@@ -937,7 +887,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     # in-core literals below are the not-yet-migrated remainder (issue #863).
     **dispatch_table("refresher"),
     "ecmwf": _ecmwf_grouped,
-    "openeo": _openeo_grouped,
     "earthdata": _earthdata_grouped,
     "openaq": _openaq_grouped,
     "sentinel_hub": _sentinel_hub_grouped,
@@ -957,7 +906,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("writer"),
     "ecmwf": _index_writer("available_datasets", grouped=True),
-    "openeo": _write_openeo,
     "sentinel_hub": _index_writer("available_collections"),
     "gee": _index_writer("available_datasets"),
     "earthdata": _index_writer("available_datasets"),
@@ -1159,7 +1107,6 @@ def _biodiversity_curated_ids(catalog: Any) -> list[str]:
 _CURATED_IDS: dict[str, Callable[[Any], list[str]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("curated_ids"),
-    "openeo": _curated_collection_ids,
     "earthdata": _curated_attr_ids("short_name"),
     "sentinel_hub": _curated_attr_ids("sh_collection"),
     "chc": _chc_ftp_bases,
