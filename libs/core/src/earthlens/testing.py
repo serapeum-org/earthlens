@@ -181,13 +181,15 @@ def is_upstream_unavailable(exc: BaseException) -> str | None:
     for link in _exception_chain(exc):
         # Status first: a `urllib.error.HTTPError` is also a `URLError` (in
         # `_NETWORK_EXC`), so classifying it by type would skip a real 4xx as
-        # "unreachable". Read the status, and let a definite non-transient status
-        # (400 / 403 / 404 / ...) stay a failure instead of falling through.
+        # "unreachable". A definite non-transient status (400 / 403 / 404 / ...)
+        # is authoritative: the request reached the service and got a real
+        # answer, so it stays a failure and a deeper transient link (e.g. an
+        # earlier retry's connection error) does not override it.
         status = _http_status(link)
         if status is not None:
             if status in _TRANSIENT_HTTP_STATUS:
                 return f"upstream returned HTTP {status}"
-            continue
+            return None
         if isinstance(link, _NETWORK_EXC):
             return f"upstream unreachable ({type(link).__name__})"
         # Message-sniff only third-party/wrapped exceptions. An AssertionError

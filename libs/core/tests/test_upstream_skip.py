@@ -92,6 +92,17 @@ def test_walks_the_cause_chain() -> None:
         assert is_upstream_unavailable(exc) is not None
 
 
+def test_non_transient_status_is_authoritative() -> None:
+    """A real 404 chained from a transient error is a failure, not a skip."""
+    try:
+        try:
+            raise ConnectionError("earlier retry failed to connect")
+        except Exception as cause:
+            raise _WithResponse("not found", 404) from cause
+    except Exception as exc:
+        assert is_upstream_unavailable(exc) is None
+
+
 def test_suppressed_context_is_not_followed() -> None:
     """`raise … from None` hides a transient context, so it is not reclassified."""
     try:
