@@ -258,21 +258,6 @@ class TestOpeneoRefresher:
         assert outcome.live_count == 2, "two collection ids listed"
 
 
-class TestHdxRefresher:
-    """Tests for the HDX (CKAN) lister."""
-
-    def test_lists_package_names(self, monkeypatch):
-        """hdx refresh reads CKAN package_list and audits by hdx_id."""
-        monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
-            lambda url: {"result": ["kontur-boundaries", "kontur-population"]},
-        )
-        outcome = refresh_one(_info("hdx"))
-        assert outcome.status == "ok", "hdx refresh ran"
-        assert outcome.live_count == 2, "two package names listed"
-
-
 class TestEarthdataRefresher:
     """Tests for the earthdata (CMR) lister."""
 
@@ -951,32 +936,6 @@ class TestIndexWriters:
         assert sorted(catalog.datasets) == ["KABR", "PAEC"], "stations regenerated"
         assert catalog.datasets["KABR"].name == "Aberdeen", "row fields parsed"
         assert catalog.datasets["KABR"].latitude == 45.4558, "latitude parsed"
-
-
-class TestHdxWriter:
-    """Tests for the merge-preserving HDX sidecar writer."""
-
-    def test_merges_metadata_and_drops_gone(self, tmp_path, monkeypatch):
-        """Surviving ids keep org/title; new ids get bare rows; gone ids drop."""
-        info, _module, dst = _catalog_copy("hdx", tmp_path, monkeypatch)
-        sidecar = dst / "_available.json.gz"
-        with gzip.open(sidecar, "wt", encoding="utf-8") as handle:
-            json.dump(
-                {
-                    "__comment__": "x",
-                    "datasets": {
-                        "keep": {"org": "O", "title": "T"},
-                        "gone": {"org": "g", "title": "g"},
-                    },
-                },
-                handle,
-            )
-        refresh_mod._WRITERS["hdx"](info, {"hdx": ["keep", "newone"]})
-        with gzip.open(sidecar, "rt", encoding="utf-8") as handle:
-            rows = json.load(handle)["datasets"]
-        assert rows["keep"] == {"org": "O", "title": "T"}, "metadata preserved"
-        assert rows["newone"] == {"org": "", "title": ""}, "new id bare"
-        assert "gone" not in rows, "id absent upstream dropped"
 
 
 class TestS3IndexRegen:

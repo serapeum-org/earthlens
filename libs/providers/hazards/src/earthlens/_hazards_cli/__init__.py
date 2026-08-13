@@ -41,6 +41,13 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
     "flodis": {"validator": "earthlens.flodis.cli:validator"},
     "flopros": {"validator": "earthlens.flopros.cli:validator"},
     "gdacs": {"validator": "earthlens.gdacs.cli:validator"},
+    "hdx": {
+        "refresher": "earthlens.hdx.cli:refresher",
+        "writer": "earthlens.hdx.cli:writer",
+        "curated_ids": "earthlens.hdx.cli:curated_ids",
+        "prober": "earthlens.hdx.cli:prober",
+        "emitter": "earthlens.hdx.cli:emitter",
+    },
     "hanze": {"validator": "earthlens.hanze.cli:validator"},
     "jrc_flood": {"validator": "earthlens.jrc_flood.cli:validator"},
     "nsi": {"validator": "earthlens.nsi.cli:validator"},

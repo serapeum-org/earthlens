@@ -323,32 +323,6 @@ class TestEarthdataEmitter:
         assert result.row["output_kind"] == "vector", "GEDI -> vector"
 
 
-class TestHdxEmitter:
-    """Tests for the HDX emitter (public CKAN)."""
-
-    def test_infers_themes_from_resource_formats(self, monkeypatch):
-        """Resource formats seed formats / themes / output_kinds."""
-        monkeypatch.setattr(
-            stanza_mod,
-            "_get_json",
-            lambda url, **kw: {
-                "result": {
-                    "organization": {"name": "kontur"},
-                    "title": "Population",
-                    "resources": [
-                        {"name": "a.gpkg", "format": "Geopackage"},
-                        {"name": "b.csv", "format": "CSV"},
-                    ],
-                }
-            },
-        )
-        result = emit_stanza(_info("hdx"), "kontur-population", key="kontur-pop")
-        assert result.status == "ok", "hdx emitter ran"
-        assert result.row["formats"] == ["CSV", "Geopackage"], "formats sorted"
-        assert result.row["output_kinds"] == ["tabular", "vector"], "kinds inferred"
-        assert result.row["org"] == "kontur", "org carried"
-
-
 class TestEumetsatEmitter:
     """Tests for the EUMETSAT emitter (public browse)."""
 

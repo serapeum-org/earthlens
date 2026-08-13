@@ -26,6 +26,7 @@ from urllib.parse import quote
 
 import yaml
 
+from earthlens._cli_tooling import dispatch_table
 from earthlens.cli._gee_categories import categorise_asset
 from earthlens.cli.adapter import BackendInfo, load_catalog
 from earthlens.cli.refresh import _get_json
@@ -233,64 +234,6 @@ def _emit_usgs_water(
         "units": str(opts.get("units") or ""),
         "group": str(opts.get("group") or "Physical"),
         "services": list(services),
-    }
-
-
-# --------------------------------------------------------------------------- #
-# hdx — seed from a CKAN package_show (public, no auth).
-# --------------------------------------------------------------------------- #
-_HDX_VECTOR = {"geopackage", "shp", "geojson", "kml", "geodatabase", "topojson"}
-_HDX_RASTER = {"geotiff", "cog", "netcdf", "grib", "img", "ascii grid"}
-_HDX_TABULAR = {"csv", "xlsx", "xls", "json", "tsv", "parquet"}
-
-
-def _hdx_kind_for_format(fmt: str) -> str | None:
-    """Return the pyramids output kind for a CKAN format label (or None)."""
-    token = fmt.strip().lower()
-    if token in _HDX_VECTOR:
-        return "vector"
-    if token in _HDX_RASTER:
-        return "raster"
-    if token in _HDX_TABULAR:
-        return "tabular"
-    return None
-
-
-def _hdx_package(hdx_id: str) -> dict[str, Any]:
-    """Return one HDX dataset's CKAN package_show result (public)."""
-    body = _get_json(
-        "https://data.humdata.org/api/3/action/package_show", params={"id": hdx_id}
-    )
-    return body.get("result") or {}
-
-
-def _emit_hdx(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
-    """Seed an HDX `datasets:` row from a dataset's CKAN resources.
-
-    Args:
-        catalog: The loaded HDX `Catalog` (unused; CKAN is the source).
-        upstream_id: The HDX dataset id (CKAN name).
-        **opts: Unused.
-
-    Returns:
-        The seeded row (formats / themes / output_kinds inferred from the
-        dataset's resource formats).
-    """
-    package = _hdx_package(upstream_id)
-    organisation = package.get("organization")
-    org_name = organisation.get("name", "") if isinstance(organisation, dict) else ""
-    formats = sorted(
-        {r["format"] for r in package.get("resources", []) if r.get("format")}
-    )
-    kinds = sorted({k for k in (_hdx_kind_for_format(f) for f in formats) if k})
-    return {
-        "hdx_id": upstream_id,
-        "org": org_name,
-        "title": package.get("title", ""),
-        "themes": kinds or ["unknown"],
-        "formats": formats,
-        "resource_filter": "",
-        "output_kinds": kinds or ["tabular"],
     }
 
 
@@ -846,10 +789,11 @@ def _emit_ecmwf(catalog: Any, upstream_id: str, **opts: Any) -> dict[str, Any]:
 
 
 _EMITTERS: dict[str, Callable[..., dict[str, Any]]] = {
+    # Discovered handlers first; in-core literals are the migration remainder.
+    **dispatch_table("emitter"),
     "ecmwf": _emit_ecmwf,
     "earthdata": _emit_earthdata,
     "usgs_water": _emit_usgs_water,
-    "hdx": _emit_hdx,
     "eumetsat": _emit_eumetsat,
     "gee": _emit_gee,
     "jaxa": _emit_jaxa,
@@ -945,14 +889,6 @@ def emit_stanza(
 
 #: Provider id -> the YAML block its curated rows live under.
 _STANZA_BLOCK: dict[str, str] = {"usgs_water": "parameters", **_BIODIVERSITY_BLOCKS}
-
-#: Provider id -> the opt name whose value names the per-family target file
-#: (sharded catalogs) when `--target` is not given explicitly.
-_DEFAULT_TARGET_OPT: dict[str, str] = {
-    "earthdata": "daac",
-    "eumetsat": "group",
-    "hdx": "group",
-}
 
 
 def _append_to_block(path: Path, block: str, key: str, row: dict[str, Any]) -> None:

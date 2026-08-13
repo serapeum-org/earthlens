@@ -35,6 +35,9 @@ from earthlens.cli.refresh import (
     _get_text as get_text,
 )
 from earthlens.cli.refresh import (
+    _index_path as index_path,
+)
+from earthlens.cli.refresh import (
     _index_writer as index_writer,
 )
 from earthlens.cli.refresh import (
@@ -54,6 +57,7 @@ __all__ = [
     "flatten",
     "get_json",
     "get_text",
+    "index_path",
     "index_writer",
     "infer_dtype",
     "lint",

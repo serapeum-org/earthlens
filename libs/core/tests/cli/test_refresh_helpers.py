@@ -84,33 +84,6 @@ class TestRadarParse:
         assert "KABR" in data["stations"], "HOMR rows written"
 
 
-class TestHdxWriter:
-    """Tests for the merge-preserving gzipped HDX sidecar writer."""
-
-    def test_merge_preserves_existing_rows(self, tmp_path, monkeypatch):
-        """Surviving names keep their org/title; new names get a bare row."""
-        monkeypatch.setattr(
-            refresh_mod, "_index_path", lambda info: tmp_path / "x.yaml"
-        )
-        sidecar = tmp_path / "_available.json.gz"
-        with gzip.open(sidecar, "wt", encoding="utf-8") as handle:
-            json.dump({"datasets": {"keep": {"org": "o", "title": "t"}}}, handle)
-        path = refresh_mod._write_hdx(_info("hdx"), {"g": ["keep", "new"]})
-        with gzip.open(path, "rt", encoding="utf-8") as handle:
-            datasets = json.load(handle)["datasets"]
-        assert datasets["keep"] == {"org": "o", "title": "t"}, "existing row kept"
-        assert datasets["new"] == {"org": "", "title": ""}, "new row bare"
-
-    def test_no_sidecar_starts_fresh(self, tmp_path, monkeypatch):
-        """With no existing sidecar, every live name gets a fresh bare row."""
-        monkeypatch.setattr(
-            refresh_mod, "_index_path", lambda info: tmp_path / "x.yaml"
-        )
-        path = refresh_mod._write_hdx(_info("hdx"), {"g": ["a"]})
-        with gzip.open(path, "rt", encoding="utf-8") as handle:
-            assert "a" in json.load(handle)["datasets"], "new row created"
-
-
 class TestGeeCoverageBody:
     """Tests for the _gee_coverage classifier body + coverage_one error path."""
 

@@ -11,7 +11,6 @@ from earthlens.cli import _gee_hydrate as hydrate_mod
 from earthlens.cli import curate as curate_mod
 from earthlens.cli import datasets as datasets_mod
 from earthlens.cli import refresh as refresh_mod
-from earthlens.cli import stanza as stanza_mod
 from earthlens.cli.app import app
 from earthlens.cli.refresh import CoverageOutcome
 from earthlens.cli.table import build_table
@@ -418,20 +417,23 @@ class TestCurate:
         assert result.exit_code == 0, f"curate failed: {result.output}"
         assert "datasets:" in result.output and "code: '00060'" in result.output
 
-    def test_json_output(self, monkeypatch):
+    def test_json_output(self):
         """--json emits the seeded row object."""
-        monkeypatch.setattr(
-            stanza_mod,
-            "_get_json",
-            lambda url, **kw: {
-                "result": {"title": "P", "resources": [{"name": "a", "format": "CSV"}]}
-            },
-        )
         result = runner.invoke(
-            app, ["datasets", "curate", "hdx", "kontur-population", "--json"]
+            app,
+            [
+                "datasets",
+                "curate",
+                "eumetsat",
+                "EO:EUM:DAT:MSG:HRSEVIRI",
+                "--group",
+                "MSG",
+                "--minimal",
+                "--json",
+            ],
         )
         payload = json.loads(result.output)
-        assert payload["status"] == "ok" and payload["row"]["hdx_id"]
+        assert payload["status"] == "ok" and payload["row"]["collection_id"]
 
     def test_write_appends_to_catalog(self, tmp_path, monkeypatch):
         """curate --write inserts the row into the (temp) catalog file."""

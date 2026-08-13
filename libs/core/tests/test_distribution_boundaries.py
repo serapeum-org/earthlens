@@ -1288,7 +1288,6 @@ class TestCliIsBackendAgnostic:
             "ghsl",
             "glaciers",
             "goes",
-            "hdx",
             "iucn",
             "jaxa",
             "mswep",
