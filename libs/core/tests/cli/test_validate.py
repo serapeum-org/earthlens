@@ -12,7 +12,6 @@ from earthlens.cli.validate import (
     ValidateResult,
     _live_ecmwf,
     _validate_nwp,
-    _validate_radar,
     _validate_tropycal,
     supported_providers,
     validate_one,
@@ -132,16 +131,6 @@ class TestValidateNwp:
 class TestStructuralLints:
     """Negative cases for the structural validators."""
 
-    def test_radar_out_of_range_coords_flagged(self):
-        """A station with an impossible latitude is flagged."""
-        catalog = SimpleNamespace(
-            datasets={
-                "KXXX": SimpleNamespace(name="X", latitude=999.0, longitude=0.0),
-            }
-        )
-        _checked, issues = _validate_radar(catalog)
-        assert any("latitude" in i for i in issues), "bad latitude flagged"
-
     def test_tropycal_unknown_basin_and_bad_source_flagged(self):
         """A non-SDK basin and an unsupported (basin, source) pair are flagged."""
         catalog = SimpleNamespace(
@@ -176,24 +165,6 @@ class TestLiveValidators:
         """openeo only appears in the supported set under live."""
         assert "openeo" not in supported_providers()
         assert "openeo" in supported_providers(live=True)
-
-    def test_radar_live_flags_empty_feed(self, monkeypatch):
-        """An unreachable / empty NEXRAD chunk feed is flagged live."""
-        monkeypatch.setattr(validate_mod, "_radar_feed_stations", lambda: set())
-        result = validate_one(_info("radar"), live=True)
-        assert result.status == "ok" and result.issues, "empty feed -> issue"
-
-    def test_radar_live_clean_when_streaming(self, monkeypatch):
-        """A feed containing a catalogued station clears the radar live check."""
-        catalog = next(b for b in list_backends() if b.provider == "radar")
-        from earthlens.cli.adapter import load_catalog
-
-        station = next(iter(load_catalog(catalog).datasets))
-        monkeypatch.setattr(
-            validate_mod, "_radar_feed_stations", lambda: {station, "KZZZ"}
-        )
-        result = validate_one(_info("radar"), live=True)
-        assert result.issues == [], "streaming station -> clean"
 
     def test_nwp_live_flags_non_200_cycle(self, monkeypatch):
         """A direct-https model whose latest cycle does not HEAD 200 is flagged."""
@@ -290,32 +261,6 @@ class TestLivePrimitives:
             ),
         )
         assert _http_head("https://x") == 204, "status code returned"
-
-    def test_radar_feed_stations_paginates(self, monkeypatch):
-        """_radar_feed_stations follows the continuation token across pages."""
-        import earthlens.radar.backend as radar_backend
-        from earthlens.cli.validate import _radar_feed_stations
-
-        pages = [
-            {
-                "CommonPrefixes": [{"Prefix": "KAAA/"}],
-                "IsTruncated": True,
-                "NextContinuationToken": "t",
-            },
-            {"CommonPrefixes": [{"Prefix": "KBBB/"}], "IsTruncated": False},
-        ]
-
-        class FakeClient:
-            def __init__(self):
-                self.calls = 0
-
-            def list_objects_v2(self, **kw):
-                page = pages[self.calls]
-                self.calls += 1
-                return page
-
-        monkeypatch.setattr(radar_backend, "_s3_client", lambda region: FakeClient())
-        assert _radar_feed_stations() == {"KAAA", "KBBB"}, "both pages collected"
 
 
 class TestLiveValidatorBranches:

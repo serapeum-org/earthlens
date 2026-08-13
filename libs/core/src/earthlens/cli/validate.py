@@ -123,23 +123,6 @@ def _require(key: str, record: Any, fields: tuple[str, ...]) -> list[str]:
     ]
 
 
-def _validate_radar(catalog: Any) -> tuple[int, list[str]]:
-    """Each radar station needs a name and in-range latitude / longitude."""
-
-    def check(key: str, record: Any) -> list[str]:
-        """Flag a station missing a name or with out-of-range coordinates."""
-        issues = _require(key, record, ("name",))
-        lat = getattr(record, "latitude", None)
-        lon = getattr(record, "longitude", None)
-        if not (isinstance(lat, (int, float)) and -90 <= lat <= 90):
-            issues.append(f"{key}: latitude {lat!r} out of range")
-        if not (isinstance(lon, (int, float)) and -180 <= lon <= 180):
-            issues.append(f"{key}: longitude {lon!r} out of range")
-        return issues
-
-    return _lint(catalog, check)
-
-
 #: tropycal's basin universe and which sources serve each (no `jtwc` source;
 #: `both` is HURDAT NA+EP, `all` is IBTrACS global). Ported from the retired
 #: `tools/tropycal/audit_tropycal_catalog.py`.
@@ -212,7 +195,6 @@ _VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("validator"),
     "nwp": _validate_nwp,
-    "radar": _validate_radar,
     "tropycal": _validate_tropycal,
     "chc": _validate_chc,
 }
@@ -229,62 +211,6 @@ def _http_head(url: str) -> int:
 
 
 #: CDSE openEO processes endpoint (public; pairs with the collections one).
-
-
-def _radar_feed_stations(region: str = "us-east-1") -> set[str]:
-    """Return the station ids currently present in the NEXRAD chunk feed.
-
-    Lists the top-level `{STATION}/` prefixes in the unsigned
-    `unidata-nexrad-level2-chunks` bucket (the real-time feed
-    `earthlens.radar` fetches from). Ported from the retired
-    `tools/radar/audit_radar_catalog.py`.
-
-    Args:
-        region: AWS region of the bucket.
-
-    Returns:
-        The set of station-id prefixes currently in the feed.
-    """
-    from earthlens.radar.backend import BUCKET, _s3_client
-
-    client = _s3_client(region)
-    stations: set[str] = set()
-    token: str | None = None
-    while True:
-        kwargs: dict[str, Any] = {"Bucket": BUCKET, "Delimiter": "/"}
-        if token:
-            kwargs["ContinuationToken"] = token
-        response = client.list_objects_v2(**kwargs)
-        stations.update(
-            prefix["Prefix"].rstrip("/")
-            for prefix in response.get("CommonPrefixes", [])
-        )
-        token = response.get("NextContinuationToken")
-        if not response.get("IsTruncated"):
-            break
-    return stations
-
-
-def _live_radar(catalog: Any) -> tuple[int, list[str]]:
-    """Confirm the real-time NEXRAD chunk feed is reachable and lines up.
-
-    Flags a hard failure (feed served nothing → unreachable / outage) or an
-    id-format mismatch (the feed is non-empty but no catalogued station is in
-    it). Per-station idleness is expected — the feed is a rolling ~1-2 h
-    buffer — so it is not flagged.
-    """
-    catalogued = set(catalog.datasets)
-    feed = _radar_feed_stations()
-    if not feed:
-        return len(catalogued), [
-            "NEXRAD chunk feed served no stations (unreachable / outage?)"
-        ]
-    if not (catalogued & feed):
-        return len(catalogued), [
-            "no catalogued station is in the live feed "
-            "(id format may not match the feed prefixes)"
-        ]
-    return len(catalogued), []
 
 
 def _nwp_latest_cycle(model: Any, hours_ago: int = 6) -> dt.datetime | None:
@@ -381,7 +307,6 @@ def _live_ecmwf(catalog: Any) -> tuple[int, list[str]]:
 _LIVE_VALIDATORS: dict[str, Callable[[Any], tuple[int, list[str]]]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("live_validator"),
-    "radar": _live_radar,
     "nwp": _live_nwp,
     "ecmwf": _live_ecmwf,
 }

@@ -166,31 +166,6 @@ class TestCoverageOne:
         assert data["counts"] == {"DONE": 2}
 
 
-_RADAR_TABLE = (
-    "NCDCID   ICAO  NAME            ST LAT      LON\n"
-    "-------- ----- --------------- -- -------- ---------\n"
-    "10000001 KABR  ABERDEEN        SD 45.4558  -98.4133\n"
-    "10000002 PAEC  NOME            AK 64.5114  -165.295\n"
-    "10000003 xx    BAD ROW         ZZ 0.0      0.0\n"
-)
-
-
-class TestRadarRefresher:
-    """Tests for the radar (NOAA HOMR) lister."""
-
-    def test_parses_icao_ids(self):
-        """Only four-letter alphabetic ICAO ids are parsed from the table."""
-        assert refresh_mod._radar_station_ids(_RADAR_TABLE) == ["KABR", "PAEC"]
-
-    def test_refresh_diffs_against_curated_stations(self, monkeypatch):
-        """radar has no available_* block, so live diffs vs curated stations."""
-        monkeypatch.setattr(refresh_mod, "_get_text", lambda url: _RADAR_TABLE)
-        outcome = refresh_one(_info("radar"))
-        assert outcome.status == "ok", "radar refresh ran"
-        assert outcome.live_count == 2, "two ICAO ids parsed"
-        assert outcome.bundled_count > 2, "diffed against the curated station set"
-
-
 class _FakeFTP:
     """A minimal in-memory FTP stand-in for the CHC walk test."""
 
@@ -397,25 +372,6 @@ class TestRedact:
         assert _redact("nothing to hide", "") == "nothing to hide"
 
 
-class TestRadarMissingColumns:
-    """_radar_station_rows degrades cleanly when a required column is absent."""
-
-    def test_missing_name_column_returns_empty(self):
-        """A HOMR header without NAME yields {} instead of raising KeyError."""
-        text = "ICAO  LAT      LON\n----- -------- --------\nKABR  45.0     -98.0"
-        assert refresh_mod._radar_station_rows(text) == {}
-
-    def test_absent_st_column_defaults_state_blank(self):
-        """A table with the required columns but no ST keeps the row, state=''."""
-        text = (
-            "ICAO  NAME       LAT      LON\n"
-            "----- ---------- -------- --------\n"
-            "KABR  ABERDEEN   45.0     -98.0"
-        )
-        rows = refresh_mod._radar_station_rows(text)
-        assert rows["KABR"]["state"] == "", "absent ST column -> empty state"
-
-
 def _catalog_copy(provider, tmp_path, monkeypatch):
     """Copy a provider's catalog (dir or single file) and repoint CATALOG_PATH."""
     info = _info(provider)
@@ -450,23 +406,6 @@ class TestIndexWriters:
         after = sorted(load_catalog(info).available_datasets)
         assert after == before, f"{provider} index drifted on round-trip"
         assert path.endswith("_index.yaml"), "wrote the sharded index file"
-
-    def test_radar_regenerates_stations_block(self, tmp_path, monkeypatch):
-        """radar --write re-parses HOMR into the full curated stations: block."""
-        info, module, dst = _catalog_copy("radar", tmp_path, monkeypatch)
-        homr = (
-            "NCDCID   ICAO  NAME            ST LAT      LON\n"
-            "-------- ----- --------------- -- -------- ---------\n"
-            "10000001 KABR  ABERDEEN        SD 45.4558  -98.4133\n"
-            "10000002 PAEC  NOME            AK 64.5114  -165.295\n"
-        )
-        monkeypatch.setattr(refresh_mod, "_get_text", lambda url: homr)
-        refresh_mod._WRITERS["radar"](info, {"radar": []})
-        module.clear_catalog_cache()
-        catalog = load_catalog(info)
-        assert sorted(catalog.datasets) == ["KABR", "PAEC"], "stations regenerated"
-        assert catalog.datasets["KABR"].name == "Aberdeen", "row fields parsed"
-        assert catalog.datasets["KABR"].latitude == 45.4558, "latitude parsed"
 
 
 class TestComputedIndexWriters:

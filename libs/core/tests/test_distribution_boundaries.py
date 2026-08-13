@@ -1274,7 +1274,6 @@ class TestCliIsBackendAgnostic:
             "ecmwf",
             "nwp",
             "openaq",
-            "radar",
             "tropycal",
         }
     )
@@ -1284,7 +1283,6 @@ class TestCliIsBackendAgnostic:
     PENDING_IMPORTS = frozenset(
         {
             "ecmwf",
-            "radar",
         }
     )
 

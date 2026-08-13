@@ -21,6 +21,12 @@ CLI_TOOLING: dict[str, dict[str, str]] = {
     "mswep": {"validator": "earthlens.mswep.cli:validator"},
     "nrel": {"validator": "earthlens.nrel.cli:validator"},
     "pvgis": {"validator": "earthlens.pvgis.cli:validator"},
+    "radar": {
+        "refresher": "earthlens.radar.cli:refresher",
+        "writer": "earthlens.radar.cli:writer",
+        "validator": "earthlens.radar.cli:validator",
+        "live_validator": "earthlens.radar.cli:live_validator",
+    },
     "radklim": {"validator": "earthlens.radklim.cli:validator"},
     "s3": {
         "refresher": "earthlens.s3.cli:refresher",

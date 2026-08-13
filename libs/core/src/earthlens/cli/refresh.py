@@ -387,117 +387,6 @@ def _get_text(url: str) -> str:
     return response.text
 
 
-#: NOAA HOMR registry of every WSR-88D / NEXRAD site (public, fixed-width).
-_RADAR_STATIONS_URL = "https://www.ncei.noaa.gov/access/homr/file/nexrad-stations.txt"
-
-
-def _radar_column_spans(separator: str) -> list[tuple[int, int]]:
-    """Return one `(start, end)` slice per dash-run column in the rule line."""
-    spans: list[tuple[int, int]] = []
-    start: int | None = None
-    for index, char in enumerate(separator):
-        if char == "-" and start is None:
-            start = index
-        elif char != "-" and start is not None:
-            spans.append((start, index))
-            start = None
-    if start is not None:
-        spans.append((start, len(separator)))
-    return spans
-
-
-def _radar_station_rows(text: str) -> dict[str, dict[str, Any]]:
-    """Parse the HOMR `nexrad-stations.txt` body into full station rows.
-
-    The file is a fixed-width table: a header row, a row of dash runs
-    marking each column's span, then one row per site. Keeps the four-letter
-    alphabetic ICAO sites with in-range coordinates — the shape of the
-    catalog's `stations:` block. Returns an empty mapping (rather than
-    raising) when the table is too short or its header lacks any of the
-    required `ICAO` / `NAME` / `LAT` / `LON` columns.
-
-    Args:
-        text: The full `nexrad-stations.txt` body.
-
-    Returns:
-        Mapping of ICAO id to `{name, latitude, longitude, state}`, sorted
-        (`state` is `""` when the table carries no `ST` column).
-    """
-    lines = text.splitlines()
-    if len(lines) < 3:
-        return {}
-    spans = _radar_column_spans(lines[1])
-    columns = {lines[0][s:e].strip(): (s, e) for s, e in spans}
-    # ICAO / NAME / LAT / LON are read unconditionally below; bail cleanly if
-    # the upstream table ever drops one rather than raising a KeyError.
-    if not {"ICAO", "NAME", "LAT", "LON"} <= set(columns):
-        return {}
-
-    def cell(row: str, name: str) -> str:
-        """Return the stripped value of the fixed-width `name` column in `row`."""
-        start, end = columns[name]
-        return row[start:end].strip()
-
-    rows: dict[str, dict[str, Any]] = {}
-    for row in lines[2:]:
-        icao = cell(row, "ICAO")
-        if len(icao) != 4 or not icao.isalpha():
-            continue
-        try:
-            lat = round(float(cell(row, "LAT")), 4)
-            lon = round(float(cell(row, "LON")), 4)
-        except (ValueError, KeyError):
-            continue
-        if not (-90 <= lat <= 90 and -180 <= lon <= 180):
-            continue
-        rows[icao] = {
-            "name": cell(row, "NAME").title(),
-            "latitude": lat,
-            "longitude": lon,
-            "state": cell(row, "ST") if "ST" in columns else "",
-        }
-    return dict(sorted(rows.items()))
-
-
-def _radar_station_ids(text: str) -> list[str]:
-    """Return the sorted ICAO ids from the HOMR table (id column only)."""
-    return sorted(_radar_station_rows(text))
-
-
-def _radar_grouped(catalog: Any) -> dict[str, list[str]]:
-    """List every live NEXRAD ICAO id from the public NOAA HOMR registry.
-
-    Args:
-        catalog: The loaded radar `Catalog` (unused; the registry is fixed).
-
-    Returns:
-        A single-group mapping `{"radar": [sorted ICAO ids]}`.
-    """
-    return {"radar": _radar_station_ids(_get_text(_RADAR_STATIONS_URL))}
-
-
-def _write_radar(info: BackendInfo, grouped: dict[str, list[str]]) -> str:
-    """Regenerate radar's curated `stations:` block from NOAA HOMR.
-
-    Unlike the `available_*` writers, this rewrites the *curated* station
-    registry itself — re-parsing the HOMR table into full `{name, latitude,
-    longitude, state}` rows (the radar catalog has no separate index; its
-    `stations:` map is the catalog).
-
-    Args:
-        info: The radar backend.
-        grouped: The live id fetch (unused; the full table is re-fetched).
-
-    Returns:
-        The path of the rewritten catalog file.
-    """
-    path = _index_path(info)
-    _replace_index_block(
-        path, "stations", _radar_station_rows(_get_text(_RADAR_STATIONS_URL))
-    )
-    return str(path)
-
-
 #: FIRMS data-availability listing of every served sensor (needs a MAP_KEY).
 #: CHC anonymous-FTP host and the products root walked for coverage.
 _CHC_FTP_HOST = "data.chc.ucsb.edu"
@@ -626,7 +515,6 @@ _REFRESHERS: dict[str, Callable[[Any], dict[str, list[str]]]] = {
     **dispatch_table("refresher"),
     "ecmwf": _ecmwf_grouped,
     "openaq": _openaq_grouped,
-    "radar": _radar_grouped,
     "chc": _chc_grouped,
 }
 
@@ -639,7 +527,6 @@ _WRITERS: dict[str, Callable[[BackendInfo, dict[str, list[str]]], str]] = {
     # Discovered handlers first; in-core literals are the migration remainder.
     **dispatch_table("writer"),
     "ecmwf": _index_writer("available_datasets", grouped=True),
-    "radar": _write_radar,
     "openaq": _write_openaq,
 }
 
