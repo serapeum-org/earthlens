@@ -1,4 +1,4 @@
-"""Unit tests for `earthlens.cli._gee_hydrate` (Earth Engine mocked)."""
+"""Unit tests for `earthlens.gee._hydrate` (Earth Engine mocked)."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
-from earthlens.cli import _gee_hydrate as hydrate_mod
-from earthlens.cli._gee_hydrate import (
+from earthlens.gee import _hydrate as hydrate_mod
+from earthlens.gee._hydrate import (
     _band_records,
     _configure_ee,
     _date_window,

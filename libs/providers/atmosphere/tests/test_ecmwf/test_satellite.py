@@ -152,7 +152,7 @@ class TestSatelliteHydrationSanity:
         (`lat_bnds`, `nobs`, `SZA`) or a coordinate unit must never survive as a
         hydrated `nc_variable`.
         """
-        from earthlens.cli._ecmwf_hydrate import _is_auxiliary
+        from earthlens.ecmwf._hydrate import _is_auxiliary
 
         coordinate_units = {
             "degrees_north",

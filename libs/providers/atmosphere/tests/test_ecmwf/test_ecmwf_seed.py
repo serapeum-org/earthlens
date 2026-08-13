@@ -1,4 +1,4 @@
-"""Unit tests for `earthlens.cli._ecmwf_seed` (form.json fetch mocked)."""
+"""Unit tests for `earthlens.ecmwf._seed` (form.json fetch mocked)."""
 
 from __future__ import annotations
 
@@ -7,9 +7,9 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
-from earthlens.cli import _ecmwf_seed as seed_mod
-from earthlens.cli._ecmwf_seed import bulk_seed_uncurated
 from earthlens.cli.stanza import StanzaResult
+from earthlens.ecmwf import _seed as seed_mod
+from earthlens.ecmwf._seed import bulk_seed_uncurated
 
 pytestmark = pytest.mark.cli
 

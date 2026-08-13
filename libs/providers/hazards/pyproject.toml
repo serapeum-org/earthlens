@@ -66,6 +66,11 @@ osm-pbf = ["pyrosm >=0.11.0", "osmium >=4.3.1"]
 [project.entry-points."earthlens.backends"]
 hazards = "earthlens._hazards:BACKENDS"
 
+# This distribution's slice of the CLI catalog-tooling table (refresh / audit /
+# probe / validate handlers), merged by earthlens._cli_tooling.
+[project.entry-points."earthlens.cli"]
+hazards = "earthlens._hazards_cli:CLI_TOOLING"
+
 [project.urls]
 Homepage = "https://github.com/serapeum-org/earthlens"
 

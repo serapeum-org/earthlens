@@ -46,6 +46,9 @@ worldpop = ["worldpoppy >=0.4", "py7zr >=0.20"]
 [project.entry-points."earthlens.backends"]
 land = "earthlens._land:BACKENDS"
 
+[project.entry-points."earthlens.cli"]
+land = "earthlens._land_cli:CLI_TOOLING"
+
 [project.urls]
 Homepage = "https://github.com/serapeum-org/earthlens"
 

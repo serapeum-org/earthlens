@@ -53,6 +53,10 @@ mswep = ["google-api-python-client >=2.0", "google-auth >=2.0"]
 [project.entry-points."earthlens.backends"]
 atmosphere = "earthlens._atmosphere:BACKENDS"
 
+# This distribution's slice of the catalog-tooling (refresh/curate/validate) table.
+[project.entry-points."earthlens.cli"]
+atmosphere = "earthlens._atmosphere_cli:CLI_TOOLING"
+
 [project.urls]
 Homepage = "https://github.com/serapeum-org/earthlens"
 

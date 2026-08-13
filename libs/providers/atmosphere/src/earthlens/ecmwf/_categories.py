@@ -64,7 +64,7 @@ def categorise_dataset(dataset_id: str) -> str:
         - An ERA5 id routes to the `era5` shard:
 
             ```python
-            >>> from earthlens.cli._ecmwf_categories import categorise_dataset
+            >>> from earthlens.ecmwf._categories import categorise_dataset
             >>> categorise_dataset("reanalysis-era5-single-levels")
             'era5'
 
@@ -72,7 +72,7 @@ def categorise_dataset(dataset_id: str) -> str:
         - A CAMS id routes to the `ads` shard:
 
             ```python
-            >>> from earthlens.cli._ecmwf_categories import categorise_dataset
+            >>> from earthlens.ecmwf._categories import categorise_dataset
             >>> categorise_dataset("cams-global-reanalysis-eac4")
             'ads'
 
@@ -80,7 +80,7 @@ def categorise_dataset(dataset_id: str) -> str:
         - An unrecognised id falls through to `other`:
 
             ```python
-            >>> from earthlens.cli._ecmwf_categories import categorise_dataset
+            >>> from earthlens.ecmwf._categories import categorise_dataset
             >>> categorise_dataset("reanalysis-oras5")
             'other'
 

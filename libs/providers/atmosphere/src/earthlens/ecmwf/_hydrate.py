@@ -109,7 +109,7 @@ def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
     Returns:
         Mapping of NetCDF short name to `{long_name, units}`.
     """
-    from earthlens.cli.curate import _ecmwf_deep_sample
+    from earthlens.ecmwf.cli import _ecmwf_deep_sample
 
     return _ecmwf_deep_sample(dataset_id)
 
