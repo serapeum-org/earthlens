@@ -28,6 +28,11 @@ on:
       - 'pyproject.toml'
       - '.github/workflows/tests-e2e-hazards.yml'
       - '.github/workflows/tests-e2e-reusable.yml'
+      # A markdown-only change (e.g. a provider README) matches libs/** above
+      # but cannot affect an e2e result, so exclude it — a code+docs change
+      # still matches a non-md path and runs. (paths-ignore can't combine with
+      # paths, hence the ! negation.)
+      - '!**/*.md'
   workflow_dispatch:
 
 jobs:
