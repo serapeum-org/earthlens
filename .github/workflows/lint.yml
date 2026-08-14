@@ -15,8 +15,16 @@ on:
     branches: [main]
   pull_request:
 
+# A PR supersedes its own in-flight lint run (group keyed on the PR ref); a push
+# to `main` gets a unique group per run (keyed on run_id) so no main run cancels
+# another. `cancel-in-progress: false` alone is not enough: GitHub cancels any
+# *pending* run in a shared group when a newer one queues, so a shared
+# `github.ref` group would drop the middle of three quick merges, leaving that
+# commit with no lint result. Mirrors tests.yml. See that file for the full note.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: >-
+    ${{ github.workflow }}-${{ github.event_name == 'pull_request'
+    && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
