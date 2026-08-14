@@ -11907,7 +11907,7 @@
   <span class="md-ellipsis">
     
   
-    Showcase — the GERD reservoir filling on the Blue Nile (2020 → 2024)
+    The Grand Ethiopian Renaissance Dam filling, 2013 -&gt; 2025
   
 
     
@@ -24427,7 +24427,7 @@ for d in DATES:
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="read-the-passes-as-a-collection">Read the passes as a collection<a class="anchor-link" href="#read-the-passes-as-a-collection">¶</a></h3><p><code>DatasetCollection.read_multiple_files()</code> loads the whole <code>pass_dir</code> folder into a
+<h3 id="read-the-passes-as-a-collection">Read the passes as a collection<a class="anchor-link" href="#read-the-passes-as-a-collection">¶</a></h3><p><code>DatasetCollection.from_files()</code> loads the whole <code>pass_dir</code> folder into a
 single collection that pyramids can plot and animate.</p>
 </div>
 </div>
@@ -24451,10 +24451,10 @@ single collection that pyramids can plot and animate.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dc</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_multiple_files</span><span class="p">(</span><span class="n">pass_dir</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">if</span> <span class="n">labels</span> <span class="k">else</span> <span class="kc">None</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dc</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">(</span><span class="n">pass_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">labels</span> <span class="k">else</span> <span class="kc">None</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">vv</span><span class="p">)</span><span class="si">}</span><span class="s2"> passes:"</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">dc = DatasetCollection.read_multiple_files(pass_dir, date=False) if labels else None
+<div class="clipboard-copy-txt" id="cell-6">dc = DatasetCollection.from_files(pass_dir) if labels else None
 print(f"{len(vv)} passes:", labels)</div>
 </div>
 </div>

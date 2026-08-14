@@ -11905,7 +11905,7 @@
   <span class="md-ellipsis">
     
   
-    Showcase — the GERD reservoir filling on the Blue Nile (2020 → 2024)
+    The Grand Ethiopian Renaissance Dam filling, 2013 -&gt; 2025
   
 
     
@@ -23925,7 +23925,7 @@ len(frame_paths)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="build-the-animation">Build the animation<a class="anchor-link" href="#build-the-animation">¶</a></h2><p><code>pyramids</code> renders the true colour for us: <code>Dataset.plot(rgb=[0, 1, 2], surface_reflectance=...)</code>
+<h2 id="build-the-animation">Build the animation<a class="anchor-link" href="#build-the-animation">¶</a></h2><p><code>pyramids</code> renders the true colour for us: <code>Dataset.plot(rgb_options={"rgb": [0, 1, 2], "surface_reflectance": ...})</code>
 composites the red/green/blue bands and stretches the reflectance — no hand-rolled band maths. We drive
 a <code>matplotlib</code> animation that re-plots each daily <code>Dataset</code> into the same axis and stamps the date, then
 save it as an <strong>animated GIF</strong> and embed it inline. A GIF plays in any viewer — Jupyter, VS Code,
