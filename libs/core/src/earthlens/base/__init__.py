@@ -38,8 +38,10 @@ from earthlens.base.http import (
     HttpRangeFile,
     RangeReadError,
     Timeout,
+    is_network_unreachable,
     prefer_ipv4,
     redact_url,
+    retry_login_forcing_ipv4,
 )
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.naming import safe_filename
@@ -77,6 +79,7 @@ __all__ = [
     "FluxableLeaf",
     "HttpClient",
     "HttpRangeFile",
+    "is_network_unreachable",
     "LazyClientMixin",
     "load_catalog",
     "load_providers",
@@ -93,6 +96,7 @@ __all__ = [
     "RemoteProduct",
     "resolve_aoi",
     "resolve_cadence",
+    "retry_login_forcing_ipv4",
     "S3Auth",
     "S3Credentials",
     "safe_filename",

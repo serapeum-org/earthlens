@@ -36,7 +36,7 @@ from pydantic import BaseModel, ConfigDict, SecretStr
 
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
-from earthlens.base.http import prefer_ipv4
+from earthlens.base.http import retry_login_forcing_ipv4
 from earthlens.earthdata.auth import EarthdataAuth, EarthdataCredentials
 
 if TYPE_CHECKING:
@@ -199,11 +199,9 @@ class ASFAuth(AbstractAuth[ASFCredentials]):
                 "Install the extra with `pip install earthlens[asf]`."
             ) from exc
 
-        # Both the EDL login below and the ASFSession token exchange reach the
-        # dual-stack urs.earthdata.nasa.gov; on a host with no IPv6 egress a
-        # resolved AAAA connects into a dead route (ENETUNREACH). Force IPv4
-        # before either dial. See issue #926.
-        prefer_ipv4()
+        # The EDL login below (via EarthdataAuth) is already detection-gated to
+        # retry over IPv4 on an ENETUNREACH from the dual-stack
+        # urs.earthdata.nasa.gov (issue #926).
         edl = EarthdataAuth(
             EarthdataCredentials(
                 token=self._creds.token,
@@ -224,7 +222,12 @@ class ASFAuth(AbstractAuth[ASFCredentials]):
             )
 
         self._edl = edl
-        self._session = asf_search.ASFSession().auth_with_token(token)
+        # The ASFSession token exchange dials the same dual-stack EDL host; on a
+        # host with no IPv6 egress its AAAA connects into a dead route. Retry
+        # over IPv4 only if that actually happens. See issue #926.
+        self._session = retry_login_forcing_ipv4(
+            lambda: asf_search.ASFSession().auth_with_token(token)
+        )
 
     @staticmethod
     def _extract_token(edl: EarthdataAuth) -> str | None:

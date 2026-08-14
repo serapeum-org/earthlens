@@ -46,7 +46,7 @@ from pydantic import BaseModel, ConfigDict, SecretStr
 
 from earthlens.base.auth import AbstractAuth
 from earthlens.base.auth import AuthenticationError as _BaseAuthenticationError
-from earthlens.base.http import prefer_ipv4
+from earthlens.base.http import retry_login_forcing_ipv4
 
 _REGISTER_URL = "https://urs.earthdata.nasa.gov"
 _DOCS_URL = "https://earthaccess.readthedocs.io"
@@ -335,9 +335,11 @@ class EarthdataAuth(AbstractAuth[EarthdataCredentials]):
             try:
                 # urs.earthdata.nasa.gov is dual-stack; on a host with no IPv6
                 # egress a resolved AAAA connects into a dead route
-                # (ENETUNREACH) with no IPv4 fallback. Force IPv4 first (#926).
-                prefer_ipv4()
-                auth = earthaccess.login(strategy=strategy, persist=True)
+                # (ENETUNREACH). Retry over IPv4 only if that actually happens
+                # (leaving IPv6-capable hosts untouched). See issue #926.
+                auth = retry_login_forcing_ipv4(
+                    lambda: earthaccess.login(strategy=strategy, persist=True)
+                )
             except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
                 raise AuthenticationError(
                     "Earthdata Login failed while contacting EDL "
