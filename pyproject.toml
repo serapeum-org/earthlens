@@ -1,6 +1,6 @@
 [project]
 name = "earthlens"
-version = "0.14.0"
+version = "0.15.0"
 description = "remote sensing package"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -30,12 +30,12 @@ requires-python = ">=3.11,<4"
 # five is conflict-free — the irreconcilable pins only meet if a user asks for
 # two conflicting extras at once, exactly as before the split.
 dependencies = [
-    "earthlens-core ==0.14.0",
-    "earthlens-atmosphere ==0.14.0",
-    "earthlens-ocean ==0.14.0",
-    "earthlens-imagery ==0.14.0",
-    "earthlens-land ==0.14.0",
-    "earthlens-hazards ==0.14.0",
+    "earthlens-core ==0.15.0",
+    "earthlens-atmosphere ==0.15.0",
+    "earthlens-ocean ==0.15.0",
+    "earthlens-imagery ==0.15.0",
+    "earthlens-land ==0.15.0",
+    "earthlens-hazards ==0.15.0",
 ]
 
 
@@ -124,8 +124,10 @@ dev = [
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
-    # runtime dep of earthlens itself.
-    "pyramids-gis[viz] >=0.46.0",
+    # runtime dep of earthlens itself. 0.52.0 adopts cleopatra 0.31's RgbBands
+    # in the ArrayGlyph constructor (pyramids #972) and its [viz] extra pulls
+    # cleopatra[tiles] >=0.31.0.
+    "pyramids-gis[viz] >=0.53.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -135,9 +137,12 @@ dev = [
     # object (the old kwarg still works as a deprecated alias, but the
     # showcase notebooks already migrated their existing text_loc= calls,
     # and the new dark-canvas notebook uses FrameLabel's color= directly
-    # rather than the also-deprecated label_color=) -- floor pinned to
-    # the latest of these, >=0.26.1.
-    "cleopatra >=0.26.1",
+    # rather than the also-deprecated label_color=) -- 0.30.0 completes the
+    # move to grouped/typed render-parameter objects (glyphs/styling/basemap
+    # subpackages), and 0.31.0 groups ArrayGlyph's loose rgb /
+    # surface_reflectance / cutoff / percentile constructor keywords into an
+    # RgbBands object (pyramids 0.52.0's plot path builds on this).
+    "cleopatra >=0.31.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.
@@ -168,8 +173,8 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.46.0",
-    "cleopatra >=0.26.1",
+    "pyramids-gis[viz] >=0.53.0",
+    "cleopatra >=0.31.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
 ]
