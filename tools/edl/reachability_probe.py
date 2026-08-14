@@ -128,7 +128,10 @@ def main() -> int:
     # Dial the host through requests once as the runner is configured, then
     # again with IPv6 forced off. urllib3 asks getaddrinfo for AF_UNSPEC only
     # while HAS_IPV6 is true; setting it false restricts resolution to A
-    # records, which is exactly the candidate production fix.
+    # records, which is exactly what earthlens.base.prefer_ipv4() does in
+    # production. The flip is duplicated inline here on purpose: the probe is a
+    # standalone diagnostic that must run even if the earthlens package import
+    # is broken, so it deliberately does not import prefer_ipv4().
     print("requests GET, default vs IPv4-forced:")
     _http_get(EDL_HOST, "default stack")
     urllib3.util.connection.HAS_IPV6 = False
