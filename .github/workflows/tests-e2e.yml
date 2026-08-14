@@ -2,13 +2,14 @@ name: Tests - E2E (live CDS + GEE + STAC)
 
 # Live end-to-end suites against external services (Copernicus Climate
 # Data Store; Google Earth Engine). These hit real servers / queue
-# server-side, so running on every push/PR would burn quota and slow
-# CI. So:
+# server-side, so running on every push to any branch or every PR would burn
+# quota and slow CI. So the triggers are deliberately scoped:
 #
 #   * push to `main`: every merge to the default branch runs the FULL live
 #     e2e suite, so what actually landed is validated end-to-end (the
 #     per-provider `tests-e2e-<theme>.yml` gates only run the affected lane on
-#     a PR; this is the complete post-merge check).
+#     a PR; this is the complete post-merge check). Docs-/markdown-/CI-only
+#     merges are skipped via `paths-ignore` on the trigger below.
 #   * schedule: weekly on Sunday at 04:00 UTC
 #   * workflow_dispatch: manual trigger from the Actions tab
 #
