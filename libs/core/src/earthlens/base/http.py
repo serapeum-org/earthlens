@@ -322,8 +322,17 @@ def is_network_unreachable(exc: BaseException | None) -> bool:
     wrapped several layers deep — `requests.ConnectionError` around urllib3's
     `NewConnectionError` around the `OSError`. This walks the `__cause__` /
     `__context__` chain (guarding against cycles) and reports whether any link
-    is an `ENETUNREACH` `OSError`, falling back to the rendered message when
-    urllib3 embeds the errno as text rather than chaining the `OSError`.
+    is an `ENETUNREACH` `OSError`.
+
+    The `isinstance` / `errno` check is the precise signal and is
+    platform-correct (`errno.ENETUNREACH` resolves to the local value). It is
+    backed by a text fallback for the common case where urllib3 embeds the
+    errno in a `NewConnectionError` message rather than chaining the `OSError`;
+    that fallback matches the platform errno tag (`[Errno 101]` on the Linux CI
+    runners #926 targets) so an unrelated message that merely mentions an
+    unreachable network cannot trip the process-wide, irreversible IPv4 flip
+    downstream. The tag form is Unix-shaped and does not match a Windows
+    `WinError`, but a bare Windows `OSError` is still caught by the errno check.
 
     Args:
         exc: The exception to inspect, or `None`.
@@ -336,8 +345,7 @@ def is_network_unreachable(exc: BaseException | None) -> bool:
         seen.add(id(exc))
         if isinstance(exc, OSError) and exc.errno == errno.ENETUNREACH:
             return True
-        text = str(exc)
-        if "[Errno 101]" in text or "Network is unreachable" in text:
+        if f"[Errno {errno.ENETUNREACH}]" in str(exc):
             return True
         exc = exc.__cause__ or exc.__context__
     return False

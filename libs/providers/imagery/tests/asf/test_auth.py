@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import errno
+
 import pytest
 import requests
 
@@ -16,7 +18,7 @@ def _enetunreach_error() -> requests.ConnectionError:
     """A ConnectionError shaped like a real dead-IPv6-route failure."""
     return requests.ConnectionError(
         "HTTPSConnectionPool(host='urs.earthdata.nasa.gov', port=443): "
-        "(Caused by NewConnectionError('[Errno 101] Network is unreachable'))"
+        f"(Caused by NewConnectionError('[Errno {errno.ENETUNREACH}] Network is unreachable'))"
     )
 
 

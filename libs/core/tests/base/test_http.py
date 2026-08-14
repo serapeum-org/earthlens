@@ -1135,7 +1135,7 @@ def _enetunreach_connection_error() -> requests.ConnectionError:
     return requests.ConnectionError(
         "HTTPSConnectionPool(host='urs.earthdata.nasa.gov', port=443): Max "
         "retries exceeded (Caused by NewConnectionError('Failed to establish a "
-        "new connection: [Errno 101] Network is unreachable'))"
+        f"new connection: [Errno {errno.ENETUNREACH}] Network is unreachable'))"
     )
 
 
