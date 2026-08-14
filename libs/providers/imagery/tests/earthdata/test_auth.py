@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 import pytest
+import requests
 
 from earthlens.earthdata import (
     AuthenticationError,
@@ -221,3 +222,50 @@ class TestEarthdataAuth:
         """The context-manager form configures on enter."""
         with EarthdataAuth(EarthdataCredentials()) as auth:
             assert auth.is_authenticated() is True
+
+
+def _enetunreach_error() -> requests.ConnectionError:
+    """A ConnectionError shaped like a real dead-IPv6-route failure."""
+    return requests.ConnectionError(
+        "HTTPSConnectionPool(host='urs.earthdata.nasa.gov', port=443): "
+        "(Caused by NewConnectionError('[Errno 101] Network is unreachable'))"
+    )
+
+
+@pytest.fixture
+def has_ipv6():
+    """Reset urllib3's HAS_IPV6 to True and restore it after the test."""
+    import urllib3.util.connection as connection
+
+    saved = connection.HAS_IPV6
+    connection.HAS_IPV6 = True
+    try:
+        yield connection
+    finally:
+        connection.HAS_IPV6 = saved
+
+
+class TestForceIpv4OnDeadRoute:
+    """`configure` forces IPv4 only after an observed ENETUNREACH login."""
+
+    def test_a_dead_ipv6_route_forces_ipv4_and_retries(
+        self, fake_earthaccess, edl_env, has_ipv6
+    ) -> None:
+        """An ENETUNREACH login flips IPv6 off and retries the dial once."""
+        fake_earthaccess.login_raises = _enetunreach_error()
+        auth = EarthdataAuth(EarthdataCredentials())
+        with pytest.raises(AuthenticationError, match="EDL"):
+            auth.configure()
+        assert len(fake_earthaccess.login_calls) == 2
+        assert has_ipv6.HAS_IPV6 is False
+
+    def test_a_non_enetunreach_login_error_leaves_ipv6_enabled(
+        self, fake_earthaccess, edl_env, has_ipv6
+    ) -> None:
+        """A login failure that is not ENETUNREACH is not retried over IPv4."""
+        fake_earthaccess.login_raises = requests.ConnectionError("reset by peer")
+        auth = EarthdataAuth(EarthdataCredentials())
+        with pytest.raises(AuthenticationError):
+            auth.configure()
+        assert len(fake_earthaccess.login_calls) == 1
+        assert has_ipv6.HAS_IPV6 is True

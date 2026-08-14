@@ -3,12 +3,34 @@
 from __future__ import annotations
 
 import pytest
+import requests
 
 from earthlens.asf import (
     ASFAuth,
     ASFCredentials,
     AuthenticationError,
 )
+
+
+def _enetunreach_error() -> requests.ConnectionError:
+    """A ConnectionError shaped like a real dead-IPv6-route failure."""
+    return requests.ConnectionError(
+        "HTTPSConnectionPool(host='urs.earthdata.nasa.gov', port=443): "
+        "(Caused by NewConnectionError('[Errno 101] Network is unreachable'))"
+    )
+
+
+@pytest.fixture
+def has_ipv6():
+    """Reset urllib3's HAS_IPV6 to True and restore it after the test."""
+    import urllib3.util.connection as connection
+
+    saved = connection.HAS_IPV6
+    connection.HAS_IPV6 = True
+    try:
+        yield connection
+    finally:
+        connection.HAS_IPV6 = saved
 
 
 @pytest.mark.asf
@@ -99,3 +121,28 @@ def test_configure_raises_friendly_importerror_when_sdk_missing(
     auth = ASFAuth(ASFCredentials())
     with pytest.raises(ImportError, match=r"earthlens\[asf\]"):
         auth.configure()
+
+
+@pytest.mark.asf
+@pytest.mark.unit
+def test_asfsession_dead_ipv6_route_forces_ipv4_and_retries(
+    fake_asf_search, fake_earthdata_auth, has_ipv6
+) -> None:
+    """An ENETUNREACH on the ASFSession dial forces IPv4 and retries once."""
+    calls = {"n": 0}
+
+    class _FlakySession(fake_asf_search.ASFSession):
+        """An ASFSession whose first token exchange hits a dead IPv6 route."""
+
+        def auth_with_token(self, token: str):
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise _enetunreach_error()
+            return super().auth_with_token(token)
+
+    fake_asf_search.ASFSession = _FlakySession
+    auth = ASFAuth(ASFCredentials(token="EDL.HEAD.BODY"))
+    auth.configure()
+    assert auth.is_authenticated()
+    assert calls["n"] == 2
+    assert has_ipv6.HAS_IPV6 is False
