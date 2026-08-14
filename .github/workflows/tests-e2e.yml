@@ -176,7 +176,7 @@ jobs:
       # while the A record works (issue #926). Print the per-family connect and
       # a default-vs-IPv4-forced GET so a failing run confirms the cause and
       # shows whether forcing IPv4 would fix it. Never gates the job.
-      - name: Probe Earthdata Login reachability
+      - name: Probe Earthdata Login reachability (earthdata)
         continue-on-error: true
         run: uv run --locked python tools/edl/reachability_probe.py
 
@@ -238,7 +238,7 @@ jobs:
       # GDIS rides NASA Earthdata Cloud over the same EDL host as the earthdata
       # and asf lanes; it fails the same intermittent ENETUNREACH way (#926).
       # Probe the host before the login step. Never gates the job.
-      - name: Probe Earthdata Login reachability
+      - name: Probe Earthdata Login reachability (emdat/GDIS)
         continue-on-error: true
         run: uv run --locked python tools/edl/reachability_probe.py
 
@@ -384,7 +384,7 @@ jobs:
       # asf_search authenticates against the same EDL host as the earthdata
       # lane and fails the same intermittent ENETUNREACH way (#926). Probe it
       # before the tests. Never gates the job.
-      - name: Probe Earthdata Login reachability
+      - name: Probe Earthdata Login reachability (asf)
         continue-on-error: true
         run: uv run --locked python tools/edl/reachability_probe.py
 
