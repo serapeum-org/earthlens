@@ -5,6 +5,10 @@ name: Tests - E2E (live CDS + GEE + STAC)
 # server-side, so running on every push/PR would burn quota and slow
 # CI. So:
 #
+#   * push to `main`: every merge to the default branch runs the FULL live
+#     e2e suite, so what actually landed is validated end-to-end (the
+#     per-provider `tests-e2e-<theme>.yml` gates only run the affected lane on
+#     a PR; this is the complete post-merge check).
 #   * schedule: weekly on Sunday at 04:00 UTC
 #   * workflow_dispatch: manual trigger from the Actions tab
 #
@@ -16,9 +20,11 @@ permissions:
   contents: read
 
 # This workflow has no `pull_request` trigger, so the expression below is
-# always false and the block only SERIALISES: two dispatches on the same ref
-# queue instead of burning CDS quota twice over, which is what you want
-# against rate- and quota-limited services.
+# always false and the block only SERIALISES: two runs on the same ref (e.g.
+# back-to-back merges to `main`, or a merge overlapping the weekly cron) queue
+# instead of burning CDS quota twice over, which is what you want against rate-
+# and quota-limited services. Not cancelling a half-finished live run mid-flight
+# is the right call for this suite.
 #
 # The expression is kept rather than hard-coded `false` so the PR-cancel half
 # switches on by itself if a `pull_request` trigger is ever added - at which
@@ -29,6 +35,8 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: '0 4 * * 0'
   workflow_dispatch:
