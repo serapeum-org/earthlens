@@ -233,7 +233,7 @@ def _enetunreach_error() -> requests.ConnectionError:
     )
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def has_ipv6():
     """Reset urllib3's HAS_IPV6 to True and restore it after the test."""
     import urllib3.util.connection as connection
@@ -258,6 +258,26 @@ class TestForceIpv4OnDeadRoute:
         with pytest.raises(AuthenticationError, match="EDL"):
             auth.configure()
         assert len(fake_earthaccess.login_calls) == 2
+        assert has_ipv6.HAS_IPV6 is False
+
+    def test_a_dead_ipv6_route_recovers_over_ipv4(
+        self, fake_earthaccess, edl_env, has_ipv6
+    ) -> None:
+        """The IPv4 retry after an ENETUNREACH returns an authenticated handle."""
+        calls = {"n": 0}
+        original = fake_earthaccess.login
+
+        def flaky_login(**kwargs):
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise _enetunreach_error()
+            return original(**kwargs)
+
+        fake_earthaccess.login = flaky_login
+        auth = EarthdataAuth(EarthdataCredentials())
+        auth.configure()
+        assert auth.is_authenticated()
+        assert calls["n"] == 2
         assert has_ipv6.HAS_IPV6 is False
 
     def test_a_non_enetunreach_login_error_leaves_ipv6_enabled(

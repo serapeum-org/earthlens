@@ -483,21 +483,22 @@ def _enetunreach_error() -> requests.ConnectionError:
     )
 
 
+@pytest.fixture(autouse=True)
+def has_ipv6():
+    """Save/restore urllib3's HAS_IPV6 around every test so no flip leaks."""
+    import urllib3.util.connection as connection
+
+    saved = connection.HAS_IPV6
+    connection.HAS_IPV6 = True
+    try:
+        yield connection
+    finally:
+        connection.HAS_IPV6 = saved
+
+
 @pytest.mark.emdat
 class TestForceIpv4OnDeadRoute:
     """A dead IPv6 route forces IPv4 for the retry; other failures do not."""
-
-    @pytest.fixture
-    def has_ipv6(self):
-        """Reset urllib3's HAS_IPV6 to True and restore it after the test."""
-        import urllib3.util.connection as connection
-
-        saved = connection.HAS_IPV6
-        connection.HAS_IPV6 = True
-        try:
-            yield connection
-        finally:
-            connection.HAS_IPV6 = saved
 
     def test_enetunreach_forces_ipv4_and_retry_succeeds(
         self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path, has_ipv6

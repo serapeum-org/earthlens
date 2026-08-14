@@ -22,7 +22,7 @@ def _enetunreach_error() -> requests.ConnectionError:
     )
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def has_ipv6():
     """Reset urllib3's HAS_IPV6 to True and restore it after the test."""
     import urllib3.util.connection as connection
