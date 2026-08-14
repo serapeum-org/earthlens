@@ -19,12 +19,22 @@ name: Tests - E2E (live CDS + GEE + STAC)
 permissions:
   contents: read
 
-# This workflow has no `pull_request` trigger, so the expression below is
-# always false and the block only SERIALISES: two runs on the same ref (e.g.
-# back-to-back merges to `main`, or a merge overlapping the weekly cron) queue
-# instead of burning CDS quota twice over, which is what you want against rate-
-# and quota-limited services. Not cancelling a half-finished live run mid-flight
-# is the right call for this suite.
+# This workflow has no `pull_request` trigger, so the expression below is always
+# false: `cancel-in-progress: false` protects a live run that is already IN
+# PROGRESS, so an active suite is never cancelled mid-flight against the rate-
+# and quota-limited services — which is the point.
+#
+# It does NOT guarantee a run for every merge, though. All main pushes and the
+# weekly cron share one group (github.ref is `refs/heads/main` for both), and
+# GitHub cancels any *pending* run in a shared group when a newer one queues,
+# even with cancel-in-progress: false. So if merges pile up faster than a run
+# finishes (~20-30 min) — A in progress, B queued, C arrives — B is superseded
+# before it starts and that commit gets no e2e run. This is a deliberate
+# quota-first trade-off: serialise (never two full live runs at once) and, when
+# merges collide, run the latest main state rather than every intermediate; the
+# weekly cron backstops. To instead guarantee a run per merge, key the group on
+# github.run_id for non-PR events (as tests.yml does) — but that runs colliding
+# merges in PARALLEL and doubles the live-quota spend, which this suite avoids.
 #
 # The expression is kept rather than hard-coded `false` so the PR-cancel half
 # switches on by itself if a `pull_request` trigger is ever added - at which
