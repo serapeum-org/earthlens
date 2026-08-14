@@ -171,15 +171,6 @@ jobs:
           verify-lock: true
           version: "0.11.29"
 
-      # urs.earthdata.nasa.gov is dual-stack, but GitHub runners have no IPv6
-      # egress, so a resolved AAAA connects into a dead route (ENETUNREACH)
-      # while the A record works (issue #926). Print the per-family connect and
-      # a default-vs-IPv4-forced GET so a failing run confirms the cause and
-      # shows whether forcing IPv4 would fix it. Never gates the job.
-      - name: Probe Earthdata Login reachability (earthdata)
-        continue-on-error: true
-        run: uv run --locked python tools/edl/reachability_probe.py
-
       - name: Run live NASA Earthdata e2e tests
         # The Earthdata e2e test skips itself when these are unset, so
         # this job is harmless if the secrets are not configured yet.
@@ -234,13 +225,6 @@ jobs:
       - name: Run live EM-DAT Dataverse e2e tests
         run: |
           uv run --locked pytest -m "e2e and emdat and not gdis" -v
-
-      # GDIS rides NASA Earthdata Cloud over the same EDL host as the earthdata
-      # and asf lanes; it fails the same intermittent ENETUNREACH way (#926).
-      # Probe the host before the login step. Never gates the job.
-      - name: Probe Earthdata Login reachability (emdat/GDIS)
-        continue-on-error: true
-        run: uv run --locked python tools/edl/reachability_probe.py
 
       # GDIS rides NASA Earthdata Cloud, so it needs an Earthdata Login whose
       # account has also accepted the SEDAC data-use agreement. These tests are
@@ -380,13 +364,6 @@ jobs:
           install-groups: "groups: dev, extras: all"
           verify-lock: true
           version: "0.11.29"
-
-      # asf_search authenticates against the same EDL host as the earthdata
-      # lane and fails the same intermittent ENETUNREACH way (#926). Probe it
-      # before the tests. Never gates the job.
-      - name: Probe Earthdata Login reachability (asf)
-        continue-on-error: true
-        run: uv run --locked python tools/edl/reachability_probe.py
 
       - name: Run live ASF (InSAR) e2e tests
         # Anonymous search and stack run with no secrets; the authed
