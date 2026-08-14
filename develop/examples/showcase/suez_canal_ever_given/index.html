@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12082,7 +12082,7 @@
   <span class="md-ellipsis">
     
   
-    The Grand Ethiopian Renaissance Dam filling, 2013 -&gt; 2025
+    Showcase — the GERD reservoir filling on the Blue Nile (2020 → 2024)
   
 
     
@@ -23957,7 +23957,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="showcase-the-suez-canal-blockage-ever-given-march-2021">Showcase — the Suez Canal blockage (Ever Given, March 2021)<a class="anchor-link" href="#showcase-the-suez-canal-blockage-ever-given-march-2021">¶</a></h1><p>On <strong>23 March 2021</strong> the 400 m container ship <em>Ever Given</em> ran aground and wedged across the Suez Canal, halting one of the world's busiest shipping lanes for six days until it was refloated on 29 March. This notebook pulls a Sentinel-2 time series around the blockage and renders it entirely through <strong>pyramids' own plotting</strong> — reading the scenes off disk with <code>DatasetCollection.from_files()</code> and drawing each one in <strong>true colour</strong> with <code>Dataset.plot(rgb_options=...)</code>.</p>
+<h1 id="showcase-the-suez-canal-blockage-ever-given-march-2021">Showcase — the Suez Canal blockage (Ever Given, March 2021)<a class="anchor-link" href="#showcase-the-suez-canal-blockage-ever-given-march-2021">¶</a></h1><p>On <strong>23 March 2021</strong> the 400 m container ship <em>Ever Given</em> ran aground and wedged across the Suez Canal, halting one of the world's busiest shipping lanes for six days until it was refloated on 29 March. This notebook pulls a Sentinel-2 time series around the blockage and renders it entirely through <strong>pyramids' own plotting</strong> — reading the scenes off disk with <code>DatasetCollection.read_multiple_files()</code> and drawing each one in <strong>true colour</strong> with <code>Dataset.plot(rgb_options=...)</code>.</p>
 </div>
 </div>
 </div>
@@ -23970,7 +23970,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="what-this-notebook-does">What this notebook does<a class="anchor-link" href="#what-this-notebook-does">¶</a></h2><ol>
 <li><strong>Fetch</strong> a Sentinel-2 true-colour scene (<code>B4,B3,B2</code>) for six dates spanning the blockage, into one folder.</li>
-<li><strong>Read</strong> the folder as a collection with <code>DatasetCollection.from_files()</code>.</li>
+<li><strong>Read</strong> the folder as a collection with <code>DatasetCollection.read_multiple_files()</code>.</li>
 <li><strong>Compare</strong> before / during / after with <code>Dataset.plot(rgb_options=...)</code>.</li>
 <li><strong>Show the full true-colour progression</strong> across all six dates.</li>
 <li><strong>Animate</strong> the scenes as a real-colour GIF.</li>
@@ -24251,7 +24251,7 @@ print(f"{len(dates)} scenes:", dates)</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="read-the-folder-as-a-collection">Read the folder as a collection<a class="anchor-link" href="#read-the-folder-as-a-collection">¶</a></h3><p><code>DatasetCollection.from_files()</code> reads every GeoTIFF in <code>scene_dir</code> into one indexable collection (<code>date=False</code> keeps the on-disk order). This is the object every plotting cell below draws from.</p>
+<h3 id="read-the-folder-as-a-collection">Read the folder as a collection<a class="anchor-link" href="#read-the-folder-as-a-collection">¶</a></h3><p><code>DatasetCollection.read_multiple_files()</code> reads every GeoTIFF in <code>scene_dir</code> into one indexable collection (<code>date=False</code> keeps the on-disk order). This is the object every plotting cell below draws from.</p>
 </div>
 </div>
 </div>
@@ -24274,10 +24274,14 @@ print(f"{len(dates)} scenes:", dates)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dc</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">(</span><span class="n">scene_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">dates</span> <span class="k">else</span> <span class="kc">None</span>  <span class="c1"># read the folder</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">dc</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_multiple_files</span><span class="p">(</span><span class="n">scene_dir</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">if</span> <span class="n">dates</span> <span class="k">else</span> <span class="kc">None</span>
+<span class="p">)</span>  <span class="c1"># read the folder</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span><span class="si">}</span><span class="s2"> scenes loaded"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">dc = DatasetCollection.from_files(scene_dir) if dates else None  # read the folder
+<div class="clipboard-copy-txt" id="cell-5">dc = (
+    DatasetCollection.read_multiple_files(scene_dir, date=False) if dates else None
+)  # read the folder
 print(f"{len(dates)} scenes loaded")</div>
 </div>
 </div>
@@ -24491,7 +24495,7 @@ else:
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="recap">Recap<a class="anchor-link" href="#recap">¶</a></h2><p>The series is read from one folder with <code>DatasetCollection.from_files()</code>, every scene is drawn in true colour with <code>Dataset.plot(rgb_options=...)</code>, and the same scenes animate as a real-colour GIF (frames prepared by cleopatra's <code>prepare_array</code>).</p>
+<h2 id="recap">Recap<a class="anchor-link" href="#recap">¶</a></h2><p>The series is read from one folder with <code>DatasetCollection.read_multiple_files()</code>, every scene is drawn in true colour with <code>Dataset.plot(rgb_options=...)</code>, and the same scenes animate as a real-colour GIF (frames prepared by cleopatra's <code>prepare_array</code>).</p>
 <h3 id="try-it-yourself">Try it yourself<a class="anchor-link" href="#try-it-yourself">¶</a></h3><ul>
 <li>Change <code>DATES</code>/<code>AOI</code>, or add the NIR band for a false-colour view.</li>
 <li>See the <a href="../../reference/gee/introduction.md">GEE backend reference</a>.</li>
