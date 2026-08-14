@@ -374,7 +374,8 @@ def retry_login_forcing_ipv4(login: Callable[[], _LoginResult]) -> _LoginResult:
     """
     try:
         return login()
-    except Exception as exc:  # noqa: BLE001 - retried only for ENETUNREACH, else re-raised
+    except Exception as exc:  # noqa: BLE001
+        # Catch broadly so any ENETUNREACH shape is retried; all else re-raised.
         if not is_network_unreachable(exc):
             raise
         logger.warning(
