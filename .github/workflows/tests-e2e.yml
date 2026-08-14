@@ -47,6 +47,15 @@ concurrency:
 on:
   push:
     branches: [main]
+    # A merge that changes only docs / markdown / mkdocs config / CI workflow
+    # files cannot affect an e2e result, so it skips the full live suite (which
+    # burns rate/quota-limited services). `paths-ignore` skips only when EVERY
+    # changed path matches, so a mixed merge (docs + code) still runs.
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - 'mkdocs.yml'
+      - '.github/**'
   schedule:
     - cron: '0 4 * * 0'
   workflow_dispatch:
