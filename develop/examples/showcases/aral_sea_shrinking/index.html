@@ -11907,7 +11907,7 @@
   <span class="md-ellipsis">
     
   
-    Showcase — the GERD reservoir filling on the Blue Nile (2020 → 2024)
+    The Grand Ethiopian Renaissance Dam filling, 2013 -&gt; 2025
   
 
     
@@ -23832,13 +23832,12 @@ embeds the GIF. Earth Engine needs a service account, read from the <code>GEE_SE
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cleopatra.glyphs.gridded.array_glyph</span><span class="w"> </span><span class="kn">import</span> <span class="n">FrameLabel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset.collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetCollection</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
@@ -23849,13 +23848,12 @@ embeds the GIF. Earth Engine needs a service account, read from the <code>GEE_SE
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">ARAL</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">43.4</span><span class="p">,</span> <span class="mf">46.8</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">58.2</span><span class="p">,</span> <span class="mf">61.6</span><span class="p">])</span>  <span class="c1"># the whole Aral basin</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import base64
-import os
+<div class="clipboard-copy-txt" id="cell-1">import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from cleopatra.array_glyph import FrameLabel
-from IPython.display import HTML
+from cleopatra.glyphs.gridded.array_glyph import FrameLabel
+from IPython.display import Image, display
 from pyramids.dataset.collection import DatasetCollection
 
 from earthlens.core import EarthLens
@@ -23912,6 +23910,12 @@ true-colour bands <code>SR_B3</code> / <code>SR_B2</code> / <code>SR_B1</code>, 
         <span class="n">asset</span><span class="p">,</span> <span class="n">bands</span> <span class="o">=</span> <span class="s2">"LANDSAT/LE07/C02/T1_L2"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"SR_B3"</span><span class="p">,</span> <span class="s2">"SR_B2"</span><span class="p">,</span> <span class="s2">"SR_B1"</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">asset</span><span class="p">,</span> <span class="n">bands</span> <span class="o">=</span> <span class="s2">"LANDSAT/LC08/C02/T1_L2"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"SR_B4"</span><span class="p">,</span> <span class="s2">"SR_B3"</span><span class="p">,</span> <span class="s2">"SR_B2"</span><span class="p">]</span>
+    <span class="c1"># The per-year folder is the cache: reuse an already-downloaded year so a re-run</span>
+    <span class="c1"># only fetches the missing years, not the whole 38-year archive.</span>
+    <span class="n">cached</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">OUT</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">))</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.tif"</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">cached</span><span class="p">:</span>
+        <span class="n">frames</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">cached</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">continue</span>
     <span class="n">job</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
         <span class="n">data_source</span><span class="o">=</span><span class="s2">"gee"</span><span class="p">,</span>
         <span class="n">dataset</span><span class="o">=</span><span class="n">asset</span><span class="p">,</span>
@@ -23927,7 +23931,8 @@ true-colour bands <code>SR_B3</code> / <code>SR_B2</code> / <code>SR_B1</code>, 
     <span class="p">)</span>
     <span class="n">job</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">service_account</span><span class="o">=</span><span class="n">SERVICE_ACCOUNT</span><span class="p">,</span> <span class="n">service_key</span><span class="o">=</span><span class="n">SERVICE_KEY</span><span class="p">)</span>
     <span class="n">paths</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">progress_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">frames</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">paths</span><span class="p">:</span>
+        <span class="n">frames</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="o">=</span> <span class="n">paths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-2">frames = {}
@@ -23938,6 +23943,12 @@ for year in range(1986, 2024):
         asset, bands = "LANDSAT/LE07/C02/T1_L2", ["SR_B3", "SR_B2", "SR_B1"]
     else:
         asset, bands = "LANDSAT/LC08/C02/T1_L2", ["SR_B4", "SR_B3", "SR_B2"]
+    # The per-year folder is the cache: reuse an already-downloaded year so a re-run
+    # only fetches the missing years, not the whole 38-year archive.
+    cached = sorted((OUT / str(year)).glob("*.tif"))
+    if cached:
+        frames[year] = cached[0]
+        continue
     job = EarthLens(
         data_source="gee",
         dataset=asset,
@@ -23953,7 +23964,8 @@ for year in range(1986, 2024):
     )
     job.authenticate(service_account=SERVICE_ACCOUNT, service_key=SERVICE_KEY)
     paths = job.download(progress_bar=False)
-    frames[year] = paths[0]
+    if paths:
+        frames[year] = paths[0]
 len(frames)</div>
 </div>
 </div>
@@ -23968,7 +23980,7 @@ len(frames)</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="build-the-time-lapse">Build the time-lapse<a class="anchor-link" href="#build-the-time-lapse">¶</a></h2><p><code>pyramids</code> animates a stack of rasters natively — no hand-rolled frame loop. We load the yearly frames
-into a <strong><code>DatasetCollection</code></strong>, and <code>collection.plot(rgb=[0, 1, 2], surface_reflectance=…)</code> composites
+into a <strong><code>DatasetCollection</code></strong>, and <code>collection.plot(rgb_options={"rgb": [0, 1, 2], "surface_reflectance": …})</code> composites
 the red/green/blue Landsat bands <em>per year</em> into a true-colour time-lapse. <code>glyph.animate(...)</code> stamps
 each frame with its year — which we nudge up into the top margin so it reads like a title instead of
 sitting on the water — and <code>glyph.save_animation(...)</code> writes a larger, social-post-sized animated GIF
@@ -23996,55 +24008,61 @@ sitting on the water — and <code>glyph.save_animation(...)</code> writes a lar
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">timeline</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
-<span class="n">cube</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">read_multiple_files</span><span class="p">(</span>
-    <span class="p">[</span><span class="n">frames</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">timeline</span><span class="p">],</span> <span class="n">date</span><span class="o">=</span><span class="kc">False</span>
-<span class="p">)</span>
+<span class="n">cube</span> <span class="o">=</span> <span class="n">DatasetCollection</span><span class="o">.</span><span class="n">from_files</span><span class="p">([</span><span class="n">frames</span><span class="p">[</span><span class="n">year</span><span class="p">]</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">timeline</span><span class="p">])</span>
 
+<span class="c1"># full_bleed=True fills the whole square figure edge-to-edge -- no title bar and no</span>
+<span class="c1"># white margins top/bottom (the Aral basin AOI is ~square, so nothing is letterboxed).</span>
 <span class="n">glyph</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">26000</span><span class="p">},</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">)</span>
+    <span class="n">rgb_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"rgb"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">"surface_reflectance"</span><span class="p">:</span> <span class="mi">26000</span><span class="p">},</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+    <span class="n">full_bleed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
-
-<span class="c1"># Float the year label above the frame, anchored top-left, instead of overlaying</span>
-<span class="c1"># the basin, and enlarge it for a social post. An explicit FrameLabel location switches to</span>
-<span class="c1"># data coordinates and is already non-clipping; [0, -10] sits just above the</span>
-<span class="c1"># image's own top-left corner (baseline-anchored, so the glyphs render upward).</span>
+<span class="c1"># Place the year label INSIDE the frame (top-left): FrameLabel(location=None) anchors</span>
+<span class="c1"># it just inside that corner; white so it reads over both the dark water and pale bed.</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">animate</span><span class="p">(</span>
     <span class="n">timeline</span><span class="p">,</span>
-    <span class="n">interval</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
-    <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">]),</span>
-    <span class="n">cbar_label_size</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span>
+    <span class="n">interval</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">frame_label</span><span class="o">=</span><span class="n">FrameLabel</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">72</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#3a2a17"</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+    <span class="n">full_bleed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
-
 <span class="n">gif_path</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aral_timelapse.gif"</span>
+<span class="n">mp4_path</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aral_timelapse.mp4"</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">set_dpi</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span>  <span class="c1"># GIF renders at figsize*dpi -&gt; 1200 px</span>
+<span class="c1"># PyCharm animates GIFs but not HTML5 &lt;video&gt;: show the GIF inline, and also write a</span>
+<span class="c1"># 1200x1200 MP4 to out/ for a LinkedIn post.</span>
+<span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">gif_path</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 <span class="n">glyph</span><span class="o">.</span><span class="n">save_animation</span><span class="p">(</span>
-    <span class="nb">str</span><span class="p">(</span><span class="n">gif_path</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">3</span>
-<span class="p">)</span>  <span class="c1"># save_animation() also accepts a Path directly; str() here just keeps the call explicit</span>
+    <span class="nb">str</span><span class="p">(</span><span class="n">mp4_path</span><span class="p">),</span> <span class="n">fps</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">extra_args</span><span class="o">=</span><span class="p">[</span><span class="s2">"-vf"</span><span class="p">,</span> <span class="s2">"scale=1200:1200"</span><span class="p">]</span>
+<span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">timeline = sorted(frames)
-cube = DatasetCollection.read_multiple_files(
-    [frames[year] for year in timeline], date=False
-)
+cube = DatasetCollection.from_files([frames[year] for year in timeline])
 
+# full_bleed=True fills the whole square figure edge-to-edge -- no title bar and no
+# white margins top/bottom (the Aral basin AOI is ~square, so nothing is letterboxed).
 glyph = cube.plot(
-    rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 26000}, figsize=(8, 7.5)
+    rgb_options={"rgb": [0, 1, 2], "surface_reflectance": 26000},
+    figsize=(8, 8),
+    full_bleed=True,
 )
-
-# Float the year label above the frame, anchored top-left, instead of overlaying
-# the basin, and enlarge it for a social post. An explicit FrameLabel location switches to
-# data coordinates and is already non-clipping; [0, -10] sits just above the
-# image's own top-left corner (baseline-anchored, so the glyphs render upward).
+# Place the year label INSIDE the frame (top-left): FrameLabel(location=None) anchors
+# it just inside that corner; white so it reads over both the dark water and pale bed.
 glyph.animate(
     timeline,
-    interval=350,
-    frame_label=FrameLabel(location=[0, -10]),
-    cbar_label_size=22,
+    interval=300,
+    frame_label=FrameLabel(location=[20, 72], color="#3a2a17", size=30),
+    full_bleed=True,
 )
-
 gif_path = OUT / "aral_timelapse.gif"
+mp4_path = OUT / "aral_timelapse.mp4"
+glyph.fig.set_dpi(150)  # GIF renders at figsize*dpi -&gt; 1200 px
+# PyCharm animates GIFs but not HTML5 &lt;video&gt;: show the GIF inline, and also write a
+# 1200x1200 MP4 to out/ for a LinkedIn post.
+glyph.save_animation(str(gif_path), fps=4)
 glyph.save_animation(
-    str(gif_path), fps=3
-)  # save_animation() also accepts a Path directly; str() here just keeps the call explicit
+    str(mp4_path), fps=4, dpi=150, extra_args=["-vf", "scale=1200:1200"]
+)
 plt.close("all")</div>
 </div>
 </div>
@@ -24081,15 +24099,9 @@ plt.close("all")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">encoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">gif_path</span><span class="o">.</span><span class="n">read_bytes</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-<span class="n">HTML</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s1">'&lt;img src="data:image/gif;base64,</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s1">" alt="Aral Sea 1986-2023 true-colour time-lapse" /&gt;'</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">gif_path</span><span class="p">)))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">encoded = base64.b64encode(gif_path.read_bytes()).decode()
-HTML(
-    f'&lt;img src="data:image/gif;base64,{encoded}" alt="Aral Sea 1986-2023 true-colour time-lapse" /&gt;'
-)</div>
+<div class="clipboard-copy-txt" id="cell-4">display(Image(filename=str(gif_path)))</div>
 </div>
 </div>
 </div>

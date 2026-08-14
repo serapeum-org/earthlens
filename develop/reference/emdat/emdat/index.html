@@ -12615,7 +12615,7 @@
   <span class="md-ellipsis">
     
   
-    Showcase — the GERD reservoir filling on the Blue Nile (2020 → 2024)
+    The Grand Ethiopian Renaissance Dam filling, 2013 -&gt; 2025
   
 
     
@@ -28854,11 +28854,7 @@ success. The class is a context manager via
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="k">class</span><span class="w"> </span><span class="nc">EmdatAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">EmdatCredentials</span><span class="p">]):</span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="k">class</span><span class="w"> </span><span class="nc">EmdatAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">EmdatCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate the GDIS sources against NASA Earthdata Login.</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    Construction is side-effect-free; :meth:`configure` performs the login and</span>
@@ -29018,106 +29014,102 @@ success. The class is a context manager via
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            AuthenticationError: When the login is refused, or when every</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">                attempt failed to reach EDL.</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="c1"># urs.earthdata.nasa.gov is dual-stack; on a host with no IPv6 egress a</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="c1"># resolved AAAA connects into a dead route (ENETUNREACH) with no IPv4</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="c1"># fallback. Force IPv4 before the first dial. See issue #926.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="n">prefer_ipv4</span><span class="p">()</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_LOGIN_ATTEMPTS</span><span class="p">):</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>                <span class="k">return</span> <span class="n">earthaccess</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span> <span class="n">persist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>            <span class="k">except</span> <span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">Timeout</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">==</span> <span class="n">_LOGIN_ATTEMPTS</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>                    <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>                        <span class="sa">f</span><span class="s2">&quot;Earthdata Login could not reach EDL in &quot;</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_LOGIN_ATTEMPTS</span><span class="si">}</span><span class="s2"> attempts (strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">): &quot;</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. This is a network &quot;</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>                        <span class="s2">&quot;failure rather than a rejected credential; check &quot;</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>                        <span class="s2">&quot;connectivity to urs.earthdata.nasa.gov and retry.&quot;</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>                <span class="n">wait</span> <span class="o">=</span> <span class="n">_LOGIN_BACKOFF</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">attempt</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>                    <span class="sa">f</span><span class="s2">&quot;EMDAT: Earthdata Login could not reach EDL &quot;</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">); retrying in </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s &quot;</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">_LOGIN_ATTEMPTS</span><span class="si">}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                <span class="p">)</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - re-raised as AuthenticationError</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="s2">&quot;Earthdata Login failed while contacting EDL &quot;</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                    <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">): </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. Set &quot;</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>                    <span class="s2">&quot;EARTHDATA_USERNAME / EARTHDATA_PASSWORD, add a &#39;machine &quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>                    <span class="s2">&quot;urs.earthdata.nasa.gov&#39; entry to ~/.netrc, or register a &quot;</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>                    <span class="sa">f</span><span class="s2">&quot;free account at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;unreachable&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated` already</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        returns `True`. On the first call, resolves the login strategy, exports</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        any explicit credential to the environment variable `earthaccess`</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        reads, logs in with `persist=True`, and keeps the returned handle.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            ImportError: When `earthaccess` is not installed.</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            AuthenticationError: When `earthaccess.login` raises while</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">                contacting EDL, or returns an unauthenticated handle.</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="k">return</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="c1"># A CI workflow that maps an undefined secret onto an env var leaves it</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="c1"># as an empty string. `earthaccess` treats a present-but-empty</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="c1"># EARTHDATA_TOKEN as a real token and fails with &quot;Token does not</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="c1"># exist&quot;, masking valid username/password env vars. Drop any empty EDL</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="c1"># env var so the strategy resolves to the credential actually set.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">previous</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;EARTHDATA_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_USERNAME&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_PASSWORD&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                <span class="n">previous</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="c1"># Everything from here restores the environment on the way out, however</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="c1"># it leaves — a failed import and a failed login included.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                <span class="kn">import</span><span class="w"> </span><span class="nn">earthaccess</span>  <span class="c1"># lazy — only needed when actually logging in</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                    <span class="s2">&quot;the GDIS sources need `earthaccess`, which is not &quot;</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>                    <span class="s2">&quot;installed. Install the extra with `pip install &quot;</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>                    <span class="s2">&quot;earthlens[emdat]`. The `emdat:events` source needs no &quot;</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>                    <span class="s2">&quot;credentials and no extra.&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="n">strategy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_strategy</span><span class="p">()</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;environment&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>                <span class="c1"># `setdefault`, not `update`: the empty-var pop above already</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>                <span class="c1"># recorded the true prior value, and the exporter re-samples</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>                <span class="c1"># `os.environ` afterwards, so it would report `None` for a</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>                <span class="c1"># variable that was really `&quot;&quot;`.</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_explicit_credentials</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                    <span class="n">previous</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>            <span class="n">auth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_login</span><span class="p">(</span><span class="n">earthaccess</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="c1"># An explicit credential is put in the environment only because</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>            <span class="c1"># earthaccess has no argument for one. Leaving it there would make</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>            <span class="c1"># it process-global and inherit into any later subprocess.</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>            <span class="n">_restore_env</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">&quot;authenticated&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>                <span class="s2">&quot;Earthdata Login failed — no valid credentials resolved &quot;</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>                <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">). Set EARTHDATA_USERNAME / &quot;</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>                <span class="s2">&quot;EARTHDATA_PASSWORD, add a &#39;machine urs.earthdata.nasa.gov&#39; &quot;</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>                <span class="sa">f</span><span class="s2">&quot;entry to ~/.netrc, or register at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">. Note that &quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>                <span class="s2">&quot;an authenticated account must also accept the SEDAC data-use &quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>                <span class="sa">f</span><span class="s2">&quot;agreement once at </span><span class="si">{</span><span class="n">_EULA_URL</span><span class="si">}</span><span class="s2">, or the download returns 401.&quot;</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="p">)</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">auth</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_LOGIN_ATTEMPTS</span><span class="p">):</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                <span class="k">return</span> <span class="n">earthaccess</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span> <span class="n">persist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="k">except</span> <span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">Timeout</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">==</span> <span class="n">_LOGIN_ATTEMPTS</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>                    <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>                        <span class="sa">f</span><span class="s2">&quot;Earthdata Login could not reach EDL in &quot;</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_LOGIN_ATTEMPTS</span><span class="si">}</span><span class="s2"> attempts (strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">): &quot;</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. This is a network &quot;</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>                        <span class="s2">&quot;failure rather than a rejected credential; check &quot;</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>                        <span class="s2">&quot;connectivity to urs.earthdata.nasa.gov and retry.&quot;</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>                <span class="n">wait</span> <span class="o">=</span> <span class="n">_LOGIN_BACKOFF</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">attempt</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>                    <span class="sa">f</span><span class="s2">&quot;EMDAT: Earthdata Login could not reach EDL &quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">); retrying in </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s &quot;</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">_LOGIN_ATTEMPTS</span><span class="si">}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                <span class="p">)</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - re-raised as AuthenticationError</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>                <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                    <span class="s2">&quot;Earthdata Login failed while contacting EDL &quot;</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>                    <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">): </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. Set &quot;</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>                    <span class="s2">&quot;EARTHDATA_USERNAME / EARTHDATA_PASSWORD, add a &#39;machine &quot;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                    <span class="s2">&quot;urs.earthdata.nasa.gov&#39; entry to ~/.netrc, or register a &quot;</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="sa">f</span><span class="s2">&quot;free account at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;unreachable&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated` already</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        returns `True`. On the first call, resolves the login strategy, exports</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        any explicit credential to the environment variable `earthaccess`</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        reads, logs in with `persist=True`, and keeps the returned handle.</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            ImportError: When `earthaccess` is not installed.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            AuthenticationError: When `earthaccess.login` raises while</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                contacting EDL, or returns an unauthenticated handle.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="k">return</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="c1"># A CI workflow that maps an undefined secret onto an env var leaves it</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="c1"># as an empty string. `earthaccess` treats a present-but-empty</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="c1"># EARTHDATA_TOKEN as a real token and fails with &quot;Token does not</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="c1"># exist&quot;, masking valid username/password env vars. Drop any empty EDL</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="c1"># env var so the strategy resolves to the credential actually set.</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="n">previous</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;EARTHDATA_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_USERNAME&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_PASSWORD&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>                <span class="n">previous</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="c1"># Everything from here restores the environment on the way out, however</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="c1"># it leaves — a failed import and a failed login included.</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>                <span class="kn">import</span><span class="w"> </span><span class="nn">earthaccess</span>  <span class="c1"># lazy — only needed when actually logging in</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>                    <span class="s2">&quot;the GDIS sources need `earthaccess`, which is not &quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                    <span class="s2">&quot;installed. Install the extra with `pip install &quot;</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>                    <span class="s2">&quot;earthlens[emdat]`. The `emdat:events` source needs no &quot;</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>                    <span class="s2">&quot;credentials and no extra.&quot;</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="n">strategy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_strategy</span><span class="p">()</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;environment&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>                <span class="c1"># `setdefault`, not `update`: the empty-var pop above already</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>                <span class="c1"># recorded the true prior value, and the exporter re-samples</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>                <span class="c1"># `os.environ` afterwards, so it would report `None` for a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>                <span class="c1"># variable that was really `&quot;&quot;`.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_explicit_credentials</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>                    <span class="n">previous</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>            <span class="n">auth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_login</span><span class="p">(</span><span class="n">earthaccess</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>            <span class="c1"># An explicit credential is put in the environment only because</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="c1"># earthaccess has no argument for one. Leaving it there would make</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>            <span class="c1"># it process-global and inherit into any later subprocess.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>            <span class="n">_restore_env</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">&quot;authenticated&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>                <span class="s2">&quot;Earthdata Login failed — no valid credentials resolved &quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>                <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">). Set EARTHDATA_USERNAME / &quot;</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>                <span class="s2">&quot;EARTHDATA_PASSWORD, add a &#39;machine urs.earthdata.nasa.gov&#39; &quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>                <span class="sa">f</span><span class="s2">&quot;entry to ~/.netrc, or register at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">. Note that &quot;</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>                <span class="s2">&quot;an authenticated account must also accept the SEDAC data-use &quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>                <span class="sa">f</span><span class="s2">&quot;agreement once at </span><span class="si">{</span><span class="n">_EULA_URL</span><span class="si">}</span><span class="s2">, or the download returns 401.&quot;</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">auth</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29259,7 +29251,11 @@ contacting EDL, or returns an unauthenticated handle.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/emdat/auth.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-317">317</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
@@ -29321,77 +29317,73 @@ contacting EDL, or returns an unauthenticated handle.</p>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated` already</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    returns `True`. On the first call, resolves the login strategy, exports</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    any explicit credential to the environment variable `earthaccess`</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    reads, logs in with `persist=True`, and keeps the returned handle.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        ImportError: When `earthaccess` is not installed.</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        AuthenticationError: When `earthaccess.login` raises while</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            contacting EDL, or returns an unauthenticated handle.</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="k">return</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="c1"># A CI workflow that maps an undefined secret onto an env var leaves it</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="c1"># as an empty string. `earthaccess` treats a present-but-empty</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="c1"># EARTHDATA_TOKEN as a real token and fails with &quot;Token does not</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="c1"># exist&quot;, masking valid username/password env vars. Drop any empty EDL</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="c1"># env var so the strategy resolves to the credential actually set.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="n">previous</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;EARTHDATA_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_USERNAME&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_PASSWORD&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="n">previous</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="c1"># Everything from here restores the environment on the way out, however</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>    <span class="c1"># it leaves — a failed import and a failed login included.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">earthaccess</span>  <span class="c1"># lazy — only needed when actually logging in</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                <span class="s2">&quot;the GDIS sources need `earthaccess`, which is not &quot;</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>                <span class="s2">&quot;installed. Install the extra with `pip install &quot;</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>                <span class="s2">&quot;earthlens[emdat]`. The `emdat:events` source needs no &quot;</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>                <span class="s2">&quot;credentials and no extra.&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="n">strategy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_strategy</span><span class="p">()</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;environment&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>            <span class="c1"># `setdefault`, not `update`: the empty-var pop above already</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>            <span class="c1"># recorded the true prior value, and the exporter re-samples</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>            <span class="c1"># `os.environ` afterwards, so it would report `None` for a</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>            <span class="c1"># variable that was really `&quot;&quot;`.</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_explicit_credentials</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                <span class="n">previous</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="n">auth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_login</span><span class="p">(</span><span class="n">earthaccess</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="c1"># An explicit credential is put in the environment only because</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="c1"># earthaccess has no argument for one. Leaving it there would make</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="c1"># it process-global and inherit into any later subprocess.</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">_restore_env</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">&quot;authenticated&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="s2">&quot;Earthdata Login failed — no valid credentials resolved &quot;</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">). Set EARTHDATA_USERNAME / &quot;</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="s2">&quot;EARTHDATA_PASSWORD, add a &#39;machine urs.earthdata.nasa.gov&#39; &quot;</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="sa">f</span><span class="s2">&quot;entry to ~/.netrc, or register at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">. Note that &quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="s2">&quot;an authenticated account must also accept the SEDAC data-use &quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="sa">f</span><span class="s2">&quot;agreement once at </span><span class="si">{</span><span class="n">_EULA_URL</span><span class="si">}</span><span class="s2">, or the download returns 401.&quot;</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="p">)</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">auth</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated` already</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    returns `True`. On the first call, resolves the login strategy, exports</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    any explicit credential to the environment variable `earthaccess`</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    reads, logs in with `persist=True`, and keeps the returned handle.</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        ImportError: When `earthaccess` is not installed.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        AuthenticationError: When `earthaccess.login` raises while</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            contacting EDL, or returns an unauthenticated handle.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="c1"># A CI workflow that maps an undefined secret onto an env var leaves it</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="c1"># as an empty string. `earthaccess` treats a present-but-empty</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="c1"># EARTHDATA_TOKEN as a real token and fails with &quot;Token does not</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="c1"># exist&quot;, masking valid username/password env vars. Drop any empty EDL</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="c1"># env var so the strategy resolves to the credential actually set.</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="n">previous</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;EARTHDATA_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_USERNAME&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_PASSWORD&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="n">previous</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="c1"># Everything from here restores the environment on the way out, however</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="c1"># it leaves — a failed import and a failed login included.</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">earthaccess</span>  <span class="c1"># lazy — only needed when actually logging in</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>                <span class="s2">&quot;the GDIS sources need `earthaccess`, which is not &quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                <span class="s2">&quot;installed. Install the extra with `pip install &quot;</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>                <span class="s2">&quot;earthlens[emdat]`. The `emdat:events` source needs no &quot;</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>                <span class="s2">&quot;credentials and no extra.&quot;</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="n">strategy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_strategy</span><span class="p">()</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;environment&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="c1"># `setdefault`, not `update`: the empty-var pop above already</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="c1"># recorded the true prior value, and the exporter re-samples</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="c1"># `os.environ` afterwards, so it would report `None` for a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="c1"># variable that was really `&quot;&quot;`.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_explicit_credentials</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>                <span class="n">previous</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="n">auth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_login</span><span class="p">(</span><span class="n">earthaccess</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="c1"># An explicit credential is put in the environment only because</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="c1"># earthaccess has no argument for one. Leaving it there would make</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="c1"># it process-global and inherit into any later subprocess.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="n">_restore_env</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">&quot;authenticated&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>            <span class="s2">&quot;Earthdata Login failed — no valid credentials resolved &quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>            <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">). Set EARTHDATA_USERNAME / &quot;</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="s2">&quot;EARTHDATA_PASSWORD, add a &#39;machine urs.earthdata.nasa.gov&#39; &quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="sa">f</span><span class="s2">&quot;entry to ~/.netrc, or register at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">. Note that &quot;</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="s2">&quot;an authenticated account must also accept the SEDAC data-use &quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="sa">f</span><span class="s2">&quot;agreement once at </span><span class="si">{</span><span class="n">_EULA_URL</span><span class="si">}</span><span class="s2">, or the download returns 401.&quot;</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">auth</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -34424,11 +34416,7 @@ success. The class is a context manager via
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="k">class</span><span class="w"> </span><span class="nc">EmdatAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">EmdatCredentials</span><span class="p">]):</span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="k">class</span><span class="w"> </span><span class="nc">EmdatAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">EmdatCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate the GDIS sources against NASA Earthdata Login.</span>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    Construction is side-effect-free; :meth:`configure` performs the login and</span>
@@ -34588,106 +34576,102 @@ success. The class is a context manager via
 <a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="sd">            AuthenticationError: When the login is refused, or when every</span>
 <a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">                attempt failed to reach EDL.</span>
 <a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="c1"># urs.earthdata.nasa.gov is dual-stack; on a host with no IPv6 egress a</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a>        <span class="c1"># resolved AAAA connects into a dead route (ENETUNREACH) with no IPv4</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a>        <span class="c1"># fallback. Force IPv4 before the first dial. See issue #926.</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>        <span class="n">prefer_ipv4</span><span class="p">()</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_LOGIN_ATTEMPTS</span><span class="p">):</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>                <span class="k">return</span> <span class="n">earthaccess</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span> <span class="n">persist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>            <span class="k">except</span> <span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">Timeout</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">==</span> <span class="n">_LOGIN_ATTEMPTS</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>                    <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>                        <span class="sa">f</span><span class="s2">&quot;Earthdata Login could not reach EDL in &quot;</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_LOGIN_ATTEMPTS</span><span class="si">}</span><span class="s2"> attempts (strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">): &quot;</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. This is a network &quot;</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>                        <span class="s2">&quot;failure rather than a rejected credential; check &quot;</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>                        <span class="s2">&quot;connectivity to urs.earthdata.nasa.gov and retry.&quot;</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>                <span class="n">wait</span> <span class="o">=</span> <span class="n">_LOGIN_BACKOFF</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">attempt</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>                    <span class="sa">f</span><span class="s2">&quot;EMDAT: Earthdata Login could not reach EDL &quot;</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">); retrying in </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s &quot;</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">_LOGIN_ATTEMPTS</span><span class="si">}</span><span class="s2">).&quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                <span class="p">)</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - re-raised as AuthenticationError</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="s2">&quot;Earthdata Login failed while contacting EDL &quot;</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                    <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">): </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. Set &quot;</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>                    <span class="s2">&quot;EARTHDATA_USERNAME / EARTHDATA_PASSWORD, add a &#39;machine &quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>                    <span class="s2">&quot;urs.earthdata.nasa.gov&#39; entry to ~/.netrc, or register a &quot;</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>                    <span class="sa">f</span><span class="s2">&quot;free account at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;unreachable&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated` already</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        returns `True`. On the first call, resolves the login strategy, exports</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        any explicit credential to the environment variable `earthaccess`</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        reads, logs in with `persist=True`, and keeps the returned handle.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">            ImportError: When `earthaccess` is not installed.</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">            AuthenticationError: When `earthaccess.login` raises while</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">                contacting EDL, or returns an unauthenticated handle.</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="k">return</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="c1"># A CI workflow that maps an undefined secret onto an env var leaves it</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="c1"># as an empty string. `earthaccess` treats a present-but-empty</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="c1"># EARTHDATA_TOKEN as a real token and fails with &quot;Token does not</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="c1"># exist&quot;, masking valid username/password env vars. Drop any empty EDL</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="c1"># env var so the strategy resolves to the credential actually set.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">previous</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;EARTHDATA_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_USERNAME&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_PASSWORD&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                <span class="n">previous</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="c1"># Everything from here restores the environment on the way out, however</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="c1"># it leaves — a failed import and a failed login included.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                <span class="kn">import</span><span class="w"> </span><span class="nn">earthaccess</span>  <span class="c1"># lazy — only needed when actually logging in</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                    <span class="s2">&quot;the GDIS sources need `earthaccess`, which is not &quot;</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>                    <span class="s2">&quot;installed. Install the extra with `pip install &quot;</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>                    <span class="s2">&quot;earthlens[emdat]`. The `emdat:events` source needs no &quot;</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>                    <span class="s2">&quot;credentials and no extra.&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="n">strategy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_strategy</span><span class="p">()</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;environment&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>                <span class="c1"># `setdefault`, not `update`: the empty-var pop above already</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>                <span class="c1"># recorded the true prior value, and the exporter re-samples</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>                <span class="c1"># `os.environ` afterwards, so it would report `None` for a</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>                <span class="c1"># variable that was really `&quot;&quot;`.</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_explicit_credentials</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                    <span class="n">previous</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>            <span class="n">auth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_login</span><span class="p">(</span><span class="n">earthaccess</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="c1"># An explicit credential is put in the environment only because</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>            <span class="c1"># earthaccess has no argument for one. Leaving it there would make</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>            <span class="c1"># it process-global and inherit into any later subprocess.</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>            <span class="n">_restore_env</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">&quot;authenticated&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>                <span class="s2">&quot;Earthdata Login failed — no valid credentials resolved &quot;</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>                <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">). Set EARTHDATA_USERNAME / &quot;</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>                <span class="s2">&quot;EARTHDATA_PASSWORD, add a &#39;machine urs.earthdata.nasa.gov&#39; &quot;</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>                <span class="sa">f</span><span class="s2">&quot;entry to ~/.netrc, or register at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">. Note that &quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>                <span class="s2">&quot;an authenticated account must also accept the SEDAC data-use &quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>                <span class="sa">f</span><span class="s2">&quot;agreement once at </span><span class="si">{</span><span class="n">_EULA_URL</span><span class="si">}</span><span class="s2">, or the download returns 401.&quot;</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="p">)</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">auth</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a>        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">_LOGIN_ATTEMPTS</span><span class="p">):</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>                <span class="k">return</span> <span class="n">earthaccess</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span> <span class="n">persist</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a>            <span class="k">except</span> <span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">ConnectionError</span><span class="p">,</span> <span class="n">requests</span><span class="o">.</span><span class="n">Timeout</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a>                <span class="k">if</span> <span class="n">attempt</span> <span class="o">==</span> <span class="n">_LOGIN_ATTEMPTS</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a>                    <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a>                        <span class="sa">f</span><span class="s2">&quot;Earthdata Login could not reach EDL in &quot;</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_LOGIN_ATTEMPTS</span><span class="si">}</span><span class="s2"> attempts (strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">): &quot;</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. This is a network &quot;</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>                        <span class="s2">&quot;failure rather than a rejected credential; check &quot;</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>                        <span class="s2">&quot;connectivity to urs.earthdata.nasa.gov and retry.&quot;</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>                <span class="n">wait</span> <span class="o">=</span> <span class="n">_LOGIN_BACKOFF</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">attempt</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>                    <span class="sa">f</span><span class="s2">&quot;EMDAT: Earthdata Login could not reach EDL &quot;</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">); retrying in </span><span class="si">{</span><span class="n">wait</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">s &quot;</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">_LOGIN_ATTEMPTS</span><span class="si">}</span><span class="s2">).&quot;</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                <span class="p">)</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">wait</span><span class="p">)</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - re-raised as AuthenticationError</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>                <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                    <span class="s2">&quot;Earthdata Login failed while contacting EDL &quot;</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>                    <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">): </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">. Set &quot;</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>                    <span class="s2">&quot;EARTHDATA_USERNAME / EARTHDATA_PASSWORD, add a &#39;machine &quot;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                    <span class="s2">&quot;urs.earthdata.nasa.gov&#39; entry to ~/.netrc, or register a &quot;</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>                    <span class="sa">f</span><span class="s2">&quot;free account at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;unreachable&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated` already</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        returns `True`. On the first call, resolves the login strategy, exports</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        any explicit credential to the environment variable `earthaccess`</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        reads, logs in with `persist=True`, and keeps the returned handle.</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">            ImportError: When `earthaccess` is not installed.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            AuthenticationError: When `earthaccess.login` raises while</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">                contacting EDL, or returns an unauthenticated handle.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="k">return</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="c1"># A CI workflow that maps an undefined secret onto an env var leaves it</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="c1"># as an empty string. `earthaccess` treats a present-but-empty</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="c1"># EARTHDATA_TOKEN as a real token and fails with &quot;Token does not</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="c1"># exist&quot;, masking valid username/password env vars. Drop any empty EDL</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="c1"># env var so the strategy resolves to the credential actually set.</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="n">previous</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;EARTHDATA_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_USERNAME&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_PASSWORD&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>                <span class="n">previous</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>        <span class="c1"># Everything from here restores the environment on the way out, however</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="c1"># it leaves — a failed import and a failed login included.</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>                <span class="kn">import</span><span class="w"> </span><span class="nn">earthaccess</span>  <span class="c1"># lazy — only needed when actually logging in</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>            <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>                    <span class="s2">&quot;the GDIS sources need `earthaccess`, which is not &quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                    <span class="s2">&quot;installed. Install the extra with `pip install &quot;</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>                    <span class="s2">&quot;earthlens[emdat]`. The `emdat:events` source needs no &quot;</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>                    <span class="s2">&quot;credentials and no extra.&quot;</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="n">strategy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_strategy</span><span class="p">()</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;environment&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>                <span class="c1"># `setdefault`, not `update`: the empty-var pop above already</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>                <span class="c1"># recorded the true prior value, and the exporter re-samples</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>                <span class="c1"># `os.environ` afterwards, so it would report `None` for a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>                <span class="c1"># variable that was really `&quot;&quot;`.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_explicit_credentials</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>                    <span class="n">previous</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>            <span class="n">auth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_login</span><span class="p">(</span><span class="n">earthaccess</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>        <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>            <span class="c1"># An explicit credential is put in the environment only because</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>            <span class="c1"># earthaccess has no argument for one. Leaving it there would make</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>            <span class="c1"># it process-global and inherit into any later subprocess.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>            <span class="n">_restore_env</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">&quot;authenticated&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>                <span class="s2">&quot;Earthdata Login failed — no valid credentials resolved &quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>                <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">). Set EARTHDATA_USERNAME / &quot;</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>                <span class="s2">&quot;EARTHDATA_PASSWORD, add a &#39;machine urs.earthdata.nasa.gov&#39; &quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>                <span class="sa">f</span><span class="s2">&quot;entry to ~/.netrc, or register at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">. Note that &quot;</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>                <span class="s2">&quot;an authenticated account must also accept the SEDAC data-use &quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>                <span class="sa">f</span><span class="s2">&quot;agreement once at </span><span class="si">{</span><span class="n">_EULA_URL</span><span class="si">}</span><span class="s2">, or the download returns 401.&quot;</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">auth</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -34829,7 +34813,11 @@ contacting EDL, or returns an unauthenticated handle.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/hazards/src/earthlens/emdat/auth.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-317">317</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
 <span class="normal"><a href="#__codelineno-0-318">318</a></span>
 <span class="normal"><a href="#__codelineno-0-319">319</a></span>
 <span class="normal"><a href="#__codelineno-0-320">320</a></span>
@@ -34891,77 +34879,73 @@ contacting EDL, or returns an unauthenticated handle.</p>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span>
-<span class="normal"><a href="#__codelineno-0-380">380</a></span>
-<span class="normal"><a href="#__codelineno-0-381">381</a></span>
-<span class="normal"><a href="#__codelineno-0-382">382</a></span>
-<span class="normal"><a href="#__codelineno-0-383">383</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated` already</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    returns `True`. On the first call, resolves the login strategy, exports</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    any explicit credential to the environment variable `earthaccess`</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    reads, logs in with `persist=True`, and keeps the returned handle.</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        ImportError: When `earthaccess` is not installed.</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="sd">        AuthenticationError: When `earthaccess.login` raises while</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="sd">            contacting EDL, or returns an unauthenticated handle.</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="k">return</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="c1"># A CI workflow that maps an undefined secret onto an env var leaves it</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="c1"># as an empty string. `earthaccess` treats a present-but-empty</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="c1"># EARTHDATA_TOKEN as a real token and fails with &quot;Token does not</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>    <span class="c1"># exist&quot;, masking valid username/password env vars. Drop any empty EDL</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="c1"># env var so the strategy resolves to the credential actually set.</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="n">previous</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;EARTHDATA_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_USERNAME&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_PASSWORD&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="n">previous</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="c1"># Everything from here restores the environment on the way out, however</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>    <span class="c1"># it leaves — a failed import and a failed login included.</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">earthaccess</span>  <span class="c1"># lazy — only needed when actually logging in</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                <span class="s2">&quot;the GDIS sources need `earthaccess`, which is not &quot;</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>                <span class="s2">&quot;installed. Install the extra with `pip install &quot;</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>                <span class="s2">&quot;earthlens[emdat]`. The `emdat:events` source needs no &quot;</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>                <span class="s2">&quot;credentials and no extra.&quot;</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="n">strategy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_strategy</span><span class="p">()</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;environment&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>            <span class="c1"># `setdefault`, not `update`: the empty-var pop above already</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>            <span class="c1"># recorded the true prior value, and the exporter re-samples</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>            <span class="c1"># `os.environ` afterwards, so it would report `None` for a</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>            <span class="c1"># variable that was really `&quot;&quot;`.</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_explicit_credentials</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                <span class="n">previous</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="n">auth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_login</span><span class="p">(</span><span class="n">earthaccess</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a>    <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a>        <span class="c1"># An explicit credential is put in the environment only because</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="c1"># earthaccess has no argument for one. Leaving it there would make</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="c1"># it process-global and inherit into any later subprocess.</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>        <span class="n">_restore_env</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">&quot;authenticated&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="s2">&quot;Earthdata Login failed — no valid credentials resolved &quot;</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">). Set EARTHDATA_USERNAME / &quot;</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="s2">&quot;EARTHDATA_PASSWORD, add a &#39;machine urs.earthdata.nasa.gov&#39; &quot;</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="sa">f</span><span class="s2">&quot;entry to ~/.netrc, or register at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">. Note that &quot;</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="s2">&quot;an authenticated account must also accept the SEDAC data-use &quot;</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="sa">f</span><span class="s2">&quot;agreement once at </span><span class="si">{</span><span class="n">_EULA_URL</span><span class="si">}</span><span class="s2">, or the download returns 401.&quot;</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="p">)</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">auth</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticate against EDL via `earthaccess.login`.</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated` already</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    returns `True`. On the first call, resolves the login strategy, exports</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">    any explicit credential to the environment variable `earthaccess`</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    reads, logs in with `persist=True`, and keeps the returned handle.</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        ImportError: When `earthaccess` is not installed.</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        AuthenticationError: When `earthaccess.login` raises while</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">            contacting EDL, or returns an unauthenticated handle.</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="c1"># A CI workflow that maps an undefined secret onto an env var leaves it</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="c1"># as an empty string. `earthaccess` treats a present-but-empty</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>    <span class="c1"># EARTHDATA_TOKEN as a real token and fails with &quot;Token does not</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>    <span class="c1"># exist&quot;, masking valid username/password env vars. Drop any empty EDL</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>    <span class="c1"># env var so the strategy resolves to the credential actually set.</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>    <span class="n">previous</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;EARTHDATA_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_USERNAME&quot;</span><span class="p">,</span> <span class="s2">&quot;EARTHDATA_PASSWORD&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>            <span class="n">previous</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="c1"># Everything from here restores the environment on the way out, however</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="c1"># it leaves — a failed import and a failed login included.</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">earthaccess</span>  <span class="c1"># lazy — only needed when actually logging in</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>                <span class="s2">&quot;the GDIS sources need `earthaccess`, which is not &quot;</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>                <span class="s2">&quot;installed. Install the extra with `pip install &quot;</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>                <span class="s2">&quot;earthlens[emdat]`. The `emdat:events` source needs no &quot;</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>                <span class="s2">&quot;credentials and no extra.&quot;</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="n">strategy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_strategy</span><span class="p">()</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;environment&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="c1"># `setdefault`, not `update`: the empty-var pop above already</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="c1"># recorded the true prior value, and the exporter re-samples</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="c1"># `os.environ` afterwards, so it would report `None` for a</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="c1"># variable that was really `&quot;&quot;`.</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_export_explicit_credentials</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>                <span class="n">previous</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="n">auth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_login</span><span class="p">(</span><span class="n">earthaccess</span><span class="p">,</span> <span class="n">strategy</span><span class="p">)</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="c1"># An explicit credential is put in the environment only because</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>        <span class="c1"># earthaccess has no argument for one. Leaving it there would make</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>        <span class="c1"># it process-global and inherit into any later subprocess.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>        <span class="n">_restore_env</span><span class="p">(</span><span class="n">previous</span><span class="p">)</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="s2">&quot;authenticated&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>            <span class="s2">&quot;Earthdata Login failed — no valid credentials resolved &quot;</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>            <span class="sa">f</span><span class="s2">&quot;(strategy=</span><span class="si">{</span><span class="n">strategy</span><span class="si">!r}</span><span class="s2">). Set EARTHDATA_USERNAME / &quot;</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>            <span class="s2">&quot;EARTHDATA_PASSWORD, add a &#39;machine urs.earthdata.nasa.gov&#39; &quot;</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>            <span class="sa">f</span><span class="s2">&quot;entry to ~/.netrc, or register at </span><span class="si">{</span><span class="n">_REGISTER_URL</span><span class="si">}</span><span class="s2">. Note that &quot;</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="s2">&quot;an authenticated account must also accept the SEDAC data-use &quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="sa">f</span><span class="s2">&quot;agreement once at </span><span class="si">{</span><span class="n">_EULA_URL</span><span class="si">}</span><span class="s2">, or the download returns 401.&quot;</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="p">)</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_auth</span> <span class="o">=</span> <span class="n">auth</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
