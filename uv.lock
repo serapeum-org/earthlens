@@ -2232,7 +2232,7 @@ dev = [
     { name = "pip" },
     { name = "pre-commit", specifier = ">=3.7.1" },
     { name = "pre-commit-hooks", specifier = ">=4.6.0" },
-    { name = "pyramids-gis", extras = ["viz"], specifier = ">=0.52.0" },
+    { name = "pyramids-gis", extras = ["viz"], specifier = ">=0.53.0" },
     { name = "pytest", specifier = ">=8.2.2" },
     { name = "pytest-cov", specifier = ">=5.0.0" },
     { name = "twine", specifier = ">=5.0.0" },
@@ -2251,7 +2251,7 @@ docs = [
     { name = "mkdocs-table-reader-plugin", specifier = ">=3.1.0" },
     { name = "mkdocstrings", specifier = ">=0.24.0" },
     { name = "mkdocstrings-python", specifier = ">=1.7.5" },
-    { name = "pyramids-gis", extras = ["viz"], specifier = ">=0.52.0" },
+    { name = "pyramids-gis", extras = ["viz"], specifier = ">=0.53.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
 ]
 notebook = [
@@ -2373,7 +2373,7 @@ requires-dist = [
     { name = "platformdirs", specifier = ">=3.0.0" },
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pyproj", specifier = ">=3.7.0" },
-    { name = "pyramids-gis", specifier = ">=0.52.0" },
+    { name = "pyramids-gis", specifier = ">=0.53.0" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "requests", specifier = ">=2.28.1" },
@@ -2488,7 +2488,7 @@ requires-dist = [
     { name = "gportal", marker = "extra == 'jaxa'", specifier = ">=0.4,<0.5" },
     { name = "jaxa-earth", marker = "extra == 'jaxa'", specifier = ">=0.1.6,<0.2" },
     { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
-    { name = "pyramids-gis", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.52.0" },
+    { name = "pyramids-gis", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.53.0" },
     { name = "rtree", marker = "extra == 'gee'", specifier = ">=1.0.0" },
     { name = "sentinelhub", marker = "extra == 'sentinel-hub'", specifier = ">=3.11.5" },
     { name = "urllib3", marker = "extra == 'gee'", specifier = ">=1.26" },
@@ -2565,7 +2565,7 @@ requires-dist = [
     { name = "erddapy", marker = "extra == 'erddap'", specifier = ">=3.0" },
     { name = "platformdirs", specifier = ">=3.0.0" },
     { name = "pyobis", marker = "extra == 'obis'", specifier = ">=1.6.1" },
-    { name = "pyramids-gis", extras = ["parquet"], marker = "extra == 'nwm'", specifier = ">=0.52.0" },
+    { name = "pyramids-gis", extras = ["parquet"], marker = "extra == 'nwm'", specifier = ">=0.53.0" },
 ]
 provides-extras = ["argo", "cmems", "erddap", "nwm", "usgs-water", "obis"]
 
@@ -7084,7 +7084,7 @@ wheels = [
 
 [[package]]
 name = "pyramids-gis"
-version = "0.52.0"
+version = "0.53.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi", marker = "(platform_machine == 'ARM64' and sys_platform == 'win32') or (platform_machine != 'ARM64' and extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo') or (sys_platform != 'win32' and extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -7101,31 +7101,31 @@ dependencies = [
     { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
     { name = "shapely", marker = "platform_machine != 'ARM64' or sys_platform != 'win32' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f7/2a/fbdba3d97acdc86a5d1e80fa870876d31dd24a3ec496d3cf3eee9635c943/pyramids_gis-0.52.0.tar.gz", hash = "sha256:95eb272806340b54755f58140d5855ae2be17abe8221b5b08b5a914b56ad0fe9", size = 961070, upload-time = "2026-08-13T01:04:40.473Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3c/07/04ba6483655688536a33be86031256853c54f2e2c2db2fd08a9e68d776a6/pyramids_gis-0.53.0.tar.gz", hash = "sha256:640072a7d518185e9f2ed2091ac3f6717cfe7483f7efa0f9d040c7d20481e8ca", size = 971297, upload-time = "2026-08-14T01:36:09.292Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e9/28/a8e092786d3d354bba779e1495ba59ee644f827d17840aeb00ec9a30395a/pyramids_gis-0.52.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:7e1c35abb9cd5f9d71a27036516eaa66dcd48755295b2fe1814c73341f06c538", size = 43473215, upload-time = "2026-08-13T01:03:39.682Z" },
-    { url = "https://files.pythonhosted.org/packages/0d/fb/357657baf5376a06a45e8b88766cfceada4b0268bf31377b057aa3f53287/pyramids_gis-0.52.0-cp311-cp311-macosx_11_0_x86_64.whl", hash = "sha256:459f6cd3a3591452c6e2c2fd5b2f7c1f685964522750c453c1f7838c76c37f50", size = 46724492, upload-time = "2026-08-13T01:03:42.487Z" },
-    { url = "https://files.pythonhosted.org/packages/84/df/e6c16827c07abc4462b2b9b686ec398c650778ac25ca25f0ff7c441fdc52/pyramids_gis-0.52.0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:158776c2d56e2d0be3b1d1d8c876d8f32e951a9737726840cb82c220fadaae2a", size = 30455813, upload-time = "2026-08-13T01:03:45.034Z" },
-    { url = "https://files.pythonhosted.org/packages/ac/34/549f2f58e5ae138dfdf5e4d60b20a74eb5651b4bc01bc29d718ac90af387/pyramids_gis-0.52.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:d83c54ec786de46c44062a19592d810f45909fc3fc0a5f9e280c47190b4a545e", size = 31952531, upload-time = "2026-08-13T01:03:47.751Z" },
-    { url = "https://files.pythonhosted.org/packages/09/24/c35719a6995bb135f8042d18a8d3cdcaeb4efbe6ccc56f2f0dbb938df6cc/pyramids_gis-0.52.0-cp311-cp311-win_amd64.whl", hash = "sha256:34ad7851db43a074c35c5bafcb5076599933f45c18294820b0346c322768dc75", size = 36850925, upload-time = "2026-08-13T01:03:50.147Z" },
-    { url = "https://files.pythonhosted.org/packages/19/73/b06c98bb8890a90c124ae29fc293213254567639712e951251b51ec27d8e/pyramids_gis-0.52.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:8b623cd62f425b382cf7937122baffb8bcebbee7bd281024bb3e74162c3eaad2", size = 43473196, upload-time = "2026-08-13T01:03:52.941Z" },
-    { url = "https://files.pythonhosted.org/packages/e9/e4/bde44c6942c625b7b5c9652af099f0b06cf2a0cebcf0dd74d8fec5ea071d/pyramids_gis-0.52.0-cp312-cp312-macosx_11_0_x86_64.whl", hash = "sha256:86986ad31be81ee9e885a52458a990a6885ff7547205e9b265cf380206e7e66d", size = 46726626, upload-time = "2026-08-13T01:03:55.633Z" },
-    { url = "https://files.pythonhosted.org/packages/7d/00/0c27688bc6bcf338905a8d5225b6e1afb2832f92039fc09202b83a708f9f/pyramids_gis-0.52.0-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:cc3964b0e8227c5a7517816a5e4243765df97fa8e59cfd38b7384898215efabd", size = 30442060, upload-time = "2026-08-13T01:03:58.574Z" },
-    { url = "https://files.pythonhosted.org/packages/c7/2c/1d38e499ea3ce56b5831e23bed7bde8e2ce69b43d8bf73868c431cb3f778/pyramids_gis-0.52.0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:8a24b7109520d65f94672bf887b40c5e5fc188d832068ffb9149d51fe4d307ba", size = 31942813, upload-time = "2026-08-13T01:04:00.731Z" },
-    { url = "https://files.pythonhosted.org/packages/8e/72/542bcac03d91efa658c27485f49244f9a4e7f85504edd4f14eaf5459c7fb/pyramids_gis-0.52.0-cp312-cp312-win_amd64.whl", hash = "sha256:71c1602656573f66ce07a3dc4a5ae83729100aee25e80b193f83b6a04cda1491", size = 36861837, upload-time = "2026-08-13T01:04:03.064Z" },
-    { url = "https://files.pythonhosted.org/packages/93/21/e833a73d6fea494d16e5fe07200de9b38dccbd2fa3f68b63361ff5382313/pyramids_gis-0.52.0-cp312-cp312-win_arm64.whl", hash = "sha256:b692094336ec9150f931d59654f19e62f046d174ea7a24a6716902dd74357d15", size = 25975220, upload-time = "2026-08-13T01:04:05.824Z" },
-    { url = "https://files.pythonhosted.org/packages/73/2d/7a419049dd349deb9554e7fab62f215b35239a63c21a5ccf302a1f40bac5/pyramids_gis-0.52.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:f9a87552aae7a10c497807ad846d0f688b10dfe8fe524742f607eebb0304e0e1", size = 43473228, upload-time = "2026-08-13T01:04:08.462Z" },
-    { url = "https://files.pythonhosted.org/packages/b7/c7/4dd83eb311ba5b6ca4065bfb9fa098dbf9772b02c48e57eeba793a8a2afd/pyramids_gis-0.52.0-cp313-cp313-macosx_11_0_x86_64.whl", hash = "sha256:cd21d61310ce3ce484f009e8c5c65e96a330165c06df63cb3dee06eaae7a42a4", size = 46726606, upload-time = "2026-08-13T01:04:11.088Z" },
-    { url = "https://files.pythonhosted.org/packages/32/9b/7a11fa72b3d31ce9c97506d17fbdcfbb474d84dabd448fec8975bf537963/pyramids_gis-0.52.0-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:13804d3b8a37274cb87635e7f1f1d468ff1afcdeb72cd41aeba1ce9f64268ee2", size = 30442118, upload-time = "2026-08-13T01:04:13.763Z" },
-    { url = "https://files.pythonhosted.org/packages/d8/ca/d26f3f561a45d91bbd6e3521fc65917c3484ff86805c1bbc5e0ed36e5702/pyramids_gis-0.52.0-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:9e5c99b2177279e262de9a8f5c90688d6d4adc1e395046a4c4fae2984f0ff3a2", size = 31942704, upload-time = "2026-08-13T01:04:16.72Z" },
-    { url = "https://files.pythonhosted.org/packages/0d/22/301bec51f787e858137a14564b4fb73f321c008542a01426398313aea1ae/pyramids_gis-0.52.0-cp313-cp313-win_amd64.whl", hash = "sha256:5450895488f22ff8ed8a567a5dc7ee8d20685c383e5c8fe41679a374341dc1d4", size = 36861809, upload-time = "2026-08-13T01:04:18.963Z" },
-    { url = "https://files.pythonhosted.org/packages/4a/78/ab8870ca0ec32189248109bf64c47258825254b68afc4a77537171a0e5cd/pyramids_gis-0.52.0-cp313-cp313-win_arm64.whl", hash = "sha256:8e08482dcc7b401af4b75186f520d8c3c491b4eb0a2bede693cd8da33a97ad53", size = 25974242, upload-time = "2026-08-13T01:04:21.308Z" },
-    { url = "https://files.pythonhosted.org/packages/c7/4c/5082995ae9d5bb4df254c734b45bc9c0ff543dc386e862a9efd21bcc2f6b/pyramids_gis-0.52.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:f801b12196496b8139a0fc47cf8307516fa7016a6f923b2a1cf6b15b99ce87c3", size = 43476670, upload-time = "2026-08-13T01:04:24.139Z" },
-    { url = "https://files.pythonhosted.org/packages/a4/61/5532aebb5bbda658d2d79e9d172f668c7f3b5c5f92038560117fc070c9c5/pyramids_gis-0.52.0-cp314-cp314-macosx_11_0_x86_64.whl", hash = "sha256:8ae823ab046089ae22fce7bce27c6fe2f869d0011880647049cdf5a16882f194", size = 46731326, upload-time = "2026-08-13T01:04:27.382Z" },
-    { url = "https://files.pythonhosted.org/packages/f3/77/a568387ba5797a99221584bc572e5fcae627945c23c017f18dc1eaf41242/pyramids_gis-0.52.0-cp314-cp314-manylinux_2_28_aarch64.whl", hash = "sha256:b96864b1dfce21f79d8501efc54e93980b9aa412710bc74fa823f1bd9972392e", size = 30443903, upload-time = "2026-08-13T01:04:29.988Z" },
-    { url = "https://files.pythonhosted.org/packages/2b/7d/01decd14c0cf4f7bffad4afb0b17077877c12043f9b81c3cad1dc78488fa/pyramids_gis-0.52.0-cp314-cp314-manylinux_2_28_x86_64.whl", hash = "sha256:f3e956c835817ac0db0849b2066f8875ae89214e2ce7ef72408259d4a7884040", size = 31945146, upload-time = "2026-08-13T01:04:32.726Z" },
-    { url = "https://files.pythonhosted.org/packages/cc/a8/82958dae4bb56f211edb74eeee34d6ab10a1e55bc5f82c851e730aef51f6/pyramids_gis-0.52.0-cp314-cp314-win_amd64.whl", hash = "sha256:8ab579a4432dc87eb01d0786b1680d346c8b453be00c707bf818c50c7dbd1aa9", size = 37901292, upload-time = "2026-08-13T01:04:35.049Z" },
-    { url = "https://files.pythonhosted.org/packages/a9/d5/c4c6a52cd748feae24ea7e462e4a0e06253eff2171686e5f7776d29a6722/pyramids_gis-0.52.0-cp314-cp314-win_arm64.whl", hash = "sha256:759cf4a4de4136154bfd7eb64bbafb4ff8e8cfe48d730da2270c15a747ac21b1", size = 26714005, upload-time = "2026-08-13T01:04:38.096Z" },
+    { url = "https://files.pythonhosted.org/packages/a9/46/7630239dec113727cbea42fcbe42b7ae4bb4ab3a64f5921f8b38f6bf9eec/pyramids_gis-0.53.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:54053054a8d3f686a5a19e46ce46c0d8720d1f80ec75a355b5946563b6f4ae23", size = 43483384, upload-time = "2026-08-14T01:34:52.038Z" },
+    { url = "https://files.pythonhosted.org/packages/8e/0e/0f49cfecefdaccdfb56b16aa2a29d072fda111692aeb49f1a1a53f8acc57/pyramids_gis-0.53.0-cp311-cp311-macosx_11_0_x86_64.whl", hash = "sha256:dbf7fc5251494437a2114e569defd359701bf9baa3486763638cdfab7bf2f303", size = 46736523, upload-time = "2026-08-14T01:34:56.362Z" },
+    { url = "https://files.pythonhosted.org/packages/64/d9/262378495c5db3636eb214f4322ecc4a84b9171a7760fef60d8397d7ad3e/pyramids_gis-0.53.0-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:d095fe10611c9616b540b3c0ecc92473f3fb10a7b9b5915b58866ea7f7bd94c3", size = 30465975, upload-time = "2026-08-14T01:35:00.07Z" },
+    { url = "https://files.pythonhosted.org/packages/e0/07/adc909b4b44e0bc706a5611b7c4fc939b880c46b584d88eeaa64e12c5de6/pyramids_gis-0.53.0-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:530c1945d1fd18112923e52ac1b8bc804b8cc5e48598b5c99296f92706f2c7b3", size = 31962723, upload-time = "2026-08-14T01:35:03.525Z" },
+    { url = "https://files.pythonhosted.org/packages/a5/2a/aceebfc9f58ecf32f27bf7c341479db44d5dddc943eb3948b0f29af9efc4/pyramids_gis-0.53.0-cp311-cp311-win_amd64.whl", hash = "sha256:5ded28a039b936048a2bd45c03f551469c51f3c0cb7f05c273ff6fc255ed3ddb", size = 36861159, upload-time = "2026-08-14T01:35:07.034Z" },
+    { url = "https://files.pythonhosted.org/packages/a2/f5/d55348744556235f29ce5d13031d7169e681c3a2c7ea3fe26b0d45867dbb/pyramids_gis-0.53.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:dba86e04208f65616bcf09aa0b53fb724f46e2363e75196a39e9114f8b835c6c", size = 43483365, upload-time = "2026-08-14T01:35:10.646Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/fd/28fc28cb760eb8fa8092b7af4f1efd1855fec16dc18bbee7990ccb9e9870/pyramids_gis-0.53.0-cp312-cp312-macosx_11_0_x86_64.whl", hash = "sha256:d780bb7054f97d28949734ab5b8ca27104799df6a9022cd344133b90124b83f1", size = 46738668, upload-time = "2026-08-14T01:35:14.59Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/20/393969c01e7adc33e4fb0b03e493e72c3b6716611290e82f034fcbcd4dca/pyramids_gis-0.53.0-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:ffe59e64517d6c1194a09a6e606db9fa81a5b08142973aa49a6c22a013cda1d3", size = 30452235, upload-time = "2026-08-14T01:35:17.948Z" },
+    { url = "https://files.pythonhosted.org/packages/c6/d4/8af818662032c5def1c60a3dc17b21d6def7c7a17045daca4dfb919d0f7d/pyramids_gis-0.53.0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:4542780cc5b5704aa1e22eb81b361e564cb9c4905d25bdadd833b6a2dc973cce", size = 31953003, upload-time = "2026-08-14T01:35:20.859Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/83/82e6568af95fe2921bf022bd0ca9e265552e23903786e003700ed10a8123/pyramids_gis-0.53.0-cp312-cp312-win_amd64.whl", hash = "sha256:ff3d79ec76350878dfddc1d8790028b3c56dbd6d717a4c08f8f4b65bc431379c", size = 36872075, upload-time = "2026-08-14T01:35:23.863Z" },
+    { url = "https://files.pythonhosted.org/packages/95/18/a8a528f4ebc21ffb4f56da934f98824d6553ef2de3147cffbaf9f891c923/pyramids_gis-0.53.0-cp312-cp312-win_arm64.whl", hash = "sha256:6d4d7547882d320455defc263ac991841b887851de5cdcbbdccf40dccd381fd1", size = 25985504, upload-time = "2026-08-14T01:35:28.537Z" },
+    { url = "https://files.pythonhosted.org/packages/c5/45/f2527689f512f14f545cfb28621c2ee3b3539dbbbed64f7857dc57100742/pyramids_gis-0.53.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:9a75d54452adf65b28ef220d6ccba562adabe50e5ae6c5863ddf13be4cbd518e", size = 43483400, upload-time = "2026-08-14T01:35:31.555Z" },
+    { url = "https://files.pythonhosted.org/packages/0c/2a/40d1ad278eec636f6995eaac6125844e62901459417b57fdf630e81f2784/pyramids_gis-0.53.0-cp313-cp313-macosx_11_0_x86_64.whl", hash = "sha256:41af8624ca0ab32ac7ecc3602b7659ada4a455b1561eadef9d12f79a7fb61c8c", size = 46738635, upload-time = "2026-08-14T01:35:34.942Z" },
+    { url = "https://files.pythonhosted.org/packages/32/89/2990aaa06b92e80a7d95c0278d662adbd0649d70a3e947e1496d821f2361/pyramids_gis-0.53.0-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:b3faf3b36cd6157698b7c7b9a26845e6723339ec22f7cfd87db9384217578476", size = 30452285, upload-time = "2026-08-14T01:35:38.026Z" },
+    { url = "https://files.pythonhosted.org/packages/47/b8/61249eaee52541abf819b677d0d209f46011ef5e064b48fff0acf7750734/pyramids_gis-0.53.0-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:36de4b619049c5bb155b566286d3c88d16ec1c778c8cd7740480305c14c79d8a", size = 31952896, upload-time = "2026-08-14T01:35:41.392Z" },
+    { url = "https://files.pythonhosted.org/packages/38/d3/e7ce07eedafc796b6ac194b2944ee0d1385f87648fb16ec43103a06c76a8/pyramids_gis-0.53.0-cp313-cp313-win_amd64.whl", hash = "sha256:85672f7383e7dc4f155c0c1c1674cf7e812a5bc930b18caaccab48e98bd2db70", size = 36872041, upload-time = "2026-08-14T01:35:44.548Z" },
+    { url = "https://files.pythonhosted.org/packages/6f/c6/b03f456f4ee7dc61bd23e91140707aa00eeeb5c12ed2e21559984572c901/pyramids_gis-0.53.0-cp313-cp313-win_arm64.whl", hash = "sha256:0b383f5e6764c71d2320e408e7ca513c16e7226b3e60a3a57faee512e782de41", size = 25984517, upload-time = "2026-08-14T01:35:47.392Z" },
+    { url = "https://files.pythonhosted.org/packages/a9/14/826d6afee56556798c1cbcf0d699a5fea09ecf683e190cccc0b5e43726c9/pyramids_gis-0.53.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:106096ade2e3eca79109410640735a46609d8d9dfeed46d4766c483398e0d4cd", size = 43486838, upload-time = "2026-08-14T01:35:50.395Z" },
+    { url = "https://files.pythonhosted.org/packages/d4/c3/7dea6fffb952addbe6e68edc776b07a94a8e2b0fb7bbe425d0856717ad73/pyramids_gis-0.53.0-cp314-cp314-macosx_11_0_x86_64.whl", hash = "sha256:61892057889e18f701e82eee768349fa184c21ca4251c45ea96ce3f02ec2721a", size = 46743361, upload-time = "2026-08-14T01:35:54.346Z" },
+    { url = "https://files.pythonhosted.org/packages/9e/5b/ab7cdad4d34a430063202ecfe51823d1d1d5139b07315cac1495b5fdfe6b/pyramids_gis-0.53.0-cp314-cp314-manylinux_2_28_aarch64.whl", hash = "sha256:30d4f3b7233035edccbdb8206447ce37e7af599406c7187cd7a5d8e53d38d6be", size = 30454072, upload-time = "2026-08-14T01:35:57.637Z" },
+    { url = "https://files.pythonhosted.org/packages/22/04/98a5b69e55b20d0152cd1533668b20743d8cbc143d660421121f7026966a/pyramids_gis-0.53.0-cp314-cp314-manylinux_2_28_x86_64.whl", hash = "sha256:2d85dab417716c734e063b14ac50886a9b33a6d24342cdd53474c8533a69e005", size = 31955334, upload-time = "2026-08-14T01:36:00.725Z" },
+    { url = "https://files.pythonhosted.org/packages/9c/45/662a14169f08f8ac369bc5c27ee01fe0e1356ad12447a7cd303bc2f75644/pyramids_gis-0.53.0-cp314-cp314-win_amd64.whl", hash = "sha256:5e849433fe1af70ff7305c88d3830a202291ba4e6c39b4f24cf0647cfda96705", size = 37911576, upload-time = "2026-08-14T01:36:03.922Z" },
+    { url = "https://files.pythonhosted.org/packages/31/37/45bf03e7b447c82b7dd1fe4020c1bd0a0692b591e47bbde0632aa8fa0584/pyramids_gis-0.53.0-cp314-cp314-win_arm64.whl", hash = "sha256:6de5b973719238ede5ea85a36fe2350e8280adaeb7d44defc47fa18d3ca89f27", size = 26724284, upload-time = "2026-08-14T01:36:06.821Z" },
 ]
 
 [package.optional-dependencies]
