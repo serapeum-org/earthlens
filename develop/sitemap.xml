@@ -893,6 +893,22 @@
          <lastmod>2026-08-15</lastmod>
     </url>
     <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/danube_braided_truecolour/</loc>
+         <lastmod>2026-08-15</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/danube_exposed_sediment_truecolour/</loc>
+         <lastmod>2026-08-15</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/danube_modis_corridor_timelapse/</loc>
+         <lastmod>2026-08-15</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/danube_truecolour_timelapse/</loc>
+         <lastmod>2026-08-15</lastmod>
+    </url>
+    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/dubai_urban_growth/</loc>
          <lastmod>2026-08-15</lastmod>
     </url>
@@ -910,6 +926,14 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/netherlands_drought_2026/</loc>
+         <lastmod>2026-08-15</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/rhine_danube_lowflow_2026/</loc>
+         <lastmod>2026-08-15</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/develop/examples/showcases/rhine_landsat_wetyear_vs_2026/</loc>
          <lastmod>2026-08-15</lastmod>
     </url>
     <url>
