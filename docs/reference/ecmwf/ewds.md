@@ -69,7 +69,7 @@ variables and families carry constraint-derived request shapes with
 | `cems-glofas-forecast` | **Shipped** — verified live. |
 | `cems-glofas-historical` | **Curated** — `request_kind: glofas` (ordinary `year`/`month`/`day`, no hindcast remap); discharge (`avg_dis`) verified live. |
 | `cems-glofas-historical-intermediate` | **Curated** — the ERA5T intermediate stream (`product_type: intermediate`), a second config of `cems-glofas-historical` via the per-row `cds_dataset` override; discharge verified live. |
-| `cems-glofas-reforecast`, `cems-glofas-seasonal`, `cems-glofas-seasonal-reforecast` | **Curated** — `glofas_hindcast` / `seasonal` request kinds. |
+| `cems-glofas-reforecast`, `cems-glofas-seasonal`, `cems-glofas-seasonal-reforecast` | **Curated** — `glofas_hindcast` / `seasonal` / `seasonal_hindcast` request kinds. |
 | `cems-fire-historical-v1`, `cems-fire-seasonal` | **Curated** — CEMS fire-danger rows. |
 | `efas-*` | **Curated** — the EFAS forecast / historical / reforecast / seasonal suite. |
 
