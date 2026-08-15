@@ -930,3 +930,29 @@ class TestGlofasIntermediate:
         """A row without an override has dataset_id == cds_dataset."""
         v = Catalog().get_variable("reanalysis-era5-single-levels", "2m-temperature")
         assert v.dataset_id == v.cds_dataset == "reanalysis-era5-single-levels"
+
+
+class TestCatalogHealth:
+    """Tests for the Catalog.health() self-check."""
+
+    def test_health_keys(self):
+        """health() returns exactly the four defect / usage lists."""
+        assert set(Catalog().health()) == {
+            "variable_missing_nc_variable",
+            "dataset_without_variables",
+            "unregistered_provider",
+            "unused_provider",
+        }
+
+    def test_shipped_catalog_has_no_defects(self):
+        """The shipped catalog carries no missing-nc / empty / unregistered rows."""
+        report = Catalog().health()
+        assert report["variable_missing_nc_variable"] == [], "every var has an nc name"
+        assert report["dataset_without_variables"] == [], "no empty datasets"
+        assert report["unregistered_provider"] == [], "every provider is registered"
+
+    def test_unused_provider_is_a_sorted_list(self):
+        """unused_provider is an informational sorted list of registered-but-unused."""
+        unused = Catalog().health()["unused_provider"]
+        assert isinstance(unused, list)
+        assert unused == sorted(unused), "unused providers are reported sorted"
