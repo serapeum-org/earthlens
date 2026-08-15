@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24100,7 +24100,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="n">DATASET</span> <span class="o">=</span> <span class="s2">"cems-glofas-historical-intermediate"</span>
 <span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"out"</span><span class="p">)</span>
-<span class="n">DANUBE</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">44.0</span><span class="p">,</span> <span class="mf">48.5</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">16.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">])</span>  <span class="c1"># a Danube-basin bbox</span>
+<span class="n">DANUBE</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"lat_lim"</span><span class="p">:</span> <span class="p">[</span><span class="mf">44.0</span><span class="p">,</span> <span class="mf">48.5</span><span class="p">],</span> <span class="s2">"lon_lim"</span><span class="p">:</span> <span class="p">[</span><span class="mf">16.0</span><span class="p">,</span> <span class="mf">22.0</span><span class="p">]}</span>  <span class="c1"># a Danube-basin bbox</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
 
@@ -24113,7 +24113,7 @@ from earthlens.core import EarthLens
 
 DATASET = "cems-glofas-historical-intermediate"
 OUT = Path("out")
-DANUBE = dict(lat_lim=[44.0, 48.5], lon_lim=[16.0, 22.0])  # a Danube-basin bbox</div>
+DANUBE = {"lat_lim": [44.0, 48.5], "lon_lim": [16.0, 22.0]}  # a Danube-basin bbox</div>
 </div>
 </div>
 </div>
