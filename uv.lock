@@ -1966,7 +1966,7 @@ wheels = [
 
 [[package]]
 name = "earthlens"
-version = "0.14.0"
+version = "0.15.0"
 source = { editable = "." }
 dependencies = [
     { name = "earthlens-atmosphere" },
@@ -2265,7 +2265,7 @@ notebook = [
 
 [[package]]
 name = "earthlens-atmosphere"
-version = "0.14.0"
+version = "0.15.0"
 source = { editable = "libs/providers/atmosphere" }
 dependencies = [
     { name = "earthlens-core" },
@@ -2331,7 +2331,7 @@ provides-extras = ["s3", "ecmwf", "ecmwf-modern", "cmip6", "isimip", "nwp", "rad
 
 [[package]]
 name = "earthlens-core"
-version = "0.14.0"
+version = "0.15.0"
 source = { editable = "libs/core" }
 dependencies = [
     { name = "geopandas" },
@@ -2350,6 +2350,7 @@ dependencies = [
     { name = "shapely" },
     { name = "tqdm" },
     { name = "typer" },
+    { name = "urllib3" },
 ]
 
 [package.optional-dependencies]
@@ -2381,12 +2382,13 @@ requires-dist = [
     { name = "shapely", specifier = ">=2.0.0" },
     { name = "tqdm", specifier = ">=4.66.0" },
     { name = "typer", specifier = ">=0.12" },
+    { name = "urllib3", specifier = ">=1.26" },
 ]
 provides-extras = ["s3", "test"]
 
 [[package]]
 name = "earthlens-hazards"
-version = "0.14.0"
+version = "0.15.0"
 source = { editable = "libs/providers/hazards" }
 dependencies = [
     { name = "earthlens-core" },
@@ -2437,7 +2439,7 @@ provides-extras = ["emdat", "fdsn", "hdx", "overture", "osm", "osm-pbf"]
 
 [[package]]
 name = "earthlens-imagery"
-version = "0.14.0"
+version = "0.15.0"
 source = { editable = "libs/providers/imagery" }
 dependencies = [
     { name = "earthlens-core" },
@@ -2497,7 +2499,7 @@ provides-extras = ["earthdata", "asf", "eumetsat", "gee", "jaxa", "openeo", "sen
 
 [[package]]
 name = "earthlens-land"
-version = "0.14.0"
+version = "0.15.0"
 source = { editable = "libs/providers/land" }
 dependencies = [
     { name = "earthlens-core" },
@@ -2527,7 +2529,7 @@ provides-extras = ["dem", "ghsl", "gbif", "worldpop"]
 
 [[package]]
 name = "earthlens-ocean"
-version = "0.14.0"
+version = "0.15.0"
 source = { editable = "libs/providers/ocean" }
 dependencies = [
     { name = "earthlens-core" },
