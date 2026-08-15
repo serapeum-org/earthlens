@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23090,14 +23090,16 @@ operational</code>, <code>hydrological_model: lisflood</code>, <code>leadtime_ho
 <code>product_type: control_forecast</code>, delivered <code>unarchived</code> as NetCDF. The output
 lands at <code>&lt;path&gt;/river_discharge_in_the_last_24_hours_cems-glofas-forecast.nc</code>.</p>
 <h2 id="scope-and-follow-ups"><a class="toclink" href="#scope-and-follow-ups">Scope and follow-ups</a><a class="headerlink" href="#scope-and-follow-ups" title="Permanent link">#</a></h2>
-<p>Only <code>cems-glofas-forecast</code> is curated in this release (verified end to end
-against live EWDS). The rest of the EWDS universe is reachable with the same
-token but not yet wired for download:</p>
+<p>The GloFAS, CEMS-fire, and EFAS families on EWDS are curated (added across the
+three-store work and #1039). Discharge on <code>cems-glofas-forecast</code> /
+<code>cems-glofas-historical</code> is verified end to end against live EWDS; the remaining
+variables and families carry constraint-derived request shapes with
+<code>units: unknown</code> placeholders pending per-variable live verification.</p>
 <table>
 <thead>
 <tr>
 <th>Dataset</th>
-<th>Status / blocker</th>
+<th>Status</th>
 </tr>
 </thead>
 <tbody>
@@ -23106,20 +23108,24 @@ token but not yet wired for download:</p>
 <td><strong>Shipped</strong> — verified live.</td>
 </tr>
 <tr>
-<td><code>cems-glofas-reforecast</code>, <code>cems-glofas-historical</code></td>
-<td>Use <code>hyear</code>/<code>hmonth</code>/<code>hday</code> date keys — need a date-key remap.</td>
+<td><code>cems-glofas-historical</code></td>
+<td><strong>Curated</strong> — <code>request_kind: glofas</code> (ordinary <code>year</code>/<code>month</code>/<code>day</code>, no hindcast remap); discharge (<code>avg_dis</code>) verified live.</td>
 </tr>
 <tr>
-<td><code>cems-glofas-seasonal</code>, <code>cems-glofas-seasonal-reforecast</code></td>
-<td>Monthly + <code>leadtime_hour</code> shape.</td>
+<td><code>cems-glofas-historical-intermediate</code></td>
+<td><strong>Curated</strong> — the ERA5T intermediate stream (<code>product_type: intermediate</code>), a second config of <code>cems-glofas-historical</code> via the per-row <code>cds_dataset</code> override; discharge verified live.</td>
+</tr>
+<tr>
+<td><code>cems-glofas-reforecast</code>, <code>cems-glofas-seasonal</code>, <code>cems-glofas-seasonal-reforecast</code></td>
+<td><strong>Curated</strong> — <code>glofas_hindcast</code> / <code>seasonal</code> request kinds.</td>
 </tr>
 <tr>
 <td><code>cems-fire-historical-v1</code>, <code>cems-fire-seasonal</code></td>
-<td>Need their valid <code>product_type</code> / <code>dataset_type</code> / <code>system_version</code> combos pinned.</td>
+<td><strong>Curated</strong> — CEMS fire-danger rows.</td>
 </tr>
 <tr>
 <td><code>efas-*</code></td>
-<td>The public EFAS archive (licence-gated); EFAS real-time is partner-gated and out of scope.</td>
+<td><strong>Curated</strong> — the EFAS forecast / historical / reforecast / seasonal suite.</td>
 </tr>
 </tbody>
 </table>
