@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import errno
 import time
 from typing import Any
 
@@ -17,7 +18,10 @@ from earthlens.base.http import (
     _default_user_agent,
     _parse_retry_after,
     _progress_total,
+    is_network_unreachable,
+    prefer_ipv4,
     redact_url,
+    retry_login_forcing_ipv4,
 )
 
 
@@ -1084,3 +1088,145 @@ class TestThreadLocalSession:
         reset_thread_local_sessions()
 
         assert thread_local_session("demo") is not first
+
+
+class TestPreferIpv4:
+    """`prefer_ipv4` narrows urllib3 to IPv4 without ever restoring IPv6."""
+
+    @pytest.fixture(autouse=True)
+    def _restore_has_ipv6(self):
+        """Save and restore the process-global HAS_IPV6 around each test."""
+        import urllib3.util.connection as connection
+
+        saved = connection.HAS_IPV6
+        try:
+            yield
+        finally:
+            connection.HAS_IPV6 = saved
+
+    def test_sets_has_ipv6_false(self):
+        """It flips the urllib3 flag so getaddrinfo is asked for IPv4 only."""
+        import urllib3.util.connection as connection
+
+        connection.HAS_IPV6 = True
+        prefer_ipv4()
+        assert connection.HAS_IPV6 is False
+
+    def test_is_idempotent(self):
+        """A second call leaves the flag false rather than toggling it back."""
+        import urllib3.util.connection as connection
+
+        prefer_ipv4()
+        prefer_ipv4()
+        assert connection.HAS_IPV6 is False
+
+    def test_allowed_gai_family_becomes_af_inet(self):
+        """urllib3 then resolves connections in the IPv4 address family."""
+        import socket
+
+        import urllib3.util.connection as connection
+
+        prefer_ipv4()
+        assert connection.allowed_gai_family() == socket.AF_INET
+
+
+def _enetunreach_connection_error() -> requests.ConnectionError:
+    """Build a ConnectionError shaped like a real dead-IPv6-route failure."""
+    return requests.ConnectionError(
+        "HTTPSConnectionPool(host='urs.earthdata.nasa.gov', port=443): Max "
+        "retries exceeded (Caused by NewConnectionError('Failed to establish a "
+        f"new connection: [Errno {errno.ENETUNREACH}] Network is unreachable'))"
+    )
+
+
+class TestIsNetworkUnreachable:
+    """`is_network_unreachable` detects ENETUNREACH anywhere in the chain."""
+
+    def test_bare_enetunreach_oserror_is_detected(self):
+        """An OSError whose errno is ENETUNREACH is recognised directly."""
+        assert is_network_unreachable(OSError(errno.ENETUNREACH, "unreachable"))
+
+    def test_wrapped_message_is_detected(self):
+        """A requests error that only embeds the errno as text is recognised."""
+        assert is_network_unreachable(_enetunreach_connection_error())
+
+    def test_chained_oserror_is_detected(self):
+        """An ENETUNREACH reached only through __cause__ is found."""
+        top = RuntimeError("wrapper")
+        top.__cause__ = OSError(errno.ENETUNREACH, "unreachable")
+        assert is_network_unreachable(top)
+
+    def test_unrelated_error_is_not_detected(self):
+        """A different failure (e.g. connection reset) is not ENETUNREACH."""
+        assert not is_network_unreachable(requests.ConnectionError("reset by peer"))
+
+    def test_none_is_not_detected(self):
+        """A missing exception is reported as not unreachable."""
+        assert not is_network_unreachable(None)
+
+    def test_a_reference_cycle_terminates(self):
+        """A cyclic cause/context chain does not loop forever."""
+        a = RuntimeError("a")
+        b = RuntimeError("b")
+        a.__cause__ = b
+        b.__cause__ = a
+        assert not is_network_unreachable(a)
+
+
+class TestRetryLoginForcingIpv4:
+    """`retry_login_forcing_ipv4` forces IPv4 only on an observed ENETUNREACH."""
+
+    @pytest.fixture(autouse=True)
+    def _restore_has_ipv6(self):
+        """Reset HAS_IPV6 to True before each test and restore it after."""
+        import urllib3.util.connection as connection
+
+        saved = connection.HAS_IPV6
+        connection.HAS_IPV6 = True
+        try:
+            yield connection
+        finally:
+            connection.HAS_IPV6 = saved
+
+    def test_success_first_try_does_not_touch_ipv6(self, _restore_has_ipv6):
+        """A login that succeeds runs once and leaves IPv6 enabled."""
+        calls = []
+        result = retry_login_forcing_ipv4(lambda: calls.append(1) or "ok")
+        assert result == "ok"
+        assert len(calls) == 1
+        assert _restore_has_ipv6.HAS_IPV6 is True
+
+    def test_enetunreach_forces_ipv4_and_retries_once(self, _restore_has_ipv6):
+        """An ENETUNREACH flips IPv6 off and the login is retried and returns."""
+        calls = {"n": 0}
+
+        def login():
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise _enetunreach_connection_error()
+            return "ok"
+
+        assert retry_login_forcing_ipv4(login) == "ok"
+        assert calls["n"] == 2
+        assert _restore_has_ipv6.HAS_IPV6 is False
+
+    def test_non_enetunreach_propagates_without_forcing(self, _restore_has_ipv6):
+        """A non-ENETUNREACH failure is re-raised and IPv6 is left alone."""
+        with pytest.raises(requests.ConnectionError):
+            retry_login_forcing_ipv4(
+                lambda: (_ for _ in ()).throw(requests.ConnectionError("reset"))
+            )
+        assert _restore_has_ipv6.HAS_IPV6 is True
+
+    def test_persistent_enetunreach_propagates_after_one_retry(self, _restore_has_ipv6):
+        """When the retry also hits ENETUNREACH the error propagates."""
+        calls = {"n": 0}
+
+        def login():
+            calls["n"] += 1
+            raise _enetunreach_connection_error()
+
+        with pytest.raises(requests.ConnectionError):
+            retry_login_forcing_ipv4(login)
+        assert calls["n"] == 2
+        assert _restore_has_ipv6.HAS_IPV6 is False

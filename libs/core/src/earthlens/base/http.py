@@ -42,7 +42,7 @@ import time
 from collections.abc import Callable
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, TypeVar, cast
 from urllib.parse import urlsplit
 
 import requests
@@ -284,6 +284,106 @@ def _default_user_agent() -> str:
     from earthlens.core import __version__
 
     return f"earthlens/{__version__}"
+
+
+def prefer_ipv4() -> None:
+    """Make every urllib3-based request in this process skip AAAA records.
+
+    urllib3 asks `getaddrinfo` for `AF_UNSPEC` — both IPv4 (A) and IPv6 (AAAA)
+    addresses — only while `urllib3.util.connection.HAS_IPV6` is true. Setting
+    it false narrows resolution to `AF_INET`, so a connection only ever tries
+    an IPv4 address.
+
+    This exists for a host reached over a network with no IPv6 egress, where a
+    resolved AAAA connects into a dead route and raises
+    `OSError: [Errno 101] Network is unreachable` (`ENETUNREACH`) with no IPv4
+    fallback — the failure mode of GitHub-hosted runners against the dual-stack
+    Earthdata Login host `urs.earthdata.nasa.gov`. Forcing IPv4 drops the AAAA
+    from consideration, so the dead route is never dialled.
+
+    The switch is a `urllib3` module global, so it is **process-wide**: it
+    affects every `requests` / `urllib3` connection made afterwards, not only
+    the caller's. It is idempotent — calling it again is a no-op — and only
+    ever removes IPv6, never restores it. Reach for it in one shared place (an
+    auth path against a known dual-stack host), not per request.
+    """
+    import urllib3.util.connection as connection
+
+    connection.HAS_IPV6 = False
+
+
+_LoginResult = TypeVar("_LoginResult")
+
+
+def is_network_unreachable(exc: BaseException | None) -> bool:
+    """Return whether `exc`'s cause/context chain holds an `ENETUNREACH` error.
+
+    A dead IPv6 route surfaces as `OSError: [Errno 101] Network is unreachable`
+    wrapped several layers deep — `requests.ConnectionError` around urllib3's
+    `NewConnectionError` around the `OSError`. This walks the `__cause__` /
+    `__context__` chain (guarding against cycles) and reports whether any link
+    is an `ENETUNREACH` `OSError`.
+
+    The `isinstance` / `errno` check is the precise signal and is
+    platform-correct (`errno.ENETUNREACH` resolves to the local value). It is
+    backed by a text fallback for the common case where urllib3 embeds the
+    errno in a `NewConnectionError` message rather than chaining the `OSError`;
+    that fallback matches the platform errno tag (`[Errno 101]` on the Linux CI
+    runners #926 targets) so an unrelated message that merely mentions an
+    unreachable network cannot trip the process-wide, irreversible IPv4 flip
+    downstream. The tag form is Unix-shaped and does not match a Windows
+    `WinError`, but a bare Windows `OSError` is still caught by the errno check.
+
+    Args:
+        exc: The exception to inspect, or `None`.
+
+    Returns:
+        Whether an `ENETUNREACH` appears anywhere in the exception chain.
+    """
+    seen: set[int] = set()
+    while exc is not None and id(exc) not in seen:
+        seen.add(id(exc))
+        if isinstance(exc, OSError) and exc.errno == errno.ENETUNREACH:
+            return True
+        if f"[Errno {errno.ENETUNREACH}]" in str(exc):
+            return True
+        exc = exc.__cause__ or exc.__context__
+    return False
+
+
+def retry_login_forcing_ipv4(login: Callable[[], _LoginResult]) -> _LoginResult:
+    """Run `login`, and on a dead IPv6 route force IPv4 and retry it once.
+
+    `login` is called as-is first. If it fails with an `ENETUNREACH` — the
+    dual-stack host resolved a AAAA that connects into a dead route, the #926
+    failure on hosts with no IPv6 egress — `prefer_ipv4()` narrows the process
+    to IPv4 and `login` is retried exactly once. Any other failure, and the
+    retry's own failure, propagate unchanged.
+
+    Forcing IPv4 only on an observed `ENETUNREACH` leaves IPv6 untouched on
+    healthy dual-stack and IPv6-only networks, where the first call succeeds and
+    the switch never fires.
+
+    Args:
+        login: A zero-argument callable that performs the login / dial and
+            returns its result (e.g. an `earthaccess` auth handle or an
+            authenticated session).
+
+    Returns:
+        Whatever `login` returns, from the first successful call or the retry.
+    """
+    try:
+        return login()
+    except Exception as exc:  # noqa: BLE001
+        # Catch broadly so any ENETUNREACH shape is retried; all else re-raised.
+        if not is_network_unreachable(exc):
+            raise
+        logger.warning(
+            "Login hit a dead IPv6 route (ENETUNREACH); forcing IPv4 and "
+            "retrying the dial once."
+        )
+        prefer_ipv4()
+        return login()
 
 
 def new_session() -> requests.Session:
