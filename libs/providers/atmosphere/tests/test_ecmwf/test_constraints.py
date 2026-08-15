@@ -627,3 +627,66 @@ class TestFetchConstraints:
         monkeypatch.setattr(constraints_module.urllib.request, "urlopen", _fail)
         with pytest.raises(ValueError, match="non-https URL"):
             fetch_constraints("any-dataset")
+
+
+class TestDateRangeConstraints:
+    """The `date` field matches by range containment, not exact value.
+
+    A CAMS reanalysis (`cams_date` request kind) serves a single `date` range
+    string (`2003-01-01/2025-12-31`); a specific requested day / sub-range must
+    validate against it rather than requiring an exact string match.
+    """
+
+    _RANGE_ENTRY = [{"variable": ["2m_temperature"], "date": ["2003-01-01/2025-12-31"]}]
+
+    def test_date_sub_range_inside_passes(self, monkeypatch):
+        """A `date` sub-range inside the constraint range validates."""
+        _stub_urlopen(monkeypatch, self._RANGE_ENTRY)
+        RequestValidator(
+            "cams-global-reanalysis-eac4",
+            {"variable": ["2m_temperature"], "date": "2023-01-01/2023-01-01"},
+        ).check()
+
+    def test_single_date_inside_passes(self, monkeypatch):
+        """A single `date` day inside the constraint range validates."""
+        _stub_urlopen(monkeypatch, self._RANGE_ENTRY)
+        RequestValidator(
+            "cams-global-reanalysis-eac4",
+            {"variable": ["2m_temperature"], "date": "2010-06-15"},
+        ).check()
+
+    def test_date_outside_range_raises(self, monkeypatch):
+        """A `date` outside the constraint range is rejected."""
+        _stub_urlopen(monkeypatch, self._RANGE_ENTRY)
+        with pytest.raises(ValueError, match="does not match"):
+            RequestValidator(
+                "cams-global-reanalysis-eac4",
+                {"variable": ["2m_temperature"], "date": "2030-01-01/2030-01-01"},
+            ).check()
+
+
+class TestDateWithin:
+    """Tests for the `_date_within` range-containment helper."""
+
+    @pytest.mark.parametrize(
+        "request_date, constraint, expected",
+        [
+            ("2023-01-01/2023-01-01", "2003-01-01/2025-12-31", True),
+            ("2023-01-01", "2003-01-01/2025-12-31", True),
+            ("2003-01-01/2025-12-31", "2003-01-01/2025-12-31", True),
+            ("2030-01-01/2030-01-01", "2003-01-01/2025-12-31", False),
+            ("2002-12-31", "2003-01-01/2025-12-31", False),
+            ("2020-01-01", "2020-01-01", True),
+            ("2020-01-02", "2020-01-01", False),
+        ],
+    )
+    def test_containment(self, request_date, constraint, expected):
+        """A request date / range is served iff it falls within the constraint.
+
+        Args:
+            request_date: The request's `date` value (a day or `X/Y` range).
+            constraint: One constraint `date` value (a day or `A/B` range).
+            expected: Whether the request should count as within the constraint.
+        """
+        result = constraints_module._date_within(request_date, constraint)
+        assert result is expected, f"{request_date} within {constraint}: {result}"

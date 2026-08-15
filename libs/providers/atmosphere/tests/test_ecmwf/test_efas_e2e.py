@@ -18,11 +18,15 @@ class TestEfasE2E:
 
     def test_live_efas_forecast_returns_discharge(self, tmp_path):
         """A tiny efas-forecast retrieve returns a non-empty river-discharge file."""
+        # The catalog row's `system_version: operational` serves this variable
+        # only through ~2020 in the live EWDS constraints (recent efas-forecast
+        # moved to a versioned system); use a date that is actually served
+        # rather than a stale fixed one CDS no longer offers.
         lens = EarthLens(
             data_source="ecmwf",
             variables={"efas-forecast": ["river-discharge-in-the-last-24-hours"]},
-            start="2024-01-01",
-            end="2024-01-01",
+            start="2020-10-01",
+            end="2020-10-01",
             temporal_resolution="daily",
             lat_lim=[45.0, 50.0],
             lon_lim=[5.0, 10.0],
