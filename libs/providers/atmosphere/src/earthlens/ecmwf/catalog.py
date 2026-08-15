@@ -295,6 +295,12 @@ def _build_dataset_map(
             # `cems-glofas-historical`. setdefault (not assignment) so the explicit
             # override wins; no existing row sets it, so this is backward-compatible.
             merged.setdefault("cds_dataset", ds_name)
+            # Remember the catalog key the variable is curated under. It equals
+            # cds_dataset for every ordinary row, and differs only when the row
+            # overrode cds_dataset (the GloFAS intermediate stream). Naming the
+            # output by dataset_id keeps the intermediate's file from colliding
+            # with the consolidated stream (same cds_variable + cds_dataset).
+            merged.setdefault("dataset_id", ds_name)
             # Default cds_variable to the slug-with-underscores form
             # of the YAML key (e.g. "2m-temperature" -> "2m_temperature").
             # A per-variable row may set `cds_variable` explicitly
@@ -375,8 +381,14 @@ def _synthesize_monthly_entries(
                 "`monthly_product_type: [monthly_averaged_reanalysis]`)."
             )
         rebranded = {
+            # dataset_id tracks cds_dataset here (the synthesised entry is keyed
+            # under ds.monthly), so the monthly output filename is unaffected.
             code: var.model_copy(
-                update={"cds_dataset": ds.monthly, "product_type": monthly_pt}
+                update={
+                    "cds_dataset": ds.monthly,
+                    "dataset_id": ds.monthly,
+                    "product_type": monthly_pt,
+                }
             )
             for code, var in ds.variables.items()
         }
@@ -443,8 +455,16 @@ class Variable(FluxableLeaf):
     :class:`earthlens.base.FluxableLeaf`.
 
     Attributes:
-        cds_dataset: CDS dataset short name used for daily / sub-daily
-            requests, e.g. `"reanalysis-era5-single-levels"`.
+        cds_dataset: CDS dataset short name the retrieve is sent to (the
+            download target), e.g. `"reanalysis-era5-single-levels"`.
+        dataset_id: Catalog key the variable is curated under. Equals
+            `cds_dataset` for every ordinary row, but differs when a row
+            overrides `cds_dataset` to curate a second config of one CDS
+            dataset under a distinct id (the GloFAS historical
+            `intermediate` stream, which retrieves from
+            `cems-glofas-historical`). Used to name the output file so the
+            two configs do not collide; `None` on a directly-built spec
+            falls back to `cds_dataset`.
         cds_variable: CDS variable name passed in the retrieve()
             request, e.g. `"2m_temperature"`.
         nc_variable: Short variable name inside the CDS NetCDF
@@ -495,6 +515,7 @@ class Variable(FluxableLeaf):
     # + `is_flux` property are inherited from `FluxableLeaf`.
 
     cds_dataset: str
+    dataset_id: str | None = None
     cds_variable: str
     nc_variable: str
     units: str

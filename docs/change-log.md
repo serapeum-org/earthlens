@@ -1,5 +1,15 @@
 # Change Log
 
+## Unreleased
+
+### Feat
+
+- **ecmwf**: add the GloFAS historical intermediate (ERA5T) reanalysis stream, with a per-row `cds_dataset` override so the consolidated and intermediate configs of one CDS dataset coexist and write to distinct output files (#1039)
+
+### Fix
+
+- **ecmwf**: correct the GloFAS historical discharge NetCDF variable to `avg_dis` (m3 s-1) (#1039)
+
 ## 0.15.0 (2026-08-14)
 
 ### Feat

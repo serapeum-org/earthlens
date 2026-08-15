@@ -179,6 +179,27 @@ class TestApi:
         target = ecmwf_stub._api(pressure_level_var_info)
         assert target.name == "temperature_reanalysis-era5-pressure-levels.nc"
 
+    def test_target_filename_uses_dataset_id_override(self, ecmwf_stub):
+        """A cds_dataset override names the output by dataset_id, not the target.
+
+        Mirrors the GloFAS intermediate stream: the file is named by the
+        requested catalog id so it cannot collide with a sibling config sharing
+        cds_variable + cds_dataset, while the retrieve still targets cds_dataset.
+        """
+        spec = Variable(
+            cds_dataset="reanalysis-era5-single-levels",
+            dataset_id="alias-dataset",
+            cds_variable="2m_temperature",
+            nc_variable="t2m",
+            units="K",
+            product_type=["reanalysis"],
+        )
+        target = ecmwf_stub._api(spec)
+        assert target.name == "2m_temperature_alias-dataset.nc"
+        assert ecmwf_stub.client.retrieve.call_args.args[0] == (
+            "reanalysis-era5-single-levels"
+        ), "retrieve still targets cds_dataset, not the alias id"
+
     def test_variable_spec_requires_cds_dataset(self):
         """Variable cannot be built without cds_dataset."""
         with pytest.raises(ValidationError, match="cds_dataset"):
