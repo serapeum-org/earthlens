@@ -1,0 +1,33 @@
+# FLOPROS — global flood-protection-standard database (Scussolini et al., 2016).
+#
+# One shapefile of ~4650 subnational polygons, each carrying flood-protection
+# standards expressed as return periods (years) across the FLOPROS layers:
+# Modelled (riverine), Merged (the recommended combined riverine standard), and
+# the Design / Policy layers (min & max, riverine `_Riv` and coastal `_Co`). The
+# shapefile lives inside the NHESS-2016 paper's supplement zip. Single public
+# download, no credentials; geometry is read by pyramids.
+
+license: CC-BY-3.0
+attribution: "Scussolini et al. (2016), Nat. Hazards Earth Syst. Sci., 16, 1049-1061 (doi:10.5194/nhess-16-1049-2016)"
+
+datasets:
+
+  flopros:
+    url: https://nhess.copernicus.org/articles/16/1049/2016/nhess-16-1049-2016-supplement.zip
+    shapefile_stem: FLOPROS_shp_V1
+    crs: EPSG:4326
+    # Identity columns kept on every returned polygon.
+    identity_columns: [name, geonunit, type_en]
+    # Public layer name -> source `.dbf` column. Values are flood-protection
+    # standards as return periods in years (0 = no modelled/merged standard).
+    layers:
+      merged_riverine: MerL_Riv
+      modelled_riverine: ModL_Riv
+      design_min_riverine: DL_Min_Riv
+      design_max_riverine: DL_Max_Riv
+      policy_min_riverine: PL_Min_Riv
+      policy_max_riverine: PL_Max_Riv
+      design_min_coastal: DL_Min_Co
+      design_max_coastal: DL_Max_Co
+      policy_min_coastal: PL_Min_Co
+      policy_max_coastal: PL_Max_Co

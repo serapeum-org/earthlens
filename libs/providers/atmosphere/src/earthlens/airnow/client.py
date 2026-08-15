@@ -28,7 +28,7 @@ from typing import Any
 
 import requests
 
-from earthlens.base.http import HttpClient
+from earthlens.base.http import HttpClient, Timeout
 
 #: AirNow bounding-box observations endpoint.
 BASE_URL = "https://www.airnowapi.org/aq/data/"
@@ -47,7 +47,7 @@ class AirnowClient:
             response's error is raised.
         backoff_factor: Base seconds for exponential back-off when no
             `Retry-After` header is present (wait = factor * 2**attempt).
-        timeout: Per-request timeout in seconds.
+        timeout: Per-request timeout in seconds — a float or a `(connect, read)` pair.
     """
 
     def __init__(
@@ -57,7 +57,7 @@ class AirnowClient:
         session: requests.Session | None = None,
         max_retries: int = 5,
         backoff_factor: float = 1.0,
-        timeout: float = 60.0,
+        timeout: Timeout = 60.0,
         sleep: Callable[[float], None] = time.sleep,
     ) -> None:
         """Build a client bound to one API key.
@@ -70,7 +70,8 @@ class AirnowClient:
             max_retries: Maximum `429` retries before raising.
             backoff_factor: Base seconds for exponential back-off when the
                 response carries no `Retry-After` header.
-            timeout: Per-request timeout in seconds.
+            timeout: Per-request timeout in seconds — a float or a
+                `(connect, read)` pair.
             sleep: The sleep function used between retries. Defaults to
                 `time.sleep`; injectable so tests run without real delays.
         """
@@ -96,8 +97,8 @@ class AirnowClient:
         return self._http.backoff_factor
 
     @property
-    def timeout(self) -> float:
-        """Per-request timeout in seconds."""
+    def timeout(self) -> Timeout:
+        """Per-request timeout in seconds (a float or a `(connect, read)` pair)."""
         return self._http.timeout
 
     def get_data(self, params: dict[str, Any]) -> list[dict[str, Any]]:

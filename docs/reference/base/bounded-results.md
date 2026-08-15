@@ -34,13 +34,20 @@ worth knowing before you rely on it:
 
 | Behaviour | What it means | Backends |
 |---|---|---|
-| **Stops the work** | Items past the cap are never fetched. The cap bounds requests and memory, not just the return value. | admin, climate_indices, drought (USDM), eea_aq, nrel, obis, openaq, osm, pvgis, sensor_community, tropycal (across basins / storms), wdpa |
+| **Stops the work** | Items past the cap are never fetched. The cap bounds requests and memory, not just the return value. | admin, caravan (range-readable archives), climate_indices, drought (USDM), eea_aq, nrel, obis, openaq, osm, pvgis, sensor_community, tropycal (across basins / storms), wdpa |
 | **Pushed to the service** | The cap goes into the provider's own query, so the surplus is never transferred at all. | fdsn (per network) |
-| **Trims the result** | The provider answers the whole request in one call, so the cap bounds what you get back but not what was fetched. | argo, usgs_water, tropycal (within one basin) |
+| **Trims the result** | The provider answers the whole request in one call, so the cap bounds what you get back but not what was fetched. | argo, caravan (`base` at its default version), usgs_water, tropycal (within one basin) |
 
 For the third group, narrowing the request is what reduces transfer — a tighter
 date window, a smaller bbox, or (for usgs_water) the constructor's own
 `limit=`, which the service applies per request.
+
+`caravan` appears in both groups because its two transports differ. Every
+extension ships as a ZIP, which is read member-by-member over HTTP Range, so
+the cap genuinely stops the work. `base` at its default version is a single
+`tar.gz` that has to be scanned sequentially, so there every selected catchment
+is read in one pass and the cap only trims — reading it per catchment would
+mean re-scanning a 29 GB stream each time.
 
 ## Rules that hold everywhere
 

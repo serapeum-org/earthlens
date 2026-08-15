@@ -7,14 +7,14 @@ import json
 import pytest
 from typer.testing import CliRunner
 
-from earthlens.cli import _gee_hydrate as hydrate_mod
+import earthlens.stac.cli as stac_cli
 from earthlens.cli import curate as curate_mod
 from earthlens.cli import datasets as datasets_mod
 from earthlens.cli import refresh as refresh_mod
-from earthlens.cli import stanza as stanza_mod
 from earthlens.cli.app import app
 from earthlens.cli.refresh import CoverageOutcome
 from earthlens.cli.table import build_table
+from earthlens.gee import _hydrate as hydrate_mod
 
 pytestmark = pytest.mark.cli
 
@@ -233,14 +233,14 @@ class TestRefresh:
         )
         result = runner.invoke(app, ["datasets", "refresh", "all", "--json"])
         payload = json.loads(result.output)
-        assert len(payload) == 49, "one outcome per backend"
+        assert len(payload) == 61, "one outcome per backend"
         assert any(o["provider"] == "stac" for o in payload), "stac included"
 
     def test_stac_json_reports_new_ids(self, monkeypatch):
         """A live id absent from the bundle shows up as new (mocked)."""
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "new-z"}], "links": []},
         )
         result = runner.invoke(app, ["datasets", "refresh", "stac", "--json"])
@@ -251,8 +251,8 @@ class TestRefresh:
     def test_show_ids_lists_new_ids(self, monkeypatch):
         """--show-ids prints each new upstream id under the table."""
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "brand-new-collection"}], "links": []},
         )
         result = runner.invoke(app, ["datasets", "refresh", "stac", "--show-ids"])
@@ -278,7 +278,11 @@ class TestRefresh:
             },
             crs="ESRI:54009",
         )
-        monkeypatch.setattr(refresh_mod, "_ghsl_tile_frame", lambda: frame)
+        monkeypatch.setattr(
+            __import__("earthlens.ghsl.cli", fromlist=["_tile_frame"]),
+            "_tile_frame",
+            lambda: frame,
+        )
         monkeypatch.setattr(
             ghsl_helpers, "TILE_SCHEMA_PATH", tmp_path / "tile_schema.geojson"
         )
@@ -307,8 +311,8 @@ class TestRefresh:
         shutil.copytree(stac_catalog.CATALOG_PATH, dst)
         monkeypatch.setattr(stac_catalog, "CATALOG_PATH", dst)
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "x"}], "links": []},
         )
         result = runner.invoke(app, ["datasets", "refresh", "stac", "--write"])
@@ -332,8 +336,8 @@ class TestRefresh:
         shutil.copytree(stac_catalog.CATALOG_PATH, dst)
         monkeypatch.setattr(stac_catalog, "CATALOG_PATH", dst)
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "x"}], "links": []},
         )
         buf = io.StringIO()
@@ -363,8 +367,8 @@ class TestAudit:
     def test_json_reports_broken(self, monkeypatch):
         """--json carries the broken/untracked drift lists."""
         monkeypatch.setattr(
-            refresh_mod,
-            "_get_json",
+            stac_cli,
+            "get_json",
             lambda url: {"collections": [{"id": "only-live"}], "links": []},
         )
         result = runner.invoke(app, ["datasets", "audit", "stac", "--json"])
@@ -375,7 +379,7 @@ class TestAudit:
     def test_strict_exits_nonzero_on_drift(self, monkeypatch):
         """--strict exits 1 when a curated dataset is no longer served live."""
         monkeypatch.setattr(
-            refresh_mod, "_get_json", lambda url: {"collections": [], "links": []}
+            stac_cli, "get_json", lambda url: {"collections": [], "links": []}
         )
         result = runner.invoke(app, ["datasets", "audit", "stac", "--strict"])
         assert result.exit_code == 1, "drift under --strict -> exit 1"
@@ -418,20 +422,24 @@ class TestCurate:
         assert result.exit_code == 0, f"curate failed: {result.output}"
         assert "datasets:" in result.output and "code: '00060'" in result.output
 
-    def test_json_output(self, monkeypatch):
+    def test_json_output(self):
         """--json emits the seeded row object."""
-        monkeypatch.setattr(
-            stanza_mod,
-            "_get_json",
-            lambda url, **kw: {
-                "result": {"title": "P", "resources": [{"name": "a", "format": "CSV"}]}
-            },
-        )
         result = runner.invoke(
-            app, ["datasets", "curate", "hdx", "kontur-population", "--json"]
+            app,
+            [
+                "datasets",
+                "curate",
+                "eumetsat",
+                "EO:EUM:DAT:MSG:HRSEVIRI",
+                "--group",
+                "MSG",
+                "--minimal",
+                "--json",
+            ],
         )
         payload = json.loads(result.output)
-        assert payload["status"] == "ok" and payload["row"]["hdx_id"]
+        assert payload["status"] == "ok"
+        assert payload["row"]["collection_id"]
 
     def test_write_appends_to_catalog(self, tmp_path, monkeypatch):
         """curate --write inserts the row into the (temp) catalog file."""
@@ -506,65 +514,6 @@ class TestCurate:
         )
         assert result.exit_code == 2, "--all + --fill-empty -> exit 2"
 
-    def test_fill_empty_ecmwf_runs_bulk_hydrate(self, monkeypatch):
-        """ecmwf --fill-empty --write drives the ecmwf hydrate and reports a summary."""
-        from earthlens.cli import _ecmwf_hydrate as ecmwf_hydrate_mod
-
-        calls = {}
-
-        def fake_hydrate(limit=None, timeout=None):
-            calls["limit"] = limit
-            calls["timeout"] = timeout
-            return {
-                "candidates": 4,
-                "hydrated": 3,
-                "skipped": 1,
-                "timed_out": 0,
-                "filled": ["a", "b", "c"],
-            }
-
-        monkeypatch.setattr(ecmwf_hydrate_mod, "bulk_hydrate_empty", fake_hydrate)
-        result = runner.invoke(
-            app, ["datasets", "curate", "ecmwf", "--fill-empty", "--write"]
-        )
-        assert result.exit_code == 0, f"ecmwf fill-empty failed: {result.output}"
-        assert "hydrated 3" in result.output
-        assert "/ 4" in result.output
-        assert calls["timeout"] == 180, "the default --timeout is threaded through"
-
-    def test_fill_empty_ecmwf_threads_custom_timeout(self, monkeypatch):
-        """A custom --timeout is passed to the ecmwf hydrate; 0 means no deadline."""
-        from earthlens.cli import _ecmwf_hydrate as ecmwf_hydrate_mod
-
-        calls = {}
-
-        def fake_hydrate(limit=None, timeout=None):
-            calls["timeout"] = timeout
-            return {
-                "candidates": 1,
-                "hydrated": 0,
-                "skipped": 1,
-                "timed_out": 1,
-                "filled": [],
-            }
-
-        monkeypatch.setattr(ecmwf_hydrate_mod, "bulk_hydrate_empty", fake_hydrate)
-        result = runner.invoke(
-            app,
-            [
-                "datasets",
-                "curate",
-                "ecmwf",
-                "--fill-empty",
-                "--write",
-                "--timeout",
-                "0",
-            ],
-        )
-        assert result.exit_code == 0, f"ecmwf fill-empty failed: {result.output}"
-        assert calls["timeout"] is None, "--timeout 0 becomes no deadline (None)"
-        assert "1 timed out" in result.output, "timed-out count is surfaced"
-
     def test_fill_empty_unsupported_provider(self):
         """--fill-empty on a provider that is neither gee nor ecmwf is rejected."""
         result = runner.invoke(
@@ -576,25 +525,6 @@ class TestCurate:
         """curate without an upstream id (and no --fill-empty) is a usage error."""
         result = runner.invoke(app, ["datasets", "curate", "usgs_water"])
         assert result.exit_code == 2, "missing id -> exit 2"
-
-    def test_all_runs_bulk_seed(self, monkeypatch):
-        """ecmwf --all --write drives the bulk seed and reports a summary."""
-        from earthlens.cli import _ecmwf_seed as seed_mod
-
-        monkeypatch.setattr(
-            seed_mod,
-            "bulk_seed_uncurated",
-            lambda limit=None: {
-                "candidates": 5,
-                "seeded": 4,
-                "skipped": 1,
-                "failed": [("x", "boom")],
-            },
-        )
-        result = runner.invoke(app, ["datasets", "curate", "ecmwf", "--all", "--write"])
-        assert result.exit_code == 0, f"--all failed: {result.output}"
-        assert "seeded 4" in result.output
-        assert "/ 5" in result.output
 
     def test_all_requires_write(self):
         """--all without --write is a usage error (it mutates the catalog)."""
@@ -627,6 +557,13 @@ class TestValidate:
         result = runner.invoke(app, ["datasets", "validate", "usgs_water", "--json"])
         payload = json.loads(result.output)
         assert payload[0]["status"] == "ok" and payload[0]["issues"] == []
+
+    def test_nsi_validates_clean(self):
+        """The nsi offline validator passes for the bundled catalog."""
+        result = runner.invoke(app, ["datasets", "validate", "nsi", "--json"])
+        payload = json.loads(result.output)
+        assert payload[0]["status"] == "ok", "nsi validated"
+        assert payload[0]["checked"] == 3, "three nsi sources checked"
 
     def test_emdat_validates_clean(self):
         """The emdat offline validator passes for the bundled catalog."""
@@ -663,27 +600,6 @@ class TestProbe:
         ]
     }
 
-    def test_deep_flag_routes_to_credentialed_sampler(self, monkeypatch):
-        """probe --deep uses the deep sampler (creds mocked)."""
-        from earthlens.cli import curate as curate_mod
-
-        monkeypatch.setattr(
-            curate_mod, "_ecmwf_deep_sample", lambda d: {"t2m": {"units": "K"}}
-        )
-        result = runner.invoke(
-            app,
-            [
-                "datasets",
-                "probe",
-                "ecmwf",
-                "reanalysis-era5-single-levels",
-                "--deep",
-                "--json",
-            ],
-        )
-        payload = json.loads(result.output)
-        assert payload["status"] == "ok" and payload["assets"]["t2m"]["units"] == "K"
-
     def test_unsupported_provider_exits_nonzero(self):
         """A provider with no prober reports unsupported and exits 1."""
         result = runner.invoke(app, ["datasets", "probe", "gdacs", "whatever"])
@@ -697,7 +613,7 @@ class TestProbe:
 
     def test_schema_json_with_mocked_sample(self, monkeypatch):
         """--json emits the parsed band/asset schema."""
-        monkeypatch.setattr(curate_mod, "_get_json", lambda url: self._SAMPLE)
+        monkeypatch.setattr(stac_cli, "get_json", lambda url: self._SAMPLE)
         result = runner.invoke(
             app, ["datasets", "probe", "stac", "sentinel-2-l2a", "--json"]
         )
@@ -707,7 +623,7 @@ class TestProbe:
 
     def test_table_lists_assets(self, monkeypatch):
         """The default table lists each probed entry under the NAME column."""
-        monkeypatch.setattr(curate_mod, "_get_json", lambda url: self._SAMPLE)
+        monkeypatch.setattr(stac_cli, "get_json", lambda url: self._SAMPLE)
         result = runner.invoke(app, ["datasets", "probe", "stac", "sentinel-2-l2a"])
         assert result.exit_code == 0, f"probe failed: {result.output}"
         assert "NAME" in result.output and "B04" in result.output

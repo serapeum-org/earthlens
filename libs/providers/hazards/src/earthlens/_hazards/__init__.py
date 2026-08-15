@@ -12,11 +12,35 @@ from __future__ import annotations
 
 __all__ = ["BACKENDS"]
 
+#: Module path shared by the three `aqueduct` facade keys (canonical + aliases).
+_AQUEDUCT_MODULE = "earthlens.aqueduct"
+
+#: Module path shared by the three NSI facade keys (nsi / nfip / nfhl).
+_NSI = "earthlens.nsi"
+
+#: Module path for the JRC-flood backend, reused across its alias keys.
+_JRC_FLOOD = "earthlens.jrc_flood"
+
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 21 data-source keys.
+#: distribution's 33 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'fdsn': ('earthlens.fdsn', 'FDSN', 'fdsn', {}),
     'gdacs': ('earthlens.gdacs', 'GDACS', '', {}),
+    # FLOPROS global flood-protection standards (Scussolini et al. 2016) — one
+    # public NHESS supplement shapefile, CC-BY-3.0, no extra SDK.
+    'flopros': ('earthlens.flopros', 'FLOPROS', '', {}),
+    # WRI Aqueduct riverine flood-risk exposure (files.wri.org 2015 Analyzer);
+    # public CC-BY-4.0, no extra SDK (core requests + pyramids).
+    'aqueduct': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
+    'aqueduct-floods': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
+    'aqueduct-flood-risk': (_AQUEDUCT_MODULE, 'Aqueduct', '', {}),
+    # HANZE historical European flood impacts — public Zenodo record
+    # (CC-BY-4.0), no extra SDK: the deps are core.
+    'hanze': ('earthlens.hanze', 'HANZE', '', {}),
+    # FLODIS global observed flood footprints <-> impacts — public Zenodo record
+    # 8123096 (CC-BY-4.0), no extra SDK: HttpClient + pandas are core. The global
+    # companion to hanze; sibling of emdat (EM-DAT/GDIS/GFD-derived).
+    'flodis': ('earthlens.flodis', 'FLODIS', '', {}),
     # The extras hint covers the gdis:* sources, which need earthaccess. The
     # emdat:events source is anonymous HTTP and needs no extra; the hint is
     # per key, not per dataset, so it is stated once here.
@@ -25,6 +49,10 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'hdx': ('earthlens.hdx', 'HDX', 'hdx', {}),
     'overture': ('earthlens.overture', 'Overture', 'overture', {}),
     'firms': ('earthlens.firms', 'FIRMS', '', {}),
+    'jrc-flood': (_JRC_FLOOD, 'JRCFlood', '', {}),
+    'efhm': (_JRC_FLOOD, 'JRCFlood', '', {}),
+    'jrc-flood-hazard': (_JRC_FLOOD, 'JRCFlood', '', {}),
+    'european-flood-hazard': (_JRC_FLOOD, 'JRCFlood', '', {}),
     'risk-indicators': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'thinkhazard': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
     'inform': ('earthlens.risk_indicators', 'RiskIndicators', '', {}),
@@ -34,6 +62,12 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'openstreetmap': ('earthlens.osm', 'OSM', 'osm', {}),
     'overpass': ('earthlens.osm', 'OSM', 'osm', {}),
     'ohsome': ('earthlens.osm', 'OSM', 'osm', {}),
+    # NSI — US object-level flood exposure & loss over three keyless sources.
+    # `nsi` defaults to source='structures'; the source-pinning aliases carry a
+    # default_kwargs so `EarthLens("nfip")` does not silently fall back to it.
+    'nsi': (_NSI, 'NSI', '', {}),
+    'nfip': (_NSI, 'NSI', '', {'source': 'nfip'}),
+    'nfhl': (_NSI, 'NSI', '', {'source': 'nfhl'}),
     'admin': ('earthlens.admin', 'AdminBoundaries', '', {}),
     'admin-boundaries': ('earthlens.admin', 'AdminBoundaries', '', {}),
     'geoboundaries': ('earthlens.admin', 'AdminBoundaries', '', {}),

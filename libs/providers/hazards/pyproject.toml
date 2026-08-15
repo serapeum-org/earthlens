@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-hazards"
-version = "0.12.0"
+version = "0.15.0"
 description = "hazard, humanitarian and vector-basemap backends for earthlens"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -33,7 +33,7 @@ requires-python = ">=3.11,<4"
 # this distribution brings the backends' code without their dependencies —
 # `pip install earthlens-hazards[<backend>]` adds exactly one backend's SDK.
 dependencies = [
-    "earthlens-core ==0.12.0",
+    "earthlens-core ==0.15.0",
     # `emdat:events` reads the EM-DAT archive workbook with `pandas.read_excel`,
     # which needs openpyxl. It is a hard dependency rather than part of the
     # `[emdat]` extra on purpose: that route is anonymous and documented as
@@ -52,12 +52,24 @@ emdat = ["earthaccess >=0.17.0"]
 fdsn = ["obspy >=1.5.0"]
 hdx = ["hdx-python-api >=6,<7"]
 overture = ["overturemaps >=1.0.0", "duckdb >=1.0.0"]
-osm = ["overpy >=0.7", "ohsome >=0.4.0"]
+# `urllib3` is imported directly by the ohsome path (backend.py builds a
+# `urllib3.util.retry.Retry` to give the SDK's transport a repo-standard
+# 429/5xx retry policy), so it is a declared direct dependency here — never
+# relied on transitively — per the repository's hard dependency rule. `>=2` for
+# the `backoff_max` / `retry_after_max` Retry constructor args (2.0 promoted
+# them from class attributes), which cap a hostile `Retry-After` to match
+# HttpClient's 300 s ceiling.
+osm = ["overpy >=0.7", "ohsome >=0.4.0", "urllib3 >=2"]
 osm-pbf = ["pyrosm >=0.11.0", "osmium >=4.3.1"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
 hazards = "earthlens._hazards:BACKENDS"
+
+# This distribution's slice of the CLI catalog-tooling table (refresh / audit /
+# probe / validate handlers), merged by earthlens._cli_tooling.
+[project.entry-points."earthlens.cli"]
+hazards = "earthlens._hazards_cli:CLI_TOOLING"
 
 [project.urls]
 Homepage = "https://github.com/serapeum-org/earthlens"
@@ -71,7 +83,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.gdacs*", "earthlens.hdx*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
+include = ["earthlens._hazards*", "earthlens.admin*", "earthlens.aqueduct*", "earthlens.emdat*", "earthlens.fdsn*", "earthlens.firms*", "earthlens.flodis*", "earthlens.flopros*", "earthlens.gdacs*", "earthlens.hanze*", "earthlens.hdx*", "earthlens.jrc_flood*", "earthlens.nsi*", "earthlens.osm*", "earthlens.overture*", "earthlens.risk_indicators*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -92,18 +104,24 @@ consider_namespace_packages = true
 addopts = "--import-mode=importlib"
 markers = [
     "admin: tests for the administrative-boundaries backend (geoBoundaries + CGAZ + Natural Earth + US Census TIGER/Line; no extra SDK — core requests + pyramids; all four public, GADM omitted for license).",
+    "aqueduct: tests for the WRI Aqueduct riverine flood-risk backend (files.wri.org 2015 Analyzer, CC-BY-4.0; no extra SDK — core requests + pyramids; country/state/basin exposure shapefiles).",
     "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
     "emdat: tests for the EM-DAT disaster backend (the UCLouvain Dataverse archive is anonymous and needs no extra; the GDIS sources need the `emdat` extra: earthaccess, plus an Earthdata Login).",
     "gdis: tests for the GDIS half of the EM-DAT backend (needs an Earthdata Login plus acceptance of the SEDAC data-use agreement); deselect with `-m \"not gdis\"` on a machine without credentials.",
     "fdsn: tests for the FDSN seismic-event backend (requires the `fdsn` extra: obspy).",
     "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
+    "flodis: tests for the FLODIS observed-flood footprints<->impacts backend (public Zenodo record 8123096, CC-BY-4.0, no extra SDK — core HttpClient + pandas; global companion to hanze, sibling of emdat).",
+    "flopros: tests for the FLOPROS flood-protection-standard backend (NHESS-2016 supplement shapefile, CC-BY-3.0, no extra SDK — core HttpClient + base/archive + pyramids; subnational protection standards as return periods).",
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
+    "hanze: tests for the HANZE historical European flood-impacts backend (public Zenodo record 20478847, CC-BY-4.0, no extra SDK — core HttpClient + pandas + pyramids).",
     "hdx: tests for the Humanitarian Data Exchange backend (requires the `hdx` extra: hdx-python-api).",
+    "jrc_flood: tests for the JRC European Flood Hazard Map backend (river-flood water depth per return period, Europe + Mediterranean; open HTTPS from the JRC, no extra SDK — core requests + pyramids `/vsicurl` windowed reads; CC-BY 4.0).",
     "integration: exercises multiple modules together with mocked I/O.",
     "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
     "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; requires the `osm-pbf` extra: pyrosm + osmium/pyosmium; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract).",
     "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
     "risk_indicators: tests for the risk-indicators backend (GFDRR ThinkHazard! + INFORM Risk + Global Forest Watch; no extra SDK — core requests + pandas + pyramids; GFW datasets need GFW_API_KEY, ThinkHazard/INFORM are public).",
+    "nsi: tests for the NSI US flood exposure/loss backend (USACE National Structure Inventory + FEMA NFHL flood zones + FEMA NFIP claims v3; no extra SDK — core requests + pandas + pyramids; per-instance OUTPUT_KIND; all three keyless US public domain).",
     "slow: mark test as slow.",
     "unit: in-process unit test, no network or filesystem outside tmp_path.",
 ]

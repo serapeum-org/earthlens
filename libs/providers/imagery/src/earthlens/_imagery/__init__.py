@@ -13,7 +13,7 @@ from __future__ import annotations
 __all__ = ["BACKENDS"]
 
 #: `key -> (module, class_name, extras_hint, default_kwargs)` for this
-#: distribution's 28 data-source keys.
+#: distribution's 29 data-source keys.
 BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'asf': ('earthlens.asf', 'ASF', 'asf', {}),
     'alaska-satellite-facility': ('earthlens.asf', 'ASF', 'asf', {}),
@@ -48,6 +48,7 @@ BACKENDS: dict[str, tuple[str, str, str, dict[str, object]]] = {
     'landsat': ('earthlens.stac', 'STAC', 'stac', {'endpoint': 'usgs-landsat'}),
     'bdc': ('earthlens.stac', 'STAC', 'stac', {'endpoint': 'bdc'}),
     'brazil-data-cube': ('earthlens.stac', 'STAC', 'stac', {'endpoint': 'bdc'}),
+    'eodc': ('earthlens.stac', 'STAC', 'stac', {'endpoint': 'eodc'}),
     'jaxa': ('earthlens.jaxa', 'JAXA', 'jaxa', {}),
     'jaxa-earth': ('earthlens.jaxa', 'JAXA', 'jaxa', {}),
     'g-portal': ('earthlens.jaxa', 'JAXA', 'jaxa', {}),

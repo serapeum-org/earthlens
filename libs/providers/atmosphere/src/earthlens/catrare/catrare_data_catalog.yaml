@@ -1,0 +1,61 @@
+# CatRaRE — Catalogue of Radar-based Rainfall Events (DWD, v2026.01).
+#
+# Objectively-defined heavy-rainfall events derived from the RADKLIM radar
+# climatology over Germany, 2001-2025. Two threshold selections are published:
+#   T5 — events whose rainfall reaches at least a 5-year return period;
+#   W3 — a severity-weighted selection (the Eta severity index).
+# Each threshold ships a FileGDB (`.gdb.zip`) with two layers — the EventZones
+# footprint polygons and the RRmaxPoints maximum-rainfall points — plus a CSV
+# of the same 67 event attributes (no geometry). The companion to the RADKLIM
+# grids. CC-BY-4.0 / GeoNutzV; geometry read by pyramids.
+#
+# The FileGDB layers carry NO embedded CRS: the geometry is in the DWD RADOLAN
+# polar-stereographic grid (`source_crs` below). The backend assigns it and
+# reprojects to EPSG:4326.
+
+base_url: https://opendata.dwd.de/climate_environment/CDC/event_catalogues/germany/precipitation
+# Directory version (dotted) and the tag embedded in file/layer names.
+version: v2026.01
+version_tag: v2026_01
+years: "2001_2025"
+# DWD RADOLAN polar-stereographic projection (a sphere, no EPSG code).
+source_crs: "+proj=stere +lat_0=90 +lat_ts=60 +lon_0=10 +x_0=0 +y_0=0 +a=6370040 +b=6370040 +to_meter=1 +no_defs"
+license: CC-BY-4.0
+attribution: "Deutscher Wetterdienst (DWD), CatRaRE v2026.01 (RADKLIM); GeoNutzV / CC-BY-4.0"
+
+# FileGDB layer stems (composed into `CatRaRE_<years>_<threshold>_Eta_<stem>_<tag>`).
+geometry_layers:
+  zones: EventZones
+  points: RRmaxPoints
+
+# The event columns the date-window filter compares against (start / end of each
+# event's interval), so a future column rename is a catalog-only change.
+date_columns:
+  start: Date_START
+  end: Date_END
+
+# Event attribute columns kept on every returned feature.
+event_columns:
+  - Event_ID
+  - Start_Time
+  - End_Time
+  - Date_START
+  - Date_END
+  - Duration
+  - Area
+  - Eta
+  - RRmax
+  - RRmean
+  - SRImax
+  - Country_RRmax
+  - BDL_RRmax
+
+datasets:
+
+  t5:
+    threshold: T5
+    description: heavy-rainfall events with a return period of at least 5 years
+
+  w3:
+    threshold: W3
+    description: severity-weighted selection of heavy-rainfall events (Eta index)

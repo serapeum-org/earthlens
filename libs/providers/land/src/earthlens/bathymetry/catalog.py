@@ -9,12 +9,16 @@ informational `available_datasets:` list — and validated here against typed
 pydantic rows. The loader merges every file at construction time (the
 ghsl / cmems sharded pattern) through a `(path, mtime_ns)` parse cache.
 
-Every shipped row uses the single `erddap-griddap` transport pinned in the
-A1 gate (`planning/bathymetry/captures/bathymetry-sdk-facts.md`): a NOAA
-ERDDAP `griddap` coverage subset by bbox to a NetCDF the backend reads with
-pyramids and writes to GeoTIFF. The `transport` field still admits the
-`gebco-api` / `opendap` values so a future row can carry a different
-endpoint without a model change, but none ships today.
+Two transports ship today, both pinned live in an A1 gate:
+
+* `erddap-griddap` (GEBCO / ETOPO — `planning/bathymetry/captures/`): a NOAA
+  ERDDAP `griddap` coverage subset by bbox to a NetCDF the backend reads with
+  pyramids and writes to GeoTIFF.
+* `wcs` (EMODnet Bathymetry — `planning/flood-risk/captures/`): an OGC WCS
+  coverage read over pyramids `Dataset.from_wcs` and cropped to the AOI.
+
+The `transport` field also admits the reserved `gebco-api` / `opendap` values
+so a future row can carry a different endpoint without a model change.
 """
 
 from __future__ import annotations
@@ -22,7 +26,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Literal, cast
 
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, ValidationError
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    PrivateAttr,
+    ValidationError,
+    model_validator,
+)
 
 from earthlens.base import AbstractCatalog
 from earthlens.base.catalog_source import (
@@ -41,10 +52,10 @@ CATALOG_PATH: Path = Path(__file__).parent / "catalog"
 #: per-family file invalidates the entry without re-parsing an unchanged tree.
 _CATALOG_CACHE: dict[Any, tuple[list[str], dict[str, Dataset]]] = CatalogParseCache()
 
-#: Transport mechanisms a catalog row may declare. Only `erddap-griddap`
-#: ships today; the other two are reserved for a future GEBCO-API / OPeNDAP
-#: row (see the module docstring).
-Transport = Literal["erddap-griddap", "gebco-api", "opendap"]
+#: Transport mechanisms a catalog row may declare. `erddap-griddap` (GEBCO /
+#: ETOPO) and `wcs` (EMODnet Bathymetry) ship today; `gebco-api` / `opendap`
+#: are reserved for a future row (see the module docstring).
+Transport = Literal["erddap-griddap", "wcs", "gebco-api", "opendap"]
 
 #: Longitude conventions an ERDDAP DEM may serve its grid in.
 LonConvention = Literal["-180..180", "0..360"]
@@ -65,22 +76,35 @@ class Dataset(BaseModel):
     """One curated DEM row — an endpoint, a coverage id, and a band.
 
     Attributes:
-        id: Catalog key for the row (`"gebco_2020"`, `"etopo1_ice"`). Set
-            from the catalog key by the loader.
+        id: Catalog key for the row (`"gebco_2020"`, `"etopo1_ice"`,
+            `"emodnet"`). Set from the catalog key by the loader.
         title: Human-readable one-line description.
-        transport: How the grid is fetched. Every shipped row is
-            `"erddap-griddap"`; `"gebco-api"` / `"opendap"` are reserved.
-        endpoint: Base URL of the server (an ERDDAP base, no trailing
-            `/griddap`). A trailing slash is tolerated by the URL builder.
+        transport: How the grid is fetched — `"erddap-griddap"` (GEBCO /
+            ETOPO) or `"wcs"` (EMODnet Bathymetry); `"gebco-api"` /
+            `"opendap"` are reserved.
+        endpoint: Base URL of the server — an ERDDAP base (no trailing
+            `/griddap`) for `erddap-griddap`, or the OGC WCS endpoint for
+            `wcs`. A trailing slash is tolerated.
         dataset_id: The coverage / dataset id on that server
-            (`"GEBCO_2020"`, `"etopo1_ice"`).
+            (`"GEBCO_2020"`, `"etopo1_ice"`, or the WCS coverage
+            `"emodnet:mean"`).
         variable: The single elevation band name in the grid (`"elevation"`
-            for GEBCO, `"z"` for ETOPO1).
+            for GEBCO / EMODnet, `"z"` for ETOPO1).
         native_resolution: Human-readable native cell size
-            (`"15 arc-second"`, `"1 arc-minute"`).
+            (`"15 arc-second"`, `"1 arc-minute"`, `"3.75 arc-second"`).
         lon_convention: Whether the server's longitude axis runs
-            `"-180..180"` or `"0..360"`. The URL builder normalises the
-            request bbox to this.
+            `"-180..180"` or `"0..360"`. The griddap URL builder normalises
+            the request bbox to this.
+        wcs_version: The OGC WCS protocol version pyramids `from_wcs` must
+            negotiate (`"1.0.0"` for EMODnet — its GeoServer only subsets
+            cleanly at 1.0.0). Empty for non-`wcs` rows.
+        crs: The request / native CRS for a `wcs` row (`"EPSG:4326"`).
+            Ignored by the griddap path.
+        native_bbox: The coverage's advertised extent as
+            `(west, south, east, north)` in `crs`, used by the `wcs` branch
+            to guard out-of-domain requests (the WCS server returns an
+            all-zeros grid, not an error, outside coverage). `None` for
+            griddap rows (ERDDAP rejects an out-of-coverage bbox itself).
         license_note: Attribution / licence text surfaced in docs and logs.
     """
 
@@ -94,7 +118,50 @@ class Dataset(BaseModel):
     variable: str
     native_resolution: str = ""
     lon_convention: LonConvention = "-180..180"
+    wcs_version: str = ""
+    crs: str = "EPSG:4326"
+    native_bbox: tuple[float, float, float, float] | None = None
     license_note: str = ""
+
+    @model_validator(mode="after")
+    def _check_wcs_fields(self) -> Dataset:
+        """Require a `wcs` row to carry the fields its transport needs.
+
+        A `transport: wcs` row is read through pyramids `from_wcs`, which
+        needs the WCS protocol version and (for the out-of-domain guard) the
+        coverage's advertised extent. Enforce both here — present, and not
+        degenerate (a blank version, or a zero/negative-area `native_bbox`) —
+        so a malformed row fails at catalog load, not mid-download.
+
+        Returns:
+            Dataset: The validated row (unchanged).
+
+        Raises:
+            ValueError: If a `wcs` row is missing / blank `wcs_version` or
+                `native_bbox`, or `native_bbox` has non-positive area.
+        """
+        if self.transport != "wcs":
+            return self
+        missing = [
+            name
+            for name, value in (
+                ("wcs_version", (self.wcs_version or "").strip()),
+                ("native_bbox", self.native_bbox),
+            )
+            if not value
+        ]
+        if missing:
+            raise ValueError(
+                f"wcs row {self.id or self.dataset_id!r} is missing "
+                f"required field(s): {', '.join(missing)}."
+            )
+        bbox = self.native_bbox
+        if bbox is not None and (bbox[0] >= bbox[2] or bbox[1] >= bbox[3]):
+            raise ValueError(
+                f"wcs row {self.id or self.dataset_id!r} has a degenerate "
+                f"native_bbox {bbox}; expected west < east and south < north."
+            )
+        return self
 
 
 def _yaml_files_for(path: Path) -> list[Path]:

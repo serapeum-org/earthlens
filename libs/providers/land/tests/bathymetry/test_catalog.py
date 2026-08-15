@@ -23,9 +23,18 @@ def catalog() -> Catalog:
     return Catalog()
 
 
-def test_catalog_loads_three_dems(catalog: Catalog):
-    """The shipped catalog carries the three curated DEM rows."""
-    assert sorted(catalog.datasets) == ["etopo1_bedrock", "etopo1_ice", "gebco_2020"]
+def test_catalog_loads_curated_dems(catalog: Catalog):
+    """The shipped catalog carries the GEBCO, ETOPO, and EMODnet rows."""
+    assert sorted(catalog.datasets) == [
+        "emodnet",
+        "emodnet_2016",
+        "emodnet_2018",
+        "emodnet_2020",
+        "emodnet_2022",
+        "etopo1_bedrock",
+        "etopo1_ice",
+        "gebco_2020",
+    ]
 
 
 def test_available_datasets_matches_curated(catalog: Catalog):
@@ -71,6 +80,13 @@ def test_unknown_id_raises_did_you_mean(catalog: Catalog):
         catalog.get("gebco2020")
 
 
+def test_get_catalog_returns_dataset_map(catalog: Catalog):
+    """get_catalog() returns the id→Dataset map backing the catalog."""
+    mapping = catalog.get_catalog()
+    assert mapping is catalog.datasets
+    assert mapping["emodnet"].transport == "wcs"
+
+
 def test_get_returns_frozen_dataset(catalog: Catalog):
     """get() returns a frozen Dataset row that rejects mutation."""
     row = catalog.get("etopo1_ice")
@@ -83,6 +99,124 @@ def test_dataset_requires_core_fields():
     """A Dataset row without endpoint / dataset_id / variable fails to build."""
     with pytest.raises(ValidationError):
         Dataset(endpoint="https://x/erddap")
+
+
+def test_emodnet_row_fields(catalog: Catalog):
+    """The EMODnet row carries the live-pinned WCS transport fields."""
+    row = catalog.get("emodnet")
+    assert row.transport == "wcs"
+    assert row.endpoint == "https://ows.emodnet-bathymetry.eu/wcs"
+    assert row.dataset_id == "emodnet:mean"
+    assert row.wcs_version == "1.0.0"
+    assert row.crs == "EPSG:4326"
+    assert row.native_bbox == (-70.5, 11.0, 43.0, 90.0)
+    assert row.variable == "elevation"
+
+
+def test_emodnet_licence_recorded(catalog: Catalog):
+    """The EMODnet row records the required attribution / DOI licence note."""
+    note = catalog.get("emodnet").license_note
+    assert "EMODnet" in note
+    assert "doi:10.12770" in note
+
+
+@pytest.mark.parametrize(
+    "dataset_id, coverage, native_bbox",
+    [
+        ("emodnet_2016", "emodnet:mean_2016", (-36.0, 25.0, 43.0, 85.0)),
+        ("emodnet_2018", "emodnet:mean_2018", (-36.0, 15.0, 43.0, 90.0)),
+        ("emodnet_2020", "emodnet:mean_2020", (-36.0, 15.0, 43.0, 90.0)),
+        ("emodnet_2022", "emodnet:mean_2022", (-70.5, 11.0, 43.0, 90.0)),
+    ],
+)
+def test_emodnet_release_variants(
+    catalog: Catalog,
+    dataset_id: str,
+    coverage: str,
+    native_bbox: tuple[float, float, float, float],
+):
+    """Each release resolves to its own coverage id and advertised extent.
+
+    The per-release `native_bbox` is pinned from each coverage's live WCS
+    `DescribeCoverage` envelope — the older releases cover a smaller domain
+    than the latest, so copying one extent to all rows would fail the guard
+    open for the older ones.
+    """
+    row = catalog.get(dataset_id)
+    assert row.transport == "wcs"
+    assert row.dataset_id == coverage
+    assert row.wcs_version == "1.0.0"
+    assert row.native_bbox == native_bbox
+
+
+def test_wcs_row_missing_version_rejected():
+    """A wcs row without wcs_version fails validation."""
+    with pytest.raises(ValidationError, match="wcs_version"):
+        Dataset(
+            transport="wcs",
+            endpoint="https://x/wcs",
+            dataset_id="c:mean",
+            variable="elevation",
+            native_bbox=(-1.0, -1.0, 1.0, 1.0),
+        )
+
+
+def test_wcs_row_missing_native_bbox_rejected():
+    """A wcs row without native_bbox fails validation."""
+    with pytest.raises(ValidationError, match="native_bbox"):
+        Dataset(
+            transport="wcs",
+            endpoint="https://x/wcs",
+            dataset_id="c:mean",
+            variable="elevation",
+            wcs_version="1.0.0",
+        )
+
+
+def test_wcs_row_blank_version_rejected():
+    """A wcs row whose wcs_version is only whitespace fails validation."""
+    with pytest.raises(ValidationError, match="wcs_version"):
+        Dataset(
+            transport="wcs",
+            endpoint="https://x/wcs",
+            dataset_id="c:mean",
+            variable="elevation",
+            wcs_version="  ",
+            native_bbox=(-1.0, -1.0, 1.0, 1.0),
+        )
+
+
+@pytest.mark.parametrize(
+    "native_bbox",
+    [
+        (0.0, 0.0, 0.0, 0.0),  # zero area
+        (1.0, 0.0, -1.0, 1.0),  # west > east (inverted longitude)
+        (-1.0, 1.0, 1.0, -1.0),  # south > north (inverted latitude)
+    ],
+)
+def test_wcs_row_degenerate_bbox_rejected(native_bbox):
+    """A wcs row with a non-positive-area native_bbox fails validation."""
+    with pytest.raises(ValidationError, match="degenerate native_bbox"):
+        Dataset(
+            transport="wcs",
+            endpoint="https://x/wcs",
+            dataset_id="c:mean",
+            variable="elevation",
+            wcs_version="1.0.0",
+            native_bbox=native_bbox,
+        )
+
+
+def test_griddap_row_needs_no_wcs_fields():
+    """A griddap row builds without the WCS-only fields (they stay defaulted)."""
+    row = Dataset(
+        transport="erddap-griddap",
+        endpoint="https://x/erddap",
+        dataset_id="A",
+        variable="z",
+    )
+    assert row.wcs_version == ""
+    assert row.native_bbox is None
 
 
 def test_load_from_single_file(tmp_path: Path):

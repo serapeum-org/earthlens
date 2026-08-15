@@ -69,6 +69,64 @@ def test_build_constraints_rejects_unknown_protocol():
         build_constraints(_space(), _time(), "wmsdap")
 
 
+def _space_sf() -> SpatialExtent:
+    """A San-Francisco-Bay bbox with negative (−180..180) longitudes."""
+    return SpatialExtent.from_pairs(lat_lim=[37.0, 38.5], lon_lim=[-123.5, -121.5])
+
+
+def test_build_constraints_lon_360_shifts_negative_longitudes():
+    """`lon_360` maps a −180..180 tabledap box into the 0..360 convention."""
+    c = build_constraints(_space_sf(), _time(), "tabledap", lon_360=True)
+    assert c["longitude>="] == pytest.approx(236.5)
+    assert c["longitude<="] == pytest.approx(238.5)
+    # Latitude/time keys are untouched by the shift.
+    assert c["latitude>="] == 37.0
+    assert c["latitude<="] == 38.5
+
+
+def test_build_constraints_lon_360_ignored_when_false():
+    """Without the flag the negative longitudes pass through unchanged."""
+    c = build_constraints(_space_sf(), _time(), "tabledap")
+    assert c["longitude>="] == -123.5
+    assert c["longitude<="] == -121.5
+
+
+def test_build_constraints_lon_360_global_box_drops_longitude_keys():
+    """A near-global `lon_360` box drops the un-expressible longitude filter."""
+    world = SpatialExtent.from_pairs(lat_lim=[-80.0, 80.0], lon_lim=[-180.0, 180.0])
+    c = build_constraints(world, _time(), "tabledap", lon_360=True)
+    assert "longitude>=" not in c
+    assert "longitude<=" not in c
+    # Latitude + time still subset the stations.
+    assert c["latitude>="] == -80.0
+    assert c["time>="] == "2023-06-01T12:00:00Z"
+
+
+def test_build_constraints_lon_360_greenwich_box_drops_longitude_keys():
+    """A `lon_360` box straddling 0 deg drops the longitude keys and warns."""
+    from loguru import logger
+
+    channel = SpatialExtent.from_pairs(lat_lim=[49.0, 52.0], lon_lim=[-1.0, 1.0])
+    messages: list[str] = []
+    sink = logger.add(messages.append, level="WARNING")
+    try:
+        c = build_constraints(channel, _time(), "tabledap", lon_360=True)
+    finally:
+        logger.remove(sink)
+    assert "longitude>=" not in c
+    assert "longitude<=" not in c
+    # Latitude still constrains, and the drop is not silent.
+    assert c["latitude>="] == 49.0
+    assert any("wraps the 0/360 seam" in message for message in messages)
+
+
+def test_build_constraints_lon_360_no_effect_on_griddap():
+    """`lon_360` never touches griddap constraints (grids carry their axis)."""
+    c = build_constraints(_space_sf(), _time(), "griddap", lon_360=True)
+    assert c["longitude>="] == -123.5
+    assert c["longitude<="] == -121.5
+
+
 def test_build_griddap_url_full_cube():
     """A time/lat/lon cube subsets every axis in dim order."""
     constraints = build_constraints(_space(), _time(), "griddap")

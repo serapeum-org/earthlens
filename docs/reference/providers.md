@@ -25,6 +25,7 @@ plain HTTP and pull in no additional SDK.
 | Copernicus Marine (CMEMS) | `cmems` | raster | Copernicus Marine login | `cmems` | [CMEMS](cmems/introduction.md) |
 | FDSN seismic events (USGS / EMSC / INGV / …) | `fdsn` | vector | none | `fdsn` | [FDSN](fdsn/introduction.md) |
 | GDACS disaster alerts | `gdacs` | vector | none | — | [GDACS](gdacs/introduction.md) |
+| EM-DAT disaster impacts | `emdat`, `gdis` | tabular | registered account (token) | `emdat` | [EM-DAT](emdat/introduction.md) |
 | OpenAQ air quality (global aggregator) | `openaq` | tabular | API key (`X-API-Key`) | — | [OpenAQ](openaq/introduction.md) |
 | AirNow air quality (US / Canada EPA) | `airnow` | tabular | API key (`API_KEY`) | — | [AirNow](airnow/introduction.md) |
 | EEA air quality (Europe) | `eea-aq` | tabular | none (public) | `eea_aq` | [EEA](eea-aq/introduction.md) |
@@ -35,6 +36,7 @@ plain HTTP and pull in no additional SDK.
 | Open NWP forecasts (NOAA NODD / ECMWF Open Data / DWD via Herbie) | `nwp` | raster | none (open buckets) | `nwp` | [NWP](nwp/introduction.md) |
 | NEXRAD Level-II radar (real-time chunk feed) | `radar`, `nexrad` | vector | none (anonymous S3) | `radar` | [NEXRAD radar](radar/introduction.md) |
 | openEO server-side processing (defaults to CDSE) | `openeo` | raster | CDSE OIDC (interactive or client-credentials) | `openeo` | [openEO](openeo/introduction.md) |
+| GloH2O MSWEP / MSWX (approved Drive share) | `mswep`, `mswx`, `gloh2o` | raster (NetCDF granules) | any Drive credential (service account / ADC / OAuth / rclone) - link-shared, access granted per person | `mswep` | [MSWEP](mswep/introduction.md) |
 | NOAA National Water Model (`noaa-nwm-pds`) | `nwm`, `national-water-model` | per-product (`chrtout` tabular / `ldasout` raster) | unsigned AWS (public bucket) | `nwm` | [NWM](nwm/introduction.md) |
 | Humanitarian Data Exchange (UN OCHA, CKAN) | `hdx` | mixed | none (public) | `hdx` | [HDX](hdx/introduction.md) |
 | NASA FIRMS active fire detections | `firms` | vector | `FIRMS_MAP_KEY` | — | [FIRMS](firms/introduction.md) |
@@ -42,6 +44,7 @@ plain HTTP and pull in no additional SDK.
 | Sentinel Hub server-side render (CDSE) | `sentinel-hub`, `sentinelhub` | mixed (raster / tabular per plane) | OAuth client id / secret | `sentinel-hub` | [Sentinel Hub](sentinel-hub/introduction.md) |
 | Overture Maps vector basemap | `overture` | vector | none (public) | `overture` | [Overture](overture/introduction.md) |
 | USGS Water — NWIS / Water Data | `usgs-water`, `usgs-nwis`, `nwis` | tabular | none | `usgs-water` | [USGS Water](usgs-water/introduction.md) |
+| Caravan large-sample hydrology (incl. the open GRDC subset) | `caravan`, `caravan-grdc`, `grdc-caravan` | tabular | none (CC-BY-4.0) | — | [Caravan](caravan/introduction.md) |
 | JRC Global Human Settlement Layer | `ghsl`, `ghs`, `human-settlement` | raster | none (open HTTPS) | — | [GHSL](ghsl/introduction.md) |
 | WorldPop population data hub | `worldpop`, `world-pop` | mixed (rasters + age/sex tables) | none (CC-BY-4.0) | `worldpop` (optional) | [WorldPop](worldpop/introduction.md) |
 | Alaska Satellite Facility (SAR search + InSAR baselines) | `asf`, `alaska-satellite-facility`, `insar` | raster | NASA Earthdata Login (reuses `earthdata`) | `asf` | [ASF](asf/introduction.md) |

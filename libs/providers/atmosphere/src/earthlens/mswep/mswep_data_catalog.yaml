@@ -1,0 +1,251 @@
+# GloH2O MSWEP / MSWX catalog.
+#
+# Facts here are pinned against the **MSWEP V3.16 Documentation** (GloH2O,
+# 6 February 2026) unless a row is marked `provisional: true`. A provisional
+# value could not be verified without an approved GloH2O Drive share; the
+# backend refuses to resolve against one rather than silently building a path
+# that does not exist. Correcting them is task `A1` of the completion plan:
+# drop the `provisional:` flag once the value is confirmed inside the share.
+#
+# Licence: CC BY-NC 4.0 - non-commercial only. Every request emits a
+# LicenseWarning.
+
+license: CC-BY-NC
+
+attribution: >-
+  Wang, X., Alharbi, R. S., Baez-Villanueva, O. M., Miralles, D. G., Ma, J.,
+  Xu, S., McCabe, M. F., Pappenberger, F., van Dijk, A. I. J. M., McVicar,
+  T. R., Karthikeyan, L., Fowler, H. J., Pan, M., Gebrechorkos, S. H., &
+  Beck, H. E. (2026). MSWEP V3: Machine learning-powered global precipitation
+  estimates at 0.1 degree hourly resolution (1979-present). arXiv.
+  https://doi.org/10.48550/arXiv.2602.01436
+
+# NRT granules for the trailing `nrt_revision_days` days are progressively
+# rewritten upstream as better inputs land, so a cached copy inside this window
+# is always re-downloaded. "MSWEP-NRT files for the past ten days are
+# progressively updated as new data become available. Users should redownload
+# upgraded files." -- MSWEP V3.16 Documentation, section 5.
+nrt_revision_days: 10
+
+# Warn above this many granules in one request; bulk transfers belong to
+# rclone (an hourly year is ~8760 files).
+granule_warn_threshold: 500
+
+# Auxiliary CSVs describing the rain gauges used in MSWEP's gauge-correction
+# step. Folder and file names are verbatim from the MSWEP V3.16 Documentation,
+# section 7. What that section does NOT say is which folder holds it -- it
+# reads "included in the Gauge_metadata folder" with no parent -- but the v3.16
+# share carries it directly under the version root, alongside Past / NRT, so the
+# backend looks for it there in a single lookup.
+gauge_metadata:
+  folder: Gauge_metadata
+  files:
+    daily_station_locations.csv:
+      description: >-
+        Latitude/longitude of each daily gauge that passed quality control and
+        deduplication. Identifiers are the original source station codes
+        (e.g. GHCND_GME00010350).
+    monthly_station_locations.csv:
+      description: >-
+        Latitude/longitude of each monthly gauge. Identifiers
+        (e.g. gridcell_00042230) are 0.25 degree GPCC grid cells; the numeric
+        suffix is the cell's flattened index in a global 720x1440 grid, in
+        row-major order from the top-left.
+    daily_station_date_ranges.csv:
+      description: >-
+        First and last valid observation per daily gauge. Bounds the temporal
+        span only - it does not imply continuous coverage, and many gauges have
+        gaps of days, months or years.
+    monthly_station_date_ranges.csv:
+      description: >-
+        First and last valid observation per monthly gauge. Same caveat about
+        gaps as the daily file.
+    daily_station_reporting_times.csv:
+      description: >-
+        Inferred reporting time per daily gauge, as an integer hour offset from
+        00:00 UTC. -5 means totals likely end 19:00 UTC; 0 means aligned with
+        the UTC calendar day; +3 means 03:00 UTC the following day.
+
+products:
+
+  mswep:
+    description: >-
+      Multi-Source Weighted-Ensemble Precipitation - machine-learning merged
+      gauge, satellite and reanalysis precipitation at 0.1 degree, 1979 to
+      ~2 hours from real time.
+    # `<root>/<variant>/<temporal>/<stem>.nc` -- MSWEP has no variable level.
+    # Verbatim example from the V3.16 documentation, section 6:
+    #   MSWEP_V315/Past/Hourly/2020116.18.nc
+    path_template: "{root}/{variant}/{temporal}/{stem}.nc"
+    default_version: "3.16"
+    # Roots are the shared folders' own names, confirmed from the share. GloH2O
+    # shares one folder per version, so `folder_id` points straight at one of
+    # these -- the `root` name here is descriptive (and drives the on-disk output
+    # mirror), not a folder to search for.
+    versions:
+      "2.80":
+        root: MSWEP_V280
+        description: >-
+          Recommended by GloH2O over V3.15/V3.16 for trend analysis over
+          1979-2021: V3.15/V3.16 show artificially low precipitation during
+          2000-2015 from an IMERG/GSMaP step change in 2015. No Hourly
+          resolution in this version.
+      "3.15":
+        root: MSWEP_V315
+      "3.16":
+        # Confirmed: the shared v3.16 folder is named MSWEP_V316_test (the
+        # `_test` suffix matches GloH2O's MSWEP_V315_test pattern), not the
+        # MSWEP_V316 that the version string would suggest.
+        root: MSWEP_V316_test
+    variants:
+      Past:
+        description: Gauge-corrected historical MSWEP.
+        start: "1979-01-01"
+        end: "2024-12-31"
+      Past_nogauge:
+        description: >-
+          Satellite-reanalysis baseline without gauge correction. For
+          evaluating the baseline against independent gauges, and for
+          near-real-time anomalies such as event return periods.
+        start: "1979-01-01"
+        end: "2024-12-31"
+      NRT:
+        description: >-
+          Near-real-time, ~2 hour latency. Trailing files are revised for
+          ~10 days as GSMaP/IMERG/ERA5 inputs mature.
+        start: "2025-01-01"
+        end: null
+    resolutions:
+      hourly:
+        folder: Hourly
+        stem: "%Y%j.%H"
+        step: PT1H
+        units: mm/hour
+      3hourly:
+        folder: 3hourly
+        stem: "%Y%j.%H"
+        step: PT3H
+        units: mm/3-hour
+      daily:
+        folder: Daily
+        stem: "%Y%j"
+        step: P1D
+        units: mm/day
+      monthly:
+        folder: Monthly
+        stem: "%Y%m"
+        step: P1M
+        units: mm/month
+    variables:
+      precipitation:
+        netcdf_field: precipitation
+        long_name: Precipitation accumulation over the timestep
+        dims: [1800, 3600]
+
+  mswx:
+    description: >-
+      Multi-Source Weather - bias-corrected global meteorological forcing at
+      0.1 degree / 3-hourly, the companion to MSWEP. Its forecast streams
+      extend MSWEP forward.
+    # `<root>/<variant>/<variable>/<temporal>/<stem>.nc` -- MSWX inserts a
+    # variable level MSWEP does not have. Confirmed shape:
+    #   MSWX_V100/Past/Temp/Daily/2007133.nc
+    path_template: "{root}/{variant}/{variable}/{temporal}/{stem}.nc"
+    # The forecast streams (Mid / Long) add an initialisation-time and an
+    # ensemble-member level, and the leaf granule is named by VALID time
+    # (same stem as analysis). Confirmed shape:
+    #   MSWX_V100/Mid/Temp/20260801_00/01/Daily/2026213.nc
+    forecast_path_template: "{root}/{variant}/{variable}/{init}/{member}/{temporal}/{stem}.nc"
+    default_version: "1.00"
+    versions:
+      "1.00":
+        root: MSWX_V100
+    variants:
+      Past:
+        description: ERA5-based historical MSWX.
+        start: "1979-01-01"
+        end: null
+      NRT:
+        description: GDAS-based near-real-time MSWX.
+        start: null
+        end: null
+      # The two forecast streams, the folders `Mid` and `Long`. Fetchable via
+      # the forecast_path_template above: request with variant=Mid/Long,
+      # init=<YYYY-MM-DD>, members=[...]; start/end select the valid times.
+      # Member counts / horizons are from the MSWX paper (Beck et al., BAMS
+      # 2022). The `Long` (seasonal) archive was empty when the share was
+      # surveyed, so a Long request currently returns nothing.
+      Mid:
+        kind: forecast
+        description: >-
+          Bias-corrected medium-range ensemble forecast, derived from NOAA GEFS.
+        members: 30
+        horizon: 10 days
+        base_model: GEFS
+        update_cadence: daily
+        notes: >-
+          Layout <variable>/<YYYYMMDD_HH init>/<member NN>/<temporal>/<valid>.nc;
+          members are sub-folders, the leaf named by valid time. Initialised at
+          00Z daily.
+      Long:
+        kind: forecast
+        description: >-
+          Bias-corrected long-range ensemble forecast (MSWX-Long), derived from
+          ECMWF SEAS5.
+        members: 51
+        horizon: 7 months
+        base_model: SEAS5
+        update_cadence: monthly
+        notes: >-
+          Same layout as the medium-range stream. The seasonal archive was empty
+          when the share was surveyed, so a request currently returns nothing.
+    resolutions:
+      3hourly:
+        folder: 3hourly
+        stem: "%Y%j.%H"
+        step: PT3H
+        units: varies
+      daily:
+        folder: Daily
+        stem: "%Y%j"
+        step: P1D
+        units: varies
+      monthly:
+        folder: Monthly
+        stem: "%Y%m"
+        step: P1M
+        units: varies
+    # All ten variable folder names confirmed present in the share's Past tree
+    # (the `variable` key IS the Drive folder name). The `netcdf_field` values
+    # are descriptive; only the folder name affects pathing.
+    variables:
+      Temp:
+        netcdf_field: air_temperature
+        long_name: 2-m air temperature
+      P:
+        netcdf_field: precipitation
+        long_name: Precipitation
+      Tmax:
+        netcdf_field: air_temperature
+        long_name: 2-m daily maximum air temperature
+      Tmin:
+        netcdf_field: air_temperature
+        long_name: 2-m daily minimum air temperature
+      Pres:
+        netcdf_field: surface_pressure
+        long_name: Surface pressure
+      RelHum:
+        netcdf_field: relative_humidity
+        long_name: 2-m relative humidity
+      SpecHum:
+        netcdf_field: specific_humidity
+        long_name: 2-m specific humidity
+      Wind:
+        netcdf_field: wind_speed
+        long_name: 10-m wind speed
+      SWd:
+        netcdf_field: downward_shortwave_radiation
+        long_name: Downward shortwave radiation
+      LWd:
+        netcdf_field: downward_longwave_radiation
+        long_name: Downward longwave radiation

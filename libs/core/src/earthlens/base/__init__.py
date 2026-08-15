@@ -33,7 +33,16 @@ from earthlens.base.catalog_source import (
     load_catalog,
     yaml_files_for,
 )
-from earthlens.base.http import HttpClient, redact_url
+from earthlens.base.http import (
+    HttpClient,
+    HttpRangeFile,
+    RangeReadError,
+    Timeout,
+    is_network_unreachable,
+    prefer_ipv4,
+    redact_url,
+    retry_login_forcing_ipv4,
+)
 from earthlens.base.leaves import FluxableLeaf
 from earthlens.base.naming import safe_filename
 from earthlens.base.providers import Provider, clear_providers_cache, load_providers
@@ -69,6 +78,8 @@ __all__ = [
     "estimate_pixel_dims",
     "FluxableLeaf",
     "HttpClient",
+    "HttpRangeFile",
+    "is_network_unreachable",
     "LazyClientMixin",
     "load_catalog",
     "load_providers",
@@ -77,18 +88,22 @@ __all__ = [
     "normalize_aoi",
     "OutputKind",
     "PolygonAoiWarning",
+    "prefer_ipv4",
     "Provider",
+    "RangeReadError",
     "redact_url",
     "region_affinity",
     "RemoteProduct",
     "resolve_aoi",
     "resolve_cadence",
+    "retry_login_forcing_ipv4",
     "S3Auth",
     "S3Credentials",
     "safe_filename",
     "SpatialExtent",
     "split_time",
     "TemporalExtent",
+    "Timeout",
     "to_datetime",
     "warn_if_egress",
     "WHOLE_WINDOW",

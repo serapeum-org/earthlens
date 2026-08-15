@@ -1,6 +1,6 @@
 [project]
 name = "earthlens"
-version = "0.12.0"
+version = "0.15.0"
 description = "remote sensing package"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -30,12 +30,12 @@ requires-python = ">=3.11,<4"
 # five is conflict-free — the irreconcilable pins only meet if a user asks for
 # two conflicting extras at once, exactly as before the split.
 dependencies = [
-    "earthlens-core ==0.12.0",
-    "earthlens-atmosphere ==0.12.0",
-    "earthlens-ocean ==0.12.0",
-    "earthlens-imagery ==0.12.0",
-    "earthlens-land ==0.12.0",
-    "earthlens-hazards ==0.12.0",
+    "earthlens-core ==0.15.0",
+    "earthlens-atmosphere ==0.15.0",
+    "earthlens-ocean ==0.15.0",
+    "earthlens-imagery ==0.15.0",
+    "earthlens-land ==0.15.0",
+    "earthlens-hazards ==0.15.0",
 ]
 
 
@@ -58,7 +58,9 @@ gee = ["earthlens-imagery[gee]"]
 ghsl = ["earthlens-land[ghsl]"]
 goes = ["earthlens-atmosphere[goes]"]
 hdx = ["earthlens-hazards[hdx]"]
+isimip = ["earthlens-atmosphere[isimip]"]
 jaxa = ["earthlens-imagery[jaxa]"]
+mswep = ["earthlens-atmosphere[mswep]"]
 nwm = ["earthlens-ocean[nwm]"]
 nwp = ["earthlens-atmosphere[nwp]"]
 obis = ["earthlens-ocean[obis]"]
@@ -97,7 +99,9 @@ all = [
     "earthlens[ghsl]",
     "earthlens[goes]",
     "earthlens[hdx]",
+    "earthlens[isimip]",
     "earthlens[jaxa]",
+    "earthlens[mswep]",
     "earthlens[nwm]",
     "earthlens[nwp]",
     "earthlens[obis]",
@@ -120,8 +124,10 @@ dev = [
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): the showcase notebooks render rasters and
     # animate Dataset stacks via Dataset.plot / DatasetCollection.plot; not a
-    # runtime dep of earthlens itself.
-    "pyramids-gis[viz] >=0.46.0",
+    # runtime dep of earthlens itself. 0.52.0 adopts cleopatra 0.31's RgbBands
+    # in the ArrayGlyph constructor (pyramids #972) and its [viz] extra pulls
+    # cleopatra[tiles] >=0.31.0.
+    "pyramids-gis[viz] >=0.53.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -131,9 +137,12 @@ dev = [
     # object (the old kwarg still works as a deprecated alias, but the
     # showcase notebooks already migrated their existing text_loc= calls,
     # and the new dark-canvas notebook uses FrameLabel's color= directly
-    # rather than the also-deprecated label_color=) -- floor pinned to
-    # the latest of these, >=0.26.1.
-    "cleopatra >=0.26.1",
+    # rather than the also-deprecated label_color=) -- 0.30.0 completes the
+    # move to grouped/typed render-parameter objects (glyphs/styling/basemap
+    # subpackages), and 0.31.0 groups ArrayGlyph's loose rgb /
+    # surface_reflectance / cutoff / percentile constructor keywords into an
+    # RgbBands object (pyramids 0.52.0's plot path builds on this).
+    "cleopatra >=0.31.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.
@@ -164,8 +173,8 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.46.0",
-    "cleopatra >=0.26.1",
+    "pyramids-gis[viz] >=0.53.0",
+    "cleopatra >=0.31.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
 ]
@@ -358,7 +367,9 @@ markers = [
     "unit: in-process unit test, no network or filesystem outside tmp_path.",
     "integration: exercises multiple modules together with mocked I/O.",
     "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
+    "catrare: tests for the CatRaRE DWD heavy-rainfall event-catalogue backend (opendata.dwd.de FileGDB v2026.01, CC-BY-4.0 / GeoNutzV, no extra SDK — core HttpClient + pyramids; RADKLIM-derived events reprojected from the RADOLAN grid).",
     "chc: tests for the Climate Hazards Center (CHC) FTP backend (no extra SDK; covers CHIRPS / CHIRP / CHIRTS / WBGT / SPI / SPEI / CHC_CMIP6 etc.).",
+    "caravan: tests for the Caravan large-sample hydrology backend (no extra SDK; static Zenodo archives read over HTTP Range, includes the open GRDC-Caravan subset).",
     "s3: tests for the S3 backend (requires the `s3` extra: boto3).",
     "ecmwf: tests for the ECMWF/CDS backend (requires the `ecmwf` extra: cdsapi).",
     "gee: tests for the Google Earth Engine backend (requires the `gee` extra: earthengine-api).",
@@ -372,6 +383,8 @@ markers = [
     "openeo: tests for the openEO server-side-processing backend (requires the `openeo` extra: openeo).",
     "sentinel_hub: tests for the Sentinel Hub server-side-render backend (requires the `sentinel-hub` extra: sentinelhub).",
     "gdacs: tests for the GDACS multi-hazard alert backend (public feed, no extra SDK).",
+    "flopros: tests for the FLOPROS flood-protection-standard backend (NHESS-2016 supplement shapefile, CC-BY-3.0, no extra SDK — core HttpClient + base/archive + pyramids; subnational protection standards as return periods).",
+    "hanze: tests for the HANZE historical European flood-impacts backend (public Zenodo record 20478847, CC-BY-4.0, no extra SDK — core HttpClient + pandas + pyramids).",
     "emdat: tests for the EM-DAT disaster backend (the UCLouvain Dataverse archive is anonymous and needs no extra; the GDIS sources need the `emdat` extra: earthaccess, plus an Earthdata Login).",
     "gdis: tests for the GDIS half of the EM-DAT backend (needs an Earthdata Login plus acceptance of the SEDAC data-use agreement); deselect with `-m \"not gdis\"` on a machine without credentials.",
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
@@ -380,8 +393,11 @@ markers = [
     "sensor_community: tests for the Sensor.Community air-quality backend (crowdsourced low-cost sensors; no extra SDK — core `requests` + `pandas`; public archive + live JSON API, ODbL).",
     "tropycal: tests for the Tropycal cyclone-track backend (requires the `tropycal` extra: tropycal, cartopy).",
     "firms: tests for the NASA FIRMS active-fire backend (free MAP_KEY, no extra SDK; uses the core `requests` + `pandas` dependencies).",
+    "flodis: tests for the FLODIS observed-flood footprints<->impacts backend (public Zenodo record 8123096, CC-BY-4.0, no extra SDK — core HttpClient + pandas; global companion to hanze, sibling of emdat).",
+    "mswep: tests for the GloH2O MSWEP / MSWX backend (requires the `mswep` extra).",
     "nwm: tests for the NOAA National Water Model backend (requires the `nwm` extra: boto3; unsigned noaa-nwm-pds bucket).",
     "cmip6: tests for the CMIP6 backend (raw archive on the open Pangeo gs://cmip6 bucket; anonymous, no extra SDK; reads via pyramids).",
+    "isimip: tests for the ISIMIP bias-adjusted climate-forcing backend (requires the `isimip` extra: isimip-client; facet search + server-side cutout job on the ISIMIP repository, public/no auth).",
     "overture: tests for the Overture Maps vector backend (requires the `overture` extra: overturemaps).",
     "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
     "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
@@ -400,12 +416,15 @@ markers = [
     "ptree: e2e-only selector for the live P-Tree Himawari HSD FTP fetch (needs $JAXA_PTREE_USERNAME + $JAXA_PTREE_PASSWORD; 30-day rolling archive; the no-network ptree unit tests carry `@pytest.mark.jaxa + @pytest.mark.unit` instead so `-m ptree` does not pick them up).",
     "argo: tests for the Argo float-profile backend (requires the `argo` extra: argopy; open data, no auth).",
     "erddap: tests for the generic ERDDAP backend (requires the `erddap` extra: erddapy; griddap raster via direct .nc download + pyramids, tabledap tabular via to_pandas; public servers only).",
-    "bathymetry: tests for the bathymetry DEM backend (GEBCO 2020 + ETOPO1 ice/bedrock via NOAA ERDDAP griddap; no extra SDK — core requests + pyramids).",
+    "bathymetry: tests for the bathymetry DEM backend (GEBCO 2020 + ETOPO1 ice/bedrock via NOAA ERDDAP griddap; EMODnet Bathymetry European DTM via OGC WCS; no extra SDK — core requests + pyramids).",
+    "fabdem: tests for the FABDEM V1-2 bare-earth DEM backend (Forest And Buildings removed Copernicus DEM, ~30m; open HTTPS from the University of Bristol, no extra SDK — core requests + pyramids; CC-BY-NC-SA 4.0 non-commercial).",
+    "jrc_flood: tests for the JRC European Flood Hazard Map backend (river-flood water depth per return period, Europe + Mediterranean; open HTTPS from the JRC, no extra SDK — core requests + pyramids `/vsicurl` windowed reads; CC-BY 4.0).",
     "solar_wind_atlas: tests for the Solar & Wind Atlas backend (Global Solar Atlas + Global Wind Atlas climatology layers; no extra SDK — core requests + pyramids; GWA windowed /vsicurl COG read, GSA download-then-localise).",
     "pvgis: tests for the JRC PVGIS solar-radiation / PV time-series backend (keyless REST via core `requests` + `pandas`; no extra SDK).",
     "climate_indices: tests for the climate / teleconnection index backend (NOAA PSL + KNMI Climate Explorer monthly ASCII series; no extra SDK — core requests + pandas).",
     "nrel: tests for the NREL NSRDB / WIND Toolkit solar-wind time-series backend (keyed REST CSV via core `requests` + `pandas`; no extra SDK; required api_key + email auth).",
     "risk_indicators: tests for the risk-indicators backend (GFDRR ThinkHazard! + INFORM Risk + Global Forest Watch; no extra SDK — core requests + pandas + pyramids; GFW datasets need GFW_API_KEY, ThinkHazard/INFORM are public).",
+    "nsi: tests for the NSI US flood exposure/loss backend (USACE National Structure Inventory + FEMA NFHL flood zones + FEMA NFIP claims v3; no extra SDK — core requests + pandas + pyramids; per-instance OUTPUT_KIND; all three keyless US public domain).",
     "glaciers: tests for the glaciers backend (RGI 7.0 per-region outlines via IHP-WINS + GLIMS WFS time-series outlines + WGMS Fluctuations of Glaciers tabular; no extra SDK — core requests + pandas + pyramids; mixed per-instance OUTPUT_KIND; all sources open, no auth).",
     "osm: tests for the OpenStreetMap backend (requires the `osm` extra: overpy + ohsome; two public keyless protocols — Overpass current-state via overpy, OSM history via ohsome; the non-e2e suite fakes both SDKs).",
     "osm_pbf: tests for the OpenStreetMap `pbf` protocol (bulk Geofabrik `.osm.pbf` reads; requires the `osm-pbf` extra: pyrosm + osmium/pyosmium; the non-e2e suite fakes the reader + HttpClient, the gated e2e downloads a small extract).",

@@ -579,10 +579,11 @@ class STAC(LazyClientMixin, AbstractDataSource):
             reduced = getattr(collection.groupby(labels), op)(skipna=config.skipna)
             geo, epsg = _geo_of(Dataset, files[0])
             part = f"_part{idx}" if multi else ""
+            # Flatten endpoint-namespaced keys ("eodc/gfm") so the "/" does not
+            # target a non-existent subdirectory (matches _fetch's filenames).
+            safe_key = safe_filename(collection_key)
             for label, array in reduced.items():
-                target = (
-                    out_dir / f"{collection_key}_{op}_{config.freq}_{label}{part}.tif"
-                )
+                target = out_dir / f"{safe_key}_{op}_{config.freq}_{label}{part}.tif"
                 write_cog(
                     Dataset.create_from_array(arr=array, geo=geo, epsg=epsg),
                     str(target),

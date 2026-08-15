@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-land"
-version = "0.12.0"
+version = "0.15.0"
 description = "terrain, elevation, soil, ecology and population backends for earthlens"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -33,7 +33,7 @@ requires-python = ">=3.11,<4"
 # this distribution brings the backends' code without their dependencies —
 # `pip install earthlens-land[<backend>]` adds exactly one backend's SDK.
 dependencies = [
-    "earthlens-core ==0.12.0",
+    "earthlens-core ==0.15.0",
 ]
 
 [project.optional-dependencies]
@@ -45,6 +45,9 @@ worldpop = ["worldpoppy >=0.4", "py7zr >=0.20"]
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
 land = "earthlens._land:BACKENDS"
+
+[project.entry-points."earthlens.cli"]
+land = "earthlens._land_cli:CLI_TOOLING"
 
 [project.urls]
 Homepage = "https://github.com/serapeum-org/earthlens"
@@ -58,7 +61,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._land*", "earthlens.bathymetry*", "earthlens.dem*", "earthlens.gbif*", "earthlens.ghsl*", "earthlens.glaciers*", "earthlens.iucn*", "earthlens.soilgrids*", "earthlens.wdpa*", "earthlens.worldpop*"]
+include = ["earthlens._land*", "earthlens.bathymetry*", "earthlens.dem*", "earthlens.fabdem*", "earthlens.gbif*", "earthlens.ghsl*", "earthlens.glaciers*", "earthlens.iucn*", "earthlens.soilgrids*", "earthlens.wdpa*", "earthlens.worldpop*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -83,6 +86,7 @@ markers = [
     "bathymetry: tests for the bathymetry DEM backend (GEBCO 2020 + ETOPO1 ice/bedrock via NOAA ERDDAP griddap; no extra SDK — core requests + pyramids).",
     "dem: tests for the Copernicus DEM backend (GLO-30 / GLO-90; requires the `dem` extra: boto3; anonymous copernicus-dem-30m / -90m buckets; raw COG tiles — no decode, mosaic/crop is pyramids downstream).",
     "e2e: end-to-end test against a live external service (e.g. CDS); select with `-m e2e`.",
+    "fabdem: tests for the FABDEM V1-2 bare-earth DEM backend (Forest And Buildings removed Copernicus DEM, ~30m; open HTTPS from the University of Bristol, no extra SDK — core requests + pyramids; CC-BY-NC-SA 4.0 non-commercial).",
     "gbif: tests for the GBIF species-occurrence backend (requires the `gbif` extra: pygbif; search is anonymous).",
     "ghsl: tests for the GHSL backend (JRC Global Human Settlement Layer; open HTTPS, no extra SDK for the direct path; localised via pyramids).",
     "glaciers: tests for the glaciers backend (RGI 7.0 per-region outlines via IHP-WINS + GLIMS WFS time-series outlines + WGMS Fluctuations of Glaciers tabular; no extra SDK — core requests + pandas + pyramids; mixed per-instance OUTPUT_KIND; all sources open, no auth).",

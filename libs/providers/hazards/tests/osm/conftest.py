@@ -170,27 +170,52 @@ def fake_overpass_post(monkeypatch: pytest.MonkeyPatch) -> FakePostState:
 
 @dataclass
 class FakeOhsomeState:
-    """Records the `elements.geometry.post` kwargs and serves a fixture frame."""
+    """Records the client-construction + post kwargs and serves a fixture frame.
+
+    The backend issues the request as `OhsomeClient(...).post(endpoint=
+    "elements/geometry", ...)`, so both the constructor kwargs (`user_agent` /
+    `retry` / `log`) and the post kwargs are captured; `error` lets a test make
+    the post raise instead of returning a frame.
+    """
 
     frame: gpd.GeoDataFrame = field(default_factory=make_ohsome_frame)
     post_kwargs: dict[str, Any] = field(default_factory=dict)
+    client_kwargs: dict[str, Any] = field(default_factory=dict)
+    error: BaseException | None = None
 
 
 @pytest.fixture
 def fake_ohsome(monkeypatch: pytest.MonkeyPatch) -> FakeOhsomeState:
-    """Replace the `ohsome` module with a recording fake."""
+    """Replace the `ohsome` module with a recording fake.
+
+    Mirrors both SDK call forms: the root `OhsomeClient(...).post(endpoint=
+    "elements/geometry", ...)` the backend uses (recording the construction
+    kwargs so a test can assert the retry / user-agent policy) and the chained
+    `.elements.geometry.post(...)` form.
+    """
     state = FakeOhsomeState()
+
+    def _record_post(**kwargs: Any):
+        state.post_kwargs = kwargs
+        if state.error is not None:
+            raise state.error
+        return types.SimpleNamespace(as_dataframe=lambda: state.frame)
 
     class _Geometry:
         def post(self, **kwargs: Any):
-            state.post_kwargs = kwargs
-            return types.SimpleNamespace(as_dataframe=lambda: state.frame)
+            return _record_post(**kwargs)
 
     class _Elements:
         geometry = _Geometry()
 
     class _OhsomeClient:
         elements = _Elements()
+
+        def __init__(self, **kwargs: Any) -> None:
+            state.client_kwargs = kwargs
+
+        def post(self, **kwargs: Any):
+            return _record_post(**kwargs)
 
     module = types.ModuleType("ohsome")
     module.OhsomeClient = _OhsomeClient

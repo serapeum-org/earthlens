@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import errno
 import os
 import sys
 from pathlib import Path
@@ -472,3 +473,55 @@ class TestConfigure:
         )
         with pytest.raises(ImportError, match=r"earthlens\[emdat\]"):
             auth.configure()
+
+
+def _enetunreach_error() -> requests.ConnectionError:
+    """A ConnectionError shaped like a real dead-IPv6-route failure."""
+    return requests.ConnectionError(
+        "HTTPSConnectionPool(host='urs.earthdata.nasa.gov', port=443): "
+        f"(Caused by NewConnectionError('[Errno {errno.ENETUNREACH}] Network is unreachable'))"
+    )
+
+
+@pytest.fixture(autouse=True)
+def has_ipv6():
+    """Save/restore urllib3's HAS_IPV6 around every test so no flip leaks."""
+    import urllib3.util.connection as connection
+
+    saved = connection.HAS_IPV6
+    connection.HAS_IPV6 = True
+    try:
+        yield connection
+    finally:
+        connection.HAS_IPV6 = saved
+
+
+@pytest.mark.emdat
+class TestForceIpv4OnDeadRoute:
+    """A dead IPv6 route forces IPv4 for the retry; other failures do not."""
+
+    def test_enetunreach_forces_ipv4_and_retry_succeeds(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path, has_ipv6
+    ) -> None:
+        """The first dial hits ENETUNREACH, IPv4 is forced, the retry logs in."""
+        fake = _FlakyEarthaccess(1, _enetunreach_error())
+        _install_fake(monkeypatch, fake)
+        auth = EmdatAuth(
+            EmdatCredentials(token=SecretStr("t"), netrc_path=missing_netrc)
+        )
+        auth.configure()
+        assert auth.is_authenticated()
+        assert has_ipv6.HAS_IPV6 is False
+
+    def test_a_non_enetunreach_drop_leaves_ipv6_enabled(
+        self, monkeypatch: pytest.MonkeyPatch, missing_netrc: Path, has_ipv6
+    ) -> None:
+        """A dropped connection that is not ENETUNREACH never touches IPv6."""
+        fake = _FlakyEarthaccess(1, requests.ConnectionError("connection reset"))
+        _install_fake(monkeypatch, fake)
+        auth = EmdatAuth(
+            EmdatCredentials(token=SecretStr("t"), netrc_path=missing_netrc)
+        )
+        auth.configure()
+        assert auth.is_authenticated()
+        assert has_ipv6.HAS_IPV6 is True

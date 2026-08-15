@@ -93,7 +93,9 @@ def s3_era5_data_source_output_dir() -> Path:
 
 # The HTTP transport seam lives in the installed package so every member
 # root can reach it; see earthlens.testing for why it cannot live here.
-from earthlens.testing import (  # noqa: F401 - fixtures used by name
+from earthlens.testing import (  # noqa: F401 - fixtures + hooks used by name
+    pytest_runtest_call,
+    pytest_sessionfinish,
     real_pooled_session,
     unpooled_http_transport,
 )

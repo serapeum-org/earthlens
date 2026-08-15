@@ -1,4 +1,4 @@
-"""Unit tests for the CLI's `_jaxa_grouped` refresh walker."""
+"""Unit tests for the JAXA CLI refresh walker (`earthlens.jaxa.cli.refresher`)."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from earthlens.cli.refresh import _jaxa_grouped
+from earthlens.jaxa.cli import refresher as _jaxa_grouped
 
 pytestmark = [pytest.mark.jaxa, pytest.mark.unit]
 

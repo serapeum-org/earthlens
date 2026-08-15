@@ -1,5 +1,58 @@
 # Change Log
 
+## 0.15.0 (2026-08-14)
+
+### Feat
+
+- **e2e**: add a per-provider live-e2e-on-change gate and skip lanes on upstream outages (#1017)
+- **stac**: add Copernicus GFM and the EODC STAC endpoint (#1015)
+- **bathymetry**: add EMODnet Bathymetry European DTM over OGC WCS (#1011)
+- add GESLA, FLOPROS, and CatRaRE flood-data backends (batch 2) (#1000)
+- **isimip**: add the earthlens.isimip bias-adjusted climate-forcing backend (#999)
+- **flodis**: add the FLODIS observed flood footprints–impacts backend (#998)
+- **radklim**: add the DWD RADKLIM / RADOLAN radar-precipitation backend (#981)
+- **fabdem,jrc-flood**: add FABDEM bare-earth DEM and JRC European Flood Hazard Map backends (#958)
+- **aqueduct**: add the WRI Aqueduct riverine flood-risk backend  (#957)
+- **nsi**: add earthlens.nsi US flood exposure & loss backend (NSI / NFHL / NFIP) (#949)
+- **hanze**: add historical European flood-impacts backend (#948)
+
+### Fix
+
+- **osm**: handle ohsome 403/429 throttling with a typed error and retry (#1027)
+- **ghsl**: fail a dead JRC host fast with a split connect/read timeout (#1016)
+- **stac**: pin anonymous S3 reads to the region endpoint where required (#937)
+
+### Refactor
+
+- **cli**: make core's CLI backend-agnostic via entry-point discovery (#1021)
+
+## 0.14.0 (2026-08-07)
+
+### Feat
+
+- **mswep**: add the GloH2O MSWEP / MSWX backend (#889)
+
+## 0.13.0 (2026-08-02)
+
+### BREAKING CHANGE
+
+- a backend subclassing another backend now raises
+TypeError unless it declares ergonomics_resolved=True, and _create_grid
+/ _check_input_dates must return SpatialExtent / TemporalExtent rather
+than a dict or None. Both affect downstream subclasses only; all 48
+in-repo backends are unchanged, and download(aggregate=None) still
+works.
+
+### Feat
+
+- **caravan**: add the Caravan large-sample hydrology backend (open GRDC route) (#887)
+- **ecmwf**: three-store Copernicus Data Store backend (CDS + ADS + EWDS) (#871)
+- **emdat**: add the EM-DAT disaster-impacts backend (#888)
+
+### Refactor
+
+- **base**: enforce the shared contracts instead of restating them (#853)
+
 ## 0.12.0 (2026-07-27)
 
 ### BREAKING CHANGE

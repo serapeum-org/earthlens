@@ -1,0 +1,502 @@
+"""Google Drive v3 primitives for the MSWEP / MSWX backend.
+
+Drive has no paths — only parent/child ids — so every lookup here walks
+the tree by name from the shared-folder id GloH2O's approval email
+carries. Two rules shape the module:
+
+* **Always pass `supportsAllDrives` / `includeItemsFromAllDrives`.**
+  GloH2O may place the share in a Shared Drive rather than a personal
+  one, and the listing silently returns nothing without them.
+* **Never enumerate a granule folder.** `Past/Hourly/` holds roughly
+  400,000 files (46 years x 8760), so `files.list` paging to find 24 of
+  them is absurd. :func:`find_children_by_name` resolves **by name** in
+  chunked `or`-joined queries instead; folder listing is reserved for
+  the handful of structural levels (the share root, the variant and
+  temporal folders) where cardinality is tiny.
+
+:class:`RootResolver` wraps the shared folder as the product/version
+root. GloH2O shares one folder per product and per version, so the
+`folder_id` a user is given **is** the `MSWEP_V280` / `MSWX_V100` /
+`MSWEP_V316_test` folder — there is no parent to search, and the version
+is chosen by which share you point at.
+"""
+
+from __future__ import annotations
+
+import http.client
+import ssl
+import time
+from collections.abc import Callable
+from dataclasses import dataclass
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
+
+from loguru import logger
+
+if TYPE_CHECKING:
+    from earthlens.mswep.catalog import Catalog
+
+#: Drive's MIME type for a folder — the `q` filter that keeps a listing
+#: to sub-directories.
+FOLDER_MIME = "application/vnd.google-apps.folder"
+
+#: Page size for `files.list`. Drive caps this at 1000.
+PAGE_SIZE = 1000
+
+#: How many file names to pack into one `or`-joined `files.list` query.
+#: Drive rejects an over-long `q`, and 100 names keeps the request well
+#: inside the limit while cutting a 24-granule day to a single call.
+NAME_QUERY_CHUNK = 100
+
+
+@dataclass(frozen=True)
+class DriveEntry:
+    """One Drive object: its id, name and MIME type.
+
+    Attributes:
+        id: The Drive file id, used for every subsequent call.
+        name: The object's name within its parent folder.
+        mime_type: Drive MIME type; equals :data:`FOLDER_MIME` for a
+            folder.
+
+    Examples:
+        - A folder entry knows it is one:
+            ```python
+            >>> from earthlens.mswep.drive import DriveEntry, FOLDER_MIME
+            >>> DriveEntry(id="1a", name="Past", mime_type=FOLDER_MIME).is_folder
+            True
+
+            ```
+    """
+
+    id: str
+    name: str
+    mime_type: str = ""
+
+    @property
+    def is_folder(self) -> bool:
+        """Return whether this entry is a Drive folder."""
+        return self.mime_type == FOLDER_MIME
+
+
+def escape_query_value(value: str) -> str:
+    """Escape a string for use inside a Drive `q` string literal.
+
+    Drive's query grammar delimits literals with single quotes, so a
+    backslash or apostrophe in a file name must be escaped or the query
+    is malformed. Granule names never contain either, but folder names
+    come from the share and are not ours to trust.
+
+    Args:
+        value: The raw value to embed.
+
+    Returns:
+        str: The escaped value, without surrounding quotes.
+
+    Examples:
+        - An apostrophe is escaped:
+            ```python
+            >>> from earthlens.mswep.drive import escape_query_value
+            >>> escape_query_value("O'Brien")
+            "O\\\\'Brien"
+
+            ```
+    """
+    return value.replace("\\", "\\\\").replace("'", "\\'")
+
+
+def _execute_list(service: Any, query: str, page_token: str | None) -> dict[str, Any]:
+    """Run one `files.list` page against Drive.
+
+    Args:
+        service: The Drive v3 client.
+        query: The assembled `q` expression.
+        page_token: Continuation token, or `None` for the first page.
+
+    Returns:
+        dict[str, Any]: The raw Drive response.
+    """
+    return dict(
+        service.files()
+        .list(
+            q=query,
+            fields="nextPageToken, files(id, name, mimeType)",
+            pageSize=PAGE_SIZE,
+            pageToken=page_token,
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True,
+        )
+        .execute()
+    )
+
+
+def _paged_entries(service: Any, query: str) -> list[DriveEntry]:
+    """Collect every page of a `files.list` query into `DriveEntry` rows.
+
+    Args:
+        service: The Drive v3 client.
+        query: The assembled `q` expression.
+
+    Returns:
+        list[DriveEntry]: Every matching entry, across all pages.
+    """
+    entries: list[DriveEntry] = []
+    page_token: str | None = None
+    while True:
+        response = _execute_list(service, query, page_token)
+        for row in response.get("files", []):
+            entries.append(
+                DriveEntry(
+                    id=row["id"],
+                    name=row.get("name", ""),
+                    mime_type=row.get("mimeType", ""),
+                )
+            )
+        page_token = response.get("nextPageToken")
+        if not page_token:
+            return entries
+
+
+def list_folders(service: Any, parent_id: str) -> list[DriveEntry]:
+    """List the sub-folders of one Drive folder.
+
+    Restricted to folders on purpose: every caller here walks structural
+    levels (the share root, variant, variable, temporal), and a granule
+    folder holds hundreds of thousands of files that must never be
+    paged.
+
+    Args:
+        service: The Drive v3 client.
+        parent_id: Drive id of the parent folder.
+
+    Returns:
+        list[DriveEntry]: The child folders, in Drive's own order.
+    """
+    query = (
+        f"'{escape_query_value(parent_id)}' in parents "
+        f"and mimeType = '{FOLDER_MIME}' and trashed = false"
+    )
+    return _paged_entries(service, query)
+
+
+def find_folder(service: Any, parent_id: str, name: str) -> DriveEntry | None:
+    """Resolve one named sub-folder of a Drive folder.
+
+    Args:
+        service: The Drive v3 client.
+        parent_id: Drive id of the parent folder.
+        name: Exact child folder name.
+
+    Returns:
+        DriveEntry | None: The folder, or `None` when absent.
+    """
+    query = (
+        f"'{escape_query_value(parent_id)}' in parents "
+        f"and name = '{escape_query_value(name)}' "
+        f"and mimeType = '{FOLDER_MIME}' and trashed = false"
+    )
+    entries = _paged_entries(service, query)
+    return entries[0] if entries else None
+
+
+def find_children_by_name(
+    service: Any, parent_id: str, names: list[str]
+) -> dict[str, DriveEntry]:
+    """Resolve many named children of one folder in chunked queries.
+
+    The granule-enumeration primitive. Rather than page a folder holding
+    ~400,000 files, this asks Drive for exactly the names wanted,
+    `or`-joining up to :data:`NAME_QUERY_CHUNK` of them per request — so
+    a 24-granule day costs one call, not 400 pages.
+
+    Args:
+        service: The Drive v3 client.
+        parent_id: Drive id of the folder holding the granules.
+        names: Exact file names to resolve.
+
+    Returns:
+        dict[str, DriveEntry]: Name to entry, containing only the names
+            that exist. A caller detects a missing granule by its
+            absence from this mapping.
+    """
+    found: dict[str, DriveEntry] = {}
+    parent = escape_query_value(parent_id)
+    for start in range(0, len(names), NAME_QUERY_CHUNK):
+        chunk = names[start : start + NAME_QUERY_CHUNK]
+        clause = " or ".join(f"name = '{escape_query_value(n)}'" for n in chunk)
+        query = f"'{parent}' in parents and ({clause}) and trashed = false"
+        for entry in _paged_entries(service, query):
+            found[entry.name] = entry
+    return found
+
+
+class DriveTransportError(Exception):
+    """Base for Drive transport failures the backend classifies."""
+
+
+class DownloadQuotaExceededError(DriveTransportError):
+    """Raised when Drive refuses a file for exceeding its download quota.
+
+    Drive caps downloads **per file**, counted across everyone who holds
+    the share. A folder handed to thousands of researchers hits this
+    routinely, and it is the single most-reported failure of pulling a
+    popular share with `rclone`. It is **not** a missing granule and
+    **not** a rate limit: back-off does not clear it, and it typically
+    resets only after about 24 hours.
+
+    It gets its own type so it can never fall through the
+    missing-granule path, which would return a silently partial time
+    series while logging what looks like routine NRT latency.
+    """
+
+
+class RateLimitedError(DriveTransportError):
+    """Raised when Drive throttles the caller and retries are exhausted.
+
+    Distinct from :class:`DownloadQuotaExceededError`: this one *is*
+    cleared by waiting, so it is retried with exponential back-off first
+    and only surfaces when the retry budget runs out.
+    """
+
+
+#: Drive `reason` values meaning "this file is capped", not "slow down".
+QUOTA_REASONS = frozenset({"downloadQuotaExceeded", "quotaExceeded"})
+
+#: How many times a throttled or 5xx request is retried before giving up.
+MAX_RETRIES = 5
+
+#: Base seconds for the exponential back-off between retries.
+BACKOFF_BASE = 2.0
+
+#: Connection-level failures that carry no HTTP status but are still
+#: worth retrying: a dropped or timed-out socket mid-transfer is exactly
+#: the transient case the back-off exists for. `ConnectionError` /
+#: `ssl.SSLError` are network-specific (a disk-full `OSError` is not one
+#: of these, so it is not retried), and `IncompleteRead` is the truncated
+#: streaming response httplib2 raises.
+_TRANSIENT_TRANSPORT_ERRORS: tuple[type[BaseException], ...] = (
+    ConnectionError,
+    TimeoutError,
+    ssl.SSLError,
+    http.client.IncompleteRead,
+)
+
+
+def classify_http_error(exc: Exception) -> DriveTransportError | None:
+    """Map a Drive failure onto this module's typed transport errors.
+
+    Args:
+        exc: The exception raised by the Drive client.
+
+    Returns:
+        DriveTransportError | None: A :class:`DownloadQuotaExceededError`
+            / :class:`RateLimitedError` when the status and reason say
+            so, or `None` when `exc` is not a transport failure this
+            module handles — the caller re-raises the original so it
+            keeps its own traceback.
+    """
+    status = getattr(getattr(exc, "resp", None), "status", None)
+    if status is None:
+        # No HTTP status: a bare connection/timeout failure with no `.resp`.
+        # Retry the transient transport ones like throttling; leave anything
+        # else (a disk-full OSError, a programming error) to re-raise.
+        if isinstance(exc, _TRANSIENT_TRANSPORT_ERRORS):
+            return RateLimitedError(
+                f"Google Drive connection failed transiently: {exc!r}"
+            )
+        return None
+    if status not in (403, 429, 500, 502, 503, 504):
+        return None
+
+    detail = str(exc)
+    if any(reason in detail for reason in QUOTA_REASONS):
+        return DownloadQuotaExceededError(
+            "Google Drive refused this granule: its per-file download quota "
+            "is exhausted. Drive counts that quota across everyone holding "
+            "the GloH2O share, so a popular file trips it regardless of your "
+            "own usage. Back-off does not help; it usually clears after "
+            "~24 hours. For a large window use `rclone sync`, which GloH2O "
+            f"asks non-commercial users to use for bulk transfers. ({exc})"
+        )
+    if status in (403, 429):
+        return RateLimitedError(f"Google Drive throttled the request: {exc}")
+    # Everything left is a 5xx the status filter above let through: transient
+    # server-side trouble, cleared by waiting exactly like throttling.
+    return RateLimitedError(f"Google Drive returned a transient {status}: {exc}")
+
+
+def download_media(
+    service: Any,
+    file_id: str,
+    destination: Path,
+    *,
+    max_retries: int = MAX_RETRIES,
+    sleep: Callable[[float], None] = time.sleep,
+) -> Path:
+    """Download one Drive file to `destination`, atomically and with retries.
+
+    Streams through `MediaIoBaseDownload` so a multi-hundred-megabyte
+    granule never lands in memory, and writes to a `.part` sibling that
+    is renamed only once the transfer completes. An interrupted download
+    therefore leaves no truncated file that a later run would mistake
+    for a cached granule.
+
+    Throttling and 5xx responses are retried with exponential back-off.
+    A **quota** refusal is not: it is raised immediately as
+    :class:`DownloadQuotaExceededError`, because waiting does not clear
+    it and retrying only burns the budget.
+
+    Args:
+        service: The Drive v3 client.
+        file_id: Drive id of the file to fetch.
+        destination: Final path to write.
+        max_retries: Attempts before a throttled download gives up.
+        sleep: Sleep function, injected so tests do not wait.
+
+    Returns:
+        Path: `destination`.
+
+    Raises:
+        DownloadQuotaExceededError: When the file's download quota is
+            exhausted.
+        RateLimitedError: When throttling outlasts the retry budget.
+    """
+    from googleapiclient.http import MediaIoBaseDownload
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    partial = destination.with_name(destination.name + ".part")
+
+    for attempt in range(max_retries):
+        request = service.files().get_media(fileId=file_id, supportsAllDrives=True)
+        try:
+            with partial.open("wb") as handle:
+                downloader = MediaIoBaseDownload(handle, request)
+                done = False
+                while not done:
+                    _, done = downloader.next_chunk()
+            partial.replace(destination)
+            return destination
+        except Exception as exc:  # noqa: BLE001 - re-raised after classification
+            partial.unlink(missing_ok=True)
+            classified = classify_http_error(exc)
+            if classified is None:
+                raise
+            if isinstance(classified, DownloadQuotaExceededError):
+                raise classified from exc
+            if attempt == max_retries - 1:
+                raise classified from exc
+            delay = BACKOFF_BASE**attempt
+            logger.warning(
+                f"mswep: Drive throttled {destination.name}; retrying in "
+                f"{delay:.0f}s ({attempt + 1}/{max_retries})."
+            )
+            sleep(delay)
+
+    raise RateLimitedError(  # pragma: no cover - loop always returns or raises
+        f"exhausted {max_retries} attempts downloading {destination.name}"
+    )
+
+
+class RootResolver:
+    """Resolve a product + version onto the shared Drive root folder.
+
+    GloH2O shares one folder per product **and** per version, so the
+    `folder_id` handed to a user is the `MSWEP_V280` / `MSWX_V100` /
+    `MSWEP_V316_test` folder itself — its children are the variants
+    (`Past`, `NRT`, …). There is no parent to search: the id you were
+    given is the root. The resolver reads that folder's metadata once,
+    caches it, and validates the requested version against the catalog.
+
+    Attributes:
+        _service: The Drive v3 client.
+        _folder_id: Drive id of the shared root folder GloH2O granted.
+        _catalog: The MSWEP catalog, read for version metadata.
+        _root: The cached root `DriveEntry`, or `None` before first use.
+
+    Examples:
+        - The root's name comes from the shared folder itself:
+            ```python
+            >>> from earthlens.mswep.drive import DriveEntry, FOLDER_MIME
+            >>> DriveEntry("1a", "MSWEP_V316_test", FOLDER_MIME).name
+            'MSWEP_V316_test'
+
+            ```
+    """
+
+    def __init__(self, service: Any, folder_id: str, catalog: Catalog) -> None:
+        """Bind the resolver to a Drive client, share and catalog.
+
+        Args:
+            service: The Drive v3 client.
+            folder_id: Drive id of the shared folder — which **is** the
+                product/version root, not a parent to search.
+            catalog: The MSWEP catalog, read for version metadata.
+        """
+        self._service = service
+        self._folder_id = folder_id
+        self._catalog = catalog
+        self._root: DriveEntry | None = None
+
+    def root(self) -> DriveEntry:
+        """Return the shared folder itself, as the product/version root (cached).
+
+        GloH2O shares one folder per product **and** per version — the id
+        you are given is the `MSWEP_V280` / `MSWX_V100` / `MSWEP_V316_test`
+        folder directly, whose children are the variants (`Past`, `NRT`,
+        …). There is no parent to list, so this just reads the folder's
+        own metadata.
+
+        Returns:
+            DriveEntry: The shared folder.
+        """
+        if self._root is None:
+            meta = (
+                self._service.files()
+                .get(
+                    fileId=self._folder_id,
+                    fields="id, name, mimeType",
+                    supportsAllDrives=True,
+                )
+                .execute()
+            )
+            self._root = DriveEntry(
+                id=meta["id"],
+                name=meta.get("name", ""),
+                mime_type=meta.get("mimeType", ""),
+            )
+        return self._root
+
+    def resolve(self, product_key: str, version: str | None = None) -> DriveEntry:
+        """Resolve a product + version onto the shared root folder.
+
+        The `folder_id` given at construction **is** the root, so this
+        validates the request against the catalog (product exists, version
+        known and not provisional) and returns the folder. The version
+        selects descriptive metadata — units, the trend caveat — not the
+        data itself: which version you get is decided by which per-version
+        share you point `folder_id` at.
+
+        Args:
+            product_key: Product key (`"mswep"`, `"mswx"`).
+            version: Version key; defaults to the product's
+                `default_version`.
+
+        Returns:
+            DriveEntry: The shared root folder.
+
+        Raises:
+            ValueError: When the product or version is unknown.
+            ProvisionalValueError: When the version row is an unverified
+                placeholder.
+        """
+        product = self._catalog.get_product(product_key)
+        key = version or product.default_version
+        if key not in product.versions:
+            raise ValueError(
+                f"{key!r} is not a known {product_key} version. Known "
+                f"versions: {sorted(product.versions)}."
+            )
+        self._catalog.check_not_provisional(
+            product.versions[key], f"the {product_key} v{key} version"
+        )
+        return self.root()

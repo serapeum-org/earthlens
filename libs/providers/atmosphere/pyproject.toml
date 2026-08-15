@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-atmosphere"
-version = "0.12.0"
+version = "0.15.0"
 description = "weather, climate, air quality and solar/wind resource backends for earthlens"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -33,7 +33,7 @@ requires-python = ">=3.11,<4"
 # this distribution brings the backends' code without their dependencies —
 # `pip install earthlens-atmosphere[<backend>]` adds exactly one backend's SDK.
 dependencies = [
-    "earthlens-core ==0.12.0",
+    "earthlens-core ==0.15.0",
 ]
 
 [project.optional-dependencies]
@@ -41,15 +41,21 @@ s3 = ["earthlens-core[s3]"]
 ecmwf = ["cdsapi >=0.7.7"]
 ecmwf-modern = ["ecmwf-datastores-client >=0.5.1"]
 cmip6 = []
+isimip = ["isimip-client >=2"]
 nwp = ["herbie-data >=2026.3", "ecmwf-opendata >=0.3", "ecmwflibs; sys_platform == 'win32'"]
 radar = ["earthlens-core[s3]"]
 goes = ["earthlens-core[s3]"]
 tropycal = ["tropycal >=1.4", "cartopy >=0.22"]
 eea_aq = ["airbase >=1.0", "nest_asyncio >=1.5"]
+mswep = ["google-api-python-client >=2.0", "google-auth >=2.0"]
 
 # This distribution's slice of the facade's data-source table.
 [project.entry-points."earthlens.backends"]
 atmosphere = "earthlens._atmosphere:BACKENDS"
+
+# This distribution's slice of the catalog-tooling (refresh/curate/validate) table.
+[project.entry-points."earthlens.cli"]
+atmosphere = "earthlens._atmosphere_cli:CLI_TOOLING"
 
 [project.urls]
 Homepage = "https://github.com/serapeum-org/earthlens"
@@ -63,7 +69,7 @@ where = ["src"]
 # `namespaces = true` lets setuptools discover the __init__-less parent (matches
 # earthlens-core).
 namespaces = true
-include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.nrel*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
+include = ["earthlens._atmosphere*", "earthlens.airnow*", "earthlens.catrare*", "earthlens.chc*", "earthlens.climate_indices*", "earthlens.cmip6*", "earthlens.drought*", "earthlens.ecmwf*", "earthlens.eea_aq*", "earthlens.goes*", "earthlens.isimip*", "earthlens.nrel*", "earthlens.mswep*", "earthlens.nwp*", "earthlens.openaq*", "earthlens.pvgis*", "earthlens.radar*", "earthlens.radklim*", "earthlens.s3*", "earthlens.sensor_community*", "earthlens.solar_wind_atlas*", "earthlens.tropycal*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "catalog/*.yaml"]
@@ -82,6 +88,7 @@ consider_namespace_packages = true
 addopts = "--import-mode=importlib"
 markers = [
     "airnow: tests for the AirNow air-quality backend (US/Canada EPA `/aq/data/` bbox REST; no extra SDK — core `requests` + `pandas`; needs a free AIRNOW_API_KEY for live e2e).",
+    "catrare: tests for the CatRaRE DWD heavy-rainfall event-catalogue backend (opendata.dwd.de FileGDB v2026.01, CC-BY-4.0 / GeoNutzV, no extra SDK — core HttpClient + pyramids; RADKLIM-derived events reprojected from the RADOLAN grid).",
     "chc: tests for the Climate Hazards Center (CHC) FTP backend (no extra SDK; covers CHIRPS / CHIRP / CHIRTS / WBGT / SPI / SPEI / CHC_CMIP6 etc.).",
     "climate_indices: tests for the climate / teleconnection index backend (NOAA PSL + KNMI Climate Explorer monthly ASCII series; no extra SDK — core requests + pandas).",
     "cmip6: tests for the CMIP6 backend (raw archive on the open Pangeo gs://cmip6 bucket; anonymous, no extra SDK; reads via pyramids).",
@@ -91,11 +98,14 @@ markers = [
     "eea: tests for the EEA (`eea_aq`) air-quality backend (requires the `eea_aq` extra: airbase; European monitor observations via Parquet; public, no auth).",
     "goes: tests for the NOAA GOES-R ABI backend (requires the `goes` extra: boto3; unsigned noaa-goes19/18/16 buckets).",
     "integration: exercises multiple modules together with mocked I/O.",
+    "isimip: tests for the ISIMIP bias-adjusted climate-forcing backend (requires the `isimip` extra: isimip-client; facet search + server-side cutout job on the ISIMIP repository, public/no auth).",
     "nrel: tests for the NREL NSRDB / WIND Toolkit solar-wind time-series backend (keyed REST CSV via core `requests` + `pandas`; no extra SDK; required api_key + email auth).",
+    "mswep: tests for the GloH2O MSWEP / MSWX backend (requires the `mswep` extra: google-api-python-client, google-auth; downloads NetCDF granules from the user's approved GloH2O Google-Drive share -- CC-BY-NC, access is a prerequisite).",
     "nwp: tests for the NWP forecast backend (requires the `nwp` extra: herbie-data, ecmwf-opendata; GRIB read via pyramids' GDAL driver).",
     "openaq: tests for the OpenAQ v3 air-quality backend (no extra SDK; uses the core `requests` dependency).",
     "pvgis: tests for the JRC PVGIS solar-radiation / PV time-series backend (keyless REST via core `requests` + `pandas`; no extra SDK).",
     "radar: tests for the NEXRAD Level-II radar backend (requires the `radar` extra: boto3; unsigned unidata-nexrad-level2-chunks bucket).",
+    "radklim: tests for the DWD RADKLIM / RADOLAN radar-precipitation backend (no extra SDK — core requests + pyramids; anonymous DWD Open Data HTTPS; RADKLIM yearly NetCDF archives + operational HDF5/binary granules over Germany).",
     "s3: tests for the S3 backend (requires the `s3` extra: boto3).",
     "sensor_community: tests for the Sensor.Community air-quality backend (crowdsourced low-cost sensors; no extra SDK — core `requests` + `pandas`; public archive + live JSON API, ODbL).",
     "slow: mark test as slow.",
