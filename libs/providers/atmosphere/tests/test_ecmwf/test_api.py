@@ -200,6 +200,21 @@ class TestApi:
             "reanalysis-era5-single-levels"
         ), "retrieve still targets cds_dataset, not the alias id"
 
+    def test_target_filename_falls_back_to_cds_dataset_when_no_dataset_id(
+        self, ecmwf_stub
+    ):
+        """A directly-built spec (dataset_id=None) names the output by cds_dataset."""
+        spec = Variable(
+            cds_dataset="reanalysis-era5-single-levels",
+            cds_variable="2m_temperature",
+            nc_variable="t2m",
+            units="K",
+            product_type=["reanalysis"],
+        )
+        assert spec.dataset_id is None, "a directly-built spec has no dataset_id"
+        target = ecmwf_stub._api(spec)
+        assert target.name == "2m_temperature_reanalysis-era5-single-levels.nc"
+
     def test_variable_spec_requires_cds_dataset(self):
         """Variable cannot be built without cds_dataset."""
         with pytest.raises(ValidationError, match="cds_dataset"):

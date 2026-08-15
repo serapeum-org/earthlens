@@ -89,7 +89,9 @@ datasets:
   # `avg_dis` (m3 s-1). The full consolidated variable set is mirrored here (via
   # the per-row `cds_dataset` override, catalog.py); only discharge is
   # live-verified — runoff / snow-depth / soil-wetness carry the same placeholder
-  # nc_variable / units as the consolidated row above.
+  # nc_variable / units as the consolidated row above. This is a curated alias
+  # (no CDS/STAC id of its own), so `datasets audit ecmwf --coverage` does not
+  # bucket it — its live probe resolves via the `cds_dataset` override.
   cems-glofas-historical-intermediate:
     endpoint: ewds
     grid_resolution: 0.05
