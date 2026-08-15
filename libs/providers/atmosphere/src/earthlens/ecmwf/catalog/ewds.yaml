@@ -60,39 +60,44 @@ datasets:
       # snow-depth / soil-wetness state variables need timespan: instantaneous)
       download_format: unarchived
     variables:
+      # All four variables verified live 2026-08-15: the NetCDF variables use
+      # short GRIB codes (not the full cds_variable name), and snow-depth /
+      # soil-wetness are only served under `timespan: instantaneous` (a per-row
+      # extras override), while discharge / runoff use the dataset-level
+      # `time_mean`.
       average-river-discharge-in-the-last-24-hours:
         cds_variable: average_river_discharge_in_the_last_24_hours
-        # Verified live 2026-07-31: the NetCDF variable is `avg_dis` (m3 s-1),
-        # NOT the full cds_variable name. (runoff / snow-depth / soil-wetness
-        # below keep placeholder nc_variable / units — not yet live-verified.)
         nc_variable: avg_dis
         units: m3 s-1
       runoff-water-equivalent:
         cds_variable: runoff_water_equivalent
-        nc_variable: runoff_water_equivalent
-        units: unknown
+        nc_variable: rowe
+        units: kg m-2
       snow-depth-water-equivalent:
         cds_variable: snow_depth_water_equivalent
-        nc_variable: snow_depth_water_equivalent
-        units: unknown
+        nc_variable: sd
+        units: kg m-2
+        extras:
+          timespan: [instantaneous]
       soil-wetness-index:
         cds_variable: soil_wetness_index
-        nc_variable: soil_wetness_index
-        units: unknown
+        nc_variable: swir
+        units: '1'
+        extras:
+          timespan: [instantaneous]
 
   # GloFAS historical — INTERMEDIATE stream (ERA5T-driven, ~2-5 days behind real
   # time). Same CDS dataset as cems-glofas-historical (see the explicit
   # `cds_dataset:` below — a second curated config of one dataset, differing only
   # by product_type), but `product_type: intermediate`, which covers the most
   # recent weeks/months the final `consolidated` reanalysis has not caught up to
-  # yet. Verified live 2026-07-31/08-01: intermediate + the discharge variable +
-  # timespan=time_mean spans 2024-2026 through the current month, NetCDF variable
-  # `avg_dis` (m3 s-1). The full consolidated variable set is mirrored here (via
-  # the per-row `cds_dataset` override, catalog.py); only discharge is
-  # live-verified — runoff / snow-depth / soil-wetness carry the same placeholder
-  # nc_variable / units as the consolidated row above. This is a curated alias
-  # (no CDS/STAC id of its own), so `datasets audit ecmwf --coverage` does not
-  # bucket it — its live probe resolves via the `cds_dataset` override.
+  # yet. All four variables verified live 2026-08-15 (intermediate +
+  # 2026-06-15/16, Danube bbox): discharge `avg_dis` + runoff `rowe` under
+  # `timespan: time_mean`, snow-depth `sd` + soil-wetness `swir` under
+  # `timespan: instantaneous`. The full consolidated variable set is mirrored
+  # here via the per-row `cds_dataset` override (catalog.py). This is a curated
+  # alias (no CDS/STAC id of its own), so `datasets audit ecmwf --coverage` does
+  # not bucket it — its live probe resolves via the `cds_dataset` override.
   cems-glofas-historical-intermediate:
     endpoint: ewds
     grid_resolution: 0.05
@@ -110,23 +115,28 @@ datasets:
         nc_variable: avg_dis
         units: m3 s-1
       # runoff / snow-depth / soil-wetness mirror the consolidated stream (same
-      # cds_dataset override); their nc_variable / units are placeholders — not
-      # yet live-verified — exactly as on the consolidated row above.
+      # cds_dataset override + verified values); snow-depth / soil-wetness carry
+      # the per-row `timespan: instantaneous` the intermediate stream serves them
+      # under.
       runoff-water-equivalent:
         cds_dataset: cems-glofas-historical
         cds_variable: runoff_water_equivalent
-        nc_variable: runoff_water_equivalent
-        units: unknown
+        nc_variable: rowe
+        units: kg m-2
       snow-depth-water-equivalent:
         cds_dataset: cems-glofas-historical
         cds_variable: snow_depth_water_equivalent
-        nc_variable: snow_depth_water_equivalent
-        units: unknown
+        nc_variable: sd
+        units: kg m-2
+        extras:
+          timespan: [instantaneous]
       soil-wetness-index:
         cds_dataset: cems-glofas-historical
         cds_variable: soil_wetness_index
-        nc_variable: soil_wetness_index
-        units: unknown
+        nc_variable: swir
+        units: '1'
+        extras:
+          timespan: [instantaneous]
   cems-glofas-reforecast:
     endpoint: ewds
     grid_resolution: 0.05

@@ -8,7 +8,11 @@
 
 ### Fix
 
-- **ecmwf**: correct the GloFAS historical discharge NetCDF variable to `avg_dis` (m3 s-1) (#1039)
+- **ecmwf**: live-verify all four GloFAS historical variables — real NetCDF names `avg_dis` / `rowe` / `sd` / `swir`, and the per-variable `timespan` (`time_mean` for discharge/runoff, `instantaneous` for snow-depth/soil-wetness) (#1039)
+
+### Docs
+
+- **ecmwf**: add a runnable GloFAS historical intermediate example notebook (#1039)
 
 ## 0.15.0 (2026-08-14)
 
