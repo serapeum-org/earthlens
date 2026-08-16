@@ -45,9 +45,11 @@ datasets:
     request_kind: form
     extras:
       version: ["2"]
-      # No day/time selector on this dataset's form - drop the template keys.
+      # This form exposes no day/time/data_format widgets - drop the template
+      # keys rather than sending selectors the store does not accept.
       day: null
       time: null
+      data_format: null
     variables:
       live-fuel-moisture-content-group:
         cds_variable: live_fuel_moisture_content_group
@@ -60,10 +62,11 @@ datasets:
     extras:
       experiment: [historical]
       version: ["1_0"]
-      # Annual data: no month/day/time selector on this dataset's form.
+      # Annual data: this form exposes no month/day/time/data_format widgets.
       month: null
       day: null
       time: null
+      data_format: null
     variables:
       burned-area:
         cds_variable: burned_area
