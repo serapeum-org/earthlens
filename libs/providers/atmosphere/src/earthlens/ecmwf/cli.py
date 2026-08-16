@@ -19,24 +19,39 @@ from earthlens.cli.toolkit import (
 )
 from earthlens.ecmwf import _hydrate, _seed
 from earthlens.ecmwf._categories import categorise_dataset  # noqa: F401 — role target
-from earthlens.ecmwf.endpoints import ENDPOINTS
+from earthlens.ecmwf.endpoints import ENDPOINTS, endpoint_url
 
 #: Cap on `/collections` pages followed via `rel="next"`.
 _MAX_PAGES = 50
 
-#: Every store's API root, by `endpoint` slug — derived from the single
-#: `ENDPOINTS` registry rather than restated, so adding a store is one edit
-#: there instead of three here. Covers the Copernicus instances (CDS / ADS /
-#: EWDS) and the ECMWF-hosted ones (ECDS / XDS).
-_ECMWF_STORE_URLS: dict[str, str] = {
-    slug: default_url for slug, (default_url, _url_env, _key_env) in ENDPOINTS.items()
-}
 
-#: Each store's public STAC catalogue. Listing `/collections` needs no
-#: credentials (only data *retrieval* does).
-_ECMWF_STORE_COLLECTIONS_URLS: dict[str, str] = {
-    slug: f"{root}/catalogue/v1/collections" for slug, root in _ECMWF_STORE_URLS.items()
-}
+def _store_urls() -> dict[str, str]:
+    """Every store's API root, by `endpoint` slug.
+
+    Derived from the single `ENDPOINTS` registry rather than restated, so
+    adding a store is one edit there. Resolved through `endpoint_url` on each
+    call so a `<ENDPOINT>_URL` override reaches the catalog tooling exactly as
+    it reaches the retrieve client — a frozen module-level dict would silently
+    ignore it.
+
+    Returns:
+        dict[str, str]: Slug to API root for all five stores.
+    """
+    return {slug: endpoint_url(slug) for slug in ENDPOINTS}
+
+
+def _store_collections_urls() -> dict[str, str]:
+    """Every store's public STAC catalogue endpoint, by `endpoint` slug.
+
+    Listing `/collections` needs no credentials (only data *retrieval* does).
+
+    Returns:
+        dict[str, str]: Slug to `/catalogue/v1/collections` URL.
+    """
+    return {
+        slug: f"{root}/catalogue/v1/collections" for slug, root in _store_urls().items()
+    }
+
 
 #: Persist a live fetch back into the bundled `available_datasets` index.
 writer = index_writer("available_datasets", grouped=True)
@@ -57,7 +72,7 @@ def refresher(_catalog: Any) -> dict[str, list[str]]:
         `ewds`, `ecds`, `xds`) — of sorted, de-duplicated dataset ids.
     """
     grouped: dict[str, list[str]] = {}
-    for store, base in _ECMWF_STORE_COLLECTIONS_URLS.items():
+    for store, base in _store_collections_urls().items():
         ids: set[str] = set()
         url: str | None = base
         pages = 0
@@ -303,7 +318,12 @@ def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
         return "fire"
     fields = {f.get("name") for f in form if isinstance(f, dict)}
     if "hyear" in fields:
-        return "glofas_hindcast" if "hday" in fields else "seasonal_hindcast"
+        # A form carrying BOTH date axes (year/month/day *and* hyear/hmonth/
+        # hday) pairs them, so `glofas_hindcast` - which renames year->hyear -
+        # would delete the model-cycle date. S2S reforecasts are that shape.
+        if "hday" in fields:
+            return "s2s_reforecast" if "day" in fields else "glofas_hindcast"
+        return "seasonal_hindcast"
     # A real seasonal forecast keys on `leadtime_month`. Without it, a
     # year/month-only form is a monthly reanalysis / emission inventory /
     # radiative-forcing product, not a seasonal forecast — so require the lead
@@ -331,8 +351,7 @@ def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
 def emitter(catalog: Any, upstream_id: str, **_opts: Any) -> dict[str, Any]:
     """Seed an ECMWF `datasets:` row from the live CADS `form.json`.
 
-    Resolves the dataset's store (CDS / ADS / EWDS / ECDS / XDS) from the
-    per-store index,
+    Resolves the dataset's store from the per-store index,
     fetches its `form.json`, guesses the `request_kind` from the date/selector
     fields, and enumerates every variable the `variable` widget exposes.
     `nc_variable` / `units` are placeholders (the form does not carry them) —
@@ -350,7 +369,7 @@ def emitter(catalog: Any, upstream_id: str, **_opts: Any) -> dict[str, Any]:
     endpoint = _ecmwf_endpoint_for(catalog, upstream_id)
     token = _ecmwf_token()
     headers = {"PRIVATE-TOKEN": token} if token else None
-    url = f"{_ECMWF_STORE_URLS[endpoint]}/catalogue/v1/collections/{upstream_id}/form.json"
+    url = f"{_store_urls()[endpoint]}/catalogue/v1/collections/{upstream_id}/form.json"
     raw: Any = get_json(url, headers=headers)
     # CADS form.json is usually {"form": [...]} but is sometimes the bare
     # [...] list; `raw` is Any so both shapes narrow without a mypy conflict.

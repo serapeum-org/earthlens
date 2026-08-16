@@ -19,7 +19,7 @@ The two consumed top-level sections each map to a typed field on
 :class:`Catalog`:
 
 * `available_datasets` (informational per-store index of dataset
-  names across CDS / ADS / EWDS) → :attr:`Catalog.available_datasets`
+  names across all five stores) → :attr:`Catalog.available_datasets`
 * `datasets` (structural map of CDS datasets, each carrying a
   monthly variant and a per-variable map) → :attr:`Catalog.datasets`,
   with each value a :class:`Dataset`
@@ -127,7 +127,7 @@ def _merge_available(
 
     Args:
         block: A file's `available_datasets` value — a flat list of ids, or a
-            per-store `{cds: [...], ads: [...], ewds: [...]}` mapping (in which
+            per-store `{cds: [...], ads: [...], ...}` mapping (in which
             case each id is also recorded against its store for endpoint
             auto-resolution).
         available: Accumulator for the flat id list (mutated in place).
@@ -501,7 +501,7 @@ class Variable(FluxableLeaf):
             for CMIP6. Keys not enumerated in this model are not
             silently dropped: they live here and reach the server.
         endpoint: CADS instance this dataset lives on — `"cds"`
-            (default), `"ads"`, or `"ewds"`. Propagated from the parent
+            (default), `"ads"`, `"ewds"`, `"ecds"` or `"xds"`. Propagated from the parent
             dataset; selects the retrieve URL via
             `earthlens.ecmwf.endpoints.open_client`.
         grid_resolution: Native grid spacing in degrees for the
@@ -588,7 +588,7 @@ class Dataset(BaseModel):
             `experiment`, `model`) that the dataset's request shape
             requires beyond the ERA5 standard set.
         endpoint: CADS instance the dataset lives on — `"cds"`
-            (default), `"ads"`, or `"ewds"`. Inherited by every child
+            (default), `"ads"`, `"ewds"`, `"ecds"` or `"xds"`. Inherited by every child
             variable and used to route the retrieve URL.
         grid_resolution: Native grid spacing in degrees (e.g. `0.05`
             for GloFAS), or `None` to use the ERA5 default. Inherited
@@ -731,7 +731,7 @@ class Catalog(AbstractCatalog):
     providers: dict[str, Provider] = Field(default_factory=dict)
 
     def store_for(self, dataset_id: str) -> str | None:
-        """Return the Copernicus store (`cds` / `ads` / `ewds`) hosting a dataset.
+        """Return the store slug (e.g. `cds` / `ewds` / `xds`) hosting a dataset.
 
         Reads the per-store availability index. Used to auto-resolve the
         `endpoint` for a raw-request passthrough when the caller omits it.
