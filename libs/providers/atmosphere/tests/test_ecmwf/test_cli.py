@@ -54,18 +54,21 @@ def _catalog_copy(tmp_path, monkeypatch):
 def _store_of(url):
     """Resolve which store a collections URL belongs to.
 
-    `xds` is tested before `ecds` because `ecds.ecmwf.int` also contains the
-    substring `ds.ecmwf.int`; matching the full host keeps them distinct.
+    Each store is matched on its full host, so the checks are order-independent
+    and an unrecognised host raises instead of silently defaulting — the
+    earlier `else: cds` fallback quietly handed the two ECMWF hosts CDS's
+    dataset ids when the stores were added.
     """
-    if "ads.atmosphere" in url:
-        return "ads"
-    if "ewds" in url:
-        return "ewds"
-    if "xds.ecmwf.int" in url:
-        return "xds"
-    if "ecds.ecmwf.int" in url:
-        return "ecds"
-    return "cds"
+    for host, store in (
+        ("cds.climate.copernicus.eu", "cds"),
+        ("ads.atmosphere.copernicus.eu", "ads"),
+        ("ewds.climate.copernicus.eu", "ewds"),
+        ("ecds.ecmwf.int", "ecds"),
+        ("xds.ecmwf.int", "xds"),
+    ):
+        if host in url:
+            return store
+    raise AssertionError(f"unrecognised store URL in test stub: {url}")
 
 
 _STORE_SAMPLE_ID = {

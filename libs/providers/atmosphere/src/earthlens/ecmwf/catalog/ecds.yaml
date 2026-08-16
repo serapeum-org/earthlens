@@ -47,6 +47,8 @@ datasets:
     extras:
       origin: [ecmwf]
       level_type: [single_level]
+      # Pinned from the live constraints (2026-08-16); S2S expresses its lead
+      # as a range string, and `0_24` is the first 24-hour window.
       forecast_type: [control_forecast]
       leadtime_hour: ["0_24"]
       time: ["00:00"]
@@ -76,6 +78,8 @@ datasets:
     extras:
       origin: [ecmwf]
       level_type: [single_level]
+      # Pinned from the live constraints (2026-08-16). Reforecast leads are
+      # published every 6 h; 102 h is a mid-range representative value.
       forecast_type: [control_forecast]
       leadtime_hour: ["102"]
       time: ["00:00"]
@@ -95,6 +99,10 @@ datasets:
     extras:
       origin: [ecmwf]
       level_type: [single_level]
+      # Pinned from the live constraints (2026-08-16). `forecast_type` also
+      # accepts perturbed_forecast / high_resolution_forecast, and TIGGE
+      # publishes 46 lead times; +24 h at 00:00 UTC is a representative
+      # single-field default. Use the passthrough for another combination.
       forecast_type: [control_forecast]
       leadtime_hour: ["24"]
       time: ["00:00"]

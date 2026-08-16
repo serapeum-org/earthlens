@@ -44,6 +44,11 @@ datasets:
     endpoint: xds
     request_kind: form
     extras:
+      # Pinned from the live constraints (2026-08-16): version 2 spans
+      # 1999-2025 and is the newer of the two (`1` / `2`). Note the STAC
+      # `extent` advertises 2003-2021, which is narrower than what the
+      # constraints actually serve - the constraints are authoritative, and a
+      # 2000-01 retrieve succeeded.
       version: ["2"]
       # This form exposes no day/time/data_format widgets - drop the template
       # keys rather than sending selectors the store does not accept.
@@ -60,6 +65,11 @@ datasets:
     endpoint: xds
     request_kind: form
     extras:
+      # Pinned from the live constraints (2026-08-16). `experiment` also
+      # accepts six SSP scenarios (ssp1_1_9 .. ssp5_8_5) and the form exposes a
+      # `model` widget with 12+ CMIP6 models; neither is pinned here because
+      # only the `historical` / default-model combination has been retrieved.
+      # Use the passthrough for another scenario or model.
       experiment: [historical]
       version: ["1_0"]
       # Annual data: this form exposes no month/day/time/data_format widgets.
@@ -71,8 +81,10 @@ datasets:
       burned-area:
         cds_variable: burned_area
         nc_variable: BAF_pred
-        # The NetCDF carries no `units` attribute, but declares Conventions
-        # CF-1.9 with long_name "Burned Area Fraction", and the observed values
-        # sit within [0, 1] (3.3e-06 .. 2.4e-03). `1` is the CF dimensionless
-        # unit for a fraction - recorded from evidence, not guessed.
+        # INFERRED, not observed: the NetCDF carries no `units` attribute and
+        # the catalogue metadata documents none. The inference is from the
+        # file's own CF-1.9 declaration plus `long_name` "Burned Area Fraction"
+        # and observed values inside [0, 1] (3.3e-06 .. 2.4e-03), so `1` (the
+        # CF dimensionless unit for a fraction) is the best-supported value.
+        # Replace it if the provider ever documents a unit.
         units: "1"
