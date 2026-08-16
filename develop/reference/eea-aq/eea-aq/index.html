@@ -29929,23 +29929,23 @@ chronological order.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/eea_aq/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-280">280</a></span>
-<span class="normal"><a href="#__codelineno-0-281">281</a></span>
-<span class="normal"><a href="#__codelineno-0-282">282</a></span>
-<span class="normal"><a href="#__codelineno-0-283">283</a></span>
-<span class="normal"><a href="#__codelineno-0-284">284</a></span>
-<span class="normal"><a href="#__codelineno-0-285">285</a></span>
-<span class="normal"><a href="#__codelineno-0-286">286</a></span>
-<span class="normal"><a href="#__codelineno-0-287">287</a></span>
-<span class="normal"><a href="#__codelineno-0-288">288</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_request</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Run an airbase `request.download()`, tolerating a running event loop.</span>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        request: The `airbase.AirbaseRequest` (or a compatible stand-in).</span>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        directory: Destination directory for the downloaded Parquet.</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a>    <span class="n">_patch_running_loop</span><span class="p">()</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a>    <span class="n">request</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">directory</span><span class="p">,</span> <span class="n">skip_existing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">raise_for_status</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
+<span class="normal"><a href="#__codelineno-0-294">294</a></span>
+<span class="normal"><a href="#__codelineno-0-295">295</a></span>
+<span class="normal"><a href="#__codelineno-0-296">296</a></span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="k">def</span><span class="w"> </span><span class="nf">download_request</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Run an airbase `request.download()`, tolerating a running event loop.</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        request: The `airbase.AirbaseRequest` (or a compatible stand-in).</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        directory: Destination directory for the downloaded Parquet.</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>    <span class="n">_patch_running_loop</span><span class="p">()</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="n">request</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">directory</span><span class="p">,</span> <span class="n">skip_existing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">raise_for_status</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29991,19 +29991,19 @@ chronological order.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/eea_aq/_helpers.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-241">241</a></span>
-<span class="normal"><a href="#__codelineno-0-242">242</a></span>
-<span class="normal"><a href="#__codelineno-0-243">243</a></span>
-<span class="normal"><a href="#__codelineno-0-244">244</a></span>
-<span class="normal"><a href="#__codelineno-0-245">245</a></span>
-<span class="normal"><a href="#__codelineno-0-246">246</a></span>
-<span class="normal"><a href="#__codelineno-0-247">247</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_frame</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an empty DataFrame with the exact long-format schema.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        pd.DataFrame: Zero rows, `SCHEMA` columns and dtypes.</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">column</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">SCHEMA</span><span class="p">})</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">SCHEMA</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span>
+<span class="normal"><a href="#__codelineno-0-257">257</a></span>
+<span class="normal"><a href="#__codelineno-0-258">258</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="k">def</span><span class="w"> </span><span class="nf">empty_frame</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an empty DataFrame with the exact long-format schema.</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a><span class="sd">        pd.DataFrame: Zero rows, `SCHEMA` columns and dtypes.</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">column</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">SCHEMA</span><span class="p">})</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">SCHEMA</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -30028,6 +30028,15 @@ from the <code>Samplingpoint</code> prefix (<code>"MT/SPO-..."</code> -&gt; <cod
 the string <code>Value</code> to float, and localises the naive <code>Start</code> timestamp
 to UTC. Rows whose numeric code is not in <code>code_to_name</code> are dropped
 (a pollutant the request did not ask for).</p>
+<p>EEA flags a reading it does not vouch for with a negative <code>Validity</code>
+(<code>-1</code> not valid, <code>-99</code> station maintenance / calibration) and fills its
+<code>Value</code> with a no-data sentinel — <code>-999</code> in the legacy Historical export,
+but also plain zeros. Those readings are masked to <code>NaN</code> here so <code>value</code>
+holds only measurements: a sentinel left in place would otherwise be
+averaged as if it were a real concentration. The flag itself is kept in
+the <code>validity</code> column. Valid rows keep their value as published, small
+near-zero negatives included — those are genuine instrument noise, not
+sentinels.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -30170,7 +30179,18 @@ recorded in the <code>dataset</code> column.</p>
 <span class="normal"><a href="#__codelineno-0-235">235</a></span>
 <span class="normal"><a href="#__codelineno-0-236">236</a></span>
 <span class="normal"><a href="#__codelineno-0-237">237</a></span>
-<span class="normal"><a href="#__codelineno-0-238">238</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="k">def</span><span class="w"> </span><span class="nf">shape_frame</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span>
+<span class="normal"><a href="#__codelineno-0-239">239</a></span>
+<span class="normal"><a href="#__codelineno-0-240">240</a></span>
+<span class="normal"><a href="#__codelineno-0-241">241</a></span>
+<span class="normal"><a href="#__codelineno-0-242">242</a></span>
+<span class="normal"><a href="#__codelineno-0-243">243</a></span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="k">def</span><span class="w"> </span><span class="nf">shape_frame</span><span class="p">(</span>
 <a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="n">raw</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">code_to_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 <a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Reshape one raw EEA Parquet frame into the backend&#39;s long schema.</span>
@@ -30182,46 +30202,57 @@ recorded in the <code>dataset</code> column.</p>
 <a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">    to UTC. Rows whose numeric code is not in `code_to_name` are dropped</span>
 <a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">    (a pollutant the request did not ask for).</span>
 <a id="__codelineno-0-198" name="__codelineno-0-198"></a>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">        raw: One Parquet file read with `pandas.read_parquet`.</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">        dataset: The dataset era this frame came from (`&quot;Verified&quot;`),</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">            recorded in the `dataset` column.</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">        code_to_name: EEA numeric code -&gt; earthlens pollutant name map.</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">        pd.DataFrame: The frame in the `SCHEMA` columns / dtypes.</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>    <span class="k">if</span> <span class="n">raw</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a>        <span class="k">return</span> <span class="n">empty_frame</span><span class="p">()</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>    <span class="n">keep</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">code_to_name</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>    <span class="k">if</span> <span class="n">keep</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a>        <span class="c1"># Non-empty Parquet whose codes miss every requested pollutant is</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a>        <span class="c1"># usually an upstream `Pollutant`-column type/vocabulary drift (the</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="c1"># catalog codes are integers); surface a distinct diagnostic rather</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="c1"># than a silent empty frame so it is not mistaken for &quot;no data&quot;.</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="n">observed</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))[:</span><span class="mi">10</span><span class="p">]</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>            <span class="sa">f</span><span class="s2">&quot;EEA reshape: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span><span class="si">}</span><span class="s2"> Parquet row(s) but none matched the &quot;</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>            <span class="sa">f</span><span class="s2">&quot;requested pollutant code(s) </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">code_to_name</span><span class="p">)</span><span class="si">}</span><span class="s2">; observed &quot;</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>            <span class="sa">f</span><span class="s2">&quot;Pollutant value(s) </span><span class="si">{</span><span class="n">observed</span><span class="si">}</span><span class="s2">. Possible airbase schema drift.&quot;</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="p">)</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="k">return</span> <span class="n">empty_frame</span><span class="p">()</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="n">out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">keep</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;station_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Samplingpoint&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Samplingpoint&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;parameter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">code_to_name</span><span class="p">)</span>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="c1"># The EEA download service publishes the observation period in UTC, so the</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="c1"># naive `Start` is localised (not converted) to UTC here; the date-window</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="c1"># filter in the backend is therefore correct at day boundaries.</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;datetime_utc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Start&quot;</span><span class="p">],</span> <span class="n">utc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Value&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Unit&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;agg_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;AggType&quot;</span><span class="p">]</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;validity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Validity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;Int64&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;verification&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Verification&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;Int64&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;dataset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;provider&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;EEA&quot;</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">SCHEMA</span><span class="p">)</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">    EEA flags a reading it does not vouch for with a negative `Validity`</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    (`-1` not valid, `-99` station maintenance / calibration) and fills its</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a><span class="sd">    `Value` with a no-data sentinel — `-999` in the legacy Historical export,</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="sd">    but also plain zeros. Those readings are masked to `NaN` here so `value`</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a><span class="sd">    holds only measurements: a sentinel left in place would otherwise be</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="sd">    averaged as if it were a real concentration. The flag itself is kept in</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="sd">    the `validity` column. Valid rows keep their value as published, small</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="sd">    near-zero negatives included — those are genuine instrument noise, not</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="sd">    sentinels.</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        raw: One Parquet file read with `pandas.read_parquet`.</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        dataset: The dataset era this frame came from (`&quot;Verified&quot;`),</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            recorded in the `dataset` column.</span>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        code_to_name: EEA numeric code -&gt; earthlens pollutant name map.</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        pd.DataFrame: The frame in the `SCHEMA` columns / dtypes.</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>    <span class="k">if</span> <span class="n">raw</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="k">return</span> <span class="n">empty_frame</span><span class="p">()</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="n">keep</span> <span class="o">=</span> <span class="n">raw</span><span class="p">[</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">code_to_name</span><span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="k">if</span> <span class="n">keep</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="c1"># Non-empty Parquet whose codes miss every requested pollutant is</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="c1"># usually an upstream `Pollutant`-column type/vocabulary drift (the</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="c1"># catalog codes are integers); surface a distinct diagnostic rather</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="c1"># than a silent empty frame so it is not mistaken for &quot;no data&quot;.</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>        <span class="n">observed</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))[:</span><span class="mi">10</span><span class="p">]</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>            <span class="sa">f</span><span class="s2">&quot;EEA reshape: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span><span class="si">}</span><span class="s2"> Parquet row(s) but none matched the &quot;</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>            <span class="sa">f</span><span class="s2">&quot;requested pollutant code(s) </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">code_to_name</span><span class="p">)</span><span class="si">}</span><span class="s2">; observed &quot;</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>            <span class="sa">f</span><span class="s2">&quot;Pollutant value(s) </span><span class="si">{</span><span class="n">observed</span><span class="si">}</span><span class="s2">. Possible airbase schema drift.&quot;</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="p">)</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="k">return</span> <span class="n">empty_frame</span><span class="p">()</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>    <span class="n">out</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">keep</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;station_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Samplingpoint&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;country&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Samplingpoint&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;parameter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Pollutant&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">code_to_name</span><span class="p">)</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>    <span class="c1"># The EEA download service publishes the observation period in UTC, so the</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>    <span class="c1"># naive `Start` is localised (not converted) to UTC here; the date-window</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>    <span class="c1"># filter in the backend is therefore correct at day boundaries.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;datetime_utc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Start&quot;</span><span class="p">],</span> <span class="n">utc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Value&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;coerce&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Unit&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;agg_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;AggType&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;validity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Validity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;Int64&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="n">out</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;validity&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">NA</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;verification&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep</span><span class="p">[</span><span class="s2">&quot;Verification&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;Int64&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;dataset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>    <span class="n">out</span><span class="p">[</span><span class="s2">&quot;provider&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;EEA&quot;</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>    <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">SCHEMA</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
