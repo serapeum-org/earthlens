@@ -24243,7 +24243,7 @@ is curated on each store before downloading anything.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
@@ -24253,12 +24253,13 @@ is curated on each store before downloading anything.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
-<span class="c1"># Downloads go to a scratch dir, not into the docs tree.</span>
-<span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">())</span> <span class="o">/</span> <span class="s1">'earthlens-ecds-xds-demo'</span>
+<span class="c1"># Downloads land in the shared cache, not in the docs tree and not on the</span>
+<span class="c1"># system drive. Override with EARTHLENS_CACHE if your cache lives elsewhere.</span>
+<span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'EARTHLENS_CACHE'</span><span class="p">,</span> <span class="s1">'D:/earthlens-cache'</span><span class="p">))</span> <span class="o">/</span> <span class="s1">'ecds_xds'</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'writing to'</span><span class="p">,</span> <span class="n">OUT</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import tempfile
+<div class="clipboard-copy-txt" id="cell-1">import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -24268,8 +24269,9 @@ import xarray as xr
 from earthlens.core import EarthLens
 from earthlens.ecmwf import Catalog
 
-# Downloads go to a scratch dir, not into the docs tree.
-OUT = Path(tempfile.gettempdir()) / 'earthlens-ecds-xds-demo'
+# Downloads land in the shared cache, not in the docs tree and not on the
+# system drive. Override with EARTHLENS_CACHE if your cache lives elsewhere.
+OUT = Path(os.environ.get('EARTHLENS_CACHE', 'D:/earthlens-cache')) / 'ecds_xds'
 OUT.mkdir(parents=True, exist_ok=True)
 print('writing to', OUT)</div>
 </div>
@@ -24285,8 +24287,9 @@ print('writing to', OUT)</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="what-lives-on-the-two-stores">What lives on the two stores<a class="anchor-link" href="#what-lives-on-the-two-stores">¶</a></h2><p><code>Catalog.store_for()</code> resolves any dataset id to the store that serves it, and
-<code>available_datasets</code> is the full universe each store offers — including ids that are
-reachable through the raw-request passthrough but not yet curated.</p>
+<code>available_datasets</code> is the full universe each store offers. All five are curated
+today; anything a store added later would show up here as <code>passthrough only</code> and
+still be downloadable through the raw-request passthrough.</p>
 </div>
 </div>
 </div>

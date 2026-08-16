@@ -23515,14 +23515,21 @@ own request dict verbatim:</p>
 </tr>
 </tbody>
 </table>
-<p>The requested date range drives the <strong>model cycle</strong>; the reforecast date is pinned in the row's <code>extras</code>
-(<code>hyear: 1995</code> by default). Override it through the
-<a href="../datastores/#download-anything--the-raw-request-passthrough">passthrough</a> to target a different reforecast year.</p>
+<p>The store only serves a reforecast on the model run's <strong>own calendar day</strong>, so the two dates move together:
+<code>request_kind: s2s_reforecast</code> copies the requested <code>month</code>/<code>day</code> into <code>hmonth</code>/<code>hday</code>. Only the reforecast
+<strong>year</strong> is a per-row value (<code>hyear: 1995</code> by default); use the
+<a href="../datastores/#download-anything--the-raw-request-passthrough">passthrough</a> to target a different one.</p>
+<div class="admonition warning">
+<p class="admonition-title">One model-cycle date per request</p>
+<p>Because a CDS form request treats every list as an independent cross-product axis, it cannot express the
+pairing between the two dates: an <code>n</code>-day window would submit <code>n x n</code> <code>day</code>/<code>hday</code> combinations of which
+only the <code>n</code> diagonal pairs exist. The backend therefore rejects a multi-day window for this row with a
+clear error — request one model-cycle date at a time (<code>start == end</code>).</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Why not <code>request_kind: glofas_hindcast</code>?</p>
-<p>That kind looks like the obvious fit — it exists precisely to map <code>year</code> → <code>hyear</code> — but it <strong>renames</strong>
-rather than adds, so it would delete the model-cycle date this dataset also requires. The row therefore uses
-<code>request_kind: form</code> with the <code>h*</code> keys pinned as <code>extras</code>, which is what the live constraints accept.</p>
+<p>That kind looks like the obvious fit — it exists precisely to map <code>year</code> to <code>hyear</code> — but it <strong>renames</strong>
+rather than adds, so it would delete the model-cycle date this dataset also requires.</p>
 </div>
 <h2 id="fire-fuel-and-burned-area-xds"><a class="toclink" href="#fire-fuel-and-burned-area-xds">Fire fuel and burned area (XDS)</a><a class="headerlink" href="#fire-fuel-and-burned-area-xds" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
