@@ -63,13 +63,15 @@ class TestEeaLiveQuery:
         assert _SCHEMA_COLUMNS <= set(df.columns), f"missing columns: {df.columns}"
         assert set(df["parameter"].unique()) == {"pm25"}
         assert (df["country"] == "MT").all(), "all rows should be Maltese stations"
-        # Legacy Airbase encodes missing readings as the -999 sentinel (not NaN),
-        # which the backend currently passes through (see #1046), and raw hourly
-        # data carries occasional small instrument-noise negatives near zero. Drop
-        # the sentinel and assert the rest sit in a physically plausible band with a
+        # Readings EEA flags invalid carry a no-data sentinel (-999 in this era) and
+        # are masked to NaN by the backend, so no sentinel may survive into `value`.
+        # What remains is real, and raw hourly data carries occasional small
+        # instrument-noise negatives near zero — assert a plausible band with a
         # positive centre rather than strictly non-negative.
-        real = df.loc[df["value"] != -999.0, "value"].dropna()
-        assert not real.empty, "expected some real (non-sentinel) observations"
+        assert not (df["value"] == -999.0).any(), "no-data sentinel left in value"
+        assert (df.loc[df["value"].isna(), "validity"] < 0).all()
+        real = df["value"].dropna()
+        assert not real.empty, "expected some real observations"
         assert real.between(-50, 10000).all(), "implausible PM2.5 concentration"
         assert real.median() > 0, "expected mostly-positive concentrations"
         assert df["datetime_utc"].dt.year.between(2010, 2012).all()
