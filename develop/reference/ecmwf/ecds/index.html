@@ -2633,6 +2633,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#s2s-sub-seasonal-to-seasonal-forecasts-ecds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S2S — sub-seasonal to seasonal forecasts (ECDS)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="S2S — sub-seasonal to seasonal forecasts (ECDS)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reforecasts-have-two-date-axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reforecasts have two date axes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#fire-fuel-and-burned-area-xds" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23260,6 +23288,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#s2s-sub-seasonal-to-seasonal-forecasts-ecds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S2S — sub-seasonal to seasonal forecasts (ECDS)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="S2S — sub-seasonal to seasonal forecasts (ECDS)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reforecasts-have-two-date-axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reforecasts have two date axes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#fire-fuel-and-burned-area-xds" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23422,20 +23478,66 @@ own request dict verbatim:</p>
 <a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="p">)</span>
 <a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
-<h2 id="fire-fuel-and-burned-area-xds"><a class="toclink" href="#fire-fuel-and-burned-area-xds">Fire fuel and burned area (XDS)</a><a class="headerlink" href="#fire-fuel-and-burned-area-xds" title="Permanent link">#</a></h2>
+<h2 id="s2s-sub-seasonal-to-seasonal-forecasts-ecds"><a class="toclink" href="#s2s-sub-seasonal-to-seasonal-forecasts-ecds">S2S — sub-seasonal to seasonal forecasts (ECDS)</a><a class="headerlink" href="#s2s-sub-seasonal-to-seasonal-forecasts-ecds" title="Permanent link">#</a></h2>
+<p>S2S shares TIGGE's single-level ECMWF vocabulary, but — unlike TIGGE — comes back on a <strong>regular
+<code>latitude</code>/<code>longitude</code> grid</strong>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;ecmwf&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;derived-fire-fuel-biomass&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;live-fuel-moisture-content-group&quot;</span><span class="p">]},</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2000-01-31&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;monthly&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;s2s-forecasts&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;2m-temperature&quot;</span><span class="p">]},</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2026-08-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2026-08-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">51.0</span><span class="p">],</span>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/fire-fuel&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/s2s&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">)</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="reforecasts-have-two-date-axes"><a class="toclink" href="#reforecasts-have-two-date-axes">Reforecasts have two date axes</a><a class="headerlink" href="#reforecasts-have-two-date-axes" title="Permanent link">#</a></h3>
+<p><code>s2s-reforecasts</code> is the one row here that needs explaining. It carries <strong>two</strong> dates:</p>
+<table>
+<thead>
+<tr>
+<th>Keys</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>year</code> / <code>month</code> / <code>day</code></td>
+<td>the <strong>model cycle</strong> — which forecast system version produced the reforecast</td>
+</tr>
+<tr>
+<td><code>hyear</code> / <code>hmonth</code> / <code>hday</code></td>
+<td>the <strong>reforecast date</strong> — the historical date being re-forecast</td>
+</tr>
+</tbody>
+</table>
+<p>The requested date range drives the <strong>model cycle</strong>; the reforecast date is pinned in the row's <code>extras</code>
+(<code>hyear: 1995</code> by default). Override it through the
+<a href="../datastores/#download-anything--the-raw-request-passthrough">passthrough</a> to target a different reforecast year.</p>
+<div class="admonition note">
+<p class="admonition-title">Why not <code>request_kind: glofas_hindcast</code>?</p>
+<p>That kind looks like the obvious fit — it exists precisely to map <code>year</code> → <code>hyear</code> — but it <strong>renames</strong>
+rather than adds, so it would delete the model-cycle date this dataset also requires. The row therefore uses
+<code>request_kind: form</code> with the <code>h*</code> keys pinned as <code>extras</code>, which is what the live constraints accept.</p>
+</div>
+<h2 id="fire-fuel-and-burned-area-xds"><a class="toclink" href="#fire-fuel-and-burned-area-xds">Fire fuel and burned area (XDS)</a><a class="headerlink" href="#fire-fuel-and-burned-area-xds" title="Permanent link">#</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">lens</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;ecmwf&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;derived-fire-fuel-biomass&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;live-fuel-moisture-content-group&quot;</span><span class="p">]},</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2000-01-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2000-01-31&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">temporal_resolution</span><span class="o">=</span><span class="s2">&quot;monthly&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">50.0</span><span class="p">,</span> <span class="mf">51.0</span><span class="p">],</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/fire-fuel&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">)</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </code></pre></div>
 <p>Both XDS datasets are delivered as a <strong>ZIP wrapping a single NetCDF</strong> whose member name encodes the requested
 subset (e.g. <code>LFMC_MAP_2000_01.area-subset.51.10.50.9.nc</code>); earthlens unwraps that for you, so <code>download()</code>
@@ -23461,6 +23563,18 @@ returns the <code>.nc</code> path.</p>
 <td><code>K</code></td>
 </tr>
 <tr>
+<td><code>s2s-forecasts</code></td>
+<td><code>2m-temperature</code></td>
+<td><code>t2m</code></td>
+<td><code>K</code></td>
+</tr>
+<tr>
+<td><code>s2s-reforecasts</code></td>
+<td><code>maximum-2m-temperature-in-the-last-6-hours</code></td>
+<td><code>mx2t6</code></td>
+<td><code>K</code></td>
+</tr>
+<tr>
 <td><code>derived-fire-fuel-biomass</code></td>
 <td><code>live-fuel-moisture-content-group</code></td>
 <td><code>LFMC</code></td>
@@ -23476,15 +23590,10 @@ returns the <code>.nc</code> path.</p>
 </table>
 <p><strong>Not yet curated</strong>, deliberately:</p>
 <ul>
-<li><strong><code>s2s-forecasts</code> / <code>s2s-reforecasts</code></strong> — these need <code>s2s-licence</code> <strong>revision 5</strong>; until it is accepted no
-  retrieve can be observed, so no variable metadata can be pinned. Rows are left out rather than guessed. Both ids
-  are still listed in <code>available_datasets</code>, so they remain reachable today through the
-  <a href="../datastores/#download-anything--the-raw-request-passthrough">raw-request passthrough</a>.
-  <code>s2s-reforecasts</code> exposes <code>hyear</code> / <code>hmonth</code> / <code>hday</code>, which the shipped <code>glofas_hindcast</code> request kind already
-  remaps — reuse it when the licence clears.</li>
-<li><strong>The other 36 TIGGE variables and 11 XDS variables</strong> the constraints expose — only the rows above have been
-  retrieved and unit-verified. Placeholder units have shipped wrong values before, so they wait for a real
-  download.</li>
+<li><strong>The other variables each dataset exposes</strong> — TIGGE alone offers 37. Only the rows above have been retrieved
+  and unit-verified; placeholder units have shipped wrong values before, so the rest wait for a real download.
+  Any of them is reachable today through the
+  <a href="../datastores/#download-anything--the-raw-request-passthrough">raw-request passthrough</a>.</li>
 </ul>
 <p>See <a href="../datastores/">the five data stores</a> for the cross-store picture and
 <a href="../ewds/">EWDS (GloFAS / floods)</a> for the flood walkthrough.</p>

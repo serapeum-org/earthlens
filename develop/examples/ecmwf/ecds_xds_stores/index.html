@@ -14404,10 +14404,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#reaching-an-uncurated-dataset" class="md-nav__link">
+  <a href="#s2s-reforecasts-two-date-axes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reaching an uncurated dataset
+        S2S reforecasts — two date axes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reaching-an-unverified-variable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reaching an unverified variable
       
     </span>
   </a>
@@ -23360,10 +23371,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#reaching-an-uncurated-dataset" class="md-nav__link">
+  <a href="#s2s-reforecasts-two-date-axes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reaching an uncurated dataset
+        S2S reforecasts — two date axes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reaching-an-unverified-variable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reaching an unverified variable
       
     </span>
   </a>
@@ -24660,12 +24682,66 @@ fds.close()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="reaching-an-uncurated-dataset">Reaching an uncurated dataset<a class="anchor-link" href="#reaching-an-uncurated-dataset">¶</a></h2><p><code>s2s-forecasts</code> and <code>s2s-reforecasts</code> are offered by ECDS but not curated here —
-their licence revision was not yet accepted when this backend was written, so no
-retrieve could be observed and no variable metadata pinned.</p>
-<p>They are still reachable <strong>today</strong> through the raw-request passthrough, which takes
-the store's own request dict verbatim and needs no curated row. The same escape
-hatch works for any id across the five stores:</p>
+<h2 id="s2s-reforecasts-two-date-axes">S2S reforecasts — two date axes<a class="anchor-link" href="#s2s-reforecasts-two-date-axes">¶</a></h2><p><code>s2s-reforecasts</code> is the subtlest row on either store. It carries <strong>two</strong> dates:
+<code>year</code>/<code>month</code>/<code>day</code> select the <em>model cycle</em> (which forecast system version ran),
+and <code>hyear</code>/<code>hmonth</code>/<code>hday</code> select the <em>reforecast date</em> being re-run.</p>
+<p>The requested range drives the model cycle; the reforecast date is pinned in the
+row's <code>extras</code>. <code>request_kind: glofas_hindcast</code> would look like the obvious fit —
+it maps <code>year</code> to <code>hyear</code> — but it <strong>renames</strong> rather than adds, so it would drop
+the model-cycle date this dataset also needs.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=17">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-10">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">spec</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span>
+    <span class="s1">'s2s-reforecasts'</span><span class="p">,</span> <span class="s1">'maximum-2m-temperature-in-the-last-6-hours'</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'request_kind :'</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">request_kind</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'NetCDF name  :'</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">nc_variable</span><span class="p">,</span> <span class="s1">'|'</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
+<span class="n">pinned</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'h'</span><span class="p">)}</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'pinned h* extras:'</span><span class="p">,</span> <span class="n">pinned</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-10">spec = catalog.get_variable(
+    's2s-reforecasts', 'maximum-2m-temperature-in-the-last-6-hours'
+)
+print('request_kind :', spec.request_kind)
+print('NetCDF name  :', spec.nc_variable, '|', spec.units)
+pinned = {k: v for k, v in spec.extras.items() if k.startswith('h')}
+print('pinned h* extras:', pinned)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=18">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="reaching-an-unverified-variable">Reaching an unverified variable<a class="anchor-link" href="#reaching-an-unverified-variable">¶</a></h2><p>Every dataset on both stores is curated, but only the variables verified against a
+real download carry rows — TIGGE alone exposes 37. Anything else stays reachable
+through the raw-request passthrough, which takes the store's own request dict
+verbatim and needs no curated row:</p>
 <div class="highlight"><pre><span></span><span class="n">EarthLens</span><span class="p">(</span>
     <span class="n">data_source</span><span class="o">=</span><span class="s1">'ecmwf'</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">=</span><span class="s1">'s2s-forecasts'</span><span class="p">,</span>
@@ -24678,7 +24754,7 @@ hatch works for any id across the five stores:</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=17">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=19">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -24688,8 +24764,10 @@ hatch works for any id across the five stores:</p>
 <li>One facade key (<code>ecmwf</code>) and one token reach <strong>five</strong> stores; only <code>endpoint</code> differs.</li>
 <li><strong>ECDS</strong> needs its portal-scope <code>terms-of-use-ecds</code> policy on top of dataset licences.</li>
 <li><strong>TIGGE</strong> returns an unstructured <code>values</code> grid — <code>area</code> subsets points, it does not regrid.</li>
+<li><strong>S2S</strong> shares TIGGE's vocabulary but returns a regular lat/lon grid.</li>
+<li><strong>S2S reforecasts</strong> need both a model-cycle date and a reforecast date.</li>
 <li><strong>XDS</strong> returns a regular lat/lon grid inside a ZIP, and is research-grade, not operational.</li>
-<li>Anything uncurated stays reachable through the raw-request passthrough.</li>
+<li>Any unverified variable stays reachable through the raw-request passthrough.</li>
 </ul>
 </div>
 </div>
