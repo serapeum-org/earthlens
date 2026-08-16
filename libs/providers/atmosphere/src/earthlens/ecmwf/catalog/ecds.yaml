@@ -29,8 +29,12 @@
 # regrid. Consumers that need a regular grid must regrid downstream; earthlens
 # does not silently do it here.
 #
-# Verified live 2026-08-16 (real retrieve + variable inspection); see
-# `planning/ecmwf/captures/ecds-xds/c2-real-retrieves-2026-08-16.md`.
+# Verified live 2026-08-16 by retrieving each variable and reading the file:
+#   tigge-forecasts    2_m_temperature -> t2m   (K), flat NetCDF, dim `values`
+#   s2s-forecasts      2_m_temperature -> t2m   (K), flat NetCDF, lat/lon
+#   s2s-reforecasts    maximum_2_m_..._6_hours -> mx2t6 (K), flat NetCDF, lat/lon
+# S2S needed `s2s-licence` rev 5; holding rev 4 returns 403 (licences are
+# versioned, so comparing ids alone is not enough).
 #
 # Deliberately NOT curated yet: the other variables each dataset's constraints
 # expose (TIGGE alone offers 37). Only the variables below have been retrieved
@@ -86,6 +90,14 @@ datasets:
       data_format: netcdf
       # Only the reforecast YEAR is pinned; `hmonth`/`hday` are copied from
       # the requested model-cycle date by `request_kind: s2s_reforecast`.
+      #
+      # `hyear` is NOT validated against the requested model cycle: each cycle
+      # publishes reforecasts for its own ~20-year window, and the valid
+      # (year, hyear) pairs live in the dataset's 29 317 constraint entries.
+      # 1995 is inside the window of the cycles verified live (2015), and the
+      # pre-flight constraint check rejects a pair the store does not serve —
+      # so a mismatch fails with a clear error rather than bad data. Deriving
+      # the window per cycle would need the constraints at request time.
       hyear: ["1995"]
     variables:
       maximum-2m-temperature-in-the-last-6-hours:

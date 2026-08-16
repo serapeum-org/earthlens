@@ -164,7 +164,7 @@ Curated so far, each verified by a real retrieve rather than from the constraint
 | `derived-fire-fuel-biomass` | `live-fuel-moisture-content-group` | `LFMC` | `%` |
 | `projections-fire-fuel-burned-area` | `burned-area` | `BAF_pred` | `1` (CF dimensionless — the file declares CF-1.9 with `long_name` "Burned Area Fraction" and values inside [0, 1]) |
 
-**Not yet curated**, deliberately:
+**Deliberately left uncurated:**
 
 - **The other variables each dataset exposes** — TIGGE alone offers 37. Only the rows above have been retrieved
   and unit-verified; placeholder units have shipped wrong values before, so the rest wait for a real download.

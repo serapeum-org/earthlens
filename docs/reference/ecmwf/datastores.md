@@ -105,5 +105,6 @@ The end-to-end flow for onboarding the full inventory is therefore: `refresh ecm
 `curate ecmwf --all --write` (seed every uncurated id) → `curate ecmwf --fill-empty --write` (hydrate the placeholders
 from live retrieves).
 
-See [EWDS (GloFAS / floods)](ewds.md) for the flood-specific walkthrough and
+See [EWDS (GloFAS / floods)](ewds.md) for the flood-specific walkthrough,
+[ECDS + XDS](ecds.md) for the two ECMWF-hosted stores, and
 [Catalog & tooling](catalog.md) for the catalog layout.

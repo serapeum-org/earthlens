@@ -351,9 +351,9 @@ def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
 def emitter(catalog: Any, upstream_id: str, **_opts: Any) -> dict[str, Any]:
     """Seed an ECMWF `datasets:` row from the live CADS `form.json`.
 
-    Resolves the dataset's store from the per-store index,
-    fetches its `form.json`, guesses the `request_kind` from the date/selector
-    fields, and enumerates every variable the `variable` widget exposes.
+    Resolves the dataset's store from the per-store index, fetches its
+    `form.json`, guesses the `request_kind` from the date/selector fields, and
+    enumerates every variable the `variable` widget exposes.
     `nc_variable` / `units` are placeholders (the form does not carry them) —
     confirm them from a live retrieve (`curate ecmwf --fill-empty`).
 
