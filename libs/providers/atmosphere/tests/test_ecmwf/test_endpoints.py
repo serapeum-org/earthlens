@@ -225,6 +225,13 @@ class TestConstraintsHost:
         _clear_cads_env(monkeypatch)
         assert ep.constraints_base_url("cds") is None
 
+    def test_endpoint_url_rejects_an_unknown_slug(self, monkeypatch):
+        """`endpoint_url` names the valid slugs when given an unknown one."""
+        _clear_cads_env(monkeypatch)
+        with pytest.raises(ValueError, match="unknown ECMWF endpoint") as excinfo:
+            ep.endpoint_url("mars")
+        assert "ecds" in str(excinfo.value)
+
     def test_constraints_host_follows_url_override(self, monkeypatch):
         """Pointing `XDS_URL` at a staging host moves the constraints host too."""
         _clear_cads_env(monkeypatch)
