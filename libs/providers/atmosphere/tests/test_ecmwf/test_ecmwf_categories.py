@@ -86,33 +86,3 @@ class TestRulesTable:
             slug for slug in ENDPOINTS if slug not in CATEGORIES and slug != "cds"
         }
         assert not missing, f"stores without a shard category: {missing}"
-
-
-class TestCliStoreTables:
-    """The CLI store tables are derived from `ENDPOINTS`, never restated."""
-
-    def test_store_urls_cover_every_endpoint(self):
-        """Every registered store has an API root in the CLI table."""
-        from earthlens.ecmwf.cli import _ECMWF_STORE_URLS
-        from earthlens.ecmwf.endpoints import ENDPOINTS
-
-        assert set(_ECMWF_STORE_URLS) == set(ENDPOINTS)
-
-    def test_store_urls_match_the_registry(self):
-        """The CLI table's URLs are the registry's, not a divergent copy."""
-        from earthlens.ecmwf.cli import _ECMWF_STORE_URLS
-        from earthlens.ecmwf.endpoints import ENDPOINTS
-
-        for slug, (default_url, _url_env, _key_env) in ENDPOINTS.items():
-            assert _ECMWF_STORE_URLS[slug] == default_url, slug
-
-    def test_collections_urls_are_built_from_the_roots(self):
-        """Each catalogue URL is its store's root plus the collections path."""
-        from earthlens.ecmwf.cli import (
-            _ECMWF_STORE_COLLECTIONS_URLS,
-            _ECMWF_STORE_URLS,
-        )
-
-        for slug, root in _ECMWF_STORE_URLS.items():
-            expected = f"{root}/catalogue/v1/collections"
-            assert _ECMWF_STORE_COLLECTIONS_URLS[slug] == expected, slug

@@ -238,12 +238,20 @@ class TestConstraintsHost:
         monkeypatch.setenv("XDS_URL", "https://staging.xds.invalid/api")
         assert ep.constraints_base_url("xds") == "https://staging.xds.invalid/api"
 
-    @pytest.mark.parametrize("endpoint", ["ecds", "xds"])
-    def test_catalog_accepts_the_new_endpoint_slugs(self, endpoint):
+    @pytest.mark.parametrize(
+        "endpoint, dataset, cds_variable",
+        [
+            ("ecds", "tigge-forecasts", "2_m_temperature"),
+            ("xds", "derived-fire-fuel-biomass", "live_fuel_moisture_content_group"),
+        ],
+    )
+    def test_catalog_accepts_the_new_endpoint_slugs(
+        self, endpoint, dataset, cds_variable
+    ):
         """A catalog row may declare the new stores without a validation error."""
         variable = Variable(
-            cds_dataset="tigge-forecasts",
-            cds_variable="2m_temperature",
+            cds_dataset=dataset,
+            cds_variable=cds_variable,
             nc_variable="t2m",
             units="K",
             endpoint=endpoint,
