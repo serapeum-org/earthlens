@@ -59,6 +59,9 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # axes — `year`/`month`/`day` select the model cycle and
     # `hyear`/`hmonth`/`hday` the reforecast — so the month/day are *copied*
     # into the h-keys rather than renamed. `hyear` alone comes from `extras`.
+    # The strip tuple is deliberately empty: the form accepts every template
+    # key including `time`, so there is nothing to drop (the row's `extras`
+    # pin the single `time` slot the dataset serves).
     "s2s_reforecast": (),
     # Seasonal (GloFAS/EFAS/CDS seasonal): keyed by `year`/`month` + a lead
     # (`leadtime_month`/`leadtime_hour`) + `originating_centre`/`system` from
@@ -377,15 +380,37 @@ def _reject_multi_day_reforecast(request: dict[str, Any], var_info: Variable) ->
     """
     days = request.get("day") or []
     months = request.get("month") or []
+    if not days:
+        raise ValueError(
+            f"{var_info.cds_dataset!r} selects a reforecast by the model run's "
+            "own calendar day, so it needs a `day`. Request it with "
+            "temporal_resolution='daily'."
+        )
     if len(days) > 1 or len(months) > 1:
         raise ValueError(
             f"{var_info.cds_dataset!r} pairs the model-cycle date with the "
             "reforecast date, and a CDS form request cannot express that "
-            f"pairing: a {len(days) or 1}-day window would submit "
-            f"{(len(days) or 1) * (len(days) or 1)} day/hday combinations of "
-            f"which only {len(days) or 1} exist. Request one model-cycle date "
-            "at a time (start == end)."
+            f"pairing: a {len(days)}-day window would submit "
+            f"{len(days) * len(days)} day/hday combinations of which only "
+            f"{len(days)} exist. Request one model-cycle date at a time "
+            "(start == end)."
         )
+    # A 29 February model cycle has no reforecast in a non-leap `hyear`. The
+    # row's `extras` are merged after this hook runs, so read `hyear` from the
+    # catalog row rather than from the half-built request.
+    hyears = var_info.extras.get("hyear") or []
+    if months == ["02"] and days == ["29"]:
+        non_leap = [
+            year
+            for year in hyears
+            if not (int(year) % 4 == 0 and (int(year) % 100 or int(year) % 400 == 0))
+        ]
+        if non_leap:
+            raise ValueError(
+                f"{var_info.cds_dataset!r}: a 29 February model cycle has no "
+                f"reforecast in the non-leap hyear(s) {non_leap}. Pick a leap "
+                "`hyear` in the row's extras, or another model-cycle date."
+            )
 
 
 def _apply_request_kind_dates(
@@ -394,8 +419,11 @@ def _apply_request_kind_dates(
     """Rewrite the request's date keys for the date-representation kinds (G11).
 
     `cams_date` replaces year/month/day with a single `date` range string;
-    `glofas_hindcast` / `seasonal_hindcast` remap year/month(/day) to the
-    `hyear`/`hmonth`(/`hday`) hindcast-reference keys. Any other kind is a no-op.
+    `glofas_hindcast` / `seasonal_hindcast` *rename* year/month(/day) to the
+    `hyear`/`hmonth`(/`hday`) hindcast-reference keys; `s2s_reforecast`
+    *copies* month/day into them instead, because that dataset needs both the
+    model-cycle and the reforecast date (and rejects a window it cannot
+    express). Any other kind is a no-op.
 
     Args:
         request: The request dict assembled so far (mutated in place).
@@ -430,7 +458,9 @@ def _apply_request_kind_dates(
         _reject_multi_day_reforecast(request, var_info)
         for src_key, dst_key in (("month", "hmonth"), ("day", "hday")):
             if src_key in request:
-                request[dst_key] = request[src_key]
+                # Copy by value: assigning the list itself would alias the two
+                # keys, so a later edit to `day` would silently move `hday`.
+                request[dst_key] = list(request[src_key])
 
 
 def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> None:
