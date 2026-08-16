@@ -218,8 +218,9 @@ nav:
     - ECMWF:
       - Introduction: reference/ecmwf/introduction.md
       - Usage: reference/ecmwf/usage.md
-      - Data stores (CDS + ADS + EWDS): reference/ecmwf/datastores.md
+      - Data stores (CDS + ADS + EWDS + ECDS + XDS): reference/ecmwf/datastores.md
       - EWDS (GloFAS / floods): reference/ecmwf/ewds.md
+      - ECDS + XDS (TIGGE / S2S / fire fuel): reference/ecmwf/ecds.md
       - Catalog & tooling: reference/ecmwf/catalog.md
       - Reference: reference/ecmwf/ecmwf.md
     - EUMETSAT (Data Store):
