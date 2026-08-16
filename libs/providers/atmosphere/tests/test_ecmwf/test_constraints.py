@@ -658,11 +658,12 @@ class TestDateRangeConstraints:
     def test_date_outside_range_raises(self, monkeypatch):
         """A `date` outside the constraint range is rejected."""
         _stub_urlopen(monkeypatch, self._RANGE_ENTRY)
+        validator = RequestValidator(
+            "cams-global-reanalysis-eac4",
+            {"variable": ["2m_temperature"], "date": "2030-01-01/2030-01-01"},
+        )
         with pytest.raises(ValueError, match="does not match"):
-            RequestValidator(
-                "cams-global-reanalysis-eac4",
-                {"variable": ["2m_temperature"], "date": "2030-01-01/2030-01-01"},
-            ).check()
+            validator.check()
 
 
 class TestDateWithin:
