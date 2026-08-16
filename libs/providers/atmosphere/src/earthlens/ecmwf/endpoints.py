@@ -78,6 +78,33 @@ def endpoint_url(endpoint: str) -> str:
 
     Raises:
         ValueError: If `endpoint` is not a known slug.
+
+    Examples:
+        - Resolve the two ECMWF-hosted stores:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import endpoint_url
+            >>> endpoint_url("ecds")
+            'https://ecds.ecmwf.int/api'
+            >>> endpoint_url("xds")
+            'https://xds.ecmwf.int/api'
+
+            ```
+        - Derive a store's profile page from its API root:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import endpoint_url
+            >>> endpoint_url("ewds").rsplit("/api", 1)[0] + "/profile"
+            'https://ewds.climate.copernicus.eu/profile'
+
+            ```
+        - An unknown slug is rejected and the message lists the valid ones:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import endpoint_url
+            >>> endpoint_url("mars")
+            Traceback (most recent call last):
+                ...
+            ValueError: unknown ECMWF endpoint 'mars'; expected one of ['ads', 'cds', 'ecds', 'ewds', 'xds']
+
+            ```
     """
     if endpoint not in ENDPOINTS:
         raise ValueError(
@@ -100,6 +127,30 @@ def constraints_base_url(endpoint: str) -> str | None:
 
     Returns:
         str | None: The base URL, or `None` for CDS.
+
+    Examples:
+        - CDS keeps its historic `None`, so the default template is used:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import constraints_base_url
+            >>> constraints_base_url("cds") is None
+            True
+
+            ```
+        - Every other store validates against its own host:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import constraints_base_url
+            >>> constraints_base_url("ecds")
+            'https://ecds.ecmwf.int/api'
+
+            ```
+        - Build the URL a dataset's constraints are actually fetched from:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import constraints_base_url
+            >>> base = constraints_base_url("xds")
+            >>> f"{base}/catalogue/v1/collections/derived-fire-fuel-biomass/constraints.json"
+            'https://xds.ecmwf.int/api/catalogue/v1/collections/derived-fire-fuel-biomass/constraints.json'
+
+            ```
     """
     return None if endpoint == "cds" else endpoint_url(endpoint)
 
