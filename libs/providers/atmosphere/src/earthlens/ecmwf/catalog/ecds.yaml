@@ -1,0 +1,61 @@
+# ECMWF Data Store (ECDS) datasets for the ECMWF backend.
+#
+# Reached via the ECDS endpoint (`endpoint: ecds`) with the shared CDS Personal
+# Access Token — the same token authenticates against CDS / ADS / EWDS / ECDS /
+# XDS; only the URL differs (probing `profiles/v1/account` on each returns the
+# same account). See `earthlens.ecmwf.endpoints`.
+#
+# ECDS is ECMWF-hosted rather than Copernicus-branded, but runs the same CADS
+# software: the catalogue publishes `form.json` and `constraints.json` at the
+# usual paths, so the shipped pre-flight `RequestValidator` works unchanged.
+#
+# ECDS additionally requires a **portal-scope** policy, `terms-of-use-ecds`,
+# which is separate from any dataset licence and is invisible to a
+# dataset-scope licence check. Without it every retrieve returns 403 with
+# "user didn't accept all required site policies".
+#
+# TIGGE vocabulary is NOT the MARS/CDS idiom — the live `constraints.json` is
+# authoritative and differs from the sibling shards:
+#   origin      : ecmwf (not the MARS spelling `ecmf`); 13 centres total —
+#                 bom, cma, cptec, dwd, eccc, ecmwf, imd, jma, kma, mf, ncep,
+#                 ncmrwf, ukmo
+#   level_type  : single_level (not `surface`); also isentropic,
+#                 potential_vorticity, pressure
+#   variable    : 2_m_temperature (underscores around the `m`)
+#
+# Output shape: TIGGE returns a **flat** NetCDF (no zip wrapper) carrying its
+# native reduced-Gaussian representation — the retrieved file has a `values`
+# dimension, NOT `lat`/`lon`. The `area` selector subsets points; it does not
+# regrid. Consumers that need a regular grid must regrid downstream; earthlens
+# does not silently do it here.
+#
+# Verified live 2026-08-16 (real retrieve + variable inspection); see
+# `planning/ecmwf/captures/ecds-xds/c2-real-retrieves-2026-08-16.md`.
+#
+# Deliberately NOT curated yet:
+#   s2s-forecasts, s2s-reforecasts — both require `s2s-licence` rev 5 while the
+#     account carries rev 4, so no retrieve could be observed and no variable
+#     metadata pinned. This plan forbids placeholder units, so the rows are left
+#     out entirely rather than guessed. `s2s-reforecasts` additionally exposes
+#     `hyear`/`hmonth`/`hday`, which the shipped `glofas_hindcast` request kind
+#     already remaps — reuse it when the licence clears.
+#   The other 36 TIGGE variables the constraints expose (10_m_u_component_of_wind,
+#     mean_sea_level_pressure, total_precipitation, …) — only 2_m_temperature has
+#     been retrieved and unit-verified so far.
+
+datasets:
+  tigge-forecasts:
+    endpoint: ecds
+    request_kind: form
+    extras:
+      origin: [ecmwf]
+      level_type: [single_level]
+      forecast_type: [control_forecast]
+      leadtime_hour: ["24"]
+      time: ["00:00"]
+      data_format: netcdf
+    variables:
+      2m-temperature:
+        cds_variable: 2_m_temperature
+        nc_variable: t2m
+        units: K
