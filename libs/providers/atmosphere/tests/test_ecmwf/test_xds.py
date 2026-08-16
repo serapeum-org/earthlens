@@ -1,8 +1,11 @@
-"""Unit tests for the XDS (ECMWF Cross Data Store) catalog rows.
+"""Unit tests for the ECDS and XDS catalog rows.
 
-The two fire-fuel rows load on the `xds` endpoint and build a request whose
-`day` / `time` (and, for the annual burned-area row, `month`) template keys are
-dropped by explicit `null` opt-outs rather than by a bespoke `request_kind`.
+Covers the two ECMWF-hosted stores added alongside CDS / ADS / EWDS: the XDS
+fire-fuel rows, whose `day` / `time` (and, on the annual burned-area row,
+`month`) template keys are dropped by explicit `null` opt-outs rather than a
+bespoke `request_kind`, and the ECDS TIGGE row, whose request vocabulary is
+taken from the live constraints rather than the MARS idiom.
+
 Variable metadata is live-verified; see
 `planning/ecmwf/captures/ecds-xds/c2-real-retrieves-2026-08-16.md`.
 """
@@ -14,7 +17,9 @@ import pytest
 
 from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.ecmwf import Catalog
+from earthlens.ecmwf import constraints as constraints_module
 from earthlens.ecmwf.backend import ECMWF
+from earthlens.ecmwf.endpoints import constraints_base_url
 
 pytestmark = [pytest.mark.unit]
 
@@ -115,3 +120,131 @@ class TestXdsRequestShape:
         request = _backend()._build_request(variable)
         assert request["variable"] == [variable.cds_variable]
         assert request["area"] == [51.0, 9.0, 50.0, 10.0]
+
+
+class TestEcdsCatalogRows:
+    """Catalog shape for the curated ECDS dataset."""
+
+    def test_tigge_is_curated_on_the_ecds_endpoint(self):
+        """`tigge-forecasts` loads and routes to ECDS."""
+        record = Catalog().datasets["tigge-forecasts"]
+        assert record.endpoint == "ecds"
+        assert all(v.endpoint == "ecds" for v in record.variables.values())
+
+    def test_tigge_variable_metadata_is_live_verified(self):
+        """The 2 m temperature row carries its real NetCDF name and unit."""
+        variable = Catalog().get_variable("tigge-forecasts", "2m-temperature")
+        assert variable.cds_variable == "2_m_temperature"
+        assert variable.nc_variable == "t2m"
+        assert variable.units == "K"
+
+    def test_tigge_uses_the_live_request_vocabulary(self):
+        """The row pins the values the live constraints accept, not the MARS idiom."""
+        request = _backend()._build_request(
+            Catalog().get_variable("tigge-forecasts", "2m-temperature")
+        )
+        assert request["origin"] == ["ecmwf"]
+        assert request["level_type"] == ["single_level"]
+        assert request["variable"] == ["2_m_temperature"]
+
+    @pytest.mark.parametrize("dataset", ["s2s-forecasts", "s2s-reforecasts"])
+    def test_s2s_is_indexed_but_not_curated(self, dataset):
+        """S2S is offered by the store but stays uncurated until its licence clears."""
+        catalog = Catalog()
+        assert dataset in catalog.available_datasets
+        assert dataset not in catalog.datasets
+
+    @pytest.mark.parametrize(
+        "dataset, store",
+        [
+            ("tigge-forecasts", "ecds"),
+            ("s2s-forecasts", "ecds"),
+            ("s2s-reforecasts", "ecds"),
+            ("derived-fire-fuel-biomass", "xds"),
+            ("projections-fire-fuel-burned-area", "xds"),
+        ],
+    )
+    def test_store_for_resolves_every_new_id(self, dataset, store):
+        """Every ECDS/XDS id resolves to its store, including uncurated ones."""
+        assert Catalog().store_for(dataset) == store
+
+
+class TestNewStoreConstraints:
+    """Constraint fetching for the two ECMWF-hosted stores."""
+
+    @pytest.fixture(autouse=True)
+    def _clear_cache(self):
+        """Reset the module-level constraints cache between tests."""
+        constraints_module._CACHE.clear()
+        yield
+        constraints_module._CACHE.clear()
+
+    @pytest.mark.parametrize(
+        "dataset, endpoint, host",
+        [
+            ("tigge-forecasts", "ecds", "ecds.ecmwf.int"),
+            ("derived-fire-fuel-biomass", "xds", "xds.ecmwf.int"),
+        ],
+    )
+    def test_constraints_are_fetched_from_the_store_host(
+        self, monkeypatch, dataset, endpoint, host
+    ):
+        """Constraints come from the dataset's own store, not the CDS default."""
+        seen: list[str] = []
+
+        class _Resp:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_):
+                return False
+
+            def read(self):
+                return b"[]"
+
+        def _capture(url, *_a, **_kw):
+            seen.append(getattr(url, "full_url", url))
+            return _Resp()
+
+        monkeypatch.setattr(constraints_module.urllib.request, "urlopen", _capture)
+        constraints_module.fetch_constraints(
+            dataset, base_url=constraints_base_url(endpoint)
+        )
+        assert seen, "no constraints request was issued"
+        assert host in seen[0]
+        assert dataset in seen[0]
+
+
+class TestNewStoreLicenceRefusal:
+    """A licence refusal names the store the dataset actually lives on."""
+
+    @pytest.mark.parametrize(
+        "endpoint, host",
+        [("ecds", "ecds.ecmwf.int"), ("xds", "xds.ecmwf.int")],
+    )
+    def test_permission_error_points_at_the_right_store(
+        self, ecmwf_stub, endpoint, host
+    ):
+        """The rewritten 403 links the dataset page on its own store."""
+        from earthlens.ecmwf import Variable
+
+        variable = Variable(
+            cds_dataset="tigge-forecasts",
+            cds_variable="2_m_temperature",
+            nc_variable="t2m",
+            units="K",
+            endpoint=endpoint,
+        )
+
+        def boom(*_args, **_kwargs):
+            raise RuntimeError(
+                "the request you have submitted is not valid. "
+                "Required licences not accepted; please accept the terms of use."
+            )
+
+        ecmwf_stub.client.retrieve.side_effect = boom
+        with pytest.raises(PermissionError) as excinfo:
+            ecmwf_stub._api(variable)
+        message = str(excinfo.value)
+        assert host in message
+        assert "tigge-forecasts" in message

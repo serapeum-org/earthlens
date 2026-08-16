@@ -37,6 +37,8 @@ _LIVE_CDS_TEST_CLASSES = frozenset(
         "TestFireE2E",
         "TestCamsE2E",
         "TestSatelliteCdrE2E",
+        "TestEcdsE2E",
+        "TestXdsE2E",
     }
 )
 
