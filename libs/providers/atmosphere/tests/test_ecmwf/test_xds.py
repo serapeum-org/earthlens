@@ -6,8 +6,9 @@ fire-fuel rows, whose `day` / `time` (and, on the annual burned-area row,
 bespoke `request_kind`, and the ECDS TIGGE row, whose request vocabulary is
 taken from the live constraints rather than the MARS idiom.
 
-Variable metadata is live-verified; see
-`planning/ecmwf/captures/ecds-xds/c2-real-retrieves-2026-08-16.md`.
+Every curated variable's `nc_variable` and `units` were read out of a real
+download rather than taken from the constraints or the documentation; each
+shard's header records what was observed.
 """
 
 from __future__ import annotations
@@ -222,6 +223,29 @@ class TestEcdsCatalogRows:
         assert request["hmonth"] == request["month"] == [month]
         assert request["hday"] == request["day"] == [day]
 
+    @pytest.mark.parametrize("end", ["2015-01-05", "2015-03-01"])
+    def test_multi_day_window_is_rejected(self, end):
+        """A window spanning >1 model-cycle day cannot express the date pairing.
+
+        A CDS form treats every list as a cross-product axis, so an n-day
+        window would submit n x n day/hday combinations of which only the n
+        diagonal pairs exist.
+        """
+        backend = _daily_backend("2015-01-01")
+        stamps = pd.date_range("2015-01-01", end, freq="D")
+        backend.time = TemporalExtent(
+            start_date=stamps[0],
+            end_date=stamps[-1],
+            resolution="D",
+            dates=stamps,
+        )
+        with pytest.raises(ValueError, match="one model-cycle date at a time"):
+            backend._build_request(
+                Catalog().get_variable(
+                    "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
+                )
+            )
+
     def test_only_the_reforecast_year_is_pinned(self):
         """`hyear` stays a per-row choice; `hmonth`/`hday` are not pinned."""
         extras = Catalog().datasets["s2s-reforecasts"].extras
@@ -247,7 +271,7 @@ class TestEcdsCatalogRows:
         ],
     )
     def test_store_for_resolves_every_new_id(self, dataset, store):
-        """Every ECDS/XDS id resolves to its store, including uncurated ones."""
+        """Every ECDS/XDS id resolves to its store via the per-store index."""
         assert Catalog().store_for(dataset) == store
 
 

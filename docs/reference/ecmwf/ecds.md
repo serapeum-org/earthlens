@@ -112,14 +112,20 @@ lens.download()
 | `year` / `month` / `day` | the **model cycle** — which forecast system version produced the reforecast |
 | `hyear` / `hmonth` / `hday` | the **reforecast date** — the historical date being re-forecast |
 
-The requested date range drives the **model cycle**; the reforecast date is pinned in the row's `extras`
-(`hyear: 1995` by default). Override it through the
-[passthrough](datastores.md#download-anything--the-raw-request-passthrough) to target a different reforecast year.
+The store only serves a reforecast on the model run's **own calendar day**, so the two dates move together:
+`request_kind: s2s_reforecast` copies the requested `month`/`day` into `hmonth`/`hday`. Only the reforecast
+**year** is a per-row value (`hyear: 1995` by default); use the
+[passthrough](datastores.md#download-anything--the-raw-request-passthrough) to target a different one.
+
+!!! warning "One model-cycle date per request"
+    Because a CDS form request treats every list as an independent cross-product axis, it cannot express the
+    pairing between the two dates: an `n`-day window would submit `n x n` `day`/`hday` combinations of which
+    only the `n` diagonal pairs exist. The backend therefore rejects a multi-day window for this row with a
+    clear error — request one model-cycle date at a time (`start == end`).
 
 !!! note "Why not `request_kind: glofas_hindcast`?"
-    That kind looks like the obvious fit — it exists precisely to map `year` → `hyear` — but it **renames**
-    rather than adds, so it would delete the model-cycle date this dataset also requires. The row therefore uses
-    `request_kind: form` with the `h*` keys pinned as `extras`, which is what the live constraints accept.
+    That kind looks like the obvious fit — it exists precisely to map `year` to `hyear` — but it **renames**
+    rather than adds, so it would delete the model-cycle date this dataset also requires.
 
 ## Fire fuel and burned area (XDS)
 

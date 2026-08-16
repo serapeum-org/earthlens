@@ -359,6 +359,35 @@ def _remap_date_keys(
             request[dst_key] = request.pop(src_key)
 
 
+def _reject_multi_day_reforecast(request: dict[str, Any], var_info: Variable) -> None:
+    """Refuse an S2S-reforecast window that spans more than one model-cycle day.
+
+    The model-cycle and reforecast dates are paired, but a CDS form request
+    treats every list as an independent cross-product axis, so a window of `n`
+    days would submit `n x n` `day`/`hday` combinations of which only the `n`
+    diagonal pairs exist. There is no request shape that expresses the pairing,
+    so ask for one day at a time.
+
+    Args:
+        request: The request assembled so far.
+        var_info: The catalog row being requested (named in the error).
+
+    Raises:
+        ValueError: If the window covers more than one day.
+    """
+    days = request.get("day") or []
+    months = request.get("month") or []
+    if len(days) > 1 or len(months) > 1:
+        raise ValueError(
+            f"{var_info.cds_dataset!r} pairs the model-cycle date with the "
+            "reforecast date, and a CDS form request cannot express that "
+            f"pairing: a {len(days) or 1}-day window would submit "
+            f"{(len(days) or 1) * (len(days) or 1)} day/hday combinations of "
+            f"which only {len(days) or 1} exist. Request one model-cycle date "
+            "at a time (start == end)."
+        )
+
+
 def _apply_request_kind_dates(
     request: dict[str, Any], var_info: Variable, start_date: Any, end_date: Any
 ) -> None:
@@ -391,11 +420,14 @@ def _apply_request_kind_dates(
     elif var_info.request_kind == "s2s_reforecast":
         # S2S reforecasts carry two coupled date axes: the model cycle
         # (`year`/`month`/`day`) and the reforecast (`hyear`/`hmonth`/`hday`).
-        # The store only serves reforecasts on the model run's own calendar
-        # day, so copy month/day across instead of pinning them to a literal —
-        # a frozen `hmonth`/`hday` only matches when the request happens to
-        # fall on that date. `hyear` names the historical year and stays a
-        # per-row `extras` value.
+        # The store only serves a reforecast on the model run's own calendar
+        # day, so the two must be *paired*, not crossed — and a CDS form
+        # request cannot express "zip these two lists": every list is a
+        # cross-product axis. A multi-day window would therefore submit
+        # `day x hday` combinations of which only the diagonal exists, so
+        # refuse it explicitly rather than send a request the store rejects
+        # (or, worse, one it partially serves).
+        _reject_multi_day_reforecast(request, var_info)
         for src_key, dst_key in (("month", "hmonth"), ("day", "hday")):
             if src_key in request:
                 request[dst_key] = request[src_key]
@@ -510,7 +542,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 dataset, or when running offline. Defaults to `False`.
         """
         self.skip_constraints = skip_constraints
-        # Per-endpoint cdsapi client cache (cds / ads / ewds). Populated
+        # Per-endpoint cdsapi client cache (one per ENDPOINTS slug). Populated
         # lazily by `_client_for` so a multi-endpoint download reuses one
         # connection per CADS instance. `_injected_client` holds a client
         # bound via the `client` setter (used for every endpoint); it stays
