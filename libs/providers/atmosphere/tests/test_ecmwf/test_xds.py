@@ -147,12 +147,45 @@ class TestEcdsCatalogRows:
         assert request["level_type"] == ["single_level"]
         assert request["variable"] == ["2_m_temperature"]
 
+    @pytest.mark.parametrize(
+        "dataset, variable_name, nc_variable",
+        [
+            ("s2s-forecasts", "2m-temperature", "t2m"),
+            (
+                "s2s-reforecasts",
+                "maximum-2m-temperature-in-the-last-6-hours",
+                "mx2t6",
+            ),
+        ],
+    )
+    def test_s2s_metadata_is_live_verified(self, dataset, variable_name, nc_variable):
+        """Both S2S rows carry their real NetCDF names and units."""
+        variable = Catalog().get_variable(dataset, variable_name)
+        assert variable.nc_variable == nc_variable
+        assert variable.units == "K"
+        assert variable.endpoint == "ecds"
+
+    def test_s2s_reforecasts_keeps_both_date_axes(self):
+        """The reforecast request carries the model-cycle *and* reforecast dates.
+
+        `glofas_hindcast` renames year->hyear, which would drop the model-cycle
+        date this dataset also requires, so the row uses `form` with pinned h*
+        extras instead.
+        """
+        request = _backend()._build_request(
+            Catalog().get_variable(
+                "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
+            )
+        )
+        for key in ("year", "month", "hyear", "hmonth", "hday"):
+            assert key in request, key
+
     @pytest.mark.parametrize("dataset", ["s2s-forecasts", "s2s-reforecasts"])
-    def test_s2s_is_indexed_but_not_curated(self, dataset):
-        """S2S is offered by the store but stays uncurated until its licence clears."""
+    def test_s2s_is_curated(self, dataset):
+        """Both S2S datasets are curated now that the licence is accepted."""
         catalog = Catalog()
         assert dataset in catalog.available_datasets
-        assert dataset not in catalog.datasets
+        assert dataset in catalog.datasets
 
     @pytest.mark.parametrize(
         "dataset, store",

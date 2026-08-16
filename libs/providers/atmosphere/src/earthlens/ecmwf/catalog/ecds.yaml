@@ -32,18 +32,63 @@
 # Verified live 2026-08-16 (real retrieve + variable inspection); see
 # `planning/ecmwf/captures/ecds-xds/c2-real-retrieves-2026-08-16.md`.
 #
-# Deliberately NOT curated yet:
-#   s2s-forecasts, s2s-reforecasts — both require `s2s-licence` rev 5 while the
-#     account carries rev 4, so no retrieve could be observed and no variable
-#     metadata pinned. This plan forbids placeholder units, so the rows are left
-#     out entirely rather than guessed. `s2s-reforecasts` additionally exposes
-#     `hyear`/`hmonth`/`hday`, which the shipped `glofas_hindcast` request kind
-#     already remaps — reuse it when the licence clears.
-#   The other 36 TIGGE variables the constraints expose (10_m_u_component_of_wind,
-#     mean_sea_level_pressure, total_precipitation, …) — only 2_m_temperature has
-#     been retrieved and unit-verified so far.
+# Deliberately NOT curated yet: the other variables each dataset's constraints
+# expose (TIGGE alone offers 37). Only the variables below have been retrieved
+# and unit-verified; placeholder units have shipped wrong values before, so the
+# rest wait for a real download.
 
 datasets:
+  # S2S real-time forecasts. Same single-level ECMWF vocabulary as TIGGE, but
+  # the output comes back on a regular latitude/longitude grid rather than
+  # TIGGE's unstructured `values` representation (verified live 2026-08-16).
+  s2s-forecasts:
+    endpoint: ecds
+    request_kind: form
+    extras:
+      origin: [ecmwf]
+      level_type: [single_level]
+      forecast_type: [control_forecast]
+      leadtime_hour: ["0_24"]
+      time: ["00:00"]
+      data_format: netcdf
+    variables:
+      2m-temperature:
+        cds_variable: 2_m_temperature
+        nc_variable: t2m
+        units: K
+
+  # S2S reforecasts carry TWO date axes: `year`/`month`/`day` select the model
+  # cycle, and `hyear`/`hmonth`/`hday` select the reforecast being run for it.
+  #
+  # `request_kind: glofas_hindcast` looks like the obvious fit, but it is wrong
+  # here: `_remap_date_keys` *renames* year->hyear (a pop + set), so it would
+  # delete the model-cycle date this dataset also requires. Verified by building
+  # the request both ways — the hindcast kind yields only the h* keys, whereas
+  # `form` plus pinned h* extras yields both sets, which is what the live
+  # constraints accept.
+  #
+  # Consequence: the requested date range drives the model cycle
+  # (`year`/`month`/`day`); the reforecast date is pinned below. Change `hyear`
+  # to target a different reforecast year.
+  s2s-reforecasts:
+    endpoint: ecds
+    request_kind: form
+    extras:
+      origin: [ecmwf]
+      level_type: [single_level]
+      forecast_type: [control_forecast]
+      leadtime_hour: ["102"]
+      time: ["00:00"]
+      data_format: netcdf
+      hyear: ["1995"]
+      hmonth: ["01"]
+      hday: ["01"]
+    variables:
+      maximum-2m-temperature-in-the-last-6-hours:
+        cds_variable: maximum_2_m_temperature_in_the_last_6_hours
+        nc_variable: mx2t6
+        units: K
+
   tigge-forecasts:
     endpoint: ecds
     request_kind: form

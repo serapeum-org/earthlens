@@ -82,6 +82,45 @@ lens = EarthLens(
 lens.download()
 ```
 
+## S2S — sub-seasonal to seasonal forecasts (ECDS)
+
+S2S shares TIGGE's single-level ECMWF vocabulary, but — unlike TIGGE — comes back on a **regular
+`latitude`/`longitude` grid**:
+
+```python
+from earthlens.core import EarthLens
+
+lens = EarthLens(
+    data_source="ecmwf",
+    variables={"s2s-forecasts": ["2m-temperature"]},
+    start="2026-08-01",
+    end="2026-08-01",
+    temporal_resolution="daily",
+    lat_lim=[50.0, 51.0],
+    lon_lim=[9.0, 10.0],
+    path="data/s2s",
+)
+lens.download()
+```
+
+### Reforecasts have two date axes
+
+`s2s-reforecasts` is the one row here that needs explaining. It carries **two** dates:
+
+| Keys | Meaning |
+|------|---------|
+| `year` / `month` / `day` | the **model cycle** — which forecast system version produced the reforecast |
+| `hyear` / `hmonth` / `hday` | the **reforecast date** — the historical date being re-forecast |
+
+The requested date range drives the **model cycle**; the reforecast date is pinned in the row's `extras`
+(`hyear: 1995` by default). Override it through the
+[passthrough](datastores.md#download-anything--the-raw-request-passthrough) to target a different reforecast year.
+
+!!! note "Why not `request_kind: glofas_hindcast`?"
+    That kind looks like the obvious fit — it exists precisely to map `year` → `hyear` — but it **renames**
+    rather than adds, so it would delete the model-cycle date this dataset also requires. The row therefore uses
+    `request_kind: form` with the `h*` keys pinned as `extras`, which is what the live constraints accept.
+
 ## Fire fuel and burned area (XDS)
 
 ```python
@@ -114,20 +153,17 @@ Curated so far, each verified by a real retrieve rather than from the constraint
 | Dataset | Variable | NetCDF | Units |
 |---------|----------|--------|-------|
 | `tigge-forecasts` | `2m-temperature` | `t2m` | `K` |
+| `s2s-forecasts` | `2m-temperature` | `t2m` | `K` |
+| `s2s-reforecasts` | `maximum-2m-temperature-in-the-last-6-hours` | `mx2t6` | `K` |
 | `derived-fire-fuel-biomass` | `live-fuel-moisture-content-group` | `LFMC` | `%` |
 | `projections-fire-fuel-burned-area` | `burned-area` | `BAF_pred` | `1` (CF dimensionless — the file declares CF-1.9 with `long_name` "Burned Area Fraction" and values inside [0, 1]) |
 
 **Not yet curated**, deliberately:
 
-- **`s2s-forecasts` / `s2s-reforecasts`** — these need `s2s-licence` **revision 5**; until it is accepted no
-  retrieve can be observed, so no variable metadata can be pinned. Rows are left out rather than guessed. Both ids
-  are still listed in `available_datasets`, so they remain reachable today through the
+- **The other variables each dataset exposes** — TIGGE alone offers 37. Only the rows above have been retrieved
+  and unit-verified; placeholder units have shipped wrong values before, so the rest wait for a real download.
+  Any of them is reachable today through the
   [raw-request passthrough](datastores.md#download-anything--the-raw-request-passthrough).
-  `s2s-reforecasts` exposes `hyear` / `hmonth` / `hday`, which the shipped `glofas_hindcast` request kind already
-  remaps — reuse it when the licence clears.
-- **The other 36 TIGGE variables and 11 XDS variables** the constraints expose — only the rows above have been
-  retrieved and unit-verified. Placeholder units have shipped wrong values before, so they wait for a real
-  download.
 
 See [the five data stores](datastores.md) for the cross-store picture and
 [EWDS (GloFAS / floods)](ewds.md) for the flood walkthrough.
