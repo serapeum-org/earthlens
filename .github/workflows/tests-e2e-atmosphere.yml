@@ -40,4 +40,8 @@ jobs:
     uses: ./.github/workflows/tests-e2e-reusable.yml
     with:
       theme: atmosphere
+      # Atmosphere's live CDS/ECMWF hosts sit in server-side queues that can
+      # wait far longer than the other themes' hosts; give the lane more
+      # headroom than the 45-minute default.
+      timeout_minutes: 90
     secrets: inherit

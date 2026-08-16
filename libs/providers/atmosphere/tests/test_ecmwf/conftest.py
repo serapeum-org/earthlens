@@ -16,6 +16,7 @@ Holds the four pieces every test in this directory needs:
 
 from __future__ import annotations
 
+import threading
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -95,6 +96,46 @@ def _block_real_cdsapi(request, monkeypatch):
         )
 
     monkeypatch.setattr(cdsapi, "Client", _no_live_client)
+
+
+@pytest.fixture
+def download_within_budget():
+    """Run a live retrieve under a wall-clock budget, failing fast on a hang.
+
+    Live CDS retrieves sit in a server-side queue whose wait is unbounded; a
+    single stuck job (the recurring queue-hang class) would otherwise burn the
+    whole 45-minute e2e lane and cancel every following test. This runs the
+    download on a daemon thread and fails the test if it overruns the budget,
+    so one wedged retrieve costs only its own budget rather than the lane.
+
+    Returns:
+        Callable[..., list]: A `run(lens, budget_s=900.0)` helper that returns
+        the download result, re-raises any error the download raised, or fails
+        the test if the budget elapses first.
+    """
+
+    def _run(lens, budget_s: float = 900.0):
+        box: dict = {}
+
+        def _work():
+            try:
+                box["out"] = lens.download()
+            except BaseException as exc:  # noqa: BLE001 - relayed to main thread
+                box["exc"] = exc
+
+        worker = threading.Thread(target=_work, daemon=True)
+        worker.start()
+        worker.join(budget_s)
+        if worker.is_alive():
+            pytest.fail(
+                f"live retrieve exceeded the {budget_s:.0f}s budget "
+                "(CDS queue hang); failing fast so the e2e lane survives"
+            )
+        if "exc" in box:
+            raise box["exc"]
+        return box["out"]
+
+    return _run
 
 
 @pytest.fixture
