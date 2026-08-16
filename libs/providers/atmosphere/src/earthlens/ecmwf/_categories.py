@@ -25,6 +25,8 @@ CATEGORIES = [
     "ewds",
     "efas",
     "fire",
+    "ecds",
+    "xds",
     "other",
 ]
 
@@ -38,6 +40,13 @@ _RULES: list[tuple[str, str]] = [
     ("cems-glofas", "ewds"),
     ("cems-flood", "ewds"),
     ("efas-", "efas"),
+    # ECMWF-hosted stores. `projections-fire-fuel` is listed ahead of the
+    # `projections-cmip5` / `projections-cordex` rules for readability; the
+    # three prefixes do not overlap, so order between them is not load-bearing.
+    ("tigge-", "ecds"),
+    ("s2s-", "ecds"),
+    ("derived-fire-fuel", "xds"),
+    ("projections-fire-fuel", "xds"),
     ("reanalysis-pan-carra", "carra"),
     ("reanalysis-carra", "carra"),
     ("reanalysis-cerra", "cerra"),

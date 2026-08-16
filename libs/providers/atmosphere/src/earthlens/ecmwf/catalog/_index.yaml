@@ -234,3 +234,15 @@ available_datasets:
   - efas-reforecast
   - efas-seasonal
   - efas-seasonal-reforecast
+  # ECMWF Data Store — the complete store, enumerated live 2026-08-16.
+  # `s2s-forecasts` / `s2s-reforecasts` are listed here (this index is the
+  # universe the store offers) but are not curated in `ecds.yaml` yet: they
+  # need `s2s-licence` rev 5.
+  ecds:
+  - s2s-forecasts
+  - s2s-reforecasts
+  - tigge-forecasts
+  # ECMWF Cross Data Store — the complete store, enumerated live 2026-08-16.
+  xds:
+  - derived-fire-fuel-biomass
+  - projections-fire-fuel-burned-area
