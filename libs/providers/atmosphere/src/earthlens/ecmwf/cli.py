@@ -2,9 +2,9 @@
 
 Registered with core's catalog-tooling commands through the `earthlens.cli`
 entry-point group (see `earthlens._atmosphere_cli`). The refresher / writer /
-coverage / prober / emitter read the three public CADS stores (CDS / ADS / EWDS);
-the deep prober, live-validator, hydrator and seeder are credentialed
-(`~/.cdsapirc`).
+coverage / prober / emitter read every public CADS store (CDS / ADS / EWDS /
+ECDS / XDS); the deep prober, live-validator, hydrator and seeder are
+credentialed (`~/.cdsapirc`).
 """
 
 from __future__ import annotations
@@ -19,24 +19,23 @@ from earthlens.cli.toolkit import (
 )
 from earthlens.ecmwf import _hydrate, _seed
 from earthlens.ecmwf._categories import categorise_dataset  # noqa: F401 — role target
+from earthlens.ecmwf.endpoints import ENDPOINTS
 
 #: Cap on `/collections` pages followed via `rel="next"`.
 _MAX_PAGES = 50
 
-#: The three Copernicus Data Store public STAC catalogues, by `endpoint` slug.
-#: Listing each `/collections` needs no credentials (only data *retrieval*
-#: does); the slugs match `earthlens.ecmwf.endpoints.ENDPOINTS`.
-_ECMWF_STORE_COLLECTIONS_URLS: dict[str, str] = {
-    "cds": "https://cds.climate.copernicus.eu/api/catalogue/v1/collections",
-    "ads": "https://ads.atmosphere.copernicus.eu/api/catalogue/v1/collections",
-    "ewds": "https://ewds.climate.copernicus.eu/api/catalogue/v1/collections",
+#: Every store's API root, by `endpoint` slug — derived from the single
+#: `ENDPOINTS` registry rather than restated, so adding a store is one edit
+#: there instead of three here. Covers the Copernicus instances (CDS / ADS /
+#: EWDS) and the ECMWF-hosted ones (ECDS / XDS).
+_ECMWF_STORE_URLS: dict[str, str] = {
+    slug: default_url for slug, (default_url, _url_env, _key_env) in ENDPOINTS.items()
 }
 
-#: The three Copernicus store API roots, by `endpoint` slug.
-_ECMWF_STORE_URLS = {
-    "cds": "https://cds.climate.copernicus.eu/api",
-    "ads": "https://ads.atmosphere.copernicus.eu/api",
-    "ewds": "https://ewds.climate.copernicus.eu/api",
+#: Each store's public STAC catalogue. Listing `/collections` needs no
+#: credentials (only data *retrieval* does).
+_ECMWF_STORE_COLLECTIONS_URLS: dict[str, str] = {
+    slug: f"{root}/catalogue/v1/collections" for slug, root in _ECMWF_STORE_URLS.items()
 }
 
 #: Persist a live fetch back into the bundled `available_datasets` index.
@@ -44,7 +43,7 @@ writer = index_writer("available_datasets", grouped=True)
 
 
 def refresher(_catalog: Any) -> dict[str, list[str]]:
-    """List Copernicus dataset ids per store (CDS + ADS + EWDS), live (public).
+    """List dataset ids per store (CDS / ADS / EWDS / ECDS / XDS), live (public).
 
     Enumerates each store's `/catalogue/v1/collections`, following `rel="next"`
     pagination (bounded by `_MAX_PAGES`). Each collection's `id` is a
@@ -54,8 +53,8 @@ def refresher(_catalog: Any) -> dict[str, list[str]]:
         _catalog: The loaded ECMWF `Catalog` (unused; the endpoints are fixed).
 
     Returns:
-        A per-store mapping `{"cds": [...], "ads": [...], "ewds": [...]}` of
-        sorted, de-duplicated dataset ids.
+        A per-store mapping — one key per `ENDPOINTS` slug (`cds`, `ads`,
+        `ewds`, `ecds`, `xds`) — of sorted, de-duplicated dataset ids.
     """
     grouped: dict[str, list[str]] = {}
     for store, base in _ECMWF_STORE_COLLECTIONS_URLS.items():
@@ -82,9 +81,9 @@ def refresher(_catalog: Any) -> dict[str, list[str]]:
 
 
 def coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
-    """Classify every `available_datasets:` id across the three Copernicus stores.
+    """Classify every `available_datasets:` id across all five stores.
 
-    The per-store availability index (CDS + ADS + EWDS, written by
+    The per-store availability index (CDS / ADS / EWDS / ECDS / XDS, written by
     `refresh ecmwf --write`) is unioned into `catalog.available_datasets`. A
     dataset with a curated row is `DONE`; every other id is `addressable`
     (reachable now via the raw-request passthrough, curatable on demand).
@@ -332,7 +331,8 @@ def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
 def emitter(catalog: Any, upstream_id: str, **_opts: Any) -> dict[str, Any]:
     """Seed an ECMWF `datasets:` row from the live CADS `form.json`.
 
-    Resolves the dataset's store (CDS / ADS / EWDS) from the per-store index,
+    Resolves the dataset's store (CDS / ADS / EWDS / ECDS / XDS) from the
+    per-store index,
     fetches its `form.json`, guesses the `request_kind` from the date/selector
     fields, and enumerates every variable the `variable` widget exposes.
     `nc_variable` / `units` are placeholders (the form does not carry them) —

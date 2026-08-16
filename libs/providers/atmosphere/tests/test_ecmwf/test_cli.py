@@ -51,21 +51,51 @@ def _catalog_copy(tmp_path, monkeypatch):
     return info, module, dst
 
 
-def _per_store_get_json(url, **kw):
-    """Return a distinct single collection id per Copernicus store host."""
+def _store_of(url):
+    """Resolve which store a collections URL belongs to.
+
+    `xds` is tested before `ecds` because `ecds.ecmwf.int` also contains the
+    substring `ds.ecmwf.int`; matching the full host keeps them distinct.
+    """
     if "ads.atmosphere" in url:
-        cid = "cams-global-reanalysis-eac4"
-    elif "ewds" in url:
-        cid = "cems-glofas-forecast"
-    else:
-        cid = "reanalysis-era5-land"
-    return {"collections": [{"id": cid}], "links": []}
+        return "ads"
+    if "ewds" in url:
+        return "ewds"
+    if "xds.ecmwf.int" in url:
+        return "xds"
+    if "ecds.ecmwf.int" in url:
+        return "ecds"
+    return "cds"
+
+
+_STORE_SAMPLE_ID = {
+    "cds": "reanalysis-era5-land",
+    "ads": "cams-global-reanalysis-eac4",
+    "ewds": "cems-glofas-forecast",
+    "ecds": "tigge-forecasts",
+    "xds": "derived-fire-fuel-biomass",
+}
+
+_STORE_PREFIX = {
+    "cds": "reanalysis",
+    "ads": "cams",
+    "ewds": "cems",
+    "ecds": "tigge",
+    "xds": "fuel",
+}
+
+
+def _per_store_get_json(url, **kw):
+    """Return a distinct single collection id per store host."""
+    return {
+        "collections": [{"id": _STORE_SAMPLE_ID[_store_of(url)]}],
+        "links": [],
+    }
 
 
 def _paginated_get_json(url, **kw):
-    """Two pages per Copernicus store — page 1 links to page 2 via `rel=next`."""
-    store = "ads" if "ads.atmosphere" in url else "ewds" if "ewds" in url else "cds"
-    prefix = {"cds": "reanalysis", "ads": "cams", "ewds": "cems"}[store]
+    """Two pages per store — page 1 links to page 2 via `rel=next`."""
+    prefix = _STORE_PREFIX[_store_of(url)]
     if "page2" in url:
         return {"collections": [{"id": f"{prefix}-two"}], "links": []}
     return {
@@ -89,7 +119,7 @@ class TestRefresher:
         assert outcome.live_count == 1, "one CDS dataset id listed"
 
     def test_writes_per_store_index_from_live_fetch(self, tmp_path, monkeypatch):
-        """ecmwf --write persists per-store (cds/ads/ewds) ids into available_datasets."""
+        """ecmwf --write persists every store's ids into available_datasets."""
         info, module, dst = _catalog_copy(tmp_path, monkeypatch)
         monkeypatch.setattr(ecmwf_cli, "get_json", _per_store_get_json)
         outcome = refresh_one(info, write=True)
@@ -101,13 +131,11 @@ class TestRefresher:
             "cds": ["reanalysis-era5-land"],
             "ads": ["cams-global-reanalysis-eac4"],
             "ewds": ["cems-glofas-forecast"],
+            "ecds": ["tigge-forecasts"],
+            "xds": ["derived-fire-fuel-biomass"],
         }, "per-store ids persisted"
         catalog = load_catalog(info)
-        for expected in (
-            "reanalysis-era5-land",
-            "cams-global-reanalysis-eac4",
-            "cems-glofas-forecast",
-        ):
+        for expected in _STORE_SAMPLE_ID.values():
             assert expected in catalog.available_datasets, f"{expected} unioned"
 
     def test_pagination_follows_rel_next_across_pages(self, tmp_path, monkeypatch):
@@ -122,6 +150,8 @@ class TestRefresher:
             "cds": ["reanalysis-one", "reanalysis-two"],
             "ads": ["cams-one", "cams-two"],
             "ewds": ["cems-one", "cems-two"],
+            "ecds": ["tigge-one", "tigge-two"],
+            "xds": ["fuel-one", "fuel-two"],
         }, "both pages' ids per store persisted"
 
 
