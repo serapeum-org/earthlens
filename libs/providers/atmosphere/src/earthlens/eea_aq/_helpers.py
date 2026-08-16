@@ -196,16 +196,6 @@ def shape_frame(
     to UTC. Rows whose numeric code is not in `code_to_name` are dropped
     (a pollutant the request did not ask for).
 
-    EEA flags a reading it does not vouch for with a negative `Validity`
-    (`-1` not valid, `-99` station maintenance / calibration) and fills its
-    `Value` with a no-data sentinel — `-999` in the legacy Historical export,
-    but also plain zeros. Those readings are masked to `NaN` here so `value`
-    holds only measurements: a sentinel left in place would otherwise be
-    averaged as if it were a real concentration. The flag itself is kept in
-    the `validity` column. Valid rows keep their value as published, small
-    near-zero negatives included — those are genuine instrument noise, not
-    sentinels.
-
     Args:
         raw: One Parquet file read with `pandas.read_parquet`.
         dataset: The dataset era this frame came from (`"Verified"`),
@@ -242,7 +232,6 @@ def shape_frame(
     out["units"] = keep["Unit"]
     out["agg_type"] = keep["AggType"]
     out["validity"] = keep["Validity"].astype("Int64")
-    out.loc[out["validity"] < 0, "value"] = pd.NA
     out["verification"] = keep["Verification"].astype("Int64")
     out["dataset"] = dataset
     out["provider"] = "EEA"

@@ -121,32 +121,6 @@ class TestShapeFrame:
         out = shape_frame(self._raw(), "Verified", {123: "xx"})
         assert out.empty and "country" in out.columns
 
-    def _raw_invalid(self):
-        raw = self._raw()
-        raw.loc[:, "Pollutant"] = 6001
-        raw.loc[:, "Value"] = ["-999", "0"]
-        raw.loc[:, "Validity"] = [-1, -99]
-        return raw
-
-    def test_masks_invalid_readings(self):
-        """A negatively-flagged reading has its sentinel value masked to NaN."""
-        out = shape_frame(self._raw_invalid(), "Historical", {6001: "pm25"})
-        assert out["value"].isna().all()
-        assert not (out["value"] == -999.0).any()
-
-    def test_keeps_the_validity_flag(self):
-        """Masking the value preserves the validity flag itself."""
-        out = shape_frame(self._raw_invalid(), "Historical", {6001: "pm25"})
-        assert list(out["validity"]) == [-1, -99]
-
-    def test_keeps_valid_negative_values(self):
-        """A small negative reading flagged valid is instrument noise, not a sentinel."""
-        raw = self._raw()
-        raw.loc[:, "Pollutant"] = 6001
-        raw.loc[:, "Value"] = ["-0.5", "5.6"]
-        out = shape_frame(raw, "Historical", {6001: "pm25"})
-        assert list(out["value"]) == [-0.5, 5.6]
-
     def test_no_matching_code_logs_drift_diagnostic(self):
         """A non-empty Parquet matching no code logs a distinct drift warning."""
         from loguru import logger
