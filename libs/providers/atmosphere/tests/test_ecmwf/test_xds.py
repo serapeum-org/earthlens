@@ -169,7 +169,7 @@ class TestEcdsCatalogRows:
 
     def test_tigge_uses_the_live_request_vocabulary(self):
         """The row pins the values the live constraints accept, not the MARS idiom."""
-        request = _backend()._build_request(
+        request = _daily_backend("2024-01-01")._build_request(
             Catalog().get_variable("tigge-forecasts", "2m-temperature")
         )
         assert request["origin"] == ["ecmwf"]
@@ -241,6 +241,35 @@ class TestEcdsCatalogRows:
         )
         with pytest.raises(ValueError, match="one model-cycle date at a time"):
             backend._build_request(
+                Catalog().get_variable(
+                    "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
+                )
+            )
+
+    def test_reforecast_keys_are_copies_not_aliases(self):
+        """`hmonth`/`hday` are distinct lists, so editing one cannot move the other."""
+        request = _daily_backend("2015-06-01")._build_request(
+            Catalog().get_variable(
+                "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
+            )
+        )
+        assert request["day"] == request["hday"]
+        assert request["day"] is not request["hday"]
+        assert request["month"] is not request["hmonth"]
+
+    def test_monthly_resolution_is_rejected(self):
+        """The row selects by the model run's calendar day, so it needs a `day`."""
+        with pytest.raises(ValueError, match="temporal_resolution='daily'"):
+            _backend()._build_request(
+                Catalog().get_variable(
+                    "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
+                )
+            )
+
+    def test_leap_day_against_a_non_leap_reforecast_year_is_rejected(self):
+        """A 29 February cycle has no reforecast in the pinned non-leap 1995."""
+        with pytest.raises(ValueError, match="non-leap"):
+            _daily_backend("2016-02-29")._build_request(
                 Catalog().get_variable(
                     "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
                 )
