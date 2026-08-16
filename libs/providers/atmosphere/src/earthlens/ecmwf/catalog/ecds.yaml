@@ -58,21 +58,21 @@ datasets:
         units: K
 
   # S2S reforecasts carry TWO date axes: `year`/`month`/`day` select the model
-  # cycle, and `hyear`/`hmonth`/`hday` select the reforecast being run for it.
+  # cycle, and `hyear`/`hmonth`/`hday` select the reforecast run for it. The
+  # store only serves a reforecast on the model run's own calendar day, so the
+  # two axes must move together.
   #
-  # `request_kind: glofas_hindcast` looks like the obvious fit, but it is wrong
-  # here: `_remap_date_keys` *renames* year->hyear (a pop + set), so it would
-  # delete the model-cycle date this dataset also requires. Verified by building
-  # the request both ways — the hindcast kind yields only the h* keys, whereas
-  # `form` plus pinned h* extras yields both sets, which is what the live
-  # constraints accept.
+  # `request_kind: glofas_hindcast` is NOT usable here: `_remap_date_keys`
+  # *renames* year->hyear, which would delete the model-cycle date this dataset
+  # also requires. `request_kind: s2s_reforecast` instead *copies* month/day
+  # into hmonth/hday, so the reforecast date tracks the request. Pinning them
+  # to a literal instead only worked when the requested date happened to match
+  # it, and silently returned no data otherwise.
   #
-  # Consequence: the requested date range drives the model cycle
-  # (`year`/`month`/`day`); the reforecast date is pinned below. Change `hyear`
-  # to target a different reforecast year.
+  # Only the reforecast YEAR is a per-row choice (`hyear`, below).
   s2s-reforecasts:
     endpoint: ecds
-    request_kind: form
+    request_kind: s2s_reforecast
     extras:
       origin: [ecmwf]
       level_type: [single_level]
@@ -80,9 +80,9 @@ datasets:
       leadtime_hour: ["102"]
       time: ["00:00"]
       data_format: netcdf
+      # Only the reforecast YEAR is pinned; `hmonth`/`hday` are copied from
+      # the requested model-cycle date by `request_kind: s2s_reforecast`.
       hyear: ["1995"]
-      hmonth: ["01"]
-      hday: ["01"]
     variables:
       maximum-2m-temperature-in-the-last-6-hours:
         cds_variable: maximum_2_m_temperature_in_the_last_6_hours

@@ -46,6 +46,27 @@ def _backend():
     return backend
 
 
+def _daily_backend(stamp):
+    """A stub ECMWF on a single day, for the date-parameterised rows."""
+    when = pd.Timestamp(stamp)
+    backend = ECMWF.__new__(ECMWF)
+    backend.time = TemporalExtent(
+        start_date=when,
+        end_date=when,
+        resolution="D",
+        dates=pd.date_range(when, when, freq="D"),
+    )
+    backend.space = SpatialExtent(
+        latitude_min=50.0,
+        latitude_max=51.0,
+        longitude_min=9.0,
+        longitude_max=10.0,
+        resolution=1.5,
+    )
+    backend.temporal_resolution = "daily"
+    return backend
+
+
 class TestXdsCatalogRows:
     """Catalog shape for the two XDS datasets."""
 
@@ -78,6 +99,13 @@ class TestXdsCatalogRows:
         assert variable.cds_variable == "burned_area"
         assert variable.nc_variable == "BAF_pred"
         assert variable.units == "1"
+
+    @pytest.mark.parametrize("dataset", _XDS)
+    def test_xds_rows_opt_out_of_data_format(self, dataset):
+        """Neither XDS form has a `data_format` widget, so the key is dropped."""
+        record = Catalog().datasets[dataset]
+        variable = next(iter(record.variables.values()))
+        assert "data_format" not in _backend()._build_request(variable)
 
     @pytest.mark.parametrize("dataset", _XDS)
     def test_no_placeholder_units(self, dataset):
@@ -169,16 +197,37 @@ class TestEcdsCatalogRows:
         """The reforecast request carries the model-cycle *and* reforecast dates.
 
         `glofas_hindcast` renames year->hyear, which would drop the model-cycle
-        date this dataset also requires, so the row uses `form` with pinned h*
-        extras instead.
+        date this dataset also requires, so the row uses `s2s_reforecast`.
         """
-        request = _backend()._build_request(
+        request = _daily_backend("2015-01-01")._build_request(
             Catalog().get_variable(
                 "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
             )
         )
-        for key in ("year", "month", "hyear", "hmonth", "hday"):
+        for key in ("year", "month", "day", "hyear", "hmonth", "hday"):
             assert key in request, key
+
+    @pytest.mark.parametrize("month, day", [("01", "01"), ("06", "15"), ("11", "30")])
+    def test_reforecast_date_tracks_the_requested_month_and_day(self, month, day):
+        """`hmonth`/`hday` follow the requested model cycle, never a fixed literal.
+
+        A pinned reforecast date only matches when the request happens to fall
+        on it; every other window is rejected by the live constraints.
+        """
+        request = _daily_backend(f"2015-{month}-{day}")._build_request(
+            Catalog().get_variable(
+                "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
+            )
+        )
+        assert request["hmonth"] == request["month"] == [month]
+        assert request["hday"] == request["day"] == [day]
+
+    def test_only_the_reforecast_year_is_pinned(self):
+        """`hyear` stays a per-row choice; `hmonth`/`hday` are not pinned."""
+        extras = Catalog().datasets["s2s-reforecasts"].extras
+        assert extras["hyear"] == ["1995"]
+        assert "hmonth" not in extras
+        assert "hday" not in extras
 
     @pytest.mark.parametrize("dataset", ["s2s-forecasts", "s2s-reforecasts"])
     def test_s2s_is_curated(self, dataset):

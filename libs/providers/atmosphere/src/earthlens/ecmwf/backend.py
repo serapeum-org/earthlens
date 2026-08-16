@@ -55,6 +55,11 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # GloFAS/EFAS hindcast (reforecast): keys on `hyear`/`hmonth`/`hday`
     # (remapped in `_build_request`) + `leadtime_hour`; drop `time`.
     "glofas_hindcast": ("time",),
+    # S2S reforecast (ECDS): unlike `glofas_hindcast` this keeps BOTH date
+    # axes — `year`/`month`/`day` select the model cycle and
+    # `hyear`/`hmonth`/`hday` the reforecast — so the month/day are *copied*
+    # into the h-keys rather than renamed. `hyear` alone comes from `extras`.
+    "s2s_reforecast": (),
     # Seasonal (GloFAS/EFAS/CDS seasonal): keyed by `year`/`month` + a lead
     # (`leadtime_month`/`leadtime_hour`) + `originating_centre`/`system` from
     # `extras`; no `day`, no time-of-day.
@@ -383,6 +388,17 @@ def _apply_request_kind_dates(
     elif var_info.request_kind == "seasonal_hindcast":
         # Seasonal reforecast: hindcast year/month, no day (stripped elsewhere).
         _remap_date_keys(request, (("year", "hyear"), ("month", "hmonth")))
+    elif var_info.request_kind == "s2s_reforecast":
+        # S2S reforecasts carry two coupled date axes: the model cycle
+        # (`year`/`month`/`day`) and the reforecast (`hyear`/`hmonth`/`hday`).
+        # The store only serves reforecasts on the model run's own calendar
+        # day, so copy month/day across instead of pinning them to a literal —
+        # a frozen `hmonth`/`hday` only matches when the request happens to
+        # fall on that date. `hyear` names the historical year and stays a
+        # per-row `extras` value.
+        for src_key, dst_key in (("month", "hmonth"), ("day", "hday")):
+            if src_key in request:
+                request[dst_key] = request[src_key]
 
 
 def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> None:
