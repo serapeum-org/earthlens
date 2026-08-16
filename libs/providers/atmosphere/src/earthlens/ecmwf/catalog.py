@@ -1,7 +1,7 @@
 """Variable-catalog loader for the CDS-backed ECMWF data source.
 
 Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
-Copernicus Data Store catalog spanning all three stores. The catalog
+CADS catalog spanning all five stores. The catalog
 ships as a directory of per-family YAML files under
 `src/earthlens/ecmwf/catalog/` — one `<family>.yaml` per product
 family (CDS: `era5.yaml`, `carra.yaml`, `cerra.yaml`, `cmip5.yaml`,
@@ -668,7 +668,7 @@ class Catalog(AbstractCatalog):
 
     Attributes:
         available_datasets: Informational list of every dataset id across
-            the three Copernicus stores (CDS + ADS + EWDS), unioned from the
+            all five stores (CDS + ADS + EWDS + ECDS + XDS), unioned from the
             per-store `available_datasets:` block in `_index.yaml`; runtime
             code does not consume it.
         datasets: Structural map keyed by CDS dataset short name. Each
@@ -713,12 +713,12 @@ class Catalog(AbstractCatalog):
             ['divergence', 'fraction-of-cloud-cover', 'geopotential']
 
             ```
-        - Inspect what CDS hosts overall:
+        - Inspect what the five stores host overall:
 
             ```python
             >>> from earthlens.ecmwf import Catalog
             >>> len(Catalog().available_datasets)
-            169
+            174
 
             ```
     """

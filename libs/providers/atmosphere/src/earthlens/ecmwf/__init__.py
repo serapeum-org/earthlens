@@ -1,6 +1,6 @@
-"""ECMWF / Copernicus Data Store backend (CDS + ADS + EWDS).
+"""ECMWF / CADS backend (CDS + ADS + EWDS + ECDS + XDS).
 
-Reaches all three Copernicus Data Store instances through one
+Reaches all five CADS instances through one
 :mod:`cdsapi` client and one Personal Access Token, routing each
 dataset to its store via the catalog `endpoint`: the Climate Data
 Store (C3S — ERA5, CARRA / CERRA, seasonal, CMIP5 / CORDEX, satellite

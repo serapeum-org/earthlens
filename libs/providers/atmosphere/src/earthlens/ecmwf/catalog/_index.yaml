@@ -1,4 +1,4 @@
-# Copernicus Data Store catalog for the ECMWF backend (CDS + ADS + EWDS).
+# CADS catalog for the ECMWF backend (CDS + ADS + EWDS + ECDS + XDS).
 #
 # Schema:
 #
@@ -51,9 +51,9 @@
 #                                      emitted by CDS (used in the
 #                                      output filename).
 #
-# Refreshed from all three Copernicus Data Store `/collections` endpoints
-# (CDS + ADS + EWDS) — `available_datasets` is a per-store mapping totalling
-# 169 ids (cds: 141, ads: 16, ewds: 12). Regenerate with
+# Refreshed from all five CADS `/collections` endpoints (CDS + ADS + EWDS +
+# ECDS + XDS) — `available_datasets` is a per-store mapping totalling 174 ids
+# (cds: 141, ads: 16, ewds: 12, ecds: 3, xds: 2). Regenerate with
 # `earthlens datasets refresh ecmwf --write`.
 #
 # See: https://cds.climate.copernicus.eu/datasets,
