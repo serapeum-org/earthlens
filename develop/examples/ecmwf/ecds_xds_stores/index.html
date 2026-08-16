@@ -24243,7 +24243,8 @@ is curated on each store before downloading anything.</p>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -24252,10 +24253,13 @@ is curated on each store before downloading anything.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.ecmwf</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
 
-<span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'out'</span><span class="p">)</span> <span class="o">/</span> <span class="s1">'ecds_xds'</span>
+<span class="c1"># Downloads go to a scratch dir, not into the docs tree.</span>
+<span class="n">OUT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">())</span> <span class="o">/</span> <span class="s1">'earthlens-ecds-xds-demo'</span>
 <span class="n">OUT</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'writing to'</span><span class="p">,</span> <span class="n">OUT</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">from pathlib import Path
+<div class="clipboard-copy-txt" id="cell-1">import tempfile
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24264,8 +24268,10 @@ import xarray as xr
 from earthlens.core import EarthLens
 from earthlens.ecmwf import Catalog
 
-OUT = Path('out') / 'ecds_xds'
-OUT.mkdir(parents=True, exist_ok=True)</div>
+# Downloads go to a scratch dir, not into the docs tree.
+OUT = Path(tempfile.gettempdir()) / 'earthlens-ecds-xds-demo'
+OUT.mkdir(parents=True, exist_ok=True)
+print('writing to', OUT)</div>
 </div>
 </div>
 </div>
@@ -24684,11 +24690,13 @@ fds.close()</div>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="s2s-reforecasts-two-date-axes">S2S reforecasts — two date axes<a class="anchor-link" href="#s2s-reforecasts-two-date-axes">¶</a></h2><p><code>s2s-reforecasts</code> is the subtlest row on either store. It carries <strong>two</strong> dates:
 <code>year</code>/<code>month</code>/<code>day</code> select the <em>model cycle</em> (which forecast system version ran),
-and <code>hyear</code>/<code>hmonth</code>/<code>hday</code> select the <em>reforecast date</em> being re-run.</p>
-<p>The requested range drives the model cycle; the reforecast date is pinned in the
-row's <code>extras</code>. <code>request_kind: glofas_hindcast</code> would look like the obvious fit —
-it maps <code>year</code> to <code>hyear</code> — but it <strong>renames</strong> rather than adds, so it would drop
-the model-cycle date this dataset also needs.</p>
+and <code>hyear</code>/<code>hmonth</code>/<code>hday</code> select the <em>reforecast date</em> being re-run. The store
+only serves a reforecast on the model run's own calendar day, so the two must move
+together.</p>
+<p><code>request_kind: s2s_reforecast</code> <strong>copies</strong> the requested <code>month</code>/<code>day</code> into
+<code>hmonth</code>/<code>hday</code>; only the reforecast <strong>year</strong> is a per-row choice. (The existing
+<code>glofas_hindcast</code> kind cannot be reused — it <em>renames</em> <code>year</code> to <code>hyear</code>, which
+would delete the model-cycle date this dataset also needs.)</p>
 </div>
 </div>
 </div>
@@ -24717,7 +24725,7 @@ the model-cycle date this dataset also needs.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'request_kind :'</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">request_kind</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'NetCDF name  :'</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">nc_variable</span><span class="p">,</span> <span class="s1">'|'</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
 <span class="n">pinned</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">extras</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'h'</span><span class="p">)}</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'pinned h* extras:'</span><span class="p">,</span> <span class="n">pinned</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'pinned h* extras:'</span><span class="p">,</span> <span class="n">pinned</span><span class="p">,</span> <span class="s1">'&lt;- only the year'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-10">spec = catalog.get_variable(
     's2s-reforecasts', 'maximum-2m-temperature-in-the-last-6-hours'
@@ -24725,7 +24733,7 @@ the model-cycle date this dataset also needs.</p>
 print('request_kind :', spec.request_kind)
 print('NetCDF name  :', spec.nc_variable, '|', spec.units)
 pinned = {k: v for k, v in spec.extras.items() if k.startswith('h')}
-print('pinned h* extras:', pinned)</div>
+print('pinned h* extras:', pinned, '&lt;- only the year')</div>
 </div>
 </div>
 </div>
