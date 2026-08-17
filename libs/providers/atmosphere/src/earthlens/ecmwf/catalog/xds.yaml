@@ -23,8 +23,11 @@
 # has no `month` either, so those template keys are dropped with explicit
 # `null` opt-outs in `extras` rather than by inventing a new `request_kind`.
 #
-# Verified live 2026-08-16 (real retrieves + variable inspection); see
-# `planning/ecmwf/captures/ecds-xds/c2-real-retrieves-2026-08-16.md`.
+# Verified live 2026-08-16 by retrieving each variable and reading the file:
+#   derived-fire-fuel-biomass         live_fuel_moisture_content_group -> LFMC
+#                                     (units `%`), ZIP -> NetCDF, dims time/lat/lon
+#   projections-fire-fuel-burned-area burned_area -> BAF_pred, ZIP -> NetCDF,
+#                                     dims time/lat/lon (units: see the row below)
 #
 # Deliberately NOT curated yet — these variables exist in the live constraints
 # but have not been retrieved, and this plan forbids `units: unknown`
