@@ -718,7 +718,7 @@ class Catalog(AbstractCatalog):
             ```python
             >>> from earthlens.ecmwf import Catalog
             >>> len(Catalog().available_datasets)
-            174
+            175
 
             ```
     """

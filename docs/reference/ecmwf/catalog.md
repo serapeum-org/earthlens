@@ -44,7 +44,7 @@ describe each field; required vs optional is called out explicitly.
 ```yaml
 version: 3                                       # catalog schema version (informational)
 
-available_datasets:                              # inventory across all five stores (~174)
+available_datasets:                              # inventory across all five stores (~175)
   - <dataset_name_1>                             #   one entry per dataset the stores publish
   - <dataset_name_2>                             #   diffed by `earthlens datasets refresh ecmwf`
   - ...
@@ -100,7 +100,7 @@ Bump it when the schema gains an incompatible new field.
 ##### `available_datasets`
 
 *Optional, but conventionally always present.* A flat list of every
-dataset short name the five stores currently publish — roughly 174
+dataset short name the five stores currently publish — roughly 175
 entries today, keyed under a per-store block in `_index.yaml`. The
 list is maintained by `earthlens datasets refresh ecmwf`, which hits
 each store's live catalogue API
