@@ -133,6 +133,7 @@ class TestReturnPeriods:
 
     def test_aoi_tag_includes_polygon(self, tmp_path: Path):
         """The cache key folds in the real `aoi=` polygon (a GeoDataFrame)."""
+        from earthlens.base.cache import aoi_tag
         from earthlens.earthlens import EarthLens
 
         aoi = {
@@ -141,16 +142,20 @@ class TestReturnPeriods:
                 [[4.8, 51.8], [5.0, 51.8], [5.0, 52.0], [4.8, 52.0], [4.8, 51.8]]
             ],
         }
-        bbox_only = EarthLens(
-            data_source="jrc-flood",
-            lat_lim=[51.8, 52.0],
-            lon_lim=[4.8, 5.0],
-            return_periods=[100],
-            path=tmp_path,
-        ).datasource._aoi_tag
-        with_polygon = EarthLens(
-            data_source="jrc-flood", aoi=aoi, return_periods=[100], path=tmp_path
-        ).datasource._aoi_tag
+        bbox_only = aoi_tag(
+            EarthLens(
+                data_source="jrc-flood",
+                lat_lim=[51.8, 52.0],
+                lon_lim=[4.8, 5.0],
+                return_periods=[100],
+                path=tmp_path,
+            ).datasource.space
+        )
+        with_polygon = aoi_tag(
+            EarthLens(
+                data_source="jrc-flood", aoi=aoi, return_periods=[100], path=tmp_path
+            ).datasource.space
+        )
         assert with_polygon != bbox_only
         assert "|" in with_polygon
 

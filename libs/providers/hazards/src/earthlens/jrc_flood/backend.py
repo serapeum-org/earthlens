@@ -31,6 +31,9 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
+    aoi_tag,
+    sidecar_is_fresh,
+    write_sidecar,
 )
 from earthlens.base.spatial import crop_to_aoi
 from earthlens.jrc_flood._helpers import (
@@ -234,37 +237,14 @@ class JRCFlood(AbstractDataSource):
         """The AOI as `(west, south, east, north)` in degrees."""
         return (self.space.west, self.space.south, self.space.east, self.space.north)
 
-    @property
-    def _aoi_tag(self) -> str:
-        """A stable cache key for this AOI (bbox plus any polygon geometry).
-
-        The bbox alone is not enough: with `SUPPORTS_POLYGON_AOI`, two requests
-        can share a bounding box but carry different polygon masks, so the
-        polygon geometry is folded in to keep their cached crops distinct.
-        """
-        import hashlib
-
-        tag = (
-            f"{self.space.west},{self.space.south},{self.space.east},{self.space.north}"
-        )
-        geometry = getattr(self.space, "geometry", None)
-        if geometry is not None:
-            # `space.geometry` is a geopandas GeoDataFrame (from the facade's
-            # `aoi=`), so serialise it to GeoJSON; fall back to a shapely `.wkt`.
-            if hasattr(geometry, "to_json"):
-                key = geometry.to_json()
-            else:
-                key = getattr(geometry, "wkt", str(geometry))
-            tag += "|" + hashlib.sha256(key.encode("utf-8")).hexdigest()
-        return tag
-
     def _is_cached(self, target: Path) -> bool:
         """Whether `target` already holds this exact AOI (AOI-aware skip).
 
         The output filename encodes the return period but not the AOI, so a bare
         exists-check would return a previous AOI's raster for a new bbox in the
-        same `path`. A `<target>.aoi` sidecar records the bbox the file was
-        written for; the skip only fires when it matches and `force` is off.
+        same `path`. The `<target>.aoi` sidecar records the AOI the file was
+        written for (`earthlens.base.cache`); the skip only fires when it matches
+        and `force` is off.
 
         Args:
             target: The candidate output GeoTIFF path.
@@ -272,18 +252,8 @@ class JRCFlood(AbstractDataSource):
         Returns:
             bool: `True` when a matching cached output exists and may be reused.
         """
-        sidecar = target.with_suffix(target.suffix + ".aoi")
-        return (
-            not getattr(self, "_force", False)
-            and target.exists()
-            and sidecar.exists()
-            and sidecar.read_text(encoding="utf-8").strip() == self._aoi_tag
-        )
-
-    def _write_aoi_sidecar(self, target: Path) -> None:
-        """Record the AOI `target` was written for, next to it."""
-        target.with_suffix(target.suffix + ".aoi").write_text(
-            self._aoi_tag, encoding="utf-8"
+        return not getattr(self, "_force", False) and sidecar_is_fresh(
+            target, aoi_tag(self.space)
         )
 
     def download(
@@ -427,5 +397,5 @@ class JRCFlood(AbstractDataSource):
             raise
         finally:
             close_quietly(window_ds)
-        self._write_aoi_sidecar(target)
+        write_sidecar(target, aoi_tag(self.space))
         return target

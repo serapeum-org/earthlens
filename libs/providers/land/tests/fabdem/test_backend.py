@@ -251,6 +251,7 @@ class TestDownload:
 
     def test_aoi_tag_includes_polygon(self, tmp_path: Path):
         """The cache key folds in the real `aoi=` polygon (a GeoDataFrame)."""
+        from earthlens.base.cache import aoi_tag
         from earthlens.earthlens import EarthLens
 
         aoi = {
@@ -259,15 +260,17 @@ class TestDownload:
                 [[0.4, 50.4], [0.6, 50.4], [0.6, 50.6], [0.4, 50.6], [0.4, 50.4]]
             ],
         }
-        bbox_only = EarthLens(
-            data_source="fabdem",
-            lat_lim=[50.4, 50.6],
-            lon_lim=[0.4, 0.6],
-            path=tmp_path,
-        ).datasource._aoi_tag
-        with_polygon = EarthLens(
-            data_source="fabdem", aoi=aoi, path=tmp_path
-        ).datasource._aoi_tag
+        bbox_only = aoi_tag(
+            EarthLens(
+                data_source="fabdem",
+                lat_lim=[50.4, 50.6],
+                lon_lim=[0.4, 0.6],
+                path=tmp_path,
+            ).datasource.space
+        )
+        with_polygon = aoi_tag(
+            EarthLens(data_source="fabdem", aoi=aoi, path=tmp_path).datasource.space
+        )
         assert with_polygon != bbox_only
         assert "|" in with_polygon
 

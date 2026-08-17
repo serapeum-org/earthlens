@@ -27,6 +27,12 @@ from earthlens.base.abstractdatasource import (
     TemporalExtent,
 )
 from earthlens.base.auth import AbstractAuth, AuthenticationError
+from earthlens.base.cache import (
+    aoi_tag,
+    sidecar_is_fresh,
+    sidecar_path,
+    write_sidecar,
+)
 from earthlens.base.catalog_source import (
     catalog_cache_key,
     clear_all_catalog_caches,
@@ -66,6 +72,7 @@ __all__ = [
     "AbstractAuth",
     "AbstractCatalog",
     "AbstractDataSource",
+    "aoi_tag",
     "AuthenticationError",
     "CADENCE_ALIASES",
     "catalog_cache_key",
@@ -100,6 +107,8 @@ __all__ = [
     "S3Auth",
     "S3Credentials",
     "safe_filename",
+    "sidecar_is_fresh",
+    "sidecar_path",
     "SpatialExtent",
     "split_time",
     "TemporalExtent",
@@ -108,5 +117,6 @@ __all__ = [
     "warn_if_egress",
     "WHOLE_WINDOW",
     "window_labels",
+    "write_sidecar",
     "yaml_files_for",
 ]
