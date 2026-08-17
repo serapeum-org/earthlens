@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23917,7 +23917,7 @@ and value markers so the hierarchy is visible at a glance. Comments
 describe each field; required vs optional is called out explicitly.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">                                       </span><span class="c1"># catalog schema version (informational)</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">available_datasets</span><span class="p">:</span><span class="w">                              </span><span class="c1"># inventory across all five stores (~174)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">available_datasets</span><span class="p">:</span><span class="w">                              </span><span class="c1"># inventory across all five stores (~175)</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;dataset_name_1&gt;</span><span class="w">                             </span><span class="c1">#   one entry per dataset the stores publish</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;dataset_name_2&gt;</span><span class="w">                             </span><span class="c1">#   diffed by `earthlens datasets refresh ecmwf`</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
@@ -23966,7 +23966,7 @@ tooling that needs to detect catalog format changes between releases.
 Bump it when the schema gains an incompatible new field.</p>
 <h5 id="available_datasets"><a class="toclink" href="#available_datasets"><code>available_datasets</code></a><a class="headerlink" href="#available_datasets" title="Permanent link">#</a></h5>
 <p><em>Optional, but conventionally always present.</em> A flat list of every
-dataset short name the five stores currently publish — roughly 174
+dataset short name the five stores currently publish — roughly 175
 entries today, keyed under a per-store block in <code>_index.yaml</code>. The
 list is maintained by <code>earthlens datasets refresh ecmwf</code>, which hits
 each store's live catalogue API
