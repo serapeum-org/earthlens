@@ -302,6 +302,28 @@ def _ecmwf_form_variables(form: list[Any]) -> list[str]:
     return out
 
 
+def _hindcast_request_kind(fields: set[str | None]) -> str:
+    """Pick the hindcast kind for a form that carries `hyear`.
+
+    Three shapes exist. A form with `hyear` but no `hday` is a seasonal
+    reforecast (year/month only). A form with `hday` *and* the plain `day` axis
+    carries **both** dates — the model cycle and the reforecast — which are
+    paired, so it needs `s2s_reforecast` (which copies month/day across);
+    `glofas_hindcast` would rename `year` to `hyear` and delete the model-cycle
+    date. A form with `hday` and no `day` is the GloFAS/EFAS shape, where the
+    hindcast date is the only one.
+
+    Args:
+        fields: The `name` of every widget in the dataset's `form.json`.
+
+    Returns:
+        str: One of `seasonal_hindcast`, `s2s_reforecast`, `glofas_hindcast`.
+    """
+    if "hday" not in fields:
+        return "seasonal_hindcast"
+    return "s2s_reforecast" if "day" in fields else "glofas_hindcast"
+
+
 def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
     """Guess the `request_kind` from a dataset id + its `form.json` fields.
 
@@ -318,12 +340,7 @@ def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
         return "fire"
     fields = {f.get("name") for f in form if isinstance(f, dict)}
     if "hyear" in fields:
-        # A form carrying BOTH date axes (year/month/day *and* hyear/hmonth/
-        # hday) pairs them, so `glofas_hindcast` - which renames year->hyear -
-        # would delete the model-cycle date. S2S reforecasts are that shape.
-        if "hday" in fields:
-            return "s2s_reforecast" if "day" in fields else "glofas_hindcast"
-        return "seasonal_hindcast"
+        return _hindcast_request_kind(fields)
     # A real seasonal forecast keys on `leadtime_month`. Without it, a
     # year/month-only form is a monthly reanalysis / emission inventory /
     # radiative-forcing product, not a seasonal forecast — so require the lead
