@@ -16,6 +16,7 @@ from __future__ import annotations
 import zipfile
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from earthlens.core import EarthLens
@@ -39,6 +40,30 @@ def _variables_in(path: Path) -> set[str]:
         with xr.open_dataset(member) as dataset:
             names.update(dataset.data_vars)
     return names
+
+
+def _time_stamps(path: Path) -> list:
+    """Return the datetime values on a retrieved file's time coordinate."""
+    import pandas as pd
+    import xarray as xr
+
+    member = path
+    if zipfile.is_zipfile(path):
+        with zipfile.ZipFile(path) as archive:
+            target = path.parent / f"{path.stem}_times"
+            archive.extractall(target)
+        member = sorted(target.rglob("*.nc"))[0]
+    with xr.open_dataset(member) as dataset:
+        name = next(
+            (
+                coord
+                for coord in dataset.coords
+                if "datetime" in str(dataset[coord].dtype)
+            ),
+            None,
+        )
+        assert name is not None, f"no datetime coordinate in {member.name}"
+        return [pd.Timestamp(value) for value in dataset[name].values.ravel()]
 
 
 def _fetch(dataset, variable, start, end, resolution, tmp_path, runner):
@@ -100,6 +125,9 @@ class TestEcdsE2E:
         A June window is included deliberately: while `hmonth`/`hday` were
         pinned to `01`/`01` only a January request could succeed, and the
         failure surfaced as an empty result rather than an error.
+
+        The dates inside the file are what prove the copy worked: a store that
+        ignored `hmonth`/`hday` would still return a well-formed `mx2t6`.
         """
         path = _fetch(
             "s2s-reforecasts",
@@ -111,6 +139,15 @@ class TestEcdsE2E:
             download_within_budget,
         )
         assert "mx2t6" in _variables_in(path)
+
+        cycle = pd.Timestamp(start)
+        stamps = _time_stamps(path)
+        assert {stamp.year for stamp in stamps} == {1995}, (
+            f"reforecast should sit in the pinned hyear 1995, got {stamps[:3]}"
+        )
+        assert {stamp.month for stamp in stamps} == {cycle.month}, (
+            f"reforecast month should track the {cycle:%B} cycle, got {stamps[:3]}"
+        )
 
 
 class TestXdsE2E:
