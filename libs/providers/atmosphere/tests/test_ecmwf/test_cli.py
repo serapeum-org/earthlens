@@ -626,7 +626,7 @@ class TestStoreTables:
 
     def test_every_store_has_an_api_root(self):
         """All five slugs resolve to their documented API root."""
-        assert ecmwf_cli._ECMWF_STORE_URLS == {
+        assert ecmwf_cli._store_urls() == {
             "cds": "https://cds.climate.copernicus.eu/api",
             "ads": "https://ads.atmosphere.copernicus.eu/api",
             "ewds": "https://ewds.climate.copernicus.eu/api",
@@ -636,10 +636,18 @@ class TestStoreTables:
 
     def test_every_store_has_a_collections_url(self):
         """Each catalogue URL is its store's root plus the collections path."""
-        assert ecmwf_cli._ECMWF_STORE_COLLECTIONS_URLS == {
+        assert ecmwf_cli._store_collections_urls() == {
             "cds": "https://cds.climate.copernicus.eu/api/catalogue/v1/collections",
             "ads": "https://ads.atmosphere.copernicus.eu/api/catalogue/v1/collections",
             "ewds": "https://ewds.climate.copernicus.eu/api/catalogue/v1/collections",
             "ecds": "https://ecds.ecmwf.int/api/catalogue/v1/collections",
             "xds": "https://xds.ecmwf.int/api/catalogue/v1/collections",
         }
+
+    def test_url_override_reaches_the_catalog_tooling(self, monkeypatch):
+        """A `<ENDPOINT>_URL` override applies to the CLI, not just the client."""
+        monkeypatch.setenv("ECDS_URL", "https://staging.ecds.invalid/api")
+        assert ecmwf_cli._store_urls()["ecds"] == "https://staging.ecds.invalid/api"
+        assert ecmwf_cli._store_collections_urls()["ecds"] == (
+            "https://staging.ecds.invalid/api/catalogue/v1/collections"
+        )
