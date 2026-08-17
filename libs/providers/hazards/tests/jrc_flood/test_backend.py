@@ -16,28 +16,8 @@ pytestmark = pytest.mark.jrc_flood
 _GT = (-24.54208333, 0.0008333333333333334, 0.0, 71.13375, 0.0, -0.0008333333333333334)
 
 
-class _FakeSource:
-    """Stand-in for a lazily-opened pyramids Dataset over the EFHM."""
-
-    def __init__(self, geo, columns: int, rows: int, no_data_value=(-9999.0,)):
-        self.geotransform = geo
-        self.columns = columns
-        self.rows = rows
-        self.no_data_value = no_data_value
-        self.reads: list[list[int]] = []
-
-    def read_array(self, window: list[int]) -> np.ndarray:
-        """Record the window and return a zero array of its shape."""
-        self.reads.append(window)
-        _, _, cols, rows = window
-        return np.zeros((rows, cols), dtype="float32")
-
-    def close(self) -> None:
-        """No-op."""
-
-
 class _FakeCropped:
-    """Stand-in for the rebuilt window Dataset that writes a stub GeoTIFF."""
+    """Stand-in for the cropped window Dataset that writes a stub GeoTIFF."""
 
     def __init__(self, recorder: dict):
         self._recorder = recorder
@@ -51,26 +31,39 @@ class _FakeCropped:
         """No-op."""
 
 
+class _FakeSource:
+    """Stand-in for a lazily-opened pyramids Dataset over the EFHM."""
+
+    def __init__(
+        self, geo, columns: int, rows: int, no_data_value=(-9999.0,), recorder=None
+    ):
+        self.geotransform = geo
+        self.columns = columns
+        self.rows = rows
+        self.no_data_value = no_data_value
+        self.crops: list = []
+        self._recorder = recorder if recorder is not None else {}
+
+    def crop(self, mask=None, touch=True, *, bbox=None, epsg=None) -> _FakeCropped:
+        """Record the windowed bbox crop and return a writable fake window."""
+        self.crops.append(bbox)
+        return _FakeCropped(self._recorder)
+
+    def close(self) -> None:
+        """No-op."""
+
+
 @pytest.fixture
 def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> dict:
-    """Patch pyramids Dataset (read_file + create_from_array) + mask_to_geometry."""
-    recorder: dict = {"source": _FakeSource(_GT, 110162, 51992)}
+    """Patch pyramids Dataset (read_file + windowed crop) + crop_to_aoi."""
+    recorder: dict = {}
+    recorder["source"] = _FakeSource(_GT, 110162, 51992, recorder=recorder)
 
     class _FakeDataset:
         @classmethod
         def read_file(cls, path: str) -> _FakeSource:
             recorder["read_path"] = path
             return recorder["source"]
-
-        @classmethod
-        def create_from_array(cls, array, *, geo, epsg, no_data_value) -> _FakeCropped:
-            recorder["create"] = {
-                "shape": array.shape,
-                "geo": geo,
-                "epsg": epsg,
-                "nodata": no_data_value,
-            }
-            return _FakeCropped(recorder)
 
     import pyramids.dataset as pyr_dataset
 
@@ -175,15 +168,14 @@ class TestFetch:
     """Tests for the windowed read / write path."""
 
     def test_writes_one_geotiff_per_rp(self, tmp_path: Path, fake_pyramids: dict):
-        """A download reads the AOI window and writes one GeoTIFF."""
-        # #2: the source's own nodata (not the catalog default) is carried through.
-        fake_pyramids["source"].no_data_value = (-8888.0,)
+        """A download windowed-crops the AOI and writes one GeoTIFF."""
         out = _make(tmp_path, return_periods=[100]).download()
         assert out == [tmp_path / "efhm_RP100.tif"]
         assert out[0].exists()
-        assert fake_pyramids["source"].reads == [[35210, 22960, 241, 241]]
-        assert fake_pyramids["create"]["nodata"] == -8888.0
-        # #3: an AOI sidecar is written next to the output.
+        # The AOI bbox is forwarded to the windowed crop (nodata / grid carry
+        # through is pyramids' own concern now, covered by its tests).
+        assert fake_pyramids["source"].crops == [[4.8, 51.8, 5.0, 52.0]]
+        # An AOI sidecar is written next to the output.
         assert (tmp_path / "efhm_RP100.tif.aoi").exists()
 
     def test_outside_coverage_raises(self, tmp_path: Path, fake_pyramids: dict):
@@ -198,17 +190,17 @@ class TestFetch:
     def test_idempotent_skip_same_aoi(self, tmp_path: Path, fake_pyramids: dict):
         """A re-request for the same AOI skips the windowed read (sidecar match)."""
         _make(tmp_path, return_periods=[100]).download()
-        fake_pyramids["source"].reads.clear()
+        fake_pyramids["source"].crops.clear()
         out = _make(tmp_path, return_periods=[100]).download()
         assert out == [tmp_path / "efhm_RP100.tif"]
-        assert fake_pyramids["source"].reads == []
+        assert fake_pyramids["source"].crops == []
 
     def test_different_aoi_not_skipped(self, tmp_path: Path, fake_pyramids: dict):
         """A same-path request for a different AOI re-reads (no stale return)."""
         (tmp_path / "efhm_RP100.tif").write_bytes(b"stale")
         (tmp_path / "efhm_RP100.tif.aoi").write_text("9,9,9.1,9.1", encoding="utf-8")
         _make(tmp_path, return_periods=[100]).download()
-        assert fake_pyramids["source"].reads, "a different AOI must re-read the window"
+        assert fake_pyramids["source"].crops, "a different AOI must re-read the window"
 
     def test_write_failure_cleans_up(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -222,14 +214,14 @@ class TestFetch:
             def close(self) -> None:
                 pass
 
+        class _RaisingSource(_FakeSource):
+            def crop(self, mask=None, touch=True, *, bbox=None, epsg=None) -> _Raising:
+                return _Raising()
+
         class _FakeDataset:
             @classmethod
-            def read_file(cls, path: str) -> _FakeSource:
-                return _FakeSource(_GT, 110162, 51992)
-
-            @classmethod
-            def create_from_array(cls, array, *, geo, epsg, no_data_value) -> _Raising:
-                return _Raising()
+            def read_file(cls, path: str) -> _RaisingSource:
+                return _RaisingSource(_GT, 110162, 51992)
 
         import pyramids.dataset as pyr_dataset
 

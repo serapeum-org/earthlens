@@ -6,8 +6,11 @@ range-accessible Cloud-Optimized GeoTIFFs on figshare, read **windowed** over
 Atlas layers are DEFLATE-compressed ZIP archives with no random access, so they
 are downloaded once into a cache and read **windowed from the local ZIP member**
 (`download_cache_crop`). Both paths funnel through `read_part_to_geotiff`, which
-uses `pyramids.dataset.Dataset.read_part` — the cloud-native partial read — and
-never `Dataset.crop` (which materialises the whole global raster).
+delegates to `pyramids.dataset.Dataset.crop(bbox=)` — its windowed fast path
+reads only the AOI's pixel window straight from the source (over `/vsicurl/` a
+few hundred KB rather than the whole multi-GB raster) and never materialises the
+whole global grid. `pyramids` applies the `/vsicurl` HTTP tuning (readdir/retry/
+timeout, extensionless-URL handling) itself, so no GDAL env is set here.
 
 All raster I/O goes through `pyramids`; the stdlib `zipfile` is used only to
 name the GeoTIFF member inside a downloaded ZIP, never to read pixels.
@@ -15,8 +18,6 @@ name the GeoTIFF member inside a downloaded ZIP, never to read pixels.
 
 from __future__ import annotations
 
-import math
-import os
 import zipfile
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -24,37 +25,14 @@ from urllib.parse import urlsplit
 
 import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 
+from earthlens.base import close_quietly
 from earthlens.base.http import HttpClient
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent
 
-#: GDAL `/vsicurl` HTTP settings applied (via `setdefault`) before the first
-#: remote read. `GDAL_DISABLE_READDIR_ON_OPEN` stops GDAL listing the "directory"
-#: of a remote object; the retry knobs ride out the figshare presigned-URL
-#: refresh. `CPL_VSIL_CURL_ALLOWED_EXTENSIONS` is deliberately **not** set — it
-#: whitelists extensions, and the figshare download URL is extension-less, so
-#: setting it would make GDAL reject the URL (pinned in the A1b gate).
-_GDAL_HTTP_ENV: dict[str, str] = {
-    "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
-    "GDAL_HTTP_TIMEOUT": "30",
-    "GDAL_HTTP_MAX_RETRY": "3",
-    "GDAL_HTTP_RETRY_DELAY": "2",
-}
-
 #: Stream chunk size (bytes) for the Global Solar Atlas ZIP download.
 _DOWNLOAD_CHUNK = 1 << 20
-
-
-def configure_gdal_http() -> None:
-    """Apply the `/vsicurl` HTTP environment defaults (idempotent).
-
-    Sets each key in `_GDAL_HTTP_ENV` only when absent, so a caller that has
-    already tuned GDAL is left untouched. Called once at the top of every
-    windowed read.
-    """
-    for key, value in _GDAL_HTTP_ENV.items():
-        os.environ.setdefault(key, value)
 
 
 def vsicurl(url: str) -> str:
@@ -91,37 +69,18 @@ def bbox_from_extent(space: SpatialExtent) -> list[float]:
     return [space.west, space.south, space.east, space.north]
 
 
-def _source_no_data(dataset: object) -> object:
-    """Return the source raster's first-band no-data value, or `-9999` default.
-
-    `pyramids` exposes `no_data_value` as a per-band tuple (e.g. `(-9999.0,)` or
-    `(None,)`). The windowed crop carries the source value through to the written
-    GeoTIFF so genuinely-empty cells stay flagged; a missing value falls back to
-    the pyramids default.
-
-    Args:
-        dataset: An opened `pyramids.Dataset`.
-
-    Returns:
-        The first-band no-data value when the source declares one, else `-9999`.
-    """
-    nodata = getattr(dataset, "no_data_value", None)
-    if isinstance(nodata, (list, tuple)) and nodata and nodata[0] is not None:
-        return nodata[0]
-    return -9999
-
-
 def read_part_to_geotiff(
     path: str, bbox: list[float], out_path: Path, *, epsg: int = 4326
 ) -> Path:
     """Read just the `bbox` window from a raster and write it as a GeoTIFF.
 
-    The windowed primitive is `pyramids.dataset.Dataset.read_part`, which fetches
-    only the AOI's byte ranges (for a COG over `/vsicurl/`, a few hundred KB
-    rather than the whole multi-GB file). `Dataset.crop` is **not** used: it
-    reads the entire band into memory, which for a global 250 m COG is tens of
-    GiB. The returned pixels are wrapped back into a georeferenced GeoTIFF using
-    the source grid snapped to the bbox.
+    Delegates the windowed read to `pyramids.dataset.Dataset.crop(bbox=)`, whose
+    fast path resolves the bbox to a pixel window and reads **only** that window
+    straight from the source: for a COG over `/vsicurl/` a few hundred KB rather
+    than the whole multi-GB file, and for a `/vsizip/` member only that member's
+    window. The source grid, CRS and no-data value are carried onto the crop, so
+    genuinely-empty cells stay flagged. `pyramids` applies the `/vsicurl` HTTP
+    tuning (readdir/retry/timeout, extensionless-URL handling) itself.
 
     Args:
         path: A `/vsicurl/<url>` (remote COG) or `/vsizip/<zip>/<member.tif>`
@@ -135,47 +94,18 @@ def read_part_to_geotiff(
     """
     from pyramids.dataset import Dataset
 
-    configure_gdal_http()
     west, south, east, north = bbox
     dataset = Dataset.read_file(path)
     try:
-        origin_x, pixel_w, _, origin_y, _, pixel_h = dataset.geotransform
-        col0 = math.floor((west - origin_x) / pixel_w)
-        col1 = math.ceil((east - origin_x) / pixel_w)
-        row0 = math.floor((north - origin_y) / pixel_h)
-        row1 = math.ceil((south - origin_y) / pixel_h)
-        # A point / sub-pixel bbox (e.g. lat_min == lat_max landing on a cell
-        # edge) snaps to a zero-width window; read at least one pixel so the
-        # request still yields a 1x1 cell instead of failing.
-        ncols = max(1, col1 - col0)
-        nrows = max(1, row1 - row0)
-        array = dataset.read_part(
-            (west, south, east, north),
-            dst_width=ncols,
-            dst_height=nrows,
-            bbox_crs=epsg,
-        )
-        if getattr(array, "ndim", 2) == 3 and array.shape[0] == 1:
-            array = array[0]
-        geo = (
-            origin_x + col0 * pixel_w,
-            pixel_w,
-            0.0,
-            origin_y + row0 * pixel_h,
-            0.0,
-            pixel_h,
-        )
-        window = Dataset.create_from_array(
-            arr=array,
-            geo=geo,
-            epsg=dataset.epsg,
-            no_data_value=_source_no_data(dataset),
-        )
-        window.to_file(str(out_path))
+        window = dataset.crop(bbox=[west, south, east, north], epsg=epsg)
     finally:
         # Drop the /vsicurl handle — an open remote dataset can hang the
         # interpreter at exit on GDAL's curl-handle cleanup (A1b).
-        dataset = None
+        close_quietly(dataset)
+    try:
+        window.to_file(str(out_path))
+    finally:
+        close_quietly(window)
     return out_path
 
 

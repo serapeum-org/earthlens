@@ -27,10 +27,10 @@ def test_bbox_from_extent_returns_wsen() -> None:
     assert _helpers.bbox_from_extent(space) == [12.0, 55.0, 12.5, 55.5]
 
 
-def test_window_crop_opens_vsicurl_and_reads_part(
+def test_window_crop_opens_vsicurl_and_crops(
     fake_pyramids: type[FakeDataset], tmp_path: Path
 ) -> None:
-    """window_crop opens the /vsicurl path and extracts via read_part, not crop."""
+    """window_crop opens the /vsicurl path and windowed-crops it to the bbox."""
     out = tmp_path / "wind_100m.tif"
     result = _helpers.window_crop(
         "https://ndownloader.figshare.com/files/17247017",
@@ -39,54 +39,21 @@ def test_window_crop_opens_vsicurl_and_reads_part(
     )
     assert result == out
     assert fake_pyramids.recorder["opened"][0].startswith("/vsicurl/https://")
-    assert fake_pyramids.recorder["read_part"][0]["bbox"] == (12.0, 55.0, 12.5, 55.5)
+    crop = fake_pyramids.recorder["crop"][0]
+    assert crop["bbox"] == [12.0, 55.0, 12.5, 55.5]
+    assert crop["epsg"] == 4326
     assert fake_pyramids.recorder["written"] == str(out)
-    assert "create" in fake_pyramids.recorder
 
 
-def test_window_crop_window_size_matches_native_grid(
+def test_window_crop_degenerate_bbox_still_crops(
     fake_pyramids: type[FakeDataset], tmp_path: Path
 ) -> None:
-    """A 0.5 deg bbox at the 0.0025 deg native grid reads a ~200x200 window."""
-    _helpers.window_crop(
-        "https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif"
-    )
-    part = fake_pyramids.recorder["read_part"][0]
-    assert part["dst_width"] == 200
-    assert part["dst_height"] == 200
-
-
-def test_window_crop_clamps_degenerate_bbox_to_one_pixel(
-    fake_pyramids: type[FakeDataset], tmp_path: Path
-) -> None:
-    """A zero-extent point bbox still reads a 1x1 window instead of failing."""
+    """A zero-extent point bbox is forwarded to crop (pyramids clamps the window)."""
     _helpers.window_crop(
         "https://x/w.tif", [12.0, 55.0, 12.0, 55.0], tmp_path / "p.tif"
     )
-    part = fake_pyramids.recorder["read_part"][0]
-    assert part["dst_width"] == 1
-    assert part["dst_height"] == 1
-
-
-def test_window_crop_squeezes_single_band_3d(
-    fake_pyramids: type[FakeDataset], tmp_path: Path
-) -> None:
-    """A (1, H, W) read_part result is squeezed to (H, W) before writing."""
-    fake_pyramids.emit_3d = True
-    _helpers.window_crop(
-        "https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif"
-    )
-    assert fake_pyramids.recorder["create"][0]["shape"] == (200, 200)
-
-
-def test_window_crop_propagates_source_no_data(
-    fake_pyramids: type[FakeDataset], tmp_path: Path
-) -> None:
-    """The written GeoTIFF carries the source raster's no-data value, not -9999."""
-    _helpers.window_crop(
-        "https://x/w.tif", [12.0, 55.0, 12.5, 55.5], tmp_path / "w.tif"
-    )
-    assert fake_pyramids.recorder["create"][0]["no_data_value"] == -32768.0
+    assert fake_pyramids.recorder["crop"][0]["bbox"] == [12.0, 55.0, 12.0, 55.0]
+    assert fake_pyramids.recorder["written"] == str(tmp_path / "p.tif")
 
 
 def test_download_zip_cleans_partial_on_failure(

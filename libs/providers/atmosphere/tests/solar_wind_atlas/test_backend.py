@@ -34,7 +34,7 @@ def test_wind_variable_reads_windowed_vsicurl(
     opened = fake_pyramids.recorder["opened"]
     assert len(opened) == 1
     assert opened[0] == "/vsicurl/https://ndownloader.figshare.com/files/17247017"
-    assert fake_pyramids.recorder["read_part"][0]["dst_width"] == 200
+    assert "crop" in fake_pyramids.recorder
 
 
 def test_solar_variable_downloads_then_crops(

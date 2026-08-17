@@ -23,6 +23,7 @@ no `LicenseWarning`. The raster read happens through `pyramids` (a windowed
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 from loguru import logger
 
@@ -36,13 +37,7 @@ from earthlens.base import (
     write_sidecar,
 )
 from earthlens.base.spatial import crop_to_aoi
-from earthlens.jrc_flood._helpers import (
-    configure_gdal_http,
-    efhm_url,
-    pixel_window,
-    source_no_data,
-    window_origin,
-)
+from earthlens.jrc_flood._helpers import efhm_url
 from earthlens.jrc_flood.catalog import Catalog, Dataset
 
 
@@ -237,6 +232,33 @@ class JRCFlood(AbstractDataSource):
         """The AOI as `(west, south, east, north)` in degrees."""
         return (self.space.west, self.space.south, self.space.east, self.space.north)
 
+    def _bbox_overlaps(self, source: Any) -> bool:
+        """Whether the AOI overlaps the source raster's geographic extent.
+
+        A cheap geographic bounds test (from the source's affine transform and
+        pixel dimensions) so an AOI outside the EFHM's Europe / Mediterranean
+        coverage is reported with a clear error before the windowed crop, rather
+        than surfacing as an empty or opaque crop result.
+
+        Args:
+            source: An opened `pyramids.Dataset` exposing `geotransform`,
+                `columns`, and `rows`.
+
+        Returns:
+            bool: `True` when the AOI bbox intersects the raster's extent.
+        """
+        origin_x, pixel_w, _, origin_y, _, pixel_h = source.geotransform
+        west_bound, east_bound = origin_x, origin_x + source.columns * pixel_w
+        # `pixel_h` is negative for a north-up grid, so the south edge is lower.
+        north_bound, south_bound = origin_y, origin_y + source.rows * pixel_h
+        west, south, east, north = self._bbox
+        return not (
+            east <= west_bound
+            or west >= east_bound
+            or north <= south_bound
+            or south >= north_bound
+        )
+
     def _is_cached(self, target: Path) -> bool:
         """Whether `target` already holds this exact AOI (AOI-aware skip).
 
@@ -320,12 +342,13 @@ class JRCFlood(AbstractDataSource):
     def _fetch_one(self, product: RemoteProduct) -> Path:
         """Read the AOI window of one return-period GeoTIFF and write the crop.
 
-        Opens the whole-Europe GeoTIFF lazily over `/vsicurl` (HTTP range
-        requests, tuned via `configure_gdal_http`), maps the AOI bbox to a pixel
-        window, reads **only** that window with `pyramids`, rebuilds a small
-        `Dataset` from the window (with the shifted geotransform and the source's
-        own no-data value), applies the polygon mask when the request carried an
-        `aoi=` polygon, and writes the GeoTIFF.
+        Opens the whole-Europe GeoTIFF lazily and windowed-crops it to the AOI
+        with `pyramids.Dataset.crop(bbox=)`, whose fast path reads **only** the
+        AOI's pixel window over `/vsicurl` (HTTP range requests — pyramids tunes
+        the readdir/retry/timeout knobs itself) and carries the source grid, CRS
+        and no-data through. `crop_to_aoi` then trims the all-touched window to
+        the exact bbox — or to the exact polygon when the request carried an
+        `aoi=` polygon.
 
         Args:
             product: The `RemoteProduct` whose `metadata` carries `rp` + `url`.
@@ -347,40 +370,27 @@ class JRCFlood(AbstractDataSource):
             logger.info(f"JRCFlood: {target.name} already holds this AOI; skipping.")
             return target
 
-        configure_gdal_http()
         source = PyramidsDataset.read_file(url)
         try:
-            geo = source.geotransform
-            window = pixel_window(geo, self._bbox, source.columns, source.rows)
-            if window is None:
+            if not self._bbox_overlaps(source):
                 raise ValueError(
                     f"the AOI {self._bbox} is outside the EFHM's Europe / "
                     f"Mediterranean coverage; no RP{rp} data to write."
                 )
-            col_off, row_off, cols, rows = window
             logger.info(
-                f"JRCFlood RP{rp}: reading window {cols}x{rows} px at "
-                f"({col_off}, {row_off}) from {url}"
+                f"JRCFlood RP{rp}: windowed /vsicurl crop of {self._bbox} from {url}"
             )
-            array = source.read_array(window=[col_off, row_off, cols, rows])
-            window_geo = window_origin(geo, col_off, row_off)
-            # Carry the source's own no-data through rather than assuming the
-            # catalog value; fall back to the catalog nodata if it declares none.
-            nodata = source_no_data(source, default=self._dataset.nodata)
+            # The windowed fast path reads only the AOI pixel window from the
+            # ~23 GB source; nodata / CRS / grid are carried onto the crop.
+            windowed = source.crop(bbox=list(self._bbox), epsg=4326)
         finally:
             close_quietly(source)
 
-        window_ds = PyramidsDataset.create_from_array(
-            array,
-            geo=window_geo,
-            epsg=4326,
-            no_data_value=nodata,
-        )
-        # The floor/ceil pixel window covers the bbox with up to one extra pixel
-        # per edge; crop to the exact bbox (matching FABDEM) — or to the exact
-        # polygon when the request carried an `aoi=` polygon.
+        # crop(bbox=) keeps every pixel the box overlaps (all-touched, up to one
+        # extra pixel per edge); trim to the exact bbox (matching FABDEM) — or to
+        # the exact polygon when the request carried an `aoi=` polygon.
         cropped = crop_to_aoi(
-            window_ds,
+            windowed,
             self.space,
             bbox=[self.space.west, self.space.south, self.space.east, self.space.north],
             touch=False,
@@ -396,6 +406,6 @@ class JRCFlood(AbstractDataSource):
             staged.unlink(missing_ok=True)
             raise
         finally:
-            close_quietly(window_ds)
+            close_quietly(windowed)
         write_sidecar(target, aoi_tag(self.space))
         return target
