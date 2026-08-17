@@ -1,3 +1,37 @@
+"""ECMWF / Copernicus data-store backend — :class:`ECMWF`, an :class:`AbstractDataSource`.
+
+Downloads from the five CADS data stores through one `cdsapi` client:
+the Copernicus trio (CDS, ADS, EWDS) and the two ECMWF-hosted stores
+(ECDS, XDS). A request is `{dataset: [variable, ...], ...}` plus a date
+range, a bbox and a temporal resolution; the dataset ids, variable
+metadata and per-store routing all come from
+:class:`earthlens.ecmwf.Catalog` (loaded from the per-family
+`catalog/*.yaml` shards). Nothing about a dataset is hardcoded here.
+
+Each row's `endpoint` picks the store, resolved to an API root and a
+credential by :mod:`earthlens.ecmwf.endpoints`; one client is cached per
+endpoint, so a single :meth:`ECMWF.download` may span several stores.
+
+The pipeline (per `(dataset, variable)` pair) is:
+
+1. :meth:`ECMWF._build_request` — build the request from the catalog row,
+   then shape its date keys by `request_kind` (see
+   :data:`_REQUEST_KIND_STRIPS`): kinds strip the template fields their
+   dataset rejects, and the reforecast kinds rewrite the date axes —
+   `glofas_hindcast` *renames* `year`/`month`/`day` to the `h*` keys,
+   while `s2s_reforecast` *copies* them, keeping both dates.
+2. :class:`earthlens.ecmwf.constraints.RequestValidator` — pre-flight the
+   request against the store's `constraints.json` before anything is queued.
+3. :meth:`ECMWF._api` — submit through `cdsapi`, then normalise the
+   response: a zipped or archived NetCDF is unpacked
+   (:func:`_unpack_netcdf_archive`) so `download()` always returns the
+   written data files.
+
+Authentication failures are surfaced as :class:`AuthenticationError`,
+which distinguishes missing credentials from an unaccepted licence — the
+two most common ways a retrieve is refused.
+"""
+
 from __future__ import annotations
 
 import os
