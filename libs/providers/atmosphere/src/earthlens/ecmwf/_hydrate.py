@@ -8,8 +8,8 @@ the comments and ordering of the surrounding rows are preserved, only the
 placeholder fields are rewritten.
 
 Credentialed and licence-gated: the CDS retrieve sits behind
-:func:`_retrieve_netcdf_vars` (monkeypatch-able), so the stanza-rewriting core
-(:func:`_rewrite_stanza`) stays pure and fully testable offline. A dataset
+:func:`_retrieve_netcdf_vars`, an isolated seam that keeps the
+stanza-rewriting core (:func:`_rewrite_stanza`) pure and offline. A dataset
 whose retrieve fails (unaccepted licence, CDS outage) is skipped, never fatal —
 the fill is best-effort and partial by design (one retrieve confirms the
 variable it sampled).
@@ -101,7 +101,8 @@ def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
     The credentialed seam — delegates to the ECMWF deep sampler, which builds a
     minimal request from the dataset's constraints, retrieves it via `cdsapi`
     (`~/.cdsapirc`), and reads each NetCDF variable's `long_name` / `units`.
-    Wrapped as a module-level function so tests can monkeypatch it offline.
+    Kept a module-level function so the one credentialed call is isolated
+    from the pure rewriting logic around it.
 
     Args:
         dataset_id: The Copernicus dataset id to sample.
