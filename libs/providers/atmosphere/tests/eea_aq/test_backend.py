@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from loguru import logger
 
 from earthlens.eea_aq import EEA_AQ
 
@@ -71,6 +72,35 @@ class _EraClient:
 
     def request(self, source, *countries, poll=None, verbose=True):
         return _EraRequest(self._verified if source == "Verified" else self._unverified)
+
+
+class _NoFilesRequest:
+    """An airbase request whose download writes no Parquet (an empty era)."""
+
+    def download(
+        self, dir: str, skip_existing: bool = True, raise_for_status: bool = True
+    ) -> None:
+        return None
+
+
+class _NoFilesClient:
+    """A recording client whose every era returns zero Parquet files."""
+
+    countries = frozenset({"MT"})
+
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, tuple[str, ...], object]] = []
+
+    def request(self, source, *countries, poll=None, verbose=True):
+        self.calls.append((source, countries, poll))
+        return _NoFilesRequest()
+
+
+def _capture(level: str) -> tuple[list[str], int]:
+    """Add a loguru sink collecting messages at `level`; return (messages, id)."""
+    messages: list[str] = []
+    sink = logger.add(lambda m: messages.append(m.record["message"]), level=level)
+    return messages, sink
 
 
 def _backend(client, tmp_path: Path, **overrides) -> EEA_AQ:
@@ -211,6 +241,48 @@ class TestApi:
 
         df = _backend(_EmptyClient(), tmp_path).download(progress_bar=False)
         assert df.empty
+
+
+@pytest.mark.eea
+class TestEmptyResultSignals:
+    """The two empty results are logged distinctly (see issue #1046).
+
+    An era that returns zero Parquet files (the shape of an upstream EEA
+    export outage) is a WARNING; a window that excludes every downloaded row
+    (the era holds data, the dates are simply empty) is an INFO, so a caller
+    facing an empty frame can tell the two apart.
+    """
+
+    def test_empty_era_warns_per_era(self, tmp_path):
+        """An era serving zero files logs a WARNING naming the era and cause."""
+        client = _NoFilesClient()
+        messages, sink = _capture("WARNING")
+        df = _backend(client, tmp_path).download(progress_bar=False)
+        logger.remove(sink)
+
+        assert df.empty and "station_id" in df.columns
+        # The default 2023 window sweeps both eras; each empty era warns.
+        assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
+        no_file_warnings = [m for m in messages if "no Parquet files" in m]
+        assert len(no_file_warnings) == 2
+        assert any("Verified" in m for m in no_file_warnings)
+        assert all("upstream" in m for m in no_file_warnings)
+
+    def test_out_of_window_download_logs_info_not_outage(self, tmp_path):
+        """Files that all fall outside the window log an INFO, not the era WARNING."""
+        parquet = tmp_path / "june.parquet"
+        _era_frame(verification=1).to_parquet(parquet)  # a single 2023-06-15 row
+        client = _FakeAirbaseClient(parquet)
+        messages, sink = _capture("INFO")
+        df = _backend(client, tmp_path, start="2023-07-01", end="2023-07-31").download(
+            progress_bar=False
+        )
+        logger.remove(sink)
+
+        assert df.empty and "station_id" in df.columns
+        assert any("none fell within" in m for m in messages)
+        # Distinct from the empty-era path: this is not reported as missing files.
+        assert not any("no Parquet files" in m for m in messages)
 
 
 @pytest.mark.eea

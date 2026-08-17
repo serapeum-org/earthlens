@@ -350,7 +350,22 @@ class EEA_AQ(AbstractDataSource):
         )
         lower, upper = self._window()
         mask = (combined["datetime_utc"] >= lower) & (combined["datetime_utc"] < upper)
-        return combined[mask].reset_index(drop=True)
+        windowed = combined[mask].reset_index(drop=True)
+        if windowed.empty:
+            # Files were downloaded and carried rows, but every row fell outside
+            # [start, end). This is a genuine no-data *window* — the era(s) hold
+            # data, just not for the requested dates — logged at INFO to keep it
+            # deliberately distinct from the WARNING an empty era raises in
+            # `_iter_dataset_frames`. That split is the whole point: a caller
+            # facing an empty frame can tell "the export returned no files"
+            # (possible upstream outage) from "the dates are simply empty".
+            logger.info(
+                f"EEA download: {len(combined)} observation(s) were downloaded "
+                f"but none fell within [{lower}, {upper}); the era(s) hold data "
+                f"for {countries} / {polls}, so the requested date window is the "
+                f"empty part, not the upstream export."
+            )
+        return windowed
 
     def _iter_dataset_frames(
         self,
@@ -385,9 +400,21 @@ class EEA_AQ(AbstractDataSource):
                 download_request(request, tmp)
                 parquets = sorted(Path(tmp).rglob("*.parquet"))
                 if not parquets:
-                    logger.info(
-                        f"EEA download: dataset {dataset!r} returned no Parquet "
-                        f"files for {countries} / {polls}."
+                    # This is the whole era for every requested country and
+                    # pollutant at once (airbase requests them in one call), so
+                    # zero files is notable, not routine: it is the shape of an
+                    # upstream EEA export outage when a major reporter is asked
+                    # for a populated era (as in 2026-08, when Verified /
+                    # Unverified served zero files platform-wide). It can also be
+                    # a genuine absence for a small country / rare pollutant, so
+                    # the message names both causes rather than asserting either.
+                    logger.warning(
+                        f"EEA download: era {dataset!r} returned no Parquet files "
+                        f"for countries {countries} / pollutants {polls}. A major "
+                        f"reporter returning zero files usually means the EEA "
+                        f"export is temporarily unavailable upstream; it can also "
+                        f"mean these countries/pollutants are genuinely absent "
+                        f"from this era."
                     )
                 for parquet in parquets:
                     yield shape_frame(pd.read_parquet(parquet), dataset, code_to_name)
