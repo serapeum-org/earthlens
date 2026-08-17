@@ -56,6 +56,7 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.eea_aq._helpers import (
+    adjacent_eras,
     countries_in_bbox,
     datasets_for_years,
     download_request,
@@ -331,11 +332,26 @@ class EEA_AQ(AbstractDataSource):
         # Lazy so a `limit=` stops the work where it costs: each dataset is a
         # separate bulk download of every matching Parquet, so a cap met by the
         # Verified era means the Unverified one is never requested at all.
-        frames = self._take_limited(
-            self._iter_dataset_frames(datasets, client, countries, polls, code_to_name),
-            limit=self._limit,
-        )
-        non_empty = [frame for frame in frames if not frame.empty]
+        non_empty = self._sweep(datasets, client, countries, polls, code_to_name)
+        if not non_empty:
+            # The primary era(s) returned zero files. Retry the adjacent live
+            # era(s) not already swept (Verified <-> Unverified): a boundary year
+            # can be missing from its primary era yet present in the neighbour —
+            # a not-yet-promoted year still in the Unverified stream, or a
+            # transiently empty Verified export. This runs *only* on a
+            # fully-empty primary sweep, so the normal success path never
+            # double-downloads, and a recent-year request — already spanning both
+            # live eras — has no adjacent era left to try.
+            fallback = adjacent_eras(datasets)
+            if fallback:
+                logger.warning(
+                    f"EEA download: primary era(s) {datasets} returned no files "
+                    f"for countries {countries} / pollutants {polls}; retrying the "
+                    f"adjacent era(s) {fallback}."
+                )
+                non_empty = self._sweep(
+                    fallback, client, countries, polls, code_to_name
+                )
         if not non_empty:
             return empty_frame()
         combined = pd.concat(non_empty, ignore_index=True)
@@ -366,6 +382,35 @@ class EEA_AQ(AbstractDataSource):
                 f"empty part, not the upstream export."
             )
         return windowed
+
+    def _sweep(
+        self,
+        datasets: list[Any],
+        client: Any,
+        countries: list[str],
+        polls: list[str],
+        code_to_name: dict[int, str],
+    ) -> list[pd.DataFrame]:
+        """Download `datasets` era by era and return the non-empty shaped frames.
+
+        Args:
+            datasets: The eras to sweep, in priority order.
+            client: The airbase client to request through.
+            countries: Reporting-country codes the service serves.
+            polls: Pollutant codes to request.
+            code_to_name: Pollutant code (numeric) to catalog name, restricted
+                to the requested pollutants.
+
+        Returns:
+            list[pd.DataFrame]: One shaped frame per Parquet that held rows;
+                empty frames are dropped. A cap (`self._limit`) is honoured
+                lazily, so an era past the cap is never bulk-downloaded.
+        """
+        frames = self._take_limited(
+            self._iter_dataset_frames(datasets, client, countries, polls, code_to_name),
+            limit=self._limit,
+        )
+        return [frame for frame in frames if not frame.empty]
 
     def _iter_dataset_frames(
         self,

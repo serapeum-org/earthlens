@@ -49,6 +49,26 @@ def _era_frame(verification: int) -> pd.DataFrame:
     )
 
 
+def _row_frame(start: str, verification: int = 1) -> pd.DataFrame:
+    """One MT pm25 row at ISO `start`, tagged with `verification`."""
+    starts = pd.to_datetime([start])
+    return pd.DataFrame(
+        {
+            "Samplingpoint": ["MT/SPO-1"],
+            "Pollutant": [6001],
+            "Start": starts,
+            # `End` is unused by `shape_frame`; keep it equal to `Start` to avoid
+            # timedelta arithmetic (the value is irrelevant to the reshape).
+            "End": starts,
+            "Value": ["5.0"],
+            "Unit": ["ug.m-3"],
+            "AggType": ["hour"],
+            "Validity": [1],
+            "Verification": [verification],
+        }
+    )
+
+
 class _EraRequest:
     """Copies a per-era fixture Parquet into the download dir."""
 
@@ -94,6 +114,33 @@ class _NoFilesClient:
     def request(self, source, *countries, poll=None, verbose=True):
         self.calls.append((source, countries, poll))
         return _NoFilesRequest()
+
+
+class _MaybeEraRequest:
+    """Copies a fixture Parquet, or writes nothing when the era has no files."""
+
+    def __init__(self, parquet: str | None) -> None:
+        self._parquet = parquet
+
+    def download(
+        self, dir: str, skip_existing: bool = True, raise_for_status: bool = True
+    ) -> None:
+        if self._parquet is not None:
+            shutil.copy(self._parquet, Path(dir) / "d.parquet")
+
+
+class _SelectiveEraClient:
+    """Serves a Parquet for some eras and zero files for others (by era name)."""
+
+    countries = frozenset({"MT"})
+
+    def __init__(self, **era_parquets: str | None) -> None:
+        self._map = era_parquets
+        self.calls: list[tuple[str, tuple[str, ...], object]] = []
+
+    def request(self, source, *countries, poll=None, verbose=True):
+        self.calls.append((source, countries, poll))
+        return _MaybeEraRequest(self._map.get(source))
 
 
 def _capture(level: str) -> tuple[list[str], int]:
@@ -283,6 +330,51 @@ class TestEmptyResultSignals:
         assert any("none fell within" in m for m in messages)
         # Distinct from the empty-era path: this is not reported as missing files.
         assert not any("no Parquet files" in m for m in messages)
+
+
+@pytest.mark.eea
+class TestAdjacentEraFallback:
+    """When the primary era is empty, the adjacent live era is retried (#1046)."""
+
+    def test_empty_primary_era_falls_back_to_adjacent(self, tmp_path):
+        """A 2013-2022 window whose Verified era is empty resolves via Unverified."""
+        unverified = tmp_path / "u.parquet"
+        _row_frame("2022-06-15T00:00").to_parquet(unverified)
+        client = _SelectiveEraClient(Verified=None, Unverified=str(unverified))
+        messages, sink = _capture("WARNING")
+        df = _backend(client, tmp_path, start="2022-06-01", end="2022-06-30").download(
+            progress_bar=False
+        )
+        logger.remove(sink)
+
+        assert len(df) == 1
+        assert df.loc[0, "dataset"] == "Unverified"
+        assert df.loc[0, "datetime_utc"].year == 2022
+        # Verified swept first (empty), then Unverified as the adjacent fallback.
+        assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
+        assert any("retrying the adjacent era(s)" in m for m in messages)
+
+    def test_no_fallback_when_both_live_eras_already_swept(self, tmp_path):
+        """A 2023+ window already spans both live eras, so no fallback fires."""
+        client = _NoFilesClient()  # both eras empty
+        messages, sink = _capture("WARNING")
+        df = _backend(client, tmp_path).download(progress_bar=False)  # default 2023
+        logger.remove(sink)
+
+        assert df.empty
+        # Exactly the two live eras, with no extra adjacent retry appended.
+        assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
+        assert not any("retrying the adjacent era(s)" in m for m in messages)
+
+    def test_fallback_era_also_empty_returns_schema_only(self, tmp_path):
+        """When both the primary and the adjacent era are empty, an empty frame."""
+        client = _SelectiveEraClient(Verified=None, Unverified=None)
+        df = _backend(client, tmp_path, start="2022-06-01", end="2022-06-30").download(
+            progress_bar=False
+        )
+
+        assert df.empty and "station_id" in df.columns
+        assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
 
 
 @pytest.mark.eea

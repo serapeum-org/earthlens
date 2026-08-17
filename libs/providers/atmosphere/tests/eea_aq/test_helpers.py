@@ -9,6 +9,7 @@ import pandas as pd
 import pytest
 
 from earthlens.eea_aq._helpers import (
+    adjacent_eras,
     countries_in_bbox,
     datasets_for_years,
     download_request,
@@ -80,6 +81,27 @@ class TestDatasetsForYears:
     def test_reversed_years_normalised(self):
         """A reversed year pair is normalised."""
         assert datasets_for_years(2024, 2021) == ["Verified", "Unverified"]
+
+
+@pytest.mark.eea
+class TestAdjacentEras:
+    """The empty-primary-era fallback target (Verified <-> Unverified)."""
+
+    def test_verified_only_falls_back_to_unverified(self):
+        """A Verified-only (2013-2022) sweep falls back to Unverified."""
+        assert adjacent_eras(["Verified"]) == ["Unverified"]
+
+    def test_both_live_eras_have_no_untried_neighbour(self):
+        """A recent-year sweep already spans both live eras: nothing to try."""
+        assert adjacent_eras(["Verified", "Unverified"]) == []
+
+    def test_historical_only_has_no_live_neighbour(self):
+        """Historical is a frozen archive with no adjacent live era."""
+        assert adjacent_eras(["Historical"]) == []
+
+    def test_historical_plus_verified_falls_back_to_unverified(self):
+        """A straddling Historical+Verified sweep still tries Unverified."""
+        assert adjacent_eras(["Historical", "Verified"]) == ["Unverified"]
 
 
 @pytest.mark.eea

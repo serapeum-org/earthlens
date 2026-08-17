@@ -90,6 +90,17 @@ EEA_DATASET_YEARS: dict[str, tuple[int, int]] = {
     "Unverified": (2023, 9999),
 }
 
+#: Verified <-> Unverified adjacency, used only for the empty-primary-era
+#: fallback (`adjacent_eras`). The two live eras hold the same measurements at
+#: different validation stages: the EEA promotes a year from `Unverified`
+#: (E2a/UTD) into `Verified` (E1a) once validated, so a boundary year can be
+#: missing from one while still present in the other. `Historical` has no
+#: adjacency — it is a frozen archive with no live counterpart.
+_ADJACENT_ERAS: dict[str, str] = {
+    "Verified": "Unverified",
+    "Unverified": "Verified",
+}
+
 #: Long-format schema (column -> dtype) the backend returns, even for an
 #: empty result, so callers always get the same shape.
 SCHEMA: dict[str, str] = {
@@ -182,6 +193,47 @@ def datasets_for_years(start_year: int, end_year: int) -> list[str]:
         for name, (first, last) in EEA_DATASET_YEARS.items()
         if start_year <= last and end_year >= first
     ]
+
+
+def adjacent_eras(datasets: list[str]) -> list[str]:
+    """Return the Verified/Unverified era(s) adjacent to `datasets`, untried.
+
+    The fallback target when a primary sweep returns zero files: the live era
+    (`Verified` / `Unverified`) paired with one already selected but not itself
+    in `datasets`. A boundary year can be missing from its primary era yet
+    present in the adjacent one — a year still awaiting promotion sits in
+    `Unverified` only, and a `Verified` export can be transiently empty — so
+    retrying the neighbour recovers it. Returns `[]` when there is nothing new
+    to try: a recent-year request already spans both live eras, and a
+    `Historical`-only request has no live neighbour.
+
+    Args:
+        datasets: The eras already swept, as returned by `datasets_for_years`.
+
+    Returns:
+        list[str]: The adjacent live era(s) not in `datasets`, order-stable and
+            de-duplicated.
+
+    Examples:
+        - A `Verified`-only (2013–2022) sweep falls back to `Unverified`:
+            ```python
+            >>> from earthlens.eea_aq._helpers import adjacent_eras
+            >>> adjacent_eras(["Verified"])
+            ['Unverified']
+            >>> adjacent_eras(["Verified", "Unverified"])
+            []
+            >>> adjacent_eras(["Historical"])
+            []
+
+            ```
+    """
+    already = set(datasets)
+    out: list[str] = []
+    for name in datasets:
+        neighbour = _ADJACENT_ERAS.get(name)
+        if neighbour is not None and neighbour not in already and neighbour not in out:
+            out.append(neighbour)
+    return out
 
 
 def shape_frame(
