@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2500,7 +2500,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS + ECDS + XDS)
+    Data stores (CDS + ADS + EWDS)
   
 
     
@@ -2529,34 +2529,6 @@
     
   
     EWDS (GloFAS / floods)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../ecmwf/ecds/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -14719,34 +14691,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    TIGGE and fire fuel — the ECDS and XDS endpoints
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../examples/ecmwf/glofas_historical_intermediate/" class="md-nav__link">
         
   
@@ -25541,7 +25485,34 @@ observations, so the facade rejects <code>aggregate=</code> with
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
 <span class="normal"><a href="#__codelineno-0-447">447</a></span>
 <span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="k">class</span><span class="w"> </span><span class="nc">EEA_AQ</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span>
+<span class="normal"><a href="#__codelineno-0-452">452</a></span>
+<span class="normal"><a href="#__codelineno-0-453">453</a></span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span>
+<span class="normal"><a href="#__codelineno-0-459">459</a></span>
+<span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
+<span class="normal"><a href="#__codelineno-0-464">464</a></span>
+<span class="normal"><a href="#__codelineno-0-465">465</a></span>
+<span class="normal"><a href="#__codelineno-0-466">466</a></span>
+<span class="normal"><a href="#__codelineno-0-467">467</a></span>
+<span class="normal"><a href="#__codelineno-0-468">468</a></span>
+<span class="normal"><a href="#__codelineno-0-469">469</a></span>
+<span class="normal"><a href="#__codelineno-0-470">470</a></span>
+<span class="normal"><a href="#__codelineno-0-471">471</a></span>
+<span class="normal"><a href="#__codelineno-0-472">472</a></span>
+<span class="normal"><a href="#__codelineno-0-473">473</a></span>
+<span class="normal"><a href="#__codelineno-0-474">474</a></span>
+<span class="normal"><a href="#__codelineno-0-475">475</a></span>
+<span class="normal"><a href="#__codelineno-0-476">476</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="k">class</span><span class="w"> </span><span class="nc">EEA_AQ</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;EEA air-quality backend (long-format tabular output, via airbase).</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    Fetches reference-grade European monitor observations for a bbox (or</span>
@@ -25809,103 +25780,130 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="p">)</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_window</span><span class="p">()</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">combined</span><span class="p">[</span><span class="s2">&quot;datetime_utc&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lower</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">combined</span><span class="p">[</span><span class="s2">&quot;datetime_utc&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">upper</span><span class="p">)</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="k">return</span> <span class="n">combined</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_iter_dataset_frames</span><span class="p">(</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="n">countries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">polls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="n">code_to_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield one shaped frame per Parquet file, era by era.</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        A generator rather than a list so a caller that has already collected</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        enough rows never triggers the next era&#39;s bulk download. Each era&#39;s</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        temporary directory lives only for that era&#39;s reads; abandoning the</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        generator early unwinds the open one (`_take_limited` closes what it</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        stops consuming).</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">            datasets: The airbase datasets (eras) to sweep, in priority order.</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            client: The airbase client to request through.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            countries: Reporting-country codes the service serves.</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            polls: Pollutant codes to request.</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            code_to_name: Pollutant code (numeric) to catalog name, restricted to the</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">                requested pollutants.</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Yields:</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            pd.DataFrame: One shaped frame per downloaded Parquet file.</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;earthlens_eea_&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>                <span class="n">request</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="o">*</span><span class="n">countries</span><span class="p">,</span> <span class="n">poll</span><span class="o">=</span><span class="n">polls</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>                <span class="n">download_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">tmp</span><span class="p">)</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>                <span class="n">parquets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*.parquet&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="n">parquets</span><span class="p">:</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                        <span class="sa">f</span><span class="s2">&quot;EEA download: dataset </span><span class="si">{</span><span class="n">dataset</span><span class="si">!r}</span><span class="s2"> returned no Parquet &quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                        <span class="sa">f</span><span class="s2">&quot;files for </span><span class="si">{</span><span class="n">countries</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">polls</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="k">for</span> <span class="n">parquet</span> <span class="ow">in</span> <span class="n">parquets</span><span class="p">:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                    <span class="k">yield</span> <span class="n">shape_frame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">parquet</span><span class="p">),</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">code_to_name</span><span class="p">)</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>        <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch observations, write them to `path`, and return the frame.</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Runs the per-dataset airbase download, reshapes and windows the</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        Parquet, writes the long-format result to `path` as CSV (or</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        Parquet), and returns it. An empty result returns — and writes — a</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        schema-only DataFrame so callers always get the same shape.</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            progress_bar: Accepted for API parity with the other backends;</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">                airbase owns its own download progress.</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">            limit: Cap on the total observations fetched, across every era and</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">                Parquet file. Applied as each file is read, so an era past the</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                cap is never bulk-downloaded. `None` (the default) fetches</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                everything. The cap is on rows *fetched*, before the</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">                cross-era de-duplication and the window filter, so the returned</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">                frame can be shorter than the cap.</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            pd.DataFrame: The long-format observations (schema columns,</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">                `datetime_utc` tz-aware UTC). Empty (schema-only) when</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">                nothing matched.</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>                <span class="sa">f</span><span class="s2">&quot;EEA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> observation(s) across &quot;</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;station_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> station(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="p">)</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>                <span class="s2">&quot;EEA download summary: no observations matched the request; &quot;</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>                <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="p">)</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="k">return</span> <span class="n">df</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_output_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose the per-request output file path under `root_dir`.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="n">params</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;eea_aq_</span><span class="si">{</span><span class="n">params</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="n">windowed</span> <span class="o">=</span> <span class="n">combined</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="k">if</span> <span class="n">windowed</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="c1"># Files were downloaded and carried rows, but every row fell outside</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="c1"># [start, end). This is a genuine no-data *window* — the era(s) hold</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="c1"># data, just not for the requested dates — logged at INFO to keep it</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>            <span class="c1"># deliberately distinct from the WARNING an empty era raises in</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>            <span class="c1"># `_iter_dataset_frames`. That split is the whole point: a caller</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>            <span class="c1"># facing an empty frame can tell &quot;the export returned no files&quot;</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>            <span class="c1"># (possible upstream outage) from &quot;the dates are simply empty&quot;.</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                <span class="sa">f</span><span class="s2">&quot;EEA download: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span><span class="si">}</span><span class="s2"> observation(s) were downloaded &quot;</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>                <span class="sa">f</span><span class="s2">&quot;but none fell within [</span><span class="si">{</span><span class="n">lower</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">upper</span><span class="si">}</span><span class="s2">); the era(s) hold data &quot;</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>                <span class="sa">f</span><span class="s2">&quot;for </span><span class="si">{</span><span class="n">countries</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">polls</span><span class="si">}</span><span class="s2">, so the requested date window is the &quot;</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>                <span class="sa">f</span><span class="s2">&quot;empty part, not the upstream export.&quot;</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="p">)</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="k">return</span> <span class="n">windowed</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_iter_dataset_frames</span><span class="p">(</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="n">countries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="n">polls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">code_to_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield one shaped frame per Parquet file, era by era.</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        A generator rather than a list so a caller that has already collected</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        enough rows never triggers the next era&#39;s bulk download. Each era&#39;s</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        temporary directory lives only for that era&#39;s reads; abandoning the</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        generator early unwinds the open one (`_take_limited` closes what it</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        stops consuming).</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            datasets: The airbase datasets (eras) to sweep, in priority order.</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            client: The airbase client to request through.</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            countries: Reporting-country codes the service serves.</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            polls: Pollutant codes to request.</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            code_to_name: Pollutant code (numeric) to catalog name, restricted to the</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">                requested pollutants.</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        Yields:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            pd.DataFrame: One shaped frame per downloaded Parquet file.</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>        <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;earthlens_eea_&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>                <span class="n">request</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="o">*</span><span class="n">countries</span><span class="p">,</span> <span class="n">poll</span><span class="o">=</span><span class="n">polls</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>                <span class="n">download_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">tmp</span><span class="p">)</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>                <span class="n">parquets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*.parquet&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="n">parquets</span><span class="p">:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>                    <span class="c1"># This is the whole era for every requested country and</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>                    <span class="c1"># pollutant at once (airbase requests them in one call), so</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>                    <span class="c1"># zero files is notable, not routine: it is the shape of an</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>                    <span class="c1"># upstream EEA export outage when a major reporter is asked</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>                    <span class="c1"># for a populated era (as in 2026-08, when Verified /</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>                    <span class="c1"># Unverified served zero files platform-wide). It can also be</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>                    <span class="c1"># a genuine absence for a small country / rare pollutant, so</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>                    <span class="c1"># the message names both causes rather than asserting either.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>                        <span class="sa">f</span><span class="s2">&quot;EEA download: era </span><span class="si">{</span><span class="n">dataset</span><span class="si">!r}</span><span class="s2"> returned no Parquet files &quot;</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>                        <span class="sa">f</span><span class="s2">&quot;for countries </span><span class="si">{</span><span class="n">countries</span><span class="si">}</span><span class="s2"> / pollutants </span><span class="si">{</span><span class="n">polls</span><span class="si">}</span><span class="s2">. A major &quot;</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>                        <span class="sa">f</span><span class="s2">&quot;reporter returning zero files usually means the EEA &quot;</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>                        <span class="sa">f</span><span class="s2">&quot;export is temporarily unavailable upstream; it can also &quot;</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>                        <span class="sa">f</span><span class="s2">&quot;mean these countries/pollutants are genuinely absent &quot;</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>                        <span class="sa">f</span><span class="s2">&quot;from this era.&quot;</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>                <span class="k">for</span> <span class="n">parquet</span> <span class="ow">in</span> <span class="n">parquets</span><span class="p">:</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>                    <span class="k">yield</span> <span class="n">shape_frame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">parquet</span><span class="p">),</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">code_to_name</span><span class="p">)</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch observations, write them to `path`, and return the frame.</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Runs the per-dataset airbase download, reshapes and windows the</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        Parquet, writes the long-format result to `path` as CSV (or</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        Parquet), and returns it. An empty result returns — and writes — a</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        schema-only DataFrame so callers always get the same shape.</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">            progress_bar: Accepted for API parity with the other backends;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">                airbase owns its own download progress.</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            limit: Cap on the total observations fetched, across every era and</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">                Parquet file. Applied as each file is read, so an era past the</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">                cap is never bulk-downloaded. `None` (the default) fetches</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">                everything. The cap is on rows *fetched*, before the</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">                cross-era de-duplication and the window filter, so the returned</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">                frame can be shorter than the cap.</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">            pd.DataFrame: The long-format observations (schema columns,</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">                `datetime_utc` tz-aware UTC). Empty (schema-only) when</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">                nothing matched.</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>                <span class="sa">f</span><span class="s2">&quot;EEA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> observation(s) across &quot;</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;station_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> station(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="p">)</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>                <span class="s2">&quot;EEA download summary: no observations matched the request; &quot;</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>                <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>            <span class="p">)</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="k">return</span> <span class="n">df</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_output_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose the per-request output file path under `root_dir`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="n">params</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;eea_aq_</span><span class="si">{</span><span class="n">params</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26373,34 +26371,7 @@ nothing matched.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/eea_aq/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-395">395</a></span>
-<span class="normal"><a href="#__codelineno-0-396">396</a></span>
-<span class="normal"><a href="#__codelineno-0-397">397</a></span>
-<span class="normal"><a href="#__codelineno-0-398">398</a></span>
-<span class="normal"><a href="#__codelineno-0-399">399</a></span>
-<span class="normal"><a href="#__codelineno-0-400">400</a></span>
-<span class="normal"><a href="#__codelineno-0-401">401</a></span>
-<span class="normal"><a href="#__codelineno-0-402">402</a></span>
-<span class="normal"><a href="#__codelineno-0-403">403</a></span>
-<span class="normal"><a href="#__codelineno-0-404">404</a></span>
-<span class="normal"><a href="#__codelineno-0-405">405</a></span>
-<span class="normal"><a href="#__codelineno-0-406">406</a></span>
-<span class="normal"><a href="#__codelineno-0-407">407</a></span>
-<span class="normal"><a href="#__codelineno-0-408">408</a></span>
-<span class="normal"><a href="#__codelineno-0-409">409</a></span>
-<span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span>
-<span class="normal"><a href="#__codelineno-0-413">413</a></span>
-<span class="normal"><a href="#__codelineno-0-414">414</a></span>
-<span class="normal"><a href="#__codelineno-0-415">415</a></span>
-<span class="normal"><a href="#__codelineno-0-416">416</a></span>
-<span class="normal"><a href="#__codelineno-0-417">417</a></span>
-<span class="normal"><a href="#__codelineno-0-418">418</a></span>
-<span class="normal"><a href="#__codelineno-0-419">419</a></span>
-<span class="normal"><a href="#__codelineno-0-420">420</a></span>
-<span class="normal"><a href="#__codelineno-0-421">421</a></span>
-<span class="normal"><a href="#__codelineno-0-422">422</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-422">422</a></span>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
 <span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
@@ -26419,53 +26390,80 @@ nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-438">438</a></span>
 <span class="normal"><a href="#__codelineno-0-439">439</a></span>
 <span class="normal"><a href="#__codelineno-0-440">440</a></span>
-<span class="normal"><a href="#__codelineno-0-441">441</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch observations, write them to `path`, and return the frame.</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    Runs the per-dataset airbase download, reshapes and windows the</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    Parquet, writes the long-format result to `path` as CSV (or</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    Parquet), and returns it. An empty result returns — and writes — a</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    schema-only DataFrame so callers always get the same shape.</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        progress_bar: Accepted for API parity with the other backends;</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            airbase owns its own download progress.</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        limit: Cap on the total observations fetched, across every era and</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            Parquet file. Applied as each file is read, so an era past the</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            cap is never bulk-downloaded. `None` (the default) fetches</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            everything. The cap is on rows *fetched*, before the</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">            cross-era de-duplication and the window filter, so the returned</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            frame can be shorter than the cap.</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        pd.DataFrame: The long-format observations (schema columns,</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            `datetime_utc` tz-aware UTC). Empty (schema-only) when</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            nothing matched.</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>            <span class="sa">f</span><span class="s2">&quot;EEA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> observation(s) across &quot;</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;station_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> station(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="p">)</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="s2">&quot;EEA download summary: no observations matched the request; &quot;</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="p">)</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>    <span class="k">return</span> <span class="n">df</span>
+<span class="normal"><a href="#__codelineno-0-441">441</a></span>
+<span class="normal"><a href="#__codelineno-0-442">442</a></span>
+<span class="normal"><a href="#__codelineno-0-443">443</a></span>
+<span class="normal"><a href="#__codelineno-0-444">444</a></span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span>
+<span class="normal"><a href="#__codelineno-0-446">446</a></span>
+<span class="normal"><a href="#__codelineno-0-447">447</a></span>
+<span class="normal"><a href="#__codelineno-0-448">448</a></span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span>
+<span class="normal"><a href="#__codelineno-0-452">452</a></span>
+<span class="normal"><a href="#__codelineno-0-453">453</a></span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span>
+<span class="normal"><a href="#__codelineno-0-459">459</a></span>
+<span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
+<span class="normal"><a href="#__codelineno-0-464">464</a></span>
+<span class="normal"><a href="#__codelineno-0-465">465</a></span>
+<span class="normal"><a href="#__codelineno-0-466">466</a></span>
+<span class="normal"><a href="#__codelineno-0-467">467</a></span>
+<span class="normal"><a href="#__codelineno-0-468">468</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch observations, write them to `path`, and return the frame.</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    Runs the per-dataset airbase download, reshapes and windows the</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">    Parquet, writes the long-format result to `path` as CSV (or</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">    Parquet), and returns it. An empty result returns — and writes — a</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    schema-only DataFrame so callers always get the same shape.</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        progress_bar: Accepted for API parity with the other backends;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            airbase owns its own download progress.</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        limit: Cap on the total observations fetched, across every era and</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            Parquet file. Applied as each file is read, so an era past the</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">            cap is never bulk-downloaded. `None` (the default) fetches</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            everything. The cap is on rows *fetched*, before the</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">            cross-era de-duplication and the window filter, so the returned</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            frame can be shorter than the cap.</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        pd.DataFrame: The long-format observations (schema columns,</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            `datetime_utc` tz-aware UTC). Empty (schema-only) when</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">            nothing matched.</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>            <span class="sa">f</span><span class="s2">&quot;EEA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> observation(s) across &quot;</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;station_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> station(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="p">)</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>            <span class="s2">&quot;EEA download summary: no observations matched the request; &quot;</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>            <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="p">)</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -27217,7 +27215,34 @@ observations, so the facade rejects <code>aggregate=</code> with
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
 <span class="normal"><a href="#__codelineno-0-447">447</a></span>
 <span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="k">class</span><span class="w"> </span><span class="nc">EEA_AQ</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span>
+<span class="normal"><a href="#__codelineno-0-452">452</a></span>
+<span class="normal"><a href="#__codelineno-0-453">453</a></span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span>
+<span class="normal"><a href="#__codelineno-0-459">459</a></span>
+<span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
+<span class="normal"><a href="#__codelineno-0-464">464</a></span>
+<span class="normal"><a href="#__codelineno-0-465">465</a></span>
+<span class="normal"><a href="#__codelineno-0-466">466</a></span>
+<span class="normal"><a href="#__codelineno-0-467">467</a></span>
+<span class="normal"><a href="#__codelineno-0-468">468</a></span>
+<span class="normal"><a href="#__codelineno-0-469">469</a></span>
+<span class="normal"><a href="#__codelineno-0-470">470</a></span>
+<span class="normal"><a href="#__codelineno-0-471">471</a></span>
+<span class="normal"><a href="#__codelineno-0-472">472</a></span>
+<span class="normal"><a href="#__codelineno-0-473">473</a></span>
+<span class="normal"><a href="#__codelineno-0-474">474</a></span>
+<span class="normal"><a href="#__codelineno-0-475">475</a></span>
+<span class="normal"><a href="#__codelineno-0-476">476</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="k">class</span><span class="w"> </span><span class="nc">EEA_AQ</span><span class="p">(</span><span class="n">AbstractDataSource</span><span class="p">):</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;EEA air-quality backend (long-format tabular output, via airbase).</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    Fetches reference-grade European monitor observations for a bbox (or</span>
@@ -27485,103 +27510,130 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="p">)</span>
 <a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_window</span><span class="p">()</span>
 <a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">combined</span><span class="p">[</span><span class="s2">&quot;datetime_utc&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lower</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">combined</span><span class="p">[</span><span class="s2">&quot;datetime_utc&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">upper</span><span class="p">)</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="k">return</span> <span class="n">combined</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_iter_dataset_frames</span><span class="p">(</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>        <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="n">countries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>        <span class="n">polls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>        <span class="n">code_to_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield one shaped frame per Parquet file, era by era.</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        A generator rather than a list so a caller that has already collected</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        enough rows never triggers the next era&#39;s bulk download. Each era&#39;s</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        temporary directory lives only for that era&#39;s reads; abandoning the</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">        generator early unwinds the open one (`_take_limited` closes what it</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">        stops consuming).</span>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">            datasets: The airbase datasets (eras) to sweep, in priority order.</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            client: The airbase client to request through.</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">            countries: Reporting-country codes the service serves.</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">            polls: Pollutant codes to request.</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">            code_to_name: Pollutant code (numeric) to catalog name, restricted to the</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">                requested pollutants.</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">        Yields:</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">            pd.DataFrame: One shaped frame per downloaded Parquet file.</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>        <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;earthlens_eea_&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>                <span class="n">request</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="o">*</span><span class="n">countries</span><span class="p">,</span> <span class="n">poll</span><span class="o">=</span><span class="n">polls</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>                <span class="n">download_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">tmp</span><span class="p">)</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>                <span class="n">parquets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*.parquet&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="n">parquets</span><span class="p">:</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>                        <span class="sa">f</span><span class="s2">&quot;EEA download: dataset </span><span class="si">{</span><span class="n">dataset</span><span class="si">!r}</span><span class="s2"> returned no Parquet &quot;</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>                        <span class="sa">f</span><span class="s2">&quot;files for </span><span class="si">{</span><span class="n">countries</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">polls</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>                    <span class="p">)</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>                <span class="k">for</span> <span class="n">parquet</span> <span class="ow">in</span> <span class="n">parquets</span><span class="p">:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a>                    <span class="k">yield</span> <span class="n">shape_frame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">parquet</span><span class="p">),</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">code_to_name</span><span class="p">)</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>        <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch observations, write them to `path`, and return the frame.</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">        Runs the per-dataset airbase download, reshapes and windows the</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">        Parquet, writes the long-format result to `path` as CSV (or</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        Parquet), and returns it. An empty result returns — and writes — a</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        schema-only DataFrame so callers always get the same shape.</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">            progress_bar: Accepted for API parity with the other backends;</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">                airbase owns its own download progress.</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">            limit: Cap on the total observations fetched, across every era and</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">                Parquet file. Applied as each file is read, so an era past the</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">                cap is never bulk-downloaded. `None` (the default) fetches</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">                everything. The cap is on rows *fetched*, before the</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">                cross-era de-duplication and the window filter, so the returned</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">                frame can be shorter than the cap.</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">            pd.DataFrame: The long-format observations (schema columns,</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">                `datetime_utc` tz-aware UTC). Empty (schema-only) when</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">                nothing matched.</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>                <span class="sa">f</span><span class="s2">&quot;EEA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> observation(s) across &quot;</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;station_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> station(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="p">)</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>                <span class="s2">&quot;EEA download summary: no observations matched the request; &quot;</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>                <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="p">)</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="k">return</span> <span class="n">df</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_output_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose the per-request output file path under `root_dir`.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>        <span class="n">params</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;eea_aq_</span><span class="si">{</span><span class="n">params</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="n">windowed</span> <span class="o">=</span> <span class="n">combined</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="k">if</span> <span class="n">windowed</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="c1"># Files were downloaded and carried rows, but every row fell outside</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>            <span class="c1"># [start, end). This is a genuine no-data *window* — the era(s) hold</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>            <span class="c1"># data, just not for the requested dates — logged at INFO to keep it</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>            <span class="c1"># deliberately distinct from the WARNING an empty era raises in</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>            <span class="c1"># `_iter_dataset_frames`. That split is the whole point: a caller</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>            <span class="c1"># facing an empty frame can tell &quot;the export returned no files&quot;</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>            <span class="c1"># (possible upstream outage) from &quot;the dates are simply empty&quot;.</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>                <span class="sa">f</span><span class="s2">&quot;EEA download: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span><span class="si">}</span><span class="s2"> observation(s) were downloaded &quot;</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>                <span class="sa">f</span><span class="s2">&quot;but none fell within [</span><span class="si">{</span><span class="n">lower</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">upper</span><span class="si">}</span><span class="s2">); the era(s) hold data &quot;</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>                <span class="sa">f</span><span class="s2">&quot;for </span><span class="si">{</span><span class="n">countries</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">polls</span><span class="si">}</span><span class="s2">, so the requested date window is the &quot;</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>                <span class="sa">f</span><span class="s2">&quot;empty part, not the upstream export.&quot;</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>            <span class="p">)</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>        <span class="k">return</span> <span class="n">windowed</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_iter_dataset_frames</span><span class="p">(</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>        <span class="n">datasets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="n">client</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="n">countries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="n">polls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">code_to_name</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield one shaped frame per Parquet file, era by era.</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        A generator rather than a list so a caller that has already collected</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        enough rows never triggers the next era&#39;s bulk download. Each era&#39;s</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        temporary directory lives only for that era&#39;s reads; abandoning the</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        generator early unwinds the open one (`_take_limited` closes what it</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        stops consuming).</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">            datasets: The airbase datasets (eras) to sweep, in priority order.</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">            client: The airbase client to request through.</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">            countries: Reporting-country codes the service serves.</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="sd">            polls: Pollutant codes to request.</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">            code_to_name: Pollutant code (numeric) to catalog name, restricted to the</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">                requested pollutants.</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a><span class="sd">        Yields:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="sd">            pd.DataFrame: One shaped frame per downloaded Parquet file.</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>        <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;earthlens_eea_&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>                <span class="n">request</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="o">*</span><span class="n">countries</span><span class="p">,</span> <span class="n">poll</span><span class="o">=</span><span class="n">polls</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>                <span class="n">download_request</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">tmp</span><span class="p">)</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>                <span class="n">parquets</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*.parquet&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="n">parquets</span><span class="p">:</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>                    <span class="c1"># This is the whole era for every requested country and</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>                    <span class="c1"># pollutant at once (airbase requests them in one call), so</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>                    <span class="c1"># zero files is notable, not routine: it is the shape of an</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>                    <span class="c1"># upstream EEA export outage when a major reporter is asked</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>                    <span class="c1"># for a populated era (as in 2026-08, when Verified /</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>                    <span class="c1"># Unverified served zero files platform-wide). It can also be</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>                    <span class="c1"># a genuine absence for a small country / rare pollutant, so</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>                    <span class="c1"># the message names both causes rather than asserting either.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>                        <span class="sa">f</span><span class="s2">&quot;EEA download: era </span><span class="si">{</span><span class="n">dataset</span><span class="si">!r}</span><span class="s2"> returned no Parquet files &quot;</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>                        <span class="sa">f</span><span class="s2">&quot;for countries </span><span class="si">{</span><span class="n">countries</span><span class="si">}</span><span class="s2"> / pollutants </span><span class="si">{</span><span class="n">polls</span><span class="si">}</span><span class="s2">. A major &quot;</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>                        <span class="sa">f</span><span class="s2">&quot;reporter returning zero files usually means the EEA &quot;</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>                        <span class="sa">f</span><span class="s2">&quot;export is temporarily unavailable upstream; it can also &quot;</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>                        <span class="sa">f</span><span class="s2">&quot;mean these countries/pollutants are genuinely absent &quot;</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>                        <span class="sa">f</span><span class="s2">&quot;from this era.&quot;</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>                    <span class="p">)</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>                <span class="k">for</span> <span class="n">parquet</span> <span class="ow">in</span> <span class="n">parquets</span><span class="p">:</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>                    <span class="k">yield</span> <span class="n">shape_frame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">parquet</span><span class="p">),</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">code_to_name</span><span class="p">)</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch observations, write them to `path`, and return the frame.</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">        Runs the per-dataset airbase download, reshapes and windows the</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">        Parquet, writes the long-format result to `path` as CSV (or</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">        Parquet), and returns it. An empty result returns — and writes — a</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">        schema-only DataFrame so callers always get the same shape.</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">            progress_bar: Accepted for API parity with the other backends;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">                airbase owns its own download progress.</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">            limit: Cap on the total observations fetched, across every era and</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">                Parquet file. Applied as each file is read, so an era past the</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">                cap is never bulk-downloaded. `None` (the default) fetches</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">                everything. The cap is on rows *fetched*, before the</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">                cross-era de-duplication and the window filter, so the returned</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">                frame can be shorter than the cap.</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">            pd.DataFrame: The long-format observations (schema columns,</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">                `datetime_utc` tz-aware UTC). Empty (schema-only) when</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">                nothing matched.</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>        <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>                <span class="sa">f</span><span class="s2">&quot;EEA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> observation(s) across &quot;</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;station_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> station(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>            <span class="p">)</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>                <span class="s2">&quot;EEA download summary: no observations matched the request; &quot;</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>                <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>            <span class="p">)</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>        <span class="k">return</span> <span class="n">df</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a>
+<a id="__codelineno-0-470" name="__codelineno-0-470"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_output_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose the per-request output file path under `root_dir`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a>        <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span> <span class="k">else</span> <span class="s2">&quot;csv&quot;</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a>        <span class="n">params</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vars</span><span class="p">)</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a>        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">end_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;eea_aq_</span><span class="si">{</span><span class="n">params</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -28049,34 +28101,7 @@ nothing matched.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/eea_aq/backend.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-395">395</a></span>
-<span class="normal"><a href="#__codelineno-0-396">396</a></span>
-<span class="normal"><a href="#__codelineno-0-397">397</a></span>
-<span class="normal"><a href="#__codelineno-0-398">398</a></span>
-<span class="normal"><a href="#__codelineno-0-399">399</a></span>
-<span class="normal"><a href="#__codelineno-0-400">400</a></span>
-<span class="normal"><a href="#__codelineno-0-401">401</a></span>
-<span class="normal"><a href="#__codelineno-0-402">402</a></span>
-<span class="normal"><a href="#__codelineno-0-403">403</a></span>
-<span class="normal"><a href="#__codelineno-0-404">404</a></span>
-<span class="normal"><a href="#__codelineno-0-405">405</a></span>
-<span class="normal"><a href="#__codelineno-0-406">406</a></span>
-<span class="normal"><a href="#__codelineno-0-407">407</a></span>
-<span class="normal"><a href="#__codelineno-0-408">408</a></span>
-<span class="normal"><a href="#__codelineno-0-409">409</a></span>
-<span class="normal"><a href="#__codelineno-0-410">410</a></span>
-<span class="normal"><a href="#__codelineno-0-411">411</a></span>
-<span class="normal"><a href="#__codelineno-0-412">412</a></span>
-<span class="normal"><a href="#__codelineno-0-413">413</a></span>
-<span class="normal"><a href="#__codelineno-0-414">414</a></span>
-<span class="normal"><a href="#__codelineno-0-415">415</a></span>
-<span class="normal"><a href="#__codelineno-0-416">416</a></span>
-<span class="normal"><a href="#__codelineno-0-417">417</a></span>
-<span class="normal"><a href="#__codelineno-0-418">418</a></span>
-<span class="normal"><a href="#__codelineno-0-419">419</a></span>
-<span class="normal"><a href="#__codelineno-0-420">420</a></span>
-<span class="normal"><a href="#__codelineno-0-421">421</a></span>
-<span class="normal"><a href="#__codelineno-0-422">422</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-422">422</a></span>
 <span class="normal"><a href="#__codelineno-0-423">423</a></span>
 <span class="normal"><a href="#__codelineno-0-424">424</a></span>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
@@ -28095,53 +28120,80 @@ nothing matched.</p>
 <span class="normal"><a href="#__codelineno-0-438">438</a></span>
 <span class="normal"><a href="#__codelineno-0-439">439</a></span>
 <span class="normal"><a href="#__codelineno-0-440">440</a></span>
-<span class="normal"><a href="#__codelineno-0-441">441</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="bp">self</span><span class="p">,</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch observations, write them to `path`, and return the frame.</span>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="sd">    Runs the per-dataset airbase download, reshapes and windows the</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="sd">    Parquet, writes the long-format result to `path` as CSV (or</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    Parquet), and returns it. An empty result returns — and writes — a</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    schema-only DataFrame so callers always get the same shape.</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        progress_bar: Accepted for API parity with the other backends;</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">            airbase owns its own download progress.</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        limit: Cap on the total observations fetched, across every era and</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            Parquet file. Applied as each file is read, so an era past the</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">            cap is never bulk-downloaded. `None` (the default) fetches</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            everything. The cap is on rows *fetched*, before the</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">            cross-era de-duplication and the window filter, so the returned</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">            frame can be shorter than the cap.</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        pd.DataFrame: The long-format observations (schema columns,</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            `datetime_utc` tz-aware UTC). Empty (schema-only) when</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">            nothing matched.</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>            <span class="sa">f</span><span class="s2">&quot;EEA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> observation(s) across &quot;</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;station_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> station(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>        <span class="p">)</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>            <span class="s2">&quot;EEA download summary: no observations matched the request; &quot;</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>        <span class="p">)</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>    <span class="k">return</span> <span class="n">df</span>
+<span class="normal"><a href="#__codelineno-0-441">441</a></span>
+<span class="normal"><a href="#__codelineno-0-442">442</a></span>
+<span class="normal"><a href="#__codelineno-0-443">443</a></span>
+<span class="normal"><a href="#__codelineno-0-444">444</a></span>
+<span class="normal"><a href="#__codelineno-0-445">445</a></span>
+<span class="normal"><a href="#__codelineno-0-446">446</a></span>
+<span class="normal"><a href="#__codelineno-0-447">447</a></span>
+<span class="normal"><a href="#__codelineno-0-448">448</a></span>
+<span class="normal"><a href="#__codelineno-0-449">449</a></span>
+<span class="normal"><a href="#__codelineno-0-450">450</a></span>
+<span class="normal"><a href="#__codelineno-0-451">451</a></span>
+<span class="normal"><a href="#__codelineno-0-452">452</a></span>
+<span class="normal"><a href="#__codelineno-0-453">453</a></span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span>
+<span class="normal"><a href="#__codelineno-0-457">457</a></span>
+<span class="normal"><a href="#__codelineno-0-458">458</a></span>
+<span class="normal"><a href="#__codelineno-0-459">459</a></span>
+<span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
+<span class="normal"><a href="#__codelineno-0-464">464</a></span>
+<span class="normal"><a href="#__codelineno-0-465">465</a></span>
+<span class="normal"><a href="#__codelineno-0-466">466</a></span>
+<span class="normal"><a href="#__codelineno-0-467">467</a></span>
+<span class="normal"><a href="#__codelineno-0-468">468</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="bp">self</span><span class="p">,</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="n">progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch observations, write them to `path`, and return the frame.</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a><span class="sd">    Runs the per-dataset airbase download, reshapes and windows the</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a><span class="sd">    Parquet, writes the long-format result to `path` as CSV (or</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a><span class="sd">    Parquet), and returns it. An empty result returns — and writes — a</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a><span class="sd">    schema-only DataFrame so callers always get the same shape.</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a><span class="sd">        progress_bar: Accepted for API parity with the other backends;</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a><span class="sd">            airbase owns its own download progress.</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a><span class="sd">        limit: Cap on the total observations fetched, across every era and</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a><span class="sd">            Parquet file. Applied as each file is read, so an era past the</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a><span class="sd">            cap is never bulk-downloaded. `None` (the default) fetches</span>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a><span class="sd">            everything. The cap is on rows *fetched*, before the</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a><span class="sd">            cross-era de-duplication and the window filter, so the returned</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a><span class="sd">            frame can be shorter than the cap.</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a><span class="sd">        pd.DataFrame: The long-format observations (schema columns,</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a><span class="sd">            `datetime_utc` tz-aware UTC). Empty (schema-only) when</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a><span class="sd">            nothing matched.</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-449" name="__codelineno-0-449"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span>
+<a id="__codelineno-0-450" name="__codelineno-0-450"></a>    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api</span><span class="p">()</span>
+<a id="__codelineno-0-451" name="__codelineno-0-451"></a>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="n">out_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_path</span><span class="p">()</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file_format</span> <span class="o">==</span> <span class="s2">&quot;parquet&quot;</span><span class="p">:</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-0-457" name="__codelineno-0-457"></a>
+<a id="__codelineno-0-458" name="__codelineno-0-458"></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<a id="__codelineno-0-459" name="__codelineno-0-459"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>            <span class="sa">f</span><span class="s2">&quot;EEA download summary: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="si">}</span><span class="s2"> observation(s) across &quot;</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;station_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2"> station(s) written to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a>        <span class="p">)</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a>            <span class="s2">&quot;EEA download summary: no observations matched the request; &quot;</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>            <span class="sa">f</span><span class="s2">&quot;wrote an empty (schema-only) frame to </span><span class="si">{</span><span class="n">out_path</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a>        <span class="p">)</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a>    <span class="k">return</span> <span class="n">df</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

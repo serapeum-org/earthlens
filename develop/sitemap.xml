@@ -269,10 +269,6 @@
          <lastmod>2026-08-17</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/examples/ecmwf/ecds_xds_stores/</loc>
-         <lastmod>2026-08-17</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/examples/ecmwf/floods_glofas_forecast/</loc>
          <lastmod>2026-08-17</lastmod>
     </url>
@@ -1418,10 +1414,6 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/develop/reference/ecmwf/datastores/</loc>
-         <lastmod>2026-08-17</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/develop/reference/ecmwf/ecds/</loc>
          <lastmod>2026-08-17</lastmod>
     </url>
     <url>
