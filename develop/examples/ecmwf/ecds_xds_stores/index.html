@@ -24474,7 +24474,7 @@ it does not regrid. If you need a regular grid, regrid downstream.</p>
 
 <span class="n">t2m</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s1">'t2m'</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">'units:'</span><span class="p">,</span> <span class="n">t2m</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'units'</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">'range: </span><span class="si">%.1f</span><span class="s1"> .. </span><span class="si">%.1f</span><span class="s1"> K'</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">t2m</span><span class="o">.</span><span class="n">min</span><span class="p">()),</span> <span class="nb">float</span><span class="p">(</span><span class="n">t2m</span><span class="o">.</span><span class="n">max</span><span class="p">())))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'range: </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">t2m</span><span class="o">.</span><span class="n">min</span><span class="p">())</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> .. </span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">t2m</span><span class="o">.</span><span class="n">max</span><span class="p">())</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> K'</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">ds = xr.open_dataset(tigge[0])
 print('dims :', dict(ds.sizes))
@@ -24482,7 +24482,7 @@ print('vars :', list(ds.data_vars))
 
 t2m = ds['t2m']
 print('units:', t2m.attrs.get('units'))
-print('range: %.1f .. %.1f K' % (float(t2m.min()), float(t2m.max())))</div>
+print(f'range: {float(t2m.min()):.1f} .. {float(t2m.max()):.1f} K')</div>
 </div>
 </div>
 </div>
