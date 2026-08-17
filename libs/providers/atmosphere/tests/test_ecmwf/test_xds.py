@@ -68,6 +68,13 @@ def _daily_backend(stamp):
     return backend
 
 
+def _reforecast_variable():
+    """The curated `s2s-reforecasts` row the guard tests build a request from."""
+    return Catalog().get_variable(
+        "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
+    )
+
+
 class TestXdsCatalogRows:
     """Catalog shape for the two XDS datasets."""
 
@@ -239,41 +246,28 @@ class TestEcdsCatalogRows:
             resolution="D",
             dates=stamps,
         )
+        variable = _reforecast_variable()
         with pytest.raises(ValueError, match="one model-cycle date at a time"):
-            backend._build_request(
-                Catalog().get_variable(
-                    "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
-                )
-            )
+            backend._build_request(variable)
 
     def test_reforecast_keys_are_copies_not_aliases(self):
         """`hmonth`/`hday` are distinct lists, so editing one cannot move the other."""
-        request = _daily_backend("2015-06-01")._build_request(
-            Catalog().get_variable(
-                "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
-            )
-        )
+        request = _daily_backend("2015-06-01")._build_request(_reforecast_variable())
         assert request["day"] == request["hday"]
         assert request["day"] is not request["hday"]
         assert request["month"] is not request["hmonth"]
 
     def test_monthly_resolution_is_rejected(self):
         """The row selects by the model run's calendar day, so it needs a `day`."""
+        backend, variable = _backend(), _reforecast_variable()
         with pytest.raises(ValueError, match="temporal_resolution='daily'"):
-            _backend()._build_request(
-                Catalog().get_variable(
-                    "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
-                )
-            )
+            backend._build_request(variable)
 
     def test_leap_day_against_a_non_leap_reforecast_year_is_rejected(self):
         """A 29 February cycle has no reforecast in the pinned non-leap 1995."""
+        backend, variable = _daily_backend("2016-02-29"), _reforecast_variable()
         with pytest.raises(ValueError, match="non-leap"):
-            _daily_backend("2016-02-29")._build_request(
-                Catalog().get_variable(
-                    "s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"
-                )
-            )
+            backend._build_request(variable)
 
     def test_only_the_reforecast_year_is_pinned(self):
         """`hyear` stays a per-row choice; `hmonth`/`hday` are not pinned."""
