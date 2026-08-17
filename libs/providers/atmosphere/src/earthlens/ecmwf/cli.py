@@ -165,6 +165,26 @@ def prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return {str(variable): {} for variable in variables}
 
 
+def _from_info(info: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Extract per-band `NETCDF_VARNAME` / long_name / units from `gdal.Info`.
+
+    Args:
+        info: A `gdal.Info(..., format="json")` mapping for one NetCDF handle.
+
+    Returns:
+        A `{variable_name: {"long_name": ..., "units": ...}}` mapping covering
+        every band that carries a `long_name` or `units` attribute.
+    """
+    out: dict[str, dict[str, Any]] = {}
+    for band in info.get("bands", []) or []:
+        meta = band.get("metadata", {}).get("", {})
+        name = meta.get("NETCDF_VARNAME")
+        long_name, units = meta.get("long_name", ""), meta.get("units", "")
+        if name and (long_name or units):
+            out[str(name)] = {"long_name": long_name, "units": units}
+    return out
+
+
 def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     """Read each NetCDF variable's `long_name` / `units` via GDAL.
 
@@ -182,17 +202,6 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     from osgeo import gdal
 
     gdal.UseExceptions()
-
-    def _from_info(info: dict[str, Any]) -> dict[str, dict[str, Any]]:
-        """Extract per-band `NETCDF_VARNAME` / long_name / units from gdal.Info."""
-        out: dict[str, dict[str, Any]] = {}
-        for band in info.get("bands", []) or []:
-            meta = band.get("metadata", {}).get("", {})
-            name = meta.get("NETCDF_VARNAME")
-            long_name, units = meta.get("long_name", ""), meta.get("units", "")
-            if name and (long_name or units):
-                out[str(name)] = {"long_name": long_name, "units": units}
-        return out
 
     top = gdal.Info(path, format="json")
     subs = top.get("metadata", {}).get("SUBDATASETS", {})
