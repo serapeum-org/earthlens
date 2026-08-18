@@ -520,6 +520,13 @@ def widen_degenerate_bbox(
     1x1 window the old floor/ceil pixel math clamped to (`max(1, ...)`). A box
     already positive on both axes is returned unchanged.
 
+    One whole pixel (not a sub-pixel epsilon) is used deliberately: a sub-pixel
+    box would fall through the strict `west < east` fast-path check into the
+    cutline warp and yield no cells. This assumes the pixel size is not lost to
+    float rounding at the coordinate magnitude (`west + abs(pixel) > west`),
+    which holds for geographic (|lon| <= 180, pixel ~1e-3) and normal projected
+    grids.
+
     Args:
         bbox: `(west, south, east, north)` in the source CRS.
         pixel_width: The source's pixel width (`geotransform[1]`); the absolute
@@ -574,7 +581,7 @@ def ensure_no_data(dataset: Any, default: float) -> Any:
         The same `dataset`, with a no-data value guaranteed on its first band.
     """
     nodata = getattr(dataset, "no_data_value", None)
-    if not nodata or nodata[0] is None:
+    if not isinstance(nodata, (list, tuple)) or not nodata or nodata[0] is None:
         dataset.no_data_value = default
     return dataset
 
@@ -617,11 +624,14 @@ def crop_to_aoi(
     if geometry is not None:
         return _crop_to_mask(dataset, geometry, touch=True)
     # Widen a point / cell-edge bbox to one pixel so crop(bbox=) does not raise
-    # on the zero-width box (a point AOI still yields a 1x1 crop). A real
-    # `Dataset` always exposes `geotransform`; guard it so a bare test double
-    # without one still reaches the crop.
+    # on the zero-width box (a point AOI still yields a 1x1 crop). The pixel size
+    # (`geo[1]`/`geo[5]`) is in the dataset's CRS units, so only widen when the
+    # bbox is in that same CRS — for a reprojecting crop (bbox `epsg` != the
+    # dataset's CRS) mixing the units would push the edge out by a wrong amount,
+    # so leave the bbox as-is. (A real `Dataset` always exposes `geotransform` /
+    # `epsg`; the getattr guards let a bare test double without them reach crop.)
     geo = getattr(dataset, "geotransform", None)
-    if geo is not None:
+    if geo is not None and getattr(dataset, "epsg", None) == epsg:
         bbox = widen_degenerate_bbox(bbox, geo[1], geo[5])
     return dataset.crop(bbox=list(bbox), epsg=epsg, touch=touch)
 
