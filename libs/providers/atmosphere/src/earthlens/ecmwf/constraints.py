@@ -287,6 +287,29 @@ class Area(BaseModel):
             raise ValueError(first["msg"].removeprefix("Value error, ")) from None
 
 
+def _date_within(request: str, constraint: str) -> bool:
+    """Return True if a request `date` value lies within a constraint range.
+
+    A CDS `date` value is either a single `YYYY-MM-DD` day or a
+    `YYYY-MM-DD/YYYY-MM-DD` range. ISO date strings order lexicographically, so
+    a plain string comparison bounds the containment. A constraint value with no
+    `/` is a single date and matches only itself.
+
+    Args:
+        request: The request's `date` value — a single day or an `X/Y` range.
+        constraint: One constraint `date` value — a single day or an `A/B` range.
+
+    Returns:
+        True when the requested day / range falls within the constraint range.
+    """
+    if "/" not in constraint:
+        return request == constraint
+    lo, hi = constraint.split("/", 1)
+    parts = request.split("/", 1)
+    req_lo, req_hi = parts[0], parts[-1]
+    return lo <= req_lo and req_hi <= hi
+
+
 class RequestValidator:
     """End-to-end pre-flight validator for a CDS retrieve request.
 
@@ -458,10 +481,7 @@ class RequestValidator:
 
         for combo in itertools.product(*[sorted(req_norm[k]) for k in keys]):
             tuple_dict = dict(zip(keys, combo))
-            served = any(
-                all(k in es and tuple_dict[k] in es[k] for k in keys)
-                for es in entry_sets
-            )
+            served = any(self._entry_serves(tuple_dict, es, keys) for es in entry_sets)
             if served:
                 continue
             bad_keys = self._find_offending_values(req_norm)
@@ -478,6 +498,32 @@ class RequestValidator:
                 f"Live constraints: "
                 + CONSTRAINTS_URL_TEMPLATE.format(dataset=self.dataset)
             )
+
+    def _entry_serves(
+        self,
+        tuple_dict: dict[str, Any],
+        entry_set: dict[str, set[Any]],
+        keys: list[str],
+    ) -> bool:
+        """Return True if one constraint entry serves this request tuple.
+
+        Exact set membership per key, with one exception: the `date` field. A
+        CDS `date` constraint is often a single `START/END` range string (a
+        reanalysis such as CAMS EAC4 accepts a continuous span rather than an
+        enumerated year/month/day grid), so a requested date — a single day or
+        its own `X/Y` range — is served when it falls within any constraint
+        range. Every other key keeps exact membership.
+        """
+        for key in keys:
+            if key not in entry_set:
+                return False
+            value = tuple_dict[key]
+            if key == "date" and any("/" in str(cv) for cv in entry_set[key]):
+                if not any(_date_within(str(value), str(cv)) for cv in entry_set[key]):
+                    return False
+            elif value not in entry_set[key]:
+                return False
+        return True
 
     def _normalise_request(self, constraint_keys: set[str]) -> dict[str, set[Any]]:
         """Return per-key value sets for keys the constraints enumerate.

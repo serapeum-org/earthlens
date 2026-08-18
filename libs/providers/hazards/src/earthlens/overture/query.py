@@ -39,7 +39,7 @@ def _dataset_path(theme: str, overture_type: str, release: str) -> str:
     Args:
         theme: Friendly theme name (the Overture `theme=` partition).
         overture_type: Overture feature type (the `type=` partition).
-        release: Concrete release id (`"2026-05-20.0"`).
+        release: Concrete release id (`"2026-07-22.0"`).
 
     Returns:
         str: An `s3://…/*` glob over the partition's parquet files.

@@ -902,12 +902,16 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 walkthrough.
         Returns:
             list[Path]: The written output paths — one per-variable
-            NetCDF at `<self.root_dir>/<cds_variable>_<cds_dataset>.nc`,
+            NetCDF at `<self.root_dir>/<cds_variable>_<dataset_id>.nc`
+            (`dataset_id` is the requested catalog id; it equals
+            `cds_dataset` except for a row that overrides it — the GloFAS
+            intermediate stream — which is named by its own id so it does
+            not collide with the consolidated stream),
             or, when `aggregate` is set, the per-window GeoTIFFs at
             `<aggregate.out_dir or self.root_dir/aggregated>/<cds_variable>_<freq>_<window>.tif`.
             A zip-of-NetCDF response (satellite CDRs, CAMS `netcdf_zip`)
             that unpacks to more than one member is returned as every
-            member under a sibling `<cds_variable>_<cds_dataset>/`
+            member under a sibling `<cds_variable>_<dataset_id>/`
             directory (all masked to a polygon `aoi=` if one was given);
             such a multi-member response cannot be aggregated. Under the
             default `errors="warn"`, variables whose download (or
@@ -1031,7 +1035,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         # `<cds_variable>_<cds_dataset>/` directory; the returned member's parent
         # equals it exactly (a single-file retrieve returns the file at
         # `root_dir` itself).
-        member_dir = self.root_dir / f"{var_info.cds_variable}_{var_info.cds_dataset}"
+        member_dir = (
+            self.root_dir
+            / f"{var_info.cds_variable}_{var_info.dataset_id or var_info.cds_dataset}"
+        )
         is_multi_member = member_dir.is_dir() and nc_path.parent == member_dir
         if aggregate is None:
             # Return every member (already masked in `_api`) so `download()`'s
@@ -1239,8 +1246,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             var_info: Catalog row resolved by :class:`Catalog`.
                 See :meth:`_build_request` for the full list of
                 fields consumed during request assembly. `_api`
-                itself reads `cds_dataset` (the retrieve target)
-                and `cds_variable` (the output filename stem).
+                itself reads `cds_dataset` (the retrieve target) and
+                `cds_variable` / `dataset_id` (the output filename stem).
 
         Returns:
             pathlib.Path: Absolute path to the downloaded NetCDF
@@ -1273,7 +1280,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 ... )
                 >>> spec.cds_dataset
                 'reanalysis-era5-single-levels'
-                >>> f"{spec.cds_variable}_{spec.cds_dataset}.nc"
+                >>> spec.dataset_id == spec.cds_dataset  # equal for ordinary rows
+                True
+                >>> f"{spec.cds_variable}_{spec.dataset_id}.nc"
                 '2m_temperature_reanalysis-era5-single-levels.nc'
 
                 ```
@@ -1327,7 +1336,13 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             base_url=constraints_base_url(var_info.endpoint),
         ).check()
 
-        target = self.root_dir / f"{var_info.cds_variable}_{dataset}.nc"
+        # Name the output by the requested catalog id (dataset_id), not the
+        # retrieve target (cds_dataset). They match for every ordinary row; they
+        # differ only when a row overrode cds_dataset (the GloFAS intermediate
+        # stream), and naming by dataset_id stops its file from colliding with
+        # the consolidated stream, which shares cds_variable + cds_dataset.
+        stem = f"{var_info.cds_variable}_{var_info.dataset_id or dataset}"
+        target = self.root_dir / f"{stem}.nc"
         client = self._client_for(var_info.endpoint)
         logger.info(
             f"Requesting {dataset} from {var_info.endpoint.upper()}; "

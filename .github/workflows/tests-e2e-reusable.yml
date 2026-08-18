@@ -23,6 +23,11 @@ on:
         description: "Thematic distribution: atmosphere|ocean|imagery|land|hazards."
         required: true
         type: string
+      timeout_minutes:
+        description: "Wall-clock cap (minutes) for each e2e matrix lane."
+        required: false
+        type: number
+        default: 45
 
 permissions:
   contents: read
@@ -183,7 +188,9 @@ jobs:
     runs-on: ubuntu-latest
     # A live provider host can hang (see the scheduled workflow's Dataverse
     # probe); cap the job rather than hold a runner for the 6-hour default.
-    timeout-minutes: 45
+    # The cap is a caller-tunable input (default 45) so a theme with slower
+    # live hosts can raise it without touching the other themes.
+    timeout-minutes: ${{ inputs.timeout_minutes }}
 
     strategy:
       fail-fast: false

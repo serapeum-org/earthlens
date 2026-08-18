@@ -1,5 +1,19 @@
 # Change Log
 
+## Unreleased
+
+### Feat
+
+- **ecmwf**: add the GloFAS historical intermediate (ERA5T) reanalysis stream, with a per-row `cds_dataset` override so the consolidated and intermediate configs of one CDS dataset coexist and write to distinct output files (#1039)
+
+### Fix
+
+- **ecmwf**: live-verify all four GloFAS historical variables — real NetCDF names `avg_dis` / `rowe` / `sd` / `swir`, and the per-variable `timespan` (`time_mean` for discharge/runoff, `instantaneous` for snow-depth/soil-wetness) (#1039)
+
+### Docs
+
+- **ecmwf**: add a runnable GloFAS historical intermediate example notebook (#1039)
+
 ## 0.15.0 (2026-08-14)
 
 ### Feat

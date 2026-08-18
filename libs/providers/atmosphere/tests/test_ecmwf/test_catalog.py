@@ -885,3 +885,74 @@ class TestCatalog:
         monkeypatch.setattr(catalog_module, "CATALOG_PATH", tmp_path / "nope")
         with pytest.raises(ValueError, match="does not exist"):
             Catalog()
+
+
+class TestGlofasIntermediate:
+    """The GloFAS historical intermediate stream and its cds_dataset override."""
+
+    _DISCHARGE = "average-river-discharge-in-the-last-24-hours"
+
+    def test_intermediate_row_mirrors_consolidated_variables(self):
+        """The intermediate row exposes the same four variables as consolidated."""
+        cat = Catalog()
+        inter = cat.datasets["cems-glofas-historical-intermediate"]
+        cons = cat.datasets["cems-glofas-historical"]
+        assert set(inter.variables) == set(cons.variables)
+        assert inter.product_type == ["intermediate"]
+
+    def test_discharge_variable_is_live_verified(self):
+        """The discharge variable carries the live-verified avg_dis / m3 s-1."""
+        v = Catalog().get_variable(
+            "cems-glofas-historical-intermediate", self._DISCHARGE
+        )
+        assert v.nc_variable == "avg_dis"
+        assert v.units == "m3 s-1"
+
+    def test_cds_dataset_override_routes_to_consolidated(self):
+        """Every intermediate variable retrieves from cems-glofas-historical."""
+        inter = Catalog().datasets["cems-glofas-historical-intermediate"]
+        for v in inter.variables.values():
+            assert v.cds_dataset == "cems-glofas-historical"
+            assert v.dataset_id == "cems-glofas-historical-intermediate"
+
+    def test_output_stem_differs_from_consolidated(self):
+        """Intermediate and consolidated discharge write to distinct files."""
+        cat = Catalog()
+        inter = cat.get_variable("cems-glofas-historical-intermediate", self._DISCHARGE)
+        cons = cat.get_variable("cems-glofas-historical", self._DISCHARGE)
+        assert inter.cds_dataset == cons.cds_dataset, "same retrieve target"
+        assert inter.cds_variable == cons.cds_variable, "same CDS variable"
+        assert f"{inter.cds_variable}_{inter.dataset_id}" != (
+            f"{cons.cds_variable}_{cons.dataset_id}"
+        ), "output stems must not collide"
+
+    def test_ordinary_row_dataset_id_equals_cds_dataset(self):
+        """A row without an override has dataset_id == cds_dataset."""
+        v = Catalog().get_variable("reanalysis-era5-single-levels", "2m-temperature")
+        assert v.dataset_id == v.cds_dataset == "reanalysis-era5-single-levels"
+
+
+class TestCatalogHealth:
+    """Tests for the Catalog.health() self-check."""
+
+    def test_health_keys(self):
+        """health() returns exactly the four defect / usage lists."""
+        assert set(Catalog().health()) == {
+            "variable_missing_nc_variable",
+            "dataset_without_variables",
+            "unregistered_provider",
+            "unused_provider",
+        }
+
+    def test_shipped_catalog_has_no_defects(self):
+        """The shipped catalog carries no missing-nc / empty / unregistered rows."""
+        report = Catalog().health()
+        assert report["variable_missing_nc_variable"] == [], "every var has an nc name"
+        assert report["dataset_without_variables"] == [], "no empty datasets"
+        assert report["unregistered_provider"] == [], "every provider is registered"
+
+    def test_unused_provider_is_a_sorted_list(self):
+        """unused_provider is an informational sorted list of registered-but-unused."""
+        unused = Catalog().health()["unused_provider"]
+        assert isinstance(unused, list)
+        assert unused == sorted(unused), "unused providers are reported sorted"
