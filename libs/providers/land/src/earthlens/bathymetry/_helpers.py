@@ -240,8 +240,8 @@ def is_wcs_service_failure(exc: Exception) -> bool:
     """
     for link in _exception_chain(exc):
         # `link` is intentionally the generic `Exception` type: a service-failure
-        # classifier must inspect any chained exception, so no more-specific type
-        # fits. The trailing NOSONAR suppresses SonarCloud S112 on this line.
+        # classifier must inspect any chained exception, and there is no
+        # more-specific type that fits.
         verdict = _link_verdict(link)  # NOSONAR
         if verdict is not None:
             return verdict
