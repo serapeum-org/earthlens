@@ -597,6 +597,28 @@ class TestE2ESkipHelper:
         with pytest.raises(OhsomeUnavailableError):
             _skip_on_network(unexpected)
 
+    def test_skips_at_upper_5xx_boundary(self):
+        """The top of the 5xx range (599) still skips."""
+        from _pytest.outcomes import Skipped
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        from .test_osm_e2e import _skip_on_network
+
+        top = OhsomeUnavailableError("outage", status_code=599)
+        with pytest.raises(Skipped):
+            _skip_on_network(top)
+
+    def test_does_not_skip_at_600(self):
+        """Just past the 5xx range (600) re-raises, not skipped."""
+        from earthlens.osm import OhsomeUnavailableError
+
+        from .test_osm_e2e import _skip_on_network
+
+        past = OhsomeUnavailableError("odd", status_code=600)
+        with pytest.raises(OhsomeUnavailableError):
+            _skip_on_network(past)
+
 
 class TestDownloadContract:
     """Cross-cutting download() behaviour."""
