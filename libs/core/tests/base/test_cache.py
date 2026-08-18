@@ -43,6 +43,29 @@ class TestAoiTag:
         geom = SimpleNamespace(wkt="POLYGON((0 0,1 0,1 1,0 0))")
         assert "|" in aoi_tag(_space(0, 0, 1, 1, geometry=geom))
 
+    def test_geometry_str_fallback(self):
+        """A geometry with neither `to_json` nor `wkt` falls back to `str()`."""
+
+        class _Geom:
+            def __str__(self) -> str:
+                return "geom-repr"
+
+        tag = aoi_tag(_space(0, 0, 1, 1, geometry=_Geom()))
+        assert tag.startswith("0,0,1,1|")
+        assert len(tag.split("|")[1]) == 64
+
+    def test_falsy_non_none_geometry_still_hashed(self):
+        """A geometry that is falsy but not None is still folded into the tag."""
+
+        class _EmptyGeom:
+            def __bool__(self) -> bool:
+                return False
+
+            def __str__(self) -> str:
+                return "empty"
+
+        assert "|" in aoi_tag(_space(0, 0, 1, 1, geometry=_EmptyGeom()))
+
 
 class TestSidecar:
     """The `<target>.aoi` sidecar records the AOI a cached file was written for."""
