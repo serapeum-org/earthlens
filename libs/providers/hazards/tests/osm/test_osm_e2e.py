@@ -42,6 +42,11 @@ def _skip_on_network(exc: Exception) -> None:
     if isinstance(exc, (requests.ConnectionError, requests.Timeout)):
         pytest.skip(f"OSM service unreachable: {exc}")
     status = getattr(exc, "status_code", None)
+    # A 5xx on this tiny smoke bbox is only ever an upstream outage, never
+    # something the request shape provoked (ohsome answers 4xx for a bad
+    # filter/bbox/time), so skipping it here does not mask an earthlens defect —
+    # the offline TestOhsomeRoute suite is the real guardrail for the 5xx
+    # classification logic.
     if (
         isinstance(exc, OhsomeUnavailableError)
         and status is not None
