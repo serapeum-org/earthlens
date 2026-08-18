@@ -23496,7 +23496,7 @@ parquet statistics — no DuckDB), so only the rows inside the box are read.
 <tr>
 <td><code>release</code></td>
 <td><code>None</code></td>
-<td>Overture release id (<code>"2026-07-22.0"</code>). <code>None</code> targets the release Overture publishes now — auto-targeted by the SDK on the default path, resolved live on the DuckDB path. List them with the refresh tool or <code>Catalog().available_releases</code>. Pinning is reproducible only until Overture prunes that release from S3.</td>
+<td>Overture release id (<code>"2026-05-20.0"</code>). <code>None</code> lets the SDK auto-target the newest release. List them with the refresh tool or <code>Catalog().available_releases</code>.</td>
 </tr>
 <tr>
 <td><code>file_format</code></td>
@@ -23583,7 +23583,7 @@ PyArrow pushdown cheap.</p>
 <h2 id="output-return-value"><a class="toclink" href="#output-return-value">Output / return value</a><a class="headerlink" href="#output-return-value" title="Permanent link">#</a></h2>
 <p><code>download()</code> returns a <code>list[Path]</code> — one written file per requested
 feature type. Filenames embed the theme, type, and release:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>out/overture_buildings_building_2026-07-22.0.parquet
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>out/overture_buildings_building_2026-05-20.0.parquet
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>out/overture_places_place_latest.parquet
 </code></pre></div>
 <p>Every output carries a per-row <strong><code>license_id</code></strong> column and is tagged
@@ -23599,26 +23599,17 @@ a non-<code>None</code> <code>aggregate=</code> for vector backends with <code>N
 practical limit is the bbox size (the pushdown reads only the box), which
 the size guard protects you from misusing.</p>
 <h2 id="catalog-tooling"><a class="toclink" href="#catalog-tooling">Catalog tooling</a><a class="headerlink" href="#catalog-tooling" title="Permanent link">#</a></h2>
-<p>The <code>earthlens datasets</code> commands maintain the bundled catalog:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Diff the live SDK / STAC release list against the bundled index</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>overture
+<p><code>tools/overture/refresh_overture_catalog.py</code> maintains the bundled
+catalog:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Rewrite the available_releases index from the live SDK / STAC catalog</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/overture/refresh_overture_catalog.py<span class="w"> </span>refresh
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># ... and rewrite the available_releases index from it</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>refresh<span class="w"> </span>overture<span class="w"> </span>--write
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Confirm every curated theme/default-type resolves against live data</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/overture/refresh_overture_catalog.py<span class="w"> </span>validate<span class="w"> </span>--strict
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Confirm every curated theme/default-type resolves against live data</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>validate<span class="w"> </span>overture<span class="w"> </span>--live
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># Inspect one type&#39;s columns when curating a new theme</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>earthlens<span class="w"> </span>datasets<span class="w"> </span>probe<span class="w"> </span>overture<span class="w"> </span>building
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Inspect one type&#39;s columns when curating a new theme</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>tools/overture/refresh_overture_catalog.py<span class="w"> </span>probe<span class="w"> </span>building
 </code></pre></div>
-<p><code>No files found that match the pattern</code> from a DuckDB fetch means the
-release being globbed holds no objects. With a pinned <code>release</code> that means
-the pin has been pruned — drop the pin, or move it to a live id (the
-refresh above lists them). Unpinned, the release is resolved live, so it
-means the lookup could not reach <code>https://stac.overturemaps.org</code> and the
-backend fell back to the bundled index; the preceding <code>WARNING</code> in the log
-says so, and refreshing the index will not fix it.</p>
 <h2 id="streaming-vs-in-memory-reads"><a class="toclink" href="#streaming-vs-in-memory-reads">Streaming vs in-memory reads</a><a class="headerlink" href="#streaming-vs-in-memory-reads" title="Permanent link">#</a></h2>
 <p>By default each type is materialised in one shot with the SDK's
 <code>geodataframe</code>. For a large bounded bbox, pass <code>stream=True</code> to read through
@@ -23668,10 +23659,8 @@ are always kept so identity and the per-row <code>license_id</code> survive).</p
 <ul>
 <li><strong>No DuckDB attribute pushdown without <code>where=</code></strong> — the plain fetch path uses
   the SDK's PyArrow bbox pushdown only; attribute filtering needs <code>where=</code>.</li>
-<li><strong>No temporal axis</strong> — pin a <code>release</code> for reproducibility; <code>None</code> follows
-  the newest monthly release. A pin is reproducible only while that release
-  exists: Overture keeps the newest one (or two) on S3 and prunes the rest,
-  after which the pinned id resolves to nothing.</li>
+<li><strong>No temporal axis</strong> — pin a <code>release</code> for reproducibility; <code>None</code> drifts
+  to the newest monthly release.</li>
 <li><strong><code>base</code> types carry mixed geometries</strong> — <code>land</code> / <code>water</code> /
   <code>infrastructure</code> return a mix of polygons, lines, and points. Filter
   <code>geometry.geom_type</code> client-side if you need a single kind.</li>

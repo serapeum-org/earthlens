@@ -23263,7 +23263,7 @@ For the hands-on walkthrough see <a href="../usage/">Usage</a> and the layer ids
   Cloud-Optimized GeoTIFFs (COGs) on figshare, so the backend reads <strong>only the
   bbox window</strong> over a virtual <code>/vsicurl/</code> range read through the
   <a href="https://github.com/serapeum-org/pyramids">pyramids</a> GIS backend
-  (<code>Dataset.read_part</code>). A small area transfers a few hundred KB, not the
+  (<code>Dataset.crop(bbox=)</code>). A small area transfers a few hundred KB, not the
   multi-GB global file.</p>
 </li>
 <li>
