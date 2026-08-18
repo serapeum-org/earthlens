@@ -133,8 +133,10 @@ class TestReadPartToGeotiffReal:
         out = tmp_path / "out.tif"
         _helpers.read_part_to_geotiff(str(src), [0.2, -0.6, 0.6, -0.2], out)
         result = Dataset.read_file(str(out))
-        assert result.rows > 0 and result.columns > 0, "a non-empty window is written"
-        assert result.rows < 20 and result.columns < 20, "only the AOI window read"
+        assert result.rows > 0, "a non-empty window is written"
+        assert result.columns > 0, "a non-empty window is written"
+        assert result.rows < 20, "only the AOI window read"
+        assert result.columns < 20, "only the AOI window read"
         assert result.no_data_value[0] == -32768.0, "source no-data carried through"
 
     def test_degenerate_point_yields_small_crop_not_raise(self, tmp_path: Path) -> None:
@@ -144,8 +146,9 @@ class TestReadPartToGeotiffReal:
         out = tmp_path / "point.tif"
         _helpers.read_part_to_geotiff(str(src), [0.35, -0.35, 0.35, -0.35], out)
         result = Dataset.read_file(str(out))
-        assert 1 <= result.rows <= 2 and 1 <= result.columns <= 2, (
-            f"degenerate AOI should clamp small, got {result.rows}x{result.columns}"
+        assert 1 <= result.rows <= 2, f"rows should clamp small, got {result.rows}"
+        assert 1 <= result.columns <= 2, (
+            f"columns should clamp small, got {result.columns}"
         )
 
 

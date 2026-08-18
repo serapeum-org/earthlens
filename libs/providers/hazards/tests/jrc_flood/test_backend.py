@@ -269,7 +269,8 @@ class TestFetchReal:
         ).download()
         assert out == [tmp_path / "efhm_RP100.tif"]
         result = Dataset.read_file(str(out[0]))
-        assert result.rows < 200 and result.columns < 200, "only the AOI window read"
+        assert result.rows < 200, "only the AOI window read"
+        assert result.columns < 200, "only the AOI window read"
         assert result.no_data_value[0] is not None, "output carries a no-data value"
 
     def test_point_aoi_succeeds(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
