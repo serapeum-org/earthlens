@@ -32,6 +32,7 @@ from earthlens.base import (
     ensure_no_data,
     vsicurl_config,
     widen_degenerate_bbox,
+    windowed_bbox_crop,
 )
 from earthlens.base.http import HttpClient
 
@@ -93,8 +94,10 @@ def read_part_to_geotiff(
     one pixel (`widen_degenerate_bbox`) so the strict `west < east` fast path
     still fires. The source grid, CRS and no-data value are carried onto the crop
     (with a `-9999` fallback stamped when the source declares none), so
-    genuinely-empty cells stay flagged. The read is wrapped in `vsicurl_config()`
-    for the `/vsicurl` readdir-suppression + retry/timeout tuning.
+    genuinely-empty cells stay flagged; an AOI that is entirely no-data still
+    yields an all-no-data crop rather than raising. The read is wrapped in
+    `vsicurl_config()` for the `/vsicurl` readdir-suppression + retry/timeout
+    tuning.
 
     Args:
         path: A `/vsicurl/<url>` (remote COG) or `/vsizip/<zip>/<member.tif>`
@@ -115,10 +118,11 @@ def read_part_to_geotiff(
         dataset = Dataset.read_file(path)
         try:
             # A point / cell-edge AOI is widened to one source pixel so crop(bbox=)
-            # yields a 1x1 window instead of raising on the zero-width box.
+            # yields a 1x1 window instead of raising on the zero-width box; an
+            # all-no-data AOI keeps an all-no-data window rather than raising.
             geo = dataset.geotransform
-            window = dataset.crop(
-                bbox=widen_degenerate_bbox(bbox, geo[1], geo[5]), epsg=epsg
+            window = windowed_bbox_crop(
+                dataset, widen_degenerate_bbox(bbox, geo[1], geo[5]), epsg=epsg
             )
         finally:
             # Drop the /vsicurl handle — an open remote dataset can hang the

@@ -41,6 +41,7 @@ from earthlens.base.spatial import (
     ensure_no_data,
     vsicurl_config,
     widen_degenerate_bbox,
+    windowed_bbox_crop,
 )
 from earthlens.jrc_flood._helpers import efhm_url
 from earthlens.jrc_flood.catalog import Catalog, Dataset
@@ -356,7 +357,9 @@ class JRCFlood(AbstractDataSource):
         catalog no-data stamped when the source declares none). A point AOI is
         widened to one pixel so the strict fast path still fires. `crop_to_aoi`
         then trims the all-touched window to the exact bbox — or to the exact
-        polygon when the request carried an `aoi=` polygon.
+        polygon when the request carried an `aoi=` polygon. An in-coverage AOI
+        that is entirely no-data (e.g. open sea) still writes an all-no-data
+        raster rather than raising.
 
         Args:
             product: The `RemoteProduct` whose `metadata` carries `rp` + `url`.
@@ -365,7 +368,8 @@ class JRCFlood(AbstractDataSource):
             pathlib.Path: The written GeoTIFF at `<path>/efhm_RP{rp}.tif`.
 
         Raises:
-            ValueError: If the AOI does not overlap the EFHM coverage.
+            ValueError: If the AOI does not overlap the EFHM coverage (an
+                in-coverage AOI is written even when it holds no valid data).
         """
         from pyramids.dataset import Dataset as PyramidsDataset
 
@@ -398,35 +402,42 @@ class JRCFlood(AbstractDataSource):
                 geo = source.geotransform
                 bbox = widen_degenerate_bbox(self._bbox, geo[1], geo[5])
                 # The windowed fast path reads only the AOI pixel window from the
-                # ~23 GB source; nodata / CRS / grid are carried onto the crop.
-                windowed = source.crop(bbox=bbox, epsg=4326)
+                # ~23 GB source; nodata / CRS / grid are carried onto the crop. An
+                # in-coverage but all-no-data AOI keeps an all-no-data window
+                # rather than raising.
+                windowed = windowed_bbox_crop(source, bbox, epsg=4326)
             finally:
                 close_quietly(source)
 
-        # crop carries the source's own no-data through; when the source declares
-        # none, fall back to the catalog value so the output stays flagged and a
-        # polygon `aoi=` can trim exactly (matching the pre-crop behaviour).
-        windowed = ensure_no_data(windowed, self._dataset.nodata)
-
-        # crop(bbox=) keeps every pixel the box overlaps (all-touched, up to one
-        # extra pixel per edge); trim to the exact bbox (matching FABDEM) — or to
-        # the exact polygon when the request carried an `aoi=` polygon.
-        cropped = crop_to_aoi(
-            windowed,
-            self.space,
-            bbox=[self.space.west, self.space.south, self.space.east, self.space.north],
-            touch=False,
-        )
-
-        staged = target.with_name(f"{target.stem}.part{target.suffix}")
         try:
-            cropped.to_file(str(staged))
-            close_quietly(cropped)
-            staged.replace(target)
-        except BaseException:
-            close_quietly(cropped)
-            staged.unlink(missing_ok=True)
-            raise
+            # crop carries the source's own no-data through; when the source
+            # declares none, fall back to the catalog value so the output stays
+            # flagged and a polygon `aoi=` can trim exactly (matching the pre-crop
+            # behaviour).
+            windowed = ensure_no_data(windowed, self._dataset.nodata)
+            # crop(bbox=) keeps every pixel the box overlaps (all-touched, up to
+            # one extra pixel per edge); trim to the exact bbox (matching FABDEM)
+            # — or to the exact polygon when the request carried an `aoi=` polygon.
+            cropped = crop_to_aoi(
+                windowed,
+                self.space,
+                bbox=[
+                    self.space.west,
+                    self.space.south,
+                    self.space.east,
+                    self.space.north,
+                ],
+                touch=False,
+            )
+            staged = target.with_name(f"{target.stem}.part{target.suffix}")
+            try:
+                cropped.to_file(str(staged))
+                close_quietly(cropped)
+                staged.replace(target)
+            except BaseException:
+                close_quietly(cropped)
+                staged.unlink(missing_ok=True)
+                raise
         finally:
             close_quietly(windowed)
         write_sidecar(target, aoi_tag(self.space))
