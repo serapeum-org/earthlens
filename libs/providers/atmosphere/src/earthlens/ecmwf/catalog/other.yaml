@@ -3056,8 +3056,8 @@ datasets:
     variables:
       biologically-effective-degree-days:
         cds_variable: biologically_effective_degree_days
-        nc_variable: biologically_effective_degree_days
-        units: unknown
+        nc_variable: BEDD
+        units: degrees_C
       growing-season-length:
         cds_variable: growing_season_length
         nc_variable: growing_season_length
@@ -3361,8 +3361,8 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
         nc_variable: mean_diurnal_range
@@ -3546,8 +3546,8 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
         nc_variable: mean_diurnal_range
@@ -3711,8 +3711,8 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
         nc_variable: mean_diurnal_range
@@ -3894,8 +3894,8 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
         nc_variable: mean_diurnal_range
