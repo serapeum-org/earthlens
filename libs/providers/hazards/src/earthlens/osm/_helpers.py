@@ -110,15 +110,28 @@ class OhsomeUnavailableError(OhsomeResponseError):
     apart from a genuine request error and back off rather than fail hard.
     """
 
-    def __init__(self, message: str, status_code: int | None = None) -> None:
-        """Store the actionable message and the originating HTTP status.
+    def __init__(
+        self,
+        message: str,
+        status_code: int | None = None,
+        content_type: str | None = None,
+        body_preview: str | None = None,
+    ) -> None:
+        """Store the actionable message and the recovered response evidence.
 
         Args:
             message: Human-facing explanation — what happened and what to do.
             status_code: The HTTP status that triggered it (`403` / `429`), or
                 `None` when it could not be recovered from the SDK error.
+            content_type: The response `Content-Type` header, or `None`.
+            body_preview: The first characters of the response body, or `None`.
         """
-        super().__init__(message, status_code=status_code)
+        super().__init__(
+            message,
+            status_code=status_code,
+            content_type=content_type,
+            body_preview=body_preview,
+        )
 
 
 def _exception_chain(exc: BaseException) -> Iterator[BaseException]:

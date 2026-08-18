@@ -748,6 +748,8 @@ class OSM(AbstractDataSource):
                 "later, shrink the bbox or time window, or try from a different "
                 "network.",
                 status_code=status,
+                content_type=content_type,
+                body_preview=body_preview,
             ) from exc
         if status == 429:
             raise OhsomeUnavailableError(
@@ -756,6 +758,8 @@ class OSM(AbstractDataSource):
                 "rate-limiting this client; wait before retrying, or reduce the "
                 "request frequency and size.",
                 status_code=status,
+                content_type=content_type,
+                body_preview=body_preview,
             ) from exc
         # Not a throttle, so — given the guard above — the body was not JSON.
         raise OhsomeResponseError(
