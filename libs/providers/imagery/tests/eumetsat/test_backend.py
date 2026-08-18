@@ -114,7 +114,8 @@ def test_search_dtend_with_time_of_day_is_not_widened(fake_eumdac, tmp_path):
     backend._search()
     call = fake_eumdac.store.search_calls[0]
     assert call["dtend"] == backend.time.end_date
-    assert call["dtend"].hour == 9 and call["dtend"].minute == 9
+    assert call["dtend"].hour == 9, f"hour changed: {call['dtend']}"
+    assert call["dtend"].minute == 9, f"minute changed: {call['dtend']}"
 
 
 def test_search_dtend_explicit_midnight_is_not_widened(fake_eumdac, tmp_path):
