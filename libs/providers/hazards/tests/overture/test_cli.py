@@ -19,6 +19,7 @@ from earthlens.cli.curate import probe_dataset
 from earthlens.cli.refresh import refresh_one
 from earthlens.cli.validate import validate_one
 from earthlens.overture import catalog as overture_catalog
+from earthlens.overture.releases import ReleaseLookupError
 
 pytestmark = pytest.mark.cli
 
@@ -28,23 +29,134 @@ def _info():
     return next(b for b in list_backends() if b.provider == "overture")
 
 
+def _unreachable_stac() -> list[str]:
+    """Stand in for a child-link read that cannot reach the STAC catalog."""
+    raise ReleaseLookupError("could not read Overture's STAC catalog (no route)")
+
+
 class TestRefresher:
     """Tests for the Overture releases lister."""
 
     def test_release_ids_unwrap_tuple(self, monkeypatch):
-        """release ids unwrap the (releases, latest) tuple; grouped sorts them."""
+        """release ids unwrap the (releases, latest) tuple and sort them."""
         import overturemaps.core as core
 
         monkeypatch.setattr(
             core,
             "get_available_releases",
-            lambda: (["2024-01", "2023-12"], "2024-01"),
+            lambda: (["2026-07-22.0", "2026-06-17.0"], "2026-07-22.0"),
         )
-        assert overture_cli._release_ids() == ["2024-01", "2023-12"]
+        assert overture_cli._release_ids() == ["2026-06-17.0", "2026-07-22.0"]
+        assert overture_cli.refresher(None) == {
+            "overture": ["2026-06-17.0", "2026-07-22.0"]
+        }, "the refresher reports what the lister found, already sorted"
+
+    def test_release_ids_drop_unparsed_hrefs(self, monkeypatch):
+        """Ids that are not shaped like a release never reach the index."""
+        import overturemaps.core as core
+
         monkeypatch.setattr(
-            overture_cli, "_release_ids", lambda: ["2024-01", "2023-12"]
+            core,
+            "get_available_releases",
+            lambda: (["https:", "https:"], "2026-07-22.0"),
         )
-        assert overture_cli.refresher(None) == {"overture": ["2023-12", "2024-01"]}
+        monkeypatch.setattr("earthlens.overture.releases.child_release_ids", list)
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
+
+    def test_release_ids_survive_an_unreachable_recovery(self, monkeypatch):
+        """A recovery that cannot reach the catalog keeps whatever did parse."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core,
+            "get_available_releases",
+            lambda: (["https:", "2026-07-22.0"], "2026-07-22.0"),
+        )
+        monkeypatch.setattr(
+            "earthlens.overture.releases.child_release_ids", _unreachable_stac
+        )
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
+
+    def test_release_ids_recover_the_list_from_the_child_links(self, monkeypatch):
+        """Unparsed ids are re-read from the STAC catalog's child links."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core,
+            "get_available_releases",
+            lambda: (["https:", "https:"], "2026-07-22.0"),
+        )
+        monkeypatch.setattr(
+            "earthlens.overture.releases.child_release_ids",
+            lambda: ["2026-07-22.0", "2026-06-17.0"],
+        )
+        assert overture_cli._release_ids() == ["2026-06-17.0", "2026-07-22.0"], (
+            "the release the SDK could not parse must still be indexed"
+        )
+
+    def test_release_ids_raise_rather_than_blank_the_index(self, monkeypatch):
+        """Nothing parseable upstream is an error, not an empty index."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(core, "get_available_releases", lambda: (["https:"], None))
+        monkeypatch.setattr("earthlens.overture.releases.child_release_ids", list)
+        with pytest.raises(ReleaseLookupError, match=r"offline fallback"):
+            overture_cli._release_ids()
+
+    def test_release_ids_recover_when_the_sdk_lists_nothing(self, monkeypatch):
+        """An empty SDK list triggers recovery too, not just a malformed one."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core, "get_available_releases", lambda: ([], "2026-07-22.0")
+        )
+        monkeypatch.setattr(
+            "earthlens.overture.releases.child_release_ids",
+            lambda: ["2026-07-22.0", "2026-06-17.0"],
+        )
+        assert overture_cli._release_ids() == ["2026-06-17.0", "2026-07-22.0"], (
+            "a short list leaves the index as wrong as a mangled one"
+        )
+
+    def test_release_ids_keep_latest_when_recovery_finds_nothing(self, monkeypatch):
+        """The latest release still lands when recovery turns up empty."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core, "get_available_releases", lambda: ([], "2026-07-22.0")
+        )
+        monkeypatch.setattr("earthlens.overture.releases.child_release_ids", list)
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
+
+    def test_release_ids_tolerate_a_bare_list(self, monkeypatch):
+        """A non-tuple return is treated as the release list alone."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core, "get_available_releases", lambda: ["2026-07-22.0", "junk"]
+        )
+        monkeypatch.setattr("earthlens.overture.releases.child_release_ids", list)
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
+
+    def test_release_ids_without_a_latest(self, monkeypatch):
+        """A `None` latest is skipped rather than indexed as a release."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core, "get_available_releases", lambda: (["2026-07-22.0"], None)
+        )
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
+
+    def test_release_ids_deduplicate_the_latest(self, monkeypatch):
+        """A latest already present in the list is not indexed twice."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core,
+            "get_available_releases",
+            lambda: (["2026-07-22.0", "2026-07-22.0"], "2026-07-22.0"),
+        )
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
 
     def test_diffs_releases_not_feature_types(self, monkeypatch):
         """overture diffs the live releases against available_releases."""
@@ -154,3 +266,18 @@ class TestValidator:
         monkeypatch.setattr(overture_cli, "_live_sample", boom)
         result = validate_one(_info(), live=True)
         assert any("fetch failed" in i for i in result.issues), "fetch failure reported"
+
+    def test_live_reports_nothing_when_every_type_resolves(self, monkeypatch):
+        """A clean live validation walks every curated theme and flags none."""
+        sampled: list[str] = []
+        monkeypatch.setattr(
+            overture_cli, "_live_sample", lambda t: (sampled.append(t), (3, True))[1]
+        )
+        result = validate_one(_info(), live=True)
+        assert not result.issues, (
+            f"expected a clean live validation, got {result.issues}"
+        )
+        catalog = load_catalog(_info())
+        assert sorted(sampled) == sorted(
+            getattr(r, "default_type", None) or k for k, r in catalog.datasets.items()
+        ), "every curated theme's default type should have been sampled"

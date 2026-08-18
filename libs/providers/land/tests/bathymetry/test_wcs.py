@@ -8,6 +8,7 @@ import pyramids.dataset as pyramids_dataset
 import pytest
 import requests
 
+from earthlens.bathymetry import WcsServiceUnavailableError
 from earthlens.bathymetry import backend as backend_module
 from earthlens.bathymetry.backend import Bathymetry
 from earthlens.bathymetry.catalog import Dataset
@@ -190,15 +191,45 @@ def test_non_wgs84_row_skips_numeric_guard(tmp_path: Path, fake_from_wcs: dict):
     backend._guard_wcs_domain(projected, (100.0, 100.0, 200.0, 200.0))
 
 
-def test_from_wcs_failure_is_wrapped(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """A from_wcs error surfaces as a clear ValueError, not a raw exception."""
+def test_request_error_is_wrapped_as_valueerror(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """A non-service from_wcs failure surfaces as a clear ValueError."""
 
     def _boom(endpoint, *, coverage, bbox, **kwargs):
-        raise RuntimeError("server exploded")
+        raise RuntimeError("Empty intersection after subsetting")
 
     monkeypatch.setattr(pyramids_dataset.Dataset, "from_wcs", staticmethod(_boom))
     backend = _make("emodnet", tmp_path)
     with pytest.raises(ValueError, match="WCS request for 'emodnet'"):
+        backend.download()
+
+
+def test_service_failure_raises_typed_unavailable_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """A non-XML GetCapabilities answer raises the typed service error, not ValueError."""
+
+    def _degraded(endpoint, *, coverage, bbox, **kwargs):
+        raise RuntimeError("WCS GetCapabilities returned a non-XML body from ows...")
+
+    monkeypatch.setattr(pyramids_dataset.Dataset, "from_wcs", staticmethod(_degraded))
+    backend = _make("emodnet", tmp_path)
+    with pytest.raises(WcsServiceUnavailableError, match="unavailable for 'emodnet'"):
+        backend.download()
+
+
+def test_connection_error_raises_typed_unavailable_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """A dropped connection from from_wcs raises the typed service error."""
+
+    def _dropped(endpoint, *, coverage, bbox, **kwargs):
+        raise requests.exceptions.ConnectionError("Connection aborted")
+
+    monkeypatch.setattr(pyramids_dataset.Dataset, "from_wcs", staticmethod(_dropped))
+    backend = _make("emodnet", tmp_path)
+    with pytest.raises(WcsServiceUnavailableError):
         backend.download()
 
 

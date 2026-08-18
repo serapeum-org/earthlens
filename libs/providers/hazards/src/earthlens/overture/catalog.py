@@ -13,12 +13,13 @@ geometry kind, representative key columns, and the licenses its rows
 typically carry.
 
 The one moving part Overture has is the monthly **release**
-(`yyyy-mm-dd.x`). `tools/overture/refresh_overture_catalog.py` lists the
+(`yyyy-mm-dd.x`). `earthlens datasets refresh overture --write` lists the
 available releases — via the official `overturemaps` SDK (which reads
 the Overture STAC catalog) — into the bundled YAML's informational
 `available_releases:` block; the theme/type set itself is fixed and
-hand-curated. The SDK auto-targets the newest release when `release` is
-`None`, so the index is for discoverability, not dispatch.
+hand-curated. The index is for discoverability, not dispatch: Overture
+keeps only the newest release or two on S3, so a bundled release id goes
+stale within weeks and the backend resolves the release live instead.
 
 `Catalog` is a thin `earthlens.base.AbstractCatalog` subclass that loads
 the bundled `overture_data_catalog.yaml` and exposes each theme as a
@@ -38,8 +39,10 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from earthlens.base import AbstractCatalog
 from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
+from earthlens.overture.releases import is_release_id
 
 CATALOG_PATH: Path = Path(__file__).parent / "overture_data_catalog.yaml"
+
 
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Stores the
@@ -51,6 +54,52 @@ _CATALOG_CACHE: CatalogParseCache = CatalogParseCache()
 def clear_catalog_cache() -> None:
     """Empty the module-level catalog parse cache (for tests that rewrite YAML)."""
     _CATALOG_CACHE.clear()
+
+
+def _release_sort_key(release: str) -> tuple[str, int]:
+    """Order an Overture release id by its date, then its ordinal.
+
+    Release ids are `yyyy-mm-dd.n`, so a plain string sort mis-orders
+    the ordinal once it reaches two digits (`"2026-07-22.10"` sorts
+    below `"2026-07-22.9"`). Splitting the ordinal off and comparing it
+    numerically fixes that. Callers filter through `is_release_id` first, so
+    the ordinal is always numeric here.
+
+    Args:
+        release: A release id (`"2026-07-22.0"`).
+
+    Returns:
+        tuple[str, int]: The `(date, ordinal)` pair to sort on.
+
+    Examples:
+        - The ordinal compares numerically, not lexicographically:
+            ```python
+            >>> from earthlens.overture.catalog import _release_sort_key
+            >>> _release_sort_key("2026-07-22.10") > _release_sort_key("2026-07-22.9")
+            True
+
+            ```
+        - The key splits an id into the pair it sorts on:
+            ```python
+            >>> from earthlens.overture.catalog import _release_sort_key
+            >>> _release_sort_key("2026-07-22.0")
+            ('2026-07-22', 0)
+
+            ```
+        - Sorting a release list puts the newest last:
+            ```python
+            >>> from earthlens.overture.catalog import _release_sort_key
+            >>> releases = ["2026-07-22.0", "2026-06-17.0", "2026-07-22.1"]
+            >>> sorted(releases, key=_release_sort_key)[-1]
+            '2026-07-22.1'
+
+            ```
+
+    See Also:
+        Catalog.latest_release: Picks the newest indexed release with this key.
+    """
+    date, _, ordinal = release.partition(".")
+    return date, int(ordinal)
 
 
 class Theme(BaseModel):
@@ -216,7 +265,10 @@ class Catalog(AbstractCatalog):
             themes) — the full queryable universe the curated themes are a
             subset of. Rebuilt by the refresh tool.
         available_releases: Overture release identifiers (`yyyy-mm-dd.x`),
-            newest first, from the bundled YAML's informational index.
+            from the bundled YAML's informational index, in whatever
+            order the refresh tooling wrote them. `latest_release`
+            picks the newest by date and ordinal rather than by
+            position, so the order here is not load-bearing.
 
     Examples:
         - List themes and resolve one:
@@ -370,17 +422,24 @@ class Catalog(AbstractCatalog):
     def latest_release(self) -> str | None:
         """Return the newest indexed Overture release, or `None` if unindexed.
 
-        Reads only the bundled `available_releases:` index (newest
-        first); it makes no network call. When the index is empty the
-        backend leaves `release=None` and lets the `overturemaps` SDK
-        auto-target the newest release at fetch time.
+        Reads only the bundled `available_releases:` index; it makes no
+        network call. The newest entry is chosen by date and ordinal
+        rather than by position, so the index may be stored in any order
+        — `earthlens datasets refresh overture --write` persists it
+        ascending, while it was originally hand-written newest-first.
+        Entries that are not shaped like a release id are ignored, so a
+        malformed index yields `None` rather than a bogus release.
+
+        The result is a stale-by-construction fallback: Overture prunes
+        old releases from S3, so the backend prefers the release the SDK
+        reports live and only falls back to this when that read fails.
 
         Returns:
-            str | None: The newest release id (e.g. `"2026-05-20.0"`), or
+            str | None: The newest release id (e.g. `"2026-07-22.0"`), or
                 `None` when the index is empty.
 
         Examples:
-            - The newest release is the head of the index (no network):
+            - The newest release wins regardless of index order (no network):
                 ```python
                 >>> from earthlens.overture import Catalog
                 >>> release = Catalog().latest_release()
@@ -388,5 +447,26 @@ class Catalog(AbstractCatalog):
                 True
 
                 ```
+            - Position in the index does not decide the winner (these ids
+              are deliberately unlike the bundled ones, so the answer can
+              only have come from the list supplied here):
+                ```python
+                >>> from earthlens.overture import Catalog
+                >>> cat = Catalog(
+                ...     datasets={},
+                ...     available_releases=["2031-03-03.0", "2030-01-01.0"],
+                ... )
+                >>> cat.latest_release()
+                '2031-03-03.0'
+
+                ```
+
+        See Also:
+            earthlens.overture.backend.Overture._resolve_release: Prefers the
+                live release and falls back to this one.
         """
-        return self.available_releases[0] if self.available_releases else None
+        return max(
+            (r for r in self.available_releases if is_release_id(r)),
+            key=_release_sort_key,
+            default=None,
+        )
