@@ -26921,7 +26921,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>        <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a>        <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;daily&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a>        <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a>        <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -27483,7 +27483,7 @@ value to gate <code>aggregate=</code>.</p>
 
 
 <h4 id="earthlens.earthdata.Earthdata.__init__" class="doc doc-heading"><a href="#earthlens.earthdata.Earthdata.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">daac</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direct_s3</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">netrc_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">daac</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direct_s3</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">netrc_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.earthdata.Earthdata.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -27616,7 +27616,7 @@ whole-granule fetch the MVP performs.</p>
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -27625,7 +27625,7 @@ does not exist.</p>
               </div>
             </td>
             <td>
-                  <code>None</code>
+                  <code>&#39;&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -27900,7 +27900,7 @@ unknown, or the requested datasets do not all share one
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;daily&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a>    <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -30909,7 +30909,7 @@ value to gate <code>aggregate=</code>.</p>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>        <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a>        <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;daily&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a>        <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a>        <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -31471,7 +31471,7 @@ value to gate <code>aggregate=</code>.</p>
 
 
 <h4 id="earthlens.earthdata.backend.Earthdata.__init__" class="doc doc-heading"><a href="#earthlens.earthdata.backend.Earthdata.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">daac</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direct_s3</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">netrc_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;daily&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">daac</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direct_s3</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">netrc_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.earthdata.backend.Earthdata.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -31604,7 +31604,7 @@ whole-granule fetch the MVP performs.</p>
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -31613,7 +31613,7 @@ does not exist.</p>
               </div>
             </td>
             <td>
-                  <code>None</code>
+                  <code>&#39;&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -31888,7 +31888,7 @@ unknown, or the requested datasets do not all share one
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;daily&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="n">daac</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-88" name="__codelineno-0-88"></a>    <span class="n">region</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

@@ -25989,7 +25989,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>        <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a>        <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>        <span class="n">client</span><span class="p">:</span> <span class="n">SensorCommunityClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -26317,7 +26317,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 
 
 <h4 id="earthlens.sensor_community.SensorCommunity.__init__" class="doc doc-heading"><a href="#earthlens.sensor_community.SensorCommunity.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.sensor_community.SensorCommunity.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -26447,7 +26447,7 @@ has no server-side rollup. Accepts <code>"raw"</code> (default),
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -26456,7 +26456,7 @@ by the parent class if absent.</p>
               </div>
             </td>
             <td>
-                  <code>None</code>
+                  <code>&#39;&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -26601,7 +26601,7 @@ is built lazily from <code>session</code>.</p>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>    <span class="n">client</span><span class="p">:</span> <span class="n">SensorCommunityClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -27392,7 +27392,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>        <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a>        <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>        <span class="n">client</span><span class="p">:</span> <span class="n">SensorCommunityClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -27720,7 +27720,7 @@ observations, so the facade rejects <code>aggregate=</code> with
 
 
 <h4 id="earthlens.sensor_community.backend.SensorCommunity.__init__" class="doc doc-heading"><a href="#earthlens.sensor_community.backend.SensorCommunity.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">session</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">client</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;csv&#39;</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.sensor_community.backend.SensorCommunity.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -27850,7 +27850,7 @@ has no server-side rollup. Accepts <code>"raw"</code> (default),
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -27859,7 +27859,7 @@ by the parent class if absent.</p>
               </div>
             </td>
             <td>
-                  <code>None</code>
+                  <code>&#39;&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -28004,7 +28004,7 @@ is built lazily from <code>session</code>.</p>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>    <span class="n">client</span><span class="p">:</span> <span class="n">SensorCommunityClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

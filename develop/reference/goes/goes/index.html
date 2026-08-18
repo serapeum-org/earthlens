@@ -25779,7 +25779,7 @@ need the downstream reader.</p>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;abi-l2-mcmip&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="o">*</span><span class="p">,</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span>
@@ -26067,7 +26067,7 @@ need the downstream reader.</p>
 
 
 <h4 id="earthlens.goes.GOES.__init__" class="doc doc-heading"><a href="#earthlens.goes.GOES.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;abi-l2-mcmip&#39;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">satellite</span><span class="o">=</span><span class="s1">&#39;east&#39;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">BUCKET_REGION</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;abi-l2-mcmip&#39;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">satellite</span><span class="o">=</span><span class="s1">&#39;east&#39;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">BUCKET_REGION</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.goes.GOES.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -26219,7 +26219,7 @@ the domain).</p>
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -26227,7 +26227,7 @@ the domain).</p>
               </div>
             </td>
             <td>
-                  <code>None</code>
+                  <code>&#39;&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -26439,7 +26439,7 @@ is not published by the product.</p>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;abi-l2-mcmip&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="o">*</span><span class="p">,</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span>
@@ -27713,7 +27713,7 @@ need the downstream reader.</p>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;abi-l2-mcmip&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="o">*</span><span class="p">,</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span>
@@ -28001,7 +28001,7 @@ need the downstream reader.</p>
 
 
 <h4 id="earthlens.goes.backend.GOES.__init__" class="doc doc-heading"><a href="#earthlens.goes.backend.GOES.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;abi-l2-mcmip&#39;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">satellite</span><span class="o">=</span><span class="s1">&#39;east&#39;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">BUCKET_REGION</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;abi-l2-mcmip&#39;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">satellite</span><span class="o">=</span><span class="s1">&#39;east&#39;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">BUCKET_REGION</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.goes.backend.GOES.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -28153,7 +28153,7 @@ the domain).</p>
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -28161,7 +28161,7 @@ the domain).</p>
               </div>
             </td>
             <td>
-                  <code>None</code>
+                  <code>&#39;&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -28373,7 +28373,7 @@ is not published by the product.</p>
 <a id="__codelineno-0-250" name="__codelineno-0-250"></a>    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;abi-l2-mcmip&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="o">*</span><span class="p">,</span>
 <a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="n">satellite</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;east&quot;</span><span class="p">,</span>
