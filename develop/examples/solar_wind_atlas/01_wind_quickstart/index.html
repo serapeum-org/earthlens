@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24114,7 +24114,7 @@ print(
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="why-this-is-fast">Why this is fast<a class="anchor-link" href="#why-this-is-fast">¶</a></h2><p><code>download()</code> opens the remote COG over <code>/vsicurl/</code> and reads only the tiles
-overlapping the bbox via pyramids <code>Dataset.crop(bbox=)</code> — a few hundred KB, not the
+overlapping the bbox via pyramids <code>Dataset.read_part</code> — a few hundred KB, not the
 13.9 GB global file. The Global Solar Atlas layers (<code>ghi</code>, <code>dni</code>, …) instead
 download their full ~2.7 GB ZIP once and crop locally, since they are not served
 as range-accessible COGs.</p>

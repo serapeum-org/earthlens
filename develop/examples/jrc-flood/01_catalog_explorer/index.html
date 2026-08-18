@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24030,10 +24030,8 @@ print("licence:", catalog.license_id)</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="how-a-small-aoi-stays-cheap">How a small AOI stays cheap<a class="anchor-link" href="#how-a-small-aoi-stays-cheap">¶</a></h2><p>Each return period is one whole-Europe GeoTIFF (~23 GB uncompressed). The backend
-never reads it whole: it opens the file lazily and reads only the AOI's pixel
-window over <code>/vsicurl</code> (HTTP range requests) via pyramids' <code>Dataset.crop(bbox=)</code>.
-Building the request — the per-return-period URL below — is offline; only
-<code>.download()</code> touches the network.</p>
+never reads it whole: it maps the AOI to a pixel window and reads only that window
+over <code>/vsicurl</code>. <code>pixel_window</code> is the math behind it.</p>
 </div>
 </div>
 </div>
@@ -24056,19 +24054,29 @@ Building the request — the per-return-period URL below — is offline; only
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jrc_flood._helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">efhm_url</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.jrc_flood._helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">efhm_url</span><span class="p">,</span> <span class="n">pixel_window</span>
 
-<span class="c1"># One whole-Europe ~23 GB GeoTIFF per return period; a small AOI reads only its</span>
-<span class="c1"># pixel window via pyramids' Dataset.crop(bbox=) over /vsicurl (a few hundred KB).</span>
-<span class="k">for</span> <span class="n">rp</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">500</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"RP</span><span class="si">{</span><span class="n">rp</span><span class="si">}</span><span class="s2">:"</span><span class="p">,</span> <span class="n">efhm_url</span><span class="p">(</span><span class="n">rp</span><span class="p">))</span>
+<span class="c1"># The verified EFHM geotransform + raster size (EPSG:4326, ~3 arc-second).</span>
+<span class="n">gt</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">24.54208333</span><span class="p">,</span> <span class="mf">0.0008333333333333334</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">71.13375</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.0008333333333333334</span><span class="p">)</span>
+<span class="n">columns</span><span class="p">,</span> <span class="n">rows</span> <span class="o">=</span> <span class="mi">110162</span><span class="p">,</span> <span class="mi">51992</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"RP100 URL:"</span><span class="p">,</span> <span class="n">efhm_url</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+<span class="c1"># A small Rhine-delta AOI -&gt; a ~240 x 240 px window, not 110162 x 51992.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"window:"</span><span class="p">,</span> <span class="n">pixel_window</span><span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="p">(</span><span class="mf">4.8</span><span class="p">,</span> <span class="mf">51.8</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">52.0</span><span class="p">),</span> <span class="n">columns</span><span class="p">,</span> <span class="n">rows</span><span class="p">))</span>
+<span class="c1"># An AOI outside the Europe / Mediterranean coverage -&gt; None.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"outside coverage:"</span><span class="p">,</span> <span class="n">pixel_window</span><span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">30.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.8</span><span class="p">),</span> <span class="n">columns</span><span class="p">,</span> <span class="n">rows</span><span class="p">))</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">from earthlens.jrc_flood._helpers import efhm_url
+<div class="clipboard-copy-txt" id="cell-2">from earthlens.jrc_flood._helpers import efhm_url, pixel_window
 
-# One whole-Europe ~23 GB GeoTIFF per return period; a small AOI reads only its
-# pixel window via pyramids' Dataset.crop(bbox=) over /vsicurl (a few hundred KB).
-for rp in (100, 200, 500):
-    print(f"RP{rp}:", efhm_url(rp))</div>
+# The verified EFHM geotransform + raster size (EPSG:4326, ~3 arc-second).
+gt = (-24.54208333, 0.0008333333333333334, 0.0, 71.13375, 0.0, -0.0008333333333333334)
+columns, rows = 110162, 51992
+
+print("RP100 URL:", efhm_url(100))
+# A small Rhine-delta AOI -&gt; a ~240 x 240 px window, not 110162 x 51992.
+print("window:", pixel_window(gt, (4.8, 51.8, 5.0, 52.0), columns, rows))
+# An AOI outside the Europe / Mediterranean coverage -&gt; None.
+print("outside coverage:", pixel_window(gt, (30.0, -5.0, 30.2, -4.8), columns, rows))</div>
 </div>
 </div>
 </div>
