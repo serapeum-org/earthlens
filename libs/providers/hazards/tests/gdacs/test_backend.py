@@ -11,6 +11,7 @@ from geopandas import GeoDataFrame
 
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
 from earthlens.gdacs import GDACS, GdacsUnavailableError
+from earthlens.gdacs._helpers import GDACS_MAX_RETRIES
 from earthlens.gdacs.backend import SEARCH_URL
 
 from .conftest import _FakeGdacs
@@ -198,6 +199,37 @@ class TestGDACSFetch:
         products = backend._search()
         with pytest.raises(requests.HTTPError, match="404"):
             backend._fetch(products)
+
+    def test_transport_error_retries_then_wraps(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """A read timeout is retried, then wrapped as a status-less unavailable error.
+
+        The second failure mode in issue #929. The transport raises on every
+        attempt, so the backend exhausts its retries (one initial call plus
+        GDACS_MAX_RETRIES) and re-raises a GdacsUnavailableError whose
+        status_code is None (a transport error carries no HTTP status).
+        """
+        import earthlens.base.http as http
+
+        monkeypatch.setattr(http.HttpClient, "_backoff_wait", lambda self, ra, at: 0.0)
+        calls = {"n": 0}
+
+        def boom(url: str, **kwargs: object) -> object:
+            calls["n"] += 1
+            raise requests.ReadTimeout("read timed out")
+
+        monkeypatch.setattr("earthlens.gdacs.backend.requests.get", boom)
+        backend = _make_backend(tmp_path)
+        products = backend._search()
+        with pytest.raises(GdacsUnavailableError) as excinfo:
+            backend._fetch(products)
+        assert excinfo.value.status_code is None, (
+            f"a transport error carries no status, got {excinfo.value.status_code}"
+        )
+        assert calls["n"] == 1 + GDACS_MAX_RETRIES, (
+            f"expected {1 + GDACS_MAX_RETRIES} attempts, got {calls['n']}"
+        )
 
     def test_http_client_retries_configured(self, tmp_path: Path):
         """The SEARCH client retries the service-status family and transport errors."""

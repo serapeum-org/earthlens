@@ -75,6 +75,25 @@ class GdacsUnavailableError(RuntimeError):
     rather than fail. The composed query is validated offline by the gdacs unit
     tests, so a `400` reaching here is a spurious upstream `400` (issue #929),
     not a malformed request.
+
+    Examples:
+        - The typed error carries the status a caller branches on:
+            ```python
+            >>> from earthlens.gdacs import GdacsUnavailableError
+            >>> err = GdacsUnavailableError("SEARCH unavailable", status_code=503)
+            >>> err.status_code
+            503
+            >>> str(err)
+            'SEARCH unavailable'
+
+            ```
+        - A transport failure carries no status:
+            ```python
+            >>> from earthlens.gdacs import GdacsUnavailableError
+            >>> GdacsUnavailableError("connection dropped").status_code is None
+            True
+
+            ```
     """
 
     def __init__(self, message: str, status_code: int | None = None) -> None:
@@ -149,6 +168,36 @@ def service_failure_reason(exc: BaseException) -> str | None:
     Returns:
         str | None: A human-readable reason when `exc` is an availability
             failure, else `None`.
+
+    Examples:
+        - A 5xx — and GDACS's spurious 400 — count as availability failures:
+            ```python
+            >>> import requests
+            >>> from earthlens.gdacs._helpers import service_failure_reason
+            >>> service_failure_reason(requests.HTTPError("503 Server Error"))
+            'HTTP 503'
+            >>> service_failure_reason(requests.HTTPError("400 Client Error"))
+            'HTTP 400'
+
+            ```
+        - A genuine 404 and a decode error are not availability failures:
+            ```python
+            >>> import requests
+            >>> from earthlens.gdacs._helpers import service_failure_reason
+            >>> service_failure_reason(requests.HTTPError("404 Client Error")) is None
+            True
+            >>> service_failure_reason(ValueError("bad json")) is None
+            True
+
+            ```
+        - A dropped connection reports the transport failure by name:
+            ```python
+            >>> import requests
+            >>> from earthlens.gdacs._helpers import service_failure_reason
+            >>> service_failure_reason(requests.ConnectionError("boom"))
+            'upstream unreachable (ConnectionError)'
+
+            ```
     """
     status = gdacs_http_status(exc)
     if status is not None:
