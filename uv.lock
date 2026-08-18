@@ -2121,12 +2121,8 @@ dev = [
     { name = "pre-commit" },
     { name = "pre-commit-hooks" },
     { name = "pyramids-gis", extra = ["viz"] },
-    { name = "pyresample" },
     { name = "pytest" },
     { name = "pytest-cov" },
-    { name = "satpy" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
-    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
     { name = "twine" },
 ]
 docs = [
@@ -2153,6 +2149,12 @@ notebook = [
     { name = "notebook" },
     { name = "pip" },
     { name = "python-dotenv" },
+]
+notebooks = [
+    { name = "pyresample" },
+    { name = "satpy" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
 
 [package.metadata]
@@ -2250,11 +2252,8 @@ dev = [
     { name = "pre-commit", specifier = ">=3.7.1" },
     { name = "pre-commit-hooks", specifier = ">=4.6.0" },
     { name = "pyramids-gis", extras = ["viz"], specifier = ">=0.53.0" },
-    { name = "pyresample", specifier = ">=1.28" },
     { name = "pytest", specifier = ">=8.2.2" },
     { name = "pytest-cov", specifier = ">=5.0.0" },
-    { name = "satpy", specifier = ">=0.55" },
-    { name = "scipy", specifier = ">=1.11" },
     { name = "twine", specifier = ">=5.0.0" },
 ]
 docs = [
@@ -2281,6 +2280,11 @@ notebook = [
     { name = "notebook" },
     { name = "pip" },
     { name = "python-dotenv", specifier = ">=1.0" },
+]
+notebooks = [
+    { name = "pyresample", specifier = ">=1.28" },
+    { name = "satpy", specifier = ">=0.55" },
+    { name = "scipy", specifier = ">=1.11" },
 ]
 
 [[package]]
