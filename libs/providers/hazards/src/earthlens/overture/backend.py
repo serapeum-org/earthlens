@@ -319,6 +319,15 @@ class Overture(AbstractDataSource):
         but only successful ones, so `_fetch` resolves once up front rather
         than per requested type.
 
+        Only an outage is absorbed. The import sits outside the `try`, and
+        `ImportError` / `AttributeError` propagate, so an SDK that has been
+        renamed or removed fails loudly instead of degrading to the stale
+        bundled id — which is issue #931 restored at `WARNING` level. The
+        catch has to stay broad for the rest because the SDK re-raises a
+        bare `Exception` for any transport error. There is no retry: the
+        SDK offers no timeout hook, so a second attempt would only double
+        a stalled connect.
+
         What the SDK reports is checked against `RELEASE_ID` before it is
         used. `get_latest_release()` reads one key out of the upstream
         STAC catalog and returns `None` rather than raising when that key
@@ -343,11 +352,13 @@ class Overture(AbstractDataSource):
         """
         if self._release:
             return self._release
+        from overturemaps.core import get_latest_release
+
         cause: Exception | None = None
         try:
-            from overturemaps.core import get_latest_release
-
             live = get_latest_release()
+        except (ImportError, AttributeError):
+            raise
         except Exception as exc:  # noqa: BLE001 - offline / upstream outage
             cause, reason = exc, f"the live lookup failed ({exc})"
         else:

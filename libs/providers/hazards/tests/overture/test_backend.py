@@ -33,6 +33,16 @@ def _boom() -> str:
     raise OSError("no route to stac.overturemaps.org")
 
 
+def _missing_sdk() -> str:
+    """Stand in for a release lookup whose SDK entry point is gone."""
+    raise ImportError("cannot import name 'get_latest_release'")
+
+
+def _renamed_sdk() -> str:
+    """Stand in for a release lookup whose SDK internals moved."""
+    raise AttributeError("'module' object has no attribute 'get_available_releases'")
+
+
 @pytest.mark.overture
 class TestOvertureConstruction:
     """`__init__` wiring and validation."""
@@ -581,6 +591,22 @@ class TestDuckDBQueryPath:
         backend._catalog.available_releases = []
         monkeypatch.setattr(core, "get_latest_release", lambda: "https:")
         with pytest.raises(RuntimeError, match=r"not a release id"):
+            backend._resolve_release()
+
+    @pytest.mark.parametrize(
+        "lookup, error",
+        [(_missing_sdk, ImportError), (_renamed_sdk, AttributeError)],
+    )
+    def test_resolve_release_propagates_a_code_level_failure(
+        self, tmp_path: Path, monkeypatch, lookup, error
+    ):
+        """A missing or renamed SDK entry point fails loudly, not into the index."""
+        import overturemaps.core as core
+
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = ["2020-01-01.0"]
+        monkeypatch.setattr(core, "get_latest_release", lookup)
+        with pytest.raises(error):
             backend._resolve_release()
 
     def test_resolve_release_raises_when_live_fails_and_index_empty(
