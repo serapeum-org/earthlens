@@ -6,7 +6,7 @@ default `pytest` run skips it.
 
 Run with:
 
-    pixi run -e dev pytest -m e2e tests/wdpa
+    uv run --active pytest -m "e2e and wdpa" libs/providers/land/tests/wdpa
 """
 
 from __future__ import annotations
