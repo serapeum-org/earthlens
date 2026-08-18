@@ -499,6 +499,20 @@ class TestDuckDBQueryPath:
         assert seen["columns"] == ["names"]
         assert seen["limit"] == 5
 
+    def test_duckdb_filename_records_the_resolved_release(
+        self, tmp_path: Path, fake_overture, make_gdf, monkeypatch
+    ):
+        """An unpinned DuckDB write names the snapshot it read, not `latest`."""
+        monkeypatch.setattr(
+            "earthlens.overture.query.query_overture",
+            lambda *a, **k: make_gdf([PERMISSIVE_SOURCES]),
+        )
+        backend = _make_backend(
+            tmp_path, variables={"places": []}, where="confidence > 0.9"
+        )
+        paths = backend.download()
+        assert paths[0].name == f"overture_places_place_{FAKE_RELEASE}.parquet"
+
     def test_release_is_resolved_once_per_download(
         self, tmp_path: Path, fake_overture, make_gdf, monkeypatch
     ):

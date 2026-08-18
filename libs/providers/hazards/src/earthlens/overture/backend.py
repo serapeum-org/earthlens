@@ -529,7 +529,7 @@ class Overture(AbstractDataSource):
                     f"{label}: no features matched the bbox; nothing written."
                 )
                 continue
-            out_path = self._write(collection, theme_name, overture_type)
+            out_path = self._write(collection, theme_name, overture_type, release)
             logger.info(f"{label}: wrote {len(collection)} feature(s) to {out_path}")
             written.append(out_path)
         return written
@@ -539,25 +539,38 @@ class Overture(AbstractDataSource):
         collection: FeatureCollection,
         theme_name: str,
         overture_type: str,
+        release: str | None = None,
     ) -> Path:
         """Write one type's FeatureCollection to a vector file under `root_dir`.
 
         The filename embeds the theme, type, and release
-        (`overture_<theme>_<type>_<release>.<ext>`) so successive
-        downloads land in distinct files. GeoParquet (the default) is
-        written with `to_parquet` to preserve Overture's nested schema;
-        GPKG / GeoJSON go through `to_file`.
+        (`overture_<theme>_<type>_<release>.<ext>`). Overture has no
+        temporal axis — the release *is* the version — so naming it is
+        what keeps successive downloads in distinct files across a
+        monthly rollover.
+
+        The DuckDB path knows the concrete release it globbed and passes
+        it in. The default path cannot: it hands `release=None` to the SDK
+        and never learns which snapshot answered, so an unpinned fetch
+        there still writes `..._latest`, and a rollover overwrites the
+        previous run. GeoParquet (the default) is written with
+        `to_parquet` to preserve Overture's nested schema; GPKG / GeoJSON
+        go through `to_file`.
 
         Args:
             collection: The features to write.
             theme_name: Friendly theme name (for the filename).
             overture_type: Overture feature type (for the filename).
+            release: The release the rows were read from, when the caller
+                resolved one. `None` falls back to the requested
+                `release`, then to `latest`.
 
         Returns:
             Path: Absolute path of the file written.
         """
         driver, ext = _FORMATS[self._file_format]
-        stem = f"overture_{theme_name}_{overture_type}_{self._release or 'latest'}"
+        stamp = release or self._release or "latest"
+        stem = f"overture_{theme_name}_{overture_type}_{stamp}"
         out_path = self.root_dir / f"{stem}.{ext}"
         if driver == "parquet":
             collection.to_parquet(str(out_path))
