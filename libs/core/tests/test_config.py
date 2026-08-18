@@ -95,6 +95,35 @@ class TestCacheDirResolution:
         assert cache_dir() == target.resolve()
         assert not target.exists()
 
+    def test_empty_string_clears_the_override(self, tmp_path):
+        """An empty string is falsy, so it clears the override like None does."""
+        set_cache_dir(tmp_path)
+        set_cache_dir("")
+        assert cache_dir() == (Path.home() / ".earthlens" / "cache").resolve(), (
+            "an empty override should fall back to the default, not to the cwd"
+        )
+
+    def test_blank_env_var_falls_back_to_default(self, monkeypatch):
+        """An env var set to an empty value is ignored rather than used as a path."""
+        monkeypatch.setenv(CACHE_DIR_ENV, "")
+        assert cache_dir() == (Path.home() / ".earthlens" / "cache").resolve(), (
+            "a blank EARTHLENS_CACHE_DIR should be treated as unset"
+        )
+
+    def test_relative_override_is_resolved_absolute(self, tmp_path, monkeypatch):
+        """A relative override is resolved against the working directory."""
+        monkeypatch.chdir(tmp_path)
+        set_cache_dir("relative-cache")
+        resolved = cache_dir()
+        assert resolved.is_absolute(), f"cache_dir() must be absolute, got {resolved}"
+        assert resolved == (tmp_path / "relative-cache").resolve()
+
+    def test_relative_env_var_is_resolved_absolute(self, tmp_path, monkeypatch):
+        """A relative env-var value is resolved the same way as an override."""
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv(CACHE_DIR_ENV, "env-cache")
+        assert cache_dir() == (tmp_path / "env-cache").resolve()
+
 
 class TestBackendUsesCacheDir:
     """A backend built without path= falls back to the configured cache dir."""
@@ -120,3 +149,32 @@ class TestBackendUsesCacheDir:
         set_cache_dir(tmp_path)
         backend = _build()
         assert backend.path == backend.root_dir
+
+    def test_whitespace_path_falls_back(self, tmp_path):
+        """A path of only whitespace counts as not given."""
+        set_cache_dir(tmp_path)
+        assert _build(path="   ").root_dir == Path(tmp_path).resolve(), (
+            "whitespace should not be treated as a directory named ' '"
+        )
+
+    def test_relative_path_is_made_absolute(self, tmp_path, monkeypatch):
+        """An explicit relative path is anchored to the working directory."""
+        monkeypatch.chdir(tmp_path)
+        set_cache_dir(tmp_path / "cache")
+        root = _build(path="sub/dir").root_dir
+        assert root.is_absolute(), f"root_dir must be absolute, got {root}"
+        assert root == (tmp_path / "sub" / "dir").absolute()
+
+    def test_path_object_is_accepted(self, tmp_path):
+        """path= may be a Path, not only a string."""
+        explicit = tmp_path / "explicit"
+        assert _build(path=explicit).root_dir == explicit.absolute()
+
+    def test_resolution_is_read_at_construction(self, tmp_path):
+        """The cache dir is captured when the backend is built, not on download."""
+        set_cache_dir(tmp_path / "first")
+        backend = _build()
+        set_cache_dir(tmp_path / "second")
+        assert backend.root_dir == (tmp_path / "first").resolve(), (
+            "a later set_cache_dir() must not retroactively move an existing backend"
+        )
