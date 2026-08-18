@@ -110,3 +110,23 @@ class TestGdacsLiveQuery:
             "expected one combined query for all hazard types (no per-hazard "
             f"fan-out); saw eventlist params {eventlists}"
         )
+
+
+class TestSkipOnUpstream:
+    """The `_skip_on_upstream` triage runs offline (no e2e marker, no network)."""
+
+    def test_skips_on_typed_unavailable(self):
+        """A GdacsUnavailableError becomes a prefixed skip, not a failure."""
+        with pytest.raises(pytest.skip.Exception) as excinfo:
+            _skip_on_upstream(GdacsUnavailableError("down", status_code=503))
+        assert "GDACS SEARCH unavailable" in str(excinfo.value)
+
+    def test_skips_on_transport_error(self):
+        """A bare transport error also skips (belt-and-braces arm)."""
+        with pytest.raises(pytest.skip.Exception):
+            _skip_on_upstream(requests.ConnectionError("dropped"))
+
+    def test_reraises_other_errors(self):
+        """A non-availability error re-raises unchanged so the test still fails."""
+        with pytest.raises(ValueError, match="real bug"):
+            _skip_on_upstream(ValueError("real bug"))
