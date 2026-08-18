@@ -99,7 +99,9 @@ class _FakeResponse:
         if self._status_error is not None:
             raise self._status_error
         if self.status_code >= 400:
-            raise requests.HTTPError(f"{self.status_code} Server Error", response=self)
+            # Neutral label (the response carries the real status_code, which is
+            # what gdacs_http_status reads first) so it is never mis-labelled.
+            raise requests.HTTPError(f"{self.status_code} HTTP Error", response=self)
 
     def json(self) -> dict[str, Any]:
         return self._payload

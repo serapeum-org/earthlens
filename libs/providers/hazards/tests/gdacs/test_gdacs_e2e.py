@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import datetime as dt
 from pathlib import Path
+from typing import NoReturn
 
 import pytest
 import requests
@@ -30,7 +31,7 @@ _RECENT_START = (_TODAY - dt.timedelta(days=30)).strftime("%Y-%m-%d")
 _TODAY_STR = _TODAY.strftime("%Y-%m-%d")
 
 
-def _skip_on_upstream(exc: Exception) -> None:
+def _skip_on_upstream(exc: Exception) -> NoReturn:
     """Skip (not fail) when GDACS SEARCH was unavailable, else re-raise.
 
     GDACS SEARCH answers a well-formed query with a spurious `400`, or times
