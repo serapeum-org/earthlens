@@ -46,7 +46,7 @@ from earthlens.base import (
     TemporalExtent,
     to_datetime,
 )
-from earthlens.overture.catalog import Catalog, Theme
+from earthlens.overture.catalog import RELEASE_ID, Catalog, Theme
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
@@ -315,7 +315,17 @@ class Overture(AbstractDataSource):
         prunes the rest, so a bundled id goes stale within weeks. Globbing
         a pruned release matches no files and DuckDB fails the read with
         `No files found that match the pattern`. The bundled index stays
-        as an offline fallback, and the SDK caches the lookup per process.
+        as an offline fallback, and the SDK caches the lookup per process
+        — successful lookups only, so an offline caller re-attempts it.
+
+        What the SDK reports is checked against `RELEASE_ID` before it is
+        used. `get_latest_release()` reads one key out of the upstream
+        STAC catalog and returns `None` rather than raising when that key
+        moves, and the sibling release list already returns unparsed
+        `https:` fragments — so an unchecked value would build a glob like
+        `release/None/…` and fail with the very error this resolution
+        order exists to prevent. A value that is not release-shaped is
+        treated exactly like a failed lookup.
 
         Returns:
             str: A concrete release id (e.g. `"2026-07-22.0"`).
@@ -332,25 +342,31 @@ class Overture(AbstractDataSource):
         """
         if self._release:
             return self._release
+        cause: Exception | None = None
         try:
             from overturemaps.core import get_latest_release
 
-            return cast("str", get_latest_release())
+            live = get_latest_release()
         except Exception as exc:  # noqa: BLE001 - offline / upstream outage
-            indexed = self._catalog.latest_release()
-            if not indexed:
-                raise RuntimeError(
-                    "Could not resolve an Overture release for the DuckDB "
-                    f"query path: the live lookup failed ({exc}) and the "
-                    "bundled available_releases: index is empty. Pass an "
-                    "explicit release= (e.g. release='2026-07-22.0')."
-                ) from exc
-            logger.warning(
-                f"Live Overture release lookup failed ({exc}); falling back "
-                f"to the bundled index entry {indexed!r}. Overture prunes old "
-                "releases, so this id may no longer exist on S3."
-            )
-            return indexed
+            cause, reason = exc, f"the live lookup failed ({exc})"
+        else:
+            if live and RELEASE_ID.match(str(live)):
+                return str(live)
+            reason = f"the live lookup returned {live!r}, not a release id"
+        indexed = self._catalog.latest_release()
+        if not indexed:
+            raise RuntimeError(
+                "Could not resolve an Overture release for the DuckDB query "
+                f"path: {reason} and the bundled available_releases: index is "
+                "empty. Pass an explicit release= (e.g. "
+                "release='2026-07-22.0')."
+            ) from cause
+        logger.warning(
+            f"Could not resolve the live Overture release ({reason}); falling "
+            f"back to the bundled index entry {indexed!r}. Overture prunes old "
+            "releases, so this id may no longer exist on S3."
+        )
+        return indexed
 
     def _guard_bbox(self, theme_names: list[str]) -> None:
         """Reject an oversized / whole-Earth bbox for the guarded themes.

@@ -528,6 +528,32 @@ class TestDuckDBQueryPath:
         monkeypatch.setattr(core, "get_latest_release", _boom)
         assert backend._resolve_release() == "2021-01-01.0"
 
+    @pytest.mark.parametrize("live", [None, "", "https:", "2026-7-22.0"])
+    def test_resolve_release_rejects_a_live_value_that_is_not_a_release(
+        self, tmp_path: Path, monkeypatch, live
+    ):
+        """A live reply that is not release-shaped falls back like a failure."""
+        import overturemaps.core as core
+
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = ["2020-01-01.0"]
+        monkeypatch.setattr(core, "get_latest_release", lambda: live)
+        assert backend._resolve_release() == "2020-01-01.0", (
+            f"a live {live!r} must not reach the S3 glob"
+        )
+
+    def test_resolve_release_raises_on_a_bad_live_value_with_no_index(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """A junk live reply and an empty index name the junk in the error."""
+        import overturemaps.core as core
+
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = []
+        monkeypatch.setattr(core, "get_latest_release", lambda: "https:")
+        with pytest.raises(RuntimeError, match=r"not a release id"):
+            backend._resolve_release()
+
     def test_resolve_release_raises_when_live_fails_and_index_empty(
         self, tmp_path: Path, monkeypatch
     ):
