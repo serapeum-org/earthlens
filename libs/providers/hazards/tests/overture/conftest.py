@@ -178,6 +178,8 @@ def no_live_stac(
 ) -> None:
     """Block the live release lookup for every non-e2e Overture test.
 
+    Both live doors are covered: the SDK's `urlopen` (the release lookup)
+    and the refresher's `requests.get` (the STAC child-link recovery).
     `_resolve_release` falls back to the bundled index on any failure, so
     an accidental live call passes the suite and only shows up as a slow,
     network-dependent run. `pytest.fail` raises a `BaseException`, which
@@ -186,3 +188,4 @@ def no_live_stac(
     if request.node.get_closest_marker("e2e"):
         return
     monkeypatch.setattr("overturemaps.core.urlopen", _refuse_urlopen)
+    monkeypatch.setattr("earthlens.overture.cli.requests.get", _refuse_urlopen)

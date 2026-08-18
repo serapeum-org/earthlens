@@ -97,4 +97,5 @@ available_datasets: [address, bathymetry, building, building_part, connector, di
 # live at fetch time (the SDK on the default path, `get_latest_release()` on the
 # DuckDB path) and treats this block only as an offline fallback.
 available_releases:
+- 2026-06-17.0
 - 2026-07-22.0
