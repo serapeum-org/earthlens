@@ -44,7 +44,6 @@ def _variables_in(path: Path) -> set[str]:
 
 def _time_stamps(path: Path) -> list:
     """Return the datetime values on a retrieved file's time coordinate."""
-    import pandas as pd
     import xarray as xr
 
     member = path
@@ -66,7 +65,7 @@ def _time_stamps(path: Path) -> list:
         return [pd.Timestamp(value) for value in dataset[name].values.ravel()]
 
 
-def _fetch(dataset, variable, start, end, resolution, tmp_path, runner):
+def _fetch(dataset, variable, start, end, resolution, tmp_path, runner, budget_s=900.0):
     """Download one curated variable and return its written path."""
     lens = EarthLens(
         data_source="ecmwf",
@@ -78,7 +77,7 @@ def _fetch(dataset, variable, start, end, resolution, tmp_path, runner):
         lon_lim=[9.0, 10.0],
         path=str(tmp_path),
     )
-    out = runner(lens)
+    out = runner(lens, budget_s)
     assert out, f"{dataset}/{variable} returned no paths"
     assert out[0].exists()
     assert out[0].stat().st_size > 0
@@ -89,7 +88,12 @@ class TestEcdsE2E:
     """Live retrieves on the ECDS endpoint."""
 
     def test_live_tigge_returns_2m_temperature(self, tmp_path, download_within_budget):
-        """A one-day TIGGE control forecast returns the `t2m` field."""
+        """A one-day TIGGE control forecast returns the `t2m` field.
+
+        TIGGE gets double the default budget: it is a 13-centre archive and has
+        the least predictable queue of the rows here, so the shared 900s cap
+        fails it on a slow day while the request is still queued and valid.
+        """
         path = _fetch(
             "tigge-forecasts",
             "2m-temperature",
@@ -98,6 +102,7 @@ class TestEcdsE2E:
             "daily",
             tmp_path,
             download_within_budget,
+            budget_s=1800.0,
         )
         assert "t2m" in _variables_in(path)
 
