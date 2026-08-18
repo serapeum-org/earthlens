@@ -168,7 +168,11 @@ class TestGDACSFetch:
     def test_service_error_becomes_unavailable(
         self, tmp_path: Path, fake_gdacs: _FakeGdacs
     ):
-        """A persistent 5xx surfaces as a typed GdacsUnavailableError."""
+        """A 5xx is classified as an availability failure and wrapped, keeping its status.
+
+        Verifies the wrap classification only; the retry-count behaviour is
+        covered by test_status_failure_retries_then_wraps.
+        """
         fake_gdacs.set_status_error(requests.HTTPError("500 Server Error"))
         backend = _make_backend(tmp_path)
         products = backend._search()
@@ -176,14 +180,16 @@ class TestGDACSFetch:
             backend._fetch(products)
         assert excinfo.value.status_code == 500
 
-    def test_persistent_400_becomes_unavailable(
+    def test_400_classified_as_unavailable(
         self, tmp_path: Path, fake_gdacs: _FakeGdacs
     ):
-        """A 400 that survives the retries is treated as an availability failure.
+        """A 400 is classified as an availability failure, not a client error.
 
-        GDACS returns spurious 400s on well-formed queries (issue #929), so a
-        persistent 400 is wrapped like a 5xx rather than raised as a client
-        error — the query composition itself is guarded by test_forwards_params.
+        GDACS returns spurious 400s on well-formed queries (issue #929), so a 400
+        is wrapped like a 5xx rather than raised as a client error — the query
+        composition itself is guarded by test_forwards_params. Verifies the wrap
+        classification only; the retry-count behaviour is covered by
+        test_status_failure_retries_then_wraps.
         """
         fake_gdacs.set_status_error(requests.HTTPError("400 Client Error: Bad Request"))
         backend = _make_backend(tmp_path)
@@ -229,6 +235,29 @@ class TestGDACSFetch:
         )
         assert calls["n"] == 1 + GDACS_MAX_RETRIES, (
             f"expected {1 + GDACS_MAX_RETRIES} attempts, got {calls['n']}"
+        )
+
+    def test_status_failure_retries_then_wraps(
+        self, tmp_path: Path, fake_gdacs: _FakeGdacs, monkeypatch: pytest.MonkeyPatch
+    ):
+        """A persistent forcelist status (500) is retried, then wrapped.
+
+        Unlike the classification tests, the fake returns a real 500 status, so
+        the client's status-forcelist retry path actually runs: the request is
+        attempted one initial time plus GDACS_MAX_RETRIES before the survivor is
+        wrapped as a GdacsUnavailableError.
+        """
+        import earthlens.base.http as http
+
+        monkeypatch.setattr(http.HttpClient, "_backoff_wait", lambda self, ra, at: 0.0)
+        fake_gdacs.set_retry_status(500)
+        backend = _make_backend(tmp_path)
+        products = backend._search()
+        with pytest.raises(GdacsUnavailableError) as excinfo:
+            backend._fetch(products)
+        assert excinfo.value.status_code == 500
+        assert len(fake_gdacs.calls) == 1 + GDACS_MAX_RETRIES, (
+            f"expected {1 + GDACS_MAX_RETRIES} attempts, got {len(fake_gdacs.calls)}"
         )
 
     def test_http_client_retries_configured(self, tmp_path: Path):
