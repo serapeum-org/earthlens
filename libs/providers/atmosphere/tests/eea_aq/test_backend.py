@@ -303,9 +303,11 @@ class TestEmptyResultSignals:
     def test_all_eras_empty_warns_once_about_upstream(self, tmp_path):
         """When every era returns zero files, one aggregate upstream WARNING fires."""
         client = _NoFilesClient()
-        warnings, sink = _capture("WARNING")
+        infos, isink = _capture("INFO")
+        warnings, wsink = _capture("WARNING")
         df = _backend(client, tmp_path).download(progress_bar=False)
-        logger.remove(sink)
+        logger.remove(wsink)
+        logger.remove(isink)
 
         assert df.empty and "station_id" in df.columns
         assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
@@ -314,8 +316,11 @@ class TestEmptyResultSignals:
         assert len(outage) == 1
         assert "upstream" in outage[0]
         assert "Verified" in outage[0] and "Unverified" in outage[0]
-        # The per-era emptiness is no longer a WARNING (it is diagnostic INFO).
+        # The per-era emptiness is downgraded to a diagnostic INFO (not a WARNING),
+        # and is positively emitted per era with the new wording.
         assert not any("returned no Parquet files" in m for m in warnings)
+        assert any("era 'Verified' returned no Parquet files" in m for m in infos)
+        assert any("era 'Unverified' returned no Parquet files" in m for m in infos)
 
     def test_out_of_window_download_logs_info_not_outage(self, tmp_path):
         """Files that all fall outside the window log an INFO, not the era WARNING."""
@@ -339,7 +344,7 @@ class TestAdjacentEraFallback:
     """When the primary era is empty, the adjacent live era is retried (#1046)."""
 
     def test_empty_primary_era_falls_back_to_adjacent(self, tmp_path):
-        """A 2013-2022 window whose Verified era is empty resolves via Unverified."""
+        """A June-2022 boundary-year request with an empty Verified era resolves via Unverified."""
         unverified = tmp_path / "u.parquet"
         _row_frame("2022-06-15T00:00").to_parquet(unverified)
         client = _SelectiveEraClient(Verified=None, Unverified=str(unverified))
