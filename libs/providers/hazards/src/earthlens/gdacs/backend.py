@@ -32,7 +32,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
+import requests  # module-level import so tests can monkeypatch this module's `requests.get`
 from loguru import logger
 
 from earthlens.base import (
@@ -343,17 +343,14 @@ class GDACS(AbstractDataSource):
         GDACS SEARCH is a single unpaged GET whose two observed failure
         modes are both transient (issue #929): a spurious `400 Bad
         Request` on a well-formed query, and a read timeout. So the
-        client retries the service-status family
-        (:data:`~earthlens.gdacs._helpers.GDACS_RETRY_STATUSES` — the
-        `429` / `5xx` gateway family plus GDACS's spurious `400`) and the
-        transport errors
-        (:data:`~earthlens.gdacs._helpers.GDACS_RETRY_EXCEPTIONS`), up to
-        :data:`~earthlens.gdacs._helpers.GDACS_MAX_RETRIES` times, before
-        the survivor is re-raised (and wrapped by :meth:`_fetch` into a
-        :class:`~earthlens.gdacs._helpers.GdacsUnavailableError`).
+        client retries the service-status family (`GDACS_RETRY_STATUSES`
+        — the `429` / `5xx` gateway family plus GDACS's spurious `400`)
+        and the transport errors (`GDACS_RETRY_EXCEPTIONS`), up to
+        `GDACS_MAX_RETRIES` times, before the survivor is re-raised (and
+        wrapped by `_fetch` into a `GdacsUnavailableError`).
 
         Returns:
-            HttpClient: The configured transport for :meth:`_fetch`.
+            HttpClient: The configured transport for `_fetch`.
         """
         return HttpClient(
             timeout=self._timeout,
