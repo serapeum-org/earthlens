@@ -136,7 +136,14 @@ class TestGDACSFetch:
         assert fake_gdacs.calls[0]["url"] == SEARCH_URL
 
     def test_forwards_params(self, tmp_path: Path, fake_gdacs: _FakeGdacs):
-        """Date window, hazard list, and alert levels reach the query params."""
+        """Date window, hazard list, and alert levels reach the query params.
+
+        This is the sole offline regression net for the SEARCH parameter
+        contract: because the backend treats a live 400 as availability (issue
+        #929) and skips rather than fails, a real query-shaping regression would
+        not redden the e2e lane — so keep these assertions exhaustive as new
+        params are added.
+        """
         backend = _make_backend(
             tmp_path, variables=["EQ", "TC"], alert_level=["Green", "Red"]
         )
@@ -197,6 +204,9 @@ class TestGDACSFetch:
         with pytest.raises(GdacsUnavailableError) as excinfo:
             backend._fetch(products)
         assert excinfo.value.status_code == 400
+        assert "SEARCH parameter contract" in str(excinfo.value), (
+            "a persistent 400 must flag a possible contract change in its reason"
+        )
 
     def test_non_service_error_propagates(self, tmp_path: Path, fake_gdacs: _FakeGdacs):
         """A genuine client error (404) fails hard instead of being masked."""

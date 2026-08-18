@@ -300,13 +300,25 @@ class GDACS(AbstractDataSource):
             reason = service_failure_reason(exc)
             if reason is None:
                 raise
+            status = gdacs_http_status(exc)
+            # A 400 is treated as availability (GDACS's spurious-400 under load,
+            # issue #929), which trades away the lane's ability to catch a real
+            # SEARCH-contract change. Make that unmistakable in the skip reason so
+            # a persistent 400 in the skip logs prompts a contract check rather
+            # than being silently masked.
+            contract_note = (
+                " This was a 400: if it persists across runs, verify GDACS has "
+                "not changed its SEARCH parameter contract (see test_forwards_params)."
+                if status == 400
+                else ""
+            )
             raise GdacsUnavailableError(
                 f"GDACS SEARCH was unavailable after {GDACS_MAX_RETRIES} "
                 f"retries ({reason}). The composed query is well-formed (the "
                 "gdacs unit tests assert its parameters offline), so this is a "
                 "transient upstream condition — retry later or narrow the "
-                "date window.",
-                status_code=gdacs_http_status(exc),
+                f"date window.{contract_note}",
+                status_code=status,
             ) from exc
         feature_count = len(payload.get("features") or [])
         if feature_count >= MAX_EVENTS_PER_RESPONSE:
