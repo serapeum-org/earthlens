@@ -122,8 +122,9 @@ class OhsomeUnavailableError(OhsomeResponseError):
 
         Args:
             message: Human-facing explanation — what happened and what to do.
-            status_code: The HTTP status that triggered it (`403` / `429`), or
-                `None` when it could not be recovered from the SDK error.
+            status_code: The HTTP status that triggered it (`403` / `429` /
+                `5xx`), or `None` when it could not be recovered from the SDK
+                error.
             content_type: The response `Content-Type` header, or `None`.
             body_preview: The first characters of the response body, or `None`.
         """

@@ -775,7 +775,8 @@ class OSM(AbstractDataSource):
                 f"ohsome could not serve the elements/geometry request: HTTP "
                 f"{status_shown} after automatic retries. api.ohsome.org is a "
                 "public endpoint that load-sheds its compute-heavy extraction "
-                "path under load; this is a transient server-side outage, not a "
+                "path under load, so a 5xx is usually a transient server-side "
+                "condition (load-shedding or a gateway error), not typically a "
                 "problem with the request. Retry later, or check the ohsome "
                 "service status.",
                 status_code=status,
