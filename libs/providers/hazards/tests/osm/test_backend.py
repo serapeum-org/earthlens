@@ -318,7 +318,8 @@ class TestOhsomeRoute:
         assert err.status_code == 200
         assert err.content_type == "text/html"
         assert err.body_preview.startswith("<html>")
-        assert "non-JSON" in str(err) and "text/html" in str(err)
+        assert "non-JSON" in str(err)
+        assert "text/html" in str(err)
         # a 200 body is not a throttle, so it is the base error, not the subtype
         assert not isinstance(err, OhsomeUnavailableError)
 
@@ -443,7 +444,8 @@ class TestOhsomeRoute:
         assert err.content_type == "text/html"
         assert err.body_preview.startswith("<html>")
         logged = "".join(str(message) for message in messages)
-        assert "403" in logged and "text/html" in logged
+        assert "403" in logged
+        assert "text/html" in logged
 
     def test_json_error_pass_through_does_not_log(self, osm_kwargs, fake_ohsome):
         """A JSON-served ohsome error is re-raised quietly, with no stray warning."""
