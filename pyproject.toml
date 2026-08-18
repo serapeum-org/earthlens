@@ -143,6 +143,14 @@ dev = [
     # surface_reflectance / cutoff / percentile constructor keywords into an
     # RgbBands object (pyramids 0.52.0's plot path builds on this).
     "cleopatra >=0.31.0",
+    # satpy + pyresample: the 2026 eclipse showcase notebooks build the
+    # day/night true-colour composites from raw MTG FCI and GOES ABI granules
+    # and resample them into the two perspective views; not a runtime dep.
+    "satpy >=0.55",
+    "pyresample >=1.28",
+    # scipy: those same notebooks feather the disc edge and soften the limb
+    # (ndimage.binary_erosion / gaussian_filter).
+    "scipy >=1.11",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.

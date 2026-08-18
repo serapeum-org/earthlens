@@ -16,6 +16,11 @@ places:
 Keeping them apart matters: a cleanup script that deletes anything called a
 cache must not take requested products with it.
 
+Both settings are process-wide module state with no locking. Set them once at
+process start, before any backend is constructed: a backend captures its output
+directory at construction, so changing a setting mid-run splits output across
+two locations rather than raising.
+
 Resolution order for each, highest priority first:
 
 | | output | cache |
