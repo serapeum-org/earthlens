@@ -78,7 +78,7 @@ def test_daily_discharge_legacy(tmp_path: Path):
 
 @_offline_skip
 def test_statistics_monthly_legacy(tmp_path: Path):
-    """A monthly statistics pull has a value column, or skips if the window is empty."""
+    """A monthly statistics pull over a fixed historical window returns summary rows."""
     df = EarthLens(
         data_source="usgs-water",
         start="2020-01-01",
@@ -92,14 +92,16 @@ def test_statistics_monthly_legacy(tmp_path: Path):
         api="legacy",
         stat_type="monthly",
     ).download(progress_bar=False)
-    if df.empty:
-        pytest.skip("USGS returned no monthly statistics rows for the window")
+    # A fixed 2020-2021 window at a long-running gauge always has published data,
+    # so an empty result is a real regression, not transient emptiness — assert
+    # hard (mirroring the emdat / openaq stable-query e2e tests).
+    assert not df.empty
     assert "value" in df.columns
 
 
 @_offline_skip
 def test_sites_discovery_legacy(tmp_path: Path):
-    """Site discovery over a small bbox lists stations, or skips if none are returned."""
+    """Site discovery over a fixed DC bbox lists at least one long-running station."""
     df = EarthLens(
         data_source="usgs-water",
         start="2023-01-01",
@@ -111,8 +113,10 @@ def test_sites_discovery_legacy(tmp_path: Path):
         service="sites",
         api="legacy",
     ).download(progress_bar=False)
-    if df.empty:
-        pytest.skip("USGS site discovery returned no stations for the bbox")
+    # The DC bbox always contains active gauges, so an empty result is a real
+    # regression rather than transient emptiness — assert hard (mirroring the
+    # iucn known-species stable-query e2e test).
+    assert not df.empty
     assert {"site_no", "latitude", "longitude"} <= set(df.columns)
 
 
