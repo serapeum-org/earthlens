@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
+import urllib.error
+
 import pytest
+import requests
 
 from earthlens.base import SpatialExtent
+from earthlens.bathymetry import WcsServiceUnavailableError
 from earthlens.bathymetry._helpers import (
     bbox_from_extent,
     estimate_grid_pixels,
     griddap_subset_url,
+    is_wcs_service_failure,
     resolution_degrees,
 )
 
@@ -103,3 +108,131 @@ def test_estimate_grid_pixels_for_arcsecond_bbox():
 def test_estimate_grid_pixels_unparseable_returns_none():
     """An unparseable resolution gives no pixel estimate."""
     assert estimate_grid_pixels((0.0, 0.0, 1.0, 1.0), "native") is None
+
+
+class TestIsWcsServiceFailure:
+    """Classifier that tells a WCS service outage from a request error."""
+
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "WCS GetCapabilities returned a non-XML body from ows...",
+            "the server sent a non xml response",
+            "HTTP error code : 503",
+            "500 Server Error: Internal Server Error",
+            "received HTTP 429 from the endpoint",
+            "http 408 request timeout",
+            "502 Bad Gateway",
+            "504 gateway time-out",
+            "Service Unavailable",
+            "the resource is temporarily unavailable",
+            "Empty reply from server",
+            "Max retries exceeded with url",
+            "Connection reset by peer",
+            "Connection aborted",
+            "Remote end closed connection without response",
+            "read timed out",
+            "failed to establish a new connection",
+            "Temporary failure in name resolution",
+            "Name or service not known",
+        ],
+    )
+    def test_service_messages_classify_true(self, message: str):
+        """A message carrying a service / transport signature is a service failure.
+
+        Args:
+            message: The exception text under test.
+
+        Test scenario:
+            Each string is a real GDAL / requests availability signature, so the
+            classifier must report `True`.
+        """
+        assert is_wcs_service_failure(RuntimeError(message)) is True, message
+
+    @pytest.mark.parametrize(
+        "exc",
+        [
+            requests.exceptions.ConnectionError("boom"),
+            requests.exceptions.Timeout("slow"),
+            ConnectionError("dropped"),
+            TimeoutError("late"),
+            urllib.error.URLError("unreachable"),
+        ],
+    )
+    def test_transport_exception_types_classify_true(self, exc: BaseException):
+        """A transport exception type is a service failure regardless of message.
+
+        Args:
+            exc: The transport exception under test.
+
+        Test scenario:
+            `requests` / stdlib connection and timeout types are unambiguous
+            transport failures, so the classifier reports `True`.
+        """
+        assert is_wcs_service_failure(exc) is True, type(exc).__name__
+
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "Could not find coverage 'emodnet:mean'",
+            "InvalidSubsetting: Empty intersection after subsetting",
+            "grid is 5000 x 5000 pixels, too large",
+            "unknown band 'depth'",
+            "",
+        ],
+    )
+    def test_request_errors_classify_false(self, message: str):
+        """A request-shaping error carries no service signature, so it is False.
+
+        Args:
+            message: The exception text under test.
+
+        Test scenario:
+            A bad coverage id, an empty subset, an oversize grid (whose stray
+            `5000` must not read as a status), an unknown band, and an empty
+            message must all stay hard failures (`False`).
+        """
+        assert is_wcs_service_failure(RuntimeError(message)) is False, message
+
+    def test_walks_cause_chain(self):
+        """A transport error linked via __cause__ is detected through the wrapper."""
+        inner = requests.exceptions.ConnectionError("Connection reset by peer")
+        outer = RuntimeError("from_wcs failed")
+        outer.__cause__ = inner
+        assert is_wcs_service_failure(outer) is True
+
+    def test_walks_context_chain(self):
+        """A transport error linked via an implicit __context__ is also detected."""
+        try:
+            try:
+                raise requests.exceptions.Timeout("connection lost")
+            except requests.exceptions.Timeout:
+                raise RuntimeError("wrapping a transport failure")
+        except RuntimeError as exc:
+            assert is_wcs_service_failure(exc) is True
+
+    def test_self_referential_chain_is_cycle_safe(self):
+        """A cyclic cause chain terminates instead of looping forever."""
+        exc = RuntimeError("no service signal")
+        exc.__cause__ = exc
+        assert is_wcs_service_failure(exc) is False
+
+
+class TestWcsServiceUnavailableError:
+    """The typed error the WCS path raises for an unavailable service."""
+
+    def test_is_a_runtime_error(self):
+        """It subclasses RuntimeError so a broad transport catch still catches it."""
+        assert issubclass(WcsServiceUnavailableError, RuntimeError)
+
+    def test_preserves_its_message(self):
+        """The human-facing message is carried through unchanged."""
+        err = WcsServiceUnavailableError("the WCS service is unavailable, retry later")
+        assert str(err) == "the WCS service is unavailable, retry later"
+
+    def test_is_exported_from_the_package(self):
+        """It is importable from the package surface for tests to skip on."""
+        import earthlens.bathymetry as pkg
+
+        assert pkg.WcsServiceUnavailableError is WcsServiceUnavailableError
+        assert "WcsServiceUnavailableError" in pkg.__all__

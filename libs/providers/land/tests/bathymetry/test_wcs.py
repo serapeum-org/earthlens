@@ -10,7 +10,6 @@ import requests
 
 from earthlens.bathymetry import WcsServiceUnavailableError
 from earthlens.bathymetry import backend as backend_module
-from earthlens.bathymetry._helpers import is_wcs_service_failure
 from earthlens.bathymetry.backend import Bathymetry
 from earthlens.bathymetry.catalog import Dataset
 
@@ -232,32 +231,6 @@ def test_connection_error_raises_typed_unavailable_error(
     backend = _make("emodnet", tmp_path)
     with pytest.raises(WcsServiceUnavailableError):
         backend.download()
-
-
-@pytest.mark.parametrize(
-    "exc, is_service",
-    [
-        (RuntimeError("WCS GetCapabilities returned a non-XML body"), True),
-        (RuntimeError("HTTP error code : 503"), True),
-        (RuntimeError("500 Server Error: Internal Server Error"), True),
-        (requests.exceptions.ConnectionError("Max retries exceeded"), True),
-        (requests.exceptions.Timeout("read timed out"), True),
-        (RuntimeError("Could not find coverage 'emodnet:mean'"), False),
-        (RuntimeError("InvalidSubsetting: Empty intersection after subsetting"), False),
-        (RuntimeError("grid is 5000 x 5000 pixels, too large"), False),
-    ],
-)
-def test_is_wcs_service_failure_classification(exc, is_service):
-    """Service/transport failures classify True; request errors classify False."""
-    assert is_wcs_service_failure(exc) is is_service
-
-
-def test_is_wcs_service_failure_walks_the_chain():
-    """A transport error hidden under a generic wrapper is still detected."""
-    inner = requests.exceptions.ConnectionError("Connection reset by peer")
-    outer = RuntimeError("from_wcs failed")
-    outer.__cause__ = inner
-    assert is_wcs_service_failure(outer) is True
 
 
 def test_griddap_row_never_calls_from_wcs(
