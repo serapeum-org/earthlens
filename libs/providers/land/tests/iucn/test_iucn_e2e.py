@@ -6,7 +6,7 @@ default `pytest` run skips it.
 
 Run with:
 
-    pixi run -e dev pytest -m e2e tests/iucn
+    uv run --active pytest -m "e2e and iucn" libs/providers/land/tests/iucn
 """
 
 from __future__ import annotations
