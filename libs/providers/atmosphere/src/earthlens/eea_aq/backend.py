@@ -404,7 +404,7 @@ class EEA_AQ(AbstractDataSource):
 
     def _sweep(
         self,
-        datasets: list[Any],
+        datasets: list[str],
         client: Any,
         countries: list[str],
         polls: list[str],
@@ -433,7 +433,7 @@ class EEA_AQ(AbstractDataSource):
 
     def _iter_dataset_frames(
         self,
-        datasets: list[Any],
+        datasets: list[str],
         client: Any,
         countries: list[str],
         polls: list[str],
