@@ -237,19 +237,37 @@ def is_wcs_service_failure(exc: BaseException) -> bool:
             ```
     """
     for link in _exception_chain(exc):
-        status = _http_status(link)
-        if status is not None:
-            return status in _TRANSIENT_STATUS or 500 <= status <= 599
-        if isinstance(link, _TRANSPORT_EXC):
-            return True
-        if isinstance(link, OSError) and link.errno in _NETWORK_ERRNOS:
-            return True
-        message = str(link).lower()
-        if any(signature in message for signature in _SERVICE_SIGNATURES):
-            return True
-        if _STATUS_IN_TEXT_RE.search(message):
-            return True
+        verdict = _link_verdict(link)
+        if verdict is not None:
+            return verdict
     return False
+
+
+def _link_verdict(link: BaseException) -> bool | None:
+    """Classify one exception-chain link as service / request / undecided.
+
+    Args:
+        link: One exception from the cause/context chain.
+
+    Returns:
+        `True` when the link marks a service/transport failure, `False` when it
+        is an authoritative request answer (a definite non-transient HTTP
+        status), or `None` when this link alone does not decide it (defer to the
+        rest of the chain).
+    """
+    status = _http_status(link)
+    if status is not None:
+        return status in _TRANSIENT_STATUS or 500 <= status <= 599
+    if isinstance(link, _TRANSPORT_EXC):
+        return True
+    if isinstance(link, OSError) and link.errno in _NETWORK_ERRNOS:
+        return True
+    message = str(link).lower()
+    if any(signature in message for signature in _SERVICE_SIGNATURES):
+        return True
+    if _STATUS_IN_TEXT_RE.search(message):
+        return True
+    return None
 
 
 def resolution_degrees(native_resolution: str) -> float | None:
