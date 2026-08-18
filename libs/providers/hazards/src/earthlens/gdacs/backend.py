@@ -251,9 +251,12 @@ class GDACS(AbstractDataSource):
         """Issue the one combined GET and map the GeoJSON to a FeatureCollection.
 
         Widens the inherited `-> list[Path]` contract: a vector backend
-        returns in-memory :class:`FeatureCollection`s, not file paths.
-        An HTTP error propagates (it is not silently swallowed); an
-        empty feed yields a schema-correct empty FeatureCollection.
+        returns in-memory :class:`FeatureCollection`s, not file paths. A
+        service-availability failure (a connection/timeout error or a
+        retry-worthy status) that outlives the retries is re-raised as
+        `GdacsUnavailableError`; a genuine request error (`403` / `404`)
+        propagates as `requests.HTTPError`. Nothing is silently swallowed.
+        An empty feed yields a schema-correct empty FeatureCollection.
         Because GDACS SEARCH has no documented bbox filter, the mapped
         alerts are clipped to `self.space` client-side.
 
