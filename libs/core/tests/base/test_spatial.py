@@ -118,11 +118,12 @@ class TestWindowedBboxCrop:
         )
 
     def test_data_present_window_is_cropped(self):
-        """A window with valid data returns a non-empty crop."""
+        """A 3-deg box on a 1-deg grid reads exactly the 3x3 AOI window."""
         crop = windowed_bbox_crop(
             self._raster(all_nodata=False), [2.0, -6.0, 5.0, -3.0]
         )
-        assert crop.rows > 0 and crop.columns > 0
+        assert crop.rows == 3, crop.rows
+        assert crop.columns == 3, crop.columns
 
     def test_all_nodata_window_does_not_raise(self):
         """An entirely-no-data window returns an all-no-data crop, not a raise."""

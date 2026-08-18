@@ -44,8 +44,11 @@ class FakeDataset:
     """
 
     recorder: dict = {}
-    #: A plausible global geotransform (origin, 0.0025 deg pixel, negative dy).
+    #: A plausible global geotransform (origin, 0.0025 deg pixel, negative dy)
+    #: with matching dimensions, so `bbox_overlaps` sees a global extent.
     geotransform = (-180.0, 0.0025, 0.0, 80.0, 0.0, -0.0025)
+    columns = 144000
+    rows = 64000
     epsg = 4326
     #: Per-band no-data tuple, mirroring pyramids' `Dataset.no_data_value`.
     no_data_value = (-32768.0,)
