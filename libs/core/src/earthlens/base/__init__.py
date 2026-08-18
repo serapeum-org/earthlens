@@ -69,6 +69,7 @@ from earthlens.base.spatial import (
     resolve_aoi,
     vsicurl_config,
     widen_degenerate_bbox,
+    windowed_bbox_crop,
 )
 
 __all__ = [
@@ -122,6 +123,7 @@ __all__ = [
     "warn_if_egress",
     "WHOLE_WINDOW",
     "widen_degenerate_bbox",
+    "windowed_bbox_crop",
     "window_labels",
     "write_sidecar",
     "yaml_files_for",

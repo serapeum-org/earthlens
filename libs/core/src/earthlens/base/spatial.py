@@ -507,6 +507,40 @@ def vsicurl_config() -> CloudConfig:
     )
 
 
+def windowed_bbox_crop(dataset: Any, bbox: Sequence[float], *, epsg: Any = 4326) -> Any:
+    """Windowed bbox crop that keeps an all-no-data AOI as an all-no-data crop.
+
+    `Dataset.crop(bbox=)` with the default `touch=True` takes pyramids' windowed
+    fast path — reading only the AOI's pixel window — but *raises* `crop produced
+    no valid pixels` when that window is entirely no-data. An in-coverage but
+    empty AOI (e.g. open sea, or an area with no modelled value) must still
+    produce a crop, matching the pre-refactor contract where the backend wrote an
+    all-no-data raster rather than aborting. So retry with `touch=False`, which
+    returns the all-no-data window instead of raising. The fallback reads more of
+    the source (a cutline warp) and is logged, but fires only for the rare empty
+    AOI; the common data-present AOI keeps the fast windowed read.
+
+    Args:
+        dataset: An opened `pyramids.Dataset` (anything exposing `crop`).
+        bbox: `(west, south, east, north)` in `epsg` (already widened if a point).
+        epsg: CRS of `bbox`. Defaults to `4326`.
+
+    Returns:
+        The cropped `Dataset` — the windowed read, or the all-no-data window when
+        the AOI holds no valid data.
+    """
+    try:
+        return dataset.crop(bbox=list(bbox), epsg=epsg)
+    except ValueError as exc:
+        if "no valid pixels" not in str(exc):
+            raise
+        logger.info(
+            "windowed crop AOI holds no valid data; keeping the all-no-data "
+            "window via the cutline path (reads more of the source)"
+        )
+        return dataset.crop(bbox=list(bbox), epsg=epsg, touch=False)
+
+
 def widen_degenerate_bbox(
     bbox: Sequence[float], pixel_width: float, pixel_height: float
 ) -> list[float]:
@@ -623,15 +657,17 @@ def crop_to_aoi(
     geometry = getattr(space, "geometry", None)
     if geometry is not None:
         return _crop_to_mask(dataset, geometry, touch=True)
-    # Widen a point / cell-edge bbox to one pixel so crop(bbox=) does not raise
-    # on the zero-width box (a point AOI still yields a 1x1 crop). The pixel size
-    # (`geo[1]`/`geo[5]`) is in the dataset's CRS units, so only widen when the
-    # bbox is in that same CRS — for a reprojecting crop (bbox `epsg` != the
-    # dataset's CRS) mixing the units would push the edge out by a wrong amount,
-    # so leave the bbox as-is. (A real `Dataset` always exposes `geotransform` /
-    # `epsg`; the getattr guards let a bare test double without them reach crop.)
+    # Widen a point / cell-edge bbox to one pixel so a zero-area box is not handed
+    # to `crop` (which would trim to nothing / error); a point AOI still yields a
+    # 1x1 crop. The pixel size (`geo[1]`/`geo[5]`) is in the dataset's CRS units,
+    # so only widen when the bbox is in that same CRS — `epsg is None` means "the
+    # dataset's own CRS" (pyramids' default), and an explicit `epsg` must match
+    # the dataset's. For a reprojecting crop (bbox `epsg` != the dataset's CRS)
+    # mixing the units would push the edge out by a wrong amount, so leave the
+    # bbox as-is. (A real `Dataset` exposes `geotransform` / `epsg`; the getattr
+    # guards let a bare test double without them reach crop.)
     geo = getattr(dataset, "geotransform", None)
-    if geo is not None and getattr(dataset, "epsg", None) == epsg:
+    if geo is not None and (epsg is None or getattr(dataset, "epsg", None) == epsg):
         bbox = widen_degenerate_bbox(bbox, geo[1], geo[5])
     return dataset.crop(bbox=list(bbox), epsg=epsg, touch=touch)
 
