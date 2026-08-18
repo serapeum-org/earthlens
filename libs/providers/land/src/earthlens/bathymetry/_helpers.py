@@ -41,7 +41,7 @@ _TRANSIENT_STATUS: frozenset[int] = frozenset({408, 425, 429})
 #: `socket.gaierror` covers DNS resolution; the bare-`OSError` network errnos
 #: below cover unreachable-host / no-route cases that are not `ConnectionError`
 #: subclasses.
-_TRANSPORT_EXC: tuple[type[BaseException], ...] = (
+_TRANSPORT_EXC: tuple[type[Exception], ...] = (
     requests.exceptions.ConnectionError,
     requests.exceptions.Timeout,
     ConnectionError,
@@ -142,13 +142,14 @@ class WcsServiceUnavailableError(RuntimeError):
     """
 
 
-def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
+def _exception_chain(exc: Exception) -> Iterator[Exception]:
     """Yield `exc` then each linked `__cause__` / `__context__`, cycle-safe.
 
     Honours `__suppress_context__`, so a deliberate `raise … from None` hides the
     implicit context (matching stdlib `traceback`): an explicit `__cause__` wins,
     otherwise the `__context__` is followed only when the author did not suppress
-    it.
+    it. The walk stops at any non-`Exception` link (a `KeyboardInterrupt` /
+    `SystemExit` in the chain is never a service or request signal).
 
     Args:
         exc: The exception to walk.
@@ -157,19 +158,20 @@ def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
         Each exception in the chain, most recent first.
     """
     seen: set[int] = set()
-    current: BaseException | None = exc
+    current: Exception | None = exc
     while current is not None and id(current) not in seen:
         seen.add(id(current))
         yield current
         if current.__cause__ is not None:
-            current = current.__cause__
+            following: BaseException | None = current.__cause__
         elif current.__suppress_context__:
-            current = None
+            following = None
         else:
-            current = current.__context__
+            following = current.__context__
+        current = following if isinstance(following, Exception) else None
 
 
-def _http_status(exc: BaseException) -> int | None:
+def _http_status(exc: Exception) -> int | None:
     """Return the HTTP status `exc` carries, from its type or a `response`.
 
     Reads the two SDK shapes directly — `urllib.error.HTTPError.code` and
@@ -189,7 +191,7 @@ def _http_status(exc: BaseException) -> int | None:
     return code if isinstance(code, int) else None
 
 
-def is_wcs_service_failure(exc: BaseException) -> bool:
+def is_wcs_service_failure(exc: Exception) -> bool:
     """Return whether `exc` marks the WCS service (not the request) as at fault.
 
     Walks the exception's cause/context chain and reports `True` when a link is a
@@ -243,7 +245,7 @@ def is_wcs_service_failure(exc: BaseException) -> bool:
     return False
 
 
-def _link_verdict(link: BaseException) -> bool | None:
+def _link_verdict(link: Exception) -> bool | None:
     """Classify one exception-chain link as service / request / undecided.
 
     Args:
