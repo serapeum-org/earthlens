@@ -32,7 +32,6 @@ the shared biodiversity home so the backend imports the one warning class.
 
 from __future__ import annotations
 
-import json
 from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any, cast
 
@@ -224,10 +223,12 @@ def ohsome_response_is_non_json(exc: BaseException) -> bool:
     Returns:
         bool: `True` when a JSON-decode failure is in the chain.
     """
+    # Match by class name to catch the stdlib, `simplejson`, and `requests`
+    # variants without importing them, guarded by `ValueError` (every real
+    # variant subclasses it) so an unrelated same-named class is not a false
+    # positive.
     for node in _exception_chain(exc):
-        if isinstance(node, json.JSONDecodeError):
-            return True
-        if type(node).__name__ == "JSONDecodeError":
+        if isinstance(node, ValueError) and type(node).__name__ == "JSONDecodeError":
             return True
     return False
 
