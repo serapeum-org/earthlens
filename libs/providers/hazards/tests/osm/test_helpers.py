@@ -236,6 +236,14 @@ class TestOhsomeResponseRecovery:
         """A plain error (a JSON error served as JSON) is not a non-JSON body."""
         assert ohsome_response_is_non_json(RuntimeError("bad request")) is False
 
+    def test_non_json_false_for_non_valueerror_named_class(self):
+        """A class named JSONDecodeError that is not a ValueError is excluded."""
+
+        class JSONDecodeError(RuntimeError):
+            pass
+
+        assert ohsome_response_is_non_json(JSONDecodeError("x")) is False
+
     def test_body_preview_truncates(self):
         """The body preview is truncated to the requested limit."""
         import types

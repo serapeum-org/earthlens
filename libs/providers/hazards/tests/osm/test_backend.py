@@ -407,6 +407,44 @@ class TestOhsomeRoute:
         assert "text/html" in logged
         assert "rate limited" in logged
 
+    def test_forbidden_carries_and_logs_evidence(self, osm_kwargs, fake_ohsome):
+        """A 403 throttle carries the recovered content-type/body and logs them."""
+        import json
+
+        from loguru import logger
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        response = types.SimpleNamespace(
+            status_code=403,
+            headers={"Content-Type": "text/html"},
+            text="<html>Forbidden</html>",
+        )
+        decode_error = json.JSONDecodeError("Expecting value", "<html>", 0)
+        decode_error.response = response
+        fake_ohsome.error = decode_error
+
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+        try:
+            backend = OSM(
+                **{
+                    **osm_kwargs(),
+                    "variables": ["ohsome:buildings"],
+                    "start": "2020-01-01",
+                }
+            )
+            with pytest.raises(OhsomeUnavailableError) as excinfo:
+                backend.download()
+        finally:
+            logger.remove(sink_id)
+        err = excinfo.value
+        assert err.status_code == 403
+        assert err.content_type == "text/html"
+        assert err.body_preview.startswith("<html>")
+        logged = "".join(str(message) for message in messages)
+        assert "403" in logged and "text/html" in logged
+
     def test_json_error_pass_through_does_not_log(self, osm_kwargs, fake_ohsome):
         """A JSON-served ohsome error is re-raised quietly, with no stray warning."""
         from loguru import logger
