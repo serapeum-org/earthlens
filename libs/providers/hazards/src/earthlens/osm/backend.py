@@ -713,22 +713,30 @@ class OSM(AbstractDataSource):
         """
         status = ohsome_http_status(exc)
         non_json = ohsome_response_is_non_json(exc)
-        if status is None and not non_json:
-            # Not an HTTP / response failure (e.g. a transport error) — nothing to
-            # add; let the caller re-raise the original.
+        is_throttle = status in (403, 429)
+        if not is_throttle and not non_json:
+            # A transport error (no status), or a genuine ohsome error already
+            # served as readable JSON (including a JSON `401`) — nothing to add;
+            # let the caller re-raise the original, as quietly as before.
             return
 
         response = ohsome_error_response(exc)
         headers = getattr(response, "headers", None)
         content_type = headers.get("Content-Type") if headers is not None else None
         body_preview = ohsome_body_preview(response)
+        status_shown = status if status is not None else "unknown"
+        body_note = (
+            f"first {len(body_preview)} body chars: {body_preview!r}"
+            if body_preview is not None
+            else "no body captured"
+        )
         # Log the evidence the raw decoder error discards, at the point of failure
-        # — visible even when the caller skips the throttle case (`#930`).
+        # — visible even when the caller skips the throttle case (`#930`). Only the
+        # converted (throttle / non-JSON) branches reach here, so a JSON-served
+        # error propagates without a stray warning.
         logger.warning(
             "ohsome elements/geometry request failed: "
-            f"HTTP {status if status is not None else 'unknown'}, "
-            f"Content-Type {content_type!r}, "
-            f"first {len(body_preview or '')} body chars: {body_preview!r}"
+            f"HTTP {status_shown}, Content-Type {content_type!r}, {body_note}"
         )
 
         if status == 403:
@@ -749,23 +757,18 @@ class OSM(AbstractDataSource):
                 "request frequency and size.",
                 status_code=status,
             ) from exc
-        if non_json:
-            shown_status = status if status is not None else "an unknown status"
-            raise OhsomeResponseError(
-                "ohsome returned a non-JSON response for the elements/geometry "
-                f"request (HTTP {shown_status}, Content-Type {content_type!r}); "
-                f"the first {len(body_preview or '')} characters were "
-                f"{body_preview!r}. api.ohsome.org served an unparseable body — "
-                "typically a rate-limit, maintenance, or error page, or a "
-                "redirect to a landing page — rather than the expected GeoJSON. "
-                "Retry later, or check the ohsome service status.",
-                status_code=status,
-                content_type=content_type,
-                body_preview=body_preview,
-            ) from exc
-        # A recovered HTTP status that is neither a throttle nor a non-JSON body
-        # (e.g. a genuine ohsome error already served as readable JSON) — let the
-        # caller re-raise the SDK's own error unchanged.
+        # Not a throttle, so — given the guard above — the body was not JSON.
+        raise OhsomeResponseError(
+            "ohsome returned a non-JSON response for the elements/geometry "
+            f"request (HTTP {status_shown}, Content-Type {content_type!r}); "
+            f"{body_note}. api.ohsome.org served an unparseable body — typically "
+            "a rate-limit, maintenance, or error page, or a redirect to a landing "
+            "page — rather than the expected GeoJSON. Retry later, or check the "
+            "ohsome service status.",
+            status_code=status,
+            content_type=content_type,
+            body_preview=body_preview,
+        ) from exc
 
     def _fetch_pbf(self, query_id: str, dataset: Dataset) -> FeatureCollection:
         """Fetch one `pbf` layer: resolve region, fetch-cache, read, bbox-clip.

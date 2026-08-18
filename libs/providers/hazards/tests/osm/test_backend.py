@@ -407,6 +407,30 @@ class TestOhsomeRoute:
         assert "text/html" in logged
         assert "rate limited" in logged
 
+    def test_json_error_pass_through_does_not_log(self, osm_kwargs, fake_ohsome):
+        """A JSON-served ohsome error is re-raised quietly, with no stray warning."""
+        from loguru import logger
+
+        ohsome_error = RuntimeError("bad request")
+        ohsome_error.error_code = 400  # recovered status, but served AS JSON
+        fake_ohsome.error = ohsome_error
+
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+        try:
+            backend = OSM(
+                **{
+                    **osm_kwargs(),
+                    "variables": ["ohsome:buildings"],
+                    "start": "2020-01-01",
+                }
+            )
+            with pytest.raises(RuntimeError, match="bad request"):
+                backend.download()
+        finally:
+            logger.remove(sink_id)
+        assert messages == [], f"expected no warning on pass-through, got: {messages}"
+
 
 class TestDownloadContract:
     """Cross-cutting download() behaviour."""
