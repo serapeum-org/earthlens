@@ -9,7 +9,6 @@ import zipfile
 from collections.abc import Iterator
 from pathlib import Path
 
-import numpy as np
 import pytest
 
 from earthlens.solar_wind_atlas import _helpers
@@ -24,7 +23,7 @@ def zip_bytes(member: str = "World_GHI.tif") -> bytes:
 
 
 class FakeWindow:
-    """Stand-in for a created pyramids `Dataset`, recording the written path."""
+    """Stand-in for a cropped pyramids `Dataset`, recording the written path."""
 
     def __init__(self, recorder: dict) -> None:
         self._recorder = recorder
@@ -36,17 +35,23 @@ class FakeWindow:
 
 
 class FakeDataset:
-    """Stand-in for `pyramids.dataset.Dataset` capturing read_part / create."""
+    """Stand-in for `pyramids.dataset.Dataset` capturing the windowed crop.
+
+    The real windowed read + geo/no-data carry-through now lives in
+    `Dataset.crop(bbox=)` (pyramids), so the fake only records the crop request
+    and the write — the window math and no-data preservation are pyramids' own
+    tested concern, not the helper's.
+    """
 
     recorder: dict = {}
-    #: A plausible global geotransform (origin, 0.0025 deg pixel, negative dy).
+    #: A plausible global geotransform (origin, 0.0025 deg pixel, negative dy)
+    #: with matching dimensions, so `bbox_overlaps` sees a global extent.
     geotransform = (-180.0, 0.0025, 0.0, 80.0, 0.0, -0.0025)
+    columns = 144000
+    rows = 64000
     epsg = 4326
     #: Per-band no-data tuple, mirroring pyramids' `Dataset.no_data_value`.
     no_data_value = (-32768.0,)
-    #: When True, `read_part` returns a single-band `(1, H, W)` array so the
-    #: helper's squeeze branch is exercised.
-    emit_3d = False
 
     @classmethod
     def read_file(cls, path: str) -> FakeDataset:
@@ -54,48 +59,23 @@ class FakeDataset:
         cls.recorder.setdefault("opened", []).append(path)
         return cls()
 
-    def read_part(
+    def crop(
         self,
-        bbox: tuple[float, float, float, float],
+        mask: object = None,
+        touch: bool = True,
         *,
-        dst_width: int,
-        dst_height: int,
-        bbox_crs: int = 4326,
-    ) -> np.ndarray:
-        """Record the window request and return a zero array of that size."""
-        type(self).recorder.setdefault("read_part", []).append(
-            {
-                "bbox": bbox,
-                "dst_width": dst_width,
-                "dst_height": dst_height,
-                "bbox_crs": bbox_crs,
-            }
-        )
-        if type(self).emit_3d:
-            return np.zeros((1, dst_height, dst_width), dtype="float32")
-        return np.zeros((dst_height, dst_width), dtype="float32")
-
-    @classmethod
-    def create_from_array(
-        cls, *, arr: np.ndarray, geo: tuple, epsg: int, no_data_value: object = -9999
+        bbox: list[float] | tuple[float, float, float, float] | None = None,
+        epsg: object = None,
     ) -> FakeWindow:
-        """Record the geo-wrap (incl. no-data) and return a writable fake window."""
-        cls.recorder.setdefault("create", []).append(
-            {
-                "shape": arr.shape,
-                "geo": geo,
-                "epsg": epsg,
-                "no_data_value": no_data_value,
-            }
-        )
-        return FakeWindow(cls.recorder)
+        """Record the windowed bbox crop and return a writable fake window."""
+        type(self).recorder.setdefault("crop", []).append({"bbox": bbox, "epsg": epsg})
+        return FakeWindow(type(self).recorder)
 
 
 @pytest.fixture
 def fake_pyramids(monkeypatch: pytest.MonkeyPatch) -> type[FakeDataset]:
     """Inject a fake `pyramids.dataset` module so no real GDAL is touched."""
     FakeDataset.recorder = {}
-    FakeDataset.emit_3d = False
     module = types.ModuleType("pyramids.dataset")
     module.Dataset = FakeDataset
     monkeypatch.setitem(sys.modules, "pyramids.dataset", module)

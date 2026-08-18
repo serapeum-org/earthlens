@@ -29,6 +29,12 @@ from earthlens.base.abstractdatasource import (
     TemporalExtent,
 )
 from earthlens.base.auth import AbstractAuth, AuthenticationError
+from earthlens.base.cache import (
+    aoi_tag,
+    sidecar_is_fresh,
+    sidecar_path,
+    write_sidecar,
+)
 from earthlens.base.catalog_source import (
     catalog_cache_key,
     clear_all_catalog_caches,
@@ -57,18 +63,25 @@ from earthlens.base.region import (
 from earthlens.base.s3 import S3Auth, S3Credentials
 from earthlens.base.spatial import (
     METRES_PER_DEGREE,
+    bbox_overlaps,
     crop_to_aoi,
+    ensure_no_data,
     estimate_pixel_dims,
     mask_to_geometry,
     normalize_aoi,
     resolve_aoi,
+    vsicurl_config,
+    widen_degenerate_bbox,
+    windowed_bbox_crop,
 )
 
 __all__ = [
     "AbstractAuth",
     "AbstractCatalog",
     "AbstractDataSource",
+    "aoi_tag",
     "AuthenticationError",
+    "bbox_overlaps",
     "CADENCE_ALIASES",
     "catalog_cache_key",
     "clear_all_catalog_caches",
@@ -78,6 +91,7 @@ __all__ = [
     "crop_to_aoi",
     "date_windows",
     "end_is_date_only",
+    "ensure_no_data",
     "expand_bare_date_end",
     "estimate_pixel_dims",
     "FluxableLeaf",
@@ -104,13 +118,19 @@ __all__ = [
     "S3Auth",
     "S3Credentials",
     "safe_filename",
+    "sidecar_is_fresh",
+    "sidecar_path",
     "SpatialExtent",
     "split_time",
     "TemporalExtent",
     "Timeout",
     "to_datetime",
+    "vsicurl_config",
     "warn_if_egress",
     "WHOLE_WINDOW",
+    "widen_degenerate_bbox",
+    "windowed_bbox_crop",
     "window_labels",
+    "write_sidecar",
     "yaml_files_for",
 ]
