@@ -585,6 +585,14 @@ class TestDuckDBQueryPath:
         )
         assert backend._resolve_release() == "2020-01-01.0"
 
+    @pytest.mark.parametrize(
+        "release", ["not-a-release", "2026-07-22", "2026-7-22.0", ""]
+    )
+    def test_release_must_be_shaped_like_a_release_id(self, tmp_path: Path, release):
+        """A mistyped pin is rejected at construction, not by an opaque S3 miss."""
+        with pytest.raises(ValueError, match=r"release must be an Overture release id"):
+            _make_backend(tmp_path, variables={"places": []}, release=release)
+
     def test_resolve_release_explicit_skips_the_live_lookup(
         self, tmp_path: Path, monkeypatch
     ):

@@ -185,7 +185,8 @@ class Overture(AbstractDataSource):
         Raises:
             TypeError: If `variables` is not a mapping of theme -> types.
             ValueError: If `file_format` is not one of the supported
-                formats, or `variables` is empty.
+                formats, `variables` is empty, or `release` is not shaped
+                like an Overture release id.
             ImportError: If the `overturemaps` SDK is not installed.
         """
         if not isinstance(variables, dict):
@@ -203,6 +204,14 @@ class Overture(AbstractDataSource):
         if file_format not in _FORMATS:
             raise ValueError(
                 f"file_format must be one of {sorted(_FORMATS)}, got {file_format!r}."
+            )
+        if release is not None and not RELEASE_ID.match(release):
+            raise ValueError(
+                f"release must be an Overture release id, got {release!r}. "
+                "Ids are a release date plus an ordinal, e.g. "
+                "'2026-07-22.0'; list the known ones with "
+                "Catalog().available_releases. Leave it None to target "
+                "whatever Overture publishes now."
             )
         self._release = release
         self._max_features = max_features
