@@ -513,6 +513,30 @@ def widen_degenerate_bbox(
     return [west, south, east, north]
 
 
+def ensure_no_data(dataset: Any, default: float) -> Any:
+    """Stamp a fallback no-data value when a dataset declares none.
+
+    A windowed `crop(bbox=)` carries the source's own no-data through, but a
+    source that declares none leaves the output untagged — losing the flag that
+    exact polygon masking (`crop_to_aoi`) needs to trim outside-polygon cells.
+    When the dataset's first band has no no-data, set `default` and return the
+    dataset; this is a pure metadata tag (pixels are unchanged), restoring the
+    pre-crop behaviour where the backend stamped a catalog / default no-data.
+
+    Args:
+        dataset: A `pyramids.Dataset` (anything exposing a settable
+            `no_data_value` per-band tuple).
+        default: The no-data value to stamp when the dataset declares none.
+
+    Returns:
+        The same `dataset`, with a no-data value guaranteed on its first band.
+    """
+    nodata = getattr(dataset, "no_data_value", None)
+    if not nodata or nodata[0] is None:
+        dataset.no_data_value = default
+    return dataset
+
+
 def crop_to_aoi(
     dataset: Any,
     space: Any,

@@ -36,7 +36,7 @@ from earthlens.base import (
     sidecar_is_fresh,
     write_sidecar,
 )
-from earthlens.base.spatial import crop_to_aoi, widen_degenerate_bbox
+from earthlens.base.spatial import crop_to_aoi, ensure_no_data, widen_degenerate_bbox
 from earthlens.jrc_flood._helpers import efhm_url
 from earthlens.jrc_flood.catalog import Catalog, Dataset
 
@@ -390,6 +390,11 @@ class JRCFlood(AbstractDataSource):
             windowed = source.crop(bbox=bbox, epsg=4326)
         finally:
             close_quietly(source)
+
+        # crop carries the source's own no-data through; when the source declares
+        # none, fall back to the catalog value so the output stays flagged and a
+        # polygon `aoi=` can trim exactly (matching the pre-crop behaviour).
+        windowed = ensure_no_data(windowed, self._dataset.nodata)
 
         # crop(bbox=) keeps every pixel the box overlaps (all-touched, up to one
         # extra pixel per edge); trim to the exact bbox (matching FABDEM) — or to

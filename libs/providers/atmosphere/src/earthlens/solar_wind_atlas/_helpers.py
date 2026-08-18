@@ -25,8 +25,11 @@ from urllib.parse import urlsplit
 
 import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 
-from earthlens.base import close_quietly, widen_degenerate_bbox
+from earthlens.base import close_quietly, ensure_no_data, widen_degenerate_bbox
 from earthlens.base.http import HttpClient
+
+#: No-data value stamped on a windowed crop when the source declares none.
+_DEFAULT_NO_DATA = -9999.0
 
 if TYPE_CHECKING:
     from earthlens.base import SpatialExtent
@@ -106,6 +109,9 @@ def read_part_to_geotiff(
         # Drop the /vsicurl handle — an open remote dataset can hang the
         # interpreter at exit on GDAL's curl-handle cleanup (A1b).
         close_quietly(dataset)
+    # crop carries the source's own no-data through; fall back to the default so
+    # genuinely-empty cells stay flagged when the source declares none.
+    window = ensure_no_data(window, _DEFAULT_NO_DATA)
     try:
         window.to_file(str(out_path))
     finally:

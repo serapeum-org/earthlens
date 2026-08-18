@@ -62,6 +62,7 @@ from earthlens.base.s3 import S3Auth, S3Credentials
 from earthlens.base.spatial import (
     METRES_PER_DEGREE,
     crop_to_aoi,
+    ensure_no_data,
     estimate_pixel_dims,
     mask_to_geometry,
     normalize_aoi,
@@ -83,6 +84,7 @@ __all__ = [
     "close_quietly",
     "crop_to_aoi",
     "date_windows",
+    "ensure_no_data",
     "estimate_pixel_dims",
     "FluxableLeaf",
     "HttpClient",
