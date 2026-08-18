@@ -27,9 +27,13 @@ import os
 from pathlib import Path
 
 CACHE_DIR_ENV = "EARTHLENS_CACHE_DIR"
+"""Name of the environment variable read when no override is set."""
+
 _DEFAULT = Path.home() / ".earthlens" / "cache"
+"""Fallback location used when neither an override nor the env var is set."""
 
 _override: Path | None = None
+"""The `set_cache_dir()` override, or `None` when no override is active."""
 
 
 def set_cache_dir(path: str | os.PathLike[str] | None) -> None:
@@ -41,9 +45,40 @@ def set_cache_dir(path: str | os.PathLike[str] | None) -> None:
 
     Args:
         path: The directory to use, or `None` to clear a previous override.
-            `~` is expanded and the value is resolved to an absolute path. The
-            directory is not created here — it is created lazily when a
-            download first writes to it.
+            `~` is expanded and the value is resolved to an absolute path, so a
+            relative value is anchored to the current working directory. Any
+            falsy value — `None` or an empty string — clears the override. The
+            directory is not created here; it is created lazily when a download
+            first writes to it.
+
+    Examples:
+        - Point every backend at one directory, then clear the override:
+            ```python
+            >>> from earthlens.config import cache_dir, set_cache_dir
+            >>> set_cache_dir("/data/earthlens")
+            >>> cache_dir().name
+            'earthlens'
+            >>> set_cache_dir(None)
+
+            ```
+        - An override outranks the environment variable, and an empty value
+          clears it again:
+            ```python
+            >>> import os
+            >>> from earthlens.config import cache_dir, set_cache_dir
+            >>> os.environ["EARTHLENS_CACHE_DIR"] = "/data/fallback"
+            >>> set_cache_dir("/data/override")
+            >>> cache_dir().name
+            'override'
+            >>> set_cache_dir("")
+            >>> cache_dir().name
+            'fallback'
+            >>> _ = os.environ.pop("EARTHLENS_CACHE_DIR")
+
+            ```
+
+    See Also:
+        cache_dir: Reads back the directory this function sets.
     """
     global _override
     _override = Path(path).expanduser().resolve() if path else None
@@ -58,6 +93,33 @@ def cache_dir() -> Path:
     Returns:
         The resolved absolute directory. It is *not* created here; backends
         create it lazily on the first download that writes to it.
+
+    Examples:
+        - Read back the directory the next download will write to:
+            ```python
+            >>> from earthlens.config import cache_dir, set_cache_dir
+            >>> set_cache_dir("/data/earthlens")
+            >>> cache_dir().is_absolute()
+            True
+            >>> cache_dir().name
+            'earthlens'
+            >>> set_cache_dir(None)
+
+            ```
+        - Resolving the directory never creates it on disk:
+            ```python
+            >>> from earthlens.config import cache_dir, set_cache_dir
+            >>> set_cache_dir("/data/earthlens-not-created-by-resolving")
+            >>> cache_dir().exists()
+            False
+            >>> set_cache_dir(None)
+
+            ```
+
+    See Also:
+        set_cache_dir: Sets the override this function reads first.
+        earthlens.base.AbstractDataSource: Falls back to this directory when
+            it is constructed without an explicit `path`.
     """
     if _override is not None:
         return _override

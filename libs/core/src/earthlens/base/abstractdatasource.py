@@ -993,10 +993,13 @@ class AbstractDataSource(ABC):
             fmt: `strptime` format for `start` / `end`. Defaults
                 to `"%Y-%m-%d"`.
             path: Output directory. Resolved here and created on the first
-                download, not at construction. When omitted (or blank), falls
-                back to the configured earthlens cache directory
-                (`set_cache_dir()` / `EARTHLENS_CACHE_DIR`, else
-                `~/.earthlens/cache`); see `earthlens.config`.
+                download, not at construction. A relative value is anchored to
+                the current working directory. When omitted, empty, or only
+                whitespace, it falls back to the configured earthlens cache
+                directory (`set_cache_dir()` / `EARTHLENS_CACHE_DIR`, else
+                `~/.earthlens/cache`); see `earthlens.config`. The fallback is
+                resolved once, here, so a later `set_cache_dir()` does not move
+                an already-constructed backend.
 
         Raises:
             ValueError: If :attr:`REQUIRES_TIME_WINDOW` is `True` and either
