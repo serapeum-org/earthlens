@@ -92,7 +92,9 @@ def stac_catalog(client: HttpClient | None = None) -> dict[str, Any]:
     transport = client or HttpClient(timeout=STAC_TIMEOUT)
     try:
         document = transport.get_json(STAC_CATALOG_URL)
-    except Exception as exc:  # noqa: BLE001 - transport/decode, reported as one
+    # Transport, status, and decode failures all mean the same thing to every
+    # caller — the catalog could not be read — so they are reported as one.
+    except Exception as exc:  # noqa: BLE001
         raise ReleaseLookupError(
             f"could not read Overture's STAC catalog at {STAC_CATALOG_URL} ({exc})"
         ) from exc

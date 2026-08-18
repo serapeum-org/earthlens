@@ -77,8 +77,9 @@ class TestStacCatalog:
 
     def test_rejects_a_document_that_is_not_an_object(self):
         """A JSON array is not a catalog."""
+        client = _FakeClient(["2026-07-22.0"])
         with pytest.raises(ReleaseLookupError, match=r"not a JSON object"):
-            stac_catalog(_FakeClient(["2026-07-22.0"]))
+            stac_catalog(client)
 
     def test_default_client_is_bounded(self):
         """The default transport carries the module's timeout."""
@@ -96,13 +97,15 @@ class TestLatestRelease:
     @pytest.mark.parametrize("latest", [None, "", "https:", "2026-7-22.0"])
     def test_rejects_a_latest_that_is_not_a_release(self, latest):
         """A missing or malformed `latest` is a lookup failure, not a release."""
+        client = _FakeClient({"latest": latest})
         with pytest.raises(ReleaseLookupError, match=r"not a release id"):
-            latest_release(_FakeClient({"latest": latest}))
+            latest_release(client)
 
     def test_propagates_a_catalog_failure(self):
         """An unreadable catalog fails here too."""
+        client = _FakeClient(error=OSError("no route"))
         with pytest.raises(ReleaseLookupError):
-            latest_release(_FakeClient(error=OSError("no route")))
+            latest_release(client)
 
 
 @pytest.mark.overture
