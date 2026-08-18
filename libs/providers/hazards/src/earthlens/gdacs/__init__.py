@@ -27,6 +27,10 @@ Public surface (re-exported from this package):
 
 * :class:`GDACS` — the backend; instantiate with a date range, a bbox,
   and `variables=[hazard_code, ...]`, then call :meth:`GDACS.download`.
+* :class:`GdacsUnavailableError` — raised when the SEARCH feed is
+  unavailable after the backend's retries (a transport error or a
+  retry-worthy status that persisted); carries the originating
+  `status_code`. A live e2e test catches it and skips.
 * :class:`Catalog` — pydantic-backed loader for the bundled
   `gdacs_data_catalog.yaml` hazard-type dispatch table.
 * :class:`HazardType` — one hazard type's dispatch row (`name`,
@@ -49,6 +53,7 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.gdacs._helpers import GdacsUnavailableError
 from earthlens.gdacs.backend import GDACS
 from earthlens.gdacs.catalog import CATALOG_PATH, Catalog, HazardType
 from earthlens.gdacs.events import empty_fc, geojson_to_fc
@@ -57,6 +62,7 @@ __all__ = [
     "CATALOG_PATH",
     "Catalog",
     "GDACS",
+    "GdacsUnavailableError",
     "HazardType",
     "empty_fc",
     "geojson_to_fc",

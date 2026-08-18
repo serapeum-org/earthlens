@@ -10,7 +10,12 @@ from pathlib import Path
 
 import pytest
 
-from earthlens.testing import is_upstream_unavailable, pytest_runtest_call
+from earthlens.testing import (
+    _LIVE_SKIP_PREFIX,
+    is_upstream_unavailable,
+    pytest_runtest_call,
+    skip_live_unavailable,
+)
 
 
 class _WithResponse(Exception):
@@ -259,3 +264,13 @@ def test_guard_fails_a_lane_mixing_creds_skip_and_availability_skip(
     )
     assert result.returncode != 0, result.stdout
     assert "wholly masked" in result.stdout
+
+
+def test_skip_live_unavailable_stamps_the_guard_prefix() -> None:
+    """The helper skips with the shared prefix so the masked-lane guard counts it."""
+    with pytest.raises(pytest.skip.Exception) as excinfo:
+        skip_live_unavailable("GDACS SEARCH unavailable: boom")
+    assert str(excinfo.value).startswith(_LIVE_SKIP_PREFIX), (
+        f"skip reason must carry the guard prefix, got {excinfo.value!r}"
+    )
+    assert "GDACS SEARCH unavailable: boom" in str(excinfo.value)
