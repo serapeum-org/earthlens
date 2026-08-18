@@ -134,7 +134,7 @@ class OhsomeUnavailableError(OhsomeResponseError):
         )
 
 
-def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
+def _exception_chain(exc: Exception) -> Iterator[Exception]:
     """Yield `exc` and its `__cause__` / `__context__` predecessors, once each.
 
     Cycle-guarded (a self-referential `__context__` terminates instead of
@@ -145,17 +145,21 @@ def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
         exc: The exception to walk from.
 
     Yields:
-        BaseException: `exc`, then each predecessor, skipping any already seen.
+        Exception: `exc`, then each predecessor, skipping any already seen.
     """
     seen: set[int] = set()
-    current: BaseException | None = exc
+    current: Exception | None = exc
     while current is not None and id(current) not in seen:
         seen.add(id(current))
         yield current
-        current = current.__cause__ or current.__context__
+        # `__cause__` / `__context__` are `BaseException | None`; keep walking only
+        # while the predecessor is an ordinary `Exception` (a `KeyboardInterrupt`
+        # or `SystemExit` in the chain is never an ohsome response failure).
+        predecessor = current.__cause__ or current.__context__
+        current = predecessor if isinstance(predecessor, Exception) else None
 
 
-def ohsome_http_status(exc: BaseException) -> int | None:
+def ohsome_http_status(exc: Exception) -> int | None:
     """Best-effort HTTP status behind an `ohsome` SDK failure.
 
     The SDK exposes the status inconsistently. Usually it wraps the failure into
@@ -196,7 +200,7 @@ def ohsome_http_status(exc: BaseException) -> int | None:
     return None
 
 
-def ohsome_error_response(exc: BaseException) -> requests.Response | None:
+def ohsome_error_response(exc: Exception) -> requests.Response | None:
     """Best-effort `requests.Response` behind an `ohsome` SDK failure.
 
     The companion to `ohsome_http_status`: walks the same exception chain and
@@ -221,7 +225,7 @@ def ohsome_error_response(exc: BaseException) -> requests.Response | None:
     return None
 
 
-def ohsome_response_is_non_json(exc: BaseException) -> bool:
+def ohsome_response_is_non_json(exc: Exception) -> bool:
     """Return whether the failure is a JSON-decode of the ohsome response body.
 
     True when a `JSONDecodeError` (stdlib, `simplejson`, or the `requests`
