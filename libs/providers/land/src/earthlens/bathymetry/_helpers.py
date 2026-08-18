@@ -10,9 +10,14 @@ time axis — the DEMs are static) was pinned live in the A1 gate; see
 from __future__ import annotations
 
 import re
+import urllib.error
 from typing import TYPE_CHECKING
 
+import requests
+
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+
     from earthlens.base import SpatialExtent
 
 #: Default sampling stride for a griddap axis range (`1` = full resolution).
@@ -20,6 +25,121 @@ _DEFAULT_STEP = 1
 
 #: Parses a `"<value> arc-(second|minute)"` native-resolution label.
 _RESOLUTION_RE = re.compile(r"\s*([\d.]+)\s*arc-(second|minute)", re.IGNORECASE)
+
+#: Exception types that always mean the transport, not the request, failed.
+_TRANSPORT_EXC: tuple[type[BaseException], ...] = (
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout,
+    ConnectionError,
+    TimeoutError,
+    urllib.error.URLError,
+)
+
+#: Lower-cased substrings in a WCS/GDAL failure that mark the OGC service — not
+#: the request — as the problem: a degraded server answering `GetCapabilities`
+#: with an HTML error page (`non-XML body`), a 5xx / gateway error, or a dropped
+#: connection. A genuine request error (a coverage id that does not exist, an
+#: empty subset intersection) carries none of these, so it stays a `ValueError`.
+_SERVICE_SIGNATURES: tuple[str, ...] = (
+    "non-xml",
+    "non xml",
+    "getcapabilities",
+    "empty reply from server",
+    "bad gateway",
+    "gateway time",
+    "service unavailable",
+    "temporarily unavailable",
+    "max retries",
+    "connection reset",
+    "connection aborted",
+    "remote end closed",
+    "read timed out",
+    "failed to establish",
+    "name resolution",
+    "name or service not known",
+)
+
+#: Matches a transient HTTP status (`408` / `429` / `5xx`) only in an HTTP
+#: context — `NNN Server Error` or `HTTP … NNN` — so a stray number in a request
+#: message (a pixel count, a coordinate) never trips it.
+_SERVICE_STATUS_RE = re.compile(
+    r"\b(?:408|429|50[0-9])\s+server error\b|http\D{0,20}(?:408|429|50[0-9])\b", re.I
+)
+
+
+class WcsServiceUnavailableError(RuntimeError):
+    """A WCS coverage read failed because the OGC service was unavailable.
+
+    Raised by the bathymetry backend's WCS path when `pyramids.Dataset.from_wcs`
+    fails for a **transport / service** reason — the endpoint dropped the
+    connection, returned a 5xx / gateway error, or answered `GetCapabilities`
+    with a non-XML error page — rather than a request error (a bad bbox or an
+    unknown coverage id, which stay a `ValueError`). It is a distinct type so a
+    caller — notably a live `e2e` test — can skip on a flaky upstream instead of
+    failing, the way the OSM backend's `OhsomeUnavailableError` does.
+    """
+
+
+def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
+    """Yield `exc` then each linked `__cause__` / `__context__`, cycle-safe.
+
+    Args:
+        exc: The exception to walk.
+
+    Yields:
+        Each exception in the chain, most recent first.
+    """
+    seen: set[int] = set()
+    current: BaseException | None = exc
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        yield current
+        current = current.__cause__ or current.__context__
+
+
+def is_wcs_service_failure(exc: BaseException) -> bool:
+    """Return whether `exc` marks the WCS service (not the request) as at fault.
+
+    Walks the exception's cause/context chain and reports `True` when any link is
+    a transport error (`requests` connection/timeout, `urllib` URL error) or its
+    message carries a service signature — a 5xx / `408` / `429` status, a
+    `non-XML body` `GetCapabilities` answer, an `Empty reply from server`, a
+    dropped connection, or a DNS failure. Returns `False` for a request error (an
+    unknown coverage, an empty subset intersection), so a genuine bug stays a
+    hard failure rather than being masked as "service down".
+
+    Args:
+        exc: The exception `pyramids.Dataset.from_wcs` raised.
+
+    Returns:
+        `True` when the failure looks like an unavailable / degraded service.
+
+    Examples:
+        - A non-XML `GetCapabilities` body is a service failure:
+            ```python
+            >>> from earthlens.bathymetry._helpers import is_wcs_service_failure
+            >>> is_wcs_service_failure(
+            ...     RuntimeError("WCS GetCapabilities returned a non-XML body")
+            ... )
+            True
+
+            ```
+        - An unknown coverage id is a request error, not a service failure:
+            ```python
+            >>> is_wcs_service_failure(RuntimeError("Could not find coverage 'x'"))
+            False
+
+            ```
+    """
+    for link in _exception_chain(exc):
+        if isinstance(link, _TRANSPORT_EXC):
+            return True
+        message = str(link).lower()
+        if any(signature in message for signature in _SERVICE_SIGNATURES):
+            return True
+        if _SERVICE_STATUS_RE.search(message):
+            return True
+    return False
 
 
 def resolution_degrees(native_resolution: str) -> float | None:

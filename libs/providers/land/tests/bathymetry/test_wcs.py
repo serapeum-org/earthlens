@@ -8,7 +8,9 @@ import pyramids.dataset as pyramids_dataset
 import pytest
 import requests
 
+from earthlens.bathymetry import WcsServiceUnavailableError
 from earthlens.bathymetry import backend as backend_module
+from earthlens.bathymetry._helpers import is_wcs_service_failure
 from earthlens.bathymetry.backend import Bathymetry
 from earthlens.bathymetry.catalog import Dataset
 
@@ -190,16 +192,72 @@ def test_non_wgs84_row_skips_numeric_guard(tmp_path: Path, fake_from_wcs: dict):
     backend._guard_wcs_domain(projected, (100.0, 100.0, 200.0, 200.0))
 
 
-def test_from_wcs_failure_is_wrapped(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """A from_wcs error surfaces as a clear ValueError, not a raw exception."""
+def test_request_error_is_wrapped_as_valueerror(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """A non-service from_wcs failure surfaces as a clear ValueError."""
 
     def _boom(endpoint, *, coverage, bbox, **kwargs):
-        raise RuntimeError("server exploded")
+        raise RuntimeError("Empty intersection after subsetting")
 
     monkeypatch.setattr(pyramids_dataset.Dataset, "from_wcs", staticmethod(_boom))
     backend = _make("emodnet", tmp_path)
     with pytest.raises(ValueError, match="WCS request for 'emodnet'"):
         backend.download()
+
+
+def test_service_failure_raises_typed_unavailable_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """A non-XML GetCapabilities answer raises the typed service error, not ValueError."""
+
+    def _degraded(endpoint, *, coverage, bbox, **kwargs):
+        raise RuntimeError("WCS GetCapabilities returned a non-XML body from ows...")
+
+    monkeypatch.setattr(pyramids_dataset.Dataset, "from_wcs", staticmethod(_degraded))
+    backend = _make("emodnet", tmp_path)
+    with pytest.raises(WcsServiceUnavailableError, match="unavailable for 'emodnet'"):
+        backend.download()
+
+
+def test_connection_error_raises_typed_unavailable_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """A dropped connection from from_wcs raises the typed service error."""
+
+    def _dropped(endpoint, *, coverage, bbox, **kwargs):
+        raise requests.exceptions.ConnectionError("Connection aborted")
+
+    monkeypatch.setattr(pyramids_dataset.Dataset, "from_wcs", staticmethod(_dropped))
+    backend = _make("emodnet", tmp_path)
+    with pytest.raises(WcsServiceUnavailableError):
+        backend.download()
+
+
+@pytest.mark.parametrize(
+    "exc, is_service",
+    [
+        (RuntimeError("WCS GetCapabilities returned a non-XML body"), True),
+        (RuntimeError("HTTP error code : 503"), True),
+        (RuntimeError("500 Server Error: Internal Server Error"), True),
+        (requests.exceptions.ConnectionError("Max retries exceeded"), True),
+        (requests.exceptions.Timeout("read timed out"), True),
+        (RuntimeError("Could not find coverage 'emodnet:mean'"), False),
+        (RuntimeError("InvalidSubsetting: Empty intersection after subsetting"), False),
+        (RuntimeError("grid is 5000 x 5000 pixels, too large"), False),
+    ],
+)
+def test_is_wcs_service_failure_classification(exc, is_service):
+    """Service/transport failures classify True; request errors classify False."""
+    assert is_wcs_service_failure(exc) is is_service
+
+
+def test_is_wcs_service_failure_walks_the_chain():
+    """A transport error hidden under a generic wrapper is still detected."""
+    inner = requests.exceptions.ConnectionError("Connection reset by peer")
+    outer = RuntimeError("from_wcs failed")
+    outer.__cause__ = inner
+    assert is_wcs_service_failure(outer) is True
 
 
 def test_griddap_row_never_calls_from_wcs(
