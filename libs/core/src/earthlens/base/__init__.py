@@ -61,6 +61,7 @@ from earthlens.base.region import (
 from earthlens.base.s3 import S3Auth, S3Credentials
 from earthlens.base.spatial import (
     METRES_PER_DEGREE,
+    bbox_overlaps,
     crop_to_aoi,
     ensure_no_data,
     estimate_pixel_dims,
@@ -78,6 +79,7 @@ __all__ = [
     "AbstractDataSource",
     "aoi_tag",
     "AuthenticationError",
+    "bbox_overlaps",
     "CADENCE_ALIASES",
     "catalog_cache_key",
     "clear_all_catalog_caches",

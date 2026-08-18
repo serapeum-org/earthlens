@@ -507,6 +507,36 @@ def vsicurl_config() -> CloudConfig:
     )
 
 
+def bbox_overlaps(dataset: Any, bbox: Sequence[float]) -> bool:
+    """Whether a bbox intersects a dataset's geographic extent.
+
+    A cheap geographic bounds test from the dataset's affine transform and pixel
+    dimensions, used to reject an AOI outside the source's coverage *before* a
+    windowed read — so an out-of-extent AOI fails fast with a clear error rather
+    than falling into pyramids' full-source cutline warp. The bbox is assumed to
+    be in the dataset's own CRS (the case for the raster backends here).
+
+    Args:
+        dataset: An opened `pyramids.Dataset` exposing `geotransform`, `columns`,
+            and `rows`.
+        bbox: `(west, south, east, north)` in the dataset's CRS.
+
+    Returns:
+        `True` when the bbox intersects the raster's extent.
+    """
+    origin_x, pixel_w, _, origin_y, _, pixel_h = dataset.geotransform
+    west_bound, east_bound = origin_x, origin_x + dataset.columns * pixel_w
+    # `pixel_h` is negative for a north-up grid, so the south edge is lower.
+    north_bound, south_bound = origin_y, origin_y + dataset.rows * pixel_h
+    west, south, east, north = bbox
+    return not (
+        east <= west_bound
+        or west >= east_bound
+        or north <= south_bound
+        or south >= north_bound
+    )
+
+
 def windowed_bbox_crop(dataset: Any, bbox: Sequence[float], *, epsg: Any = 4326) -> Any:
     """Windowed bbox crop that keeps an all-no-data AOI as an all-no-data crop.
 
@@ -515,14 +545,22 @@ def windowed_bbox_crop(dataset: Any, bbox: Sequence[float], *, epsg: Any = 4326)
     no valid pixels` when that window is entirely no-data. An in-coverage but
     empty AOI (e.g. open sea, or an area with no modelled value) must still
     produce a crop, matching the pre-refactor contract where the backend wrote an
-    all-no-data raster rather than aborting. So retry with `touch=False`, which
-    returns the all-no-data window instead of raising. The fallback reads more of
-    the source (a cutline warp) and is logged, but fires only for the rare empty
-    AOI; the common data-present AOI keeps the fast windowed read.
+    all-no-data raster rather than aborting. So retry with `touch=False`, whose
+    cutline warp crops the same window but returns the all-no-data result instead
+    of raising, and materialise it (a read into an in-memory dataset) so the
+    fallback's reads happen here — inside any tuning context and before the source
+    handle is closed — rather than lazily through a VRT afterwards.
+
+    Contract: the caller must guarantee `bbox` overlaps the source (e.g. via
+    `bbox_overlaps`). pyramids raises the same "no valid pixels" message for both
+    an all-no-data window (kept here) and a non-overlapping bbox (a full-source
+    read then error); pre-checking overlap ensures the only meaning that reaches
+    the fallback is all-no-data.
 
     Args:
         dataset: An opened `pyramids.Dataset` (anything exposing `crop`).
-        bbox: `(west, south, east, north)` in `epsg` (already widened if a point).
+        bbox: `(west, south, east, north)` in `epsg` (already widened if a point),
+            guaranteed to overlap the source.
         epsg: CRS of `bbox`. Defaults to `4326`.
 
     Returns:
@@ -532,13 +570,29 @@ def windowed_bbox_crop(dataset: Any, bbox: Sequence[float], *, epsg: Any = 4326)
     try:
         return dataset.crop(bbox=list(bbox), epsg=epsg)
     except ValueError as exc:
+        # The only ValueError carrying this phrase is pyramids'
+        # `_correct_wrap_cutline_error`; it means the window overlaps no valid
+        # data. Coupled to pyramids' wording — the `test_all_nodata_*` tests fail
+        # if a pyramids bump rewords it, flagging this string for update.
         if "no valid pixels" not in str(exc):
             raise
         logger.info(
             "windowed crop AOI holds no valid data; keeping the all-no-data "
-            "window via the cutline path (reads more of the source)"
+            "window via the slower cutline-warp crop of the same window"
         )
-        return dataset.crop(bbox=list(bbox), epsg=epsg, touch=False)
+        fallback = dataset.crop(bbox=list(bbox), epsg=epsg, touch=False)
+        # `touch=False` returns a lazy warp VRT that reads through to the source;
+        # materialise it now so those reads happen before the caller closes the
+        # source handle (and inside any active tuning context).
+        from pyramids.dataset import Dataset
+
+        no_data = fallback.no_data_value
+        return Dataset.create_from_array(
+            arr=fallback.read_array(),
+            geo=fallback.geotransform,
+            epsg=fallback.epsg,
+            no_data_value=no_data[0] if isinstance(no_data, (list, tuple)) else no_data,
+        )
 
 
 def widen_degenerate_bbox(
