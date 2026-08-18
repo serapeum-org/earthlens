@@ -131,6 +131,7 @@ def sidecar_is_fresh(target: Path, tag: str) -> bool:
             True
             >>> sidecar_is_fresh(target, "9,9,9,9")
             False
+            >>> import shutil; shutil.rmtree(target.parent)
 
             ```
         - A missing output (even with a sidecar present) is not fresh:
@@ -142,6 +143,7 @@ def sidecar_is_fresh(target: Path, tag: str) -> bool:
             >>> write_sidecar(target, "0,0,1,1")
             >>> sidecar_is_fresh(target, "0,0,1,1")
             False
+            >>> import shutil; shutil.rmtree(target.parent)
 
             ```
     """
@@ -170,6 +172,7 @@ def write_sidecar(target: Path, tag: str) -> None:
             >>> write_sidecar(target, "0,0,1,1")
             >>> sidecar_path(target).read_text(encoding="utf-8")
             '0,0,1,1'
+            >>> import shutil; shutil.rmtree(target.parent)
 
             ```
     """

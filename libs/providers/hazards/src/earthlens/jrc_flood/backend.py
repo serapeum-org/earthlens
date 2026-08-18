@@ -345,10 +345,12 @@ class JRCFlood(AbstractDataSource):
         Opens the whole-Europe GeoTIFF lazily and windowed-crops it to the AOI
         with `pyramids.Dataset.crop(bbox=)`, whose fast path reads **only** the
         AOI's pixel window over `/vsicurl` (HTTP range requests — pyramids tunes
-        the readdir/retry/timeout knobs itself) and carries the source grid, CRS
-        and no-data through. `crop_to_aoi` then trims the all-touched window to
-        the exact bbox — or to the exact polygon when the request carried an
-        `aoi=` polygon.
+        the readdir/retry/timeout knobs itself) for an axis-aligned box in the
+        source CRS, carrying the source grid, CRS and no-data through (with the
+        catalog no-data stamped when the source declares none). A point AOI is
+        widened to one pixel so the strict fast path still fires. `crop_to_aoi`
+        then trims the all-touched window to the exact bbox — or to the exact
+        polygon when the request carried an `aoi=` polygon.
 
         Args:
             product: The `RemoteProduct` whose `metadata` carries `rp` + `url`.

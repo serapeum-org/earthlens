@@ -6,11 +6,12 @@ range-accessible Cloud-Optimized GeoTIFFs on figshare, read **windowed** over
 Atlas layers are DEFLATE-compressed ZIP archives with no random access, so they
 are downloaded once into a cache and read **windowed from the local ZIP member**
 (`download_cache_crop`). Both paths funnel through `read_part_to_geotiff`, which
-delegates to `pyramids.dataset.Dataset.crop(bbox=)` — its windowed fast path
-reads only the AOI's pixel window straight from the source (over `/vsicurl/` a
-few hundred KB rather than the whole multi-GB raster) and never materialises the
-whole global grid. `pyramids` applies the `/vsicurl` HTTP tuning (readdir/retry/
-timeout, extensionless-URL handling) itself, so no GDAL env is set here.
+delegates to `pyramids.dataset.Dataset.crop(bbox=)`. For an axis-aligned box in
+the source CRS its windowed fast path reads only the AOI's pixel window straight
+from the source (over `/vsicurl/` a few hundred KB rather than the whole multi-GB
+raster); an ineligible box (reprojecting or a rotated grid) falls back to a
+cutline warp instead. `pyramids` applies the `/vsicurl` HTTP tuning (readdir/
+retry/timeout, extensionless-URL handling) itself, so no GDAL env is set here.
 
 All raster I/O goes through `pyramids`; the stdlib `zipfile` is used only to
 name the GeoTIFF member inside a downloaded ZIP, never to read pixels.
@@ -77,11 +78,15 @@ def read_part_to_geotiff(
 ) -> Path:
     """Read just the `bbox` window from a raster and write it as a GeoTIFF.
 
-    Delegates the windowed read to `pyramids.dataset.Dataset.crop(bbox=)`, whose
-    fast path resolves the bbox to a pixel window and reads **only** that window
-    straight from the source: for a COG over `/vsicurl/` a few hundred KB rather
-    than the whole multi-GB file, and for a `/vsizip/` member only that member's
-    window. The source grid, CRS and no-data value are carried onto the crop, so
+    Delegates the windowed read to `pyramids.dataset.Dataset.crop(bbox=)`. For an
+    axis-aligned box in the source CRS (the case here — EPSG:4326 AOI against a
+    4326 source) its fast path resolves the bbox to a pixel window and reads
+    **only** that window straight from the source: for a COG over `/vsicurl/` a
+    few hundred KB rather than the whole multi-GB file, and for a `/vsizip/`
+    member only that member's window. A point / cell-edge AOI is first widened to
+    one pixel (`widen_degenerate_bbox`) so the strict `west < east` fast path
+    still fires. The source grid, CRS and no-data value are carried onto the crop
+    (with a `-9999` fallback stamped when the source declares none), so
     genuinely-empty cells stay flagged. `pyramids` applies the `/vsicurl` HTTP
     tuning (readdir/retry/timeout, extensionless-URL handling) itself.
 

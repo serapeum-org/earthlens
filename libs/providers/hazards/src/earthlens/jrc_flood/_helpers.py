@@ -7,9 +7,11 @@ single-band EPSG:4326 Float32 grid at ~0.000833 deg (~90 m; documented 100 m),
 covering Europe and the Mediterranean Basin — 110162x51992 px (~23 GB
 uncompressed), so it is **never** read whole. The backend opens it lazily over
 `pyramids.dataset.Dataset.crop(bbox=)`, whose windowed fast path reads only the
-AOI's pixel window over GDAL's `/vsicurl` (HTTP range requests). This module only
-builds the per-return-period URL; the windowed read + crop live in the backend
-via pyramids (which applies the `/vsicurl` HTTP tuning itself).
+AOI's pixel window over GDAL's `/vsicurl` (HTTP range requests) for an
+axis-aligned box in the source CRS — the case here (an EPSG:4326 AOI against the
+4326 EFHM). This module only builds the per-return-period URL; the windowed read
++ crop live in the backend via pyramids (which applies the `/vsicurl` HTTP tuning
+itself).
 """
 
 from __future__ import annotations
