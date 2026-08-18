@@ -309,13 +309,15 @@ class TestEmptyResultSignals:
         logger.remove(wsink)
         logger.remove(isink)
 
-        assert df.empty and "station_id" in df.columns
+        assert df.empty
+        assert "station_id" in df.columns
         assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
         # A single aggregate outage WARNING, naming both eras, not one per era.
         outage = [m for m in warnings if "no era returned any usable observations" in m]
         assert len(outage) == 1
         assert "upstream" in outage[0]
-        assert "Verified" in outage[0] and "Unverified" in outage[0]
+        assert "Verified" in outage[0]
+        assert "Unverified" in outage[0]
         # The per-era emptiness is downgraded to a diagnostic INFO (not a WARNING),
         # and is positively emitted per era with the new wording.
         assert not any("returned no Parquet files" in m for m in warnings)
@@ -333,7 +335,8 @@ class TestEmptyResultSignals:
         )
         logger.remove(sink)
 
-        assert df.empty and "station_id" in df.columns
+        assert df.empty
+        assert "station_id" in df.columns
         assert any("none fell within" in m for m in messages)
         # Distinct from the empty-era path: this is not reported as missing files.
         assert not any("no Parquet files" in m for m in messages)
@@ -384,7 +387,8 @@ class TestAdjacentEraFallback:
             progress_bar=False
         )
 
-        assert df.empty and "station_id" in df.columns
+        assert df.empty
+        assert "station_id" in df.columns
         assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
 
     def test_out_of_range_request_does_not_fall_back(self, tmp_path):
