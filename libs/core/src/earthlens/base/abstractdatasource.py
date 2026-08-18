@@ -15,6 +15,8 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from earthlens.config import cache_dir
+
 if TYPE_CHECKING:
     from earthlens.base.http import HttpClient
 
@@ -991,8 +993,10 @@ class AbstractDataSource(ABC):
             fmt: `strptime` format for `start` / `end`. Defaults
                 to `"%Y-%m-%d"`.
             path: Output directory. Resolved here and created on the first
-                download, not at construction. Defaults to the current
-                working directory.
+                download, not at construction. When omitted (or blank), falls
+                back to the configured earthlens cache directory
+                (`set_cache_dir()` / `EARTHLENS_CACHE_DIR`, else
+                `~/.earthlens/cache`); see `earthlens.config`.
 
         Raises:
             ValueError: If :attr:`REQUIRES_TIME_WINDOW` is `True` and either
@@ -1017,7 +1021,10 @@ class AbstractDataSource(ABC):
         self.space = self._create_grid(lat_lim, lon_lim)
         self.time = self._check_input_dates(start, end, temporal_resolution, fmt)
 
-        self.root_dir = Path(path).absolute()
+        # An explicit `path=` wins; otherwise fall back to the configured
+        # earthlens cache dir (set_cache_dir() / $EARTHLENS_CACHE_DIR) so all
+        # downloads can be pointed at one location without threading `path=`.
+        self.root_dir = Path(path).absolute() if str(path).strip() else cache_dir()
         self.path = self.root_dir
 
     def _refuse_unsupported_aggregate(self) -> None:

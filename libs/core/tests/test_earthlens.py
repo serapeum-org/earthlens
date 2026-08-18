@@ -421,10 +421,12 @@ class TestTopLevelReExports:
             "EarthLens",
             "PolygonAoiWarning",
             "aggregate_netcdf",
+            "cache_dir",
             "download",
             "find",
             "iter_aggregate_netcdf",
             "search",
+            "set_cache_dir",
             "sources",
         ], f"Unexpected top-level __all__: {earthlens.core.__all__!r}"
 
@@ -845,11 +847,13 @@ class TestFacadePath:
         # An empty result holds no handle into the temp dir, so it is gone at once.
         assert not Path(temp_dir).exists(), "load() leaked its temp dir"
 
-    def test_empty_path_still_uses_cwd(self, tmp_path, monkeypatch):
-        """An explicit path='' opts into the current working directory."""
-        from pathlib import Path
+    def test_blank_path_falls_back_to_the_cache_dir(self, tmp_path, monkeypatch):
+        """A blank path counts as "not given", so the configured cache dir wins."""
+        from earthlens.config import CACHE_DIR_ENV, set_cache_dir
 
+        set_cache_dir(None)
         monkeypatch.chdir(tmp_path)
+        monkeypatch.setenv(CACHE_DIR_ENV, str(tmp_path / "cache"))
         backend = EarthLens(
             data_source="chc",
             variables=["precipitation"],
@@ -857,7 +861,7 @@ class TestFacadePath:
             end="2009-01-02",
             path="",
         ).datasource
-        assert backend.root_dir == Path.cwd(), f"got {backend.root_dir}"
+        assert backend.root_dir == tmp_path / "cache", f"got {backend.root_dir}"
 
 
 class _FakeRaster:
