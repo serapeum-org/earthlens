@@ -66,6 +66,7 @@ from earthlens.base.spatial import (
     mask_to_geometry,
     normalize_aoi,
     resolve_aoi,
+    widen_degenerate_bbox,
 )
 
 __all__ = [
@@ -116,6 +117,7 @@ __all__ = [
     "to_datetime",
     "warn_if_egress",
     "WHOLE_WINDOW",
+    "widen_degenerate_bbox",
     "window_labels",
     "write_sidecar",
     "yaml_files_for",

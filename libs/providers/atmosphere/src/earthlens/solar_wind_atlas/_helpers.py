@@ -25,7 +25,7 @@ from urllib.parse import urlsplit
 
 import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 
-from earthlens.base import close_quietly
+from earthlens.base import close_quietly, widen_degenerate_bbox
 from earthlens.base.http import HttpClient
 
 if TYPE_CHECKING:
@@ -94,10 +94,14 @@ def read_part_to_geotiff(
     """
     from pyramids.dataset import Dataset
 
-    west, south, east, north = bbox
     dataset = Dataset.read_file(path)
     try:
-        window = dataset.crop(bbox=[west, south, east, north], epsg=epsg)
+        # A point / cell-edge AOI is widened to one source pixel so crop(bbox=)
+        # yields a 1x1 window instead of raising on the zero-width box.
+        geo = dataset.geotransform
+        window = dataset.crop(
+            bbox=widen_degenerate_bbox(bbox, geo[1], geo[5]), epsg=epsg
+        )
     finally:
         # Drop the /vsicurl handle — an open remote dataset can hang the
         # interpreter at exit on GDAL's curl-handle cleanup (A1b).

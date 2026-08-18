@@ -45,14 +45,20 @@ def test_window_crop_opens_vsicurl_and_crops(
     assert fake_pyramids.recorder["written"] == str(out)
 
 
-def test_window_crop_degenerate_bbox_still_crops(
+def test_window_crop_degenerate_bbox_widened_before_crop(
     fake_pyramids: type[FakeDataset], tmp_path: Path
 ) -> None:
-    """A zero-extent point bbox is forwarded to crop (pyramids clamps the window)."""
+    """A zero-extent point bbox is widened to one source pixel before crop.
+
+    crop(bbox=) requires a strictly positive box, so a point AOI must be
+    widened first; assert the collapsed edges are pushed out.
+    """
     _helpers.window_crop(
         "https://x/w.tif", [12.0, 55.0, 12.0, 55.0], tmp_path / "p.tif"
     )
-    assert fake_pyramids.recorder["crop"][0]["bbox"] == [12.0, 55.0, 12.0, 55.0]
+    bbox = fake_pyramids.recorder["crop"][0]["bbox"]
+    assert bbox[2] > bbox[0], f"west edge not widened: {bbox}"
+    assert bbox[3] > bbox[1], f"south edge not widened: {bbox}"
     assert fake_pyramids.recorder["written"] == str(tmp_path / "p.tif")
 
 

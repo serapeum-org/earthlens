@@ -36,7 +36,7 @@ from earthlens.base import (
     sidecar_is_fresh,
     write_sidecar,
 )
-from earthlens.base.spatial import crop_to_aoi
+from earthlens.base.spatial import crop_to_aoi, widen_degenerate_bbox
 from earthlens.jrc_flood._helpers import efhm_url
 from earthlens.jrc_flood.catalog import Catalog, Dataset
 
@@ -380,9 +380,14 @@ class JRCFlood(AbstractDataSource):
             logger.info(
                 f"JRCFlood RP{rp}: windowed /vsicurl crop of {self._bbox} from {url}"
             )
+            # A point / cell-edge AOI (min == max on an axis) is widened to one
+            # source pixel so crop(bbox=)'s fast path yields a 1x1 window rather
+            # than raising on the zero-width box.
+            geo = source.geotransform
+            bbox = widen_degenerate_bbox(self._bbox, geo[1], geo[5])
             # The windowed fast path reads only the AOI pixel window from the
             # ~23 GB source; nodata / CRS / grid are carried onto the crop.
-            windowed = source.crop(bbox=list(self._bbox), epsg=4326)
+            windowed = source.crop(bbox=bbox, epsg=4326)
         finally:
             close_quietly(source)
 

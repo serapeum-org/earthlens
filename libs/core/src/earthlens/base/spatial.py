@@ -465,6 +465,54 @@ def normalize_aoi(
     return lat_lim, lon_lim
 
 
+def widen_degenerate_bbox(
+    bbox: Sequence[float], pixel_width: float, pixel_height: float
+) -> list[float]:
+    """Widen a zero-width / zero-height AOI to one source pixel.
+
+    `pyramids.Dataset.crop(bbox=)` requires a strictly positive box
+    (`west < east and south < north`); a point or cell-edge-aligned AOI
+    (`min == max` on an axis, which the facade allows) would otherwise raise. A
+    collapsed edge is pushed out by exactly one source pixel so the crop's
+    windowed fast path resolves to the single cell containing the point — the
+    1x1 window the old floor/ceil pixel math clamped to (`max(1, ...)`). A box
+    already positive on both axes is returned unchanged.
+
+    Args:
+        bbox: `(west, south, east, north)` in the source CRS.
+        pixel_width: The source's pixel width (`geotransform[1]`); the absolute
+            value is used, so the sign does not matter.
+        pixel_height: The source's pixel height (`geotransform[5]`, negative for
+            a north-up grid); the absolute value is used.
+
+    Returns:
+        A `[west, south, east, north]` list, with any collapsed axis widened by
+        one pixel.
+
+    Examples:
+        - A point AOI is widened by one pixel on both axes:
+            ```python
+            >>> from earthlens.base.spatial import widen_degenerate_bbox
+            >>> widen_degenerate_bbox([5.0, -5.0, 5.0, -5.0], 1.0, -1.0)
+            [5.0, -5.0, 6.0, -4.0]
+
+            ```
+        - A positive box is left unchanged:
+            ```python
+            >>> from earthlens.base.spatial import widen_degenerate_bbox
+            >>> widen_degenerate_bbox([4.8, 51.8, 5.0, 52.0], 0.00083, -0.00083)
+            [4.8, 51.8, 5.0, 52.0]
+
+            ```
+    """
+    west, south, east, north = bbox
+    if east <= west:
+        east = west + abs(pixel_width)
+    if north <= south:
+        north = south + abs(pixel_height)
+    return [west, south, east, north]
+
+
 def crop_to_aoi(
     dataset: Any,
     space: Any,
