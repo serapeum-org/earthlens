@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from earthlens.config import cache_dir
+from earthlens.config import resolve_output_path
 
 if TYPE_CHECKING:
     from earthlens.base.http import HttpClient
@@ -956,7 +956,7 @@ class AbstractDataSource(ABC):
         lon_lim: list[float],
         temporal_resolution: str = "daily",
         fmt: str = "%Y-%m-%d",
-        path: Path | str = "",
+        path: Path | str | None = None,
     ):
         """Initialize a data source instance.
 
@@ -994,11 +994,12 @@ class AbstractDataSource(ABC):
                 to `"%Y-%m-%d"`.
             path: Output directory. Resolved here and created on the first
                 download, not at construction. A relative value is anchored to
-                the current working directory. When omitted, empty, or only
-                whitespace, it falls back to the configured earthlens cache
-                directory (`set_cache_dir()` / `EARTHLENS_CACHE_DIR`, else
-                `~/.earthlens/cache`); see `earthlens.config`. The fallback is
-                resolved once, here, so a later `set_cache_dir()` does not move
+                the current working directory. When omitted (`None`) it falls
+                back to the configured earthlens output directory
+                (`set_output_dir()` / `EARTHLENS_DATA_DIR`, else
+                `~/.earthlens/data`); see `earthlens.config`. Pass `path=""` to
+                ask for the working directory explicitly. The fallback is
+                resolved once, here, so a later `set_output_dir()` does not move
                 an already-constructed backend.
 
         Raises:
@@ -1024,10 +1025,11 @@ class AbstractDataSource(ABC):
         self.space = self._create_grid(lat_lim, lon_lim)
         self.time = self._check_input_dates(start, end, temporal_resolution, fmt)
 
-        # An explicit `path=` wins; otherwise fall back to the configured
-        # earthlens cache dir (set_cache_dir() / $EARTHLENS_CACHE_DIR) so all
-        # downloads can be pointed at one location without threading `path=`.
-        self.root_dir = Path(path).absolute() if str(path).strip() else cache_dir()
+        # An explicit `path=` wins; omitting it entirely falls back to the
+        # configured output dir (set_output_dir() / $EARTHLENS_DATA_DIR) so a
+        # project can be pointed at one location without threading `path=`.
+        # `path=""` stays the documented way to ask for the working directory.
+        self.root_dir = resolve_output_path(path)
         self.path = self.root_dir
 
     def _refuse_unsupported_aggregate(self) -> None:

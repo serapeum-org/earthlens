@@ -110,7 +110,7 @@ class Bathymetry(AbstractDataSource):
         dataset: str = "",
         variables: list[str] | None = None,
         temporal_resolution: str = "static",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         timeout: float = 120.0,
         catalog: Catalog | None = None,

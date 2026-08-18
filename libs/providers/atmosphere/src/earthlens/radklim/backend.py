@@ -85,7 +85,7 @@ class RADKLIM(AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "raw",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         *,
         data_format: str | None = None,

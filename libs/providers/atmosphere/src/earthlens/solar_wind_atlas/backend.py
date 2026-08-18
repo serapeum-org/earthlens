@@ -93,7 +93,7 @@ class SolarWindAtlas(AbstractDataSource):
         lon_lim: list[float] | None = None,
         variables: list[str] | None = None,
         temporal_resolution: str = "static",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         cache_dir: Path | str | None = None,
         timeout: float = 600.0,

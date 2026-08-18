@@ -91,7 +91,7 @@ class JRCFlood(AbstractDataSource):
         lon_lim: list[float] | None = None,
         return_periods: list[int | str] | int | str | None = None,
         temporal_resolution: str = "static",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         *,
         catalog: Catalog | None = None,

@@ -116,7 +116,7 @@ class CMEMS(AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "daily",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         service_username: str | None = None,
         service_password: str | None = None,

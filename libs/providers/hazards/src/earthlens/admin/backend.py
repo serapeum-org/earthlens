@@ -124,7 +124,7 @@ class AdminBoundaries(AbstractDataSource):
         start: str | None = None,
         end: str | None = None,
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         country: str | None = None,
         scale: str | None = None,

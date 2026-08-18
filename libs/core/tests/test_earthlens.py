@@ -425,8 +425,10 @@ class TestTopLevelReExports:
             "download",
             "find",
             "iter_aggregate_netcdf",
+            "output_dir",
             "search",
             "set_cache_dir",
+            "set_output_dir",
             "sources",
         ], f"Unexpected top-level __all__: {earthlens.core.__all__!r}"
 
@@ -795,17 +797,20 @@ class TestFacadePath:
     def test_omitted_path_download_persists_to_named_subdir(
         self, tmp_path, monkeypatch
     ):
-        """download() with an omitted path persists under ./earthlens-data/<source>/."""
+        """download() with an omitted path persists under <output_dir()>/<source>/."""
         from pathlib import Path
 
+        from earthlens.config import set_output_dir
+
         monkeypatch.chdir(tmp_path)
+        set_output_dir(tmp_path / "configured")
         facade = EarthLens(
             data_source="chc",
             variables=["precipitation"],
             start="2009-01-01",
             end="2009-01-02",
         )
-        expected = Path.cwd() / "earthlens-data" / "chc"
+        expected = Path(tmp_path / "configured").resolve() / "chc"
         assert facade.datasource.root_dir == expected, (
             f"got {facade.datasource.root_dir}"
         )
@@ -819,10 +824,13 @@ class TestFacadePath:
         assert expected.is_dir(), "download() should create the default directory"
 
     def test_omitted_path_load_uses_tempdir(self, tmp_path, monkeypatch):
-        """load() redirects to a temp dir and removes the empty ./earthlens-data default."""
+        """load() redirects to a temp dir and removes the empty default."""
         from pathlib import Path
 
+        from earthlens.config import set_output_dir
+
         monkeypatch.chdir(tmp_path)
+        set_output_dir(tmp_path / "configured")
         facade = EarthLens(
             data_source="chc",
             variables=["precipitation"],
@@ -839,7 +847,7 @@ class TestFacadePath:
 
         monkeypatch.setattr(facade.datasource, "download", _capture)
         facade.load(progress_bar=False)
-        default = Path.cwd() / "earthlens-data" / "chc"
+        default = Path(tmp_path / "configured").resolve() / "chc"
         assert facade.datasource.root_dir != default, (
             "load() should redirect off the default"
         )
@@ -847,13 +855,14 @@ class TestFacadePath:
         # An empty result holds no handle into the temp dir, so it is gone at once.
         assert not Path(temp_dir).exists(), "load() leaked its temp dir"
 
-    def test_blank_path_falls_back_to_the_cache_dir(self, tmp_path, monkeypatch):
-        """A blank path counts as "not given", so the configured cache dir wins."""
-        from earthlens.config import CACHE_DIR_ENV, set_cache_dir
+    def test_blank_path_still_means_the_working_directory(self, tmp_path, monkeypatch):
+        """An explicit path="" opts into the cwd even when an output dir is configured."""
+        from pathlib import Path
 
-        set_cache_dir(None)
+        from earthlens.config import set_output_dir
+
         monkeypatch.chdir(tmp_path)
-        monkeypatch.setenv(CACHE_DIR_ENV, str(tmp_path / "cache"))
+        set_output_dir(tmp_path / "configured")
         backend = EarthLens(
             data_source="chc",
             variables=["precipitation"],
@@ -861,7 +870,8 @@ class TestFacadePath:
             end="2009-01-02",
             path="",
         ).datasource
-        assert backend.root_dir == tmp_path / "cache", f"got {backend.root_dir}"
+        set_output_dir(None)
+        assert backend.root_dir == Path.cwd(), f"got {backend.root_dir}"
 
 
 class _FakeRaster:

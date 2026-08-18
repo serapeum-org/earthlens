@@ -95,7 +95,7 @@ class FABDEM(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "static",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         *,
         catalog: Catalog | None = None,

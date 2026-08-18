@@ -98,7 +98,7 @@ class Glaciers(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "annual",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         region: str | list[str] | None = None,
         max_features: int = 10000,

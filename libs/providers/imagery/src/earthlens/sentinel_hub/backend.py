@@ -88,7 +88,7 @@ class SentinelHub(AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "daily",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         resolution: float = 10.0,
         evalscript: str | None = None,

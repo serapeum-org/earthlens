@@ -95,7 +95,7 @@ class Aqueduct(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         admin_level: str = "country",
         metric: str = "population_affected",

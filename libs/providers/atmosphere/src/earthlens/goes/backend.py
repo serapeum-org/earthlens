@@ -250,7 +250,7 @@ class GOES(AbstractDataSource):
         dataset: str = "abi-l2-mcmip",
         variables: list[str] | str | None = None,
         temporal_resolution: str = "raw",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         *,
         satellite: str = "east",

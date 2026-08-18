@@ -86,7 +86,7 @@ class CatRaRE(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         threshold: str = "t5",
         geometry_layer: str = "zones",

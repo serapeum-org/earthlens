@@ -31,6 +31,7 @@ from loguru import logger
 from earthlens._backends import discover_backends
 from earthlens.base import split_time
 from earthlens.base.spatial import resolve_aoi
+from earthlens.config import output_dir
 
 if TYPE_CHECKING:
     from earthlens.aggregate import AggregationConfig
@@ -724,8 +725,10 @@ class EarthLens:
                 `ValueError`. Defaults to `None`.
             path: Output directory. Created by the backend if it does
                 not exist. When omitted (`None`), defaults to
-                `./earthlens-data/<data_source>/` rather than the current
-                working directory; pass `path=""` to opt into the CWD.
+                `<output_dir()>/<data_source>/` — the directory configured by
+                `set_output_dir()` / `EARTHLENS_DATA_DIR`, else
+                `~/.earthlens/data` — rather than the current working
+                directory; pass `path=""` to opt into the CWD.
             dataset: Explicit dataset / collection key, the ergonomic
                 alternative to keying it into `variables`. When given
                 with a plain `variables` list, the facade composes the
@@ -970,14 +973,14 @@ class EarthLens:
             lon_lim = DEFAULT_LONGITUDE_LIMIT
 
         # An omitted `path` makes earthlens manage the location: `download()`
-        # persists to a named per-source subdirectory (`./earthlens-data/<source>/`)
-        # rather than scattering files into the cwd, while `load()` (which only
-        # needs the in-memory object) redirects to a throwaway temp dir and
-        # removes the empty default afterwards. An explicit `path=""` still means
-        # the CWD (a deliberate choice).
+        # persists to a named per-source subdirectory of the configured output
+        # directory rather than scattering files into the cwd, while `load()`
+        # (which only needs the in-memory object) redirects to a throwaway temp
+        # dir and removes the empty default afterwards. An explicit `path=""`
+        # still means the CWD (a deliberate choice).
         self._explicit_path = path is not None
         if path is None:
-            path = Path("earthlens-data") / data_source
+            path = output_dir() / data_source
             logger.info(
                 f"No `path` given; download() writes {data_source!r} output under "
                 f"{path}/ (load() uses a temp dir)."

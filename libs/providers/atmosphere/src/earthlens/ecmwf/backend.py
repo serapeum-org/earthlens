@@ -21,6 +21,7 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.base import AuthenticationError as _BaseAuthenticationError
+from earthlens.config import resolve_output_path
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
 from earthlens.ecmwf.endpoints import constraints_base_url, endpoint_url
@@ -451,7 +452,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "daily",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         skip_constraints: bool = False,
         request: dict[str, Any] | None = None,
@@ -529,7 +530,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             # Construction stays read-only: the base `download` wrapper's
             # `_ensure_root_dir` creates (and unwinds on failure) the output
             # directory at download time, exactly as the typed path relies on.
-            self.root_dir = Path(path).absolute()
+            self.root_dir = resolve_output_path(path)
             self.path = self.root_dir
             return
 
