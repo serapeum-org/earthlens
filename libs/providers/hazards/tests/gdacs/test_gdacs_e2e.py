@@ -118,16 +118,19 @@ class TestSkipOnUpstream:
 
     def test_skips_on_typed_unavailable(self):
         """A GdacsUnavailableError becomes a prefixed skip, not a failure."""
+        exc = GdacsUnavailableError("down", status_code=503)
         with pytest.raises(pytest.skip.Exception) as excinfo:
-            _skip_on_upstream(GdacsUnavailableError("down", status_code=503))
+            _skip_on_upstream(exc)
         assert "GDACS SEARCH unavailable" in str(excinfo.value)
 
     def test_skips_on_transport_error(self):
         """A bare transport error also skips (belt-and-braces arm)."""
+        exc = requests.ConnectionError("dropped")
         with pytest.raises(pytest.skip.Exception):
-            _skip_on_upstream(requests.ConnectionError("dropped"))
+            _skip_on_upstream(exc)
 
     def test_reraises_other_errors(self):
         """A non-availability error re-raises unchanged so the test still fails."""
+        exc = ValueError("real bug")
         with pytest.raises(ValueError, match="real bug"):
-            _skip_on_upstream(ValueError("real bug"))
+            _skip_on_upstream(exc)
