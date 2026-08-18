@@ -77,6 +77,18 @@ class WcsServiceUnavailableError(RuntimeError):
     unknown coverage id, which stay a `ValueError`). It is a distinct type so a
     caller — notably a live `e2e` test — can skip on a flaky upstream instead of
     failing, the way the OSM backend's `OhsomeUnavailableError` does.
+
+    Examples:
+        - It is a `RuntimeError`, so a broad transport-failure `except` catches it:
+            ```python
+            >>> from earthlens.bathymetry import WcsServiceUnavailableError
+            >>> try:
+            ...     raise WcsServiceUnavailableError("the WCS service is unavailable")
+            ... except RuntimeError as exc:
+            ...     print(exc)
+            the WCS service is unavailable
+
+            ```
     """
 
 
@@ -124,8 +136,17 @@ def is_wcs_service_failure(exc: BaseException) -> bool:
             True
 
             ```
+        - A dropped connection is a service failure, whatever its message:
+            ```python
+            >>> import requests
+            >>> from earthlens.bathymetry._helpers import is_wcs_service_failure
+            >>> is_wcs_service_failure(requests.exceptions.ConnectionError("boom"))
+            True
+
+            ```
         - An unknown coverage id is a request error, not a service failure:
             ```python
+            >>> from earthlens.bathymetry._helpers import is_wcs_service_failure
             >>> is_wcs_service_failure(RuntimeError("Could not find coverage 'x'"))
             False
 
