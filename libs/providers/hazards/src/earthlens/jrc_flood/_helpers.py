@@ -10,8 +10,8 @@ uncompressed), so it is **never** read whole. The backend opens it lazily over
 AOI's pixel window over GDAL's `/vsicurl` (HTTP range requests) for an
 axis-aligned box in the source CRS — the case here (an EPSG:4326 AOI against the
 4326 EFHM). This module only builds the per-return-period URL; the windowed read
-+ crop live in the backend via pyramids (which applies the `/vsicurl` HTTP tuning
-itself).
++ crop live in the backend, which wraps them in `vsicurl_config()` for the
+`/vsicurl` readdir-suppression + retry/timeout tuning.
 """
 
 from __future__ import annotations

@@ -67,6 +67,7 @@ from earthlens.base.spatial import (
     mask_to_geometry,
     normalize_aoi,
     resolve_aoi,
+    vsicurl_config,
     widen_degenerate_bbox,
 )
 
@@ -117,6 +118,7 @@ __all__ = [
     "TemporalExtent",
     "Timeout",
     "to_datetime",
+    "vsicurl_config",
     "warn_if_egress",
     "WHOLE_WINDOW",
     "widen_degenerate_bbox",

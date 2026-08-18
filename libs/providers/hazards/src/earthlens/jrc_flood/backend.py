@@ -36,7 +36,12 @@ from earthlens.base import (
     sidecar_is_fresh,
     write_sidecar,
 )
-from earthlens.base.spatial import crop_to_aoi, ensure_no_data, widen_degenerate_bbox
+from earthlens.base.spatial import (
+    crop_to_aoi,
+    ensure_no_data,
+    vsicurl_config,
+    widen_degenerate_bbox,
+)
 from earthlens.jrc_flood._helpers import efhm_url
 from earthlens.jrc_flood.catalog import Catalog, Dataset
 
@@ -344,9 +349,10 @@ class JRCFlood(AbstractDataSource):
 
         Opens the whole-Europe GeoTIFF lazily and windowed-crops it to the AOI
         with `pyramids.Dataset.crop(bbox=)`, whose fast path reads **only** the
-        AOI's pixel window over `/vsicurl` (HTTP range requests — pyramids tunes
-        the readdir/retry/timeout knobs itself) for an axis-aligned box in the
-        source CRS, carrying the source grid, CRS and no-data through (with the
+        AOI's pixel window over `/vsicurl` (HTTP range requests, tuned via
+        `vsicurl_config()` — readdir-suppression + retry/timeout) for an
+        axis-aligned box in the source CRS, carrying the source grid, CRS and
+        no-data through (with the
         catalog no-data stamped when the source declares none). A point AOI is
         widened to one pixel so the strict fast path still fires. `crop_to_aoi`
         then trims the all-touched window to the exact bbox — or to the exact
@@ -372,26 +378,30 @@ class JRCFlood(AbstractDataSource):
             logger.info(f"JRCFlood: {target.name} already holds this AOI; skipping.")
             return target
 
-        source = PyramidsDataset.read_file(url)
-        try:
-            if not self._bbox_overlaps(source):
-                raise ValueError(
-                    f"the AOI {self._bbox} is outside the EFHM's Europe / "
-                    f"Mediterranean coverage; no RP{rp} data to write."
+        # Tune the /vsicurl read (readdir-suppression + retry/timeout) for the
+        # duration of the open + windowed crop; a plain read_file installs none.
+        with vsicurl_config():
+            source = PyramidsDataset.read_file(url)
+            try:
+                if not self._bbox_overlaps(source):
+                    raise ValueError(
+                        f"the AOI {self._bbox} is outside the EFHM's Europe / "
+                        f"Mediterranean coverage; no RP{rp} data to write."
+                    )
+                logger.info(
+                    f"JRCFlood RP{rp}: windowed /vsicurl crop of {self._bbox} "
+                    f"from {url}"
                 )
-            logger.info(
-                f"JRCFlood RP{rp}: windowed /vsicurl crop of {self._bbox} from {url}"
-            )
-            # A point / cell-edge AOI (min == max on an axis) is widened to one
-            # source pixel so crop(bbox=)'s fast path yields a 1x1 window rather
-            # than raising on the zero-width box.
-            geo = source.geotransform
-            bbox = widen_degenerate_bbox(self._bbox, geo[1], geo[5])
-            # The windowed fast path reads only the AOI pixel window from the
-            # ~23 GB source; nodata / CRS / grid are carried onto the crop.
-            windowed = source.crop(bbox=bbox, epsg=4326)
-        finally:
-            close_quietly(source)
+                # A point / cell-edge AOI (min == max on an axis) is widened to
+                # one source pixel so crop(bbox=)'s fast path yields a 1x1 window
+                # rather than raising on the zero-width box.
+                geo = source.geotransform
+                bbox = widen_degenerate_bbox(self._bbox, geo[1], geo[5])
+                # The windowed fast path reads only the AOI pixel window from the
+                # ~23 GB source; nodata / CRS / grid are carried onto the crop.
+                windowed = source.crop(bbox=bbox, epsg=4326)
+            finally:
+                close_quietly(source)
 
         # crop carries the source's own no-data through; when the source declares
         # none, fall back to the catalog value so the output stays flagged and a

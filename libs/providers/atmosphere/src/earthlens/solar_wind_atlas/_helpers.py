@@ -10,8 +10,9 @@ delegates to `pyramids.dataset.Dataset.crop(bbox=)`. For an axis-aligned box in
 the source CRS its windowed fast path reads only the AOI's pixel window straight
 from the source (over `/vsicurl/` a few hundred KB rather than the whole multi-GB
 raster); an ineligible box (reprojecting or a rotated grid) falls back to a
-cutline warp instead. `pyramids` applies the `/vsicurl` HTTP tuning (readdir/
-retry/timeout, extensionless-URL handling) itself, so no GDAL env is set here.
+cutline warp instead. The read is wrapped in `vsicurl_config()` for the
+`/vsicurl` readdir-suppression + retry/timeout tuning (pyramids handles opening
+the extensionless figshare URL itself).
 
 All raster I/O goes through `pyramids`; the stdlib `zipfile` is used only to
 name the GeoTIFF member inside a downloaded ZIP, never to read pixels.
@@ -26,7 +27,12 @@ from urllib.parse import urlsplit
 
 import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 
-from earthlens.base import close_quietly, ensure_no_data, widen_degenerate_bbox
+from earthlens.base import (
+    close_quietly,
+    ensure_no_data,
+    vsicurl_config,
+    widen_degenerate_bbox,
+)
 from earthlens.base.http import HttpClient
 
 #: No-data value stamped on a windowed crop when the source declares none.
@@ -87,8 +93,8 @@ def read_part_to_geotiff(
     one pixel (`widen_degenerate_bbox`) so the strict `west < east` fast path
     still fires. The source grid, CRS and no-data value are carried onto the crop
     (with a `-9999` fallback stamped when the source declares none), so
-    genuinely-empty cells stay flagged. `pyramids` applies the `/vsicurl` HTTP
-    tuning (readdir/retry/timeout, extensionless-URL handling) itself.
+    genuinely-empty cells stay flagged. The read is wrapped in `vsicurl_config()`
+    for the `/vsicurl` readdir-suppression + retry/timeout tuning.
 
     Args:
         path: A `/vsicurl/<url>` (remote COG) or `/vsizip/<zip>/<member.tif>`
@@ -102,18 +108,22 @@ def read_part_to_geotiff(
     """
     from pyramids.dataset import Dataset
 
-    dataset = Dataset.read_file(path)
-    try:
-        # A point / cell-edge AOI is widened to one source pixel so crop(bbox=)
-        # yields a 1x1 window instead of raising on the zero-width box.
-        geo = dataset.geotransform
-        window = dataset.crop(
-            bbox=widen_degenerate_bbox(bbox, geo[1], geo[5]), epsg=epsg
-        )
-    finally:
-        # Drop the /vsicurl handle — an open remote dataset can hang the
-        # interpreter at exit on GDAL's curl-handle cleanup (A1b).
-        close_quietly(dataset)
+    # Tune the /vsicurl read (readdir-suppression + retry/timeout) for the
+    # duration of the open + windowed crop; a plain read_file installs none. It
+    # is harmless for a local `/vsizip/` member (the Global Solar Atlas path).
+    with vsicurl_config():
+        dataset = Dataset.read_file(path)
+        try:
+            # A point / cell-edge AOI is widened to one source pixel so crop(bbox=)
+            # yields a 1x1 window instead of raising on the zero-width box.
+            geo = dataset.geotransform
+            window = dataset.crop(
+                bbox=widen_degenerate_bbox(bbox, geo[1], geo[5]), epsg=epsg
+            )
+        finally:
+            # Drop the /vsicurl handle — an open remote dataset can hang the
+            # interpreter at exit on GDAL's curl-handle cleanup (A1b).
+            close_quietly(dataset)
     # crop carries the source's own no-data through; fall back to the default so
     # genuinely-empty cells stay flagged when the source declares none.
     window = ensure_no_data(window, _DEFAULT_NO_DATA)

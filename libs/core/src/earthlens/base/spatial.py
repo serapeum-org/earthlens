@@ -14,7 +14,16 @@ from collections.abc import Mapping, Sequence
 from typing import Any, cast
 
 from loguru import logger
+from pyramids.base.remote import CloudConfig
 from pyramids.feature import bbox as _pyramids_bbox
+
+#: `/vsicurl` HTTP tuning for a remote-raster read: suppress per-open sidecar
+#: probes (`GDAL_DISABLE_READDIR_ON_OPEN`, via `vsicurl_tuning`) and bound each
+#: range request with a retry / timeout budget. These are the knobs the raster
+#: backends used to set by hand; a plain `Dataset.read_file` installs none.
+_VSICURL_HTTP_MAX_RETRY = 3
+_VSICURL_HTTP_RETRY_DELAY = 2.0
+_VSICURL_HTTP_TIMEOUT = 30
 
 #: Approximate metres per degree of latitude at the equator. Retained as
 #: part of the public surface for callers doing their own rough
@@ -463,6 +472,39 @@ def normalize_aoi(
     """
     lat_lim, lon_lim, _geometry = resolve_aoi(aoi, buffer=buffer)
     return lat_lim, lon_lim
+
+
+def vsicurl_config() -> CloudConfig:
+    """Return a pyramids `CloudConfig` that tunes a remote `/vsicurl` read.
+
+    A plain `pyramids.dataset.Dataset.read_file(url)` installs no GDAL config, so
+    the readdir-suppression and retry / timeout knobs a backend needs on the
+    remote-raster hot path are not applied by default. Wrap the `read_file` (and
+    the `crop` that reads the window) in this context so `/vsicurl` opens skip the
+    per-open `.aux.xml` / `.ovr` sidecar probes against the host and bound each
+    range request — restoring the tuning the backends used to set by hand, now
+    scoped to the read rather than mutating the process environment.
+
+    Returns:
+        A `CloudConfig` context manager enabling `vsicurl_tuning` plus the retry /
+        retry-delay / timeout budget.
+
+    Examples:
+        - Use it around a remote read so the window fetch is tuned:
+            ```python
+            >>> from earthlens.base.spatial import vsicurl_config
+            >>> cfg = vsicurl_config()
+            >>> hasattr(cfg, "__enter__")
+            True
+
+            ```
+    """
+    return CloudConfig(
+        vsicurl_tuning=True,
+        http_max_retry=_VSICURL_HTTP_MAX_RETRY,
+        http_retry_delay=_VSICURL_HTTP_RETRY_DELAY,
+        http_timeout=_VSICURL_HTTP_TIMEOUT,
+    )
 
 
 def widen_degenerate_bbox(
