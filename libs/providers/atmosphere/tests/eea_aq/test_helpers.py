@@ -85,23 +85,35 @@ class TestDatasetsForYears:
 
 @pytest.mark.eea
 class TestAdjacentEras:
-    """The empty-primary-era fallback target (Verified <-> Unverified)."""
+    """The empty-primary-era fallback target (Verified <-> Unverified), year-gated."""
 
-    def test_verified_only_falls_back_to_unverified(self):
-        """A Verified-only (2013-2022) sweep falls back to Unverified."""
-        assert adjacent_eras(["Verified"]) == ["Unverified"]
+    def test_boundary_year_falls_back_to_unverified(self):
+        """A Verified-only request at the promotion boundary falls back to Unverified."""
+        assert adjacent_eras(["Verified"], 2022, 2022) == ["Unverified"]
+
+    def test_out_of_range_year_does_not_fall_back(self):
+        """A Verified-only request years before the boundary has no useful neighbour."""
+        assert adjacent_eras(["Verified"], 2015, 2015) == []
+
+    def test_range_touching_boundary_falls_back(self):
+        """A range whose upper end reaches the boundary year falls back."""
+        assert adjacent_eras(["Verified"], 2020, 2022) == ["Unverified"]
 
     def test_both_live_eras_have_no_untried_neighbour(self):
         """A recent-year sweep already spans both live eras: nothing to try."""
-        assert adjacent_eras(["Verified", "Unverified"]) == []
+        assert adjacent_eras(["Verified", "Unverified"], 2024, 2024) == []
 
     def test_historical_only_has_no_live_neighbour(self):
         """Historical is a frozen archive with no adjacent live era."""
-        assert adjacent_eras(["Historical"]) == []
+        assert adjacent_eras(["Historical"], 2010, 2010) == []
 
-    def test_historical_plus_verified_falls_back_to_unverified(self):
-        """A straddling Historical+Verified sweep still tries Unverified."""
-        assert adjacent_eras(["Historical", "Verified"]) == ["Unverified"]
+    def test_historical_plus_verified_out_of_range_does_not_fall_back(self):
+        """A 2012-2013 straddling request cannot be served by Unverified 2023+."""
+        assert adjacent_eras(["Historical", "Verified"], 2012, 2013) == []
+
+    def test_reversed_years_normalised(self):
+        """Reversed year arguments are normalised before the overlap test."""
+        assert adjacent_eras(["Verified"], 2022, 2020) == ["Unverified"]
 
 
 @pytest.mark.eea

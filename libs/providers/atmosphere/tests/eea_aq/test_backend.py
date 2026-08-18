@@ -376,6 +376,19 @@ class TestAdjacentEraFallback:
         assert df.empty and "station_id" in df.columns
         assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
 
+    def test_out_of_range_request_does_not_fall_back(self, tmp_path):
+        """A 2015 empty-Verified request never bulk-downloads the Unverified era."""
+        unverified = tmp_path / "u.parquet"
+        _row_frame("2023-06-15T00:00").to_parquet(unverified)
+        client = _SelectiveEraClient(Verified=None, Unverified=str(unverified))
+        df = _backend(client, tmp_path, start="2015-06-01", end="2015-06-30").download(
+            progress_bar=False
+        )
+
+        assert df.empty
+        # Unverified (2023+) can never satisfy 2015, so it is never requested.
+        assert [call[0] for call in client.calls] == ["Verified"]
+
 
 @pytest.mark.eea
 class TestGuards:

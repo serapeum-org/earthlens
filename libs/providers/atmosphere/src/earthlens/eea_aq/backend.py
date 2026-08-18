@@ -325,9 +325,9 @@ class EEA_AQ(AbstractDataSource):
         code_to_name = {
             self._catalog.get_pollutant(name).code: name for name in self.vars
         }
-        datasets = datasets_for_years(
-            self.time.start_date.year, self.time.end_date.year
-        )
+        start_year = self.time.start_date.year
+        end_year = self.time.end_date.year
+        datasets = datasets_for_years(start_year, end_year)
 
         # Lazy so a `limit=` stops the work where it costs: each dataset is a
         # separate bulk download of every matching Parquet, so a cap met by the
@@ -335,14 +335,17 @@ class EEA_AQ(AbstractDataSource):
         non_empty = self._sweep(datasets, client, countries, polls, code_to_name)
         if not non_empty:
             # The primary era(s) returned zero files. Retry the adjacent live
-            # era(s) not already swept (Verified <-> Unverified): a boundary year
-            # can be missing from its primary era yet present in the neighbour —
-            # a not-yet-promoted year still in the Unverified stream, or a
-            # transiently empty Verified export. This runs *only* on a
-            # fully-empty primary sweep, so the normal success path never
-            # double-downloads, and a recent-year request — already spanning both
-            # live eras — has no adjacent era left to try.
-            fallback = adjacent_eras(datasets)
+            # era(s) not already swept (Verified <-> Unverified) whose year span
+            # can plausibly cover the request: a boundary year can be missing
+            # from its primary era yet present in the neighbour (a not-yet-
+            # promoted year still in the Unverified stream). `adjacent_eras`
+            # gates on year overlap so a genuinely out-of-range request (e.g.
+            # 2015 against Unverified 2023+) never bulk-downloads an era it
+            # cannot be satisfied by. This runs *only* on a fully-empty primary
+            # sweep, so the normal success path never double-downloads, and a
+            # recent-year request — already spanning both live eras — has no
+            # adjacent era left to try.
+            fallback = adjacent_eras(datasets, start_year, end_year)
             if fallback:
                 logger.warning(
                     f"EEA download: primary era(s) {datasets} returned no files "
