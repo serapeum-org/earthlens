@@ -110,18 +110,23 @@ def download_within_budget():
     download on a daemon thread and fails the test if it overruns the budget,
     so one wedged retrieve costs only its own budget rather than the lane.
 
+    Accepts either an object exposing `download()` (an `EarthLens` / backend
+    instance) or a zero-argument callable, so a test driving `_api()` directly
+    is guarded the same way as one going through the facade.
+
     Returns:
-        Callable[..., list]: A `run(lens, budget_s=900.0)` helper that returns
-        the download result, re-raises any error the download raised, or fails
-        the test if the budget elapses first.
+        Callable[..., Any]: A `run(work, budget_s=900.0)` helper that returns
+        the retrieve result, re-raises any error it raised, or fails the test
+        if the budget elapses first.
     """
 
-    def _run(lens, budget_s: float = 900.0):
+    def _run(work, budget_s: float = 900.0):
         box: dict = {}
+        job = work if callable(work) else work.download
 
         def _work():
             try:
-                box["out"] = lens.download()
+                box["out"] = job()
             except BaseException as exc:  # noqa: BLE001 - relayed to main thread
                 box["exc"] = exc
 
