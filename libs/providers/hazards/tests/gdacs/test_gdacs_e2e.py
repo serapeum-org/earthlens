@@ -15,9 +15,10 @@ import datetime as dt
 from pathlib import Path
 
 import pytest
+import requests
 
 from earthlens.earthlens import EarthLens
-from earthlens.gdacs import GDACS
+from earthlens.gdacs import GDACS, GdacsUnavailableError
 from earthlens.gdacs.events import ATTRIBUTE_COLUMNS
 
 # A recent ~30-day window: GDACS is a live alert feed, so very old
@@ -28,6 +29,24 @@ _RECENT_START = (_TODAY - dt.timedelta(days=30)).strftime("%Y-%m-%d")
 _TODAY_STR = _TODAY.strftime("%Y-%m-%d")
 
 
+def _skip_on_upstream(exc: Exception) -> None:
+    """Skip (not fail) when GDACS SEARCH was unavailable, else re-raise.
+
+    GDACS SEARCH answers a well-formed query with a spurious `400`, or times
+    out, under load (issue #929). The backend retries those and, when they
+    persist, raises the typed `GdacsUnavailableError`, which skips the lane
+    rather than reddening it — the backend's retries already gave the service
+    several chances, so a survivor is a real outage, not a regression (the query
+    composition is asserted offline by the unit tests). A bare transport error
+    escaping the retries skips too. Anything else re-raises and fails.
+    """
+    if isinstance(
+        exc, (GdacsUnavailableError, requests.ConnectionError, requests.Timeout)
+    ):
+        pytest.skip(f"GDACS SEARCH unavailable: {exc}")
+    raise exc
+
+
 @pytest.mark.e2e
 @pytest.mark.gdacs
 class TestGdacsLiveQuery:
@@ -35,15 +54,18 @@ class TestGdacsLiveQuery:
 
     def test_recent_earthquakes(self, tmp_path: Path):
         """A recent global EQ window returns a schema-correct FeatureCollection."""
-        fc = EarthLens(
-            variables=["EQ"],
-            data_source="gdacs",
-            start=_RECENT_START,
-            end=_TODAY_STR,
-            lat_lim=[-90.0, 90.0],
-            lon_lim=[-180.0, 180.0],
-            path=str(tmp_path),
-        ).download(progress_bar=False)
+        try:
+            fc = EarthLens(
+                variables=["EQ"],
+                data_source="gdacs",
+                start=_RECENT_START,
+                end=_TODAY_STR,
+                lat_lim=[-90.0, 90.0],
+                lon_lim=[-180.0, 180.0],
+                path=str(tmp_path),
+            ).download(progress_bar=False)
+        except Exception as exc:  # noqa: BLE001 - upstream -> skip, else re-raise
+            _skip_on_upstream(exc)
 
         for column in ATTRIBUTE_COLUMNS:
             assert column in fc.columns, f"missing column {column!r}"
@@ -53,22 +75,32 @@ class TestGdacsLiveQuery:
             assert list(tmp_path.glob("gdacs_alerts_*.gpkg")), "GeoPackage written"
 
     def test_single_request(self, tmp_path: Path):
-        """A multi-hazard download issues exactly one HTTP request (no fan-out)."""
+        """A multi-hazard download issues one combined query (no per-hazard fan-out)."""
         from unittest import mock
 
         import earthlens.gdacs.backend as backend_module
 
-        with mock.patch.object(
-            backend_module.requests, "get", wraps=backend_module.requests.get
-        ) as spy:
-            GDACS(
-                start=_RECENT_START,
-                end=_TODAY_STR,
-                variables=["EQ", "TC", "FL", "VO", "WF", "DR"],
-                lat_lim=[-90.0, 90.0],
-                lon_lim=[-180.0, 180.0],
-                path=str(tmp_path),
-            ).download(progress_bar=False)
-        assert spy.call_count == 1, (
-            f"expected a single SEARCH request, got {spy.call_count}"
+        try:
+            with mock.patch.object(
+                backend_module.requests, "get", wraps=backend_module.requests.get
+            ) as spy:
+                GDACS(
+                    start=_RECENT_START,
+                    end=_TODAY_STR,
+                    variables=["EQ", "TC", "FL", "VO", "WF", "DR"],
+                    lat_lim=[-90.0, 90.0],
+                    lon_lim=[-180.0, 180.0],
+                    path=str(tmp_path),
+                ).download(progress_bar=False)
+        except Exception as exc:  # noqa: BLE001 - upstream -> skip, else re-raise
+            _skip_on_upstream(exc)
+        # Every call carries all six hazard types in one `eventlist`, so any
+        # repeat is a retry of the same combined query, not a per-hazard split.
+        # (A single transient burp now retries rather than fans out, so counting
+        # raw calls would false-fail; assert the query shape instead.)
+        assert spy.call_count >= 1, "expected at least one SEARCH request"
+        eventlists = {call.kwargs["params"]["eventlist"] for call in spy.call_args_list}
+        assert eventlists == {"EQ,TC,FL,VO,WF,DR"}, (
+            "expected one combined query for all hazard types (no per-hazard "
+            f"fan-out); saw eventlist params {eventlists}"
         )

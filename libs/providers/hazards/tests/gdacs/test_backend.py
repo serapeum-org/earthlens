@@ -10,7 +10,7 @@ import requests
 from geopandas import GeoDataFrame
 
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
-from earthlens.gdacs import GDACS
+from earthlens.gdacs import GDACS, GdacsUnavailableError
 from earthlens.gdacs.backend import SEARCH_URL
 
 from .conftest import _FakeGdacs
@@ -164,12 +164,46 @@ class TestGDACSFetch:
         results = backend._fetch(backend._search())
         assert len(results[0]) == 0, "empty feed should yield an empty FC"
 
-    def test_http_error_propagates(self, tmp_path: Path, fake_gdacs: _FakeGdacs):
-        """A non-2xx status propagates rather than being swallowed."""
+    def test_service_error_becomes_unavailable(
+        self, tmp_path: Path, fake_gdacs: _FakeGdacs
+    ):
+        """A persistent 5xx surfaces as a typed GdacsUnavailableError."""
         fake_gdacs.set_status_error(requests.HTTPError("500 Server Error"))
         backend = _make_backend(tmp_path)
-        with pytest.raises(requests.HTTPError, match="500"):
+        with pytest.raises(GdacsUnavailableError) as excinfo:
             backend._fetch(backend._search())
+        assert excinfo.value.status_code == 500
+
+    def test_persistent_400_becomes_unavailable(
+        self, tmp_path: Path, fake_gdacs: _FakeGdacs
+    ):
+        """A 400 that survives the retries is treated as an availability failure.
+
+        GDACS returns spurious 400s on well-formed queries (issue #929), so a
+        persistent 400 is wrapped like a 5xx rather than raised as a client
+        error — the query composition itself is guarded by test_forwards_params.
+        """
+        fake_gdacs.set_status_error(requests.HTTPError("400 Client Error: Bad Request"))
+        backend = _make_backend(tmp_path)
+        with pytest.raises(GdacsUnavailableError) as excinfo:
+            backend._fetch(backend._search())
+        assert excinfo.value.status_code == 400
+
+    def test_non_service_error_propagates(self, tmp_path: Path, fake_gdacs: _FakeGdacs):
+        """A genuine client error (404) fails hard instead of being masked."""
+        fake_gdacs.set_status_error(requests.HTTPError("404 Client Error: Not Found"))
+        backend = _make_backend(tmp_path)
+        with pytest.raises(requests.HTTPError, match="404"):
+            backend._fetch(backend._search())
+
+    def test_http_client_retries_configured(self, tmp_path: Path):
+        """The SEARCH client retries the service-status family and transport errors."""
+        client = _make_backend(tmp_path)._http_client()
+        assert client.max_retries >= 1, "retries must be enabled"
+        assert 400 in client.status_forcelist, "GDACS's spurious 400 must be retried"
+        assert 503 in client.status_forcelist, "the 5xx family must be retried"
+        assert requests.ConnectionError in client.retry_on_exceptions
+        assert requests.Timeout in client.retry_on_exceptions
 
     def test_cap_logs_truncation_warning(
         self,

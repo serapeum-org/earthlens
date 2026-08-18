@@ -43,6 +43,14 @@ from earthlens.base import (
 )
 from earthlens.base.http import HttpClient
 from earthlens.gdacs import events
+from earthlens.gdacs._helpers import (
+    GDACS_MAX_RETRIES,
+    GDACS_RETRY_EXCEPTIONS,
+    GDACS_RETRY_STATUSES,
+    GdacsUnavailableError,
+    gdacs_http_status,
+    service_failure_reason,
+)
 from earthlens.gdacs.catalog import Catalog
 
 if TYPE_CHECKING:
@@ -264,8 +272,15 @@ class GDACS(AbstractDataSource):
                 clipped alert collection.
 
         Raises:
-            requests.HTTPError: If the SEARCH endpoint returns a
-                non-2xx status.
+            GdacsUnavailableError: If the SEARCH request fails for a
+                service reason — a connection/timeout error or a
+                retry-worthy status (`400` / `408` / `425` / `429` /
+                `5xx`) — that outlived the backend's retries. A `400` is
+                treated this way because GDACS returns spurious `400`s on
+                well-formed queries (issue #929).
+            requests.HTTPError: On a non-retryable error status (for
+                example a `403` / `404`), which is a genuine request or
+                endpoint problem, not an availability one.
         """
         product = products[0]
         params = {
@@ -279,13 +294,20 @@ class GDACS(AbstractDataSource):
             f"{params['fromDate']}..{params['toDate']} "
             f"(levels {params['alertlevel']})"
         )
-        http = HttpClient(
-            timeout=self._timeout,
-            max_retries=0,
-            status_forcelist=(),
-            raise_for_status=True,
-        )
-        payload = http.get_json(SEARCH_URL, params=params)
+        try:
+            payload = self._http_client().get_json(SEARCH_URL, params=params)
+        except requests.RequestException as exc:
+            reason = service_failure_reason(exc)
+            if reason is None:
+                raise
+            raise GdacsUnavailableError(
+                f"GDACS SEARCH was unavailable after {GDACS_MAX_RETRIES} "
+                f"retries ({reason}). The composed query is well-formed (the "
+                "gdacs unit tests assert its parameters offline), so this is a "
+                "transient upstream condition — retry later or narrow the "
+                "date window.",
+                status_code=gdacs_http_status(exc),
+            ) from exc
         feature_count = len(payload.get("features") or [])
         if feature_count >= MAX_EVENTS_PER_RESPONSE:
             logger.warning(
@@ -302,6 +324,32 @@ class GDACS(AbstractDataSource):
             [self.space.west, self.space.east],
         )
         return [clipped]
+
+    def _http_client(self) -> HttpClient:
+        """Build the retry-configured client for the one SEARCH request.
+
+        GDACS SEARCH is a single unpaged GET whose two observed failure
+        modes are both transient (issue #929): a spurious `400 Bad
+        Request` on a well-formed query, and a read timeout. So the
+        client retries the service-status family
+        (:data:`~earthlens.gdacs._helpers.GDACS_RETRY_STATUSES` — the
+        `429` / `5xx` gateway family plus GDACS's spurious `400`) and the
+        transport errors
+        (:data:`~earthlens.gdacs._helpers.GDACS_RETRY_EXCEPTIONS`), up to
+        :data:`~earthlens.gdacs._helpers.GDACS_MAX_RETRIES` times, before
+        the survivor is re-raised (and wrapped by :meth:`_fetch` into a
+        :class:`~earthlens.gdacs._helpers.GdacsUnavailableError`).
+
+        Returns:
+            HttpClient: The configured transport for :meth:`_fetch`.
+        """
+        return HttpClient(
+            timeout=self._timeout,
+            max_retries=GDACS_MAX_RETRIES,
+            status_forcelist=GDACS_RETRY_STATUSES,
+            retry_on_exceptions=GDACS_RETRY_EXCEPTIONS,
+            raise_for_status=True,
+        )
 
     def download(
         self,
