@@ -388,17 +388,17 @@ class EEA_AQ(AbstractDataSource):
         windowed = combined[mask].reset_index(drop=True)
         if windowed.empty:
             # Files were downloaded and carried rows, but every row fell outside
-            # [start, end). This is a genuine no-data *window* — the era(s) hold
-            # data, just not for the requested dates — logged at INFO to keep it
-            # deliberately distinct from the WARNING an empty era raises in
-            # `_iter_dataset_frames`. That split is the whole point: a caller
-            # facing an empty frame can tell "the export returned no files"
-            # (possible upstream outage) from "the dates are simply empty".
+            # [start, end). Logged at INFO to keep it deliberately distinct from
+            # the aggregate outage WARNING (which fires only when *no* files came
+            # back): a caller facing an empty frame can tell "the export returned
+            # no files" (possible upstream outage) from "files came back, just
+            # not for these dates". The wording stays factual — it reports what
+            # was downloaded vs the window, without asserting a cause.
             logger.info(
                 f"EEA download: {len(combined)} observation(s) were downloaded "
-                f"but none fell within [{lower}, {upper}); the era(s) hold data "
-                f"for {countries} / {polls}, so the requested date window is the "
-                f"empty part, not the upstream export."
+                f"for {countries} / {polls} but none fell within [{lower}, "
+                f"{upper}); the swept era(s) returned data outside the requested "
+                f"window."
             )
         return windowed
 
