@@ -37,6 +37,7 @@ from earthlens.base import (
     write_sidecar,
 )
 from earthlens.base.spatial import (
+    bbox_overlaps,
     crop_to_aoi,
     ensure_no_data,
     vsicurl_config,
@@ -241,10 +242,10 @@ class JRCFlood(AbstractDataSource):
     def _bbox_overlaps(self, source: Any) -> bool:
         """Whether the AOI overlaps the source raster's geographic extent.
 
-        A cheap geographic bounds test (from the source's affine transform and
-        pixel dimensions) so an AOI outside the EFHM's Europe / Mediterranean
-        coverage is reported with a clear error before the windowed crop, rather
-        than surfacing as an empty or opaque crop result.
+        Delegates to `earthlens.base.spatial.bbox_overlaps` so an AOI outside the
+        EFHM's Europe / Mediterranean coverage is reported with a clear error
+        before the windowed crop, rather than surfacing as an empty or opaque
+        crop result.
 
         Args:
             source: An opened `pyramids.Dataset` exposing `geotransform`,
@@ -253,17 +254,7 @@ class JRCFlood(AbstractDataSource):
         Returns:
             bool: `True` when the AOI bbox intersects the raster's extent.
         """
-        origin_x, pixel_w, _, origin_y, _, pixel_h = source.geotransform
-        west_bound, east_bound = origin_x, origin_x + source.columns * pixel_w
-        # `pixel_h` is negative for a north-up grid, so the south edge is lower.
-        north_bound, south_bound = origin_y, origin_y + source.rows * pixel_h
-        west, south, east, north = self._bbox
-        return not (
-            east <= west_bound
-            or west >= east_bound
-            or north <= south_bound
-            or south >= north_bound
-        )
+        return bbox_overlaps(source, self._bbox)
 
     def _is_cached(self, target: Path) -> bool:
         """Whether `target` already holds this exact AOI (AOI-aware skip).

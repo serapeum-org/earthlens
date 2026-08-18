@@ -28,6 +28,7 @@ from urllib.parse import urlsplit
 import requests  # noqa: F401  # runtime seam so tests can monkeypatch this module's `requests`
 
 from earthlens.base import (
+    bbox_overlaps,
     close_quietly,
     ensure_no_data,
     vsicurl_config,
@@ -117,6 +118,14 @@ def read_part_to_geotiff(
     with vsicurl_config():
         dataset = Dataset.read_file(path)
         try:
+            # Reject an AOI outside the source's extent before the read, so an
+            # out-of-coverage request fails fast rather than triggering a full
+            # remote read (windowed_bbox_crop's contract requires overlap).
+            if not bbox_overlaps(dataset, bbox):
+                raise ValueError(
+                    f"the AOI {bbox} is outside the source raster's coverage; "
+                    "nothing to read."
+                )
             # A point / cell-edge AOI is widened to one source pixel so crop(bbox=)
             # yields a 1x1 window instead of raising on the zero-width box; an
             # all-no-data AOI keeps an all-no-data window rather than raising.
