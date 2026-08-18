@@ -20,7 +20,6 @@ import requests
 from loguru import logger
 
 from earthlens.cli.toolkit import index_writer, lint, require
-from earthlens.overture.catalog import RELEASE_ID
 
 #: Seconds to wait on the STAC catalog when recovering ids the SDK mangled.
 _STAC_TIMEOUT = 30
@@ -42,9 +41,8 @@ def _child_release_ids() -> list[str]:
     href.
 
     Returns:
-        Every release id the catalog links to, in the order it lists
-            them. Empty when the catalog cannot be read or lists no
-            children.
+        Every release id the catalog links to, in the order it lists them.
+        Empty when the catalog lists no children.
     """
     from overturemaps.core import STAC_CATALOG_URL
 
@@ -66,7 +64,7 @@ def _release_ids() -> list[str]:
     """Return every available Overture release id.
 
     `get_available_releases()` returns an `(all_releases, latest)` tuple.
-    Both halves are used and both are filtered through `RELEASE_ID`,
+    Both halves are used and both are filtered through `RELEASE_ID_RE`,
     because only one of them is trustworthy: the SDK derives
     `all_releases` by splitting each STAC child href on `/` after
     stripping `./`, which yields `"https:"` now that the catalog serves
@@ -89,15 +87,19 @@ def _release_ids() -> list[str]:
     """
     from overturemaps.core import get_available_releases
 
+    from earthlens.overture.catalog import RELEASE_ID_RE
+
     result = get_available_releases()
     releases, latest = result if isinstance(result, tuple) else (result, None)
     reported = {str(release) for release in releases}
     if latest is not None:
         reported.add(str(latest))
-    parsed = {ident for ident in reported if RELEASE_ID.match(ident)}
+    parsed = {ident for ident in reported if RELEASE_ID_RE.match(ident)}
     dropped = reported - parsed
     if dropped:
-        recovered = {ident for ident in _child_release_ids() if RELEASE_ID.match(ident)}
+        recovered = {
+            ident for ident in _child_release_ids() if RELEASE_ID_RE.match(ident)
+        }
         logger.warning(
             f"The overturemaps SDK reported {len(dropped)} unparsed release "
             f"id(s) ({sorted(dropped)}); recovered "

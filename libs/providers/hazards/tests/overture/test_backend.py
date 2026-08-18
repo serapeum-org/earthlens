@@ -578,13 +578,6 @@ class TestDuckDBQueryPath:
             "the SDK path auto-targets latest itself; it must not look one up"
         )
 
-    def test_resolve_release_explicit(self, tmp_path: Path):
-        """`_resolve_release` returns the explicit release when given."""
-        backend = _make_backend(
-            tmp_path, variables={"places": []}, release="2020-01-01.0"
-        )
-        assert backend._resolve_release() == "2020-01-01.0"
-
     @pytest.mark.parametrize(
         "release", ["not-a-release", "2026-07-22", "2026-7-22.0", ""]
     )

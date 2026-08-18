@@ -46,7 +46,7 @@ from earthlens.base import (
     TemporalExtent,
     to_datetime,
 )
-from earthlens.overture.catalog import RELEASE_ID, Catalog, Theme
+from earthlens.overture.catalog import RELEASE_ID_RE, Catalog, Theme
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
@@ -205,7 +205,7 @@ class Overture(AbstractDataSource):
             raise ValueError(
                 f"file_format must be one of {sorted(_FORMATS)}, got {file_format!r}."
             )
-        if release is not None and not RELEASE_ID.match(release):
+        if release is not None and not RELEASE_ID_RE.match(release):
             raise ValueError(
                 f"release must be an Overture release id, got {release!r}. "
                 "Ids are a release date plus an ordinal, e.g. "
@@ -337,7 +337,7 @@ class Overture(AbstractDataSource):
         SDK offers no timeout hook, so a second attempt would only double
         a stalled connect.
 
-        What the SDK reports is checked against `RELEASE_ID` before it is
+        What the SDK reports is checked against `RELEASE_ID_RE` before it is
         used. `get_latest_release()` reads one key out of the upstream
         STAC catalog and returns `None` rather than raising when that key
         moves, and the sibling release list already returns unparsed
@@ -371,7 +371,7 @@ class Overture(AbstractDataSource):
         except Exception as exc:  # noqa: BLE001 - offline / upstream outage
             cause, reason = exc, f"the live lookup failed ({exc})"
         else:
-            if live and RELEASE_ID.match(str(live)):
+            if live and RELEASE_ID_RE.match(str(live)):
                 return str(live)
             reason = f"the live lookup returned {live!r}, not a release id"
         indexed = self._catalog.latest_release()
@@ -492,13 +492,15 @@ class Overture(AbstractDataSource):
         # lookup would otherwise read the first types from the bundled release
         # and the rest from the live one, so a single download() could mix two
         # snapshots. Offline callers also pay one connect attempt, not one per
-        # requested type — the SDK caches only successful lookups.
+        # requested type — the SDK caches only successful lookups. It doubles
+        # as the branch flag below: it is set exactly when the DuckDB path is
+        # taken, which is the only path that needs a concrete id.
         release = self._resolve_release() if (self._where or self._columns) else None
         for product in products:
             theme_name = product.metadata["theme_name"]
             overture_type = product.metadata["type"]
             label = product.id
-            if self._where or self._columns:
+            if release is not None:
                 from earthlens.overture.query import query_overture
 
                 logger.info(

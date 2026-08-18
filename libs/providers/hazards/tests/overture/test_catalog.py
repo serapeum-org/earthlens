@@ -7,7 +7,12 @@ from pathlib import Path
 import pytest
 
 from earthlens.overture import catalog as overture_catalog
-from earthlens.overture.catalog import CATALOG_PATH, RELEASE_ID, Catalog, Theme
+from earthlens.overture.catalog import (
+    CATALOG_PATH,
+    RELEASE_ID_RE,
+    Catalog,
+    Theme,
+)
 
 
 @pytest.mark.overture
@@ -140,7 +145,7 @@ class TestCatalog:
         """The bundled YAML ships a non-empty, well-formed release index."""
         releases = Catalog().available_releases
         assert releases, "the bundled catalog should ship a release index"
-        assert all(RELEASE_ID.match(r) for r in releases), releases
+        assert all(RELEASE_ID_RE.match(r) for r in releases), releases
 
     def test_latest_release_is_the_newest_indexed(self):
         """`latest_release` returns the newest release the index carries."""

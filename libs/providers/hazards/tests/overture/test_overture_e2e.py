@@ -20,7 +20,7 @@ import pytest
 
 from earthlens.earthlens import EarthLens
 from earthlens.overture import LicenseWarning, query_overture
-from earthlens.overture.catalog import RELEASE_ID
+from earthlens.overture.catalog import RELEASE_ID_RE
 
 #: A tiny bbox over a dense Manhattan block (Times Square), small enough to
 #: fetch in seconds and reliably non-empty for both places and buildings.
@@ -127,7 +127,9 @@ class TestOvertureLiveFetch:
         from overturemaps.core import get_latest_release
 
         release = get_latest_release()
-        assert release and RELEASE_ID.match(release), f"unexpected release {release!r}"
+        assert release and RELEASE_ID_RE.match(release), (
+            f"unexpected release {release!r}"
+        )
 
     def test_duckdb_release_is_resolved_live(self, tmp_path: Path):
         """The release the DuckDB path resolves has objects under it on S3."""
@@ -141,7 +143,7 @@ class TestOvertureLiveFetch:
         ).datasource
 
         release = backend._resolve_release()
-        assert RELEASE_ID.match(release), f"resolved a non-release {release!r}"
+        assert RELEASE_ID_RE.match(release), f"resolved a non-release {release!r}"
         assert release not in backend._catalog.available_releases or (
             release == backend._catalog.latest_release()
         ), "the resolved id must come from upstream, not from a stale index"

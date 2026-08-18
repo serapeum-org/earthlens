@@ -44,10 +44,13 @@ from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 CATALOG_PATH: Path = Path(__file__).parent / "overture_data_catalog.yaml"
 
 #: Shape of an Overture release id: a release date plus an ordinal
-#: (`2026-07-22.0`). The single definition of what counts as a release id —
-#: `latest_release` ignores anything that does not match, and the refresh
-#: tooling refuses to index it.
-RELEASE_ID = re.compile(r"^\d{4}-\d{2}-\d{2}\.\d+$")
+#: (`2026-07-22.0`). The single definition of what a release id looks like —
+#: `latest_release` ignores anything that does not match, the backend rejects
+#: a `release=` that does not, and the refresh tooling refuses to index one.
+#: It is a *shape* check, not an existence one: `9999-99-99.0` matches and
+#: would sort above every real release, so it guards against garbage and
+#: typos, not against an id Overture has pruned.
+RELEASE_ID_RE = re.compile(r"^\d{4}-\d{2}-\d{2}\.\d+$")
 
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Stores the
@@ -67,7 +70,7 @@ def _release_sort_key(release: str) -> tuple[str, int]:
     Release ids are `yyyy-mm-dd.n`, so a plain string sort mis-orders
     the ordinal once it reaches two digits (`"2026-07-22.10"` sorts
     below `"2026-07-22.9"`). Splitting the ordinal off and comparing it
-    numerically fixes that. Callers filter through `RELEASE_ID` first, so
+    numerically fixes that. Callers filter through `RELEASE_ID_RE` first, so
     the ordinal is always numeric here.
 
     Args:
@@ -469,7 +472,7 @@ class Catalog(AbstractCatalog):
                 live release and falls back to this one.
         """
         return max(
-            (r for r in self.available_releases if RELEASE_ID.match(r)),
+            (r for r in self.available_releases if RELEASE_ID_RE.match(r)),
             key=_release_sort_key,
             default=None,
         )
