@@ -190,5 +190,5 @@ datasets:
     variables:
       river-discharge-in-the-last-24-hours:
         cds_variable: river_discharge_in_the_last_24_hours
-        nc_variable: river_discharge_in_the_last_24_hours
-        units: unknown
+        nc_variable: dis24
+        units: m**3 s**-1

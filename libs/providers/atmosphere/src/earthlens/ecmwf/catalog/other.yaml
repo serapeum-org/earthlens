@@ -3028,8 +3028,8 @@ datasets:
         units: unknown
       volumetric-soil-moisture:
         cds_variable: volumetric_soil_moisture
-        nc_variable: volumetric_soil_moisture
-        units: unknown
+        nc_variable: voltso
+        units: m**3 m**-3
       volumetric-transpiration-stress-onset:
         cds_variable: volumetric_transpiration_stress_onset
         nc_variable: volumetric_transpiration_stress_onset
