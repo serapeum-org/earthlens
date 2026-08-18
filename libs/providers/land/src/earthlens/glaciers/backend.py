@@ -43,6 +43,7 @@ from earthlens.base import (
     TemporalExtent,
     to_datetime,
 )
+from earthlens.config import cache_dir
 from earthlens.glaciers import _helpers
 from earthlens.glaciers.catalog import Catalog, Dataset
 
@@ -181,7 +182,7 @@ class Glaciers(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
-        self._cache_dir = self.root_dir / "_glaciers_cache"
+        self._cache_dir = cache_dir() / "glaciers"
 
     def _validate_selector(self) -> None:
         """Check the request carries the spatial selector the source needs.

@@ -24,6 +24,8 @@ from collections.abc import Generator, Iterator
 
 import pytest
 
+from earthlens.config import set_cache_dir, set_output_dir
+
 
 @pytest.fixture(autouse=True)
 def unpooled_http_transport(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -298,3 +300,34 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
             "masked run does not report green.",
             red=True,
         )
+
+
+@pytest.fixture(scope="session")
+def _earthlens_dirs_scratch(tmp_path_factory):
+    """One scratch root per session for the configured output and cache dirs."""
+    return tmp_path_factory.mktemp("earthlens-dirs")
+
+
+@pytest.fixture(autouse=True)
+def isolate_earthlens_dirs(_earthlens_dirs_scratch, request):
+    """Keep every test off the real output and cache directories.
+
+    A backend built without `path=` resolves to the configured output directory,
+    and each backend hangs its intermediates cache off the configured cache
+    directory. Left alone those are the developer's own `~/.earthlens/data` and
+    per-platform user cache, so any test that downloads would write there.
+
+    Each test gets its own slot, so a cache one test populates is not visible to
+    the next — several tests assert on an empty or a pre-seeded cache. Resolving
+    a directory never creates it, so an unused slot costs nothing on disk.
+
+    Autouse, so a member's tests get the isolation by importing this module's
+    fixtures the same way they already import the HTTP transport seam.
+    """
+    slot = re.sub(r"[^A-Za-z0-9_.-]", "_", request.node.nodeid)[-100:]
+    root = _earthlens_dirs_scratch / slot
+    set_output_dir(root / "data")
+    set_cache_dir(root / "cache")
+    yield
+    set_output_dir(None)
+    set_cache_dir(None)

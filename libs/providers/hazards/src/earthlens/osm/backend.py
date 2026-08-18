@@ -60,6 +60,7 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.base.http import DEFAULT_TIMEOUT, HttpClient
+from earthlens.config import cache_dir
 from earthlens.osm._helpers import (
     LicenseWarning,
     OhsomeUnavailableError,
@@ -93,11 +94,23 @@ ODBL_NOTICE = (
     "ODbL when redistributing."
 )
 
+
 #: Default on-disk cache directory for fetched Geofabrik `.osm.pbf` extracts
 #: (`G13`). A cross-run user cache (mirroring the cmip6 resolver's location) so
 #: a re-run reuses a previously-downloaded extract regardless of the output
 #: `path`. Overridable via the backend's `cache_dir=` argument.
-DEFAULT_PBF_CACHE_DIR = Path.home() / ".earthlens" / "cache" / "osm_pbf"
+def default_pbf_cache_dir() -> Path:
+    """The directory `.osm.pbf` extracts are cached in when none is given.
+
+    Resolved per call from the shared earthlens cache directory
+    (`set_cache_dir()` / `EARTHLENS_CACHE`), so redirecting that moves the
+    extracts with it.
+
+    Returns:
+        Path: `<cache_dir()>/osm_pbf`.
+    """
+    return cache_dir() / "osm_pbf"
+
 
 FileFormat = Literal["geojson", "gpkg"]
 
@@ -274,7 +287,8 @@ class OSM(AbstractDataSource):
                 or `"pyosmium"` (streaming, for planet-scale extracts). Ignored
                 by the `overpass` / `ohsome` protocols.
             cache_dir: Directory the fetched `.osm.pbf` extracts are cached in.
-                `None` uses `DEFAULT_PBF_CACHE_DIR` (a cross-run user cache).
+                `None` uses `default_pbf_cache_dir()` (a cross-run user cache
+                under the shared earthlens cache directory).
 
         Raises:
             TypeError: If `variables` is a mapping rather than a list / string
@@ -312,7 +326,7 @@ class OSM(AbstractDataSource):
         self._max_bbox_deg2 = max_bbox_deg2
         self._region = region
         self._engine: Engine = engine
-        self._cache_dir = Path(cache_dir) if cache_dir else DEFAULT_PBF_CACHE_DIR
+        self._cache_dir = Path(cache_dir) if cache_dir else default_pbf_cache_dir()
         # Built on first use and reused, so `MIN_REQUEST_INTERVAL` actually
         # paces successive queries: the interval is enforced from a timestamp
         # the client carries, which a per-query client would always reset.

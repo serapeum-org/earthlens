@@ -122,10 +122,14 @@ def test_missing_bbox_is_rejected(tmp_path: Path) -> None:
         )
 
 
-def test_cache_dir_defaults_under_root(tmp_path: Path) -> None:
-    """cache_dir defaults to <root_dir>/_cache/gsa."""
+def test_cache_dir_defaults_under_the_shared_cache_dir(tmp_path: Path) -> None:
+    """cache_dir defaults to solar_wind_atlas/ under the shared cache directory."""
+    from earthlens.config import cache_dir as shared_cache_dir
+
     backend = _backend(tmp_path, ["ghi"])
-    assert backend.cache_dir == backend.root_dir / "_cache" / "gsa"
+    assert backend.cache_dir == shared_cache_dir() / "solar_wind_atlas", (
+        f"got {backend.cache_dir}"
+    )
 
 
 def test_cache_dir_override_is_honoured(tmp_path: Path) -> None:

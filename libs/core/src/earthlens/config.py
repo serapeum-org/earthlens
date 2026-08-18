@@ -284,4 +284,4 @@ def cache_dir() -> Path:
     env = os.environ.get(CACHE_DIR_ENV)
     if env:
         return _resolve(env)
-    return _resolve(platformdirs.user_cache_dir("earthlens"))
+    return _resolve(platformdirs.user_cache_dir("earthlens", appauthor=False))

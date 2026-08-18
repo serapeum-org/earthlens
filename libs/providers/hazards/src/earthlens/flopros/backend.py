@@ -39,6 +39,7 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
+from earthlens.config import cache_dir
 from earthlens.flopros import _helpers
 from earthlens.flopros.catalog import Catalog
 
@@ -219,12 +220,13 @@ class FLOPROS(AbstractDataSource):
     def _cache_root(self) -> Path:
         """The directory holding the downloaded zip and its extracted shapefile.
 
-        Defaults to a `_flopros_cache` subfolder under the output path; overridden
+        Defaults to `flopros/` under the shared earthlens cache directory
+        (`set_cache_dir()` / `EARTHLENS_CACHE`); overridden
         by `cache_dir`. The download and extraction land here, not directly under
         the output `root_dir`, so a `geometry=False` request — which skips the
         GeoPackage write — leaves the output directory free of result files.
         """
-        return self._cache_dir or (self.root_dir / "_flopros_cache")
+        return self._cache_dir or (cache_dir() / "flopros")
 
     def _cached_zip(self, product: RemoteProduct) -> Path:
         """Return the local zip path, downloading it on a cache miss.

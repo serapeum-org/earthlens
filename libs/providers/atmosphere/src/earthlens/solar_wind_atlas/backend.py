@@ -34,6 +34,7 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
 )
+from earthlens.config import cache_dir as _shared_cache_dir
 from earthlens.solar_wind_atlas._helpers import (
     bbox_from_extent,
     download_cache_crop,
@@ -181,12 +182,13 @@ class SolarWindAtlas(AbstractDataSource):
         """Directory the Global Solar Atlas ZIP archives are cached in.
 
         Returns:
-            Path: The `cache_dir=` argument, or `<root_dir>/_cache/gsa` by
-                default.
+            Path: The `cache_dir=` argument, or `solar_wind_atlas/` under the
+                shared earthlens cache directory (`set_cache_dir()` /
+                `EARTHLENS_CACHE`) by default.
         """
         if self._cache_dir_arg is not None:
             return Path(self._cache_dir_arg)
-        return self.root_dir / "_cache" / "gsa"
+        return _shared_cache_dir() / "solar_wind_atlas"
 
     def _search(self) -> list[RemoteProduct]:
         """Name one product per requested layer (metadata = the `Layer` row).

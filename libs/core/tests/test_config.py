@@ -147,7 +147,8 @@ class TestCacheDirResolution:
 
     def test_default_is_the_platform_user_cache(self):
         """With nothing set it resolves to the per-platform user cache directory."""
-        assert cache_dir() == Path(platformdirs.user_cache_dir("earthlens")).resolve()
+        expected = platformdirs.user_cache_dir("earthlens", appauthor=False)
+        assert cache_dir() == Path(expected).resolve()
 
     def test_env_var_is_used(self, monkeypatch, tmp_path):
         """EARTHLENS_CACHE is picked up when no override is set."""

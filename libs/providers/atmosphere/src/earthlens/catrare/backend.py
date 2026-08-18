@@ -39,6 +39,7 @@ from earthlens.base import (
 from earthlens.base.http import HttpClient
 from earthlens.catrare import _helpers
 from earthlens.catrare.catalog import Catalog
+from earthlens.config import cache_dir
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
@@ -230,12 +231,13 @@ class CatRaRE(AbstractDataSource):
     def _cache_root(self) -> Path:
         """The directory holding the downloaded FileGDB zips.
 
-        Defaults to a `_catrare_cache` subfolder under the output path; overridden
+        Defaults to `catrare/` under the shared earthlens cache directory
+        (`set_cache_dir()` / `EARTHLENS_CACHE`); overridden
         by `cache_dir`. The download lands here, not directly under the output
         `root_dir`, so a `geometry=False` request — which skips the GeoPackage
         write — leaves the output directory free of result files.
         """
-        return self._cache_dir or (self.root_dir / "_catrare_cache")
+        return self._cache_dir or (cache_dir() / "catrare")
 
     def _cached_gdb(self, product: RemoteProduct) -> Path:
         """Return the local FileGDB zip path, downloading it on a cache miss.

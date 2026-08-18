@@ -46,9 +46,12 @@ class TestCacheDir:
 
     def test_the_env_override_wins(self, monkeypatch, tmp_path):
         """`EARTHLENS_CACHE` is the override the other backends already honour."""
+        from earthlens.config import set_cache_dir
+
+        set_cache_dir(None)  # the test-isolation override outranks the env var
         monkeypatch.setenv("EARTHLENS_CACHE", str(tmp_path))
 
-        assert _helpers.cache_dir() == tmp_path / "caravan"
+        assert _helpers.cache_dir() == tmp_path.resolve() / "caravan"
 
     def test_it_falls_back_to_the_platform_cache(self, monkeypatch):
         """The fallback is delegated to platformdirs, not hard-coded.
@@ -60,10 +63,13 @@ class TestCacheDir:
         """
         import platformdirs
 
+        from earthlens.config import set_cache_dir
+
+        set_cache_dir(None)  # the test-isolation override outranks the fallback
         monkeypatch.delenv("EARTHLENS_CACHE", raising=False)
 
-        expected = Path(platformdirs.user_cache_dir("earthlens")) / "caravan"
-        assert _helpers.cache_dir() == expected
+        root = Path(platformdirs.user_cache_dir("earthlens", appauthor=False))
+        assert _helpers.cache_dir() == root.resolve() / "caravan"
 
 
 class TestResolveRecord:

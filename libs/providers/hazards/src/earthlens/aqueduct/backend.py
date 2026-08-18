@@ -39,6 +39,7 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
+from earthlens.config import cache_dir
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
@@ -281,13 +282,14 @@ class Aqueduct(AbstractDataSource):
     def _cache_root(self) -> Path:
         """The directory holding the downloaded zips and their extracted shapefiles.
 
-        Defaults to an `_aqueduct_cache` subfolder under the output path; overridden
+        Defaults to `aqueduct/` under the shared earthlens cache directory
+        (`set_cache_dir()` / `EARTHLENS_CACHE`); overridden
         by `cache_dir`. The download and extraction land here (in the cache
         subfolder), not directly under the output `root_dir`, so a `geometry=False`
         request — which skips the GeoPackage write — leaves the output directory
         free of result files, with only the reusable cache subfolder alongside.
         """
-        return self._cache_dir or (self.root_dir / "_aqueduct_cache")
+        return self._cache_dir or (cache_dir() / "aqueduct")
 
     def _cached_zip(self, product: RemoteProduct) -> Path:
         """Return the local zip path, downloading it on a cache miss.
