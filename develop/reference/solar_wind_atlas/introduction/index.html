@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -12729,6 +12729,90 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/eclipse_geometry_3d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The eclipse in 3D — Sun → Moon → Earth, and the satellites that watched it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Moon's shadow from Meteosat — the 12 Aug 2026 total solar eclipse (MTG-FCI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_goes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watching the Moon's shadow cross the North Atlantic — the 12 Aug 2026 total solar eclipse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -23263,7 +23347,7 @@ For the hands-on walkthrough see <a href="../usage/">Usage</a> and the layer ids
   Cloud-Optimized GeoTIFFs (COGs) on figshare, so the backend reads <strong>only the
   bbox window</strong> over a virtual <code>/vsicurl/</code> range read through the
   <a href="https://github.com/serapeum-org/pyramids">pyramids</a> GIS backend
-  (<code>Dataset.read_part</code>). A small area transfers a few hundred KB, not the
+  (<code>Dataset.crop(bbox=)</code>). A small area transfers a few hundred KB, not the
   multi-GB global file.</p>
 </li>
 <li>

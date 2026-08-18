@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -13233,6 +13233,90 @@
     
   
     True-colour approach 2 — a Landsat wet-year vs 2026 baseline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/eclipse_geometry_3d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The eclipse in 3D — Sun → Moon → Earth, and the satellites that watched it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Moon's shadow from Meteosat — the 12 Aug 2026 total solar eclipse (MTG-FCI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_goes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watching the Moon's shadow cross the North Atlantic — the 12 Aug 2026 total solar eclipse
   
 
     
@@ -26385,7 +26469,7 @@ the facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>
 <a id="__codelineno-0-119" name="__codelineno-0-119"></a>        <span class="n">start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a>        <span class="n">end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a>        <span class="n">release</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a>        <span class="n">max_features</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -26887,7 +26971,7 @@ the facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>
 
 
 <h4 id="earthlens.overture.Overture.__init__" class="doc doc-heading"><a href="#earthlens.overture.Overture.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;geoparquet&#39;</span><span class="p">,</span> <span class="n">max_bbox_deg2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;geoparquet&#39;</span><span class="p">,</span> <span class="n">max_bbox_deg2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.overture.Overture.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -27020,7 +27104,7 @@ chunked in time.</p>
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -27029,7 +27113,7 @@ Created by the parent class if absent.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;&#39;</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -27366,7 +27450,7 @@ like an Overture release id.</p>
 <a id="__codelineno-0-119" name="__codelineno-0-119"></a>    <span class="n">start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a>    <span class="n">end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a>    <span class="n">release</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a>    <span class="n">max_features</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -30155,7 +30239,7 @@ the facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>
 <a id="__codelineno-0-119" name="__codelineno-0-119"></a>        <span class="n">start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a>        <span class="n">end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a>        <span class="n">release</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a>        <span class="n">max_features</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -30657,7 +30741,7 @@ the facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>
 
 
 <h4 id="earthlens.overture.backend.Overture.__init__" class="doc doc-heading"><a href="#earthlens.overture.backend.Overture.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;geoparquet&#39;</span><span class="p">,</span> <span class="n">max_bbox_deg2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">release</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;geoparquet&#39;</span><span class="p">,</span> <span class="n">max_bbox_deg2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.overture.backend.Overture.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -30790,7 +30874,7 @@ chunked in time.</p>
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -30799,7 +30883,7 @@ Created by the parent class if absent.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;&#39;</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -31136,7 +31220,7 @@ like an Overture release id.</p>
 <a id="__codelineno-0-119" name="__codelineno-0-119"></a>    <span class="n">start</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-120" name="__codelineno-0-120"></a>    <span class="n">end</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-121" name="__codelineno-0-121"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124"></a>    <span class="n">release</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-125" name="__codelineno-0-125"></a>    <span class="n">max_features</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

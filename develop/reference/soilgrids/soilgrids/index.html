@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -13063,6 +13063,90 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/eclipse_geometry_3d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The eclipse in 3D — Sun → Moon → Earth, and the satellites that watched it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Moon's shadow from Meteosat — the 12 Aug 2026 total solar eclipse (MTG-FCI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_goes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watching the Moon's shadow cross the North Atlantic — the 12 Aug 2026 total solar eclipse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -25430,7 +25514,7 @@ temporal axis).</p>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>        <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a>        <span class="o">*</span><span class="p">,</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>        <span class="n">depths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -25785,7 +25869,7 @@ temporal axis).</p>
 
 
 <h4 id="earthlens.soilgrids.SoilGrids.__init__" class="doc doc-heading"><a href="#earthlens.soilgrids.SoilGrids.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;static&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">depths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantiles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_crs</span><span class="o">=</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coverage_crs</span><span class="o">=</span><span class="n">IGH_PROJ4</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">120.0</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;static&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">depths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantiles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_crs</span><span class="o">=</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coverage_crs</span><span class="o">=</span><span class="n">IGH_PROJ4</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">120.0</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.soilgrids.SoilGrids.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -25910,7 +25994,7 @@ List ids with <code>earthlens.soilgrids.Catalog().parameters()</code>.</p>
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -25918,7 +26002,7 @@ List ids with <code>earthlens.soilgrids.Catalog().parameters()</code>.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;&#39;</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -26227,7 +26311,7 @@ not a per-dataset map).</p>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a>    <span class="o">*</span><span class="p">,</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>    <span class="n">depths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -27612,7 +27696,7 @@ temporal axis).</p>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>        <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a>        <span class="o">*</span><span class="p">,</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>        <span class="n">depths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -27967,7 +28051,7 @@ temporal axis).</p>
 
 
 <h4 id="earthlens.soilgrids.backend.SoilGrids.__init__" class="doc doc-heading"><a href="#earthlens.soilgrids.backend.SoilGrids.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;static&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">depths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantiles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_crs</span><span class="o">=</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coverage_crs</span><span class="o">=</span><span class="n">IGH_PROJ4</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">120.0</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">lat_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lon_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;static&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">depths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quantiles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_crs</span><span class="o">=</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coverage_crs</span><span class="o">=</span><span class="n">IGH_PROJ4</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">120.0</span><span class="p">,</span> <span class="n">catalog</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.soilgrids.backend.SoilGrids.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -28092,7 +28176,7 @@ List ids with <code>earthlens.soilgrids.Catalog().parameters()</code>.</p>
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -28100,7 +28184,7 @@ List ids with <code>earthlens.soilgrids.Catalog().parameters()</code>.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;&#39;</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -28409,7 +28493,7 @@ not a per-dataset map).</p>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-106" name="__codelineno-0-106"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a>    <span class="o">*</span><span class="p">,</span>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>    <span class="n">depths</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>

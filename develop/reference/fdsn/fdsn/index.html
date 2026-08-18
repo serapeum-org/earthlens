@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -13069,6 +13069,90 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/eclipse_geometry_3d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The eclipse in 3D — Sun → Moon → Earth, and the satellites that watched it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Moon's shadow from Meteosat — the 12 Aug 2026 total solar eclipse (MTG-FCI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_goes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watching the Moon's shadow cross the North Atlantic — the 12 Aug 2026 total solar eclipse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -25195,7 +25279,7 @@ end-to-end exercise of that facade guard.</p>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a>        <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a>        <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>        <span class="n">min_magnitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="n">max_magnitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -25614,7 +25698,7 @@ end-to-end exercise of that facade guard.</p>
 
 
 <h4 id="earthlens.fdsn.FDSN.__init__" class="doc doc-heading"><a href="#earthlens.fdsn.FDSN.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">min_magnitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_magnitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">magnitude_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">orderby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">earthscope_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;gpkg&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">min_magnitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_magnitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">magnitude_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">orderby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">earthscope_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;gpkg&#39;</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.fdsn.FDSN.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -25745,7 +25829,7 @@ the sentinel <code>"all"</code>, not a pandas frequency alias.</p>
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -25754,7 +25838,7 @@ Created by the parent class if absent.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;&#39;</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -26072,7 +26156,7 @@ GeoPackage) or <code>"geojson"</code>.</p>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">min_magnitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">max_magnitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -27909,7 +27993,7 @@ end-to-end exercise of that facade guard.</p>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a>        <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a>        <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a>        <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>        <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>        <span class="n">min_magnitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>        <span class="n">max_magnitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -28328,7 +28412,7 @@ end-to-end exercise of that facade guard.</p>
 
 
 <h4 id="earthlens.fdsn.backend.FDSN.__init__" class="doc doc-heading"><a href="#earthlens.fdsn.backend.FDSN.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">min_magnitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_magnitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">magnitude_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">orderby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">earthscope_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;gpkg&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">lat_lim</span><span class="p">,</span> <span class="n">lon_lim</span><span class="p">,</span> <span class="n">temporal_resolution</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">min_magnitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_magnitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">magnitude_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">event_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">orderby</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">earthscope_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;gpkg&#39;</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.fdsn.backend.FDSN.__init__" class="headerlink" title="Permanent link">#</a></h4>
 
@@ -28459,7 +28543,7 @@ the sentinel <code>"all"</code>, not a pandas frequency alias.</p>
                 <code>path</code>
             </td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span></code>
+                  <code><span title="pathlib.Path">Path</span> | <span title="str">str</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -28468,7 +28552,7 @@ Created by the parent class if absent.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;&#39;</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -28786,7 +28870,7 @@ GeoPackage) or <code>"geojson"</code>.</p>
 <a id="__codelineno-0-99" name="__codelineno-0-99"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a>    <span class="n">temporal_resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">min_magnitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">max_magnitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
