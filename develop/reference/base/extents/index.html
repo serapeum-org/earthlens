@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2495,7 +2495,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS + ECDS + XDS)
+    Data stores (CDS + ADS + EWDS)
   
 
     
@@ -2524,34 +2524,6 @@
     
   
     EWDS (GloFAS / floods)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../ecmwf/ecds/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -14265,34 +14237,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    TIGGE and fire fuel — the ECDS and XDS endpoints
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../examples/ecmwf/glofas_historical_intermediate/" class="md-nav__link">
         
   
@@ -23672,9 +23616,7 @@ the spatial counterpart of the temporal cadence.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-223">223</a></span>
-<span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-225">225</a></span>
 <span class="normal"><a href="#__codelineno-0-226">226</a></span>
 <span class="normal"><a href="#__codelineno-0-227">227</a></span>
 <span class="normal"><a href="#__codelineno-0-228">228</a></span>
@@ -23877,212 +23819,214 @@ the spatial counterpart of the temporal cadence.</p>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
 <span class="normal"><a href="#__codelineno-0-426">426</a></span>
 <span class="normal"><a href="#__codelineno-0-427">427</a></span>
-<span class="normal"><a href="#__codelineno-0-428">428</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-223" name="__codelineno-0-223"></a><span class="k">class</span><span class="w"> </span><span class="nc">SpatialExtent</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Geographic bounding box (WGS84) for a download request.</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="sd">    Backend-agnostic. Coordinates are in **degrees**:</span>
+<span class="normal"><a href="#__codelineno-0-428">428</a></span>
+<span class="normal"><a href="#__codelineno-0-429">429</a></span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-225" name="__codelineno-0-225"></a><span class="k">class</span><span class="w"> </span><span class="nc">SpatialExtent</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Geographic bounding box (WGS84) for a download request.</span>
 <a id="__codelineno-0-227" name="__codelineno-0-227"></a>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    * latitude in `[-90, 90]` (south negative, north positive)</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="sd">    * longitude in `[-180, 180]` (west negative, east positive)</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    Each concrete data source converts this to whatever format its</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="sd">    protocol expects (CDS: `[north, west, south, east]`; CHIRPS:</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    per-row clipping; S3: prefix filter; GEE:</span>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    `ee.Geometry.Rectangle(west, south, east, north)`). For</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    projected coordinates, define a separate `ProjectedExtent`</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    type — do not reuse this one with metric values.</span>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        latitude_min: Inclusive south edge of the bbox, in degrees.</span>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        latitude_max: Inclusive north edge of the bbox, in degrees.</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        longitude_min: Inclusive west edge of the bbox, in degrees.</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        longitude_max: Inclusive east edge of the bbox, in degrees.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        resolution: Grid cell size in degrees, applied to both</span>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">            latitude and longitude. `None` for backends that work</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            on irregular grids or do not need a cell size for their</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            request shape (e.g. CHIRPS FTP file lookup, S3 prefix</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            listing). Mirrors :attr:`TemporalExtent.resolution` —</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            the spatial counterpart of the temporal cadence.</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="sd">    Backend-agnostic. Coordinates are in **degrees**:</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a><span class="sd">    * latitude in `[-90, 90]` (south negative, north positive)</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="sd">    * longitude in `[-180, 180]` (west negative, east positive)</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="sd">    Each concrete data source converts this to whatever format its</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    protocol expects (CDS: `[north, west, south, east]`; CHIRPS:</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    per-row clipping; S3: prefix filter; GEE:</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">    `ee.Geometry.Rectangle(west, south, east, north)`). For</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    projected coordinates, define a separate `ProjectedExtent`</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">    type — do not reuse this one with metric values.</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        latitude_min: Inclusive south edge of the bbox, in degrees.</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        latitude_max: Inclusive north edge of the bbox, in degrees.</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">        longitude_min: Inclusive west edge of the bbox, in degrees.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        longitude_max: Inclusive east edge of the bbox, in degrees.</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        resolution: Grid cell size in degrees, applied to both</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            latitude and longitude. `None` for backends that work</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            on irregular grids or do not need a cell size for their</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            request shape (e.g. CHIRPS FTP file lookup, S3 prefix</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            listing). Mirrors :attr:`TemporalExtent.resolution` —</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            the spatial counterpart of the temporal cadence.</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="n">latitude_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">ge</span><span class="o">=-</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;South edge in degrees&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="n">latitude_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">ge</span><span class="o">=-</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;North edge in degrees&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="n">longitude_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="n">ge</span><span class="o">=-</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;West edge in degrees&quot;</span>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="p">)</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="n">longitude_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>        <span class="n">ge</span><span class="o">=-</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;East edge in degrees&quot;</span>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="p">)</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Grid cell size in degrees&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="p">)</span>
-<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="n">geometry</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
-<a id="__codelineno-0-265" name="__codelineno-0-265"></a>        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-266" name="__codelineno-0-266"></a>        <span class="n">exclude</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-<a id="__codelineno-0-269" name="__codelineno-0-269"></a>            <span class="s2">&quot;Optional WGS84 polygon mask (a geopandas `GeoDataFrame`) &quot;</span>
-<a id="__codelineno-0-270" name="__codelineno-0-270"></a>            <span class="s2">&quot;captured when the request&#39;s area of interest was a polygon &quot;</span>
-<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="s2">&quot;rather than a plain bbox. Raster backends that clip via &quot;</span>
-<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="s2">&quot;`pyramids.Dataset.crop` use it to mask the fetched bbox to &quot;</span>
-<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="s2">&quot;the exact polygon; `None` means clip to the rectangular &quot;</span>
-<a id="__codelineno-0-274" name="__codelineno-0-274"></a>            <span class="s2">&quot;bbox only. Excluded from serialisation.&quot;</span>
-<a id="__codelineno-0-275" name="__codelineno-0-275"></a>        <span class="p">),</span>
-<a id="__codelineno-0-276" name="__codelineno-0-276"></a>    <span class="p">)</span>
-<a id="__codelineno-0-277" name="__codelineno-0-277"></a>
-<a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-279" name="__codelineno-0-279"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_min_le_max</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-280" name="__codelineno-0-280"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate that `min &lt;= max` on both axes.</span>
-<a id="__codelineno-0-281" name="__codelineno-0-281"></a>
-<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="sd">        Per-field range constraints (`Field(ge=..., le=...)`) cannot</span>
-<a id="__codelineno-0-283" name="__codelineno-0-283"></a><span class="sd">        express the cross-field invariant.</span>
-<a id="__codelineno-0-284" name="__codelineno-0-284"></a>
-<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-286" name="__codelineno-0-286"></a><span class="sd">            ValueError: If either `latitude_min &gt; latitude_max` or</span>
-<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">                `longitude_min &gt; longitude_max`.</span>
-<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-289" name="__codelineno-0-289"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude_min</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">:</span>
-<a id="__codelineno-0-290" name="__codelineno-0-290"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-291" name="__codelineno-0-291"></a>                <span class="sa">f</span><span class="s2">&quot;latitude_min (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude_min</span><span class="si">}</span><span class="s2">) &gt; &quot;</span>
-<a id="__codelineno-0-292" name="__codelineno-0-292"></a>                <span class="sa">f</span><span class="s2">&quot;latitude_max (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude_max</span><span class="si">}</span><span class="s2">)&quot;</span>
-<a id="__codelineno-0-293" name="__codelineno-0-293"></a>            <span class="p">)</span>
-<a id="__codelineno-0-294" name="__codelineno-0-294"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">:</span>
-<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="c1"># A west &gt; east box is how GeoJSON/STAC spell an antimeridian</span>
-<a id="__codelineno-0-296" name="__codelineno-0-296"></a>            <span class="c1"># crossing, so say so and name the remedy: only the stac backend</span>
-<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="c1"># splits such a box today (via</span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="c1"># `pyramids.feature.bbox.split_antimeridian`), and a bare</span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="c1"># &quot;min &gt; max&quot; reads like a typo rather than an unsupported case.</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>                <span class="sa">f</span><span class="s2">&quot;longitude_min (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span><span class="si">}</span><span class="s2">) &gt; longitude_max &quot;</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span><span class="si">}</span><span class="s2">). A west-of-east box denotes an &quot;</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>                <span class="sa">f</span><span class="s2">&quot;antimeridian crossing, which this backend does not support; &quot;</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>                <span class="sa">f</span><span class="s2">&quot;split it at ±180 and issue the two halves as separate &quot;</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                <span class="sa">f</span><span class="s2">&quot;requests (e.g. [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span><span class="si">}</span><span class="s2">, 180] and &quot;</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>                <span class="sa">f</span><span class="s2">&quot;[-180, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span><span class="si">}</span><span class="s2">]).&quot;</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="p">)</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="k">return</span> <span class="bp">self</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="c1">#: The scalar fields that define spatial identity. `geometry` is a</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="c1">#: heavy, unhashable `GeoDataFrame` whose pandas `==` is non-boolean,</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="c1">#: so it is deliberately excluded from equality / hashing (as it is</span>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="c1">#: from serialisation) — two extents over the same bbox are equal and</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="c1">#: hashable whether or not one carries a polygon mask.</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="n">_IDENTITY_FIELDS</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="s2">&quot;latitude_min&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="s2">&quot;latitude_max&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="s2">&quot;longitude_min&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="s2">&quot;longitude_max&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="s2">&quot;resolution&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="p">)</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the bbox-identity tuple used for equality / hashing.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_IDENTITY_FIELDS</span><span class="p">)</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compare two extents by bbox + resolution, ignoring `geometry`.</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">        Overrides pydantic&#39;s field-wise equality, which would otherwise</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">        evaluate `GeoDataFrame == GeoDataFrame` (a non-boolean pandas</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        result) and raise for a polygon-`aoi=` extent.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">            other: The object to compare against.</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">            `True` when `other` is a `SpatialExtent` with the same bbox</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">            and resolution; `NotImplemented` for any other type.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SpatialExtent</span><span class="p">):</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>            <span class="k">return</span> <span class="bp">NotImplemented</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_identity</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_identity</span><span class="p">()</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Hash by bbox + resolution, ignoring the unhashable `geometry`.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_identity</span><span class="p">())</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">from_pairs</span><span class="p">(</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="bp">cls</span><span class="p">,</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build from the legacy `[min, max]` pair shape.</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">        :class:`AbstractDataSource.__init__` accepts `lat_lim` /</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">        `lon_lim` as constructor kwargs in the public API; this</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        classmethod adapts that shape to the four named fields.</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">            lat_lim: `[lat_min, lat_max]` in degrees.</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">            lon_lim: `[lon_min, lon_max]` in degrees.</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            resolution: Grid cell size in degrees. Defaults to</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">                `None` (unspecified — typical for backends that</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">                work off file listings rather than gridded request</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">                shapes).</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">            SpatialExtent: A validated, frozen instance.</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>            <span class="n">latitude_min</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>            <span class="n">latitude_max</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="n">longitude_min</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="n">longitude_max</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="p">)</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">north</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Northern edge of the bbox (== `latitude_max`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude_max</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">south</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Southern edge of the bbox (== `latitude_min`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude_min</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">east</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Eastern edge of the bbox (== `longitude_max`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">west</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<a id="__codelineno-0-398" name="__codelineno-0-398"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Western edge of the bbox (== `longitude_min`).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_pixel_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_m</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return `(width_px, height_px)` of this bbox sampled at `scale_m` metres.</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">        Thin wrapper over :func:`earthlens.base.spatial.estimate_pixel_dims`</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">        so every backend can pre-flight a request size without reaching</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        into another subpackage. Useful e.g. for GEE&#39;s 32768-px</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        synchronous-export cap or for any &quot;will this download blow up?&quot;</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        check before queuing a job.</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">            scale_m: Output pixel size in metres.</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">            `(width_px, height_px)` — both rounded up, each at least 1.</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">            ValueError: If `scale_m` is not positive.</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>        <span class="c1"># Local import to keep the existing import order untouched.</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">estimate_pixel_dims</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="k">return</span> <span class="n">estimate_pixel_dims</span><span class="p">(</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="n">scale_m</span><span class="p">,</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="p">)</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="n">latitude_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">ge</span><span class="o">=-</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;South edge in degrees&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="n">latitude_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">ge</span><span class="o">=-</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;North edge in degrees&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="n">longitude_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>        <span class="n">ge</span><span class="o">=-</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;West edge in degrees&quot;</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="p">)</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="n">longitude_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>        <span class="n">ge</span><span class="o">=-</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;East edge in degrees&quot;</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>    <span class="p">)</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Grid cell size in degrees&quot;</span>
+<a id="__codelineno-0-265" name="__codelineno-0-265"></a>    <span class="p">)</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="n">geometry</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+<a id="__codelineno-0-267" name="__codelineno-0-267"></a>        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-268" name="__codelineno-0-268"></a>        <span class="n">exclude</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-269" name="__codelineno-0-269"></a>        <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-270" name="__codelineno-0-270"></a>        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+<a id="__codelineno-0-271" name="__codelineno-0-271"></a>            <span class="s2">&quot;Optional WGS84 polygon mask (a geopandas `GeoDataFrame`) &quot;</span>
+<a id="__codelineno-0-272" name="__codelineno-0-272"></a>            <span class="s2">&quot;captured when the request&#39;s area of interest was a polygon &quot;</span>
+<a id="__codelineno-0-273" name="__codelineno-0-273"></a>            <span class="s2">&quot;rather than a plain bbox. Raster backends that clip via &quot;</span>
+<a id="__codelineno-0-274" name="__codelineno-0-274"></a>            <span class="s2">&quot;`pyramids.Dataset.crop` use it to mask the fetched bbox to &quot;</span>
+<a id="__codelineno-0-275" name="__codelineno-0-275"></a>            <span class="s2">&quot;the exact polygon; `None` means clip to the rectangular &quot;</span>
+<a id="__codelineno-0-276" name="__codelineno-0-276"></a>            <span class="s2">&quot;bbox only. Excluded from serialisation.&quot;</span>
+<a id="__codelineno-0-277" name="__codelineno-0-277"></a>        <span class="p">),</span>
+<a id="__codelineno-0-278" name="__codelineno-0-278"></a>    <span class="p">)</span>
+<a id="__codelineno-0-279" name="__codelineno-0-279"></a>
+<a id="__codelineno-0-280" name="__codelineno-0-280"></a>    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-281" name="__codelineno-0-281"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_min_le_max</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
+<a id="__codelineno-0-282" name="__codelineno-0-282"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate that `min &lt;= max` on both axes.</span>
+<a id="__codelineno-0-283" name="__codelineno-0-283"></a>
+<a id="__codelineno-0-284" name="__codelineno-0-284"></a><span class="sd">        Per-field range constraints (`Field(ge=..., le=...)`) cannot</span>
+<a id="__codelineno-0-285" name="__codelineno-0-285"></a><span class="sd">        express the cross-field invariant.</span>
+<a id="__codelineno-0-286" name="__codelineno-0-286"></a>
+<a id="__codelineno-0-287" name="__codelineno-0-287"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-288" name="__codelineno-0-288"></a><span class="sd">            ValueError: If either `latitude_min &gt; latitude_max` or</span>
+<a id="__codelineno-0-289" name="__codelineno-0-289"></a><span class="sd">                `longitude_min &gt; longitude_max`.</span>
+<a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude_min</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>                <span class="sa">f</span><span class="s2">&quot;latitude_min (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude_min</span><span class="si">}</span><span class="s2">) &gt; &quot;</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>                <span class="sa">f</span><span class="s2">&quot;latitude_max (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">latitude_max</span><span class="si">}</span><span class="s2">)&quot;</span>
+<a id="__codelineno-0-295" name="__codelineno-0-295"></a>            <span class="p">)</span>
+<a id="__codelineno-0-296" name="__codelineno-0-296"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>            <span class="c1"># A west &gt; east box is how GeoJSON/STAC spell an antimeridian</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="c1"># crossing, so say so and name the remedy: only the stac backend</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="c1"># splits such a box today (via</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>            <span class="c1"># `pyramids.feature.bbox.split_antimeridian`), and a bare</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="c1"># &quot;min &gt; max&quot; reads like a typo rather than an unsupported case.</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>                <span class="sa">f</span><span class="s2">&quot;longitude_min (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span><span class="si">}</span><span class="s2">) &gt; longitude_max &quot;</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span><span class="si">}</span><span class="s2">). A west-of-east box denotes an &quot;</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>                <span class="sa">f</span><span class="s2">&quot;antimeridian crossing, which this backend does not support; &quot;</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>                <span class="sa">f</span><span class="s2">&quot;split it at ±180 and issue the two halves as separate &quot;</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>                <span class="sa">f</span><span class="s2">&quot;requests (e.g. [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span><span class="si">}</span><span class="s2">, 180] and &quot;</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>                <span class="sa">f</span><span class="s2">&quot;[-180, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span><span class="si">}</span><span class="s2">]).&quot;</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>            <span class="p">)</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="k">return</span> <span class="bp">self</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="c1">#: The scalar fields that define spatial identity. `geometry` is a</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="c1">#: heavy, unhashable `GeoDataFrame` whose pandas `==` is non-boolean,</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>    <span class="c1">#: so it is deliberately excluded from equality / hashing (as it is</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="c1">#: from serialisation) — two extents over the same bbox are equal and</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="c1">#: hashable whether or not one carries a polygon mask.</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>    <span class="n">_IDENTITY_FIELDS</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="s2">&quot;latitude_min&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>        <span class="s2">&quot;latitude_max&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="s2">&quot;longitude_min&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>        <span class="s2">&quot;longitude_max&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="s2">&quot;resolution&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>    <span class="p">)</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_identity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the bbox-identity tuple used for equality / hashing.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_IDENTITY_FIELDS</span><span class="p">)</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Compare two extents by bbox + resolution, ignoring `geometry`.</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">        Overrides pydantic&#39;s field-wise equality, which would otherwise</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">        evaluate `GeoDataFrame == GeoDataFrame` (a non-boolean pandas</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">        result) and raise for a polygon-`aoi=` extent.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">            other: The object to compare against.</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">            `True` when `other` is a `SpatialExtent` with the same bbox</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">            and resolution; `NotImplemented` for any other type.</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SpatialExtent</span><span class="p">):</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>            <span class="k">return</span> <span class="bp">NotImplemented</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_identity</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_identity</span><span class="p">()</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Hash by bbox + resolution, ignoring the unhashable `geometry`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_identity</span><span class="p">())</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">from_pairs</span><span class="p">(</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="bp">cls</span><span class="p">,</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>        <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Build from the legacy `[min, max]` pair shape.</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">        :class:`AbstractDataSource.__init__` accepts `lat_lim` /</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">        `lon_lim` as constructor kwargs in the public API; this</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">        classmethod adapts that shape to the four named fields.</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">            lat_lim: `[lat_min, lat_max]` in degrees.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            lon_lim: `[lon_min, lon_max]` in degrees.</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            resolution: Grid cell size in degrees. Defaults to</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">                `None` (unspecified — typical for backends that</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">                work off file listings rather than gridded request</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">                shapes).</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">            SpatialExtent: A validated, frozen instance.</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>            <span class="n">latitude_min</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>            <span class="n">latitude_max</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>            <span class="n">longitude_min</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>            <span class="n">longitude_max</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>            <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="p">)</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">north</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Northern edge of the bbox (== `latitude_max`).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude_max</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">south</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Southern edge of the bbox (== `latitude_min`).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">latitude_min</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">east</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Eastern edge of the bbox (== `longitude_max`).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">west</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Western edge of the bbox (== `longitude_min`).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_pixel_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_m</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return `(width_px, height_px)` of this bbox sampled at `scale_m` metres.</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">        Thin wrapper over :func:`earthlens.base.spatial.estimate_pixel_dims`</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">        so every backend can pre-flight a request size without reaching</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">        into another subpackage. Useful e.g. for GEE&#39;s 32768-px</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">        synchronous-export cap or for any &quot;will this download blow up?&quot;</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">        check before queuing a job.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">            scale_m: Output pixel size in metres.</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">            `(width_px, height_px)` — both rounded up, each at least 1.</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">            ValueError: If `scale_m` is not positive.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>        <span class="c1"># Local import to keep the existing import order untouched.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>        <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">estimate_pixel_dims</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="k">return</span> <span class="n">estimate_pixel_dims</span><span class="p">(</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>            <span class="n">scale_m</span><span class="p">,</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24270,9 +24214,7 @@ result) and raise for a polygon-<code>aoi=</code> extent.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-327">327</a></span>
-<span class="normal"><a href="#__codelineno-0-328">328</a></span>
-<span class="normal"><a href="#__codelineno-0-329">329</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-329">329</a></span>
 <span class="normal"><a href="#__codelineno-0-330">330</a></span>
 <span class="normal"><a href="#__codelineno-0-331">331</a></span>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
@@ -24286,23 +24228,25 @@ result) and raise for a polygon-<code>aoi=</code> extent.</p>
 <span class="normal"><a href="#__codelineno-0-340">340</a></span>
 <span class="normal"><a href="#__codelineno-0-341">341</a></span>
 <span class="normal"><a href="#__codelineno-0-342">342</a></span>
-<span class="normal"><a href="#__codelineno-0-343">343</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-327" name="__codelineno-0-327"></a><span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compare two extents by bbox + resolution, ignoring `geometry`.</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="sd">    Overrides pydantic&#39;s field-wise equality, which would otherwise</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a><span class="sd">    evaluate `GeoDataFrame == GeoDataFrame` (a non-boolean pandas</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    result) and raise for a polygon-`aoi=` extent.</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a><span class="sd">        other: The object to compare against.</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a><span class="sd">        `True` when `other` is a `SpatialExtent` with the same bbox</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">        and resolution; `NotImplemented` for any other type.</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SpatialExtent</span><span class="p">):</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="k">return</span> <span class="bp">NotImplemented</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_identity</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_identity</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-343">343</a></span>
+<span class="normal"><a href="#__codelineno-0-344">344</a></span>
+<span class="normal"><a href="#__codelineno-0-345">345</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-329" name="__codelineno-0-329"></a><span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Compare two extents by bbox + resolution, ignoring `geometry`.</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a><span class="sd">    Overrides pydantic&#39;s field-wise equality, which would otherwise</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a><span class="sd">    evaluate `GeoDataFrame == GeoDataFrame` (a non-boolean pandas</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="sd">    result) and raise for a polygon-`aoi=` extent.</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a><span class="sd">        other: The object to compare against.</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        `True` when `other` is a `SpatialExtent` with the same bbox</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        and resolution; `NotImplemented` for any other type.</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SpatialExtent</span><span class="p">):</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="k">return</span> <span class="bp">NotImplemented</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_identity</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_identity</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24325,11 +24269,11 @@ result) and raise for a polygon-<code>aoi=</code> extent.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
-<span class="normal"><a href="#__codelineno-0-347">347</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-345" name="__codelineno-0-345"></a><span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Hash by bbox + resolution, ignoring the unhashable `geometry`.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_identity</span><span class="p">())</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-347">347</a></span>
+<span class="normal"><a href="#__codelineno-0-348">348</a></span>
+<span class="normal"><a href="#__codelineno-0-349">349</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="k">def</span><span class="w"> </span><span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Hash by bbox + resolution, ignoring the unhashable `geometry`.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_identity</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24434,9 +24378,7 @@ check before queuing a job.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-401">401</a></span>
-<span class="normal"><a href="#__codelineno-0-402">402</a></span>
-<span class="normal"><a href="#__codelineno-0-403">403</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-403">403</a></span>
 <span class="normal"><a href="#__codelineno-0-404">404</a></span>
 <span class="normal"><a href="#__codelineno-0-405">405</a></span>
 <span class="normal"><a href="#__codelineno-0-406">406</a></span>
@@ -24461,34 +24403,36 @@ check before queuing a job.</p>
 <span class="normal"><a href="#__codelineno-0-425">425</a></span>
 <span class="normal"><a href="#__codelineno-0-426">426</a></span>
 <span class="normal"><a href="#__codelineno-0-427">427</a></span>
-<span class="normal"><a href="#__codelineno-0-428">428</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-401" name="__codelineno-0-401"></a><span class="k">def</span><span class="w"> </span><span class="nf">estimate_pixel_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_m</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return `(width_px, height_px)` of this bbox sampled at `scale_m` metres.</span>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="sd">    Thin wrapper over :func:`earthlens.base.spatial.estimate_pixel_dims`</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a><span class="sd">    so every backend can pre-flight a request size without reaching</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    into another subpackage. Useful e.g. for GEE&#39;s 32768-px</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    synchronous-export cap or for any &quot;will this download blow up?&quot;</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    check before queuing a job.</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a><span class="sd">        scale_m: Output pixel size in metres.</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="sd">        `(width_px, height_px)` — both rounded up, each at least 1.</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a><span class="sd">        ValueError: If `scale_m` is not positive.</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="c1"># Local import to keep the existing import order untouched.</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">estimate_pixel_dims</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="k">return</span> <span class="n">estimate_pixel_dims</span><span class="p">(</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="n">scale_m</span><span class="p">,</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-428">428</a></span>
+<span class="normal"><a href="#__codelineno-0-429">429</a></span>
+<span class="normal"><a href="#__codelineno-0-430">430</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-403" name="__codelineno-0-403"></a><span class="k">def</span><span class="w"> </span><span class="nf">estimate_pixel_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale_m</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return `(width_px, height_px)` of this bbox sampled at `scale_m` metres.</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a><span class="sd">    Thin wrapper over :func:`earthlens.base.spatial.estimate_pixel_dims`</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a><span class="sd">    so every backend can pre-flight a request size without reaching</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a><span class="sd">    into another subpackage. Useful e.g. for GEE&#39;s 32768-px</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a><span class="sd">    synchronous-export cap or for any &quot;will this download blow up?&quot;</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a><span class="sd">    check before queuing a job.</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a><span class="sd">        scale_m: Output pixel size in metres.</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a><span class="sd">        `(width_px, height_px)` — both rounded up, each at least 1.</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a><span class="sd">        ValueError: If `scale_m` is not positive.</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>    <span class="c1"># Local import to keep the existing import order untouched.</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.base.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">estimate_pixel_dims</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>    <span class="k">return</span> <span class="n">estimate_pixel_dims</span><span class="p">(</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">longitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">latitude_min</span><span class="p">,</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">longitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">latitude_max</span><span class="p">,</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>        <span class="n">scale_m</span><span class="p">,</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24607,9 +24551,7 @@ shapes).</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-349">349</a></span>
-<span class="normal"><a href="#__codelineno-0-350">350</a></span>
-<span class="normal"><a href="#__codelineno-0-351">351</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-351">351</a></span>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
 <span class="normal"><a href="#__codelineno-0-353">353</a></span>
 <span class="normal"><a href="#__codelineno-0-354">354</a></span>
@@ -24637,37 +24579,39 @@ shapes).</p>
 <span class="normal"><a href="#__codelineno-0-376">376</a></span>
 <span class="normal"><a href="#__codelineno-0-377">377</a></span>
 <span class="normal"><a href="#__codelineno-0-378">378</a></span>
-<span class="normal"><a href="#__codelineno-0-379">379</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="k">def</span><span class="w"> </span><span class="nf">from_pairs</span><span class="p">(</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>    <span class="bp">cls</span><span class="p">,</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build from the legacy `[min, max]` pair shape.</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="sd">    :class:`AbstractDataSource.__init__` accepts `lat_lim` /</span>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a><span class="sd">    `lon_lim` as constructor kwargs in the public API; this</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">    classmethod adapts that shape to the four named fields.</span>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="sd">        lat_lim: `[lat_min, lat_max]` in degrees.</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">        lon_lim: `[lon_min, lon_max]` in degrees.</span>
-<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        resolution: Grid cell size in degrees. Defaults to</span>
-<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">            `None` (unspecified — typical for backends that</span>
-<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">            work off file listings rather than gridded request</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">            shapes).</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>
-<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">        SpatialExtent: A validated, frozen instance.</span>
-<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-374" name="__codelineno-0-374"></a>        <span class="n">latitude_min</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a>        <span class="n">latitude_max</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">longitude_min</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="n">longitude_max</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span>
+<span class="normal"><a href="#__codelineno-0-380">380</a></span>
+<span class="normal"><a href="#__codelineno-0-381">381</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a><span class="k">def</span><span class="w"> </span><span class="nf">from_pairs</span><span class="p">(</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>    <span class="bp">cls</span><span class="p">,</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="n">lat_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>    <span class="n">lon_lim</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpatialExtent</span><span class="p">:</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Build from the legacy `[min, max]` pair shape.</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a><span class="sd">    :class:`AbstractDataSource.__init__` accepts `lat_lim` /</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a><span class="sd">    `lon_lim` as constructor kwargs in the public API; this</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a><span class="sd">    classmethod adapts that shape to the four named fields.</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a><span class="sd">        lat_lim: `[lat_min, lat_max]` in degrees.</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a><span class="sd">        lon_lim: `[lon_min, lon_max]` in degrees.</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="sd">        resolution: Grid cell size in degrees. Defaults to</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="sd">            `None` (unspecified — typical for backends that</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="sd">            work off file listings rather than gridded request</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a><span class="sd">            shapes).</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        SpatialExtent: A validated, frozen instance.</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>        <span class="n">latitude_min</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="n">latitude_max</span><span class="o">=</span><span class="n">lat_lim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="n">longitude_min</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="n">longitude_max</span><span class="o">=</span><span class="n">lon_lim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24784,9 +24728,7 @@ pandas import in the abstract module.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-174">174</a></span>
-<span class="normal"><a href="#__codelineno-0-175">175</a></span>
-<span class="normal"><a href="#__codelineno-0-176">176</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-176">176</a></span>
 <span class="normal"><a href="#__codelineno-0-177">177</a></span>
 <span class="normal"><a href="#__codelineno-0-178">178</a></span>
 <span class="normal"><a href="#__codelineno-0-179">179</a></span>
@@ -24830,53 +24772,55 @@ pandas import in the abstract module.</p>
 <span class="normal"><a href="#__codelineno-0-217">217</a></span>
 <span class="normal"><a href="#__codelineno-0-218">218</a></span>
 <span class="normal"><a href="#__codelineno-0-219">219</a></span>
-<span class="normal"><a href="#__codelineno-0-220">220</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="k">class</span><span class="w"> </span><span class="nc">TemporalExtent</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Per-instance temporal context produced by :meth:`check_input_dates`.</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    Replaces the `self.time` dict that earlier versions of</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">    :class:`AbstractDataSource` accepted from subclass overrides. The</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">    frozen pydantic model enforces presence of every consumer-visible</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    field at construction time, so a subclass that returns a malformed</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">    container fails fast instead of surfacing as `KeyError` deep</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    inside the download loop.</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a><span class="sd">        start_date: Inclusive start of the requested window. Typed</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">            :data:`~typing.Any` because pandas / numpy timestamp types</span>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">            are not native pydantic primitives; the cross-field</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            validator below enforces `start_date &lt;= end_date` for</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            anything that supports comparison.</span>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">        end_date: Inclusive end of the requested window.</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">        resolution: Spacing between consecutive entries in</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">            :attr:`dates`, expressed as a pandas frequency alias —</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">            `&quot;D&quot;` for daily, `&quot;MS&quot;` for month-start. Same</span>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            shorthand pandas uses for `date_range(freq=...)`.</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        dates: The :class:`pandas.DatetimeIndex` the download loop</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            iterates. Typed :data:`~typing.Any` to avoid a hard</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">            pandas import in the abstract module.</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span>
+<span class="normal"><a href="#__codelineno-0-221">221</a></span>
+<span class="normal"><a href="#__codelineno-0-222">222</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="k">class</span><span class="w"> </span><span class="nc">TemporalExtent</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Per-instance temporal context produced by :meth:`check_input_dates`.</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">    Replaces the `self.time` dict that earlier versions of</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">    :class:`AbstractDataSource` accepted from subclass overrides. The</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">    frozen pydantic model enforces presence of every consumer-visible</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    field at construction time, so a subclass that returns a malformed</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    container fails fast instead of surfacing as `KeyError` deep</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a><span class="sd">    inside the download loop.</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a><span class="sd">        start_date: Inclusive start of the requested window. Typed</span>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="sd">            :data:`~typing.Any` because pandas / numpy timestamp types</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="sd">            are not native pydantic primitives; the cross-field</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a><span class="sd">            validator below enforces `start_date &lt;= end_date` for</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a><span class="sd">            anything that supports comparison.</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="sd">        end_date: Inclusive end of the requested window.</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="sd">        resolution: Spacing between consecutive entries in</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">            :attr:`dates`, expressed as a pandas frequency alias —</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            `&quot;D&quot;` for daily, `&quot;MS&quot;` for month-start. Same</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            shorthand pandas uses for `date_range(freq=...)`.</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        dates: The :class:`pandas.DatetimeIndex` the download loop</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">            iterates. Typed :data:`~typing.Any` to avoid a hard</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="sd">            pandas import in the abstract module.</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-201" name="__codelineno-0-201"></a>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="n">start_date</span><span class="p">:</span> <span class="n">Any</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="n">end_date</span><span class="p">:</span> <span class="n">Any</span>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="n">dates</span><span class="p">:</span> <span class="n">Any</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_start_le_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate that `start_date &lt;= end_date`.</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">            ValueError: If the window is inverted.</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_date</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_date</span><span class="p">:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a>                    <span class="sa">f</span><span class="s2">&quot;TemporalExtent has inverted bounds: start_date &quot;</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_date</span><span class="si">}</span><span class="s2"> &gt; end_date </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">end_date</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a>                <span class="p">)</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="k">return</span> <span class="bp">self</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="n">start_date</span><span class="p">:</span> <span class="n">Any</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="n">end_date</span><span class="p">:</span> <span class="n">Any</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>    <span class="n">resolution</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a>    <span class="n">dates</span><span class="p">:</span> <span class="n">Any</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a>    <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_start_le_end</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TemporalExtent</span><span class="p">:</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate that `start_date &lt;= end_date`.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            ValueError: If the window is inverted.</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_date</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_date</span><span class="p">:</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>                    <span class="sa">f</span><span class="s2">&quot;TemporalExtent has inverted bounds: start_date &quot;</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_date</span><span class="si">}</span><span class="s2"> &gt; end_date </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">end_date</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>                <span class="p">)</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="k">return</span> <span class="bp">self</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24960,9 +24904,7 @@ or escalate exactly this case:</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/core/src/earthlens/base/abstractdatasource.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-62">62</a></span>
-<span class="normal"><a href="#__codelineno-0-63">63</a></span>
-<span class="normal"><a href="#__codelineno-0-64">64</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-64">64</a></span>
 <span class="normal"><a href="#__codelineno-0-65">65</a></span>
 <span class="normal"><a href="#__codelineno-0-66">66</a></span>
 <span class="normal"><a href="#__codelineno-0-67">67</a></span>
@@ -24992,39 +24934,41 @@ or escalate exactly this case:</p>
 <span class="normal"><a href="#__codelineno-0-91">91</a></span>
 <span class="normal"><a href="#__codelineno-0-92">92</a></span>
 <span class="normal"><a href="#__codelineno-0-93">93</a></span>
-<span class="normal"><a href="#__codelineno-0-94">94</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="k">class</span><span class="w"> </span><span class="nc">PolygonAoiWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A polygon `aoi=` was reduced to its bounding box by the chosen backend.</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Issued when a request passes a real polygon area of</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    interest to a backend whose `SUPPORTS_POLYGON_AOI` is `False`. The</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    download still succeeds, but it covers the polygon&#39;s **bounding box**, so</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    cells outside the polygon are included. That is the most dangerous kind of</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    wrong result — a valid raster of the right variable over roughly the right</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    area — so it is surfaced rather than left silent.</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    A dedicated class (rather than a bare `UserWarning`) so callers can filter</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">    or escalate exactly this case:</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">        - Turn the silent degradation into an error for a strict pipeline:</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">            &gt;&gt;&gt; import warnings</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">            &gt;&gt;&gt; from earthlens.base import PolygonAoiWarning</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">            &gt;&gt;&gt; with warnings.catch_warnings(record=True) as caught:</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">            ...     warnings.simplefilter(&quot;always&quot;)</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">            ...     warnings.warn(&quot;bbox only&quot;, PolygonAoiWarning)</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">            &gt;&gt;&gt; caught[0].category.__name__</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">            &#39;PolygonAoiWarning&#39;</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">        - It is a `UserWarning`, so existing broad filters still catch it:</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">            &gt;&gt;&gt; from earthlens.base import PolygonAoiWarning</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">            &gt;&gt;&gt; issubclass(PolygonAoiWarning, UserWarning)</span>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">            True</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    &quot;&quot;&quot;</span>
+<span class="normal"><a href="#__codelineno-0-94">94</a></span>
+<span class="normal"><a href="#__codelineno-0-95">95</a></span>
+<span class="normal"><a href="#__codelineno-0-96">96</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="k">class</span><span class="w"> </span><span class="nc">PolygonAoiWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A polygon `aoi=` was reduced to its bounding box by the chosen backend.</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">    Issued when a request passes a real polygon area of</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">    interest to a backend whose `SUPPORTS_POLYGON_AOI` is `False`. The</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">    download still succeeds, but it covers the polygon&#39;s **bounding box**, so</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    cells outside the polygon are included. That is the most dangerous kind of</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    wrong result — a valid raster of the right variable over roughly the right</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">    area — so it is surfaced rather than left silent.</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">    A dedicated class (rather than a bare `UserWarning`) so callers can filter</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">    or escalate exactly this case:</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">        - Turn the silent degradation into an error for a strict pipeline:</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">            &gt;&gt;&gt; import warnings</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">            &gt;&gt;&gt; from earthlens.base import PolygonAoiWarning</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">            &gt;&gt;&gt; with warnings.catch_warnings(record=True) as caught:</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">            ...     warnings.simplefilter(&quot;always&quot;)</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">            ...     warnings.warn(&quot;bbox only&quot;, PolygonAoiWarning)</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">            &gt;&gt;&gt; caught[0].category.__name__</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">            &#39;PolygonAoiWarning&#39;</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">        - It is a `UserWarning`, so existing broad filters still catch it:</span>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a><span class="sd">            &gt;&gt;&gt; from earthlens.base import PolygonAoiWarning</span>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">            &gt;&gt;&gt; issubclass(PolygonAoiWarning, UserWarning)</span>
+<a id="__codelineno-0-93" name="__codelineno-0-93"></a><span class="sd">            True</span>
+<a id="__codelineno-0-94" name="__codelineno-0-94"></a>
+<a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
