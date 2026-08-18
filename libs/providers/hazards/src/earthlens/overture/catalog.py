@@ -31,6 +31,7 @@ the path to the bundled YAML.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any, cast
 
@@ -41,6 +42,12 @@ from earthlens.base.catalog_source import load_catalog
 from earthlens.base.yaml_loader import CatalogParseCache, load_yaml_strict
 
 CATALOG_PATH: Path = Path(__file__).parent / "overture_data_catalog.yaml"
+
+#: Shape of an Overture release id: a release date plus an ordinal
+#: (`2026-07-22.0`). The single definition of what counts as a release id —
+#: `latest_release` ignores anything that does not match, and the refresh
+#: tooling refuses to index it.
+RELEASE_ID = re.compile(r"^\d{4}-\d{2}-\d{2}\.\d+$")
 
 #: Module-level parse cache keyed on `(resolved_path, st_mtime_ns)` so a
 #: repeated `Catalog()` skips the YAML parse + pydantic validation. Stores the
@@ -60,8 +67,8 @@ def _release_sort_key(release: str) -> tuple[str, int]:
     Release ids are `yyyy-mm-dd.n`, so a plain string sort mis-orders
     the ordinal once it reaches two digits (`"2026-07-22.10"` sorts
     below `"2026-07-22.9"`). Splitting the ordinal off and comparing it
-    numerically fixes that; an id that does not carry a numeric ordinal
-    sorts below every id from the same date.
+    numerically fixes that. Callers filter through `RELEASE_ID` first, so
+    the ordinal is always numeric here.
 
     Args:
         release: A release id (`"2026-07-22.0"`).
@@ -79,7 +86,7 @@ def _release_sort_key(release: str) -> tuple[str, int]:
             ```
     """
     date, _, ordinal = release.partition(".")
-    return date, int(ordinal) if ordinal.isdigit() else -1
+    return date, int(ordinal)
 
 
 class Theme(BaseModel):
@@ -404,6 +411,8 @@ class Catalog(AbstractCatalog):
         rather than by position, so the index may be stored in any order
         — `earthlens datasets refresh overture --write` persists it
         ascending, while it was originally hand-written newest-first.
+        Entries that are not shaped like a release id are ignored, so a
+        malformed index yields `None` rather than a bogus release.
 
         The result is a stale-by-construction fallback: Overture prunes
         old releases from S3, so the backend prefers the release the SDK
@@ -434,4 +443,8 @@ class Catalog(AbstractCatalog):
 
                 ```
         """
-        return max(self.available_releases, key=_release_sort_key, default=None)
+        return max(
+            (r for r in self.available_releases if RELEASE_ID.match(r)),
+            key=_release_sort_key,
+            default=None,
+        )

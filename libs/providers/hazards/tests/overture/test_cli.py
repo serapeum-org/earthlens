@@ -77,6 +77,26 @@ class TestRefresher:
         )
         assert overture_cli._release_ids() == ["2026-07-22.0"]
 
+    def test_release_ids_without_a_latest(self, monkeypatch):
+        """A `None` latest is skipped rather than indexed as a release."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core, "get_available_releases", lambda: (["2026-07-22.0"], None)
+        )
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
+
+    def test_release_ids_deduplicate_the_latest(self, monkeypatch):
+        """A latest already present in the list is not indexed twice."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core,
+            "get_available_releases",
+            lambda: (["2026-07-22.0", "2026-07-22.0"], "2026-07-22.0"),
+        )
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
+
     def test_diffs_releases_not_feature_types(self, monkeypatch):
         """overture diffs the live releases against available_releases."""
         monkeypatch.setattr(
@@ -185,3 +205,11 @@ class TestValidator:
         monkeypatch.setattr(overture_cli, "_live_sample", boom)
         result = validate_one(_info(), live=True)
         assert any("fetch failed" in i for i in result.issues), "fetch failure reported"
+
+    def test_live_reports_nothing_when_every_type_resolves(self, monkeypatch):
+        """A catalog whose types all serve sources yields no live issues."""
+        monkeypatch.setattr(overture_cli, "_live_sample", lambda t: (3, True))
+        result = validate_one(_info(), live=True)
+        assert not result.issues, (
+            f"expected a clean live validation, got {result.issues}"
+        )

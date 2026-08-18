@@ -537,8 +537,11 @@ class TestDuckDBQueryPath:
         backend = _make_backend(tmp_path, variables={"places": []})
         backend._catalog.available_releases = []
         monkeypatch.setattr(core, "get_latest_release", _boom)
-        with pytest.raises(RuntimeError, match=r"explicit release="):
+        with pytest.raises(RuntimeError, match=r"explicit release=") as excinfo:
             backend._resolve_release()
+        assert isinstance(excinfo.value.__cause__, OSError), (
+            "the live-lookup failure should be chained, not swallowed"
+        )
 
 
 @pytest.mark.overture
