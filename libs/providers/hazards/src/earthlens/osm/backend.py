@@ -702,10 +702,10 @@ class OSM(AbstractDataSource):
           empty body, or a redirect to a landing page — becomes an
           `OhsomeResponseError` carrying the recovered evidence.
 
-        Anything else (a transport error, or a genuine ohsome error served *as*
-        JSON — including a `401`, which on this keyless endpoint signals a real
-        auth-contract change, not a throttle) is left for the caller to re-raise
-        unchanged, so a genuine regression still surfaces loudly.
+        Anything else (a transport error, or a non-`5xx` ohsome error served
+        *as* JSON — including a `401`, which on this keyless endpoint signals a
+        real auth-contract change, not a throttle) is left for the caller to
+        re-raise unchanged, so a genuine regression still surfaces loudly.
 
         Args:
             exc: The exception raised by the ohsome SDK call.
@@ -772,7 +772,7 @@ class OSM(AbstractDataSource):
             # a `"message"` field the 5xx body lacks, `#790`), so surface a clear
             # service-unavailable error carrying the status instead.
             raise OhsomeUnavailableError(
-                f"ohsome could not serve the elements/geometry request: HTTP "
+                "ohsome could not serve the elements/geometry request: HTTP "
                 f"{status_shown} after automatic retries. api.ohsome.org is a "
                 "public endpoint that load-sheds its compute-heavy extraction "
                 "path under load, so a 5xx is usually a transient server-side "
