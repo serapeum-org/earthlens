@@ -429,6 +429,36 @@ def test_missing_airbase_raises(tmp_path, monkeypatch):
 
 
 @pytest.mark.eea
+def test_airbase_client_builds_and_caches_real_client(tmp_path, monkeypatch):
+    """With no client injected, `_airbase_client` builds one via airbase, once."""
+    import airbase
+
+    built: list[object] = []
+
+    def _factory():
+        obj = object()
+        built.append(obj)
+        return obj
+
+    monkeypatch.setattr(airbase, "AirbaseClient", _factory)
+    backend = EEA_AQ(
+        start="2023-06-01",
+        end="2023-06-30",
+        variables=["pm25"],
+        lat_lim=[35.7, 36.1],
+        lon_lim=[14.1, 14.6],
+        country="MT",
+        path=str(tmp_path),
+    )
+    first = backend._airbase_client()
+    second = backend._airbase_client()
+
+    assert first is built[0], "should return the airbase-built client"
+    assert second is first, "should cache the client, not rebuild it"
+    assert len(built) == 1, f"client built {len(built)} times, expected once"
+
+
+@pytest.mark.eea
 class TestLimitStopsTheWork:
     """A `limit=` must stop the era downloads, not trim the concatenated frame.
 
