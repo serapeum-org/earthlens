@@ -806,8 +806,8 @@ datasets:
         units: unknown
       carbon-dioxide:
         cds_variable: carbon_dioxide
-        nc_variable: carbon_dioxide
-        units: unknown
+        nc_variable: co2
+        units: kg kg**-1
       methane:
         cds_variable: methane
         nc_variable: methane
@@ -1393,8 +1393,8 @@ datasets:
         units: unknown
       carbon-monoxide:
         cds_variable: carbon_monoxide
-        nc_variable: carbon_monoxide
-        units: unknown
+        nc_variable: co
+        units: kg kg**-1
       dust-aerosol-0.03-0.55um-mixing-ratio:
         cds_variable: dust_aerosol_0.03-0.55um_mixing_ratio
         nc_variable: dust_aerosol_0.03-0.55um_mixing_ratio
@@ -1531,8 +1531,8 @@ datasets:
         units: unknown
       direct-horizontal-irradiation:
         cds_variable: direct_horizontal_irradiation
-        nc_variable: direct_horizontal_irradiation
-        units: unknown
+        nc_variable: beam_horizontal_clear_sky_irradiation
+        units: W h m-2
       diffuse-horizontal-irradiation:
         cds_variable: diffuse_horizontal_irradiation
         nc_variable: diffuse_horizontal_irradiation
