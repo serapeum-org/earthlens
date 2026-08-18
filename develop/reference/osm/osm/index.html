@@ -28100,10 +28100,10 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="sd">          empty body, or a redirect to a landing page — becomes an</span>
 <a id="__codelineno-0-703" name="__codelineno-0-703"></a><span class="sd">          `OhsomeResponseError` carrying the recovered evidence.</span>
 <a id="__codelineno-0-704" name="__codelineno-0-704"></a>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a><span class="sd">        Anything else (a transport error, or a genuine ohsome error served *as*</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a><span class="sd">        JSON — including a `401`, which on this keyless endpoint signals a real</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a><span class="sd">        auth-contract change, not a throttle) is left for the caller to re-raise</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a><span class="sd">        unchanged, so a genuine regression still surfaces loudly.</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a><span class="sd">        Anything else (a transport error, or a non-`5xx` ohsome error served</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a><span class="sd">        *as* JSON — including a `401`, which on this keyless endpoint signals a</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a><span class="sd">        real auth-contract change, not a throttle) is left for the caller to</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a><span class="sd">        re-raise unchanged, so a genuine regression still surfaces loudly.</span>
 <a id="__codelineno-0-709" name="__codelineno-0-709"></a>
 <a id="__codelineno-0-710" name="__codelineno-0-710"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-711" name="__codelineno-0-711"></a><span class="sd">            exc: The exception raised by the ohsome SDK call.</span>
@@ -28170,7 +28170,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-772" name="__codelineno-0-772"></a>            <span class="c1"># a `&quot;message&quot;` field the 5xx body lacks, `#790`), so surface a clear</span>
 <a id="__codelineno-0-773" name="__codelineno-0-773"></a>            <span class="c1"># service-unavailable error carrying the status instead.</span>
 <a id="__codelineno-0-774" name="__codelineno-0-774"></a>            <span class="k">raise</span> <span class="n">OhsomeUnavailableError</span><span class="p">(</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>                <span class="sa">f</span><span class="s2">&quot;ohsome could not serve the elements/geometry request: HTTP &quot;</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a>                <span class="s2">&quot;ohsome could not serve the elements/geometry request: HTTP &quot;</span>
 <a id="__codelineno-0-776" name="__codelineno-0-776"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">status_shown</span><span class="si">}</span><span class="s2"> after automatic retries. api.ohsome.org is a &quot;</span>
 <a id="__codelineno-0-777" name="__codelineno-0-777"></a>                <span class="s2">&quot;public endpoint that load-sheds its compute-heavy extraction &quot;</span>
 <a id="__codelineno-0-778" name="__codelineno-0-778"></a>                <span class="s2">&quot;path under load, so a 5xx is usually a transient server-side &quot;</span>
@@ -33485,10 +33485,10 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="sd">          empty body, or a redirect to a landing page — becomes an</span>
 <a id="__codelineno-0-703" name="__codelineno-0-703"></a><span class="sd">          `OhsomeResponseError` carrying the recovered evidence.</span>
 <a id="__codelineno-0-704" name="__codelineno-0-704"></a>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a><span class="sd">        Anything else (a transport error, or a genuine ohsome error served *as*</span>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a><span class="sd">        JSON — including a `401`, which on this keyless endpoint signals a real</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a><span class="sd">        auth-contract change, not a throttle) is left for the caller to re-raise</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a><span class="sd">        unchanged, so a genuine regression still surfaces loudly.</span>
+<a id="__codelineno-0-705" name="__codelineno-0-705"></a><span class="sd">        Anything else (a transport error, or a non-`5xx` ohsome error served</span>
+<a id="__codelineno-0-706" name="__codelineno-0-706"></a><span class="sd">        *as* JSON — including a `401`, which on this keyless endpoint signals a</span>
+<a id="__codelineno-0-707" name="__codelineno-0-707"></a><span class="sd">        real auth-contract change, not a throttle) is left for the caller to</span>
+<a id="__codelineno-0-708" name="__codelineno-0-708"></a><span class="sd">        re-raise unchanged, so a genuine regression still surfaces loudly.</span>
 <a id="__codelineno-0-709" name="__codelineno-0-709"></a>
 <a id="__codelineno-0-710" name="__codelineno-0-710"></a><span class="sd">        Args:</span>
 <a id="__codelineno-0-711" name="__codelineno-0-711"></a><span class="sd">            exc: The exception raised by the ohsome SDK call.</span>
@@ -33555,7 +33555,7 @@ facade rejects <code>aggregate=</code> with <code>NotImplementedError</code>.</p
 <a id="__codelineno-0-772" name="__codelineno-0-772"></a>            <span class="c1"># a `&quot;message&quot;` field the 5xx body lacks, `#790`), so surface a clear</span>
 <a id="__codelineno-0-773" name="__codelineno-0-773"></a>            <span class="c1"># service-unavailable error carrying the status instead.</span>
 <a id="__codelineno-0-774" name="__codelineno-0-774"></a>            <span class="k">raise</span> <span class="n">OhsomeUnavailableError</span><span class="p">(</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>                <span class="sa">f</span><span class="s2">&quot;ohsome could not serve the elements/geometry request: HTTP &quot;</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a>                <span class="s2">&quot;ohsome could not serve the elements/geometry request: HTTP &quot;</span>
 <a id="__codelineno-0-776" name="__codelineno-0-776"></a>                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">status_shown</span><span class="si">}</span><span class="s2"> after automatic retries. api.ohsome.org is a &quot;</span>
 <a id="__codelineno-0-777" name="__codelineno-0-777"></a>                <span class="s2">&quot;public endpoint that load-sheds its compute-heavy extraction &quot;</span>
 <a id="__codelineno-0-778" name="__codelineno-0-778"></a>                <span class="s2">&quot;path under load, so a 5xx is usually a transient server-side &quot;</span>
