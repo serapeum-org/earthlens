@@ -7,6 +7,7 @@ from pathlib import Path
 
 import geopandas as gpd
 import pytest
+from loguru import logger
 
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
 from earthlens.overture import Overture
@@ -498,6 +499,43 @@ class TestDuckDBQueryPath:
         backend.download()
         assert seen["columns"] == ["names"]
         assert seen["limit"] == 5
+
+    def test_resolved_release_reaches_the_query(
+        self, tmp_path: Path, fake_overture, make_gdf, monkeypatch
+    ):
+        """The release the backend resolves is the one the S3 glob is built from."""
+        seen: dict = {}
+        monkeypatch.setattr(
+            "earthlens.overture.query.query_overture",
+            lambda theme, otype, release, bbox, **k: (
+                seen.update(release=release) or make_gdf([PERMISSIVE_SOURCES])
+            ),
+        )
+        fake_overture.latest = "2031-03-03.0"
+        backend = _make_backend(
+            tmp_path, variables={"places": []}, where="confidence > 0.9"
+        )
+        backend.download()
+        assert seen["release"] == "2031-03-03.0", (
+            "an unpinned DuckDB fetch must glob the live release, not the "
+            "bundled index entry"
+        )
+
+    def test_fallback_to_the_index_is_warned_about(self, tmp_path: Path, monkeypatch):
+        """Falling back to the bundled index says so, and says it may be stale."""
+        import overturemaps.core as core
+
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = ["2020-01-01.0"]
+        monkeypatch.setattr(core, "get_latest_release", _boom)
+        messages: list[str] = []
+        sink = logger.add(lambda record: messages.append(str(record)), level="WARNING")
+        try:
+            assert backend._resolve_release() == "2020-01-01.0"
+        finally:
+            logger.remove(sink)
+        assert any("2020-01-01.0" in message for message in messages), messages
+        assert any("may no longer exist" in message for message in messages), messages
 
     def test_duckdb_filename_records_the_resolved_release(
         self, tmp_path: Path, fake_overture, make_gdf, monkeypatch
