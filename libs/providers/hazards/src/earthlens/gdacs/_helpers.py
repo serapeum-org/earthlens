@@ -149,7 +149,16 @@ def gdacs_http_status(exc: BaseException) -> int | None:
         match = _STATUS_IN_MESSAGE.match(str(current))
         if match is not None:
             return int(match.group(1))
-        current = current.__cause__ or current.__context__
+        # Honour `raise … from None` like `testing._exception_chain`: an explicit
+        # cause wins; otherwise follow the implicit context unless it was
+        # suppressed, so a deliberately surfaced error is not reclassified via a
+        # context it asked to hide.
+        if current.__cause__ is not None:
+            current = current.__cause__
+        elif current.__suppress_context__:
+            current = None
+        else:
+            current = current.__context__
     return None
 
 

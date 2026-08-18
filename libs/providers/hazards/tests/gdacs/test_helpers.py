@@ -36,7 +36,7 @@ class TestGdacsHttpStatus:
         assert gdacs_http_status(requests.ReadTimeout("read timed out")) is None
 
     def test_walks_exception_chain(self):
-        """A wrapped error still yields the underlying status."""
+        """An explicit `raise ... from` cause still yields the underlying status."""
         try:
             try:
                 raise requests.HTTPError("500 Server Error")
@@ -44,6 +44,26 @@ class TestGdacsHttpStatus:
                 raise RuntimeError("wrapped") from inner
         except RuntimeError as outer:
             assert gdacs_http_status(outer) == 500
+
+    def test_follows_implicit_context(self):
+        """A bare re-raise inside `except` exposes the status via `__context__`."""
+        try:
+            try:
+                raise requests.HTTPError("503 Server Error")
+            except requests.HTTPError:
+                raise RuntimeError("wrapped")
+        except RuntimeError as outer:
+            assert gdacs_http_status(outer) == 503
+
+    def test_suppressed_context_hides_the_status(self):
+        """`raise ... from None` suppresses the context, so no status is recovered."""
+        try:
+            try:
+                raise requests.HTTPError("500 Server Error")
+            except requests.HTTPError:
+                raise RuntimeError("wrapped") from None
+        except RuntimeError as outer:
+            assert gdacs_http_status(outer) is None
 
 
 class TestServiceFailureReason:
