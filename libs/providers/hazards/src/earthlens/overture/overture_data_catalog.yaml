@@ -86,10 +86,11 @@ themes:
 # `themes:` block above is a subset. For discoverability, not dispatch.
 available_datasets: [address, bathymetry, building, building_part, connector, division, division_area, division_boundary, infrastructure, land, land_cover, land_use, place, segment, water]
 
-# Informational index of the Overture releases the STAC catalog exposes,
-# sorted ascending. Rebuilt by `earthlens datasets refresh overture --write`;
-# `Catalog.latest_release()` picks the newest by date and ordinal, so the order
-# here is not load-bearing.
+# Informational index of the Overture releases the STAC catalog exposes.
+# Rebuilt by `earthlens datasets refresh overture --write`, which sorts every
+# provider's index the same way — lexicographically — so a two-digit ordinal
+# (`.10`) lands before `.9`. That is harmless: `Catalog.latest_release()` picks
+# the newest by date and ordinal, so the order here is not load-bearing.
 #
 # For discoverability, not dispatch. Overture keeps only the newest release (or
 # two) on `s3://overturemaps-us-west-2` and prunes the rest, so any id bundled

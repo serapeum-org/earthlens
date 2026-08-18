@@ -131,9 +131,13 @@ earthlens datasets validate overture --live
 earthlens datasets probe overture building
 ```
 
-Run the refresh whenever a DuckDB fetch reports `No files found that match
-the pattern`: it reports how far the bundled index has drifted from what
-Overture still serves.
+`No files found that match the pattern` from a DuckDB fetch means the
+release being globbed holds no objects. With a pinned `release` that means
+the pin has been pruned — drop the pin, or move it to a live id (the
+refresh above lists them). Unpinned, the release is resolved live, so it
+means the lookup could not reach `https://stac.overturemaps.org` and the
+backend fell back to the bundled index; the preceding `WARNING` in the log
+says so, and refreshing the index will not fix it.
 
 ## Streaming vs in-memory reads
 
@@ -192,8 +196,10 @@ Notes:
 
 - **No DuckDB attribute pushdown without `where=`** — the plain fetch path uses
   the SDK's PyArrow bbox pushdown only; attribute filtering needs `where=`.
-- **No temporal axis** — pin a `release` for reproducibility; `None` drifts
-  to the newest monthly release.
+- **No temporal axis** — pin a `release` for reproducibility; `None` follows
+  the newest monthly release. A pin is reproducible only while that release
+  exists: Overture keeps the newest one (or two) on S3 and prunes the rest,
+  after which the pinned id resolves to nothing.
 - **`base` types carry mixed geometries** — `land` / `water` /
   `infrastructure` return a mix of polygons, lines, and points. Filter
   `geometry.geom_type` client-side if you need a single kind.

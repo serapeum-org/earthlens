@@ -270,7 +270,10 @@ class Catalog(AbstractCatalog):
             themes) — the full queryable universe the curated themes are a
             subset of. Rebuilt by the refresh tool.
         available_releases: Overture release identifiers (`yyyy-mm-dd.x`),
-            newest first, from the bundled YAML's informational index.
+            from the bundled YAML's informational index, in whatever
+            order the refresh tooling wrote them. `latest_release`
+            picks the newest by date and ordinal rather than by
+            position, so the order here is not load-bearing.
 
     Examples:
         - List themes and resolve one:
