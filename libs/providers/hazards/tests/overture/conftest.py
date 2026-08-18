@@ -158,16 +158,20 @@ def fake_overture(monkeypatch: pytest.MonkeyPatch) -> _FakeOverture:
     monkeypatch.setattr(
         "overturemaps.core.record_batch_reader", state.record_batch_reader
     )
-    monkeypatch.setattr("overturemaps.core.get_latest_release", state.latest_release)
+    monkeypatch.setattr(
+        "earthlens.overture.releases.latest_release", state.latest_release
+    )
     return state
 
 
-def _refuse_urlopen(*_args: Any, **_kwargs: Any) -> None:
-    """Fail the test rather than let it reach the live STAC catalog."""
+def _refuse_transport(*_args: Any, **_kwargs: Any) -> None:
+    """Fail the test rather than let it build a live STAC transport."""
     pytest.fail(
-        "an offline Overture test reached the live STAC catalog; patch "
-        "overturemaps.core.get_latest_release (the fake_overture fixture "
-        "does) instead of relying on the backend's offline fallback",
+        "an offline Overture test tried to reach the live STAC catalog; "
+        "patch earthlens.overture.releases.latest_release / "
+        ".child_release_ids (the fake_overture fixture patches the first), "
+        "or pass a fake client to the releases helpers, instead of relying "
+        "on the backend's offline fallback",
         pytrace=False,
     )
 
@@ -178,8 +182,14 @@ def no_live_stac(
 ) -> None:
     """Block the live release lookup for every non-e2e Overture test.
 
-    Both live doors are covered: the SDK's `urlopen` (the release lookup)
-    and the refresher's `requests.get` (the STAC child-link recovery).
+    Every live release read — the backend's lookup and the refresher's
+    child-link recovery alike — goes through `releases.stac_catalog`,
+    which builds its own `HttpClient` when the caller injects none. Making
+    *that* construction fail closes the live door while leaving an
+    injected fake client working, and without reaching into `requests`
+    (which the whole process shares) or depending on whether an SDK-level
+    cache happens to be warm.
+
     `_resolve_release` falls back to the bundled index on any failure, so
     an accidental live call passes the suite and only shows up as a slow,
     network-dependent run. `pytest.fail` raises a `BaseException`, which
@@ -187,5 +197,4 @@ def no_live_stac(
     """
     if request.node.get_closest_marker("e2e"):
         return
-    monkeypatch.setattr("overturemaps.core.urlopen", _refuse_urlopen)
-    monkeypatch.setattr("earthlens.overture.cli.requests.get", _refuse_urlopen)
+    monkeypatch.setattr("earthlens.overture.releases.HttpClient", _refuse_transport)

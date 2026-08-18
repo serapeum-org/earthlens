@@ -8,21 +8,17 @@ the catalog's `available_releases:` index rather than `available_datasets:`.
 
 The shared machinery (`index_writer`, `require`, `lint`, `BackendInfo`) comes
 from the public `earthlens.cli.toolkit`; the live reads use the public
-`overturemaps` SDK, imported lazily so discovery never pulls it in.
+`overturemaps` SDK and `earthlens.overture.releases`, imported lazily so
+discovery never pulls them in.
 """
 
 from __future__ import annotations
 
 from typing import Any
-from urllib.parse import urlparse
 
-import requests
 from loguru import logger
 
 from earthlens.cli.toolkit import index_writer, lint, require
-
-#: Seconds to wait on the STAC catalog when recovering ids the SDK mangled.
-_STAC_TIMEOUT = 30
 
 #: A tiny bbox (Times Square block: W, S, E, N) for the Overture live reads.
 _OVERTURE_BBOX = (-73.9876, 40.7561, -73.9851, 40.7577)
@@ -31,40 +27,11 @@ _OVERTURE_BBOX = (-73.9876, 40.7561, -73.9851, 40.7577)
 writer = index_writer("available_releases")
 
 
-def _child_release_ids() -> list[str]:
-    """Read the release ids out of the STAC catalog's own child links.
-
-    Used when the SDK's release list arrives unparsed. Each child link
-    points at `<base>/<release>/catalog.json`, so the release is the
-    second-to-last path segment — the same value the SDK is trying to
-    derive, taken from the URL path instead of a `/`-split of the whole
-    href.
-
-    Returns:
-        Every release id the catalog links to, in the order it lists them.
-        Empty when the catalog lists no children.
-    """
-    from overturemaps.core import STAC_CATALOG_URL
-
-    response = requests.get(STAC_CATALOG_URL, timeout=_STAC_TIMEOUT)
-    response.raise_for_status()
-    ids: list[str] = []
-    for link in response.json().get("links", []):
-        if link.get("rel") != "child":
-            continue
-        segments = [
-            part for part in urlparse(link.get("href", "")).path.split("/") if part
-        ]
-        if len(segments) >= 2:
-            ids.append(segments[-2])
-    return ids
-
-
 def _release_ids() -> list[str]:
     """Return every available Overture release id.
 
     `get_available_releases()` returns an `(all_releases, latest)` tuple.
-    Both halves are used and both are filtered through `RELEASE_ID_RE`,
+    Both halves are used and both are filtered through `is_release_id`,
     because only one of them is trustworthy: the SDK derives
     `all_releases` by splitting each STAC child href on `/` after
     stripping `./`, which yields `"https:"` now that the catalog serves
@@ -73,41 +40,57 @@ def _release_ids() -> list[str]:
     persisting nothing, so anything that is not release-shaped is dropped.
 
     Dropping them silently would leave the index recording one of the two
-    releases upstream actually publishes, and report that as clean, so the
-    ids are recovered from the catalog's child links (`_child_release_ids`)
-    and the recovery is logged.
+    releases upstream publishes and report that as clean, so whenever the
+    SDK's list looks lossy the ids are re-read from the catalog's child
+    links (`earthlens.overture.releases.child_release_ids`) and the
+    recovery is logged. A recovery that cannot reach the catalog is
+    logged and skipped rather than failing the refresh — whatever the SDK
+    did parse is still worth reporting.
 
     Returns:
-        The available release ids, de-duplicated and sorted ascending.
+        The available release ids, de-duplicated and sorted.
 
     Raises:
-        RuntimeError: If nothing upstream said parses as a release id.
-            Refusing here keeps `--write` from blanking the bundled index,
-            which is the backend's only offline fallback.
+        ReleaseLookupError: If nothing upstream said parses as a release
+            id. Refusing here keeps `--write` from blanking the bundled
+            index, which is the backend's only offline fallback.
     """
     from overturemaps.core import get_available_releases
 
-    from earthlens.overture.catalog import RELEASE_ID_RE
+    from earthlens.overture.releases import (
+        ReleaseLookupError,
+        child_release_ids,
+        is_release_id,
+    )
 
     result = get_available_releases()
     releases, latest = result if isinstance(result, tuple) else (result, None)
     reported = {str(release) for release in releases}
     if latest is not None:
         reported.add(str(latest))
-    parsed = {ident for ident in reported if RELEASE_ID_RE.match(ident)}
-    dropped = reported - parsed
-    if dropped:
-        recovered = {
-            ident for ident in _child_release_ids() if RELEASE_ID_RE.match(ident)
-        }
-        logger.warning(
-            f"The overturemaps SDK reported {len(dropped)} unparsed release "
-            f"id(s) ({sorted(dropped)}); recovered "
-            f"{len(recovered - parsed)} from the STAC catalog's child links."
-        )
-        parsed |= recovered
+    parsed = {ident for ident in reported if is_release_id(ident)}
+    # The SDK reports one child link per release, so fewer parsed ids than
+    # reported entries means its parser lost some — as it does today for
+    # every absolute href.
+    if len(parsed) < len(reported):
+        try:
+            recovered = {i for i in child_release_ids() if is_release_id(i)}
+        except ReleaseLookupError as exc:
+            logger.warning(
+                f"The overturemaps SDK reported {len(reported - parsed)} "
+                f"unparsed release id(s); could not recover them from the "
+                f"STAC catalog either ({exc})."
+            )
+        else:
+            logger.warning(
+                f"The overturemaps SDK reported {len(reported - parsed)} "
+                f"unparsed release id(s) ({sorted(reported - parsed)}); "
+                f"recovered {len(recovered - parsed)} from the STAC "
+                "catalog's child links."
+            )
+            parsed |= recovered
     if not parsed:
-        raise RuntimeError(
+        raise ReleaseLookupError(
             "No Overture release id could be parsed from the STAC catalog "
             f"(the SDK reported {sorted(reported)}). Refusing to rewrite "
             "available_releases: with an empty list — it is the backend's "

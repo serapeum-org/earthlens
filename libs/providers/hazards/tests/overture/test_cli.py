@@ -19,27 +19,19 @@ from earthlens.cli.curate import probe_dataset
 from earthlens.cli.refresh import refresh_one
 from earthlens.cli.validate import validate_one
 from earthlens.overture import catalog as overture_catalog
+from earthlens.overture.releases import ReleaseLookupError
 
 pytestmark = pytest.mark.cli
-
-
-class _StacResponse:
-    """Minimal stand-in for the STAC catalog HTTP response."""
-
-    def __init__(self, payload: dict):
-        self._payload = payload
-
-    def raise_for_status(self) -> None:
-        """Accept the response (the fake never carries an error status)."""
-
-    def json(self) -> dict:
-        """Return the canned catalog document."""
-        return self._payload
 
 
 def _info():
     """Return the BackendInfo for the overture backend."""
     return next(b for b in list_backends() if b.provider == "overture")
+
+
+def _unreachable_stac() -> list[str]:
+    """Stand in for a child-link read that cannot reach the STAC catalog."""
+    raise ReleaseLookupError("could not read Overture's STAC catalog (no route)")
 
 
 class TestRefresher:
@@ -71,7 +63,21 @@ class TestRefresher:
             "get_available_releases",
             lambda: (["https:", "https:"], "2026-07-22.0"),
         )
-        monkeypatch.setattr(overture_cli, "_child_release_ids", list)
+        monkeypatch.setattr("earthlens.overture.releases.child_release_ids", list)
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
+
+    def test_release_ids_survive_an_unreachable_recovery(self, monkeypatch):
+        """A recovery that cannot reach the catalog keeps whatever did parse."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core,
+            "get_available_releases",
+            lambda: (["https:", "2026-07-22.0"], "2026-07-22.0"),
+        )
+        monkeypatch.setattr(
+            "earthlens.overture.releases.child_release_ids", _unreachable_stac
+        )
         assert overture_cli._release_ids() == ["2026-07-22.0"]
 
     def test_release_ids_recover_the_list_from_the_child_links(self, monkeypatch):
@@ -84,8 +90,7 @@ class TestRefresher:
             lambda: (["https:", "https:"], "2026-07-22.0"),
         )
         monkeypatch.setattr(
-            overture_cli,
-            "_child_release_ids",
+            "earthlens.overture.releases.child_release_ids",
             lambda: ["2026-07-22.0", "2026-06-17.0"],
         )
         assert overture_cli._release_ids() == ["2026-06-17.0", "2026-07-22.0"], (
@@ -97,48 +102,9 @@ class TestRefresher:
         import overturemaps.core as core
 
         monkeypatch.setattr(core, "get_available_releases", lambda: (["https:"], None))
-        monkeypatch.setattr(overture_cli, "_child_release_ids", list)
-        with pytest.raises(RuntimeError, match=r"offline fallback"):
+        monkeypatch.setattr("earthlens.overture.releases.child_release_ids", list)
+        with pytest.raises(ReleaseLookupError, match=r"offline fallback"):
             overture_cli._release_ids()
-
-    def test_child_release_ids_read_the_release_out_of_each_href(self, monkeypatch):
-        """The release is the path segment before catalog.json, not a naive split."""
-        monkeypatch.setattr(
-            overture_cli.requests,
-            "get",
-            lambda url, timeout: _StacResponse(
-                {
-                    "links": [
-                        {"rel": "root", "href": "https://stac.example/catalog.json"},
-                        {
-                            "rel": "child",
-                            "href": "https://stac.example/2026-07-22.0/catalog.json",
-                        },
-                        {
-                            "rel": "child",
-                            "href": "https://stac.example/2026-06-17.0/catalog.json",
-                        },
-                    ]
-                }
-            ),
-        )
-        assert overture_cli._child_release_ids() == ["2026-07-22.0", "2026-06-17.0"]
-
-    def test_child_release_ids_skip_a_href_with_no_release_segment(self, monkeypatch):
-        """A child link too short to carry a release contributes nothing."""
-        monkeypatch.setattr(
-            overture_cli.requests,
-            "get",
-            lambda url, timeout: _StacResponse(
-                {
-                    "links": [
-                        {"rel": "child", "href": "https://stac.example/catalog.json"},
-                        {"rel": "child", "href": ""},
-                    ]
-                }
-            ),
-        )
-        assert overture_cli._child_release_ids() == []
 
     def test_release_ids_keep_latest_when_list_is_unusable(self, monkeypatch):
         """The latest release still lands even when every listed id is junk."""
@@ -156,7 +122,7 @@ class TestRefresher:
         monkeypatch.setattr(
             core, "get_available_releases", lambda: ["2026-07-22.0", "junk"]
         )
-        monkeypatch.setattr(overture_cli, "_child_release_ids", list)
+        monkeypatch.setattr("earthlens.overture.releases.child_release_ids", list)
         assert overture_cli._release_ids() == ["2026-07-22.0"]
 
     def test_release_ids_without_a_latest(self, monkeypatch):

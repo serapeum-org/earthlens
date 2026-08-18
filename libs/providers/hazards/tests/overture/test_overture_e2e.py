@@ -20,7 +20,8 @@ import pytest
 
 from earthlens.earthlens import EarthLens
 from earthlens.overture import LicenseWarning, query_overture
-from earthlens.overture.catalog import RELEASE_ID_RE
+from earthlens.overture.releases import is_release_id
+from earthlens.overture.releases import latest_release as live_latest_release
 
 #: A tiny bbox over a dense Manhattan block (Times Square), small enough to
 #: fetch in seconds and reliably non-empty for both places and buildings.
@@ -127,9 +128,7 @@ class TestOvertureLiveFetch:
         from overturemaps.core import get_latest_release
 
         release = get_latest_release()
-        assert release and RELEASE_ID_RE.match(release), (
-            f"unexpected release {release!r}"
-        )
+        assert is_release_id(release), f"unexpected release {release!r}"
 
     def test_duckdb_release_is_resolved_live(self, tmp_path: Path):
         """The release the DuckDB path resolves has objects under it on S3."""
@@ -143,10 +142,11 @@ class TestOvertureLiveFetch:
         ).datasource
 
         release = backend._resolve_release()
-        assert RELEASE_ID_RE.match(release), f"resolved a non-release {release!r}"
-        assert release not in backend._catalog.available_releases or (
-            release == backend._catalog.latest_release()
-        ), "the resolved id must come from upstream, not from a stale index"
+        assert is_release_id(release), f"resolved a non-release {release!r}"
+        assert release == live_latest_release(), (
+            "an unpinned DuckDB fetch must target the release Overture "
+            "publishes now, not whatever the bundled index happens to hold"
+        )
 
         # The #931 failure was an id that resolved to nothing on S3, so glob
         # the resolved release directly: an aged-out id raises

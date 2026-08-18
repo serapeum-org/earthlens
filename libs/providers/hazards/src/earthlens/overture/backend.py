@@ -46,7 +46,8 @@ from earthlens.base import (
     TemporalExtent,
     to_datetime,
 )
-from earthlens.overture.catalog import RELEASE_ID_RE, Catalog, Theme
+from earthlens.overture.catalog import Catalog, Theme
+from earthlens.overture.releases import ReleaseLookupError, is_release_id
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
@@ -205,7 +206,7 @@ class Overture(AbstractDataSource):
             raise ValueError(
                 f"file_format must be one of {sorted(_FORMATS)}, got {file_format!r}."
             )
-        if release is not None and not RELEASE_ID_RE.match(release):
+        if release is not None and not is_release_id(release):
             raise ValueError(
                 f"release must be an Overture release id, got {release!r}. "
                 "Ids are a release date plus an ordinal, e.g. "
@@ -328,23 +329,22 @@ class Overture(AbstractDataSource):
         but only successful ones, so `_fetch` resolves once up front rather
         than per requested type.
 
-        Only an outage is absorbed. The import sits outside the `try`, and
-        `ImportError` / `AttributeError` propagate, so an SDK that has been
-        renamed or removed fails loudly instead of degrading to the stale
-        bundled id — which is issue #931 restored at `WARNING` level. The
-        catch has to stay broad for the rest because the SDK re-raises a
-        bare `Exception` for any transport error. There is no retry: the
-        SDK offers no timeout hook, so a second attempt would only double
-        a stalled connect.
+        Only a lookup failure is absorbed, and only that:
+        `earthlens.overture.releases.latest_release` raises the single
+        typed `ReleaseLookupError` for an unreachable, undecodable, or
+        nonsensical catalog, so a genuine code fault (a missing SDK
+        constant, say) propagates instead of degrading to the stale
+        bundled id — which would be issue #931 restored at `WARNING`
+        level. That read is bounded by `STAC_TIMEOUT`; the SDK's own
+        lookup is not, and an unbounded one would hang here rather than
+        fall through to the index.
 
-        What the SDK reports is checked against `RELEASE_ID_RE` before it is
-        used. `get_latest_release()` reads one key out of the upstream
-        STAC catalog and returns `None` rather than raising when that key
-        moves, and the sibling release list already returns unparsed
-        `https:` fragments — so an unchecked value would build a glob like
+        A catalog that reports something which is not release-shaped
+        counts as a failure too. Upstream's `latest` is one key in a
+        document whose sibling release list already arrives as unparsed
+        `https:` fragments, so an unchecked value would build a glob like
         `release/None/…` and fail with the very error this resolution
-        order exists to prevent. A value that is not release-shaped is
-        treated exactly like a failed lookup.
+        order exists to prevent.
 
         Returns:
             str: A concrete release id (e.g. `"2026-07-22.0"`).
@@ -361,26 +361,19 @@ class Overture(AbstractDataSource):
         """
         if self._release:
             return self._release
-        from overturemaps.core import get_latest_release
+        from earthlens.overture.releases import latest_release
 
-        cause: Exception | None = None
         try:
-            live = get_latest_release()
-        except (ImportError, AttributeError):
-            raise
-        except Exception as exc:  # noqa: BLE001 - offline / upstream outage
-            cause, reason = exc, f"the live lookup failed ({exc})"
-        else:
-            if live and RELEASE_ID_RE.match(str(live)):
-                return str(live)
-            reason = f"the live lookup returned {live!r}, not a release id"
+            return latest_release()
+        except ReleaseLookupError as exc:
+            cause, reason = exc, str(exc)
         indexed = self._catalog.latest_release()
         if not indexed:
             raise RuntimeError(
                 "Could not resolve an Overture release for the DuckDB query "
-                f"path: {reason} and the bundled available_releases: index is "
-                "empty. Pass an explicit release= (e.g. "
-                "release='2026-07-22.0')."
+                f"path: {reason}, and the bundled available_releases: index "
+                "is empty. Pass an explicit release= — the ids Overture "
+                "publishes are listed at https://stac.overturemaps.org."
             ) from cause
         logger.warning(
             f"Could not resolve the live Overture release ({reason}); falling "
