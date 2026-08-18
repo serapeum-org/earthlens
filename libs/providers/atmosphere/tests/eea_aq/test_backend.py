@@ -310,7 +310,7 @@ class TestEmptyResultSignals:
         assert df.empty and "station_id" in df.columns
         assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
         # A single aggregate outage WARNING, naming both eras, not one per era.
-        outage = [m for m in warnings if "no era returned any files" in m]
+        outage = [m for m in warnings if "no era returned any usable observations" in m]
         assert len(outage) == 1
         assert "upstream" in outage[0]
         assert "Verified" in outage[0] and "Unverified" in outage[0]
@@ -358,7 +358,7 @@ class TestAdjacentEraFallback:
         assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
         # The retry is an INFO, and a recovered download raises no outage WARNING.
         assert any("retrying the adjacent era(s)" in m for m in infos)
-        assert not any("no era returned any files" in m for m in warnings)
+        assert not any("no era returned any usable observations" in m for m in warnings)
 
     def test_no_fallback_when_both_live_eras_already_swept(self, tmp_path):
         """A 2023+ window already spans both live eras, so no fallback fires."""

@@ -366,9 +366,9 @@ class EEA_AQ(AbstractDataSource):
             # genuine absence. A per-era WARNING would instead fire even when a
             # sibling era satisfied the request.
             logger.warning(
-                f"EEA download: no era returned any files for countries "
-                f"{countries} / pollutants {polls} across {swept}; the EEA export "
-                f"may be temporarily unavailable upstream, or these "
+                f"EEA download: no era returned any usable observations for "
+                f"countries {countries} / pollutants {polls} across {swept}; the "
+                f"EEA export may be temporarily unavailable upstream, or these "
                 f"countries/pollutants are genuinely absent from these eras. "
                 f"Returning an empty frame."
             )
