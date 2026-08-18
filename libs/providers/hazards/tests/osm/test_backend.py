@@ -497,6 +497,70 @@ class TestOhsomeRoute:
         assert "503" in str(excinfo.value)
         assert excinfo.value.__cause__ is key_error
 
+    @pytest.mark.parametrize("status", [500, 502, 504])
+    def test_server_error_variants_become_unavailable(
+        self, osm_kwargs, fake_ohsome, status
+    ):
+        """Each 5xx wrapped as OhsomeException(error_code=5xx) becomes unavailable.
+
+        Args:
+            status: The 5xx server-error status the SDK reports via error_code.
+
+        Test scenario:
+            A 5xx whose body does carry a "message" surfaces from the SDK as an
+            OhsomeException-like error (error_code set, no KeyError); the backend
+            still converts it to a status-carrying OhsomeUnavailableError.
+        """
+        from earthlens.osm import OhsomeUnavailableError
+
+        ohsome_error = RuntimeError("server error")
+        ohsome_error.error_code = status
+        fake_ohsome.error = ohsome_error
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeUnavailableError) as excinfo:
+            backend.download()
+        assert excinfo.value.status_code == status, (
+            f"expected status {status}, got {excinfo.value.status_code}"
+        )
+
+    def test_server_error_with_html_body_prefers_unavailable(
+        self, osm_kwargs, fake_ohsome
+    ):
+        """A 5xx with a non-JSON HTML body is unavailable, not a response error.
+
+        Test scenario:
+            A 503 served as HTML leaves a JSONDecodeError in the chain, but the
+            server-error branch takes precedence over the generic non-JSON one,
+            so it becomes an OhsomeUnavailableError (a subtype of
+            OhsomeResponseError) carrying the recovered content type and body.
+        """
+        import json
+
+        from earthlens.osm import OhsomeResponseError, OhsomeUnavailableError
+
+        response = types.SimpleNamespace(
+            status_code=503,
+            headers={"Content-Type": "text/html"},
+            text="<html>Service Unavailable</html>",
+        )
+        decode_error = json.JSONDecodeError("Expecting value", "<html>", 0)
+        decode_error.response = response
+        fake_ohsome.error = decode_error
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeUnavailableError) as excinfo:
+            backend.download()
+        err = excinfo.value
+        assert isinstance(err, OhsomeResponseError), "subtype should keep the base"
+        assert err.status_code == 503, f"expected 503, got {err.status_code}"
+        assert err.content_type == "text/html", f"got {err.content_type}"
+        assert err.body_preview.startswith("<html>"), f"got {err.body_preview!r}"
+
 
 class TestE2ESkipHelper:
     """The e2e `_skip_on_network` decides skip-vs-fail from the typed error."""
@@ -532,6 +596,22 @@ class TestE2ESkipHelper:
         genuine = ValueError("boom")
         with pytest.raises(ValueError, match="boom"):
             _skip_on_network(genuine)
+
+    def test_does_not_skip_on_non_transient_status(self):
+        """A non-403/429/5xx OhsomeUnavailableError re-raises, not skipped.
+
+        Test scenario:
+            The skip helper treats only 403/429 throttles and 5xx outages as
+            transient (`500 <= status < 600`); any other status re-raises, so a
+            genuine failure still fails the lane rather than skipping silently.
+        """
+        from earthlens.osm import OhsomeUnavailableError
+
+        from .test_osm_e2e import _skip_on_network
+
+        unexpected = OhsomeUnavailableError("odd", status_code=404)
+        with pytest.raises(OhsomeUnavailableError):
+            _skip_on_network(unexpected)
 
 
 class TestDownloadContract:
