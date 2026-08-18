@@ -111,9 +111,18 @@ def test_download_zip_streams_once_then_caches(
     assert fake_get.calls == 1
 
 
-def _write_geotiff(path: Path, *, no_data_value: float | None) -> None:
-    """Write a 20x20 0.1-deg EPSG:4326 GeoTIFF for real windowed-crop tests."""
-    arr = np.arange(400, dtype="float32").reshape(20, 20)
+def _write_geotiff(
+    path: Path, *, no_data_value: float | None, fill: float | None = None
+) -> None:
+    """Write a 20x20 0.1-deg EPSG:4326 GeoTIFF for real windowed-crop tests.
+
+    `fill` writes a constant raster (use the no-data value for an all-no-data
+    source); otherwise a ramp of distinct values.
+    """
+    if fill is None:
+        arr = np.arange(400, dtype="float32").reshape(20, 20)
+    else:
+        arr = np.full((20, 20), fill, dtype="float32")
     Dataset.create_from_array(
         arr,
         top_left_corner=(0.0, 0.0),
@@ -150,6 +159,15 @@ class TestReadPartToGeotiffReal:
         assert 1 <= result.columns <= 2, (
             f"columns should clamp small, got {result.columns}"
         )
+
+    def test_all_nodata_aoi_writes_crop_not_raise(self, tmp_path: Path) -> None:
+        """An all-no-data AOI writes an all-no-data crop instead of raising."""
+        src = tmp_path / "src.tif"
+        _write_geotiff(src, no_data_value=-9999.0, fill=-9999.0)
+        out = tmp_path / "empty.tif"
+        _helpers.read_part_to_geotiff(str(src), [0.2, -0.6, 0.6, -0.2], out)
+        result = Dataset.read_file(str(out))
+        assert bool((result.read_array() == -9999.0).all()), "written all-no-data"
 
 
 def test_download_cache_crop_downloads_then_windows(

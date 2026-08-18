@@ -4,7 +4,12 @@ import numpy as np
 import pytest
 from pyramids.dataset import Dataset
 
-from earthlens.base.spatial import ensure_no_data, widen_degenerate_bbox
+from earthlens.base.spatial import (
+    ensure_no_data,
+    vsicurl_config,
+    widen_degenerate_bbox,
+    windowed_bbox_crop,
+)
 
 
 def _dataset(no_data_value):
@@ -79,6 +84,50 @@ class TestEnsureNoData:
         """The dataset is returned for chaining."""
         ds = _dataset(no_data_value=-1.0)
         assert ensure_no_data(ds, -9999.0) is ds
+
+
+class TestVsicurlConfig:
+    """`vsicurl_config` builds a CloudConfig carrying the /vsicurl tuning."""
+
+    def test_carries_tuning_and_retry_budget(self):
+        """The config enables vsicurl_tuning plus the retry / timeout budget."""
+        cfg = vsicurl_config()
+        assert cfg.vsicurl_tuning is True, "readdir/HTTP2 fast-read tuning enabled"
+        assert cfg.http_max_retry == 3, cfg.http_max_retry
+        assert cfg.http_retry_delay == 2.0, cfg.http_retry_delay
+        assert cfg.http_timeout == 30, cfg.http_timeout
+
+    def test_is_a_context_manager(self):
+        """It is usable as a `with` block around a read."""
+        assert hasattr(vsicurl_config(), "__enter__")
+        assert hasattr(vsicurl_config(), "__exit__")
+
+
+class TestWindowedBboxCrop:
+    """`windowed_bbox_crop` reads the window, keeping an all-no-data AOI."""
+
+    def _raster(self, all_nodata: bool):
+        """A 10x10 4326 raster; optionally entirely no-data."""
+        arr = (
+            np.full((10, 10), -9999.0, "float32")
+            if all_nodata
+            else np.arange(100, dtype="float32").reshape(10, 10)
+        )
+        return Dataset.create_from_array(
+            arr, top_left_corner=(0, 0), cell_size=1.0, epsg=4326, no_data_value=-9999.0
+        )
+
+    def test_data_present_window_is_cropped(self):
+        """A window with valid data returns a non-empty crop."""
+        crop = windowed_bbox_crop(
+            self._raster(all_nodata=False), [2.0, -6.0, 5.0, -3.0]
+        )
+        assert crop.rows > 0 and crop.columns > 0
+
+    def test_all_nodata_window_does_not_raise(self):
+        """An entirely-no-data window returns an all-no-data crop, not a raise."""
+        crop = windowed_bbox_crop(self._raster(all_nodata=True), [2.0, -6.0, 5.0, -3.0])
+        assert bool((crop.read_array() == -9999.0).all()), "all-no-data crop returned"
 
 
 pytestmark = pytest.mark.unit

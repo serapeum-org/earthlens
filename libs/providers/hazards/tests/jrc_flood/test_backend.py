@@ -235,15 +235,24 @@ class TestFetch:
         assert not (tmp_path / "efhm_RP100.tif").exists()
 
 
-def _write_efhm_geotiff(path: Path) -> None:
-    """Write an EFHM-like 4326 GeoTIFF covering lon 4..6, lat 51..53."""
-    arr = np.arange(200 * 200, dtype="float32").reshape(200, 200)
+def _write_efhm_geotiff(
+    path: Path, *, no_data_value: float = -9999.0, fill: float | None = None
+) -> None:
+    """Write an EFHM-like 4326 GeoTIFF covering lon 4..6, lat 51..53.
+
+    `fill` writes a constant raster (use the no-data value for an all-no-data
+    source); otherwise a ramp of distinct values.
+    """
+    if fill is None:
+        arr = np.arange(200 * 200, dtype="float32").reshape(200, 200)
+    else:
+        arr = np.full((200, 200), fill, dtype="float32")
     Dataset.create_from_array(
         arr,
         top_left_corner=(4.0, 53.0),
         cell_size=0.01,
         epsg=4326,
-        no_data_value=-9999.0,
+        no_data_value=no_data_value,
     ).to_file(str(path))
 
 
@@ -257,9 +266,11 @@ class TestFetchReal:
     def test_windowed_crop_writes_subset(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ):
-        """A normal AOI writes one small cropped GeoTIFF carrying a no-data value."""
+        """A normal AOI writes a small crop carrying the source's own no-data."""
         src = tmp_path / "efhm.tif"
-        _write_efhm_geotiff(src)
+        # A distinctive source no-data (not the catalog -9999 fallback) so the
+        # assertion fails if source-carry-through breaks and the fallback stamps.
+        _write_efhm_geotiff(src, no_data_value=-8888.0)
         monkeypatch.setattr(backend_module, "efhm_url", lambda rp, **kw: str(src))
         out = JRCFlood(
             lat_lim=[51.8, 52.0],
@@ -271,7 +282,24 @@ class TestFetchReal:
         result = Dataset.read_file(str(out[0]))
         assert result.rows < 200, "only the AOI window read"
         assert result.columns < 200, "only the AOI window read"
-        assert result.no_data_value[0] is not None, "output carries a no-data value"
+        assert result.no_data_value[0] == -8888.0, "source no-data carried through"
+
+    def test_all_nodata_aoi_writes_file(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """An in-coverage but all-no-data AOI writes a raster instead of raising."""
+        src = tmp_path / "efhm.tif"
+        _write_efhm_geotiff(src, no_data_value=-9999.0, fill=-9999.0)
+        monkeypatch.setattr(backend_module, "efhm_url", lambda rp, **kw: str(src))
+        out = JRCFlood(
+            lat_lim=[51.8, 52.0],
+            lon_lim=[4.8, 5.0],
+            return_periods=[100],
+            path=tmp_path,
+        ).download()
+        assert out[0].exists(), "an all-no-data AOI still writes a file"
+        result = Dataset.read_file(str(out[0]))
+        assert bool((result.read_array() == -9999.0).all()), "written all-no-data"
 
     def test_point_aoi_succeeds(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         """A degenerate point AOI writes a small crop instead of raising (review H1)."""
