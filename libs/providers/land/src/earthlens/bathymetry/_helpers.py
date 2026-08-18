@@ -9,7 +9,9 @@ time axis — the DEMs are static) was pinned live in the A1 gate; see
 
 from __future__ import annotations
 
+import errno
 import re
+import socket
 import urllib.error
 from typing import TYPE_CHECKING
 
@@ -26,13 +28,43 @@ _DEFAULT_STEP = 1
 #: Parses a `"<value> arc-(second|minute)"` native-resolution label.
 _RESOLUTION_RE = re.compile(r"\s*([\d.]+)\s*arc-(second|minute)", re.IGNORECASE)
 
+#: HTTP statuses (besides the whole 5xx range, handled separately) that mean the
+#: service — not the request — is at fault: request timeout, too-early, and
+#: rate-limit. `400` / `403` / `404` are deliberately excluded: they are real
+#: answers to the request and must stay a `ValueError`.
+_TRANSIENT_STATUS: frozenset[int] = frozenset({408, 425, 429})
+
 #: Exception types that always mean the transport, not the request, failed.
+#: `socket.gaierror` covers DNS resolution; the bare-`OSError` network errnos
+#: below cover unreachable-host / no-route cases that are not `ConnectionError`
+#: subclasses.
 _TRANSPORT_EXC: tuple[type[BaseException], ...] = (
     requests.exceptions.ConnectionError,
     requests.exceptions.Timeout,
     ConnectionError,
     TimeoutError,
     urllib.error.URLError,
+    socket.gaierror,
+)
+
+#: `OSError.errno` values that mark a network-path failure (not a bad request).
+_NETWORK_ERRNOS: frozenset[int] = frozenset(
+    e
+    for e in (
+        getattr(errno, name, None)
+        for name in (
+            "ENETUNREACH",
+            "EHOSTUNREACH",
+            "ECONNREFUSED",
+            "ECONNRESET",
+            "ECONNABORTED",
+            "ETIMEDOUT",
+            "ENETDOWN",
+            "EHOSTDOWN",
+            "ENETRESET",
+        )
+    )
+    if e is not None
 )
 
 #: Lower-cased substrings in a WCS/GDAL failure that mark the OGC service — not
@@ -40,30 +72,42 @@ _TRANSPORT_EXC: tuple[type[BaseException], ...] = (
 #: with an HTML error page (`non-XML body`), a 5xx / gateway error, or a dropped
 #: connection. A genuine request error (a coverage id that does not exist, an
 #: empty subset intersection) carries none of these, so it stays a `ValueError`.
+#: Note: `getcapabilities` alone is intentionally absent — servers name it when
+#: reporting an unknown coverage too, so the `non-xml` signature (plus the status
+#: checks) catches the real bad-body case without masking a request error.
 _SERVICE_SIGNATURES: tuple[str, ...] = (
     "non-xml",
     "non xml",
-    "getcapabilities",
     "empty reply from server",
+    "internal server error",
     "bad gateway",
     "gateway time",
     "service unavailable",
     "temporarily unavailable",
+    "too many requests",
     "max retries",
     "connection reset",
     "connection aborted",
     "remote end closed",
-    "read timed out",
+    "timed out",
     "failed to establish",
     "name resolution",
     "name or service not known",
+    "network is unreachable",
+    "no route to host",
 )
 
-#: Matches a transient HTTP status (`408` / `429` / `5xx`) only in an HTTP
-#: context — `NNN Server Error` or `HTTP … NNN` — so a stray number in a request
-#: message (a pixel count, a coordinate) never trips it.
-_SERVICE_STATUS_RE = re.compile(
-    r"\b(?:408|429|50[0-9])\s+server error\b|http\D{0,20}(?:408|429|50[0-9])\b", re.I
+#: Matches a transient status (`408` / `429` / any `5xx`) only where it is a real
+#: HTTP-status token: at the start of the message, adjacent to a status keyword
+#: (`status` / `code` / `http` / `returned` / `response`), or as `NNN … Error`.
+#: The keyword gap forbids letters/digits, so a status embedded in a URL
+#: (`http://host:500/wcs`, `/tiles/429/`) or a stray pixel count never trips it.
+_STATUS_IN_TEXT_RE = re.compile(
+    r"^\s*(?:408|429|5\d\d)\b"
+    r"|(?:\bstatus\b|\bcode\b|\bhttp\b|\breturned\b|\bresponse\b)"
+    r"[^0-9A-Za-z]{0,4}(?:408|429|5\d\d)\b"
+    r"|\b(?:408|429|5\d\d)\s+(?:server|client|internal server) error\b",
+    re.I,
 )
 
 
@@ -109,16 +153,40 @@ def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
         current = current.__cause__ or current.__context__
 
 
+def _http_status(exc: BaseException) -> int | None:
+    """Return the HTTP status `exc` carries, from its type or a `response`.
+
+    Reads the two SDK shapes directly — `urllib.error.HTTPError.code` and
+    `requests` `.response.status_code` — so a status is used structurally rather
+    than parsed out of free text (which a URL or a pixel count could spoof).
+
+    Args:
+        exc: The exception to inspect.
+
+    Returns:
+        The status code, or `None` when the exception carries none.
+    """
+    if isinstance(exc, urllib.error.HTTPError):
+        return exc.code
+    response = getattr(exc, "response", None)
+    code = getattr(response, "status_code", None)
+    return code if isinstance(code, int) else None
+
+
 def is_wcs_service_failure(exc: BaseException) -> bool:
     """Return whether `exc` marks the WCS service (not the request) as at fault.
 
-    Walks the exception's cause/context chain and reports `True` when any link is
-    a transport error (`requests` connection/timeout, `urllib` URL error) or its
-    message carries a service signature — a 5xx / `408` / `429` status, a
-    `non-XML body` `GetCapabilities` answer, an `Empty reply from server`, a
-    dropped connection, or a DNS failure. Returns `False` for a request error (an
-    unknown coverage, an empty subset intersection), so a genuine bug stays a
-    hard failure rather than being masked as "service down".
+    Walks the exception's cause/context chain and reports `True` when a link is a
+    transport error (`requests` / `urllib` connection-timeout types, a
+    DNS `gaierror`, or a network-errno `OSError`), carries a **transient HTTP
+    status** (`408` / `425` / `429` or any `5xx`, read structurally from a
+    `response` / `HTTPError` when present, else from a status token in the text),
+    or matches a service signature — a `non-XML body`, an `Empty reply from
+    server`, a dropped connection, or a DNS failure. A **definite non-transient
+    status** (`400` / `403` / `404`) is authoritative: the request reached the
+    service and got a real answer, so it stays `False`. Everything else — an
+    unknown coverage, an empty subset intersection — is also `False`, so a
+    genuine bug stays a hard failure rather than being masked as "service down".
 
     Args:
         exc: The exception `pyramids.Dataset.from_wcs` raised.
@@ -153,12 +221,17 @@ def is_wcs_service_failure(exc: BaseException) -> bool:
             ```
     """
     for link in _exception_chain(exc):
+        status = _http_status(link)
+        if status is not None:
+            return status in _TRANSIENT_STATUS or 500 <= status <= 599
         if isinstance(link, _TRANSPORT_EXC):
+            return True
+        if isinstance(link, OSError) and link.errno in _NETWORK_ERRNOS:
             return True
         message = str(link).lower()
         if any(signature in message for signature in _SERVICE_SIGNATURES):
             return True
-        if _SERVICE_STATUS_RE.search(message):
+        if _STATUS_IN_TEXT_RE.search(message):
             return True
     return False
 

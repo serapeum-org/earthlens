@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import errno
+import socket
 import urllib.error
 
 import pytest
@@ -110,6 +112,18 @@ def test_estimate_grid_pixels_unparseable_returns_none():
     assert estimate_grid_pixels((0.0, 0.0, 1.0, 1.0), "native") is None
 
 
+def _http_error(
+    message: str, status: int | None = None
+) -> requests.exceptions.HTTPError:
+    """Build a requests HTTPError, optionally carrying a response status code."""
+    err = requests.exceptions.HTTPError(message)
+    if status is not None:
+        response = requests.Response()
+        response.status_code = status
+        err.response = response
+    return err
+
+
 class TestIsWcsServiceFailure:
     """Classifier that tells a WCS service outage from a request error."""
 
@@ -120,6 +134,12 @@ class TestIsWcsServiceFailure:
             "the server sent a non xml response",
             "HTTP error code : 503",
             "500 Server Error: Internal Server Error",
+            "500 Internal Server Error",
+            "GetCoverage failed with status 500",
+            "the server returned 502",
+            "522 Origin Connection Time-out",
+            "520 Web Server Returned an Unknown Error",
+            "511 Network Authentication Required",
             "received HTTP 429 from the endpoint",
             "http 408 request timeout",
             "502 Bad Gateway",
@@ -135,18 +155,12 @@ class TestIsWcsServiceFailure:
             "failed to establish a new connection",
             "Temporary failure in name resolution",
             "Name or service not known",
+            "[Errno 101] Network is unreachable",
+            "[Errno 113] No route to host",
         ],
     )
     def test_service_messages_classify_true(self, message: str):
-        """A message carrying a service / transport signature is a service failure.
-
-        Args:
-            message: The exception text under test.
-
-        Test scenario:
-            Each string is a real GDAL / requests availability signature, so the
-            classifier must report `True`.
-        """
+        """A message carrying a service / transport signature classifies True."""
         assert is_wcs_service_failure(RuntimeError(message)) is True, message
 
     @pytest.mark.parametrize(
@@ -157,41 +171,45 @@ class TestIsWcsServiceFailure:
             ConnectionError("dropped"),
             TimeoutError("late"),
             urllib.error.URLError("unreachable"),
+            socket.gaierror("Name or service not known"),
+            OSError(errno.EHOSTUNREACH, "a bare network os error"),
         ],
     )
     def test_transport_exception_types_classify_true(self, exc: BaseException):
-        """A transport exception type is a service failure regardless of message.
-
-        Args:
-            exc: The transport exception under test.
-
-        Test scenario:
-            `requests` / stdlib connection and timeout types are unambiguous
-            transport failures, so the classifier reports `True`.
-        """
+        """A transport / network-errno exception classifies True by type."""
         assert is_wcs_service_failure(exc) is True, type(exc).__name__
+
+    @pytest.mark.parametrize("status", [408, 425, 429, 500, 502, 503, 504, 522, 511])
+    def test_transient_response_status_classifies_true(self, status: int):
+        """A transient HTTP status read from the response classifies True."""
+        assert is_wcs_service_failure(_http_error("boom", status)) is True, status
+
+    @pytest.mark.parametrize("status", [400, 401, 403, 404, 410, 422])
+    def test_non_transient_response_status_classifies_false(self, status: int):
+        """A definite non-transient status is a request answer, so it is False."""
+        assert is_wcs_service_failure(_http_error("boom", status)) is False, status
+
+    @pytest.mark.parametrize("status, expected", [(503, True), (404, False)])
+    def test_urllib_httperror_classified_by_its_code(self, status: int, expected: bool):
+        """A urllib HTTPError is classified by its `.code`, transient or not."""
+        err = urllib.error.HTTPError("http://x/wcs", status, "msg", None, None)
+        assert is_wcs_service_failure(err) is expected, status
 
     @pytest.mark.parametrize(
         "message",
         [
             "Could not find coverage 'emodnet:mean'",
+            "coverage 'foo' not listed in the server's GetCapabilities document",
             "InvalidSubsetting: Empty intersection after subsetting",
             "grid is 5000 x 5000 pixels, too large",
             "unknown band 'depth'",
+            "failed to read http://server/tiles/429/data",
+            "cannot connect to http://host:500/wcs",
             "",
         ],
     )
     def test_request_errors_classify_false(self, message: str):
-        """A request-shaping error carries no service signature, so it is False.
-
-        Args:
-            message: The exception text under test.
-
-        Test scenario:
-            A bad coverage id, an empty subset, an oversize grid (whose stray
-            `5000` must not read as a status), an unknown band, and an empty
-            message must all stay hard failures (`False`).
-        """
+        """A request error — including a status embedded in a URL — classifies False."""
         assert is_wcs_service_failure(RuntimeError(message)) is False, message
 
     def test_walks_cause_chain(self):
