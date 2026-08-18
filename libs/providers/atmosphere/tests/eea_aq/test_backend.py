@@ -294,26 +294,28 @@ class TestApi:
 class TestEmptyResultSignals:
     """The two empty results are logged distinctly (see issue #1046).
 
-    An era that returns zero Parquet files (the shape of an upstream EEA
-    export outage) is a WARNING; a window that excludes every downloaded row
-    (the era holds data, the dates are simply empty) is an INFO, so a caller
-    facing an empty frame can tell the two apart.
+    A request where every era returns zero files (the shape of an upstream EEA
+    export outage) raises a single aggregate WARNING; a window that excludes
+    every downloaded row (the era holds data, the dates are simply empty) is an
+    INFO, so a caller facing an empty frame can tell the two apart.
     """
 
-    def test_empty_era_warns_per_era(self, tmp_path):
-        """An era serving zero files logs a WARNING naming the era and cause."""
+    def test_all_eras_empty_warns_once_about_upstream(self, tmp_path):
+        """When every era returns zero files, one aggregate upstream WARNING fires."""
         client = _NoFilesClient()
-        messages, sink = _capture("WARNING")
+        warnings, sink = _capture("WARNING")
         df = _backend(client, tmp_path).download(progress_bar=False)
         logger.remove(sink)
 
         assert df.empty and "station_id" in df.columns
-        # The default 2023 window sweeps both eras; each empty era warns.
         assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
-        no_file_warnings = [m for m in messages if "no Parquet files" in m]
-        assert len(no_file_warnings) == 2
-        assert any("Verified" in m for m in no_file_warnings)
-        assert all("upstream" in m for m in no_file_warnings)
+        # A single aggregate outage WARNING, naming both eras, not one per era.
+        outage = [m for m in warnings if "no era returned any files" in m]
+        assert len(outage) == 1
+        assert "upstream" in outage[0]
+        assert "Verified" in outage[0] and "Unverified" in outage[0]
+        # The per-era emptiness is no longer a WARNING (it is diagnostic INFO).
+        assert not any("returned no Parquet files" in m for m in warnings)
 
     def test_out_of_window_download_logs_info_not_outage(self, tmp_path):
         """Files that all fall outside the window log an INFO, not the era WARNING."""
@@ -341,18 +343,22 @@ class TestAdjacentEraFallback:
         unverified = tmp_path / "u.parquet"
         _row_frame("2022-06-15T00:00").to_parquet(unverified)
         client = _SelectiveEraClient(Verified=None, Unverified=str(unverified))
-        messages, sink = _capture("WARNING")
+        infos, isink = _capture("INFO")
+        warnings, wsink = _capture("WARNING")
         df = _backend(client, tmp_path, start="2022-06-01", end="2022-06-30").download(
             progress_bar=False
         )
-        logger.remove(sink)
+        logger.remove(isink)
+        logger.remove(wsink)
 
         assert len(df) == 1
         assert df.loc[0, "dataset"] == "Unverified"
         assert df.loc[0, "datetime_utc"].year == 2022
         # Verified swept first (empty), then Unverified as the adjacent fallback.
         assert [call[0] for call in client.calls] == ["Verified", "Unverified"]
-        assert any("retrying the adjacent era(s)" in m for m in messages)
+        # The retry is an INFO, and a recovered download raises no outage WARNING.
+        assert any("retrying the adjacent era(s)" in m for m in infos)
+        assert not any("no era returned any files" in m for m in warnings)
 
     def test_no_fallback_when_both_live_eras_already_swept(self, tmp_path):
         """A 2023+ window already spans both live eras, so no fallback fires."""

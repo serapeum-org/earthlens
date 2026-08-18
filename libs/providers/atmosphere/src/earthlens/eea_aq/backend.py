@@ -333,6 +333,7 @@ class EEA_AQ(AbstractDataSource):
         # separate bulk download of every matching Parquet, so a cap met by the
         # Verified era means the Unverified one is never requested at all.
         non_empty = self._sweep(datasets, client, countries, polls, code_to_name)
+        swept = list(datasets)
         if not non_empty:
             # The primary era(s) returned zero files. Retry the adjacent live
             # era(s) not already swept (Verified <-> Unverified) whose year span
@@ -344,18 +345,33 @@ class EEA_AQ(AbstractDataSource):
             # cannot be satisfied by. This runs *only* on a fully-empty primary
             # sweep, so the normal success path never double-downloads, and a
             # recent-year request — already spanning both live eras — has no
-            # adjacent era left to try.
+            # adjacent era left to try. Logged at INFO: the fallback often
+            # recovers the data, so it is not on its own an alarm.
             fallback = adjacent_eras(datasets, start_year, end_year)
             if fallback:
-                logger.warning(
+                logger.info(
                     f"EEA download: primary era(s) {datasets} returned no files "
                     f"for countries {countries} / pollutants {polls}; retrying the "
                     f"adjacent era(s) {fallback}."
                 )
+                swept += fallback
                 non_empty = self._sweep(
                     fallback, client, countries, polls, code_to_name
                 )
         if not non_empty:
+            # Nothing from any era, primary or fallback. Only here — with the
+            # whole sweep in — is the outage-framed WARNING warranted: zero files
+            # across every swept era for the requested countries/pollutants is
+            # the shape of an upstream EEA export outage, though it can also be a
+            # genuine absence. A per-era WARNING would instead fire even when a
+            # sibling era satisfied the request.
+            logger.warning(
+                f"EEA download: no era returned any files for countries "
+                f"{countries} / pollutants {polls} across {swept}; the EEA export "
+                f"may be temporarily unavailable upstream, or these "
+                f"countries/pollutants are genuinely absent from these eras. "
+                f"Returning an empty frame."
+            )
             return empty_frame()
         combined = pd.concat(non_empty, ignore_index=True)
         # A recently-promoted year can appear in both Verified and Unverified,
@@ -448,21 +464,16 @@ class EEA_AQ(AbstractDataSource):
                 download_request(request, tmp)
                 parquets = sorted(Path(tmp).rglob("*.parquet"))
                 if not parquets:
-                    # This is the whole era for every requested country and
-                    # pollutant at once (airbase requests them in one call), so
-                    # zero files is notable, not routine: it is the shape of an
-                    # upstream EEA export outage when a major reporter is asked
-                    # for a populated era (as in 2026-08, when Verified /
-                    # Unverified served zero files platform-wide). It can also be
-                    # a genuine absence for a small country / rare pollutant, so
-                    # the message names both causes rather than asserting either.
-                    logger.warning(
+                    # Diagnostic only, at INFO: this era returned no files for the
+                    # whole requested country/pollutant set. Whether that is an
+                    # upstream outage or a genuine absence cannot be judged from a
+                    # single era — a sibling era (or the adjacent-era fallback) may
+                    # still hold the data — so `_api` owns the outage WARNING once
+                    # the whole sweep is in. Warning per era here would cry
+                    # "outage" on a download that actually succeeded.
+                    logger.info(
                         f"EEA download: era {dataset!r} returned no Parquet files "
-                        f"for countries {countries} / pollutants {polls}. A major "
-                        f"reporter returning zero files usually means the EEA "
-                        f"export is temporarily unavailable upstream; it can also "
-                        f"mean these countries/pollutants are genuinely absent "
-                        f"from this era."
+                        f"for countries {countries} / pollutants {polls}."
                     )
                 for parquet in parquets:
                     yield shape_frame(pd.read_parquet(parquet), dataset, code_to_name)
