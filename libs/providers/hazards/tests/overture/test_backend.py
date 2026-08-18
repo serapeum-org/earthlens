@@ -13,7 +13,7 @@ from earthlens.overture import Overture
 from earthlens.overture._helpers import ODBL, LicenseWarning
 from earthlens.overture.backend import _require_overturemaps, _stream_to_geodataframe
 
-from .conftest import OSM_SOURCES, PERMISSIVE_SOURCES
+from .conftest import FAKE_RELEASE, OSM_SOURCES, PERMISSIVE_SOURCES
 
 
 def _make_backend(tmp_path: Path, **overrides) -> Overture:
@@ -488,6 +488,33 @@ class TestDuckDBQueryPath:
         backend.download()
         assert seen["columns"] == ["names"]
         assert seen["limit"] == 5
+
+    def test_release_is_resolved_once_per_download(
+        self, tmp_path: Path, fake_overture, make_gdf, monkeypatch
+    ):
+        """Two requested types share one release lookup, so one download is one snapshot."""
+        seen: list[str] = []
+        monkeypatch.setattr(
+            "earthlens.overture.query.query_overture",
+            lambda theme, otype, release, *a, **k: (
+                seen.append(release) or make_gdf([PERMISSIVE_SOURCES])
+            ),
+        )
+        backend = _make_backend(
+            tmp_path,
+            variables={"buildings": ["building", "building_part"]},
+            where="height > 10",
+        )
+        backend.download()
+        assert fake_overture.latest_calls == 1, "one lookup for the whole download"
+        assert seen == [FAKE_RELEASE, FAKE_RELEASE], "both types read one release"
+
+    def test_default_path_never_resolves_a_release(self, tmp_path: Path, fake_overture):
+        """Without where=/columns= the fetch stays offline and asks for no release."""
+        _make_backend(tmp_path, variables={"places": []}).download()
+        assert fake_overture.latest_calls == 0, (
+            "the SDK path auto-targets latest itself; it must not look one up"
+        )
 
     def test_resolve_release_explicit(self, tmp_path: Path):
         """`_resolve_release` returns the explicit release when given."""

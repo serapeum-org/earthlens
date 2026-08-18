@@ -315,8 +315,9 @@ class Overture(AbstractDataSource):
         prunes the rest, so a bundled id goes stale within weeks. Globbing
         a pruned release matches no files and DuckDB fails the read with
         `No files found that match the pattern`. The bundled index stays
-        as an offline fallback, and the SDK caches the lookup per process
-        — successful lookups only, so an offline caller re-attempts it.
+        as an offline fallback. The SDK caches the lookup per process,
+        but only successful ones, so `_fetch` resolves once up front rather
+        than per requested type.
 
         What the SDK reports is checked against `RELEASE_ID` before it is
         used. `get_latest_release()` reads one key out of the upstream
@@ -467,6 +468,12 @@ class Overture(AbstractDataSource):
             self.space.north,
         )
         written: list[Path] = []
+        # Resolved once, before the loop: a mid-loop recovery from a failed
+        # lookup would otherwise read the first types from the bundled release
+        # and the rest from the live one, so a single download() could mix two
+        # snapshots. Offline callers also pay one connect attempt, not one per
+        # requested type — the SDK caches only successful lookups.
+        release = self._resolve_release() if (self._where or self._columns) else None
         for product in products:
             theme_name = product.metadata["theme_name"]
             overture_type = product.metadata["type"]
@@ -474,7 +481,6 @@ class Overture(AbstractDataSource):
             if self._where or self._columns:
                 from earthlens.overture.query import query_overture
 
-                release = self._resolve_release()
                 logger.info(
                     f"Querying Overture {overture_type!r} (theme {theme_name!r}) "
                     f"via DuckDB for bbox {bbox} (release={release}, "
