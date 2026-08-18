@@ -84,6 +84,24 @@ def _release_sort_key(release: str) -> tuple[str, int]:
             True
 
             ```
+        - The key splits an id into the pair it sorts on:
+            ```python
+            >>> from earthlens.overture.catalog import _release_sort_key
+            >>> _release_sort_key("2026-07-22.0")
+            ('2026-07-22', 0)
+
+            ```
+        - Sorting a release list puts the newest last:
+            ```python
+            >>> from earthlens.overture.catalog import _release_sort_key
+            >>> releases = ["2026-07-22.0", "2026-06-17.0", "2026-07-22.1"]
+            >>> sorted(releases, key=_release_sort_key)[-1]
+            '2026-07-22.1'
+
+            ```
+
+    See Also:
+        Catalog.latest_release: Picks the newest indexed release with this key.
     """
     date, _, ordinal = release.partition(".")
     return date, int(ordinal)
@@ -442,6 +460,10 @@ class Catalog(AbstractCatalog):
                 '2026-07-22.0'
 
                 ```
+
+        See Also:
+            earthlens.overture.backend.Overture._resolve_release: Prefers the
+                live release and falls back to this one.
         """
         return max(
             (r for r in self.available_releases if RELEASE_ID.match(r)),

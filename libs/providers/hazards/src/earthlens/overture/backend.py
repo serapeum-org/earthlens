@@ -323,6 +323,12 @@ class Overture(AbstractDataSource):
         Raises:
             RuntimeError: If the live lookup fails and the bundled index
                 is empty, leaving no release to glob.
+
+        See Also:
+            earthlens.overture.catalog.Catalog.latest_release: The offline
+                fallback this reads when the live lookup fails.
+            earthlens.overture.query.build_query: Builds the S3 glob from
+                the resolved release.
         """
         if self._release:
             return self._release
