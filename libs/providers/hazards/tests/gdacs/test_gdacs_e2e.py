@@ -20,6 +20,7 @@ import requests
 from earthlens.earthlens import EarthLens
 from earthlens.gdacs import GDACS, GdacsUnavailableError
 from earthlens.gdacs.events import ATTRIBUTE_COLUMNS
+from earthlens.testing import skip_live_unavailable
 
 # A recent ~30-day window: GDACS is a live alert feed, so very old
 # windows can be sparse. Earthquakes are the most frequent hazard, so a
@@ -37,13 +38,18 @@ def _skip_on_upstream(exc: Exception) -> None:
     persist, raises the typed `GdacsUnavailableError`, which skips the lane
     rather than reddening it — the backend's retries already gave the service
     several chances, so a survivor is a real outage, not a regression (the query
-    composition is asserted offline by the unit tests). A bare transport error
-    escaping the retries skips too. Anything else re-raises and fails.
+    composition is asserted offline by the unit tests). The skip goes through
+    `skip_live_unavailable` so it carries the shared availability-skip prefix and
+    the repo-wide masked-lane guard still counts it (a wholly-skipped GDACS lane
+    never reports green). Anything else re-raises and fails.
     """
+    # `GdacsUnavailableError` is the live path — `_fetch` already wraps a SEARCH
+    # ConnectionError/Timeout into it. The bare transport arms are belt-and-braces
+    # for a transport error raised outside the SEARCH call (e.g. while writing).
     if isinstance(
         exc, (GdacsUnavailableError, requests.ConnectionError, requests.Timeout)
     ):
-        pytest.skip(f"GDACS SEARCH unavailable: {exc}")
+        skip_live_unavailable(f"GDACS SEARCH unavailable: {exc}")
     raise exc
 
 
