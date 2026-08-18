@@ -509,8 +509,9 @@ class TestE2ESkipHelper:
 
         from .test_osm_e2e import _skip_on_network
 
+        outage = OhsomeUnavailableError("outage", status_code=503)
         with pytest.raises(Skipped):
-            _skip_on_network(OhsomeUnavailableError("outage", status_code=503))
+            _skip_on_network(outage)
 
     def test_skips_on_throttle(self):
         """A 403 OhsomeUnavailableError still skips (issue #1025 behaviour)."""
@@ -520,15 +521,17 @@ class TestE2ESkipHelper:
 
         from .test_osm_e2e import _skip_on_network
 
+        throttled = OhsomeUnavailableError("throttled", status_code=403)
         with pytest.raises(Skipped):
-            _skip_on_network(OhsomeUnavailableError("throttled", status_code=403))
+            _skip_on_network(throttled)
 
     def test_reraises_a_genuine_error(self):
         """A non-throttle, non-outage error re-raises and fails the lane."""
         from .test_osm_e2e import _skip_on_network
 
+        genuine = ValueError("boom")
         with pytest.raises(ValueError, match="boom"):
-            _skip_on_network(ValueError("boom"))
+            _skip_on_network(genuine)
 
 
 class TestDownloadContract:
