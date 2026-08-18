@@ -8,7 +8,7 @@
 # theme name passed in `variables={theme: [type, ...]}`.
 #
 # Unlike GDACS, Overture *does* have a moving part worth indexing: the monthly
-# release (`yyyy-mm-dd.x`). `tools/overture/refresh_overture_catalog.py` lists
+# release (`yyyy-mm-dd.x`). `earthlens datasets refresh overture --write` lists
 # the available releases (via the official `overturemaps` SDK / the Overture
 # STAC catalog) into the informational `available_releases:` block below; the
 # theme/type set itself is fixed and hand-curated.
@@ -82,13 +82,21 @@ themes:
 
 # Informational index of every Overture feature type the SDK exposes (across
 # all themes, including the uncurated `base` / `addresses` themes). Rebuilt by
-# `tools/overture/refresh_overture_catalog.py` from the live SDK; the curated
+# `earthlens datasets refresh overture --write` from the live SDK; the curated
 # `themes:` block above is a subset. For discoverability, not dispatch.
 available_datasets: [address, bathymetry, building, building_part, connector, division, division_area, division_boundary, infrastructure, land, land_cover, land_use, place, segment, water]
 
-# Informational index of Overture releases, newest first. Rebuilt by
-# `tools/overture/refresh_overture_catalog.py`; the SDK auto-targets the newest
-# when `release=None`, so this block is for discoverability, not dispatch.
+# Informational index of the Overture releases the STAC catalog exposes.
+# Rebuilt by `earthlens datasets refresh overture --write`, which sorts every
+# provider's index the same way — lexicographically — so a two-digit ordinal
+# (`.10`) lands before `.9`. That is harmless: `Catalog.latest_release()` picks
+# the newest by date and ordinal, so the order here is not load-bearing.
+#
+# For discoverability, not dispatch. Overture keeps only the newest release (or
+# two) on `s3://overturemaps-us-west-2` and prunes the rest, so any id bundled
+# here goes stale within weeks. `release=None` therefore resolves the release
+# live at fetch time (the SDK on the default path, `get_latest_release()` on the
+# DuckDB path) and treats this block only as an offline fallback.
 available_releases:
-  - 2026-05-20.0
-  - 2026-04-15.0
+- 2026-06-17.0
+- 2026-07-22.0

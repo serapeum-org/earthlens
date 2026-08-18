@@ -7,13 +7,15 @@ from pathlib import Path
 
 import geopandas as gpd
 import pytest
+from loguru import logger
 
 from earthlens.base import RemoteProduct, SpatialExtent, TemporalExtent
 from earthlens.overture import Overture
 from earthlens.overture._helpers import ODBL, LicenseWarning
 from earthlens.overture.backend import _require_overturemaps, _stream_to_geodataframe
+from earthlens.overture.releases import ReleaseLookupError
 
-from .conftest import OSM_SOURCES, PERMISSIVE_SOURCES
+from .conftest import FAKE_RELEASE, OSM_SOURCES, PERMISSIVE_SOURCES
 
 
 def _make_backend(tmp_path: Path, **overrides) -> Overture:
@@ -26,6 +28,48 @@ def _make_backend(tmp_path: Path, **overrides) -> Overture:
     )
     params.update(overrides)
     return Overture(**params)
+
+
+def _record_releases(seen: list, gdf):
+    """Build a `query_overture` stand-in that records each release it is given."""
+
+    def _query(theme, otype, release, *_args, **_kwargs):
+        seen.append(release)
+        return gdf
+
+    return _query
+
+
+def _record_query(seen: dict, gdf):
+    """Build a `query_overture` stand-in that records its call and returns `gdf`."""
+
+    def _query(theme, otype, release, bbox, **kwargs):
+        seen.update(theme=theme, otype=otype, release=release, bbox=bbox, **kwargs)
+        return gdf
+
+    return _query
+
+
+def _stac(monkeypatch, document: dict) -> None:
+    """Serve `document` as Overture's STAC catalog for one test."""
+    monkeypatch.setattr(
+        "earthlens.overture.releases.stac_catalog", lambda *_a, **_k: document
+    )
+
+
+def _boom() -> str:
+    """Stand in for a live release lookup that cannot reach Overture."""
+    raise ReleaseLookupError("could not read Overture's STAC catalog (no route)")
+
+
+def _missing_sdk() -> str:
+    """Stand in for a release lookup whose SDK entry point is gone."""
+    raise ImportError("cannot import name 'STAC_CATALOG_URL'")
+
+
+def _renamed_sdk() -> str:
+    """Stand in for a release lookup whose SDK internals moved."""
+    raise AttributeError("'module' object has no attribute 'STAC_CATALOG_URL'")
 
 
 @pytest.mark.overture
@@ -465,12 +509,14 @@ class TestDuckDBQueryPath:
         assert fake_overture.reader_calls == [], "reader must not be used with where="
         assert "license_id" in gpd.read_parquet(paths[0]).columns
 
-    def test_columns_and_limit_forwarded(self, tmp_path: Path, make_gdf, monkeypatch):
+    def test_columns_and_limit_forwarded(
+        self, tmp_path: Path, fake_overture, make_gdf, monkeypatch
+    ):
         """`columns` and `max_features` reach query_overture (limit)."""
         seen: dict = {}
         monkeypatch.setattr(
             "earthlens.overture.query.query_overture",
-            lambda *a, **k: seen.update(k) or make_gdf([PERMISSIVE_SOURCES]),
+            _record_query(seen, make_gdf([PERMISSIVE_SOURCES])),
         )
         backend = _make_backend(
             tmp_path,
@@ -482,26 +528,166 @@ class TestDuckDBQueryPath:
         assert seen["columns"] == ["names"]
         assert seen["limit"] == 5
 
-    def test_resolve_release_explicit(self, tmp_path: Path):
-        """`_resolve_release` returns the explicit release when given."""
+    def test_resolved_release_reaches_the_query(
+        self, tmp_path: Path, fake_overture, make_gdf, monkeypatch
+    ):
+        """The release the backend resolves is the one the S3 glob is built from."""
+        seen: dict = {}
+        monkeypatch.setattr(
+            "earthlens.overture.query.query_overture",
+            lambda theme, otype, release, bbox, **k: (
+                seen.update(release=release) or make_gdf([PERMISSIVE_SOURCES])
+            ),
+        )
+        fake_overture.latest = "2031-03-03.0"
+        backend = _make_backend(
+            tmp_path, variables={"places": []}, where="confidence > 0.9"
+        )
+        backend.download()
+        assert seen["release"] == "2031-03-03.0", (
+            "an unpinned DuckDB fetch must glob the live release, not the "
+            "bundled index entry"
+        )
+
+    def test_fallback_to_the_index_is_warned_about(self, tmp_path: Path, monkeypatch):
+        """Falling back to the bundled index says so, and says it may be stale."""
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = ["2020-01-01.0"]
+        monkeypatch.setattr("earthlens.overture.releases.latest_release", _boom)
+        messages: list[str] = []
+        sink = logger.add(lambda record: messages.append(str(record)), level="WARNING")
+        try:
+            assert backend._resolve_release() == "2020-01-01.0"
+        finally:
+            logger.remove(sink)
+        assert any("2020-01-01.0" in message for message in messages), messages
+        assert any("may no longer exist" in message for message in messages), messages
+
+    def test_duckdb_filename_records_the_resolved_release(
+        self, tmp_path: Path, fake_overture, make_gdf, monkeypatch
+    ):
+        """An unpinned DuckDB write names the snapshot it read, not `latest`."""
+        monkeypatch.setattr(
+            "earthlens.overture.query.query_overture",
+            lambda *a, **k: make_gdf([PERMISSIVE_SOURCES]),
+        )
+        backend = _make_backend(
+            tmp_path, variables={"places": []}, where="confidence > 0.9"
+        )
+        paths = backend.download()
+        assert paths[0].name == f"overture_places_place_{FAKE_RELEASE}.parquet"
+
+    def test_release_is_resolved_once_per_download(
+        self, tmp_path: Path, fake_overture, make_gdf, monkeypatch
+    ):
+        """Two requested types share one release lookup, so one download is one snapshot."""
+        seen: list[str] = []
+        monkeypatch.setattr(
+            "earthlens.overture.query.query_overture",
+            lambda theme, otype, release, *a, **k: (
+                seen.append(release) or make_gdf([PERMISSIVE_SOURCES])
+            ),
+        )
+        backend = _make_backend(
+            tmp_path,
+            variables={"buildings": ["building", "building_part"]},
+            where="height > 10",
+        )
+        backend.download()
+        assert fake_overture.latest_calls == 1, "one lookup for the whole download"
+        assert seen == [FAKE_RELEASE, FAKE_RELEASE], "both types read one release"
+
+    def test_default_path_never_resolves_a_release(self, tmp_path: Path, fake_overture):
+        """Without where=/columns= the fetch stays offline and asks for no release."""
+        _make_backend(tmp_path, variables={"places": []}).download()
+        assert fake_overture.latest_calls == 0, (
+            "the SDK path auto-targets latest itself; it must not look one up"
+        )
+
+    @pytest.mark.parametrize(
+        "release", ["not-a-release", "2026-07-22", "2026-7-22.0", ""]
+    )
+    def test_release_must_be_shaped_like_a_release_id(self, tmp_path: Path, release):
+        """A mistyped pin is rejected at construction, not by an opaque S3 miss."""
+        with pytest.raises(ValueError, match=r"release must be an Overture release id"):
+            _make_backend(tmp_path, variables={"places": []}, release=release)
+
+    def test_resolve_release_explicit_skips_the_live_lookup(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """An explicit release is used without asking the SDK."""
+        monkeypatch.setattr("earthlens.overture.releases.latest_release", _boom)
         backend = _make_backend(
             tmp_path, variables={"places": []}, release="2020-01-01.0"
         )
         assert backend._resolve_release() == "2020-01-01.0"
 
-    def test_resolve_release_falls_back_to_index(self, tmp_path: Path):
-        """With no explicit release, `_resolve_release` uses the catalog index."""
+    def test_resolve_release_prefers_the_live_release(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """With no explicit release, the published release beats the bundled index."""
         backend = _make_backend(tmp_path, variables={"places": []})
-        assert backend._resolve_release() == backend._catalog.latest_release()
+        backend._catalog.available_releases = ["2020-01-01.0"]
+        _stac(monkeypatch, {"latest": "2099-12-31.0"})
+        assert backend._resolve_release() == "2099-12-31.0"
 
-    def test_resolve_release_falls_back_to_sdk(self, tmp_path: Path, monkeypatch):
-        """With no release and an empty index, it asks the SDK for the latest."""
-        import overturemaps.core as core
+    def test_resolve_release_falls_back_to_index_when_live_fails(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """A failed live lookup falls back to the newest bundled release."""
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = ["2020-01-01.0", "2021-01-01.0"]
+        monkeypatch.setattr("earthlens.overture.releases.latest_release", _boom)
+        assert backend._resolve_release() == "2021-01-01.0"
 
+    @pytest.mark.parametrize("live", [None, "", "https:", "2026-7-22.0"])
+    def test_resolve_release_rejects_a_live_value_that_is_not_a_release(
+        self, tmp_path: Path, monkeypatch, live
+    ):
+        """A live reply that is not release-shaped falls back like a failure."""
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = ["2020-01-01.0"]
+        _stac(monkeypatch, {"latest": live})
+        assert backend._resolve_release() == "2020-01-01.0", (
+            f"a live {live!r} must not reach the S3 glob"
+        )
+
+    def test_resolve_release_raises_on_a_bad_live_value_with_no_index(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """A junk live reply and an empty index name the junk in the error."""
         backend = _make_backend(tmp_path, variables={"places": []})
         backend._catalog.available_releases = []
-        monkeypatch.setattr(core, "get_latest_release", lambda: "2099-12-31.0")
-        assert backend._resolve_release() == "2099-12-31.0"
+        _stac(monkeypatch, {"latest": "https:"})
+        with pytest.raises(RuntimeError, match=r"not a release id"):
+            backend._resolve_release()
+
+    @pytest.mark.parametrize(
+        "lookup, error",
+        [(_missing_sdk, ImportError), (_renamed_sdk, AttributeError)],
+    )
+    def test_resolve_release_propagates_a_code_level_failure(
+        self, tmp_path: Path, monkeypatch, lookup, error
+    ):
+        """A missing or renamed SDK entry point fails loudly, not into the index."""
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = ["2020-01-01.0"]
+        monkeypatch.setattr("earthlens.overture.releases.latest_release", lookup)
+        with pytest.raises(error):
+            backend._resolve_release()
+
+    def test_resolve_release_raises_when_live_fails_and_index_empty(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """No live release and no bundled one is an error naming the way out."""
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = []
+        monkeypatch.setattr("earthlens.overture.releases.latest_release", _boom)
+        with pytest.raises(RuntimeError, match=r"explicit release=") as excinfo:
+            backend._resolve_release()
+        assert isinstance(excinfo.value.__cause__, ReleaseLookupError), (
+            "the live-lookup failure should be chained, not swallowed"
+        )
 
 
 @pytest.mark.overture
