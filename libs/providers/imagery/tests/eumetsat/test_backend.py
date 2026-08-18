@@ -117,6 +117,26 @@ def test_search_dtend_with_time_of_day_is_not_widened(fake_eumdac, tmp_path):
     assert call["dtend"].hour == 9 and call["dtend"].minute == 9
 
 
+def test_search_dtend_explicit_midnight_is_not_widened(fake_eumdac, tmp_path):
+    """An end typed as an explicit midnight instant means that instant."""
+    fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("p1")]
+    backend = EUMETSAT(
+        start="2024-06-01 00:00",
+        end="2024-06-02 00:00",
+        fmt="%Y-%m-%d %H:%M",
+        variables={"msg-hrseviri": ["HRSEVIRI"]},
+        lat_lim=[50.0, 52.0],
+        lon_lim=[-1.0, 1.0],
+        path=str(tmp_path),
+        **_CREDS,
+    )
+    backend._search()
+    call = fake_eumdac.store.search_calls[0]
+    assert call["dtend"] == backend.time.end_date, (
+        f"an explicit '00:00' end must not be widened to end of day, got {call['dtend']}"
+    )
+
+
 def test_search_dtend_just_past_midnight_is_not_widened(fake_eumdac, tmp_path):
     """One second past midnight is a time of day, so it is left alone."""
     fake_eumdac.store.products_for["EO:EUM:DAT:MSG:HRSEVIRI"] = [_FakeProduct("p1")]

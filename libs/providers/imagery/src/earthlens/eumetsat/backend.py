@@ -55,6 +55,8 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
+    end_is_date_only,
+    expand_bare_date_end,
 )
 from earthlens.eumetsat._helpers import eumdac_bbox, safe_product_filename
 from earthlens.eumetsat.auth import EumetsatAuth, EumetsatCredentials
@@ -295,6 +297,7 @@ class EUMETSAT(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
+        self._end_is_date_only = end_is_date_only(end)
         return self._cadence_extent(
             start,
             end,
@@ -343,13 +346,9 @@ class EUMETSAT(AbstractDataSource):
             self.space.west, self.space.south, self.space.east, self.space.north
         )
         dtstart = self.time.start_date
-        dtend = self.time.end_date
-        if (dtend.hour, dtend.minute, dtend.second, dtend.microsecond) == (0, 0, 0, 0):
-            # A date-only `end` parses to midnight, which would collapse a same-day request
-            # to a zero-width instant, so it means "through the end of that day". An `end`
-            # carrying a time of day means that instant: widening it would pull every later
-            # product of the day, which for a 10-minute full-disk cadence is tens of GB.
-            dtend = dtend.replace(hour=23, minute=59, second=59, microsecond=999999)
+        dtend = expand_bare_date_end(
+            self.time.end_date, date_only=self._end_is_date_only
+        )
         products: list[RemoteProduct] = []
         for ds in self._datasets:
             collection = store.get_collection(ds.collection_id)
