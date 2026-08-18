@@ -7,7 +7,7 @@ needed. A default `pytest` invocation skips them.
 
 Run with:
 
-    pixi run -e dev pytest -m "e2e and overture" tests/overture
+    uv run --locked pytest -m "e2e and overture" -v
 """
 
 from __future__ import annotations
@@ -127,3 +127,21 @@ class TestOvertureLiveFetch:
 
         release = get_latest_release()
         assert release and release[:2] == "20", f"unexpected release {release!r}"
+
+    def test_duckdb_release_is_resolved_live(self, tmp_path: Path):
+        """The DuckDB path globs the published release, not the bundled index."""
+        from overturemaps.core import get_latest_release
+
+        backend = EarthLens(
+            data_source="overture",
+            variables={"places": []},
+            lat_lim=_LAT_LIM,
+            lon_lim=_LON_LIM,
+            path=str(tmp_path),
+            where="confidence > 0.95",
+        ).datasource
+
+        assert backend._resolve_release() == get_latest_release(), (
+            "an unpinned DuckDB fetch must target the release Overture "
+            "publishes; the bundled index goes stale as releases are pruned"
+        )

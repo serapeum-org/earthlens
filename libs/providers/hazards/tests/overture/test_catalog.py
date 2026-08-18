@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
 
 from earthlens.overture.catalog import CATALOG_PATH, Catalog, Theme
+
+#: Shape of an Overture release id (`2026-07-22.0`).
+_RELEASE_ID = re.compile(r"^\d{4}-\d{2}-\d{2}\.\d+$")
 
 
 @pytest.mark.overture
@@ -139,12 +143,12 @@ class TestCatalog:
         """The bundled YAML ships a non-empty, well-formed release index."""
         releases = Catalog().available_releases
         assert releases, "the bundled catalog should ship a release index"
-        assert all(r[:2] == "20" for r in releases), releases
+        assert all(_RELEASE_ID.match(r) for r in releases), releases
 
-    def test_latest_release_matches_first_indexed(self):
-        """`latest_release` returns the first (newest) indexed release."""
+    def test_latest_release_is_the_newest_indexed(self):
+        """`latest_release` returns the newest release the index carries."""
         cat = Catalog()
-        assert cat.latest_release() == cat.available_releases[0]
+        assert cat.latest_release() == max(cat.available_releases)
 
     def test_latest_release_none_when_index_empty(self):
         """`latest_release` is `None` when the index is explicitly empty."""
@@ -152,12 +156,28 @@ class TestCatalog:
         assert cat.latest_release() is None
 
     def test_latest_release_returns_newest(self):
-        """`latest_release` returns the first (newest) of a supplied index."""
+        """`latest_release` returns the newest of a supplied index."""
         cat = Catalog(
             datasets=Catalog().datasets,
             available_releases=["2026-05-20.0", "2026-04-15.0"],
         )
         assert cat.latest_release() == "2026-05-20.0"
+
+    def test_latest_release_ignores_index_order(self):
+        """An ascending index — the order a refresh writes — still yields the newest."""
+        cat = Catalog(
+            datasets=Catalog().datasets,
+            available_releases=["2026-04-15.0", "2026-05-20.0"],
+        )
+        assert cat.latest_release() == "2026-05-20.0"
+
+    def test_latest_release_compares_the_ordinal_numerically(self):
+        """A two-digit ordinal beats a one-digit one from the same date."""
+        cat = Catalog(
+            datasets=Catalog().datasets,
+            available_releases=["2026-07-22.9", "2026-07-22.10"],
+        )
+        assert cat.latest_release() == "2026-07-22.10"
 
     def test_load_missing_themes_block_raises(self, tmp_path: Path):
         """A YAML without a `themes:` block is rejected."""

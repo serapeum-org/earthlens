@@ -48,7 +48,7 @@ parquet statistics — no DuckDB), so only the rows inside the box are read.
 
 | Kwarg | Default | Meaning |
 |-------|---------|---------|
-| `release` | `None` | Overture release id (`"2026-05-20.0"`). `None` lets the SDK auto-target the newest release. List them with the refresh tool or `Catalog().available_releases`. |
+| `release` | `None` | Overture release id (`"2026-07-22.0"`). `None` targets the release Overture publishes now — auto-targeted by the SDK on the default path, resolved live on the DuckDB path. List them with the refresh tool or `Catalog().available_releases`. Pinning is reproducible only until Overture prunes that release from S3. |
 | `file_format` | `"geoparquet"` | Output format: `"geoparquet"` (default, lossless nested schema), `"gpkg"`, or `"geojson"`. |
 | `max_features` | `None` | Cap on rows kept per fetched type. When set, the read **streams** (via `record_batch_reader`) and stops early once the cap is reached, rather than fetching the whole bbox and discarding rows. `None` keeps all. |
 | `stream` | `False` | Force the streaming `record_batch_reader` path (lower peak memory) even without `max_features`. Streaming is used automatically whenever `max_features` is set. |
@@ -92,7 +92,7 @@ EarthLens(
 feature type. Filenames embed the theme, type, and release:
 
 ```
-out/overture_buildings_building_2026-05-20.0.parquet
+out/overture_buildings_building_2026-07-22.0.parquet
 out/overture_places_place_latest.parquet
 ```
 
@@ -115,19 +115,25 @@ the size guard protects you from misusing.
 
 ## Catalog tooling
 
-`tools/overture/refresh_overture_catalog.py` maintains the bundled
-catalog:
+The `earthlens datasets` commands maintain the bundled catalog:
 
 ```bash
-# Rewrite the available_releases index from the live SDK / STAC catalog
-uv run python tools/overture/refresh_overture_catalog.py refresh
+# Diff the live SDK / STAC release list against the bundled index
+earthlens datasets refresh overture
+
+# ... and rewrite the available_releases index from it
+earthlens datasets refresh overture --write
 
 # Confirm every curated theme/default-type resolves against live data
-uv run python tools/overture/refresh_overture_catalog.py validate --strict
+earthlens datasets validate overture --live
 
 # Inspect one type's columns when curating a new theme
-uv run python tools/overture/refresh_overture_catalog.py probe building
+earthlens datasets probe overture building
 ```
+
+Run the refresh whenever a DuckDB fetch reports `No files found that match
+the pattern`: it reports how far the bundled index has drifted from what
+Overture still serves.
 
 ## Streaming vs in-memory reads
 

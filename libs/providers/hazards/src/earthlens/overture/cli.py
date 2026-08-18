@@ -13,12 +13,18 @@ from the public `earthlens.cli.toolkit`; the live reads use the public
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from earthlens.cli.toolkit import index_writer, lint, require
 
 #: A tiny bbox (Times Square block: W, S, E, N) for the Overture live reads.
 _OVERTURE_BBOX = (-73.9876, 40.7561, -73.9851, 40.7577)
+
+#: Shape of an Overture release id: a release date plus an ordinal
+#: (`2026-07-22.0`). Anything else the SDK reports is dropped rather than
+#: written into the bundled index.
+_RELEASE_ID = re.compile(r"^\d{4}-\d{2}-\d{2}\.\d+$")
 
 #: Persists a live release fetch into the bundled `available_releases:` block.
 writer = index_writer("available_releases")
@@ -27,17 +33,28 @@ writer = index_writer("available_releases")
 def _release_ids() -> list[str]:
     """Return every available Overture release id (`overturemaps` SDK).
 
-    `get_available_releases()` returns a `(all_releases, latest)` tuple; only
-    the release list is taken.
+    `get_available_releases()` returns an `(all_releases, latest)` tuple.
+    Both halves are used and both are filtered through `_RELEASE_ID`: the
+    SDK derives `all_releases` by splitting each STAC child href on `/`
+    after stripping `./`, which yields `"https:"` now that the catalog
+    serves absolute hrefs, whereas `latest` is read from a dedicated
+    catalog field and is unaffected. Validating the shape keeps that
+    upstream breakage — and any future variant of it — out of the bundled
+    `available_releases:` index instead of persisting `https:` as a
+    release id.
 
     Returns:
-        Every release id the SDK reports, as strings.
+        The release ids the SDK reports that are shaped like a release,
+            de-duplicated and sorted ascending.
     """
     from overturemaps.core import get_available_releases
 
     result = get_available_releases()
-    releases = result[0] if isinstance(result, tuple) else result
-    return [str(release) for release in releases]
+    releases, latest = result if isinstance(result, tuple) else (result, None)
+    ids = {str(release) for release in releases}
+    if latest is not None:
+        ids.add(str(latest))
+    return sorted(ident for ident in ids if _RELEASE_ID.match(ident))
 
 
 def refresher(_catalog: Any) -> dict[str, list[str]]:

@@ -28,6 +28,11 @@ def _make_backend(tmp_path: Path, **overrides) -> Overture:
     return Overture(**params)
 
 
+def _boom() -> str:
+    """Stand in for a live release lookup that cannot reach Overture."""
+    raise OSError("no route to stac.overturemaps.org")
+
+
 @pytest.mark.overture
 class TestOvertureConstruction:
     """`__init__` wiring and validation."""
@@ -489,19 +494,51 @@ class TestDuckDBQueryPath:
         )
         assert backend._resolve_release() == "2020-01-01.0"
 
-    def test_resolve_release_falls_back_to_index(self, tmp_path: Path):
-        """With no explicit release, `_resolve_release` uses the catalog index."""
-        backend = _make_backend(tmp_path, variables={"places": []})
-        assert backend._resolve_release() == backend._catalog.latest_release()
+    def test_resolve_release_explicit_skips_the_live_lookup(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """An explicit release is used without asking the SDK."""
+        import overturemaps.core as core
 
-    def test_resolve_release_falls_back_to_sdk(self, tmp_path: Path, monkeypatch):
-        """With no release and an empty index, it asks the SDK for the latest."""
+        monkeypatch.setattr(core, "get_latest_release", _boom)
+        backend = _make_backend(
+            tmp_path, variables={"places": []}, release="2020-01-01.0"
+        )
+        assert backend._resolve_release() == "2020-01-01.0"
+
+    def test_resolve_release_prefers_the_live_release(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """With no explicit release, the live SDK release beats the bundled index."""
+        import overturemaps.core as core
+
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = ["2020-01-01.0"]
+        monkeypatch.setattr(core, "get_latest_release", lambda: "2099-12-31.0")
+        assert backend._resolve_release() == "2099-12-31.0"
+
+    def test_resolve_release_falls_back_to_index_when_live_fails(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """A failed live lookup falls back to the newest bundled release."""
+        import overturemaps.core as core
+
+        backend = _make_backend(tmp_path, variables={"places": []})
+        backend._catalog.available_releases = ["2020-01-01.0", "2021-01-01.0"]
+        monkeypatch.setattr(core, "get_latest_release", _boom)
+        assert backend._resolve_release() == "2021-01-01.0"
+
+    def test_resolve_release_raises_when_live_fails_and_index_empty(
+        self, tmp_path: Path, monkeypatch
+    ):
+        """No live release and no bundled one is an error naming the way out."""
         import overturemaps.core as core
 
         backend = _make_backend(tmp_path, variables={"places": []})
         backend._catalog.available_releases = []
-        monkeypatch.setattr(core, "get_latest_release", lambda: "2099-12-31.0")
-        assert backend._resolve_release() == "2099-12-31.0"
+        monkeypatch.setattr(core, "get_latest_release", _boom)
+        with pytest.raises(RuntimeError, match=r"explicit release="):
+            backend._resolve_release()
 
 
 @pytest.mark.overture

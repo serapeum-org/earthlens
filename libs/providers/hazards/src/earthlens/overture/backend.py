@@ -152,8 +152,12 @@ class Overture(AbstractDataSource):
                 Created by the parent class if absent.
             fmt: `strptime` format for `start` / `end` (only used when
                 they are supplied, for record-keeping).
-            release: Overture release id (`"2026-05-20.0"`). `None` (the
-                default) lets the SDK auto-target the newest release.
+            release: Overture release id (`"2026-07-22.0"`). `None` (the
+                default) targets the newest release Overture publishes —
+                the SDK auto-targets it on the default fetch path, and the
+                DuckDB path resolves it live (see `_resolve_release`). Pin
+                it only for reproducibility, and expect a pinned id to stop
+                resolving once Overture prunes that release from S3.
             max_features: Optional cap on the rows kept per fetched type;
                 excess rows are dropped with a warning. `None` keeps all.
             file_format: Output vector format — `"geoparquet"` (default,
@@ -300,22 +304,47 @@ class Overture(AbstractDataSource):
     def _resolve_release(self) -> str:
         """Resolve a concrete release id for the DuckDB S3 path.
 
-        Uses the explicit `release` if given, else the newest entry in the
-        catalog's bundled index, else asks the SDK for the latest release.
-        The DuckDB path needs a concrete id (the `geodataframe` path can
-        leave it `None` and let the SDK pick latest, but the S3 glob can't).
+        Uses the explicit `release` if given, else asks the SDK which
+        release Overture currently publishes, else falls back to the
+        newest entry in the catalog's bundled index. The DuckDB path
+        needs a concrete id (the `geodataframe` path can leave it `None`
+        and let the SDK pick latest, but the S3 glob cannot).
+
+        The live lookup comes first because Overture keeps only the
+        newest release (or two) on `s3://overturemaps-us-west-2` and
+        prunes the rest, so a bundled id goes stale within weeks. Globbing
+        a pruned release matches no files and DuckDB fails the read with
+        `No files found that match the pattern`. The bundled index stays
+        as an offline fallback, and the SDK caches the lookup per process.
 
         Returns:
-            str: A concrete release id (e.g. `"2026-05-20.0"`).
+            str: A concrete release id (e.g. `"2026-07-22.0"`).
+
+        Raises:
+            RuntimeError: If the live lookup fails and the bundled index
+                is empty, leaving no release to glob.
         """
         if self._release:
             return self._release
-        indexed = self._catalog.latest_release()
-        if indexed:
-            return indexed
-        from overturemaps.core import get_latest_release
+        try:
+            from overturemaps.core import get_latest_release
 
-        return cast("str", get_latest_release())
+            return cast("str", get_latest_release())
+        except Exception as exc:  # noqa: BLE001 - offline / upstream outage
+            indexed = self._catalog.latest_release()
+            if not indexed:
+                raise RuntimeError(
+                    "Could not resolve an Overture release for the DuckDB "
+                    f"query path: the live lookup failed ({exc}) and the "
+                    "bundled available_releases: index is empty. Pass an "
+                    "explicit release= (e.g. release='2026-07-22.0')."
+                ) from exc
+            logger.warning(
+                f"Live Overture release lookup failed ({exc}); falling back "
+                f"to the bundled index entry {indexed!r}. Overture prunes old "
+                "releases, so this id may no longer exist on S3."
+            )
+            return indexed
 
     def _guard_bbox(self, theme_names: list[str]) -> None:
         """Reject an oversized / whole-Earth bbox for the guarded themes.

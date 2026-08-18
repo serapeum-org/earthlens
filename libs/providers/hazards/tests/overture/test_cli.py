@@ -32,19 +32,50 @@ class TestRefresher:
     """Tests for the Overture releases lister."""
 
     def test_release_ids_unwrap_tuple(self, monkeypatch):
-        """release ids unwrap the (releases, latest) tuple; grouped sorts them."""
+        """release ids unwrap the (releases, latest) tuple and sort them."""
         import overturemaps.core as core
 
         monkeypatch.setattr(
             core,
             "get_available_releases",
-            lambda: (["2024-01", "2023-12"], "2024-01"),
+            lambda: (["2026-07-22.0", "2026-06-17.0"], "2026-07-22.0"),
         )
-        assert overture_cli._release_ids() == ["2024-01", "2023-12"]
+        assert overture_cli._release_ids() == ["2026-06-17.0", "2026-07-22.0"]
         monkeypatch.setattr(
-            overture_cli, "_release_ids", lambda: ["2024-01", "2023-12"]
+            overture_cli, "_release_ids", lambda: ["2026-07-22.0", "2026-06-17.0"]
         )
-        assert overture_cli.refresher(None) == {"overture": ["2023-12", "2024-01"]}
+        assert overture_cli.refresher(None) == {
+            "overture": ["2026-06-17.0", "2026-07-22.0"]
+        }
+
+    def test_release_ids_drop_unparsed_hrefs(self, monkeypatch):
+        """Ids that are not shaped like a release never reach the index."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core,
+            "get_available_releases",
+            lambda: (["https:", "https:"], "2026-07-22.0"),
+        )
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
+
+    def test_release_ids_keep_latest_when_list_is_unusable(self, monkeypatch):
+        """The latest release still lands even when every listed id is junk."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core, "get_available_releases", lambda: ([], "2026-07-22.0")
+        )
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
+
+    def test_release_ids_tolerate_a_bare_list(self, monkeypatch):
+        """A non-tuple return is treated as the release list alone."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core, "get_available_releases", lambda: ["2026-07-22.0", "junk"]
+        )
+        assert overture_cli._release_ids() == ["2026-07-22.0"]
 
     def test_diffs_releases_not_feature_types(self, monkeypatch):
         """overture diffs the live releases against available_releases."""
