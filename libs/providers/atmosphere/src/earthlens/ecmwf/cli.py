@@ -224,15 +224,20 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     are carried and the retrieve is a valid combination rather than a 400.
     Only keys the entry actually enumerates are sent, so a product that does
     not partition by day/time (obs4mips CO2/CH4) is not handed a spurious one.
-    Retrieves via `cdsapi` (`~/.cdsapirc`); a zip-of-NetCDF response (satellite
-    CDRs deliver one) is unwrapped to its first member before the variable
-    metadata is read via GDAL.
+
+    The retrieve goes to the dataset's **own** store, resolved from the catalog
+    the same way :func:`_ecmwf_constraints` resolves it: a bare client would
+    always talk to CDS and every ADS / EWDS / ECDS / XDS dataset would 404 with
+    `process not found`. A zip-of-NetCDF response (satellite CDRs deliver one)
+    is unwrapped to its first member before the variable metadata is read via
+    GDAL.
     """
     import shutil
     import tempfile
     import zipfile
 
-    import cdsapi
+    from earthlens.ecmwf.catalog import Catalog
+    from earthlens.ecmwf.endpoints import open_client
 
     rows = _ecmwf_constraints(dataset)
     if not rows:
@@ -245,8 +250,10 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
         request[key] = value[:1] if isinstance(value, list) and value else value
     # A dataset with no variable dimension still needs the widget's "all".
     request.setdefault("variable", ["all"])
+    record = Catalog().datasets.get(dataset)
+    endpoint = record.endpoint if record is not None else "cds"
     target = Path(tempfile.mkdtemp()) / "probe.nc"
-    cdsapi.Client().retrieve(dataset, request, str(target))
+    open_client(endpoint).retrieve(dataset, request, str(target))
     if zipfile.is_zipfile(target):
         with zipfile.ZipFile(target) as archive:
             members = [name for name in archive.namelist() if name.endswith(".nc")]

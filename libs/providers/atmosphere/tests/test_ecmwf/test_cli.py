@@ -19,6 +19,7 @@ from typer.testing import CliRunner
 import earthlens.ecmwf._hydrate as hydrate_mod
 import earthlens.ecmwf._seed as seed_mod
 import earthlens.ecmwf.cli as ecmwf_cli
+import earthlens.ecmwf.endpoints as endpoints
 from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.app import app
 from earthlens.cli.curate import probe_dataset
@@ -206,6 +207,22 @@ class TestProber:
         assert ecmwf_cli._ecmwf_constraints("x") == [{"variable": []}]
 
 
+def _stub_client(monkeypatch, captured=None, seen_endpoints=None):
+    """Replace the shared client factory with one that writes an empty target."""
+
+    def _retrieve(dataset, request, target):
+        if captured is not None:
+            captured.update(request)
+        open(target, "w").close()
+
+    def _open_client(endpoint="cds"):
+        if seen_endpoints is not None:
+            seen_endpoints.append(endpoint)
+        return types.SimpleNamespace(retrieve=_retrieve)
+
+    monkeypatch.setattr(endpoints, "open_client", _open_client)
+
+
 class TestDeepProber:
     """Tests for the credentialed ecmwf `--deep` sampler."""
 
@@ -227,11 +244,7 @@ class TestDeepProber:
             "_ecmwf_constraints",
             lambda d: [{"variable": ["2m_temperature"], "year": ["2020"]}],
         )
-        cdsapi = types.ModuleType("cdsapi")
-        cdsapi.Client = lambda: types.SimpleNamespace(
-            retrieve=lambda ds, req, target: open(target, "w").close()
-        )
-        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        _stub_client(monkeypatch)
         monkeypatch.setattr(
             ecmwf_cli,
             "_read_netcdf_var_meta",
@@ -253,14 +266,7 @@ class TestDeepProber:
         }
         monkeypatch.setattr(ecmwf_cli, "_ecmwf_constraints", lambda d: [entry])
         captured: dict[str, object] = {}
-        cdsapi = types.ModuleType("cdsapi")
-        cdsapi.Client = lambda: types.SimpleNamespace(
-            retrieve=lambda ds, req, target: (
-                captured.update(req),
-                open(target, "w").close(),
-            )
-        )
-        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        _stub_client(monkeypatch, captured)
         monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
         ecmwf_cli._ecmwf_deep_sample("satellite-soil-moisture")
         assert captured["type_of_sensor"] == ["passive"]
@@ -275,14 +281,7 @@ class TestDeepProber:
             ecmwf_cli, "_ecmwf_constraints", lambda d: [{"lake": ["achit"]}]
         )
         captured: dict[str, object] = {}
-        cdsapi = types.ModuleType("cdsapi")
-        cdsapi.Client = lambda: types.SimpleNamespace(
-            retrieve=lambda ds, req, target: (
-                captured.update(req),
-                open(target, "w").close(),
-            )
-        )
-        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        _stub_client(monkeypatch, captured)
         monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
         ecmwf_cli._ecmwf_deep_sample("satellite-lake-water-level")
         assert captured["variable"] == ["all"]
@@ -306,6 +305,40 @@ class TestDeepProber:
         ).to_netcdf(path)
         meta = ecmwf_cli._read_netcdf_var_meta(str(path))
         assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
+
+    @pytest.mark.parametrize(
+        "dataset, expected",
+        [
+            ("reanalysis-era5-single-levels", "cds"),
+            ("cams-global-emission-inventories", "ads"),
+            ("cems-glofas-forecast", "ewds"),
+            ("tigge-forecasts", "ecds"),
+            ("derived-fire-fuel-biomass", "xds"),
+        ],
+    )
+    def test_deep_sample_retrieves_from_the_datasets_own_store(
+        self, monkeypatch, dataset, expected
+    ):
+        """The sample goes to the row's store; a bare client would 404 off-CDS."""
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda d: [{"variable": ["x"]}]
+        )
+        seen: list[str] = []
+        _stub_client(monkeypatch, seen_endpoints=seen)
+        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
+        ecmwf_cli._ecmwf_deep_sample(dataset)
+        assert seen == [expected]
+
+    def test_deep_sample_uncurated_dataset_falls_back_to_cds(self, monkeypatch):
+        """An id with no catalog row still samples, against the default store."""
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda d: [{"variable": ["x"]}]
+        )
+        seen: list[str] = []
+        _stub_client(monkeypatch, seen_endpoints=seen)
+        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
+        ecmwf_cli._ecmwf_deep_sample("not-a-curated-dataset")
+        assert seen == ["cds"]
 
     def test_deep_sample_no_constraints(self, monkeypatch):
         """No constraints rows yields an empty schema (after the SDK imports)."""
