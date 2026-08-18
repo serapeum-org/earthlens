@@ -235,6 +235,16 @@ class TestIsWcsServiceFailure:
         exc.__cause__ = exc
         assert is_wcs_service_failure(exc) is False
 
+    def test_suppressed_context_is_not_walked(self):
+        """A `raise ... from None` hides a transport context, so it stays False."""
+        try:
+            try:
+                raise requests.exceptions.ConnectionError("Connection reset by peer")
+            except requests.exceptions.ConnectionError:
+                raise RuntimeError("bad coverage request") from None
+        except RuntimeError as exc:
+            assert is_wcs_service_failure(exc) is False
+
 
 class TestWcsServiceUnavailableError:
     """The typed error the WCS path raises for an unavailable service."""

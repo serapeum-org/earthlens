@@ -139,6 +139,11 @@ class WcsServiceUnavailableError(RuntimeError):
 def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
     """Yield `exc` then each linked `__cause__` / `__context__`, cycle-safe.
 
+    Honours `__suppress_context__`, so a deliberate `raise … from None` hides the
+    implicit context (matching stdlib `traceback`): an explicit `__cause__` wins,
+    otherwise the `__context__` is followed only when the author did not suppress
+    it.
+
     Args:
         exc: The exception to walk.
 
@@ -150,7 +155,12 @@ def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
     while current is not None and id(current) not in seen:
         seen.add(id(current))
         yield current
-        current = current.__cause__ or current.__context__
+        if current.__cause__ is not None:
+            current = current.__cause__
+        elif current.__suppress_context__:
+            current = None
+        else:
+            current = current.__context__
 
 
 def _http_status(exc: BaseException) -> int | None:
