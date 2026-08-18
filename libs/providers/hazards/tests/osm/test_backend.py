@@ -294,6 +294,119 @@ class TestOhsomeRoute:
         with pytest.raises(RuntimeError, match="some genuine bug"):
             backend.download()
 
+    def test_non_json_body_becomes_response_error(self, osm_kwargs, fake_ohsome):
+        """A non-JSON body (an HTML page) surfaces as a typed OhsomeResponseError."""
+        import json
+
+        from earthlens.osm import OhsomeResponseError, OhsomeUnavailableError
+
+        response = types.SimpleNamespace(
+            status_code=200,
+            headers={"Content-Type": "text/html"},
+            text="<html><body>Service under maintenance</body></html>",
+        )
+        decode_error = json.JSONDecodeError("Expecting value", "<html>", 0)
+        decode_error.response = response
+        fake_ohsome.error = decode_error
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeResponseError) as excinfo:
+            backend.download()
+        err = excinfo.value
+        assert err.status_code == 200
+        assert err.content_type == "text/html"
+        assert err.body_preview.startswith("<html>")
+        assert "non-JSON" in str(err) and "text/html" in str(err)
+        # a 200 body is not a throttle, so it is the base error, not the subtype
+        assert not isinstance(err, OhsomeUnavailableError)
+
+    def test_non_json_body_without_status_still_typed(self, osm_kwargs, fake_ohsome):
+        """A non-JSON failure with no recoverable status still yields the typed error."""
+        import json
+
+        from earthlens.osm import OhsomeResponseError
+
+        fake_ohsome.error = json.JSONDecodeError("Expecting value", "", 0)
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeResponseError) as excinfo:
+            backend.download()
+        err = excinfo.value
+        assert err.status_code is None
+        assert err.content_type is None
+        assert err.body_preview is None
+
+    def test_json_error_response_propagates_unchanged(self, osm_kwargs, fake_ohsome):
+        """A genuine ohsome error served AS JSON is not masked as a response error."""
+        from earthlens.osm import OhsomeResponseError
+
+        ohsome_error = RuntimeError("bad request")
+        ohsome_error.error_code = 400  # recovered status, but no JSONDecodeError
+        fake_ohsome.error = ohsome_error
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(RuntimeError, match="bad request") as excinfo:
+            backend.download()
+        assert not isinstance(excinfo.value, OhsomeResponseError)
+
+    def test_transport_error_propagates_unchanged(self, osm_kwargs, fake_ohsome):
+        """A transport error (no status, not non-JSON) propagates untouched."""
+        import requests
+
+        from earthlens.osm import OhsomeResponseError
+
+        fake_ohsome.error = requests.ConnectionError("connection reset")
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(
+            requests.ConnectionError, match="connection reset"
+        ) as excinfo:
+            backend.download()
+        assert not isinstance(excinfo.value, OhsomeResponseError)
+
+    def test_failure_logs_status_content_type_and_body_preview(
+        self, osm_kwargs, fake_ohsome
+    ):
+        """The recovered status, content-type and body preview are logged (#930)."""
+        import json
+
+        from loguru import logger
+
+        from earthlens.osm import OhsomeResponseError
+
+        response = types.SimpleNamespace(
+            status_code=503,
+            headers={"Content-Type": "text/html; charset=utf-8"},
+            text="<html>rate limited</html>",
+        )
+        decode_error = json.JSONDecodeError("Expecting value", "<html>", 0)
+        decode_error.response = response
+        fake_ohsome.error = decode_error
+
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING", format="{message}")
+        try:
+            backend = OSM(
+                **{
+                    **osm_kwargs(),
+                    "variables": ["ohsome:buildings"],
+                    "start": "2020-01-01",
+                }
+            )
+            with pytest.raises(OhsomeResponseError):
+                backend.download()
+        finally:
+            logger.remove(sink_id)
+        logged = "".join(str(message) for message in messages)
+        assert "503" in logged
+        assert "text/html" in logged
+        assert "rate limited" in logged
+
 
 class TestDownloadContract:
     """Cross-cutting download() behaviour."""

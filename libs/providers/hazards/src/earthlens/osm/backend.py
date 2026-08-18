@@ -62,11 +62,15 @@ from earthlens.base import (
 from earthlens.base.http import DEFAULT_TIMEOUT, HttpClient
 from earthlens.osm._helpers import (
     LicenseWarning,
+    OhsomeResponseError,
     OhsomeUnavailableError,
     bbox_swne,
     bbox_wsen,
     empty_fc,
+    ohsome_body_preview,
+    ohsome_error_response,
     ohsome_http_status,
+    ohsome_response_is_non_json,
     overpy_to_gdf,
     to_fc,
 )
@@ -601,12 +605,13 @@ class OSM(AbstractDataSource):
         gives the SDK's session a urllib3 `Retry` (`MAX_OHSOME_RETRIES` retries,
         exponential `OHSOME_BACKOFF_FACTOR` growth, `Retry-After` honoured) so a
         `429`/`5xx` throttle is retried with backoff — matching the repo-wide
-        `HttpClient`. A `403` (and any leftover `429` after the retries) is *not*
-        a transient error on this public, keyless endpoint, so it is turned into
-        a clear, typed `OhsomeUnavailableError` (via `_raise_ohsome_unavailable`)
-        instead of the SDK's opaque failure — which exposes the status
-        inconsistently, sometimes as an `OhsomeException` and sometimes as a bare
-        leaked `JSONDecodeError`.
+        `HttpClient`. Any remaining failure is turned into a clear, typed error
+        (via `_reraise_ohsome_error`, which logs the recovered status /
+        `Content-Type` / body preview) instead of the SDK's opaque failure: a
+        `403` / `429` throttle becomes an `OhsomeUnavailableError`, and any other
+        non-JSON body (a rate-limit / maintenance / error page or a redirect)
+        becomes an `OhsomeResponseError` — so a decoder error never stands in for
+        "the server said no" (`#930`).
 
         Args:
             query_id: The named-query id (for logging).
@@ -621,6 +626,8 @@ class OSM(AbstractDataSource):
             OhsomeUnavailableError: If `api.ohsome.org` blocks/throttles the
                 request with a `403` (or a `429` outlasting the retries) — a
                 public-endpoint denial, not a credential error.
+            OhsomeResponseError: If `api.ohsome.org` returns any other non-JSON
+                body (a rate-limit / maintenance / error page or a redirect).
             ValueError: If no `start` (and `time`) was supplied — ohsome
                 requires a time.
         """
@@ -663,10 +670,11 @@ class OSM(AbstractDataSource):
                 endpoint="elements/geometry",
             )
             gdf = response.as_dataframe()
-        # Broad by design: classify a throttle/block into a typed error, else
-        # re-raise the original failure unchanged.
+        # Broad by design: convert a throttle/block or a non-JSON response into a
+        # clear typed error (logging the recovered evidence), else re-raise the
+        # original failure unchanged.
         except Exception as exc:  # noqa: BLE001
-            self._raise_ohsome_unavailable(exc)
+            self._reraise_ohsome_error(exc)
             raise
         # `as_dataframe()` carries a (@osmId, @snapshotTimestamp) MultiIndex;
         # reset it so the history fields become ordinary columns on the FC.
@@ -674,26 +682,55 @@ class OSM(AbstractDataSource):
             gdf = gdf.reset_index()
         return to_fc(gdf)
 
-    def _raise_ohsome_unavailable(self, exc: Exception) -> None:
-        """Re-raise an ohsome throttle/block as a typed `OhsomeUnavailableError`.
+    def _reraise_ohsome_error(self, exc: Exception) -> None:
+        """Convert an ohsome SDK failure into a clear, typed, logged error.
 
-        Inspects the SDK failure for an HTTP status (`ohsome_http_status`
-        recovers it whether the SDK wrapped the failure into an `OhsomeException`
-        or leaked a bare `JSONDecodeError`). A `403`, or a `429`
-        that outlived the retries, becomes a clear, actionable
-        `OhsomeUnavailableError`; any other failure — including a `401`, which on
-        this keyless endpoint signals a real auth-contract change, not a
-        throttle — is left for the caller to re-raise unchanged so a genuine
-        regression still surfaces loudly.
+        The raw SDK failure discards what the server actually said — a decoder
+        error is the wrong abstraction for "the response was not JSON" (`#930`).
+        This recovers the HTTP status, `Content-Type`, and first bytes of the
+        body from the exception chain (whether the SDK wrapped the failure into
+        an `OhsomeException` or leaked a bare `JSONDecodeError`), logs them at the
+        point of failure, and then raises the right typed error:
+
+        * a `403`, or a `429` that outlived the retries, becomes an
+          `OhsomeUnavailableError` (a public-endpoint throttle/block);
+        * any other non-JSON body — a rate-limit / maintenance / error page, an
+          empty body, or a redirect to a landing page — becomes an
+          `OhsomeResponseError` carrying the recovered evidence.
+
+        Anything else (a transport error, or a genuine ohsome error served *as*
+        JSON — including a `401`, which on this keyless endpoint signals a real
+        auth-contract change, not a throttle) is left for the caller to re-raise
+        unchanged, so a genuine regression still surfaces loudly.
 
         Args:
             exc: The exception raised by the ohsome SDK call.
 
         Raises:
-            OhsomeUnavailableError: When the status is a public-endpoint
-                throttle/block (`403` / `429`).
+            OhsomeUnavailableError: On a public-endpoint throttle/block (`403` /
+                `429`).
+            OhsomeResponseError: On any other non-JSON response body.
         """
         status = ohsome_http_status(exc)
+        non_json = ohsome_response_is_non_json(exc)
+        if status is None and not non_json:
+            # Not an HTTP / response failure (e.g. a transport error) — nothing to
+            # add; let the caller re-raise the original.
+            return
+
+        response = ohsome_error_response(exc)
+        headers = getattr(response, "headers", None)
+        content_type = headers.get("Content-Type") if headers is not None else None
+        body_preview = ohsome_body_preview(response)
+        # Log the evidence the raw decoder error discards, at the point of failure
+        # — visible even when the caller skips the throttle case (`#930`).
+        logger.warning(
+            "ohsome elements/geometry request failed: "
+            f"HTTP {status if status is not None else 'unknown'}, "
+            f"Content-Type {content_type!r}, "
+            f"first {len(body_preview or '')} body chars: {body_preview!r}"
+        )
+
         if status == 403:
             raise OhsomeUnavailableError(
                 "ohsome refused the elements/geometry request with HTTP 403. "
@@ -712,6 +749,23 @@ class OSM(AbstractDataSource):
                 "request frequency and size.",
                 status_code=status,
             ) from exc
+        if non_json:
+            shown_status = status if status is not None else "an unknown status"
+            raise OhsomeResponseError(
+                "ohsome returned a non-JSON response for the elements/geometry "
+                f"request (HTTP {shown_status}, Content-Type {content_type!r}); "
+                f"the first {len(body_preview or '')} characters were "
+                f"{body_preview!r}. api.ohsome.org served an unparseable body — "
+                "typically a rate-limit, maintenance, or error page, or a "
+                "redirect to a landing page — rather than the expected GeoJSON. "
+                "Retry later, or check the ohsome service status.",
+                status_code=status,
+                content_type=content_type,
+                body_preview=body_preview,
+            ) from exc
+        # A recovered HTTP status that is neither a throttle nor a non-JSON body
+        # (e.g. a genuine ohsome error already served as readable JSON) — let the
+        # caller re-raise the SDK's own error unchanged.
 
     def _fetch_pbf(self, query_id: str, dataset: Dataset) -> FeatureCollection:
         """Fetch one `pbf` layer: resolve region, fetch-cache, read, bbox-clip.
