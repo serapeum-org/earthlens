@@ -14,6 +14,7 @@ from __future__ import annotations
 import urllib.error
 import urllib.request
 from pathlib import Path
+from typing import NoReturn
 
 import numpy as np
 import pytest
@@ -60,7 +61,7 @@ def _elevation_stats(path: Path) -> tuple[float, float]:
     return float(finite.min()), float(finite.max())
 
 
-def _skip_on_service(exc: Exception) -> None:
+def _skip_on_service(exc: Exception) -> NoReturn:
     """Skip (not fail) when the failure is a transport / WCS-service problem.
 
     The `_skip_when_offline` guard only catches a total outage (the reachability
