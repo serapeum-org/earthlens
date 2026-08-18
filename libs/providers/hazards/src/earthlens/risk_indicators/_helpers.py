@@ -19,7 +19,7 @@ The module groups three concerns, none of which holds state:
   ThinkHazard ADM0 division code via the catalog's shipped lookup table.
 
 Endpoints / response shapes were live-verified 2026-06-27 (see
-`planning/risk_indicators/captures/risk-sdk-facts.md`).
+the A1 gate captures).
 """
 
 from __future__ import annotations

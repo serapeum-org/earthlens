@@ -2,7 +2,7 @@
 #
 # High-value drought / hydrology satellite CDRs. Request shapes + valid combos
 # are pinned from the live constraints.json
-# (`planning/ecmwf/captures/a1_form_satellite-*.json`, 2026-08-01). The `type`
+# (the A1 gate captures, 2026-08-01). The `type`
 # axis is the ESA-CCI sensor/record/version selector, carried in `extras`. The
 # response is a zip-of-NetCDF (unpacked by the C3 output-format handler); there
 # is no `data_format` choice (dropped per-row). No time-of-day (`satellite_cdr`

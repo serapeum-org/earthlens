@@ -13,7 +13,7 @@
 # Source + schema + licence were verified live 2026-08-10 against the pinned
 # Zenodo record 8123096 (byte-identical to GitHub commit
 # bcb651a9a4f6422e6e6ab84d8639b2ed376bee93) — see
-# `planning/flood-risk/captures/A1-flodis-source-schema-licence.md`.
+# the A1 gate captures.
 
 # The pinned Zenodo record FLODIS is fetched from. Zenodo carries an explicit
 # CC-BY-4.0 licence on the data record itself (the GitHub repo declares none),

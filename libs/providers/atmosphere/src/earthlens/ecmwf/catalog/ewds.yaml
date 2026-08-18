@@ -12,7 +12,7 @@
 # four 6-hourly `time` slots the daily template adds.
 #
 # Verified live 2026-07-01 (real retrieve + grid inspection); see
-# `planning/ecmwf/captures/ecmwf-ewds-facts.md`. GloFAS must be requested with
+# the A1 gate captures. GloFAS must be requested with
 # `temporal_resolution="daily"` (the forecast-reference date is a day, and the
 # monthly branch would drop the required `day` selector).
 

@@ -3,7 +3,7 @@
 # The greenfield ADS store: global/European air quality, greenhouse gases, and
 # atmospheric composition, operated by ECMWF under Copernicus CAMS. Request
 # shapes + enum values are pinned from the live form.json
-# (`planning/ecmwf/captures/a1_form_cams-*.json`, 2026-08-01).
+# (the A1 gate captures, 2026-08-01).
 #
 # Two request families: `cams_date` (a single `date` range string + `time`, for
 # EAC4 / composition forecasts / GFAS / air-quality forecasts) and

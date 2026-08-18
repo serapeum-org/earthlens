@@ -12,7 +12,7 @@
 # * `products:` curated ABI product families (friendly key -> `product_group`).
 # * `channels:` the 16 ABI spectral bands (reference metadata for band selection).
 #
-# Facts pinned by the A1 gate against the live buckets (planning/goes/captures/).
+# Facts pinned by the A1 gate against the live buckets.
 
 satellites:
   east: noaa-goes19

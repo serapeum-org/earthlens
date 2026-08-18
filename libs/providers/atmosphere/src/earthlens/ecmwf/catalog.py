@@ -74,7 +74,7 @@ from earthlens.ecmwf.constraints import fetch_constraints
 
 # `read_cdsapirc` / `download_job` / `list_recent_jobs` were split out of this
 # module into `earthlens.ecmwf.jobs` (N3 in
-# planning/catalog-cross-backend-comparison.md). `Catalog` still delegates to
+# the cross-backend catalog comparison). `Catalog` still delegates to
 # `download_job` / `list_recent_jobs` internally, so import them under private
 # names; `_read_cdsapirc` is re-exported only so any external caller using
 # `from earthlens.ecmwf.catalog import _read_cdsapirc` keeps working.
@@ -560,7 +560,7 @@ class Variable(FluxableLeaf):
         return _validate_grid_resolution(value)
 
     # `is_flux` property is inherited from `FluxableLeaf` (N1 in
-    # planning/catalog-cross-backend-comparison.md).
+    # the cross-backend catalog comparison).
 
 
 class Dataset(BaseModel):
@@ -934,7 +934,7 @@ class Catalog(AbstractCatalog):
     # `__getitem__` / `__contains__` / `__iter__` / `__len__` / `__repr__`
     # / `__str__` dunders are inherited from
     # :class:`earthlens.base.AbstractCatalog` (M1 in
-    # planning/catalog-cross-backend-comparison.md).
+    # the cross-backend catalog comparison).
 
     def health(self) -> dict[str, list[str]]:
         """Report structural hygiene issues across the loaded catalog (L1).

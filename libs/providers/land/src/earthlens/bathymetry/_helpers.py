@@ -4,7 +4,7 @@ No SDK and no network: these build the ERDDAP `griddap` subset URL the
 backend GETs, so they are unit-testable in isolation. The exact URL shape
 (`…/griddap/<id>.nc?<var>[(lat_lo):1:(lat_hi)][(lon_lo):1:(lon_hi)]`, no
 time axis — the DEMs are static) was pinned live in the A1 gate; see
-`planning/bathymetry/captures/bathymetry-sdk-facts.md`.
+the A1 gate captures.
 """
 
 from __future__ import annotations
