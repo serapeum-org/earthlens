@@ -471,6 +471,65 @@ class TestOhsomeRoute:
             logger.remove(sink_id)
         assert messages == [], f"expected no warning on pass-through, got: {messages}"
 
+    def test_server_error_becomes_unavailable(self, osm_kwargs, fake_ohsome):
+        """A 503 (the SDK's KeyError on a 5xx body) surfaces as unavailable (#790)."""
+        import requests
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        # The ohsome SDK does e.response.json()["message"] on the 503 body, which
+        # lacks a "message" key, dying with a raw KeyError whose originating
+        # HTTPError (status 503) is only in the __context__ chain.
+        http_error = requests.HTTPError("503 Service Unavailable")
+        http_error.response = types.SimpleNamespace(
+            status_code=503, headers={}, text=""
+        )
+        key_error = KeyError("message")
+        key_error.__context__ = http_error
+        fake_ohsome.error = key_error
+
+        backend = OSM(
+            **{**osm_kwargs(), "variables": ["ohsome:buildings"], "start": "2020-01-01"}
+        )
+        with pytest.raises(OhsomeUnavailableError) as excinfo:
+            backend.download()
+        assert excinfo.value.status_code == 503
+        assert "503" in str(excinfo.value)
+        assert excinfo.value.__cause__ is key_error
+
+
+class TestE2ESkipHelper:
+    """The e2e `_skip_on_network` decides skip-vs-fail from the typed error."""
+
+    def test_skips_on_server_error(self):
+        """A 5xx OhsomeUnavailableError skips the lane rather than failing (#790)."""
+        from _pytest.outcomes import Skipped
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        from .test_osm_e2e import _skip_on_network
+
+        with pytest.raises(Skipped):
+            _skip_on_network(OhsomeUnavailableError("outage", status_code=503))
+
+    def test_skips_on_throttle(self):
+        """A 403 OhsomeUnavailableError still skips (issue #1025 behaviour)."""
+        from _pytest.outcomes import Skipped
+
+        from earthlens.osm import OhsomeUnavailableError
+
+        from .test_osm_e2e import _skip_on_network
+
+        with pytest.raises(Skipped):
+            _skip_on_network(OhsomeUnavailableError("throttled", status_code=403))
+
+    def test_reraises_a_genuine_error(self):
+        """A non-throttle, non-outage error re-raises and fails the lane."""
+        from .test_osm_e2e import _skip_on_network
+
+        with pytest.raises(ValueError, match="boom"):
+            _skip_on_network(ValueError("boom"))
+
 
 class TestDownloadContract:
     """Cross-cutting download() behaviour."""
