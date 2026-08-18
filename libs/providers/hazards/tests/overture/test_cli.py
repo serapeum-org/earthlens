@@ -124,6 +124,22 @@ class TestRefresher:
         )
         assert overture_cli._child_release_ids() == ["2026-07-22.0", "2026-06-17.0"]
 
+    def test_child_release_ids_skip_a_href_with_no_release_segment(self, monkeypatch):
+        """A child link too short to carry a release contributes nothing."""
+        monkeypatch.setattr(
+            overture_cli.requests,
+            "get",
+            lambda url, timeout: _StacResponse(
+                {
+                    "links": [
+                        {"rel": "child", "href": "https://stac.example/catalog.json"},
+                        {"rel": "child", "href": ""},
+                    ]
+                }
+            ),
+        )
+        assert overture_cli._child_release_ids() == []
+
     def test_release_ids_keep_latest_when_list_is_unusable(self, monkeypatch):
         """The latest release still lands even when every listed id is junk."""
         import overturemaps.core as core
