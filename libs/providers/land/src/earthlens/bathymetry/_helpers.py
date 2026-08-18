@@ -100,14 +100,17 @@ _SERVICE_SIGNATURES: tuple[str, ...] = (
     "no route to host",
 )
 
-#: Matches a transient status (`408` / `429` / any `5xx`) only where it is a real
-#: HTTP-status token: at the start of the message, adjacent to a status keyword
-#: (`status` / `code` / `http` / `returned` / `response`), or as `NNN … Error`.
-#: The keyword gap forbids letters/digits, so a status embedded in a URL
-#: (`http://host:500/wcs`, `/tiles/429/`) or a stray pixel count never trips it.
+#: Matches a transient status (`408` / `429` / any `5xx`) in text only where it is
+#: unambiguously an HTTP-status token: adjacent to a status keyword
+#: (`status` / `code` / `http` / `http/1.1`), or in the `NNN … Error` form. It
+#: deliberately does NOT match a bare leading integer or a keyword like
+#: `returned`, so a request / size message (`512 x 512 grid`, `500 records
+#: returned`, `coverage returned 512 rows`) is never mistaken for a status. A
+#: bare status in free text without such a token (a raw CDN `522 …` string) is
+#: instead recognised structurally by `_http_status` when the exception carries a
+#: `.response`; the text path is only a fallback for wrapped GDAL / CURL strings.
 _STATUS_IN_TEXT_RE = re.compile(
-    r"^\s*(?:408|429|5\d\d)\b"
-    r"|(?:\bstatus\b|\bcode\b|\bhttp\b|\breturned\b|\bresponse\b)"
+    r"(?:\bhttp\b|\bhttp/\d(?:\.\d)?\b|\bstatus\b|\bcode\b)"
     r"[^0-9A-Za-z]{0,4}(?:408|429|5\d\d)\b"
     r"|\b(?:408|429|5\d\d)\s+(?:server|client|internal server) error\b",
     re.I,

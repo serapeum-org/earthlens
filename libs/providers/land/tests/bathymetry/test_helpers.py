@@ -133,13 +133,11 @@ class TestIsWcsServiceFailure:
             "WCS GetCapabilities returned a non-XML body from ows...",
             "the server sent a non xml response",
             "HTTP error code : 503",
+            "HTTP/1.1 503",
+            "HTTP/1.1 503 Service Unavailable",
             "500 Server Error: Internal Server Error",
             "500 Internal Server Error",
             "GetCoverage failed with status 500",
-            "the server returned 502",
-            "522 Origin Connection Time-out",
-            "520 Web Server Returned an Unknown Error",
-            "511 Network Authentication Required",
             "received HTTP 429 from the endpoint",
             "http 408 request timeout",
             "502 Bad Gateway",
@@ -202,6 +200,10 @@ class TestIsWcsServiceFailure:
             "coverage 'foo' not listed in the server's GetCapabilities document",
             "InvalidSubsetting: Empty intersection after subsetting",
             "grid is 5000 x 5000 pixels, too large",
+            "512 x 512 grid too large",
+            "500 records returned from GetCoverage",
+            "503 points requested, too many",
+            "coverage returned 512 rows",
             "unknown band 'depth'",
             "failed to read http://server/tiles/429/data",
             "cannot connect to http://host:500/wcs",
@@ -209,8 +211,17 @@ class TestIsWcsServiceFailure:
         ],
     )
     def test_request_errors_classify_false(self, message: str):
-        """A request error — including a status embedded in a URL — classifies False."""
+        """A request error — a leading count, or a status in a URL — classifies False."""
         assert is_wcs_service_failure(RuntimeError(message)) is False, message
+
+    def test_response_without_int_status_falls_through(self):
+        """An HTTPError whose response has no int status_code is judged by message."""
+        err = requests.exceptions.HTTPError("Service Unavailable")
+        err.response = requests.Response()  # default status_code is None
+        assert is_wcs_service_failure(err) is True
+        plain = requests.exceptions.HTTPError("Could not find coverage")
+        plain.response = requests.Response()
+        assert is_wcs_service_failure(plain) is False
 
     def test_walks_cause_chain(self):
         """A transport error linked via __cause__ is detected through the wrapper."""
