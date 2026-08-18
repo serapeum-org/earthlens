@@ -3,8 +3,13 @@
 Builds synthetic Overture `GeoDataFrame`s (no network) and a recording
 fake for `overturemaps.core.geodataframe`, so the backend can be
 exercised end-to-end offline. The `fake_overture` fixture patches the
-SDK entry point the backend imports inside `_fetch` and records every
-`(overture_type, bbox, release)` call.
+SDK entry points the backend imports inside `_fetch` — the readers and
+`get_latest_release` — and records every `(overture_type, bbox, release)`
+call.
+
+An autouse guard keeps that promise honest: any non-`e2e` test that
+reaches the live STAC catalog fails instead of quietly succeeding
+through the backend's offline fallback.
 """
 
 from __future__ import annotations
@@ -27,6 +32,10 @@ OSM_SECOND_SOURCES = [
     {"dataset": "OpenStreetMap", "license": "ODbL-1.0"},
 ]
 NO_LICENSE_SOURCES = [{"dataset": "Overture"}]
+
+#: The release the offline fake reports as the one Overture publishes. Distinct
+#: from every id in the bundled index, so a test can tell the two apart.
+FAKE_RELEASE = "2099-12-31.0"
 
 
 def _make_gdf(
@@ -77,8 +86,15 @@ class _FakeOverture:
     def __init__(self) -> None:
         self.calls: list[dict[str, Any]] = []
         self.reader_calls: list[dict[str, Any]] = []
+        self.latest_calls: int = 0
+        self.latest: str = FAKE_RELEASE
         self._gdf_for_type: dict[str, gpd.GeoDataFrame] = {}
         self.default_gdf: gpd.GeoDataFrame = _make_gdf()
+
+    def latest_release(self) -> str:
+        """Stand in for the SDK's live release lookup, counting the calls."""
+        self.latest_calls += 1
+        return self.latest
 
     def __call__(
         self,
@@ -136,10 +152,37 @@ def make_gdf() -> Callable[..., gpd.GeoDataFrame]:
 
 @pytest.fixture
 def fake_overture(monkeypatch: pytest.MonkeyPatch) -> _FakeOverture:
-    """Patch `overturemaps.core.geodataframe` with the recording fake."""
+    """Patch the SDK readers and the release lookup with the recording fake."""
     state = _FakeOverture()
     monkeypatch.setattr("overturemaps.core.geodataframe", state)
     monkeypatch.setattr(
         "overturemaps.core.record_batch_reader", state.record_batch_reader
     )
+    monkeypatch.setattr("overturemaps.core.get_latest_release", state.latest_release)
     return state
+
+
+def _refuse_urlopen(*_args: Any, **_kwargs: Any) -> None:
+    """Fail the test rather than let it reach the live STAC catalog."""
+    pytest.fail(
+        "an offline Overture test reached the live STAC catalog; patch "
+        "overturemaps.core.get_latest_release (the fake_overture fixture "
+        "does) instead of relying on the backend's offline fallback",
+        pytrace=False,
+    )
+
+
+@pytest.fixture(autouse=True)
+def no_live_stac(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Block the live release lookup for every non-e2e Overture test.
+
+    `_resolve_release` falls back to the bundled index on any failure, so
+    an accidental live call passes the suite and only shows up as a slow,
+    network-dependent run. `pytest.fail` raises a `BaseException`, which
+    that fallback does not catch, so the leak surfaces as a failure.
+    """
+    if request.node.get_closest_marker("e2e"):
+        return
+    monkeypatch.setattr("overturemaps.core.urlopen", _refuse_urlopen)

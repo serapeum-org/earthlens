@@ -470,7 +470,9 @@ class TestDuckDBQueryPath:
         assert fake_overture.reader_calls == [], "reader must not be used with where="
         assert "license_id" in gpd.read_parquet(paths[0]).columns
 
-    def test_columns_and_limit_forwarded(self, tmp_path: Path, make_gdf, monkeypatch):
+    def test_columns_and_limit_forwarded(
+        self, tmp_path: Path, fake_overture, make_gdf, monkeypatch
+    ):
         """`columns` and `max_features` reach query_overture (limit)."""
         seen: dict = {}
         monkeypatch.setattr(
