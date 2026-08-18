@@ -96,6 +96,27 @@ out/overture_buildings_building_2026-07-22.0.parquet
 out/overture_places_place_latest.parquet
 ```
 
+Which of the two you get follows one rule: **a name carries a release id when
+the backend knows it**, and `latest` when it does not.
+
+| Fetch | Filename stamp |
+|-------|----------------|
+| Any fetch with `release=` pinned | the pinned id |
+| Unpinned `where=` / `columns=` (DuckDB) | the release resolved for the glob |
+| Unpinned plain fetch (SDK) | `latest` |
+
+The SDK path is the odd one out because it hands `release=None` to the SDK and
+is never told which snapshot answered. Two consequences worth knowing:
+
+- A `_latest` file is **overwritten** by the next run, including across a
+  monthly rollover — convenient for a scratch directory, lossy if you meant to
+  keep both. A release-stamped file is not, so an unpinned DuckDB fetch
+  accumulates one file per release rather than overwriting.
+- The stamp does not encode `where=` / `columns=`, so a filtered and an
+  unfiltered fetch of the same theme, type, and release write to the **same
+  path** and the second silently replaces the first. Give them separate
+  `path=` directories when you need both.
+
 Every output carries a per-row **`license_id`** column and is tagged
 `EPSG:4326`. The SDK returns a CRS-less frame, so the backend sets the CRS
 explicitly before writing.
@@ -131,13 +152,20 @@ earthlens datasets validate overture --live
 earthlens datasets probe overture building
 ```
 
-`No files found that match the pattern` from a DuckDB fetch means the
-release being globbed holds no objects. With a pinned `release` that means
-the pin has been pruned — drop the pin, or move it to a live id (the
-refresh above lists them). Unpinned, the release is resolved live, so it
-means the lookup could not reach `https://stac.overturemaps.org` and the
-backend fell back to the bundled index; the preceding `WARNING` in the log
-says so, and refreshing the index will not fix it.
+`No files found that match the pattern` from a DuckDB fetch means the release
+being globbed holds no objects on S3. It has more than one cause, and the log
+line just above it tells you which:
+
+- **A pinned release that has been pruned.** Drop the pin, or move it to one
+  Overture still publishes — the refresh above lists them. Most common.
+- **The live lookup failed and the backend fell back to the bundled index.**
+  A `WARNING` naming the bundled id precedes the error. This is a
+  reachability problem with `https://stac.overturemaps.org`, not an index
+  problem, so refreshing will not fix it.
+- **A theme/type that exists but is empty for that release** — rare, and the
+  bbox guard usually catches the mistake first.
+
+Refreshing the index is the right first move only for the first cause.
 
 ## Streaming vs in-memory reads
 

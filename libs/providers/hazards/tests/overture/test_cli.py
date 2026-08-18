@@ -47,12 +47,9 @@ class TestRefresher:
             lambda: (["2026-07-22.0", "2026-06-17.0"], "2026-07-22.0"),
         )
         assert overture_cli._release_ids() == ["2026-06-17.0", "2026-07-22.0"]
-        monkeypatch.setattr(
-            overture_cli, "_release_ids", lambda: ["2026-07-22.0", "2026-06-17.0"]
-        )
         assert overture_cli.refresher(None) == {
             "overture": ["2026-06-17.0", "2026-07-22.0"]
-        }
+        }, "the refresher reports what the lister found, already sorted"
 
     def test_release_ids_drop_unparsed_hrefs(self, monkeypatch):
         """Ids that are not shaped like a release never reach the index."""
@@ -106,13 +103,29 @@ class TestRefresher:
         with pytest.raises(ReleaseLookupError, match=r"offline fallback"):
             overture_cli._release_ids()
 
-    def test_release_ids_keep_latest_when_list_is_unusable(self, monkeypatch):
-        """The latest release still lands even when every listed id is junk."""
+    def test_release_ids_recover_when_the_sdk_lists_nothing(self, monkeypatch):
+        """An empty SDK list triggers recovery too, not just a malformed one."""
         import overturemaps.core as core
 
         monkeypatch.setattr(
             core, "get_available_releases", lambda: ([], "2026-07-22.0")
         )
+        monkeypatch.setattr(
+            "earthlens.overture.releases.child_release_ids",
+            lambda: ["2026-07-22.0", "2026-06-17.0"],
+        )
+        assert overture_cli._release_ids() == ["2026-06-17.0", "2026-07-22.0"], (
+            "a short list leaves the index as wrong as a mangled one"
+        )
+
+    def test_release_ids_keep_latest_when_recovery_finds_nothing(self, monkeypatch):
+        """The latest release still lands when recovery turns up empty."""
+        import overturemaps.core as core
+
+        monkeypatch.setattr(
+            core, "get_available_releases", lambda: ([], "2026-07-22.0")
+        )
+        monkeypatch.setattr("earthlens.overture.releases.child_release_ids", list)
         assert overture_cli._release_ids() == ["2026-07-22.0"]
 
     def test_release_ids_tolerate_a_bare_list(self, monkeypatch):
@@ -255,9 +268,16 @@ class TestValidator:
         assert any("fetch failed" in i for i in result.issues), "fetch failure reported"
 
     def test_live_reports_nothing_when_every_type_resolves(self, monkeypatch):
-        """A catalog whose types all serve sources yields no live issues."""
-        monkeypatch.setattr(overture_cli, "_live_sample", lambda t: (3, True))
+        """A clean live validation walks every curated theme and flags none."""
+        sampled: list[str] = []
+        monkeypatch.setattr(
+            overture_cli, "_live_sample", lambda t: (sampled.append(t), (3, True))[1]
+        )
         result = validate_one(_info(), live=True)
         assert not result.issues, (
             f"expected a clean live validation, got {result.issues}"
         )
+        catalog = load_catalog(_info())
+        assert sorted(sampled) == sorted(
+            getattr(r, "default_type", None) or k for k, r in catalog.datasets.items()
+        ), "every curated theme's default type should have been sampled"

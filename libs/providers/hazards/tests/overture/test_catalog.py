@@ -144,9 +144,13 @@ class TestCatalog:
         assert all(is_release_id(r) for r in releases), releases
 
     def test_latest_release_is_the_newest_indexed(self):
-        """`latest_release` returns the newest release the index carries."""
+        """`latest_release` returns the newest release the bundled index carries."""
         cat = Catalog()
-        assert cat.latest_release() == max(cat.available_releases)
+        newest = sorted(
+            cat.available_releases,
+            key=lambda r: (r.split(".")[0], int(r.split(".")[1])),
+        )[-1]
+        assert cat.latest_release() == newest
 
     def test_latest_release_none_when_index_empty(self):
         """`latest_release` is `None` when the index is explicitly empty."""

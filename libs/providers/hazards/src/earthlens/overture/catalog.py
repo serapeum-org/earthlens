@@ -447,15 +447,17 @@ class Catalog(AbstractCatalog):
                 True
 
                 ```
-            - Position in the index does not decide the winner:
+            - Position in the index does not decide the winner (these ids
+              are deliberately unlike the bundled ones, so the answer can
+              only have come from the list supplied here):
                 ```python
                 >>> from earthlens.overture import Catalog
                 >>> cat = Catalog(
                 ...     datasets={},
-                ...     available_releases=["2026-06-17.0", "2026-07-22.0"],
+                ...     available_releases=["2031-03-03.0", "2030-01-01.0"],
                 ... )
                 >>> cat.latest_release()
-                '2026-07-22.0'
+                '2031-03-03.0'
 
                 ```
 

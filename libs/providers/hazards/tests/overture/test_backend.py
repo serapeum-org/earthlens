@@ -30,6 +30,26 @@ def _make_backend(tmp_path: Path, **overrides) -> Overture:
     return Overture(**params)
 
 
+def _record_releases(seen: list, gdf):
+    """Build a `query_overture` stand-in that records each release it is given."""
+
+    def _query(theme, otype, release, *_args, **_kwargs):
+        seen.append(release)
+        return gdf
+
+    return _query
+
+
+def _record_query(seen: dict, gdf):
+    """Build a `query_overture` stand-in that records its call and returns `gdf`."""
+
+    def _query(theme, otype, release, bbox, **kwargs):
+        seen.update(theme=theme, otype=otype, release=release, bbox=bbox, **kwargs)
+        return gdf
+
+    return _query
+
+
 def _stac(monkeypatch, document: dict) -> None:
     """Serve `document` as Overture's STAC catalog for one test."""
     monkeypatch.setattr(
@@ -496,7 +516,7 @@ class TestDuckDBQueryPath:
         seen: dict = {}
         monkeypatch.setattr(
             "earthlens.overture.query.query_overture",
-            lambda *a, **k: seen.update(k) or make_gdf([PERMISSIVE_SOURCES]),
+            _record_query(seen, make_gdf([PERMISSIVE_SOURCES])),
         )
         backend = _make_backend(
             tmp_path,

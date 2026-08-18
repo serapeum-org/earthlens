@@ -64,29 +64,33 @@ def _release_ids() -> list[str]:
     )
 
     result = get_available_releases()
-    releases, latest = result if isinstance(result, tuple) else (result, None)
-    reported = {str(release) for release in releases}
+    if isinstance(result, tuple):
+        listed, latest = (list(result) + [None, None])[:2]
+    else:
+        listed, latest = result, None
+    reported = [str(release) for release in listed or []]
     if latest is not None:
-        reported.add(str(latest))
+        reported.append(str(latest))
     parsed = {ident for ident in reported if is_release_id(ident)}
-    # The SDK reports one child link per release, so fewer parsed ids than
-    # reported entries means its parser lost some — as it does today for
-    # every absolute href.
-    if len(parsed) < len(reported):
+    unparsed = [ident for ident in reported if not is_release_id(ident)]
+    # Recover whenever the SDK's own list is unusable — every id mangled, or
+    # no list at all. Either way `latest` alone would leave the index holding
+    # one of the several releases upstream publishes and call that clean.
+    if unparsed or not listed:
         try:
             recovered = {i for i in child_release_ids() if is_release_id(i)}
         except ReleaseLookupError as exc:
             logger.warning(
-                f"The overturemaps SDK reported {len(reported - parsed)} "
-                f"unparsed release id(s); could not recover them from the "
-                f"STAC catalog either ({exc})."
+                f"The overturemaps SDK reported {len(unparsed)} unparsed "
+                f"release id(s); could not recover them from the STAC "
+                f"catalog either ({exc})."
             )
         else:
             logger.warning(
-                f"The overturemaps SDK reported {len(reported - parsed)} "
-                f"unparsed release id(s) ({sorted(reported - parsed)}); "
-                f"recovered {len(recovered - parsed)} from the STAC "
-                "catalog's child links."
+                f"The overturemaps SDK reported {len(unparsed)} unparsed "
+                f"release id(s) ({sorted(set(unparsed))}); recovered "
+                f"{len(recovered - parsed)} from the STAC catalog's child "
+                "links."
             )
             parsed |= recovered
     if not parsed:
@@ -100,15 +104,19 @@ def _release_ids() -> list[str]:
 
 
 def refresher(_catalog: Any) -> dict[str, list[str]]:
-    """List every available Overture release via the `overturemaps` SDK.
+    """List every available Overture release.
+
+    Reads the `overturemaps` SDK, falling back to Overture's STAC catalog
+    directly for the ids the SDK cannot parse (see `_release_ids`).
 
     Args:
-        _catalog: The loaded Overture `Catalog` (unused; the SDK is the source).
+        _catalog: The loaded Overture `Catalog` (unused; upstream is the
+            source).
 
     Returns:
         A single-group mapping `{"overture": [sorted release ids]}`.
     """
-    return {"overture": sorted(set(_release_ids()))}
+    return {"overture": _release_ids()}
 
 
 def curated_ids(catalog: Any) -> list[str]:

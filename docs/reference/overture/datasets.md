@@ -15,7 +15,7 @@ cat = Catalog()
 cat.themes()                       # ['buildings', 'divisions', 'places', 'transportation']
 cat.get_theme("buildings").types   # ['building', 'building_part']
 cat.available_types()              # all 15 Overture types (curated + deferred)
-cat.available_releases             # ['2026-07-22.0']
+cat.available_releases             # ['2026-06-17.0', '2026-07-22.0']
 ```
 
 ## Curated vs available

@@ -209,10 +209,10 @@ class Overture(AbstractDataSource):
         if release is not None and not is_release_id(release):
             raise ValueError(
                 f"release must be an Overture release id, got {release!r}. "
-                "Ids are a release date plus an ordinal, e.g. "
-                "'2026-07-22.0'; list the known ones with "
-                "Catalog().available_releases. Leave it None to target "
-                "whatever Overture publishes now."
+                "Ids are a release date plus an ordinal (yyyy-mm-dd.n); "
+                "list the ones Overture publishes with "
+                "earthlens.overture.releases.child_release_ids(). Leave it "
+                "None to target whatever is published now."
             )
         self._release = release
         self._max_features = max_features
@@ -485,26 +485,28 @@ class Overture(AbstractDataSource):
         # lookup would otherwise read the first types from the bundled release
         # and the rest from the live one, so a single download() could mix two
         # snapshots. Offline callers also pay one connect attempt, not one per
-        # requested type — the SDK caches only successful lookups. It doubles
-        # as the branch flag below: it is set exactly when the DuckDB path is
-        # taken, which is the only path that needs a concrete id.
-        release = self._resolve_release() if (self._where or self._columns) else None
+        # requested type. Its name says what it is: the release the DuckDB
+        # path will glob, present exactly when that path is taken, which is
+        # the only path needing a concrete id.
+        duckdb_release = (
+            self._resolve_release() if (self._where or self._columns) else None
+        )
         for product in products:
             theme_name = product.metadata["theme_name"]
             overture_type = product.metadata["type"]
             label = product.id
-            if release is not None:
+            if duckdb_release is not None:
                 from earthlens.overture.query import query_overture
 
                 logger.info(
                     f"Querying Overture {overture_type!r} (theme {theme_name!r}) "
-                    f"via DuckDB for bbox {bbox} (release={release}, "
+                    f"via DuckDB for bbox {bbox} (release={duckdb_release}, "
                     f"where={self._where!r})"
                 )
                 gdf = query_overture(
                     theme_name,
                     overture_type,
-                    release,
+                    duckdb_release,
                     bbox,
                     where=self._where,
                     columns=self._columns,
@@ -533,7 +535,9 @@ class Overture(AbstractDataSource):
                     f"{label}: no features matched the bbox; nothing written."
                 )
                 continue
-            out_path = self._write(collection, theme_name, overture_type, release)
+            out_path = self._write(
+                collection, theme_name, overture_type, duckdb_release
+            )
             logger.info(f"{label}: wrote {len(collection)} feature(s) to {out_path}")
             written.append(out_path)
         return written
