@@ -170,8 +170,9 @@ class TestGDACSFetch:
         """A persistent 5xx surfaces as a typed GdacsUnavailableError."""
         fake_gdacs.set_status_error(requests.HTTPError("500 Server Error"))
         backend = _make_backend(tmp_path)
+        products = backend._search()
         with pytest.raises(GdacsUnavailableError) as excinfo:
-            backend._fetch(backend._search())
+            backend._fetch(products)
         assert excinfo.value.status_code == 500
 
     def test_persistent_400_becomes_unavailable(
@@ -185,16 +186,18 @@ class TestGDACSFetch:
         """
         fake_gdacs.set_status_error(requests.HTTPError("400 Client Error: Bad Request"))
         backend = _make_backend(tmp_path)
+        products = backend._search()
         with pytest.raises(GdacsUnavailableError) as excinfo:
-            backend._fetch(backend._search())
+            backend._fetch(products)
         assert excinfo.value.status_code == 400
 
     def test_non_service_error_propagates(self, tmp_path: Path, fake_gdacs: _FakeGdacs):
         """A genuine client error (404) fails hard instead of being masked."""
         fake_gdacs.set_status_error(requests.HTTPError("404 Client Error: Not Found"))
         backend = _make_backend(tmp_path)
+        products = backend._search()
         with pytest.raises(requests.HTTPError, match="404"):
-            backend._fetch(backend._search())
+            backend._fetch(products)
 
     def test_http_client_retries_configured(self, tmp_path: Path):
         """The SEARCH client retries the service-status family and transport errors."""
