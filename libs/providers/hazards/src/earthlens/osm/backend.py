@@ -624,8 +624,9 @@ class OSM(AbstractDataSource):
         Raises:
             ImportError: If `ohsome` is not installed (`earthlens[osm]`).
             OhsomeUnavailableError: If `api.ohsome.org` blocks/throttles the
-                request with a `403` (or a `429` outlasting the retries) — a
-                public-endpoint denial, not a credential error.
+                request with a `403` / `429`, or is unavailable with a `5xx`
+                outlasting the retries — a public-endpoint denial/outage, not a
+                credential error.
             OhsomeResponseError: If `api.ohsome.org` returns any other non-JSON
                 body (a rate-limit / maintenance / error page or a redirect).
             ValueError: If no `start` (and `time`) was supplied — ohsome
@@ -694,6 +695,9 @@ class OSM(AbstractDataSource):
 
         * a `403`, or a `429` that outlived the retries, becomes an
           `OhsomeUnavailableError` (a public-endpoint throttle/block);
+        * a `5xx` that outlived the retries becomes an `OhsomeUnavailableError`
+          too — a transient server-side outage; the SDK can otherwise die with a
+          raw `KeyError: 'message'` on a `5xx` body (`#790`);
         * any other non-JSON body — a rate-limit / maintenance / error page, an
           empty body, or a redirect to a landing page — becomes an
           `OhsomeResponseError` carrying the recovered evidence.
@@ -708,13 +712,14 @@ class OSM(AbstractDataSource):
 
         Raises:
             OhsomeUnavailableError: On a public-endpoint throttle/block (`403` /
-                `429`).
+                `429`) or a transient server-side outage (`5xx`).
             OhsomeResponseError: On any other non-JSON response body.
         """
         status = ohsome_http_status(exc)
         non_json = ohsome_response_is_non_json(exc)
         is_throttle = status in (403, 429)
-        if not is_throttle and not non_json:
+        is_server_error = status is not None and 500 <= status < 600
+        if not is_throttle and not is_server_error and not non_json:
             # A transport error (no status), or a genuine ohsome error already
             # served as readable JSON (including a JSON `401`) — nothing to add;
             # let the caller re-raise the original, as quietly as before.
@@ -761,7 +766,24 @@ class OSM(AbstractDataSource):
                 content_type=content_type,
                 body_preview=body_preview,
             ) from exc
-        # Not a throttle, so — given the guard above — the body was not JSON.
+        if is_server_error:
+            # A 5xx that outlived the retries — a server-side outage. The SDK can
+            # die with a raw `KeyError: 'message'` here (its error handler assumes
+            # a `"message"` field the 5xx body lacks, `#790`), so surface a clear
+            # service-unavailable error carrying the status instead.
+            raise OhsomeUnavailableError(
+                f"ohsome could not serve the elements/geometry request: HTTP "
+                f"{status_shown} after automatic retries. api.ohsome.org is a "
+                "public endpoint that load-sheds its compute-heavy extraction "
+                "path under load; this is a transient server-side outage, not a "
+                "problem with the request. Retry later, or check the ohsome "
+                "service status.",
+                status_code=status,
+                content_type=content_type,
+                body_preview=body_preview,
+            ) from exc
+        # Not a throttle or a server error, so — given the guard above — the body
+        # was not JSON.
         raise OhsomeResponseError(
             "ohsome returned a non-JSON response for the elements/geometry "
             f"request (HTTP {status_shown}, Content-Type {content_type!r}); "

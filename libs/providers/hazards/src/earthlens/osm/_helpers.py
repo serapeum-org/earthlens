@@ -102,12 +102,13 @@ class OhsomeResponseError(RuntimeError):
 class OhsomeUnavailableError(OhsomeResponseError):
     """The public ohsome endpoint refused a request with a retry-worthy status.
 
-    A specialisation of `OhsomeResponseError` for the throttle/block case: raised
-    when `api.ohsome.org` answers a `403` (its front proxy blocking / throttling
-    this client — the endpoint is public and keyless, so it is never a credential
-    problem) or a `429` that outlived the SDK's automatic retries. Carries the
-    HTTP `status_code` so a caller can tell a transient public-endpoint throttle
-    apart from a genuine request error and back off rather than fail hard.
+    A specialisation of `OhsomeResponseError` for the throttle / block / outage
+    case: raised when `api.ohsome.org` answers a `403` (its front proxy blocking
+    / throttling this client — the endpoint is public and keyless, so it is never
+    a credential problem), a `429`, or a `5xx` server-side outage that outlived
+    the SDK's automatic retries. Carries the HTTP `status_code` so a caller can
+    tell a transient public-endpoint unavailability apart from a genuine request
+    error and back off rather than fail hard.
     """
 
     def __init__(
