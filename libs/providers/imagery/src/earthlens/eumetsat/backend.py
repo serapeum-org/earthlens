@@ -335,14 +335,14 @@ class EUMETSAT(AbstractDataSource):
         bbox = eumdac_bbox(
             self.space.west, self.space.south, self.space.east, self.space.north
         )
-        # `end_date` parses to midnight, so a same-day request (start == end)
-        # would otherwise collapse to the zero-width instant 00:00:00 and match
-        # (almost) no products. Extend the end bound to the end of its calendar
-        # day so an inclusive `end` covers the whole day's products.
         dtstart = self.time.start_date
-        dtend = self.time.end_date.replace(
-            hour=23, minute=59, second=59, microsecond=999999
-        )
+        dtend = self.time.end_date
+        if (dtend.hour, dtend.minute, dtend.second, dtend.microsecond) == (0, 0, 0, 0):
+            # A date-only `end` parses to midnight, which would collapse a same-day request
+            # to a zero-width instant, so it means "through the end of that day". An `end`
+            # carrying a time of day means that instant: widening it would pull every later
+            # product of the day, which for a 10-minute full-disk cadence is tens of GB.
+            dtend = dtend.replace(hour=23, minute=59, second=59, microsecond=999999)
         products: list[RemoteProduct] = []
         for ds in self._datasets:
             collection = store.get_collection(ds.collection_id)
