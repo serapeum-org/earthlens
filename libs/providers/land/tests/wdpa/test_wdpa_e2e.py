@@ -2,7 +2,8 @@
 
 Hits the real Protected Planet v4 API, which requires a personal token, so
 it is gated behind the `e2e` marker and a skip on a missing `WDPA_TOKEN`. A
-default `pytest` run skips it.
+default `pytest` run skips it. Request a token at
+`https://api.protectedplanet.net/request`.
 
 Run with:
 
