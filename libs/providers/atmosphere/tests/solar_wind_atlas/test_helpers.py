@@ -6,7 +6,9 @@ import io
 import zipfile
 from pathlib import Path
 
+import numpy as np
 import pytest
+from pyramids.dataset import Dataset
 
 from earthlens.base import SpatialExtent
 from earthlens.solar_wind_atlas import _helpers
@@ -107,6 +109,44 @@ def test_download_zip_streams_once_then_caches(
     second = _helpers.download_zip(url, tmp_path)
     assert first == second == tmp_path / "World_GHI.zip"
     assert fake_get.calls == 1
+
+
+def _write_geotiff(path: Path, *, no_data_value: float | None) -> None:
+    """Write a 20x20 0.1-deg EPSG:4326 GeoTIFF for real windowed-crop tests."""
+    arr = np.arange(400, dtype="float32").reshape(20, 20)
+    Dataset.create_from_array(
+        arr,
+        top_left_corner=(0.0, 0.0),
+        cell_size=0.1,
+        epsg=4326,
+        no_data_value=no_data_value,
+    ).to_file(str(path))
+
+
+class TestReadPartToGeotiffReal:
+    """`read_part_to_geotiff` against a real (local) pyramids raster."""
+
+    def test_windowed_crop_carries_source_no_data(self, tmp_path: Path) -> None:
+        """A normal window writes a subset carrying the source's own no-data."""
+        src = tmp_path / "src.tif"
+        _write_geotiff(src, no_data_value=-32768.0)
+        out = tmp_path / "out.tif"
+        _helpers.read_part_to_geotiff(str(src), [0.2, -0.6, 0.6, -0.2], out)
+        result = Dataset.read_file(str(out))
+        assert result.rows > 0 and result.columns > 0, "a non-empty window is written"
+        assert result.rows < 20 and result.columns < 20, "only the AOI window read"
+        assert result.no_data_value[0] == -32768.0, "source no-data carried through"
+
+    def test_degenerate_point_yields_small_crop_not_raise(self, tmp_path: Path) -> None:
+        """A point AOI produces a small crop instead of raising (review H1)."""
+        src = tmp_path / "src.tif"
+        _write_geotiff(src, no_data_value=-9999.0)
+        out = tmp_path / "point.tif"
+        _helpers.read_part_to_geotiff(str(src), [0.35, -0.35, 0.35, -0.35], out)
+        result = Dataset.read_file(str(out))
+        assert 1 <= result.rows <= 2 and 1 <= result.columns <= 2, (
+            f"degenerate AOI should clamp small, got {result.rows}x{result.columns}"
+        )
 
 
 def test_download_cache_crop_downloads_then_windows(

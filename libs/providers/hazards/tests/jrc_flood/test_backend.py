@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from pyramids.dataset import Dataset
 
 from earthlens.jrc_flood import backend as backend_module
 from earthlens.jrc_flood.backend import JRCFlood
@@ -232,3 +233,54 @@ class TestFetch:
             backend.download()
         assert not (tmp_path / "efhm_RP100.part.tif").exists()
         assert not (tmp_path / "efhm_RP100.tif").exists()
+
+
+def _write_efhm_geotiff(path: Path) -> None:
+    """Write an EFHM-like 4326 GeoTIFF covering lon 4..6, lat 51..53."""
+    arr = np.arange(200 * 200, dtype="float32").reshape(200, 200)
+    Dataset.create_from_array(
+        arr,
+        top_left_corner=(4.0, 53.0),
+        cell_size=0.01,
+        epsg=4326,
+        no_data_value=-9999.0,
+    ).to_file(str(path))
+
+
+class TestFetchReal:
+    """`_fetch_one` against a real (local) pyramids raster — no fakes.
+
+    Pins the delegated crop(bbox=) contract (windowed read + real two-crop trim +
+    no-data) that the faked-`crop` tests cannot exercise.
+    """
+
+    def test_windowed_crop_writes_subset(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """A normal AOI writes one small cropped GeoTIFF carrying a no-data value."""
+        src = tmp_path / "efhm.tif"
+        _write_efhm_geotiff(src)
+        monkeypatch.setattr(backend_module, "efhm_url", lambda rp, **kw: str(src))
+        out = JRCFlood(
+            lat_lim=[51.8, 52.0],
+            lon_lim=[4.8, 5.0],
+            return_periods=[100],
+            path=tmp_path,
+        ).download()
+        assert out == [tmp_path / "efhm_RP100.tif"]
+        result = Dataset.read_file(str(out[0]))
+        assert result.rows < 200 and result.columns < 200, "only the AOI window read"
+        assert result.no_data_value[0] is not None, "output carries a no-data value"
+
+    def test_point_aoi_succeeds(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+        """A degenerate point AOI writes a small crop instead of raising (review H1)."""
+        src = tmp_path / "efhm.tif"
+        _write_efhm_geotiff(src)
+        monkeypatch.setattr(backend_module, "efhm_url", lambda rp, **kw: str(src))
+        out = JRCFlood(
+            lat_lim=[51.9, 51.9],
+            lon_lim=[4.9, 4.9],
+            return_periods=[100],
+            path=tmp_path,
+        ).download()
+        assert out[0].exists(), "a point AOI still writes a crop"

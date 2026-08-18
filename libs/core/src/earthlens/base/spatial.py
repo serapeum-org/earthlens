@@ -574,6 +574,13 @@ def crop_to_aoi(
     geometry = getattr(space, "geometry", None)
     if geometry is not None:
         return _crop_to_mask(dataset, geometry, touch=True)
+    # Widen a point / cell-edge bbox to one pixel so crop(bbox=) does not raise
+    # on the zero-width box (a point AOI still yields a 1x1 crop). A real
+    # `Dataset` always exposes `geotransform`; guard it so a bare test double
+    # without one still reaches the crop.
+    geo = getattr(dataset, "geotransform", None)
+    if geo is not None:
+        bbox = widen_degenerate_bbox(bbox, geo[1], geo[5])
     return dataset.crop(bbox=list(bbox), epsg=epsg, touch=touch)
 
 
