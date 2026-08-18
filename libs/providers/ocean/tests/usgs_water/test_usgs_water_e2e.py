@@ -56,7 +56,7 @@ def _recent_window() -> tuple[str, str]:
 
 @_offline_skip
 def test_daily_discharge_legacy(tmp_path: Path):
-    """A daily discharge pull at a known gauge returns a non-empty table."""
+    """A daily discharge pull has the right columns, or skips if the window is empty."""
     start, end = _recent_window()
     df = EarthLens(
         data_source="usgs-water",
@@ -78,7 +78,7 @@ def test_daily_discharge_legacy(tmp_path: Path):
 
 @_offline_skip
 def test_statistics_monthly_legacy(tmp_path: Path):
-    """A monthly statistics pull returns per-month summary rows."""
+    """A monthly statistics pull has a value column, or skips if the window is empty."""
     df = EarthLens(
         data_source="usgs-water",
         start="2020-01-01",
@@ -99,7 +99,7 @@ def test_statistics_monthly_legacy(tmp_path: Path):
 
 @_offline_skip
 def test_sites_discovery_legacy(tmp_path: Path):
-    """Site discovery over a small bbox returns at least one station."""
+    """Site discovery over a small bbox lists stations, or skips if none are returned."""
     df = EarthLens(
         data_source="usgs-water",
         start="2023-01-01",

@@ -1,10 +1,13 @@
 """Pure, stateless helpers for the bathymetry backend.
 
-No SDK and no network: these build the ERDDAP `griddap` subset URL the
-backend GETs, so they are unit-testable in isolation. The exact URL shape
-(`…/griddap/<id>.nc?<var>[(lat_lo):1:(lat_hi)][(lon_lo):1:(lon_hi)]`, no
-time axis — the DEMs are static) was pinned live in the A1 gate; see
-`planning/bathymetry/captures/bathymetry-sdk-facts.md`.
+No SDK and no network — every helper here is unit-testable in isolation. Two
+groups: the ERDDAP `griddap` subset-URL builders the backend GETs (the exact
+shape `…/griddap/<id>.nc?<var>[(lat_lo):1:(lat_hi)][(lon_lo):1:(lon_hi)]`, no
+time axis — the DEMs are static — was pinned live in the A1 gate; see
+`planning/bathymetry/captures/bathymetry-sdk-facts.md`), and the WCS
+service-failure classification the backend uses to tell a transient upstream
+outage from a real request error: `WcsServiceUnavailableError` and
+`is_wcs_service_failure`.
 """
 
 from __future__ import annotations
