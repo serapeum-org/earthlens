@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -26134,7 +26134,8 @@ parameter.</p>
 <span class="normal"><a href="#__codelineno-0-137">137</a></span>
 <span class="normal"><a href="#__codelineno-0-138">138</a></span>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span>
-<span class="normal"><a href="#__codelineno-0-140">140</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="k">class</span><span class="w"> </span><span class="nc">WdpaAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">WdpaCredentials</span><span class="p">]):</span>
+<span class="normal"><a href="#__codelineno-0-140">140</a></span>
+<span class="normal"><a href="#__codelineno-0-141">141</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="k">class</span><span class="w"> </span><span class="nc">WdpaAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">WdpaCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the Protected Planet API token (mandatory).</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a</span>
@@ -26164,37 +26165,38 @@ parameter.</p>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>    <span class="n">ENV_VARS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;WDPA_TOKEN&quot;</span><span class="p">,)</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a>    <span class="n">PROVIDER</span> <span class="o">=</span> <span class="s2">&quot;Protected Planet&quot;</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a>    <span class="n">CREDENTIAL_HINT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Request a token at </span><span class="si">{</span><span class="n">_TOKEN_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a>    <span class="n">AUTH_ERROR</span> <span class="o">=</span> <span class="n">AuthenticationError</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a>    <span class="c1">#: The resolved token, set by `_connect`; `None` until `configure` runs.</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a>    <span class="n">_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-115" name="__codelineno-0-115"></a>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_explicit_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the explicit `token` off the credentials, if any.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-118" name="__codelineno-0-118"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">token</span>
-<a id="__codelineno-0-119" name="__codelineno-0-119"></a>        <span class="k">return</span> <span class="n">token</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a>
-<a id="__codelineno-0-121" name="__codelineno-0-121"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credential</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the resolved token for the `token` property to read back.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="o">=</span> <span class="n">credential</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after :meth:`configure`.</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">            str: The Protected Planet API token string.</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">                resolved a token.</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>                <span class="s2">&quot;WdpaAuth.configure() has not run yet; no token resolved.&quot;</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>            <span class="p">)</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a>    <span class="n">CREDENTIAL_ARG</span> <span class="o">=</span> <span class="s2">&quot;token&quot;</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a>    <span class="n">CREDENTIAL_HINT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Request a token at </span><span class="si">{</span><span class="n">_TOKEN_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a>    <span class="n">AUTH_ERROR</span> <span class="o">=</span> <span class="n">AuthenticationError</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a>    <span class="c1">#: The resolved token, set by `_connect`; `None` until `configure` runs.</span>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a>    <span class="n">_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a>
+<a id="__codelineno-0-117" name="__codelineno-0-117"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_explicit_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the explicit `token` off the credentials, if any.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">token</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a>        <span class="k">return</span> <span class="n">token</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-121" name="__codelineno-0-121"></a>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credential</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the resolved token for the `token` property to read back.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="o">=</span> <span class="n">credential</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after :meth:`configure`.</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">            str: The Protected Planet API token string.</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">                resolved a token.</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a>                <span class="s2">&quot;WdpaAuth.configure() has not run yet; no token resolved.&quot;</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a>            <span class="p">)</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27943,7 +27945,8 @@ parameter.</p>
 <span class="normal"><a href="#__codelineno-0-137">137</a></span>
 <span class="normal"><a href="#__codelineno-0-138">138</a></span>
 <span class="normal"><a href="#__codelineno-0-139">139</a></span>
-<span class="normal"><a href="#__codelineno-0-140">140</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="k">class</span><span class="w"> </span><span class="nc">WdpaAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">WdpaCredentials</span><span class="p">]):</span>
+<span class="normal"><a href="#__codelineno-0-140">140</a></span>
+<span class="normal"><a href="#__codelineno-0-141">141</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="k">class</span><span class="w"> </span><span class="nc">WdpaAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">WdpaCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the Protected Planet API token (mandatory).</span>
 <a id="__codelineno-0-82" name="__codelineno-0-82"></a>
 <a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a</span>
@@ -27973,37 +27976,38 @@ parameter.</p>
 <a id="__codelineno-0-107" name="__codelineno-0-107"></a>
 <a id="__codelineno-0-108" name="__codelineno-0-108"></a>    <span class="n">ENV_VARS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;WDPA_TOKEN&quot;</span><span class="p">,)</span>
 <a id="__codelineno-0-109" name="__codelineno-0-109"></a>    <span class="n">PROVIDER</span> <span class="o">=</span> <span class="s2">&quot;Protected Planet&quot;</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a>    <span class="n">CREDENTIAL_HINT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Request a token at </span><span class="si">{</span><span class="n">_TOKEN_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a>    <span class="n">AUTH_ERROR</span> <span class="o">=</span> <span class="n">AuthenticationError</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a>    <span class="c1">#: The resolved token, set by `_connect`; `None` until `configure` runs.</span>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a>    <span class="n">_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-115" name="__codelineno-0-115"></a>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_explicit_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the explicit `token` off the credentials, if any.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-118" name="__codelineno-0-118"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">token</span>
-<a id="__codelineno-0-119" name="__codelineno-0-119"></a>        <span class="k">return</span> <span class="n">token</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a>
-<a id="__codelineno-0-121" name="__codelineno-0-121"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credential</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the resolved token for the `token` property to read back.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="o">=</span> <span class="n">credential</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after :meth:`configure`.</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">            str: The Protected Planet API token string.</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">                resolved a token.</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>                <span class="s2">&quot;WdpaAuth.configure() has not run yet; no token resolved.&quot;</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>            <span class="p">)</span>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a>    <span class="n">CREDENTIAL_ARG</span> <span class="o">=</span> <span class="s2">&quot;token&quot;</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a>    <span class="n">CREDENTIAL_HINT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Request a token at </span><span class="si">{</span><span class="n">_TOKEN_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a>    <span class="n">AUTH_ERROR</span> <span class="o">=</span> <span class="n">AuthenticationError</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a>    <span class="c1">#: The resolved token, set by `_connect`; `None` until `configure` runs.</span>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a>    <span class="n">_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a>
+<a id="__codelineno-0-117" name="__codelineno-0-117"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_explicit_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the explicit `token` off the credentials, if any.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">token</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a>        <span class="k">return</span> <span class="n">token</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-121" name="__codelineno-0-121"></a>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credential</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the resolved token for the `token` property to read back.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="o">=</span> <span class="n">credential</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after :meth:`configure`.</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">            str: The Protected Planet API token string.</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">                resolved a token.</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a>                <span class="s2">&quot;WdpaAuth.configure() has not run yet; no token resolved.&quot;</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a>            <span class="p">)</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span>
 </code></pre></div></td></tr></table></div>
               </details>
 

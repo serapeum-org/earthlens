@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -26055,7 +26055,8 @@ property for <code>_rest</code> to attach as the <code>Authorization: Bearer</co
 <span class="normal"><a href="#__codelineno-0-130">130</a></span>
 <span class="normal"><a href="#__codelineno-0-131">131</a></span>
 <span class="normal"><a href="#__codelineno-0-132">132</a></span>
-<span class="normal"><a href="#__codelineno-0-133">133</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="k">class</span><span class="w"> </span><span class="nc">IucnAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">IucnCredentials</span><span class="p">]):</span>
+<span class="normal"><a href="#__codelineno-0-133">133</a></span>
+<span class="normal"><a href="#__codelineno-0-134">134</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="k">class</span><span class="w"> </span><span class="nc">IucnAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">IucnCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the IUCN Red List v4 API token (mandatory).</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a</span>
@@ -26084,37 +26085,38 @@ property for <code>_rest</code> to attach as the <code>Authorization: Bearer</co
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a>    <span class="n">ENV_VARS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;IUCN_TOKEN&quot;</span><span class="p">,)</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="n">PROVIDER</span> <span class="o">=</span> <span class="s2">&quot;IUCN Red List&quot;</span>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">CREDENTIAL_HINT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Sign up for a free token at </span><span class="si">{</span><span class="n">_TOKEN_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">AUTH_ERROR</span> <span class="o">=</span> <span class="n">AuthenticationError</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a>    <span class="c1">#: The resolved token, set by `_connect`; `None` until `configure` runs.</span>
-<a id="__codelineno-0-107" name="__codelineno-0-107"></a>    <span class="n">_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_explicit_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the explicit `token` off the credentials, if any.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">token</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a>        <span class="k">return</span> <span class="n">token</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credential</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the resolved token for the `token` property to read back.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="o">=</span> <span class="n">credential</span>
-<a id="__codelineno-0-117" name="__codelineno-0-117"></a>
-<a id="__codelineno-0-118" name="__codelineno-0-118"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-119" name="__codelineno-0-119"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after :meth:`configure`.</span>
-<a id="__codelineno-0-121" name="__codelineno-0-121"></a>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">            str: The IUCN Red List v4 token string.</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">                resolved a token.</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>                <span class="s2">&quot;IucnAuth.configure() has not run yet; no token resolved.&quot;</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>            <span class="p">)</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">CREDENTIAL_ARG</span> <span class="o">=</span> <span class="s2">&quot;token&quot;</span>
+<a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">CREDENTIAL_HINT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Sign up for a free token at </span><span class="si">{</span><span class="n">_TOKEN_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">AUTH_ERROR</span> <span class="o">=</span> <span class="n">AuthenticationError</span>
+<a id="__codelineno-0-106" name="__codelineno-0-106"></a>
+<a id="__codelineno-0-107" name="__codelineno-0-107"></a>    <span class="c1">#: The resolved token, set by `_connect`; `None` until `configure` runs.</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a>    <span class="n">_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_explicit_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the explicit `token` off the credentials, if any.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">token</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a>        <span class="k">return</span> <span class="n">token</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credential</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the resolved token for the `token` property to read back.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-117" name="__codelineno-0-117"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="o">=</span> <span class="n">credential</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after :meth:`configure`.</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">            str: The IUCN Red List v4 token string.</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">                resolved a token.</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>                <span class="s2">&quot;IucnAuth.configure() has not run yet; no token resolved.&quot;</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>            <span class="p">)</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27777,7 +27779,8 @@ property for <code>_rest</code> to attach as the <code>Authorization: Bearer</co
 <span class="normal"><a href="#__codelineno-0-130">130</a></span>
 <span class="normal"><a href="#__codelineno-0-131">131</a></span>
 <span class="normal"><a href="#__codelineno-0-132">132</a></span>
-<span class="normal"><a href="#__codelineno-0-133">133</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="k">class</span><span class="w"> </span><span class="nc">IucnAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">IucnCredentials</span><span class="p">]):</span>
+<span class="normal"><a href="#__codelineno-0-133">133</a></span>
+<span class="normal"><a href="#__codelineno-0-134">134</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="k">class</span><span class="w"> </span><span class="nc">IucnAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">IucnCredentials</span><span class="p">]):</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the IUCN Red List v4 API token (mandatory).</span>
 <a id="__codelineno-0-76" name="__codelineno-0-76"></a>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a</span>
@@ -27806,37 +27809,38 @@ property for <code>_rest</code> to attach as the <code>Authorization: Bearer</co
 <a id="__codelineno-0-100" name="__codelineno-0-100"></a>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a>    <span class="n">ENV_VARS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;IUCN_TOKEN&quot;</span><span class="p">,)</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a>    <span class="n">PROVIDER</span> <span class="o">=</span> <span class="s2">&quot;IUCN Red List&quot;</span>
-<a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">CREDENTIAL_HINT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Sign up for a free token at </span><span class="si">{</span><span class="n">_TOKEN_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">AUTH_ERROR</span> <span class="o">=</span> <span class="n">AuthenticationError</span>
-<a id="__codelineno-0-105" name="__codelineno-0-105"></a>
-<a id="__codelineno-0-106" name="__codelineno-0-106"></a>    <span class="c1">#: The resolved token, set by `_connect`; `None` until `configure` runs.</span>
-<a id="__codelineno-0-107" name="__codelineno-0-107"></a>    <span class="n">_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-108" name="__codelineno-0-108"></a>
-<a id="__codelineno-0-109" name="__codelineno-0-109"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_explicit_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the explicit `token` off the credentials, if any.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-111" name="__codelineno-0-111"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">token</span>
-<a id="__codelineno-0-112" name="__codelineno-0-112"></a>        <span class="k">return</span> <span class="n">token</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-<a id="__codelineno-0-113" name="__codelineno-0-113"></a>
-<a id="__codelineno-0-114" name="__codelineno-0-114"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credential</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-115" name="__codelineno-0-115"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the resolved token for the `token` property to read back.&quot;&quot;&quot;</span>
-<a id="__codelineno-0-116" name="__codelineno-0-116"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="o">=</span> <span class="n">credential</span>
-<a id="__codelineno-0-117" name="__codelineno-0-117"></a>
-<a id="__codelineno-0-118" name="__codelineno-0-118"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-119" name="__codelineno-0-119"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after :meth:`configure`.</span>
-<a id="__codelineno-0-121" name="__codelineno-0-121"></a>
-<a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">            str: The IUCN Red List v4 token string.</span>
-<a id="__codelineno-0-124" name="__codelineno-0-124"></a>
-<a id="__codelineno-0-125" name="__codelineno-0-125"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
-<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">                resolved a token.</span>
-<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>                <span class="s2">&quot;IucnAuth.configure() has not run yet; no token resolved.&quot;</span>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a>            <span class="p">)</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span>
+<a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="n">CREDENTIAL_ARG</span> <span class="o">=</span> <span class="s2">&quot;token&quot;</span>
+<a id="__codelineno-0-104" name="__codelineno-0-104"></a>    <span class="n">CREDENTIAL_HINT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Sign up for a free token at </span><span class="si">{</span><span class="n">_TOKEN_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-105" name="__codelineno-0-105"></a>    <span class="n">AUTH_ERROR</span> <span class="o">=</span> <span class="n">AuthenticationError</span>
+<a id="__codelineno-0-106" name="__codelineno-0-106"></a>
+<a id="__codelineno-0-107" name="__codelineno-0-107"></a>    <span class="c1">#: The resolved token, set by `_connect`; `None` until `configure` runs.</span>
+<a id="__codelineno-0-108" name="__codelineno-0-108"></a>    <span class="n">_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-109" name="__codelineno-0-109"></a>
+<a id="__codelineno-0-110" name="__codelineno-0-110"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_explicit_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the explicit `token` off the credentials, if any.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-112" name="__codelineno-0-112"></a>        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">token</span>
+<a id="__codelineno-0-113" name="__codelineno-0-113"></a>        <span class="k">return</span> <span class="n">token</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-114" name="__codelineno-0-114"></a>
+<a id="__codelineno-0-115" name="__codelineno-0-115"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credential</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the resolved token for the `token` property to read back.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-117" name="__codelineno-0-117"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="o">=</span> <span class="n">credential</span>
+<a id="__codelineno-0-118" name="__codelineno-0-118"></a>
+<a id="__codelineno-0-119" name="__codelineno-0-119"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-120" name="__codelineno-0-120"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved token; valid only after :meth:`configure`.</span>
+<a id="__codelineno-0-122" name="__codelineno-0-122"></a>
+<a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-124" name="__codelineno-0-124"></a><span class="sd">            str: The IUCN Red List v4 token string.</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125"></a>
+<a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
+<a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">                resolved a token.</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>                <span class="s2">&quot;IucnAuth.configure() has not run yet; no token resolved.&quot;</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>            <span class="p">)</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
