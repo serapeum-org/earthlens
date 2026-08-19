@@ -36,7 +36,6 @@ dependencies = [
     "earthlens-core ==0.15.0",
     # Imported directly by earthlens.caravan for its cache directory, so it is
     # declared here rather than relied on transitively through core.
-    "platformdirs >=3.0.0",
 ]
 
 [project.optional-dependencies]

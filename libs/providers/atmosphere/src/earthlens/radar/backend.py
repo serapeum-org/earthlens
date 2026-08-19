@@ -215,7 +215,15 @@ class Radar(AbstractDataSource):
         return self._whole_window_extent(start, end, fmt=fmt, resolution="raw")
 
     def _window(self) -> tuple[dt.datetime, dt.datetime]:
-        """Return the inclusive scan-time window, extending `end` to its day end."""
+        """Return the inclusive scan-time window.
+
+        A date-only `end` covers its whole calendar day; an `end` that names a
+        time of day means that instant and is returned unchanged.
+
+        Returns:
+            tuple[datetime.datetime, datetime.datetime]: The inclusive
+                `(start, end)` scan-time bounds.
+        """
         # A date-only end (midnight) would exclude the whole day's volumes; an
         # end naming a time means that instant and is left alone.
         end = expand_bare_date_end(self.time.end_date, date_only=self._end_is_date_only)

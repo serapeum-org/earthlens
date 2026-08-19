@@ -650,12 +650,7 @@ class AbstractDataSource(ABC):
             GDIS row, and tropycal sets `"tabular"` for its
             `ships` product (else `"vector"`). The facade reads the
             instance attribute, so both forms work.
-        #: Whether the raw `end` bound named a whole calendar day rather than an
-    #: instant. Recorded by the backends that widen an inclusive `end`; see
-    #: `earthlens.base.end_is_date_only`.
-    _end_is_date_only: bool = False
-
-    REQUIRES_TIME_WINDOW: Whether this backend needs both `start` and
+        REQUIRES_TIME_WINDOW: Whether this backend needs both `start` and
             `end`. `True` (the default) makes :meth:`__init__` reject a
             missing bound up front with an actionable message, instead of
             letting the `None` reach the subclass's date parsing and surface
@@ -715,6 +710,13 @@ class AbstractDataSource(ABC):
     """
 
     OUTPUT_KIND: OutputKind = "raster"
+
+    #: Whether the raw `end` bound named a whole calendar day rather than an
+    #: instant. Recorded in `_check_input_dates` by the backends that widen an
+    #: inclusive `end`; see `earthlens.base.end_is_date_only`. The `False`
+    #: default is the conservative one: a backend that never records it does
+    #: not widen.
+    _end_is_date_only: bool = False
 
     REQUIRES_TIME_WINDOW: bool = True
 

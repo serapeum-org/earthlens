@@ -71,10 +71,6 @@ WIDE_WINDOW_HOURS = 720
 #: digit so `C02` is never confused with `C12` / `C20`.
 _CHANNEL_IN_NAME = re.compile(r"-M\dC(\d{2})_")
 
-#: Matches an ISO date/time `T` (or `t`) separator sitting **between two
-#: digits** (`2026-07-03T00`), so a bare date in a month-name format
-#: (`2026-Oct-03`) is not mistaken for a timed value.
-
 
 def enumerate_hours(start: dt.datetime, end: dt.datetime) -> list[dt.datetime]:
     """Enumerate the hour buckets spanning `[start, end]` inclusive.

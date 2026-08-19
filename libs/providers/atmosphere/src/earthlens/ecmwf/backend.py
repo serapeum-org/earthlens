@@ -482,8 +482,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             temporal_resolution: Either `"daily"` or `"monthly"`.
                 Defaults to `"daily"`.
             path: Output directory. Created by the parent if it does
-                not exist. Defaults to `""` (the current working
-                directory).
+                not exist. When omitted it falls back to the
+                configured earthlens output directory (`set_output_dir()` /
+                `EARTHLENS_DATA_DIR`); see `earthlens.config`.
             fmt: `strptime` format for `start` / `end`.
                 Defaults to `"%Y-%m-%d"`.
             skip_constraints: When `True`, every CDS pre-flight

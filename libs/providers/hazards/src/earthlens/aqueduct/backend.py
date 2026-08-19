@@ -17,7 +17,7 @@ admin-aggregated exposure table.
 Only the free **riverine** 2015 product is served here; `hazard="coastal"` (part
 of the 2020 Aqueduct Floods product, which is not freely downloadable) is
 rejected with a clear message. The downloaded zip is cached under `cache_dir`
-(default: a `_aqueduct_cache` folder under the output path), so repeated
+(default: `aqueduct/` under the shared earthlens cache directory), so repeated
 requests for the same admin level reuse it.
 """
 
@@ -39,7 +39,7 @@ from earthlens.base import (
     TemporalExtent,
 )
 from earthlens.base.http import HttpClient
-from earthlens.config import cache_dir
+from earthlens.config import cache_dir as _shared_cache_dir
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
@@ -119,8 +119,10 @@ class Aqueduct(AbstractDataSource):
                 unit. A narrower box filters the returned units.
             lon_lim: `[lon_min, lon_max]` bbox longitudes; `None` keeps all.
             temporal_resolution: Recorded as the resolution label only.
-            path: Output directory for the written vector file and, by default,
-                the download cache.
+            path: Output directory for the written vector file. When omitted it
+                falls back to the configured earthlens output directory
+                (`set_output_dir()` / `EARTHLENS_DATA_DIR`); see
+                `earthlens.config`.
             fmt: `strptime` format for `start` / `end`.
             admin_level: `"country"` (default), `"state"`, or `"basin"`.
             metric: `"gdp_affected"`, `"population_affected"` (default), or
@@ -142,7 +144,8 @@ class Aqueduct(AbstractDataSource):
             geometry: `True` (default) returns a `FeatureCollection`; `False`
                 returns a geometry-dropped `DataFrame` (`OUTPUT_KIND="tabular"`).
             cache_dir: Directory for the downloaded zip. Defaults to
-                `_aqueduct_cache` under `path`.
+                `aqueduct/` under the shared earthlens cache directory
+                (`set_cache_dir()` / `EARTHLENS_CACHE`), not under `path`.
             timeout: Per-request timeout in seconds for the download.
 
         Raises:
@@ -289,7 +292,7 @@ class Aqueduct(AbstractDataSource):
         request — which skips the GeoPackage write — leaves the output directory
         free of result files, with only the reusable cache subfolder alongside.
         """
-        return self._cache_dir or (cache_dir() / "aqueduct")
+        return self._cache_dir or (_shared_cache_dir() / "aqueduct")
 
     def _cached_zip(self, product: RemoteProduct) -> Path:
         """Return the local zip path, downloading it on a cache miss.

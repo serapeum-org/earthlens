@@ -116,7 +116,9 @@ class SolarWindAtlas(AbstractDataSource):
             path: Output directory for the written GeoTIFF(s).
             fmt: Accepted for facade parity; unused.
             cache_dir: Directory the Global Solar Atlas ZIP archives are cached
-                in. Defaults to `<path>/_cache/gsa`.
+                in. Defaults to `solar_wind_atlas/` under the shared earthlens
+                cache directory (`set_cache_dir()` / `EARTHLENS_CACHE`), not
+                under `path`.
             timeout: Per-request HTTP timeout (seconds) for a solar ZIP download.
             catalog: Optional pre-built `Catalog` (tests inject a faked one);
                 defaults to the bundled catalog.

@@ -148,8 +148,9 @@ class CMEMS(AbstractDataSource):
                 catalog rows declare). An unrecognised value raises `ValueError`
                 listing the accepted spellings.
             path: Output directory. Created by the parent class if
-                it does not exist. Defaults to the current working
-                directory.
+                it does not exist. When omitted it falls back to the
+                configured earthlens output directory (`set_output_dir()` /
+                `EARTHLENS_DATA_DIR`); see `earthlens.config`.
             fmt: `strptime` format for `start` / `end`. Defaults
                 to `"%Y-%m-%d"`.
             service_username: Copernicus Marine portal username.

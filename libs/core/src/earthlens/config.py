@@ -163,8 +163,10 @@ def resolve_output_path(path: str | os.PathLike[str] | None) -> Path:
     Args:
         path: The backend's `path=` argument. `None` means "not given" and
             falls back to `output_dir()`. Any other value is a directory;
-            surrounding whitespace is stripped, and an empty result means the
-            current working directory.
+            surrounding whitespace is stripped, `~` is expanded, and an empty
+            result means the current working directory. The path is made
+            absolute rather than resolved, so a mapped drive or a junction the
+            caller typed is handed back as typed.
 
     Returns:
         The absolute output directory. It is not created here.
@@ -196,7 +198,7 @@ def resolve_output_path(path: str | os.PathLike[str] | None) -> Path:
     """
     if path is None:
         return output_dir()
-    return Path(str(path).strip() or ".").absolute()
+    return Path(str(path).strip() or ".").expanduser().absolute()
 
 
 def set_cache_dir(path: str | os.PathLike[str] | None) -> None:

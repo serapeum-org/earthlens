@@ -176,6 +176,17 @@ class TestCacheDirResolution:
         assert not target.exists()
 
 
+class TestEndGranularityDefault:
+    """The inclusive-end flag has a safe class default."""
+
+    def test_class_default_is_false(self):
+        """A backend that never records the flag does not widen its end bound."""
+        assert AbstractDataSource._end_is_date_only is False, (
+            "the conservative default must exist on the class, not only on "
+            "instances that ran _check_input_dates"
+        )
+
+
 class TestBackendUsesOutputDir:
     """A backend built without path= falls back to the configured output dir."""
 

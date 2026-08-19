@@ -39,7 +39,7 @@ from earthlens.base import (
 from earthlens.base.http import HttpClient
 from earthlens.catrare import _helpers
 from earthlens.catrare.catalog import Catalog
-from earthlens.config import cache_dir
+from earthlens.config import cache_dir as _shared_cache_dir
 
 if TYPE_CHECKING:
     from pyramids.feature.collection import FeatureCollection
@@ -105,8 +105,10 @@ class CatRaRE(AbstractDataSource):
                 event. A narrower box filters the returned events.
             lon_lim: `[lon_min, lon_max]` bbox longitudes; `None` keeps all.
             temporal_resolution: Recorded as the resolution label only.
-            path: Output directory for the written vector file and, by default,
-                the download cache.
+            path: Output directory for the written vector file. When omitted it
+                falls back to the configured earthlens output directory
+                (`set_output_dir()` / `EARTHLENS_DATA_DIR`); see
+                `earthlens.config`.
             fmt: `strptime` format for `start` / `end`.
             threshold: Which CatRaRE selection to fetch — `"t5"` (return period
                 >= 5 yr) or `"w3"` (severity-weighted).
@@ -116,7 +118,8 @@ class CatRaRE(AbstractDataSource):
             geometry: `True` (default) returns a `FeatureCollection`; `False`
                 returns a geometry-dropped `DataFrame` (`OUTPUT_KIND="tabular"`).
             cache_dir: Directory for the downloaded FileGDB. Defaults to
-                `_catrare_cache` under `path`.
+                `catrare/` under the shared earthlens cache directory
+                (`set_cache_dir()` / `EARTHLENS_CACHE`), not under `path`.
             timeout: Per-request timeout in seconds for the download.
 
         Raises:
@@ -237,7 +240,7 @@ class CatRaRE(AbstractDataSource):
         `root_dir`, so a `geometry=False` request — which skips the GeoPackage
         write — leaves the output directory free of result files.
         """
-        return self._cache_dir or (cache_dir() / "catrare")
+        return self._cache_dir or (_shared_cache_dir() / "catrare")
 
     def _cached_gdb(self, product: RemoteProduct) -> Path:
         """Return the local FileGDB zip path, downloading it on a cache miss.

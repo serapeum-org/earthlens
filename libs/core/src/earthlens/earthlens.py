@@ -1660,7 +1660,7 @@ class EarthLens:
 
         Called by :meth:`load` when `path` was omitted: `load` only needs the
         in-memory object, so the incidental files go to a fresh temp directory
-        instead of the persistent `./earthlens-data/<source>/` default, and a
+        instead of the persistent `<output_dir()>/<source>/` default, and a
         load-and-plot run never leaves files in the working tree. Creating the
         temp dir here (not at construction) means a construct-only or
         download-only run allocates no temp directory.
@@ -1747,7 +1747,7 @@ class EarthLens:
         to `path` — `load` adds the in-memory handle on top.
 
         When `path` was omitted, `load` writes to a throwaway temp directory
-        (not the persistent `./earthlens-data/<source>/` that `download` uses),
+        (not the persistent `<output_dir()>/<source>/` that `download` uses),
         so a load-and-plot run never leaves files in the working tree — there is
         no need to pass `path=tempfile.mkdtemp()` yourself. Each returned raster
         is detached into an in-memory copy and the temp directory is removed
@@ -1833,7 +1833,8 @@ def download(
             single date) — the ergonomic alternative to `start` / `end`;
             mutually exclusive with them.
         path: Output directory; defaults to
-            `./earthlens-data/<data_source>/` when omitted.
+            `<output_dir()>/<data_source>/` when omitted — the directory
+            configured by `set_output_dir()` / `EARTHLENS_DATA_DIR`.
         lat_lim: Legacy `[lat_min, lat_max]` pair — prefer `aoi=` (mutually
             exclusive with it).
         lon_lim: Legacy `[lon_min, lon_max]` pair — prefer `aoi=` (mutually
