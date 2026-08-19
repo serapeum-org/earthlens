@@ -60,7 +60,6 @@ theme:
 exclude_docs: |
   examples/*/out/
   examples/*/data/
-  examples/*/earthlens-data/
   examples/*/_nb_out/
   examples/*/_overture_out/
   examples/*/*_out/
@@ -166,6 +165,7 @@ nav:
     - Architecture: overview/architecture.md
     - Temporal aggregation: aggregation.md
     - Command-line interface: reference/cli.md
+    - Configuration: reference/configuration.md
     - Troubleshooting: troubleshooting.md
     - Migration guide: migration.md
     - Contributing: contributing.md

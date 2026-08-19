@@ -2151,7 +2151,9 @@ notebook = [
     { name = "python-dotenv" },
 ]
 notebooks = [
+    { name = "imageio-ffmpeg" },
     { name = "pyresample" },
+    { name = "pyspectral" },
     { name = "satpy" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
     { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -2282,7 +2284,9 @@ notebook = [
     { name = "python-dotenv", specifier = ">=1.0" },
 ]
 notebooks = [
+    { name = "imageio-ffmpeg", specifier = ">=0.5" },
     { name = "pyresample", specifier = ">=1.28" },
+    { name = "pyspectral", specifier = ">=0.13" },
     { name = "satpy", specifier = ">=0.55" },
     { name = "scipy", specifier = ">=1.11" },
 ]
@@ -2557,7 +2561,6 @@ version = "0.15.0"
 source = { editable = "libs/providers/ocean" }
 dependencies = [
     { name = "earthlens-core" },
-    { name = "platformdirs" },
 ]
 
 [package.optional-dependencies]
@@ -2589,7 +2592,6 @@ requires-dist = [
     { name = "earthlens-core", editable = "libs/core" },
     { name = "earthlens-core", extras = ["s3"], marker = "extra == 'nwm'", editable = "libs/core" },
     { name = "erddapy", marker = "extra == 'erddap'", specifier = ">=3.0" },
-    { name = "platformdirs", specifier = ">=3.0.0" },
     { name = "pyobis", marker = "extra == 'obis'", specifier = ">=1.6.1" },
     { name = "pyramids-gis", extras = ["parquet"], marker = "extra == 'nwm'", specifier = ">=0.53.0" },
 ]
@@ -7362,6 +7364,23 @@ wheels = [
 ]
 
 [[package]]
+name = "pyspectral"
+version = "0.14.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "h5py" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "platformdirs" },
+    { name = "python-geotiepoints" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/63/ac/91edf5a3dac26d9a071ed2419767fa3769f84121bff2330c511f3c244fd6/pyspectral-0.14.3.tar.gz", hash = "sha256:b3c519d16ebb63b0dab96ad49ef67429415e97ec8890c6665769464402ba87a8", size = 3909791, upload-time = "2026-04-02T14:59:37.355Z" }
+
+[[package]]
 name = "pystac"
 version = "1.15.1"
 source = { registry = "https://pypi.org/simple" }
@@ -7766,6 +7785,63 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/82/ed/0301aeeac3e5353ef3d94b6ec08bbcabd04a72018415dcb29e588514bba8/python_dotenv-1.2.2.tar.gz", hash = "sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3", size = 50135, upload-time = "2026-03-01T16:00:26.196Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0b/d7/1959b9648791274998a9c3526f6d0ec8fd2233e4d4acce81bbae76b44b2a/python_dotenv-1.2.2-py3-none-any.whl", hash = "sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a", size = 22101, upload-time = "2026-03-01T16:00:25.09Z" },
+]
+
+[[package]]
+name = "python-geotiepoints"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "pandas" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d7/1b/29472ee3c869bc4defb13e78e355448515d49ee34f684a471b4a4f3fa6bc/python_geotiepoints-1.9.0.tar.gz", hash = "sha256:0a7c8690f25f951e97b841f1e95ca4f437f35b08da8c2d8c535e24249e9aeafc", size = 7665794, upload-time = "2026-02-03T17:36:55.328Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/60/db/ec87e362d648a98150f92c49778f278d54192bb6b3f55cd163a03218eff1/python_geotiepoints-1.9.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:59907ab0b973ebbfc981cbff23ccc7fbf0d14193e3d04763caba88cafccfe757", size = 478437, upload-time = "2026-02-03T17:35:53.663Z" },
+    { url = "https://files.pythonhosted.org/packages/f6/0b/b5346c3802c9972adb8981a57d7573639c1346359dee399891b47a0ed59d/python_geotiepoints-1.9.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:56a251a3f042d5613c07f63386559c36ac1855a42d1e5c8a0e90d59bc890c1a7", size = 429825, upload-time = "2026-02-03T17:35:55.084Z" },
+    { url = "https://files.pythonhosted.org/packages/ae/5d/c82601d67308d21d031efe896c76afeaed7791c1235a742d9ab1b0f45a9a/python_geotiepoints-1.9.0-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:e02be449ffc24e8b91c6958bf2c8f2e0cf01de71c927891a7b264194e959a657", size = 2891212, upload-time = "2026-02-03T17:35:56.278Z" },
+    { url = "https://files.pythonhosted.org/packages/f6/98/0913e8187fb54ccce4e94cdf3cb1888b2eb499fcae94aed218b14fb76b65/python_geotiepoints-1.9.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c90426f7ff8b5bae4a877a71d3f9edfbcefb265fdbc624190862860f4161dc74", size = 2974571, upload-time = "2026-02-03T17:35:57.966Z" },
+    { url = "https://files.pythonhosted.org/packages/32/7f/25805402f492e16fe9d9c148200ed7c55c80e6d7253d10b91542317586eb/python_geotiepoints-1.9.0-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:16d526b232adf17264933803da2be328624539396171ec9785404e599ab3a978", size = 2989594, upload-time = "2026-02-03T17:35:59.319Z" },
+    { url = "https://files.pythonhosted.org/packages/a6/d8/8399a3aca6a5bde3d0baaaaba6df2260a1b1af2dc0140e2530093c35365e/python_geotiepoints-1.9.0-cp311-cp311-win_amd64.whl", hash = "sha256:f1303f436af564f9a90e528d275729e517201f56020ab7f94e3632693207b860", size = 414156, upload-time = "2026-02-03T17:36:00.612Z" },
+    { url = "https://files.pythonhosted.org/packages/4a/6f/df9e58653579970bb3148d5a1d9419fab235d8b5237fee710c6a4c1452bf/python_geotiepoints-1.9.0-cp311-cp311-win_arm64.whl", hash = "sha256:191949a44e9f04608ff0b2e790a08017a3ee99cd6e85d11724e6ab511089c73a", size = 345170, upload-time = "2026-02-03T17:36:01.724Z" },
+    { url = "https://files.pythonhosted.org/packages/73/42/c8ea2f605114527290bb4f055682e02f1db8cbca3a67f1f616448cf57d50/python_geotiepoints-1.9.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:72febd502c214a1626ee1bc4bde38a137294f5e933e5252d0b95c4fe4af2dbd1", size = 480652, upload-time = "2026-02-03T17:36:02.858Z" },
+    { url = "https://files.pythonhosted.org/packages/8c/2f/1413f917af72d06184d4928ef748ac398f1861369ef71ab7b21981abfe66/python_geotiepoints-1.9.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:5a47b78a667d61cf5d534b8fc7b63ed4c12649d77d0e161d4d7b96dcae22acbd", size = 429421, upload-time = "2026-02-03T17:36:03.99Z" },
+    { url = "https://files.pythonhosted.org/packages/14/d6/0004da72869d067af41a6aa0c0e72433133274882a19e68da8c622ad26ee/python_geotiepoints-1.9.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:d75232b418c82e0a4dda77e6ab5e32ec1f2b07ad7b5464d0aac5029dd193953a", size = 2862890, upload-time = "2026-02-03T17:36:05.339Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/23/bd81981e38108fe2106c6099591e6258865a404fd31f3df4fe8a2ae38351/python_geotiepoints-1.9.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:cf6a38e998178d9c8b92d7d940fd549d39cafbcbe3b49d89ae010deef2784105", size = 2959640, upload-time = "2026-02-03T17:36:06.719Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/6f/edfe00dd6dcf5b8bce13bd5c2701644e3caf13b72132d0e6af5b290f3257/python_geotiepoints-1.9.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:231e69108a73cec420435e2f10b462560a5d4abf15496646122c4659be7467f3", size = 2954421, upload-time = "2026-02-03T17:36:08.444Z" },
+    { url = "https://files.pythonhosted.org/packages/03/54/95e0230db16db0043b2bcc204e43d151721cc646c5afbc5db2b5b61896e4/python_geotiepoints-1.9.0-cp312-cp312-win_amd64.whl", hash = "sha256:061c5b699cdaed432942539764ffb67645f5b518f50b93e766114fbc829b0f4b", size = 413301, upload-time = "2026-02-03T17:36:09.738Z" },
+    { url = "https://files.pythonhosted.org/packages/f6/30/f9c57f035ac25fc15c8b1017700d0bc32111223e32f036decd2b40c7532d/python_geotiepoints-1.9.0-cp312-cp312-win_arm64.whl", hash = "sha256:085968f4c2d5a290605cd4bd23e27297d9ac9f2232630c8883506d3268e64d4a", size = 340947, upload-time = "2026-02-03T17:36:11.059Z" },
+    { url = "https://files.pythonhosted.org/packages/27/19/188829b64855e26cbeec2252fb4411e898db3c50dcba247ba4959df52fb5/python_geotiepoints-1.9.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:d39f7efe18d1bbae3be9e2ecfabd2321f17ec340274a5d0fb35ad9d7ba6d7054", size = 477983, upload-time = "2026-02-03T17:36:12.187Z" },
+    { url = "https://files.pythonhosted.org/packages/45/f2/6639ee835e1b89ce019d9bd983d5c263f4661ceee8c413cd4ff6bd930545/python_geotiepoints-1.9.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:0017b0fcc26d9c7d96af517052071397bd3635c148db46d2f875254ed0d9dda6", size = 426797, upload-time = "2026-02-03T17:36:13.549Z" },
+    { url = "https://files.pythonhosted.org/packages/39/de/f67a91e0a7bed19a7db58059555f1fa467b0bd7d583120ffc01b49830c57/python_geotiepoints-1.9.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:80a9eb8f8d5d5fc0cb2127934df57b22f32d74f4a59255dcda3e285cc38390d8", size = 2836211, upload-time = "2026-02-03T17:36:14.833Z" },
+    { url = "https://files.pythonhosted.org/packages/1c/d1/8b054aecd141631e798b1a067e78e6a7aac34bf5da6a59994cf400d7f085/python_geotiepoints-1.9.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:3321688d4933fd40a83d416176da7504cba1096fa73584c58253a36cec26e623", size = 2934654, upload-time = "2026-02-03T17:36:16.318Z" },
+    { url = "https://files.pythonhosted.org/packages/a6/89/8793396c96c1e07de51e3dd20a1b63082d55f934d74c68f7731ee0c1a713/python_geotiepoints-1.9.0-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:6f406d36bcebcb5162bfa49a69f05c96d2980e8a13337a02fd106b98ec4511ec", size = 2933427, upload-time = "2026-02-03T17:36:17.802Z" },
+    { url = "https://files.pythonhosted.org/packages/64/eb/fc0c2e286f600a9c356eb46804a1c36ca9736108a07a1094a490a7ec9529/python_geotiepoints-1.9.0-cp313-cp313-win_amd64.whl", hash = "sha256:6d3623b6de177923ef2496fcba8f51dd2a16dd958fcbd4bbb6406b759a73556e", size = 412424, upload-time = "2026-02-03T17:36:20.476Z" },
+    { url = "https://files.pythonhosted.org/packages/25/eb/5d8e7f2f649b9ae484e427ff562b6ffcf869bccb7f05dcd53747bc3718a0/python_geotiepoints-1.9.0-cp313-cp313-win_arm64.whl", hash = "sha256:cd1ad4c073ac6aad4157f0198e2ab91c34ce93ea7b9bf96feba0c0d72726b388", size = 340310, upload-time = "2026-02-03T17:36:21.717Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/11/8c6daf4c1fbf78b389b3f154970a0491a2350c1ed03599835eea22a9912f/python_geotiepoints-1.9.0-cp313-cp313t-macosx_10_13_x86_64.whl", hash = "sha256:bda09b2361be1490c6ffa2041eab79281651403cb7da666782e20539f1a6836c", size = 504449, upload-time = "2026-02-03T17:36:23.321Z" },
+    { url = "https://files.pythonhosted.org/packages/6d/7f/938f1ffc8942f9c2e30594231d190769bc43de12c16cf2ef198cdc46f602/python_geotiepoints-1.9.0-cp313-cp313t-macosx_11_0_arm64.whl", hash = "sha256:cd977a3183da8a26a7cf4898cfa5e5a32d3f57ef8216f5ac9af0ae767c2599e9", size = 465509, upload-time = "2026-02-03T17:36:24.575Z" },
+    { url = "https://files.pythonhosted.org/packages/53/5a/eb0fe89b2149728f7cddb7ff0321cd4cec5064fe2cb9870bca47bcf78b3d/python_geotiepoints-1.9.0-cp313-cp313t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:ecfc94d4f494decde67ce4fd83683065e5a8619746d405738dc3f1e0e55eeef4", size = 2962604, upload-time = "2026-02-03T17:36:26.603Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/79/93c6bc89af9b0ab8a67d342c30f237179e295bf1d7fe63945f3236e95d41/python_geotiepoints-1.9.0-cp313-cp313t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1caf2039f25f76f37ad4028b7e71855631beac89239a89fa6fb89c447765a366", size = 2936219, upload-time = "2026-02-03T17:36:27.918Z" },
+    { url = "https://files.pythonhosted.org/packages/63/2d/b66c72c2a056a62c7064a929d3d906102bd564adea15b718fcacdaa8ce7d/python_geotiepoints-1.9.0-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:cd797bb960e105d95a0ac934ee9c5623986cf58c472e8b0f0ea0efe75194cf41", size = 2908668, upload-time = "2026-02-03T17:36:29.181Z" },
+    { url = "https://files.pythonhosted.org/packages/21/64/2aa8c1101d2b872f6f7a69731f0fa155bce63d55ab945696b21223b9e909/python_geotiepoints-1.9.0-cp313-cp313t-win_amd64.whl", hash = "sha256:c3f0ff0be59227143f24531de35f60ad78ae4413c71b5f205dec6573938849a0", size = 470970, upload-time = "2026-02-03T17:36:30.64Z" },
+    { url = "https://files.pythonhosted.org/packages/1f/1e/b17e521f1df90fdc0e6fa75526299cafda8cb5326f5afc8ebfc18a5bd2d5/python_geotiepoints-1.9.0-cp313-cp313t-win_arm64.whl", hash = "sha256:dc18858727dbf8f436bce9999e6ea7c4fafe0d5e7f8c44e91a498a2e04fc0fd6", size = 367516, upload-time = "2026-02-03T17:36:32.723Z" },
+    { url = "https://files.pythonhosted.org/packages/cf/42/49d47f60f95546c735432b956ad483918148d14b9191789b33b62e2db781/python_geotiepoints-1.9.0-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:e3b3bd4d32b9b7e9d6a75b5f924687946aeb9d1085f3a0b932189301c8586f00", size = 480052, upload-time = "2026-02-03T17:36:33.895Z" },
+    { url = "https://files.pythonhosted.org/packages/44/46/ec73a1a63182360239803aebfe28894ae8578c7738caafa87b3a03389fdf/python_geotiepoints-1.9.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:0c7cab0711a37539f90b3b4b4cccb18d5a67b5bb93b682dfe71ef3c32bb4e2d3", size = 429453, upload-time = "2026-02-03T17:36:35.587Z" },
+    { url = "https://files.pythonhosted.org/packages/87/81/bfd245fe25596a6cccc1ffa27a614ca119c383e436f113bda6d0ed67bafa/python_geotiepoints-1.9.0-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:1821f90429786df34ae5fa11d3195b0156ece4037c13582f643d4f933577cf00", size = 2829829, upload-time = "2026-02-03T17:36:36.911Z" },
+    { url = "https://files.pythonhosted.org/packages/57/2e/d634bae57aea220b25375331c7bf165ec85680c43805c193a46203a2743f/python_geotiepoints-1.9.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:85068a1ab007126b51063d7e63611e6c93ee43badc0a7f8b30be7064195e2aa4", size = 2907786, upload-time = "2026-02-03T17:36:38.709Z" },
+    { url = "https://files.pythonhosted.org/packages/a6/ff/1edcb7bd1503cb7796282e78301ea040cb0c39280c1c67df6ad39e2bac95/python_geotiepoints-1.9.0-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:ffec121c52e3ffc10b9a2e8b6fc06ba0de774c96d4d665dd9ff44cb8ebd89fcb", size = 2908495, upload-time = "2026-02-03T17:36:40.147Z" },
+    { url = "https://files.pythonhosted.org/packages/1f/6c/338dd10a933044f0fa64f885daa19a1b0dcb039cc03ac344df87435deca4/python_geotiepoints-1.9.0-cp314-cp314-win_amd64.whl", hash = "sha256:ad918c6a4e62f0cf8ada615a58c6b2a109d1050b31dde74bc834e746ebd25805", size = 423880, upload-time = "2026-02-03T17:36:41.362Z" },
+    { url = "https://files.pythonhosted.org/packages/67/80/d384a35958a455c4696d3576f67efdab2bb91c6a7fb43e975043cea461a0/python_geotiepoints-1.9.0-cp314-cp314-win_arm64.whl", hash = "sha256:938ccce92075c29d4eec95114df5851adee27764e1c9033f3f6745025c71d21d", size = 353952, upload-time = "2026-02-03T17:36:42.611Z" },
+    { url = "https://files.pythonhosted.org/packages/db/ed/3a65fbfe9fde6556a90a8a45af55c5eb023b4540486adab9e92305f81961/python_geotiepoints-1.9.0-cp314-cp314t-macosx_10_15_x86_64.whl", hash = "sha256:0c1ae5ebfc29c40756e7de5d393faad2a89b6f2abf4d3272324513899db84976", size = 506396, upload-time = "2026-02-03T17:36:45.562Z" },
+    { url = "https://files.pythonhosted.org/packages/cd/48/f98f943f5e11b55e0a78ac4e652f0f831a62b79e1e74f15ac4637d497d02/python_geotiepoints-1.9.0-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:9734f83b6b23306393822817230220c49819f698c75ac250f7077cb2cf4ac018", size = 466697, upload-time = "2026-02-03T17:36:46.749Z" },
+    { url = "https://files.pythonhosted.org/packages/b6/b2/5289c8b6752fc91982e0fdec78fa03a5806bf2e30edcbf33d501f66c5a6f/python_geotiepoints-1.9.0-cp314-cp314t-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:2aca2d81d7c1c226a3b71cf47ea749547f612b32676d7546ac2f859c51fdf885", size = 2957934, upload-time = "2026-02-03T17:36:48.166Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/7d/1644a9c47147d08fc6888554fa70514a694d8867bd293ae888ffd45d4b25/python_geotiepoints-1.9.0-cp314-cp314t-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b6fb13608d413339148bdaaa01aa9e85fb840be3fe2efcd38bfe5580d525e1ba", size = 2937243, upload-time = "2026-02-03T17:36:50.141Z" },
+    { url = "https://files.pythonhosted.org/packages/36/a1/743d1e175e06d2aab078972e0ffef92d22fc738491cd4b46a2ad1538adf9/python_geotiepoints-1.9.0-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:f17c3e99bba54980ef1dc5af095a634e321ed0d10128aa8387a32eb58a5b9eac", size = 2919213, upload-time = "2026-02-03T17:36:51.582Z" },
+    { url = "https://files.pythonhosted.org/packages/18/0a/d94484a219fc5ff6fad524c70dcfbd77eba75e0523ae24dc3c78db59a8ab/python_geotiepoints-1.9.0-cp314-cp314t-win_amd64.whl", hash = "sha256:f37e4c66850a983d25cc70ff751fd68846c4f6f553bab68a79c8a3471b950cbd", size = 497435, upload-time = "2026-02-03T17:36:52.833Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/44/2dda8197f5853cee87a4b4d6e9ed8ba9139c5ecdeb8da1fc7bc0da6c7cea/python_geotiepoints-1.9.0-cp314-cp314t-win_arm64.whl", hash = "sha256:76ceda93a603850527d651866d4c0307a1b3c35f5f0db56b55b8e3c17338dc5d", size = 378544, upload-time = "2026-02-03T17:36:53.966Z" },
 ]
 
 [[package]]
