@@ -412,6 +412,18 @@ class TestInit:
         with pytest.raises(TypeError, match="each entry in filters"):
             make_gee(filters=[lambda c: c, "nope"])
 
+    def test_str_filters_rejected(self, make_gee):
+        """A `str` (iterable of chars) is rejected rather than iterated per char."""
+        with pytest.raises(TypeError, match="filters must be a sequence"):
+            make_gee(filters="abc")
+
+    def test_generator_filters_normalised_to_tuple(self, make_gee):
+        """A one-shot generator is materialised into a reusable tuple."""
+        first, second = (lambda c: c), (lambda c: c)
+        gee = make_gee(filters=(f for f in (first, second)))
+        assert gee.filters == (first, second)
+        assert isinstance(gee.filters, tuple)
+
     def test_bad_export_via_fails_before_catalog_load(self, monkeypatch, tmp_path):
         """A typo'd `export_via` raises before paying for the catalog parse (M3)."""
         from earthlens.gee import backend as backend_module
@@ -1099,6 +1111,22 @@ class TestBuildCollection:
             "map",
             "select",
         ]
+
+    def test_static_image_applies_filters_and_cloud_mask(self, make_gee):
+        """A static `image` dataset also runs `filters` / `cloud_mask` before select.
+
+        The hooks sit between `filterBounds` and `select` for both branches, so a
+        single-image dataset is masked the same way (no `filterDate` is issued).
+        """
+        gee = make_gee(
+            filters=[lambda c: c.filter("cc")],
+            cloud_mask=_identity_mask,
+        )
+        ds = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        col = gee._build_collection(
+            ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
+        )
+        assert col.method_names() == ["filterBounds", "filter", "map", "select"]
 
 
 class TestComposite:
