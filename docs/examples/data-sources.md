@@ -6,7 +6,7 @@ earthlens is designed following the Template/Factory design pattern to create an
 
 The main objective is to provide a unified API for all remote sensing data sources, where you only have to worry about the domain of your data (date range and spatial extent) and the package does everything in the backend.
 
-`earthlens` provides a unified API across **50 providers** — see [All supported providers](#all-supported-providers)
+`earthlens` provides a unified API across **61 providers** — see [All supported providers](#all-supported-providers)
 below for the full index, or jump straight to a provider's own reference page
 (`docs/reference/<id>/introduction.md`) for its full walkthrough.
 

@@ -3,7 +3,7 @@
 Which pip **extra** (if any) each earthlens backend needs, the **SDK** it pulls, its **distribution**, and whether
 it is bundled in `earthlens[all]`.
 
-**At a glance:** **50 backends** · **33 extras** (31 in `all`, 2 held out) · **19 backends are SDK-free** (no extra
+**At a glance:** **61 backends** · **33 extras** (31 in `all`, 2 held out) · **30 backends are SDK-free** (no extra
 — they ship with their thematic distribution and just work).
 
 - **SDK-bearing backend** → `pip install "earthlens[<extra>]"`.
@@ -50,7 +50,7 @@ it is bundled in `earthlens[all]`.
 | `usgs_water` | ocean | `usgs-water` | `dataretrieval` | ✅ |
 | `worldpop` | land | `worldpop` | `worldpoppy`, `py7zr` | ✅ |
 
-## Backends with NO extra — SDK-free (19)
+## Backends with NO extra — SDK-free (30)
 
 These use only core + pyramids (FTP / plain HTTP / static files), so there is **no extra to install** — they ship
 with their thematic distribution and work out of the box.
@@ -58,15 +58,20 @@ with their thematic distribution and work out of the box.
 | Backend | Distribution | Backend | Distribution |
 |---|---|---|---|
 | `admin` | hazards | `airnow` | atmosphere |
-| `bathymetry` | land | `caravan` | ocean |
-| `chc` | atmosphere | `climate_indices` | atmosphere |
-| `drought` | atmosphere | `firms` | hazards |
-| `gdacs` | hazards | `glaciers` | land |
-| `iucn` | land | `nrel` | atmosphere |
+| `aqueduct` | hazards | `bathymetry` | land |
+| `caravan` | ocean | `catrare` | atmosphere |
+| `chc` | atmosphere | `climate-indices` | atmosphere |
+| `drought` | atmosphere | `fabdem` | land |
+| `firms` | hazards | `flodis` | hazards |
+| `flopros` | hazards | `gdacs` | hazards |
+| `glaciers` | land | `hanze` | hazards |
+| `isimip` | atmosphere | `iucn` | land |
+| `jrc-flood` | hazards | `mswep` | atmosphere |
+| `nrel` | atmosphere | `nsi` | hazards |
 | `openaq` | atmosphere | `pvgis` | atmosphere |
-| `risk_indicators` | hazards | `sensor_community` | atmosphere |
-| `soilgrids` | land | `solar_wind_atlas` | atmosphere |
-| `wdpa` | land | | |
+| `radklim` | atmosphere | `risk-indicators` | hazards |
+| `sensor-community` | atmosphere | `soilgrids` | land |
+| `solar-wind-atlas` | atmosphere | `wdpa` | land |
 
 ## Notes
 

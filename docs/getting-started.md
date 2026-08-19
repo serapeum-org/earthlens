@@ -85,7 +85,7 @@ see each backend's reference page.
 
 ## Next steps
 
-- [Discovering datasets](discovery.md) — find which of the 50 providers has
+- [Discovering datasets](discovery.md) — find which of the 61 providers has
   what you need, with `sources()` / `find()` / `search()`.
 - [Temporal aggregation](aggregation.md) — reduce a downloaded stack into
   windowed composites (daily mean, monthly sum, …).
