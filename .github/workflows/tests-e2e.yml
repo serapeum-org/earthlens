@@ -8,11 +8,13 @@ name: Tests - E2E (live CDS + GEE + STAC)
 permissions:
   contents: read
 
-# Serialise non-PR runs (a merge, the cron, a dispatch on `main` share one group)
-# so two full live runs never overlap; cancel-in-progress applies to PRs only.
-# See tests.yml for the pending-run-cancellation trade-off.
+# Each non-PR run (a merge to `main`, the cron, a dispatch) gets its own group
+# keyed on the run id, so every merge runs to the end and a later merge never
+# cancels an earlier one. A PR still supersedes its own in-flight run.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: >-
+    ${{ github.workflow }}-${{ github.event_name == 'pull_request'
+    && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 on:
