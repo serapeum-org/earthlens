@@ -35,7 +35,9 @@ two most common ways a retrieve is refused.
 from __future__ import annotations
 
 import os
+import re
 import shutil
+import time
 import zipfile
 from functools import partial
 from pathlib import Path
@@ -202,6 +204,154 @@ def _looks_like_licence_not_accepted(exc: BaseException) -> bool:
         or "license" in message
         or "403" in message
         and ("accept" in message or "term" in message)
+    )
+
+
+class CadsUnavailableError(RuntimeError):
+    """A CADS store refused the retrieve after the backend's retries.
+
+    Raised when a store rejects a request for a reason that is the *service*,
+    not the request: the per-dataset queue limit every CADS instance enforces
+    per account. The store accepts the job and then rejects it with
+    `Number queued requests for this dataset is temporarily limited`, which is
+    transient — a different day, or a quieter account, and the identical request
+    succeeds. Carries the originating HTTP `status_code` when one is
+    discernible, so a caller — a live e2e test especially — can tell a throttled
+    store apart from a genuine request error and skip rather than fail.
+
+    Examples:
+        - The typed error carries the status a caller branches on:
+            ```python
+            >>> from earthlens.ecmwf import CadsUnavailableError
+            >>> err = CadsUnavailableError("ECDS is throttling", status_code=400)
+            >>> err.status_code
+            400
+            >>> str(err)
+            'ECDS is throttling'
+
+            ```
+        - A refusal with no discernible status carries `None`:
+            ```python
+            >>> from earthlens.ecmwf import CadsUnavailableError
+            >>> CadsUnavailableError("queue limited").status_code is None
+            True
+
+            ```
+    """
+
+    def __init__(self, message: str, status_code: int | None = None) -> None:
+        """Store the actionable message and the originating HTTP status.
+
+        Args:
+            message: What the store refused and why, in the caller's terms.
+            status_code: The HTTP status when one could be read off the
+                failure, else `None`.
+        """
+        super().__init__(message)
+        self.status_code = status_code
+
+
+def _looks_like_throttled(exc: BaseException) -> bool:
+    """Is this a CADS queue-limit rejection rather than a bad request?
+
+    A throttled retrieve fails with a `400`, the same status a malformed
+    request gets, so the status alone cannot separate them — the wording does.
+    The store states the reason plainly (`the job has been rejected`,
+    `temporarily limited`), and the request itself was already validated
+    offline against `constraints.json` before submission.
+
+    Args:
+        exc: The exception raised by `client.retrieve(...)`.
+
+    Returns:
+        True when the message looks like a queue-limit refusal; False for a
+        genuine request error that must not be retried.
+    """
+    message = str(exc).lower()
+    return "temporarily limited" in message or (
+        "has been rejected" in message and "queued" in message
+    )
+
+
+def _status_of(exc: BaseException) -> int | None:
+    """Return the HTTP status behind a failed retrieve, when discernible."""
+    response = getattr(exc, "response", None)
+    status = getattr(response, "status_code", None)
+    if isinstance(status, int):
+        return status
+    match = re.search(r"\b(\d{3})\s+(?:server|client)\s+error", str(exc), re.I)
+    return int(match.group(1)) if match else None
+
+
+#: Attempts a throttled retrieve gets before the store is declared unavailable.
+CADS_MAX_ATTEMPTS = 3
+
+#: Base seconds for the exponential wait between throttled attempts
+#: (`CADS_BACKOFF_SECONDS * 2**attempt`).
+CADS_BACKOFF_SECONDS = 2.0
+
+
+def _retrieve_with_retry(client, dataset, request, target, endpoint):
+    """Retrieve `dataset` into `target`, retrying while the store is throttling.
+
+    Wraps the one `cdsapi` call every retrieve path makes, so the two failure
+    modes a CADS store has for a well-formed request are handled in one place:
+
+    * **licence not accepted** - permanent until the user ticks the licence, so
+      it is rewritten into a :class:`PermissionError` naming the dataset page.
+    * **queue limit** - transient, so it is retried with an exponential wait and,
+      if it outlives the attempts, raised as :class:`CadsUnavailableError` so a
+      caller can skip rather than fail.
+
+    Anything else propagates untouched: a malformed request must fail fast, not
+    be retried into the same error three times.
+
+    Args:
+        client: The `cdsapi` client for `endpoint`.
+        dataset: Upstream dataset id to retrieve.
+        request: The request body, already validated against `constraints.json`.
+        target: Destination path for the retrieved bytes.
+        endpoint: CADS instance slug, used for the messages.
+
+    Returns:
+        None: The bytes are written to `target`.
+
+    Raises:
+        PermissionError: The dataset's licence has not been accepted.
+        CadsUnavailableError: The store kept refusing the job on its queue limit.
+    """
+    last: BaseException | None = None
+    for attempt in range(CADS_MAX_ATTEMPTS):
+        try:
+            client.retrieve(dataset, request, str(target))
+            return
+        except Exception as exc:  # noqa: BLE001 - cdsapi raises many types; classified here
+            if _looks_like_licence_not_accepted(exc):
+                base = endpoint_url(endpoint).rsplit("/api", 1)[0]
+                raise PermissionError(
+                    f"{endpoint.upper()} rejected the request for {dataset!r}: "
+                    f"licence not accepted. Open the dataset page at "
+                    f"{base}/datasets/{dataset} and tick the licence at the "
+                    "bottom of the 'Download' tab. The acceptance is permanent "
+                    "and tied to your Copernicus account."
+                ) from exc
+            if not _looks_like_throttled(exc):
+                raise
+            last = exc
+            if attempt + 1 < CADS_MAX_ATTEMPTS:
+                wait = CADS_BACKOFF_SECONDS * 2**attempt
+                logger.warning(
+                    f"{endpoint.upper()} is throttling {dataset!r} "
+                    f"(attempt {attempt + 1}/{CADS_MAX_ATTEMPTS}); "
+                    f"retrying in {wait:.0f}s"
+                )
+                time.sleep(wait)
+    raise CadsUnavailableError(
+        f"{endpoint.upper()} refused {dataset!r} after {CADS_MAX_ATTEMPTS} "
+        f"attempts: the per-dataset queue limit is in force for this account. "
+        f"This is temporary - retry later rather than changing the request. "
+        f"Upstream said: {last}",
+        status_code=_status_of(last) if last is not None else None,
     )
 
 
@@ -1103,6 +1253,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             errors=self._errors,
             label="variable",
             describe=_describe_pair,
+            # A throttled store refused to serve anything; continuing would
+            # report that as every variable having no data.
+            fatal=(CadsUnavailableError,),
         )
         if not failures:
             logger.info(
@@ -1249,19 +1402,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             f"Passthrough retrieve {dataset!r} via {endpoint.upper()}; "
             "this may take several minutes"
         )
-        try:
-            client.retrieve(dataset, request, str(target))
-        except Exception as exc:  # noqa: BLE001
-            # Broad catch on purpose: classify a licence rejection into a clear
-            # PermissionError and re-raise everything else unchanged.
-            if _looks_like_licence_not_accepted(exc):
-                base = endpoint_url(endpoint).rsplit("/api", 1)[0]
-                raise PermissionError(
-                    f"{endpoint.upper()} rejected {dataset!r}: licence not "
-                    f"accepted. Open {base}/datasets/{dataset} and tick the "
-                    "licence at the bottom of the 'Download' tab."
-                ) from exc
-            raise
+        _retrieve_with_retry(client, dataset, request, target, endpoint)
         return self._passthrough_postprocess(target)
 
     def _passthrough_postprocess(self, target: Path) -> list[Path]:
@@ -1459,19 +1600,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             f"Requesting {dataset} from {var_info.endpoint.upper()}; "
             "this may take several minutes"
         )
-        try:
-            client.retrieve(dataset, request, str(target))
-        except Exception as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
-            if _looks_like_licence_not_accepted(exc):
-                base = endpoint_url(var_info.endpoint).rsplit("/api", 1)[0]
-                raise PermissionError(
-                    f"{var_info.endpoint.upper()} rejected the request for "
-                    f"{dataset!r}: licence not accepted. Open the dataset page "
-                    f"at {base}/datasets/{dataset} and tick the licence at the "
-                    "bottom of the 'Download' tab. The acceptance is permanent "
-                    "and tied to your Copernicus account."
-                ) from exc
-            raise
+        _retrieve_with_retry(client, dataset, request, target, var_info.endpoint)
         # A zip-of-NetCDF response (satellite CDRs, CAMS netcdf_zip) is unpacked
         # by the C3 handler — single-member in place, multi-member into a
         # sibling dir — so a multi-timestep curated retrieve does not crash.
