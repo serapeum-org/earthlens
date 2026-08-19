@@ -712,6 +712,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../reference/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../troubleshooting/" class="md-nav__link">
         
   
@@ -12647,6 +12675,90 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../showcase/eclipse_geometry_3d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The eclipse in 3D — Sun → Moon → Earth, and the satellites that watched it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Moon's shadow from Meteosat — the 12 Aug 2026 total solar eclipse (MTG-FCI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../showcase/solar_eclipse_2026_goes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watching the Moon's shadow cross the North Atlantic — the 12 Aug 2026 total solar eclipse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -20674,10 +20786,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pin-a-release" class="md-nav__link">
+  <a href="#which-release-will-this-read" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pin a release
+        Which release will this read?
       
     </span>
   </a>
@@ -23215,10 +23327,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pin-a-release" class="md-nav__link">
+  <a href="#which-release-will-this-read" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pin a release
+        Which release will this read?
       
     </span>
   </a>
@@ -24007,7 +24119,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="overture-multi-theme-download-live">Overture — multi-theme download (live)<a class="anchor-link" href="#overture-multi-theme-download-live">¶</a></h1><p>A single request can pull several themes / types at once; one file is written per feature type. Here we grab places and building footprints for the same block, pinning a release for reproducibility.</p>
+<h1 id="overture-multi-theme-download-live">Overture — multi-theme download (live)<a class="anchor-link" href="#overture-multi-theme-download-live">¶</a></h1><p>A single request can pull several themes / types at once; one file is written per feature type. Here we grab places and building footprints for the same block, targeting the release Overture publishes right now.</p>
 </div>
 </div>
 </div>
@@ -24018,7 +24130,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Pull in the pieces we need: <code>Catalog</code> to discover the latest Overture release, the <code>EarthLens</code> entry point to run the download, and <code>geopandas</code> to inspect the written GeoParquet files.</p>
+<h2 id="setup">Setup<a class="anchor-link" href="#setup">¶</a></h2><p>Pull in the pieces we need: the <code>EarthLens</code> entry point to run the download, <code>releases</code> to see which Overture release the download will target, and <code>geopandas</code> to inspect the written GeoParquet files.</p>
 </div>
 </div>
 </div>
@@ -24044,12 +24156,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">EarthLens</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.overture</span><span class="w"> </span><span class="kn">import</span> <span class="n">Catalog</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.overture</span><span class="w"> </span><span class="kn">import</span> <span class="n">releases</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-1">import geopandas as gpd
 
 from earthlens.core import EarthLens
-from earthlens.overture import Catalog</div>
+from earthlens.overture import releases</div>
 </div>
 </div>
 </div>
@@ -24104,7 +24216,8 @@ OUT = "_overture_out"</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="pin-a-release">Pin a release<a class="anchor-link" href="#pin-a-release">¶</a></h2><p>Resolve the most recent Overture release id and pin it, so the download is reproducible even after Overture publishes a newer snapshot.</p>
+<h2 id="which-release-will-this-read">Which release will this read?<a class="anchor-link" href="#which-release-will-this-read">¶</a></h2><p>Overture publishes a dated release roughly monthly and keeps only the newest one or two on S3, pruning the rest — so a release id is a moving target, and an id that worked last quarter may no longer exist. Leaving <code>release=None</code> (the default) targets whatever is published now, which is what we want here.</p>
+<p>You <em>can</em> pin a release when you need a byte-reproducible download, but the pin holds only while that release is still on S3; once it is pruned the fetch fails with <code>No files found that match the pattern</code>. Ask Overture what it is serving today:</p>
 </div>
 </div>
 </div>
@@ -24127,12 +24240,10 @@ OUT = "_overture_out"</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">catalog</span> <span class="o">=</span> <span class="n">Catalog</span><span class="p">()</span>
-<span class="n">release</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">latest_release</span><span class="p">()</span>  <span class="c1"># pin for reproducibility</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">release</span> <span class="o">=</span> <span class="n">releases</span><span class="o">.</span><span class="n">latest_release</span><span class="p">()</span>
 <span class="n">release</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">catalog = Catalog()
-release = catalog.latest_release()  # pin for reproducibility
+<div class="clipboard-copy-txt" id="cell-3">release = releases.latest_release()
 release</div>
 </div>
 </div>
@@ -24174,7 +24285,6 @@ release</div>
     <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">"places"</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">"buildings"</span><span class="p">:</span> <span class="p">[]},</span>
     <span class="n">aoi</span><span class="o">=</span><span class="p">[</span><span class="n">LON_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">LON_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">LAT_LIM</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
     <span class="n">path</span><span class="o">=</span><span class="n">OUT</span><span class="p">,</span>
-    <span class="n">release</span><span class="o">=</span><span class="n">release</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
@@ -24184,7 +24294,6 @@ release</div>
     variables={"places": [], "buildings": []},
     aoi=[LON_LIM[0], LAT_LIM[0], LON_LIM[1], LAT_LIM[1]],
     path=OUT,
-    release=release,
 )
 paths = engine.download()
 [p.name for p in paths]</div>

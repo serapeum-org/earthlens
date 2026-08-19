@@ -712,6 +712,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../troubleshooting/" class="md-nav__link">
         
   
@@ -12862,6 +12890,90 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/eclipse_geometry_3d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The eclipse in 3D — Sun → Moon → Earth, and the satellites that watched it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Moon's shadow from Meteosat — the 12 Aug 2026 total solar eclipse (MTG-FCI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_goes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watching the Moon's shadow cross the North Atlantic — the 12 Aug 2026 total solar eclipse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -23541,7 +23653,9 @@ event/flash/group products) are <code>vector</code>, so a mixed request is rejec
   server-side pixel crop / reproject / reformat, use the <code>tailor=</code> knob
   (<a href="../data-tailor/">Data Tailor</a>).</li>
 <li><code>start</code> / <code>end</code> are inclusive dates parsed with <code>fmt</code> (default
-  <code>"%Y-%m-%d"</code>).</li>
+  <code>"%Y-%m-%d"</code>). A <strong>date-only</strong> <code>end</code> covers its whole calendar day; an <code>end</code> that names a
+  time of day means that instant, so a request bounded at <code>19:00</code> stops there rather than
+  running on to midnight.</li>
 </ul>
 <h2 id="backend-specific-keyword-arguments"><a class="toclink" href="#backend-specific-keyword-arguments">Backend-specific keyword arguments</a><a class="headerlink" href="#backend-specific-keyword-arguments" title="Permanent link">#</a></h2>
 <table>

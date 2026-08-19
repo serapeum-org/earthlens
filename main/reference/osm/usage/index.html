@@ -712,6 +712,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../troubleshooting/" class="md-nav__link">
         
   
@@ -12845,6 +12873,90 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/eclipse_geometry_3d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The eclipse in 3D — Sun → Moon → Earth, and the satellites that watched it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Moon's shadow from Meteosat — the 12 Aug 2026 total solar eclipse (MTG-FCI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_goes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watching the Moon's shadow cross the North Atlantic — the 12 Aug 2026 total solar eclipse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -23528,7 +23640,8 @@ downloads a <a href="https://download.geofabrik.de/">Geofabrik</a> extract for <
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">buildings</span><span class="p">),</span> <span class="s2">&quot;building footprints&quot;</span><span class="p">)</span>
 </code></pre></div>
 <p>The first call downloads the extract (Malta is ~8.8 MB) to a cross-run cache
-(<code>~/.earthlens/cache/osm_pbf/</code> by default, override with <code>cache_dir=</code>); repeat
+(<code>osm_pbf/</code> under the shared earthlens cache directory by default — see
+<a href="../../configuration/">Configuration</a> — override with <code>cache_dir=</code>); repeat
 calls reuse it. List the region keys with <code>Catalog().region_ids()</code>, or pass a
 raw Geofabrik path (any string with a <code>/</code>). Omit <code>lat_lim</code> / <code>lon_lim</code> to read
 the whole extract — the bbox-area cap does <strong>not</strong> apply to a <code>pbf</code> read.</p>
@@ -23657,7 +23770,7 @@ an <code>[out:xml]</code> / <code>[out:csv]</code> override will not parse.</p>
 <tr>
 <td><code>cache_dir</code></td>
 <td>directory for cached <code>.osm.pbf</code> extracts</td>
-<td><code>~/.earthlens/cache/osm_pbf</code></td>
+<td><code>&lt;cache_dir()&gt;/osm_pbf</code></td>
 </tr>
 </tbody>
 </table>

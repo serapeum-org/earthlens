@@ -712,6 +712,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../troubleshooting/" class="md-nav__link">
         
   
@@ -12751,6 +12779,90 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/eclipse_geometry_3d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The eclipse in 3D — Sun → Moon → Earth, and the satellites that watched it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Moon's shadow from Meteosat — the 12 Aug 2026 total solar eclipse (MTG-FCI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/solar_eclipse_2026_goes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watching the Moon's shadow cross the North Atlantic — the 12 Aug 2026 total solar eclipse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -23357,8 +23469,12 @@ features, not a gridded array. Two consequences follow:</p>
   a feature table.</li>
 <li>Overture is a <strong>static per-release snapshot</strong> with no temporal axis, so
   <code>start</code> / <code>end</code> are accepted but ignored. Time is expressed only by the
-  <strong>release</strong> (<code>yyyy-mm-dd.x</code>); the SDK auto-targets the newest release
-  when you do not pin one.</li>
+  <strong>release</strong> (<code>yyyy-mm-dd.x</code>). When you do not pin one, the newest release
+  is targeted live: the SDK auto-targets it on the default fetch path, and
+  the DuckDB (<code>where=</code> / <code>columns=</code>) path looks it up from Overture's STAC
+  catalog at <code>https://stac.overturemaps.org</code> before building its S3 glob.
+  That is a second endpoint to allow through a proxy or firewall; pin a
+  <code>release</code> to skip the lookup entirely.</li>
 </ul>
 <p>The output is written as <strong>GeoParquet</strong> by default (which preserves
 Overture's deeply-nested schema — <code>names</code>, <code>categories</code>, <code>sources</code>, … —
