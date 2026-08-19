@@ -210,3 +210,44 @@ class TestHydratorDoesNotPairPseudoSlugs:
 
         matched = _match_variables(["burned-area"], {"BAF_pred": {"units": "1"}})
         assert matched == {"burned-area": ("BAF_pred", "1")}
+
+
+class TestDownloadWiresTheFatalHatch:
+    """`download()` must pass `fatal=`, not merely support it (review M3)."""
+
+    @staticmethod
+    def _lens(tmp_path):
+        """An ECMWF whose one pair resolves without touching the network."""
+        source = backend_mod.ECMWF.__new__(backend_mod.ECMWF)
+        source.vars = {"tigge-forecasts": ["2m-temperature"]}
+        source.root_dir = tmp_path
+        source._errors = "warn"
+        source._aggregate = None
+        return source
+
+    @pytest.mark.parametrize("policy", ["warn", "ignore", "skip"])
+    def test_a_refusal_propagates_through_download(self, tmp_path, monkeypatch, policy):
+        """Every non-raise policy still surfaces a store refusal."""
+        source = self._lens(tmp_path)
+        source._errors = policy
+        monkeypatch.setattr(
+            backend_mod.ECMWF,
+            "_download_pair",
+            lambda self, pair, **kw: (_ for _ in ()).throw(
+                CadsUnavailableError("ECDS refused every job", status_code=400)
+            ),
+        )
+        with pytest.raises(CadsUnavailableError, match="refused every job"):
+            source.download(progress_bar=False)
+
+    def test_an_ordinary_failure_is_still_absorbed_by_download(
+        self, tmp_path, monkeypatch
+    ):
+        """A per-variable gap keeps returning partial results, not raising."""
+        source = self._lens(tmp_path)
+        monkeypatch.setattr(
+            backend_mod.ECMWF,
+            "_download_pair",
+            lambda self, pair, **kw: (_ for _ in ()).throw(ValueError("no data")),
+        )
+        assert source.download(progress_bar=False) == []
