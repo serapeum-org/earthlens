@@ -52,8 +52,8 @@
 #                                      output filename).
 #
 # Refreshed from all five CADS `/collections` endpoints (CDS + ADS + EWDS +
-# ECDS + XDS) — `available_datasets` is a per-store mapping totalling 175 ids
-# (cds: 141, ads: 16, ewds: 13, ecds: 3, xds: 2). Regenerate with
+# ECDS + XDS) — `available_datasets` is a per-store mapping totalling 174 ids
+# (cds: 141, ads: 16, ewds: 12, ecds: 3, xds: 2). Regenerate with
 # `earthlens datasets refresh ecmwf --write`.
 #
 # See: https://cds.climate.copernicus.eu/datasets,
@@ -231,7 +231,6 @@ available_datasets:
   - cems-fire-seasonal
   - cems-glofas-forecast
   - cems-glofas-historical
-  - cems-glofas-historical-intermediate
   - cems-glofas-reforecast
   - cems-glofas-seasonal
   - cems-glofas-seasonal-reforecast
