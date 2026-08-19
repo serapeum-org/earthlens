@@ -72,6 +72,12 @@ class _FakeImageCollection:
     def filterBounds(self, geom):  # noqa: N802
         return self._chain("filterBounds", geom)
 
+    def filter(self, filt):
+        return self._chain("filter", filt)
+
+    def map(self, fn):
+        return self._chain("map", fn)
+
     def select(self, bands):
         return self._chain("select", tuple(bands))
 
@@ -274,6 +280,11 @@ class _FakePyramidsDataset:
 _FAKE_TIFF_BYTES = b"MM\x00*" + b"\x00" * 64
 
 
+def _identity_mask(image):
+    """A no-op `cloud_mask` used to assert `.map` wiring (returns the image)."""
+    return image
+
+
 # -- fixtures ---------------------------------------------------------------
 
 
@@ -372,6 +383,34 @@ class TestInit:
         """An unknown `export_via` raises `ValueError` at construction."""
         with pytest.raises(ValueError, match="export_via must be"):
             make_gee(export_via="ftp")
+
+    def test_cloud_mask_and_filters_default_to_none(self, make_gee):
+        """Omitting the hooks leaves `cloud_mask=None` and `filters=()`."""
+        gee = make_gee()
+        assert gee.cloud_mask is None
+        assert gee.filters == ()
+
+    def test_cloud_mask_and_filters_captured(self, make_gee):
+        """The hooks are stored; `filters` is normalised to a tuple."""
+        first, second = (lambda c: c), (lambda c: c)
+        gee = make_gee(cloud_mask=_identity_mask, filters=[first, second])
+        assert gee.cloud_mask is _identity_mask
+        assert gee.filters == (first, second)
+
+    def test_non_callable_cloud_mask_rejected(self, make_gee):
+        """A non-callable `cloud_mask` raises `TypeError` at construction."""
+        with pytest.raises(TypeError, match="cloud_mask must be a callable"):
+            make_gee(cloud_mask="not-callable")
+
+    def test_non_iterable_filters_rejected(self, make_gee):
+        """A non-iterable `filters` raises `TypeError` at construction."""
+        with pytest.raises(TypeError, match="filters must be a sequence"):
+            make_gee(filters=42)
+
+    def test_non_callable_filter_entry_rejected(self, make_gee):
+        """A non-callable entry in `filters` raises `TypeError`."""
+        with pytest.raises(TypeError, match="each entry in filters"):
+            make_gee(filters=[lambda c: c, "nope"])
 
     def test_bad_export_via_fails_before_catalog_load(self, monkeypatch, tmp_path):
         """A typo'd `export_via` raises before paying for the catalog parse (M3)."""
@@ -1000,6 +1039,66 @@ class TestBuildCollection:
         )
         assert col.method_names() == ["filterBounds", "select"]
         assert gee.client.image_log == ["USGS/SRTMGL1_003"]
+
+    def test_filters_applied_after_bounds_before_select(self, make_gee):
+        """Constructor `filters` are applied left to right, after bounds."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            filters=[lambda c: c.filter("a"), lambda c: c.filter("b")],
+        )
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert col.method_names() == [
+            "filterDate",
+            "filterBounds",
+            "filter",
+            "filter",
+            "select",
+        ]
+        assert [args for name, args in col.calls if name == "filter"] == [
+            ("a",),
+            ("b",),
+        ]
+
+    def test_cloud_mask_mapped_before_select(self, make_gee):
+        """A `cloud_mask` is `.map`-applied before the band `select`."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            cloud_mask=_identity_mask,
+        )
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert col.method_names() == ["filterDate", "filterBounds", "map", "select"]
+        # The exact callable is threaded through to `.map`.
+        assert [args for name, args in col.calls if name == "map"] == [
+            (_identity_mask,)
+        ]
+
+    def test_filters_then_cloud_mask_then_select(self, make_gee):
+        """With both, the order is filters → cloud_mask → select."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            filters=[lambda c: c.filter("cc")],
+            cloud_mask=_identity_mask,
+        )
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert col.method_names() == [
+            "filterDate",
+            "filterBounds",
+            "filter",
+            "map",
+            "select",
+        ]
 
 
 class TestComposite:

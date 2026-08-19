@@ -43,10 +43,15 @@ Public surface (re-exported from this package):
   small-FC `getInfo()` paths).
 
 Two submodules ship more specialised helpers and are intentionally
-**not** re-exported at this top level — import them directly:
+**not** re-exported at this top level — import them directly. Both
+feed the `GEE` backend's `cloud_mask=` / `filters=` constructor hooks
+(`.map`-applied / composed before the reducer), so a cloud-masked
+median composite is a facade call rather than raw `ee`:
 
-* `earthlens.gee.cloud_masks` — `landsat_sr(image, sensor=...)` for
-  Landsat C2-L2 QA_PIXEL Clear-bit masking.
+* `earthlens.gee.cloud_masks` — per-image `ee.Image -> ee.Image`
+  masks: `landsat_sr(image, sensor=...)` (Landsat C2-L2 QA_PIXEL
+  Clear-bit) and `sentinel2_scl(image)` (Sentinel-2 L2A SCL —
+  drops cloud shadow / cloud / cirrus).
 * `earthlens.gee.filters` — `by_year` / `by_bounds` /
   `by_property_in` / `by_cloud_cover_lte` / `by_year_and_bounds`
   for `ee.ImageCollection.filter*` composition.
