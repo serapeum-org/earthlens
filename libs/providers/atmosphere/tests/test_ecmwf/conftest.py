@@ -25,7 +25,7 @@ import pandas as pd
 import pytest
 
 from earthlens.base import SpatialExtent, TemporalExtent
-from earthlens.ecmwf import ECMWF, Variable
+from earthlens.ecmwf import ECMWF, CadsUnavailableError, Variable
 
 _LIVE_CDS_TEST_CLASSES = frozenset(
     {
@@ -114,6 +114,10 @@ def download_within_budget():
     instance) or a zero-argument callable, so a test driving `_api()` directly
     is guarded the same way as one going through the facade.
 
+    A `CadsUnavailableError` **skips** rather than fails: the store refused to
+    queue the job on its per-dataset limit, which says nothing about the code
+    under test and clears on its own.
+
     Returns:
         Callable[..., Any]: A `run(work, budget_s=900.0)` helper that returns
         the retrieve result, re-raises any error it raised, or fails the test
@@ -139,7 +143,10 @@ def download_within_budget():
                 "(CDS queue hang); failing fast so the e2e lane survives"
             )
         if "exc" in box:
-            raise box["exc"]
+            exc = box["exc"]
+            if isinstance(exc, CadsUnavailableError):
+                pytest.skip(f"CADS store is throttling this account: {exc}")
+            raise exc
         return box["out"]
 
     return _run

@@ -1911,6 +1911,7 @@ class AbstractDataSource(ABC):
         label: str = "item",
         describe: Callable[[Any], str] | None = None,
         on_failure: Callable[[Any, BaseException], Any] | None = None,
+        fatal: tuple[type[BaseException], ...] = (),
     ) -> tuple[list[Any], list[tuple[str, BaseException]]]:
         """Map `fn` over `items`, applying the caller's partial-failure policy.
 
@@ -1928,6 +1929,10 @@ class AbstractDataSource(ABC):
                 accepted as a deprecated alias for `"ignore"`.
             label: Noun for the log lines (e.g. `"granule"`, `"variable"`).
             describe: Renders an item for the log; defaults to `str`.
+            fatal: Exception classes that always propagate, whatever `errors`
+                says — for a failure of the *service* rather than of one item,
+                where continuing would report an upstream outage as a set of
+                empty results.
             on_failure: Optional `(item, exception) -> placeholder`. When given,
                 a failed item contributes its placeholder to `results`, so the
                 results stay positionally aligned with `items` — the shape the
@@ -1955,6 +1960,7 @@ class AbstractDataSource(ABC):
                 describe=describe,
                 on_failure=on_failure,
                 failures=failures,
+                fatal=fatal,
             )
         )
         if failures and policy == "warn":
@@ -2007,6 +2013,7 @@ class AbstractDataSource(ABC):
         describe: Callable[[Any], str] | None,
         on_failure: Callable[[Any, BaseException], Any] | None,
         failures: list[tuple[str, BaseException]],
+        fatal: tuple[type[BaseException], ...] = (),
     ) -> Iterator[Any]:
         """Apply `fn` to each item under the failure policy, yielding as it goes.
 
@@ -2024,6 +2031,11 @@ class AbstractDataSource(ABC):
                 `"ignore"`), or `None` for `"raise"`.
             label: Noun for the log lines (e.g. `"granule"`, `"variable"`).
             describe: Renders an item for the log; defaults to `str`.
+            fatal: Exception classes that always propagate, whatever the policy
+                — a service-level failure (the upstream refused to serve *any*
+                request) is not the per-item data gap `errors="warn"` exists to
+                absorb, and silently returning fewer items would report it as
+                "this item has no data".
             on_failure: Optional `(item, exception) -> placeholder`, yielded in
                 place of the failed item's result.
             failures: Accumulator the caller owns; each failure is appended as
@@ -2048,7 +2060,7 @@ class AbstractDataSource(ABC):
             try:
                 value = fn(item)
             except Exception as exc:  # noqa: BLE001 - policy decides the fate
-                if errors is None or errors == "raise":
+                if errors is None or errors == "raise" or isinstance(exc, fatal):
                     raise
                 placeholder = self._record_failure(
                     item,
