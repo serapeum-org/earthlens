@@ -329,15 +329,30 @@ class TestDeepProber:
         ecmwf_cli._ecmwf_deep_sample(dataset)
         assert seen == [expected]
 
-    def test_deep_sample_uncurated_dataset_falls_back_to_cds(self, monkeypatch):
-        """An id with no catalog row still samples, against the default store."""
+    def test_deep_sample_uses_the_index_for_an_uncurated_dataset(self, monkeypatch):
+        """An uncurated id resolves via the index, not the CDS default.
+
+        This is the population `curate` exists for, so defaulting them to CDS
+        would 404 every ADS / EWDS / ECDS / XDS id it was asked to seed.
+        """
         monkeypatch.setattr(
             ecmwf_cli, "_ecmwf_constraints", lambda d: [{"variable": ["x"]}]
         )
         seen: list[str] = []
         _stub_client(monkeypatch, seen_endpoints=seen)
         monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
-        ecmwf_cli._ecmwf_deep_sample("not-a-curated-dataset")
+        ecmwf_cli._ecmwf_deep_sample("cams-europe-air-quality-forecasts")
+        assert seen == ["ads"]
+
+    def test_deep_sample_unknown_dataset_falls_back_to_cds(self, monkeypatch):
+        """An id in neither the rows nor the index still samples, against CDS."""
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda d: [{"variable": ["x"]}]
+        )
+        seen: list[str] = []
+        _stub_client(monkeypatch, seen_endpoints=seen)
+        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
+        ecmwf_cli._ecmwf_deep_sample("not-a-real-dataset-anywhere")
         assert seen == ["cds"]
 
     def test_deep_sample_no_constraints(self, monkeypatch):
