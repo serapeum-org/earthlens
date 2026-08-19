@@ -76,6 +76,29 @@ def landsat_sr(image: ee.Image, sensor: Sensor = "auto") -> ee.Image:
 
     Raises:
         ValueError: If `sensor` is not one of the supported names.
+
+    Examples:
+        - Screen a Landsat-8 C2-L2 stack to clear pixels, then composite
+          (`.map` the mask over the collection before the reducer):
+            ```python
+            >>> import ee  # doctest: +SKIP
+            >>> stack = ee.ImageCollection("LANDSAT/LC08/C02/T1_L2")  # doctest: +SKIP
+            >>> clear_median = stack.map(landsat_sr).median()  # doctest: +SKIP
+
+            ```
+        - Hand it to the GEE backend as the per-image `cloud_mask` so the
+          facade builds the cloud-free composite for you:
+            ```python
+            >>> from earthlens.core import EarthLens  # doctest: +SKIP
+            >>> el = EarthLens(  # doctest: +SKIP
+            ...     data_source="gee",
+            ...     dataset="LANDSAT/LC08/C02/T1_L2",
+            ...     variables=["SR_B4", "SR_B3", "SR_B2"],
+            ...     start="2023-06-01", end="2023-09-01",
+            ...     reducer="median", cloud_mask=landsat_sr,
+            ... )
+
+            ```
     """
     if sensor not in _SUPPORTED_SENSORS:
         raise ValueError(
@@ -111,6 +134,28 @@ def sentinel2_scl(image: ee.Image) -> ee.Image:
         The input image with `updateMask(...)` applied, the mask being
         the logical AND of `SCL != c` over every dropped class `c` in
         :data:`_S2_SCL_MASKED_CLASSES`.
+
+    Examples:
+        - Drop cloudy pixels from a Sentinel-2 L2A stack before compositing:
+            ```python
+            >>> import ee  # doctest: +SKIP
+            >>> s2 = ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")  # doctest: +SKIP
+            >>> clear_median = s2.map(sentinel2_scl).median()  # doctest: +SKIP
+
+            ```
+        - Use it as the GEE backend `cloud_mask` for a facade-built RGB mosaic
+          — no raw `ee` needed:
+            ```python
+            >>> from earthlens.core import EarthLens  # doctest: +SKIP
+            >>> el = EarthLens(  # doctest: +SKIP
+            ...     data_source="gee",
+            ...     dataset="COPERNICUS/S2_SR_HARMONIZED",
+            ...     variables=["B4", "B3", "B2"],
+            ...     start="2024-05-01", end="2024-06-15",
+            ...     reducer="median", cloud_mask=sentinel2_scl,
+            ... )
+
+            ```
     """
     scl = image.select("SCL")
     keep = scl.neq(_S2_SCL_MASKED_CLASSES[0])
