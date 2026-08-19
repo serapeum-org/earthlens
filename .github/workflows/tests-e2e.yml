@@ -5,11 +5,11 @@ name: Tests - E2E (live CDS + GEE + STAC)
 # server-side, so running on every push to any branch or every PR would burn
 # quota and slow CI. So the triggers are deliberately scoped:
 #
-#   * push to `main`: every non-docs/non-CI merge to the default branch runs
-#     the FULL live e2e suite, so what actually landed is validated end-to-end (the
-#     per-provider `tests-e2e-<theme>.yml` gates only run the affected lane on
-#     a PR; this is the complete post-merge check). Docs-/markdown-/CI-only
-#     merges are skipped via `paths-ignore` on the trigger below.
+#   * push to `main`: every merge to the default branch runs the FULL live e2e
+#     suite, EXCEPT a merge that changes only documentation. Any code or CI /
+#     workflow change (including this workflow itself) is validated end-to-end
+#     on its own merge. (The per-provider `tests-e2e-<theme>.yml` gates only run
+#     the affected lane on a PR; this is the complete post-merge check.)
 #   * schedule: weekly on Sunday at 04:00 UTC
 #   * workflow_dispatch: manual trigger from the Actions tab
 #
@@ -50,21 +50,14 @@ concurrency:
 on:
   push:
     branches: [main]
-    # A merge that changes only docs / markdown / mkdocs config / CI workflow
-    # files cannot affect an e2e result, so it skips the full live suite (which
-    # burns rate/quota-limited services). `paths-ignore` skips only when EVERY
-    # changed path matches, so a mixed merge (docs + code) still runs.
-    #
-    # Trade-off: a merge touching ONLY `.github/**` — including this workflow
-    # itself — is not re-run on the merge push; a CI-config change is validated
-    # only by the next weekly cron or a manual dispatch, never by its own merge.
-    # Acceptable: a workflow-YAML change cannot alter the shipped code's e2e
-    # result, and the e2e jobs use no local composite actions under `.github/`.
+    # Skip ONLY pure-documentation merges (they cannot change an e2e result).
+    # `.github/**` is intentionally NOT ignored, so a CI / workflow change runs
+    # the suite on its own merge. `paths-ignore` skips a push only when EVERY
+    # changed path matches, so a mixed docs+code merge still runs.
     paths-ignore:
       - 'docs/**'
       - '**/*.md'
       - 'mkdocs.yml'
-      - '.github/**'
   schedule:
     - cron: '0 4 * * 0'
   workflow_dispatch:
