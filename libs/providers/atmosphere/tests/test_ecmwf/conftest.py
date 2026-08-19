@@ -26,6 +26,7 @@ import pytest
 
 from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.ecmwf import ECMWF, CadsUnavailableError, Variable
+from earthlens.testing import skip_live_unavailable
 
 _LIVE_CDS_TEST_CLASSES = frozenset(
     {
@@ -116,7 +117,11 @@ def download_within_budget():
 
     A `CadsUnavailableError` **skips** rather than fails: the store refused to
     queue the job on its per-dataset limit, which says nothing about the code
-    under test and clears on its own.
+    under test and clears on its own. The skip goes through
+    :func:`earthlens.testing.skip_live_unavailable` so it carries the shared
+    availability stamp — a bare `pytest.skip` is invisible to the masked-lane
+    guard, and a store-wide throttle would then report a lane green having
+    exercised nothing.
 
     Returns:
         Callable[..., Any]: A `run(work, budget_s=900.0)` helper that returns
@@ -145,7 +150,9 @@ def download_within_budget():
         if "exc" in box:
             exc = box["exc"]
             if isinstance(exc, CadsUnavailableError):
-                pytest.skip(f"CADS store is throttling this account: {exc}")
+                skip_live_unavailable(
+                    f"CADS store is throttling this account: {exc}"
+                )
             raise exc
         return box["out"]
 
