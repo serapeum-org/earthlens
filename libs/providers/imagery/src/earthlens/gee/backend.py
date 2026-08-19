@@ -169,7 +169,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         temporal_resolution: How to composite over time — `"raw"` (one
             image: reduce the whole window), `"daily"`, `"monthly"`, or
             `"yearly"`. Defaults to `"raw"`.
-        path: Output directory (created if absent). Defaults to the cwd.
+        path: Output directory (created if absent). Defaults to the configured
+            earthlens output directory (`set_output_dir()` /
+            `EARTHLENS_DATA_DIR`); see `earthlens.config`.
         fmt: `strptime` format for `start` / `end`. Defaults to `"%Y-%m-%d"`.
         scale: Output pixel size in metres. If omitted, each dataset's
             nominal `spatial_resolution` is used.
@@ -285,7 +287,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "raw",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         *,
         scale: float | None = None,

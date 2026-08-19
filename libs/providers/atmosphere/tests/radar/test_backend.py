@@ -158,11 +158,19 @@ class TestSearch:
 class TestWindow:
     """Tests for the scan-time window helper."""
 
-    def test_window_extends_midnight_end_to_day_end(self, tmp_path):
-        """A date-only (midnight) end is extended to 23:59:59 of that day."""
-        b = _make(tmp_path, start="2024-06-01T00:00:00", end="2024-06-01T00:00:00")
+    def test_window_extends_a_date_only_end_to_day_end(self, tmp_path):
+        """A date-only end is extended to 23:59:59 of that day."""
+        b = _make(tmp_path, start="2024-06-01", end="2024-06-01")
         _, end = b._window()
         assert (end.hour, end.minute, end.second) == (23, 59, 59)
+
+    def test_window_keeps_an_explicit_midnight_end(self, tmp_path):
+        """An end typed as an explicit midnight instant means that instant."""
+        b = _make(tmp_path, start="2024-06-01T00:00:00", end="2024-06-02T00:00:00")
+        _, end = b._window()
+        assert (end.hour, end.minute, end.second) == (0, 0, 0), (
+            f"an explicit midnight must not be widened, got {end}"
+        )
 
     def test_window_keeps_explicit_end_time(self, tmp_path):
         """A non-midnight end time is returned unchanged."""

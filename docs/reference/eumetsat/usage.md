@@ -45,7 +45,9 @@ event/flash/group products) are `vector`, so a mixed request is rejected.
   server-side pixel crop / reproject / reformat, use the `tailor=` knob
   ([Data Tailor](data-tailor.md)).
 * `start` / `end` are inclusive dates parsed with `fmt` (default
-  `"%Y-%m-%d"`).
+  `"%Y-%m-%d"`). A **date-only** `end` covers its whole calendar day; an `end` that names a
+  time of day means that instant, so a request bounded at `19:00` stops there rather than
+  running on to midnight.
 
 ## Backend-specific keyword arguments
 

@@ -76,7 +76,7 @@ class CMIP6(AbstractDataSource):
         activity_id: str | None = None,
         whole_time: bool = False,
         temporal_resolution: str = "monthly",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         catalog: Catalog | None = None,
         resolver: StoreResolver | None = None,

@@ -15,6 +15,8 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from earthlens.config import resolve_output_path
+
 if TYPE_CHECKING:
     from earthlens.base.http import HttpClient
 
@@ -709,6 +711,13 @@ class AbstractDataSource(ABC):
 
     OUTPUT_KIND: OutputKind = "raster"
 
+    #: Whether the raw `end` bound named a whole calendar day rather than an
+    #: instant. Recorded in `_check_input_dates` by the backends that widen an
+    #: inclusive `end`; see `earthlens.base.end_is_date_only`. The `False`
+    #: default is the conservative one: a backend that never records it does
+    #: not widen.
+    _end_is_date_only: bool = False
+
     REQUIRES_TIME_WINDOW: bool = True
 
     SUPPORTS_POLYGON_AOI: bool = False
@@ -954,7 +963,7 @@ class AbstractDataSource(ABC):
         lon_lim: list[float],
         temporal_resolution: str = "daily",
         fmt: str = "%Y-%m-%d",
-        path: Path | str = "",
+        path: Path | str | None = None,
     ):
         """Initialize a data source instance.
 
@@ -991,8 +1000,14 @@ class AbstractDataSource(ABC):
             fmt: `strptime` format for `start` / `end`. Defaults
                 to `"%Y-%m-%d"`.
             path: Output directory. Resolved here and created on the first
-                download, not at construction. Defaults to the current
-                working directory.
+                download, not at construction. A relative value is anchored to
+                the current working directory. When omitted (`None`) it falls
+                back to the configured earthlens output directory
+                (`set_output_dir()` / `EARTHLENS_DATA_DIR`, else
+                `~/.earthlens/data`); see `earthlens.config`. Pass `path=""` to
+                ask for the working directory explicitly. The fallback is
+                resolved once, here, so a later `set_output_dir()` does not move
+                an already-constructed backend.
 
         Raises:
             ValueError: If :attr:`REQUIRES_TIME_WINDOW` is `True` and either
@@ -1017,7 +1032,11 @@ class AbstractDataSource(ABC):
         self.space = self._create_grid(lat_lim, lon_lim)
         self.time = self._check_input_dates(start, end, temporal_resolution, fmt)
 
-        self.root_dir = Path(path).absolute()
+        # An explicit `path=` wins; omitting it entirely falls back to the
+        # configured output dir (set_output_dir() / $EARTHLENS_DATA_DIR) so a
+        # project can be pointed at one location without threading `path=`.
+        # `path=""` stays the documented way to ask for the working directory.
+        self.root_dir = resolve_output_path(path)
         self.path = self.root_dir
 
     def _refuse_unsupported_aggregate(self) -> None:

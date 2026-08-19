@@ -191,7 +191,7 @@ class HANZE(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         country: str | list[str] | None = None,
         region: str | list[str] | None = None,

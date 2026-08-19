@@ -12,6 +12,11 @@ here, in `earthlens.core`:
   counterpart :func:`iter_aggregate_netcdf` (yielding
   :class:`AggregatedWindow`) — temporal
   aggregation (pure pyramids/numpy/pandas, no backend SDK).
+* :func:`set_output_dir` / :func:`output_dir` — the process-wide directory
+  every backend writes downloads to when no explicit `path=` is given (also
+  settable via `EARTHLENS_DATA_DIR`), and :func:`set_cache_dir` /
+  :func:`cache_dir` — the root each backend caches regenerable intermediates
+  under (also settable via `EARTHLENS_CACHE`). See `earthlens.config`.
 
 The concrete backends (`earthlens.ecmwf.ECMWF`, `earthlens.chc.CHIRPS`, …) are
 intentionally **not** re-exported here — each needs its own optional SDK, so a
@@ -36,6 +41,7 @@ from earthlens.aggregate import (
     iter_aggregate_netcdf,
 )
 from earthlens.base import PolygonAoiWarning
+from earthlens.config import cache_dir, output_dir, set_cache_dir, set_output_dir
 from earthlens.earthlens import EarthLens, download, find, search, sources
 
 __all__ = [
@@ -44,10 +50,14 @@ __all__ = [
     "EarthLens",
     "PolygonAoiWarning",
     "aggregate_netcdf",
-    "iter_aggregate_netcdf",
+    "cache_dir",
     "download",
     "find",
+    "iter_aggregate_netcdf",
+    "output_dir",
     "search",
+    "set_cache_dir",
+    "set_output_dir",
     "sources",
 ]
 

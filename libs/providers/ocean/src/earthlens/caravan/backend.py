@@ -111,7 +111,7 @@ class Caravan(AbstractDataSource):
         lon_lim: list[float],
         temporal_resolution: str = "daily",
         fmt: str = "%Y-%m-%d",
-        path: Path | str = "",
+        path: Path | str | None = None,
         *,
         dataset: str = "grdc",
         version: str | None = None,

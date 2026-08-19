@@ -118,7 +118,7 @@ class AirNow(AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "hourly",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         api_key: str | None = None,
         data_type: DataType = "B",
