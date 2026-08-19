@@ -11,7 +11,7 @@ the story: **earth + lens**.
 | Role | Hex |
 |------|-----|
 | Navy (primary surface) | `#0B2036` |
-| Deep navy | `#06122​0` |
+| Deep navy | `#061220` |
 | Ocean (globe) | `#3A6E96` / `#21486A` / `#0E2A42` |
 | Gold (accent — the "lens") | `#F2C879` |
 | Aqua (grid / atmosphere) | `#8FD8D2` |
@@ -37,7 +37,7 @@ animation/  orbit GIF (hero) · spinning-globe GIF + CSS SVG
 ## Usage snippets
 README header:
 ```md
-<p align="center"><img src="docs/_images/branding/brand-kit/docs/readme-banner.png" width="820"></p>
+<p align="center"><img src="docs/_images/branding/earthlens-brand-kit/docs/readme-banner.png" width="820"></p>
 ```
 Favicon (HTML `<head>`):
 ```html
