@@ -285,8 +285,9 @@ class TestSingleSecretAuth:
         """No credential raises the provider's error type, naming provider+vars+hint."""
         monkeypatch.delenv("DEMO_A", raising=False)
         monkeypatch.delenv("DEMO_B", raising=False)
+        auth = _DemoAuth(_SecretCreds())
         with pytest.raises(_DemoError) as exc_info:
-            _DemoAuth(_SecretCreds()).configure()
+            auth.configure()
         message = str(exc_info.value)
         assert "Demo" in message, message
         assert "pass demo_key=" in message, message
@@ -297,8 +298,9 @@ class TestSingleSecretAuth:
         """The provider error is still a base AuthenticationError for the broad catch."""
         monkeypatch.delenv("DEMO_A", raising=False)
         monkeypatch.delenv("DEMO_B", raising=False)
+        auth = _DemoAuth(_SecretCreds())
         with pytest.raises(AuthenticationError):
-            _DemoAuth(_SecretCreds()).configure()
+            auth.configure()
 
     def test_configure_is_idempotent(self, monkeypatch):
         """A second configure() after success does not re-connect."""
@@ -352,8 +354,9 @@ class TestSingleSecretAuthDefaults:
     def test_missing_credential_without_hint_omits_the_hint_sentence(self, monkeypatch):
         """A backend with no CREDENTIAL_HINT raises the bare provider-named message."""
         monkeypatch.delenv("ENVONLY_VAR", raising=False)
+        auth = _EnvOnlyAuth(_SecretCreds())
         with pytest.raises(AuthenticationError) as exc_info:
-            _EnvOnlyAuth(_SecretCreds()).configure()
+            auth.configure()
         message = str(exc_info.value)
         assert (
             message == "no EnvOnly credential available: pass it explicitly or set "
