@@ -71,7 +71,7 @@ class STAC(LazyClientMixin, AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "daily",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         endpoint: str | None = None,
         resolution: float | None = None,

@@ -12,7 +12,10 @@ from earthlens.osm._helpers import (
     bbox_swne,
     bbox_wsen,
     empty_fc,
+    ohsome_body_preview,
+    ohsome_error_response,
     ohsome_http_status,
+    ohsome_response_is_non_json,
     overpy_to_gdf,
     shapely_bbox,
     to_fc,
@@ -185,6 +188,82 @@ class TestOhsomeHttpStatus:
         first.__context__ = second
         second.__context__ = first
         assert ohsome_http_status(first) is None
+
+
+class TestOhsomeResponseRecovery:
+    """Recovering the response, non-JSON verdict, and body preview (#930)."""
+
+    def test_error_response_from_chain(self):
+        """The response object is dug out of the __context__ chain."""
+        import types
+
+        response = types.SimpleNamespace(status_code=200, headers={}, text="x")
+        http_error = RuntimeError("boom")
+        http_error.response = response
+        leaked = ValueError("Expecting value")
+        leaked.__context__ = http_error
+        assert ohsome_error_response(leaked) is response
+
+    def test_error_response_none_when_absent(self):
+        """No response anywhere yields None."""
+        assert ohsome_error_response(RuntimeError("no response")) is None
+
+    def test_error_response_ignores_response_without_status(self):
+        """A response object with no integer status_code is not returned."""
+        import types
+
+        exc = RuntimeError("x")
+        exc.response = types.SimpleNamespace(status_code=None)
+        assert ohsome_error_response(exc) is None
+
+    def test_non_json_detects_stdlib_json_decode_error(self):
+        """A stdlib json.JSONDecodeError anywhere in the chain reads as non-JSON."""
+        import json
+
+        outer = RuntimeError("wrapped")
+        outer.__context__ = json.JSONDecodeError("Expecting value", "<html>", 0)
+        assert ohsome_response_is_non_json(outer) is True
+
+    def test_non_json_detects_by_class_name(self):
+        """A JSONDecodeError variant (by class name) also reads as non-JSON."""
+
+        class JSONDecodeError(ValueError):
+            pass
+
+        assert ohsome_response_is_non_json(JSONDecodeError("bad")) is True
+
+    def test_non_json_false_for_plain_error(self):
+        """A plain error (a JSON error served as JSON) is not a non-JSON body."""
+        assert ohsome_response_is_non_json(RuntimeError("bad request")) is False
+
+    def test_non_json_false_for_non_valueerror_named_class(self):
+        """A class named JSONDecodeError that is not a ValueError is excluded."""
+
+        class JSONDecodeError(RuntimeError):
+            pass
+
+        assert ohsome_response_is_non_json(JSONDecodeError("x")) is False
+
+    def test_body_preview_truncates(self):
+        """The body preview is truncated to the requested limit."""
+        import types
+
+        response = types.SimpleNamespace(text="abcdefghij")
+        assert ohsome_body_preview(response, limit=4) == "abcd"
+
+    def test_body_preview_none_for_none(self):
+        """No response yields no preview."""
+        assert ohsome_body_preview(None) is None
+
+    def test_body_preview_none_when_text_unreadable(self):
+        """A body that cannot be decoded yields None rather than raising."""
+
+        class _BadBody:
+            @property
+            def text(self):
+                raise UnicodeDecodeError("utf-8", b"", 0, 1, "boom")
+
+        assert ohsome_body_preview(_BadBody()) is None
 
 
 class TestWayGeometry:

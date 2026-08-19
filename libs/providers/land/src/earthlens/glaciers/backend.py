@@ -43,6 +43,7 @@ from earthlens.base import (
     TemporalExtent,
     to_datetime,
 )
+from earthlens.config import cache_dir
 from earthlens.glaciers import _helpers
 from earthlens.glaciers.catalog import Catalog, Dataset
 
@@ -98,7 +99,7 @@ class Glaciers(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "annual",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         region: str | list[str] | None = None,
         max_features: int = 10000,
@@ -120,7 +121,10 @@ class Glaciers(AbstractDataSource):
                 WGMS path defaults to global.
             lon_lim: `[lon_min, lon_max]` AOI.
             temporal_resolution: Recorded as the resolution label only.
-            path: Output directory; also the parent of the download cache.
+            path: Output directory. When omitted it falls back to the configured
+                earthlens output directory (`set_output_dir()` /
+                `EARTHLENS_DATA_DIR`); see `earthlens.config`. The download cache
+                lives under the shared cache directory, not here.
             fmt: `strptime` format for `start` / `end`.
             region: RGI only — one GTN-G region id (`"11"`) or a list, overriding
                 the bbox -> region mapping. Also accepted as a WGMS region filter.
@@ -181,7 +185,18 @@ class Glaciers(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
-        self._cache_dir = self.root_dir / "_glaciers_cache"
+
+    @property
+    def _cache_dir(self) -> Path:
+        """The directory downloaded archives are cached in.
+
+        Resolved per call from the shared earthlens cache directory, so a later
+        `set_cache_dir()` moves it.
+
+        Returns:
+            Path: `<cache_dir()>/glaciers`.
+        """
+        return cache_dir() / "glaciers"
 
     def _validate_selector(self) -> None:
         """Check the request carries the spatial selector the source needs.

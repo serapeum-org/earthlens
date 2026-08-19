@@ -206,6 +206,26 @@ class TestSearch:
         assert start == "2020-06-01T00:00:00"
         assert end == "2020-06-01T23:59:59.999999"
 
+    def test_temporal_keeps_an_end_that_names_a_time(
+        self, fake_earthaccess, edl_env, tmp_path
+    ):
+        """An end naming a time of day means that instant, not the whole day."""
+        obj = EarthData(
+            start="2020-06-01 09:00",
+            end="2020-06-01 09:30",
+            fmt="%Y-%m-%d %H:%M",
+            variables={"GPM_3IMERGHHL_07": ["precipitation"]},
+            lat_lim=[10.0, 20.0],
+            lon_lim=[30.0, 40.0],
+            path=tmp_path,
+        )
+        obj._search()
+        start, end = fake_earthaccess.search_calls[-1]["temporal"]
+        assert start == "2020-06-01T09:00:00"
+        assert end == "2020-06-01T09:30:00", (
+            f"an explicit time must not be widened to end of day, got {end}"
+        )
+
     def test_search_one_product_per_granule(self, fake_earthaccess, edl_env, tmp_path):
         """Each returned granule becomes one RemoteProduct."""
         obj = _make(tmp_path, {"GPM_3IMERGHHL_07": ["precipitation"]})

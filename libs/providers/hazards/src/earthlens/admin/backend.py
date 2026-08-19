@@ -124,7 +124,7 @@ class AdminBoundaries(AbstractDataSource):
         start: str | None = None,
         end: str | None = None,
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         country: str | None = None,
         scale: str | None = None,
@@ -199,8 +199,11 @@ class AdminBoundaries(AbstractDataSource):
         self._file_format: FileFormat = file_format
         self._timeout = timeout
         self._catalog = Catalog()
-        # Only write a file when the caller passed a real output directory;
-        # an empty / unset path returns the in-memory collection only.
+        # Only write a file when the caller passed a real output directory; an
+        # empty / unset path returns the in-memory collection only. Decided from
+        # the raw argument, before the base class resolves it, so an omitted
+        # path still means "do not write" even though it now resolves to the
+        # configured output directory rather than the cwd.
         self._should_write = bool(path) and str(path) != "."
         super().__init__(
             start=cast("str", start),
@@ -210,7 +213,7 @@ class AdminBoundaries(AbstractDataSource):
             lat_lim=lat_lim if lat_lim is not None else list(_WHOLE_EARTH_LAT),
             lon_lim=lon_lim if lon_lim is not None else list(_WHOLE_EARTH_LON),
             fmt=fmt,
-            path=path or "",
+            path=path,
         )
         # Admin is static — pin the sentinel even when the facade forwards its
         # default cadence, so the attribute never misrepresents a cadence.

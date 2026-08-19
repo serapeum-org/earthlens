@@ -55,6 +55,7 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.base import AuthenticationError as _BaseAuthenticationError
+from earthlens.config import resolve_output_path
 from earthlens.ecmwf._helpers import (
     CadsUnavailableError,
     _retrieve_with_retry,
@@ -540,7 +541,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "daily",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         skip_constraints: bool = False,
         request: dict[str, Any] | None = None,
@@ -570,8 +571,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             temporal_resolution: Either `"daily"` or `"monthly"`.
                 Defaults to `"daily"`.
             path: Output directory. Created by the parent if it does
-                not exist. Defaults to `""` (the current working
-                directory).
+                not exist. When omitted it falls back to the
+                configured earthlens output directory (`set_output_dir()` /
+                `EARTHLENS_DATA_DIR`); see `earthlens.config`.
             fmt: `strptime` format for `start` / `end`.
                 Defaults to `"%Y-%m-%d"`.
             skip_constraints: When `True`, every CDS pre-flight
@@ -618,7 +620,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             # Construction stays read-only: the base `download` wrapper's
             # `_ensure_root_dir` creates (and unwinds on failure) the output
             # directory at download time, exactly as the typed path relies on.
-            self.root_dir = Path(path).absolute()
+            self.root_dir = resolve_output_path(path)
             self.path = self.root_dir
             return
 
