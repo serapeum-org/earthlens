@@ -28,7 +28,11 @@ from earthlens.base.abstractdatasource import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.base.auth import AbstractAuth, AuthenticationError
+from earthlens.base.auth import (
+    AbstractAuth,
+    AuthenticationError,
+    SingleSecretAuth,
+)
 from earthlens.base.cache import (
     aoi_tag,
     sidecar_is_fresh,
@@ -122,6 +126,7 @@ __all__ = [
     "resolve_cadence",
     "retry_login_forcing_ipv4",
     "safe_filename",
+    "SingleSecretAuth",
     "sidecar_is_fresh",
     "sidecar_path",
     "split_time",

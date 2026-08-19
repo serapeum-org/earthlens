@@ -52,6 +52,7 @@ class TestAirnowAuth:
         with pytest.raises(AuthenticationError) as exc:
             auth.configure()
         assert "AIRNOW_API_KEY" in str(exc.value)
+        assert "api_key=" in str(exc.value), str(exc.value)
 
     def test_configure_idempotent(self, monkeypatch: pytest.MonkeyPatch):
         """A second `configure` after success short-circuits."""
