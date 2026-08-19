@@ -39,6 +39,7 @@ import re
 import shutil
 import time
 import zipfile
+from collections.abc import Iterator
 from functools import partial
 from pathlib import Path
 from typing import Any
@@ -267,18 +268,45 @@ def _looks_like_throttled(exc: BaseException) -> bool:
         True when the message looks like a queue-limit refusal; False for a
         genuine request error that must not be retried.
     """
+    # Message sniffing is only safe on the transport errors cdsapi raises. A
+    # ValueError or AssertionError reaching here is our own bug or a test's
+    # assertion, and misreading one as a throttle would burn three attempts and
+    # then let a live test *skip* over a real failure.
+    if isinstance(exc, ValueError | AssertionError):
+        return False
     message = str(exc).lower()
-    return "temporarily limited" in message or (
-        "has been rejected" in message and "queued" in message
-    )
+    return "temporarily limited" in message or "queued requests" in message
+
+
+def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
+    """Yield `exc` and every exception it wraps, outermost first."""
+    seen: set[int] = set()
+    current: BaseException | None = exc
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        yield current
+        current = current.__cause__ or current.__context__
 
 
 def _status_of(exc: BaseException) -> int | None:
-    """Return the HTTP status behind a failed retrieve, when discernible."""
-    response = getattr(exc, "response", None)
-    status = getattr(response, "status_code", None)
-    if isinstance(status, int):
-        return status
+    """Return the HTTP status behind a failed retrieve, when discernible.
+
+    Walks the exception chain, because `cdsapi` wraps the `requests` error that
+    carries the `response` — reading only the outermost exception would answer
+    `None` for most real refusals.
+
+    Args:
+        exc: The exception raised by `client.retrieve(...)`.
+
+    Returns:
+        int | None: The HTTP status, from a `response` object when one is
+            reachable and otherwise parsed out of the message; `None` when
+            neither yields one, as a transport drop carries no status.
+    """
+    for link in _exception_chain(exc):
+        status = getattr(getattr(link, "response", None), "status_code", None)
+        if isinstance(status, int) and not isinstance(status, bool):
+            return status
     match = re.search(r"\b(\d{3})\s+(?:server|client)\s+error", str(exc), re.I)
     return int(match.group(1)) if match else None
 
@@ -291,7 +319,13 @@ CADS_MAX_ATTEMPTS = 3
 CADS_BACKOFF_SECONDS = 2.0
 
 
-def _retrieve_with_retry(client, dataset, request, target, endpoint):
+def _retrieve_with_retry(
+    client: Any,
+    dataset: str,
+    request: dict[str, Any],
+    target: Path,
+    endpoint: str,
+) -> None:
     """Retrieve `dataset` into `target`, retrying while the store is throttling.
 
     Wraps the one `cdsapi` call every retrieve path makes, so the two failure
@@ -320,12 +354,23 @@ def _retrieve_with_retry(client, dataset, request, target, endpoint):
         PermissionError: The dataset's licence has not been accepted.
         CadsUnavailableError: The store kept refusing the job on its queue limit.
     """
+    # Retrieve into a sidecar and move it into place, per the repo's atomic
+    # download contract: writing straight to `target` truncates a pre-existing
+    # good file on the first attempt, and an exhausted retry would leave the
+    # stub behind as though it were the data.
+    part = target.with_name(target.name + ".part")
     last: BaseException | None = None
     for attempt in range(CADS_MAX_ATTEMPTS):
         try:
-            client.retrieve(dataset, request, str(target))
+            client.retrieve(dataset, request, str(part))
+            # `cdsapi` always writes the file it was handed; the guard is for a
+            # stubbed client that writes nothing, so the move is skipped rather
+            # than raising a FileNotFoundError that hides what actually failed.
+            if part.exists():
+                os.replace(part, target)
             return
         except Exception as exc:  # noqa: BLE001 - cdsapi raises many types; classified here
+            part.unlink(missing_ok=True)
             if _looks_like_licence_not_accepted(exc):
                 base = endpoint_url(endpoint).rsplit("/api", 1)[0]
                 raise PermissionError(

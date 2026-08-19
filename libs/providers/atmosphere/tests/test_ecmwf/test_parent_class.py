@@ -97,7 +97,8 @@ class TestParentClassWiring:
         dataset, request, target_str = retrieved[0]
         assert dataset == "reanalysis-era5-single-levels"
         assert request["variable"] == ["2m_temperature"]
-        assert target_str == str(target)
+        # written to a sidecar, then moved onto `target` on success
+        assert target_str == f"{target}.part"
         assert target.parent == tmp_path.resolve()
 
 
