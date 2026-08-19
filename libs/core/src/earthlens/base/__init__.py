@@ -26,7 +26,11 @@ from earthlens.base.abstractdatasource import (
     SpatialExtent,
     TemporalExtent,
 )
-from earthlens.base.auth import AbstractAuth, AuthenticationError
+from earthlens.base.auth import (
+    AbstractAuth,
+    AuthenticationError,
+    SingleSecretAuth,
+)
 from earthlens.base.cache import (
     aoi_tag,
     sidecar_is_fresh,
@@ -114,6 +118,7 @@ __all__ = [
     "S3Auth",
     "S3Credentials",
     "safe_filename",
+    "SingleSecretAuth",
     "sidecar_is_fresh",
     "sidecar_path",
     "SpatialExtent",
