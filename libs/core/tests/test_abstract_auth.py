@@ -240,6 +240,7 @@ class _DemoAuth(SingleSecretAuth[_SecretCreds]):
 
     ENV_VARS = ("DEMO_A", "DEMO_B")
     PROVIDER = "Demo"
+    CREDENTIAL_ARG = "demo_key"
     CREDENTIAL_HINT = "Get one at example.test."
     AUTH_ERROR = _DemoError
 
@@ -288,6 +289,7 @@ class TestSingleSecretAuth:
             _DemoAuth(_SecretCreds()).configure()
         message = str(exc_info.value)
         assert "Demo" in message, message
+        assert "pass demo_key=" in message, message
         assert "DEMO_A or DEMO_B" in message, message
         assert "Get one at example.test." in message, message
 

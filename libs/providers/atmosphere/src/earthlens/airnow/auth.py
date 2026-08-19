@@ -122,6 +122,7 @@ class AirnowAuth(SingleSecretAuth[AirnowCredentials]):
 
     ENV_VARS = ("AIRNOW_API_KEY",)
     PROVIDER = "AirNow"
+    CREDENTIAL_ARG = "api_key"
     CREDENTIAL_HINT = f"Register a free key at {_REGISTER_URL}."
     AUTH_ERROR = AuthenticationError
 

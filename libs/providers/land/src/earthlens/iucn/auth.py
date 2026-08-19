@@ -100,6 +100,7 @@ class IucnAuth(SingleSecretAuth[IucnCredentials]):
 
     ENV_VARS = ("IUCN_TOKEN",)
     PROVIDER = "IUCN Red List"
+    CREDENTIAL_ARG = "token"
     CREDENTIAL_HINT = f"Sign up for a free token at {_TOKEN_URL}."
     AUTH_ERROR = AuthenticationError
 

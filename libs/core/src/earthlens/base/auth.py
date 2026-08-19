@@ -320,6 +320,12 @@ class SingleSecretAuth(AbstractAuth[CredentialsT]):
     #: Human-readable provider name used in the missing-credential message.
     PROVIDER: str = ""
 
+    #: Name of the constructor argument that carries the explicit secret (e.g.
+    #: `"api_key"` or `"token"`). Named in the missing-credential message so it
+    #: tells the caller exactly what to pass. Empty falls back to the generic
+    #: "pass it explicitly".
+    CREDENTIAL_ARG: str = ""
+
     #: Optional extra sentence appended to that message (e.g. a sign-up URL).
     CREDENTIAL_HINT: str = ""
 
@@ -372,9 +378,14 @@ class SingleSecretAuth(AbstractAuth[CredentialsT]):
                 if value:
                     return value
         names = " or ".join(self.ENV_VARS) or "a credential"
+        how = (
+            f"pass {self.CREDENTIAL_ARG}="
+            if self.CREDENTIAL_ARG
+            else "pass it explicitly"
+        )
         message = (
             f"no {self.PROVIDER or type(self).__name__} credential available: "
-            f"pass it explicitly or set {names}."
+            f"{how} or set {names}."
         )
         if self.CREDENTIAL_HINT:
             message = f"{message} {self.CREDENTIAL_HINT}"

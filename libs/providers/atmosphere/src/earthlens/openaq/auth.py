@@ -126,6 +126,7 @@ class OpenaqAuth(SingleSecretAuth[OpenaqCredentials]):
 
     ENV_VARS = ("OPENAQ_API_KEY",)
     PROVIDER = "OpenAQ"
+    CREDENTIAL_ARG = "api_key"
     CREDENTIAL_HINT = f"Register a free key at {_REGISTER_URL}."
     AUTH_ERROR = AuthenticationError
 

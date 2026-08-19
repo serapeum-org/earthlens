@@ -128,6 +128,7 @@ class FirmsAuth(SingleSecretAuth[FirmsCredentials]):
 
     ENV_VARS = ("FIRMS_MAP_KEY",)
     PROVIDER = "FIRMS"
+    CREDENTIAL_ARG = "api_key"
     CREDENTIAL_HINT = f"Request a free key at {_MAP_KEY_URL}."
     AUTH_ERROR = AuthenticationError
 

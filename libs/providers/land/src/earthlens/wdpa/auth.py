@@ -107,6 +107,7 @@ class WdpaAuth(SingleSecretAuth[WdpaCredentials]):
 
     ENV_VARS = ("WDPA_TOKEN",)
     PROVIDER = "Protected Planet"
+    CREDENTIAL_ARG = "token"
     CREDENTIAL_HINT = f"Request a token at {_TOKEN_URL}."
     AUTH_ERROR = AuthenticationError
 

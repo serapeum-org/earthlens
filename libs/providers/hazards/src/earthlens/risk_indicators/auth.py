@@ -128,6 +128,7 @@ class GfwAuth(SingleSecretAuth[GfwCredentials]):
 
     ENV_VARS = ("GFW_API_KEY",)
     PROVIDER = "GFW"
+    CREDENTIAL_ARG = "api_key"
     CREDENTIAL_HINT = f"Create a free key with a MyGFW account: {_CREATE_KEY_URL}."
     AUTH_ERROR = AuthenticationError
 
