@@ -360,7 +360,9 @@ def _hindcast_request_kind(fields: set[str | None]) -> str:
     hindcast date is the only one.
 
     Args:
-        fields: The `name` of every widget in the dataset's `form.json`.
+        fields: The `name` of every widget in the dataset's `form.json`. The
+            caller has already established that `hyear` is among them; a form
+            without it is not a hindcast and never reaches here.
 
     Returns:
         str: One of `seasonal_hindcast`, `s2s_reforecast`, `glofas_hindcast`.

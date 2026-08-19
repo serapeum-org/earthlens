@@ -131,7 +131,10 @@ def download_within_budget():
 
     def _run(work, budget_s: float = 900.0):
         box: dict = {}
-        job = work if callable(work) else work.download
+        # Select on the attribute, not on callability: a Mock is both
+        # callable and has `.download`, and calling it would pass the
+        # test vacuously without ever running a download.
+        job = work.download if hasattr(work, "download") else work
 
         def _work():
             try:

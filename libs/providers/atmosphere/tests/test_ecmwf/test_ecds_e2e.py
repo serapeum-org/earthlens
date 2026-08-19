@@ -74,7 +74,7 @@ def _recent_s2s_cycle() -> pd.Timestamp:
     return (pd.Timestamp.utcnow() - pd.Timedelta(days=_S2S_LAG_DAYS)).normalize()
 
 
-def _fetch(dataset, variable, start, end, resolution, tmp_path, runner, budget_s=900.0):
+def _fetch(dataset, variable, start, end, resolution, tmp_path, runner, budget_s=None):
     """Download one curated variable and return its written path."""
     lens = EarthLens(
         data_source="ecmwf",
@@ -86,7 +86,8 @@ def _fetch(dataset, variable, start, end, resolution, tmp_path, runner, budget_s
         lon_lim=[9.0, 10.0],
         path=str(tmp_path),
     )
-    out = runner(lens, budget_s)
+    # None defers to the fixture's own default rather than restating it here.
+    out = runner(lens) if budget_s is None else runner(lens, budget_s)
     assert out, f"{dataset}/{variable} returned no paths"
     assert out[0].exists()
     assert out[0].stat().st_size > 0

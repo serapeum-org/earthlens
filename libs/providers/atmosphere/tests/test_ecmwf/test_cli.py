@@ -357,8 +357,6 @@ class TestDeepProber:
 
     def test_deep_sample_no_constraints(self, monkeypatch):
         """No constraints rows yields an empty schema (after the SDK imports)."""
-        monkeypatch.setitem(sys.modules, "cdsapi", types.ModuleType("cdsapi"))
-        monkeypatch.setitem(sys.modules, "netCDF4", types.ModuleType("netCDF4"))
         monkeypatch.setattr(ecmwf_cli, "_ecmwf_constraints", lambda d: [])
         assert ecmwf_cli._ecmwf_deep_sample("x") == {}
 

@@ -251,3 +251,57 @@ class TestDownloadWiresTheFatalHatch:
             lambda self, pair, **kw: (_ for _ in ()).throw(ValueError("no data")),
         )
         assert source.download(progress_bar=False) == []
+
+
+class TestExtractedHelpers:
+    """Direct cover for the two helpers extracted for testability (review N3)."""
+
+    @pytest.mark.parametrize(
+        "fields, expected",
+        [
+            ({"hyear", "hmonth"}, "seasonal_hindcast"),
+            ({"hyear", "hmonth", "hday", "year", "month", "day"}, "s2s_reforecast"),
+            ({"hyear", "hmonth", "hday"}, "glofas_hindcast"),
+        ],
+    )
+    def test_hindcast_kind_covers_all_three_shapes(self, fields, expected):
+        """No `hday` is seasonal; `hday` with `day` pairs; `hday` alone renames."""
+        from earthlens.ecmwf.cli import _hindcast_request_kind
+
+        assert _hindcast_request_kind(fields) == expected
+
+    def test_from_info_reads_named_bands_with_metadata(self):
+        """A band with a NETCDF_VARNAME and units is extracted."""
+        from earthlens.ecmwf.cli import _from_info
+
+        info = {
+            "bands": [
+                {
+                    "metadata": {
+                        "": {
+                            "NETCDF_VARNAME": "t2m",
+                            "long_name": "2 metre temperature",
+                            "units": "K",
+                        }
+                    }
+                }
+            ]
+        }
+        assert _from_info(info) == {
+            "t2m": {"long_name": "2 metre temperature", "units": "K"}
+        }
+
+    @pytest.mark.parametrize(
+        "bands",
+        [
+            [],
+            [{"metadata": {"": {"NETCDF_VARNAME": "t2m"}}}],
+            [{"metadata": {"": {"units": "K"}}}],
+        ],
+        ids=["no-bands", "no-metadata", "no-name"],
+    )
+    def test_from_info_skips_bands_it_cannot_describe(self, bands):
+        """A band with no name, or no long_name and no units, is dropped."""
+        from earthlens.ecmwf.cli import _from_info
+
+        assert _from_info({"bands": bands}) == {}
