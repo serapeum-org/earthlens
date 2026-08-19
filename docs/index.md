@@ -1,4 +1,4 @@
-![earthlens — one Python facade for 48 Earth-observation data providers](_images/branding/earthlens-brand-kit/docs/docs-hero.png)
+![earthlens — one Python facade for 61 Earth-observation data providers](_images/branding/earthlens-brand-kit/docs/docs-hero.png)
 
 # earthlens
 
