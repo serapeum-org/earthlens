@@ -101,6 +101,11 @@ def _block_real_cdsapi(request, monkeypatch):
     monkeypatch.setattr(cdsapi, "Client", _no_live_client)
 
 
+#: Grace period for an overrunning retrieve to finish its in-flight write
+#: before the test fails and pytest removes `tmp_path` underneath it.
+_ABANDON_GRACE_SECONDS = 5.0
+
+
 @pytest.fixture
 def download_within_budget():
     """Run a live retrieve under a wall-clock budget, failing fast on a hang.
@@ -146,9 +151,18 @@ def download_within_budget():
         worker.start()
         worker.join(budget_s)
         if worker.is_alive():
+            # The thread is still inside `retrieve`, writing into `tmp_path`,
+            # and pytest is about to tear that directory down underneath it.
+            # A daemon thread cannot be killed, so give it a short grace period
+            # to finish the write it is in; if it outlives that, say so rather
+            # than leaving a confusing teardown error as the only trace.
+            worker.join(_ABANDON_GRACE_SECONDS)
+            stray = " (a retrieve is still running and holds a queue slot)" * (
+                worker.is_alive()
+            )
             pytest.fail(
                 f"live retrieve exceeded the {budget_s:.0f}s budget "
-                "(CDS queue hang); failing fast so the e2e lane survives"
+                f"(CDS queue hang); failing fast so the e2e lane survives{stray}"
             )
         if "exc" in box:
             exc = box["exc"]

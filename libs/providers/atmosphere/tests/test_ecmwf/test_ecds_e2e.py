@@ -24,33 +24,40 @@ from earthlens.core import EarthLens
 pytestmark = [pytest.mark.e2e]
 
 
+def _netcdf_members(path: Path) -> list[Path]:
+    """Return the NetCDF files in a retrieved result, unwrapping a ZIP once.
+
+    Both readers below go through this, so a zipped result is extracted once
+    into one place, and an archive carrying no NetCDF says so instead of
+    surfacing as an empty variable set or a bare `IndexError`.
+    """
+    if not zipfile.is_zipfile(path):
+        return [path]
+    target = path.parent / f"{path.stem}_unzipped"
+    if not target.exists():
+        with zipfile.ZipFile(path) as archive:
+            archive.extractall(target)
+    members = sorted(target.rglob("*.nc"))
+    assert members, f"{path.name} is a zip with no .nc member"
+    return members
+
+
 def _variables_in(path: Path) -> set[str]:
     """Return the NetCDF variable names in a retrieved file (zip or flat)."""
     import xarray as xr
 
-    members = [path]
-    if zipfile.is_zipfile(path):
-        with zipfile.ZipFile(path) as archive:
-            target = path.parent / f"{path.stem}_unzipped"
-            archive.extractall(target)
-        members = sorted(target.rglob("*.nc"))
     names: set[str] = set()
-    for member in members:
+    for member in _netcdf_members(path):
         with xr.open_dataset(member) as dataset:
             names.update(dataset.data_vars)
     return names
 
 
-def _time_stamps(path: Path) -> list:
+def _time_stamps(path: Path) -> list[pd.Timestamp]:
     """Return the datetime values on a retrieved file's time coordinate."""
     import xarray as xr
 
-    member = path
-    if zipfile.is_zipfile(path):
-        with zipfile.ZipFile(path) as archive:
-            target = path.parent / f"{path.stem}_times"
-            archive.extractall(target)
-        member = sorted(target.rglob("*.nc"))[0]
+    member = _netcdf_members(path)[0]
     with xr.open_dataset(member) as dataset:
         name = next(
             (

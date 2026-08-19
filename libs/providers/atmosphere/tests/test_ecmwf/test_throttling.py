@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 import requests
 
+import earthlens.ecmwf._helpers as helpers_mod
 import earthlens.ecmwf.backend as backend_mod
 from earthlens.ecmwf import CadsUnavailableError
 
@@ -47,7 +48,7 @@ class TestLooksLikeThrottled:
     )
     def test_classifies_only_queue_limit_refusals(self, message, expected):
         """Only a queue-limit refusal is throttling; a bad request is not."""
-        assert backend_mod._looks_like_throttled(Exception(message)) is expected
+        assert helpers_mod._looks_like_throttled(Exception(message)) is expected
 
 
 class TestStatusOf:
@@ -58,15 +59,15 @@ class TestStatusOf:
         exc = requests.HTTPError("boom")
         exc.response = requests.Response()
         exc.response.status_code = 429
-        assert backend_mod._status_of(exc) == 429
+        assert helpers_mod._status_of(exc) == 429
 
     def test_falls_back_to_the_message(self):
         """Without a response object the status is read from the text."""
-        assert backend_mod._status_of(Exception("400 Client Error: nope")) == 400
+        assert helpers_mod._status_of(Exception("400 Client Error: nope")) == 400
 
     def test_returns_none_when_undiscernible(self):
         """A transport failure carries no status."""
-        assert backend_mod._status_of(Exception("connection dropped")) is None
+        assert helpers_mod._status_of(Exception("connection dropped")) is None
 
 
 class TestRetrieveWithRetry:
@@ -75,48 +76,48 @@ class TestRetrieveWithRetry:
     def test_succeeds_without_retrying_when_the_store_is_healthy(self, tmp_path):
         """A first-attempt success calls retrieve exactly once."""
         client = _Client(failures=0)
-        backend_mod._retrieve_with_retry(client, "ds", {}, tmp_path / "o.nc", "ecds")
+        helpers_mod._retrieve_with_retry(client, "ds", {}, tmp_path / "o.nc", "ecds")
         assert client.calls == 1
 
     def test_retries_a_throttled_retrieve_and_succeeds(self, tmp_path, monkeypatch):
         """A transient throttle is retried rather than surfaced."""
-        monkeypatch.setattr(backend_mod.time, "sleep", lambda _s: None)
+        monkeypatch.setattr(helpers_mod.time, "sleep", lambda _s: None)
         client = _Client(failures=2)
-        backend_mod._retrieve_with_retry(client, "ds", {}, tmp_path / "o.nc", "ecds")
+        helpers_mod._retrieve_with_retry(client, "ds", {}, tmp_path / "o.nc", "ecds")
         assert client.calls == 3
 
     def test_raises_typed_error_once_the_attempts_are_spent(
         self, tmp_path, monkeypatch
     ):
         """Persistent throttling raises `CadsUnavailableError`, not HTTPError."""
-        monkeypatch.setattr(backend_mod.time, "sleep", lambda _s: None)
+        monkeypatch.setattr(helpers_mod.time, "sleep", lambda _s: None)
         client = _Client(failures=99)
         with pytest.raises(CadsUnavailableError) as excinfo:
-            backend_mod._retrieve_with_retry(
+            helpers_mod._retrieve_with_retry(
                 client, "ds", {}, tmp_path / "o.nc", "ecds"
             )
-        assert client.calls == backend_mod.CADS_MAX_ATTEMPTS
+        assert client.calls == helpers_mod.CADS_MAX_ATTEMPTS
         assert excinfo.value.status_code == 400
         assert "temporary" in str(excinfo.value).lower()
 
     def test_backs_off_exponentially_between_attempts(self, tmp_path, monkeypatch):
         """Each retry waits twice as long as the one before it."""
         waits: list[float] = []
-        monkeypatch.setattr(backend_mod.time, "sleep", waits.append)
+        monkeypatch.setattr(helpers_mod.time, "sleep", waits.append)
         with pytest.raises(CadsUnavailableError):
-            backend_mod._retrieve_with_retry(
+            helpers_mod._retrieve_with_retry(
                 _Client(failures=99), "ds", {}, tmp_path / "o.nc", "ecds"
             )
         assert waits == [
-            backend_mod.CADS_BACKOFF_SECONDS * 2**i
-            for i in range(backend_mod.CADS_MAX_ATTEMPTS - 1)
+            helpers_mod.CADS_BACKOFF_SECONDS * 2**i
+            for i in range(helpers_mod.CADS_MAX_ATTEMPTS - 1)
         ]
 
     def test_a_bad_request_is_not_retried(self, tmp_path):
         """A genuine request error fails fast instead of burning attempts."""
         client = _Client(failures=99, exc=requests.HTTPError("400: bad 'variable'"))
         with pytest.raises(requests.HTTPError):
-            backend_mod._retrieve_with_retry(
+            helpers_mod._retrieve_with_retry(
                 client, "ds", {}, tmp_path / "o.nc", "ecds"
             )
         assert client.calls == 1
@@ -125,7 +126,7 @@ class TestRetrieveWithRetry:
         """An unaccepted licence is permanent, so it is not retried."""
         client = _Client(failures=99, exc=Exception("403: licence not accepted"))
         with pytest.raises(PermissionError, match="licence not accepted"):
-            backend_mod._retrieve_with_retry(
+            helpers_mod._retrieve_with_retry(
                 client, "ds", {}, tmp_path / "o.nc", "ecds"
             )
         assert client.calls == 1
