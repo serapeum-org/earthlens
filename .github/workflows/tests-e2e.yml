@@ -1,48 +1,16 @@
 name: Tests - E2E (live CDS + GEE + STAC)
 
-# Live end-to-end suites against external services (Copernicus Climate
-# Data Store; Google Earth Engine). These hit real servers / queue
-# server-side, so running on every push to any branch or every PR would burn
-# quota and slow CI. So the triggers are deliberately scoped:
-#
-#   * push to `main`: every merge to the default branch runs the FULL live e2e
-#     suite, EXCEPT a merge that changes only documentation. Any code or CI /
-#     workflow change (including this workflow itself) is validated end-to-end
-#     on its own merge. (The per-provider `tests-e2e-<theme>.yml` gates only run
-#     the affected lane on a PR; this is the complete post-merge check.)
-#   * schedule: weekly on Sunday at 04:00 UTC
-#   * workflow_dispatch: manual trigger from the Actions tab
-#
-# Forks cannot read repo secrets, so a fork-PR run would fail at auth.
-# The jobs below only run on the main repo, and each suite skips its
-# tests when its credentials are absent.
+# Live e2e against external, rate/quota-limited services (CDS, GEE, EUMETSAT,
+# STAC, …). Triggers: every non-docs merge to `main` (docs-only merges skipped
+# below), the weekly cron, and manual dispatch. Jobs run only on the main repo
+# (forks have no secrets) and self-skip when a credential is absent.
 
 permissions:
   contents: read
 
-# There is no `pull_request` trigger, so the expression is always false and
-# `cancel-in-progress: false` protects a live run that is already IN PROGRESS —
-# an active suite is never cancelled mid-flight against rate/quota-limited
-# services, which is the point.
-#
-# The one shared `github.ref` group is deliberate: the non-PR events that run as
-# `refs/heads/main` — a merge to `main`, the weekly cron, and a dispatch from
-# `main` — serialise, so two full live runs never overlap. (A dispatch launched
-# from another branch runs as that ref, a separate group, and would not
-# serialise against a `main` run — an accepted edge for a manual action.) The cost is that it does NOT
-# guarantee a run per merge: GitHub cancels a *pending* run when a newer one
-# queues in the same group (see tests.yml for the full note), so during a burst
-# — merge A in progress, B pending, C queued — B is superseded before it starts,
-# and any non-PR event (a dispatch/cron, not just a later merge) can drop a
-# pending run this way. This is quota-first by choice: run the latest main state,
-# not every intermediate; the weekly cron backstops. Guaranteeing a run per merge
-# needs a run_id-keyed group (as tests.yml uses), which runs collisions in
-# PARALLEL and doubles the live-quota spend — exactly what this suite avoids.
-#
-# The expression is kept rather than hard-coded `false` so the PR-cancel half
-# switches on by itself if a `pull_request` trigger is ever added - at which
-# point re-read it, because cancelling a half-finished live run mid-flight is
-# not obviously right for this suite.
+# Serialise non-PR runs (a merge, the cron, a dispatch on `main` share one group)
+# so two full live runs never overlap; cancel-in-progress applies to PRs only.
+# See tests.yml for the pending-run-cancellation trade-off.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -50,11 +18,7 @@ concurrency:
 on:
   push:
     branches: [main]
-    # Skip ONLY pure-documentation merges (they cannot change an e2e result).
-    # `.github/**` is intentionally NOT ignored, so a CI / workflow change runs
-    # the suite on its own merge. `paths-ignore` skips a push only when EVERY
-    # changed path matches, so a mixed docs+code merge still runs.
-    paths-ignore:
+    paths-ignore:  # docs-only merges skip; code and CI changes run
       - 'docs/**'
       - '**/*.md'
       - 'mkdocs.yml'
