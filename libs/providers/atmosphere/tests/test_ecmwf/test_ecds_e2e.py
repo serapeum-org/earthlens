@@ -20,7 +20,6 @@ import pandas as pd
 import pytest
 
 from earthlens.core import EarthLens
-from earthlens.ecmwf import Catalog
 
 pytestmark = [pytest.mark.e2e]
 
@@ -63,6 +62,16 @@ def _time_stamps(path: Path) -> list:
         )
         assert name is not None, f"no datetime coordinate in {member.name}"
         return [pd.Timestamp(value) for value in dataset[name].values.ravel()]
+
+
+#: How far back to reach for an S2S real-time cycle. Far enough inside the
+#: rolling retention window to be safe, recent enough to still be served.
+_S2S_LAG_DAYS = 14
+
+
+def _recent_s2s_cycle() -> pd.Timestamp:
+    """Return an S2S real-time cycle date that is inside the retention window."""
+    return (pd.Timestamp.utcnow() - pd.Timedelta(days=_S2S_LAG_DAYS)).normalize()
 
 
 def _fetch(dataset, variable, start, end, resolution, tmp_path, runner, budget_s=900.0):
@@ -109,12 +118,18 @@ class TestEcdsE2E:
     def test_live_s2s_forecast_returns_2m_temperature(
         self, tmp_path, download_within_budget
     ):
-        """An S2S real-time forecast returns the `t2m` field."""
+        """An S2S real-time forecast returns the `t2m` field.
+
+        The cycle is derived from today rather than pinned: the real-time
+        stream is a rolling archive, so a fixed recent date silently ages out
+        and the case starts failing on the calendar instead of on the code.
+        """
+        cycle = f"{_recent_s2s_cycle():%Y-%m-%d}"
         path = _fetch(
             "s2s-forecasts",
             "2m-temperature",
-            "2026-08-01",
-            "2026-08-01",
+            cycle,
+            cycle,
             "daily",
             tmp_path,
             download_within_budget,
@@ -183,19 +198,3 @@ class TestXdsE2E:
             download_within_budget,
         )
         assert "BAF_pred" in _variables_in(path)
-
-
-class TestCuratedRowsMatchTheFiles:
-    """Every curated row's `nc_variable` is what the store actually returns."""
-
-    def test_each_row_declares_a_variable_the_catalog_can_resolve(self):
-        """Sanity check the five rows this suite covers are all curated."""
-        catalog = Catalog()
-        for dataset in (
-            "tigge-forecasts",
-            "s2s-forecasts",
-            "s2s-reforecasts",
-            "derived-fire-fuel-biomass",
-            "projections-fire-fuel-burned-area",
-        ):
-            assert dataset in catalog.datasets, dataset

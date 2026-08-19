@@ -377,3 +377,30 @@ class TestNewStoreLicenceRefusal:
         message = str(excinfo.value)
         assert host in message
         assert "tigge-forecasts" in message
+
+
+class TestCuratedRowsAreComplete:
+    """Offline guards on the five rows the live suite covers (review M6)."""
+
+    #: The rows the ECDS/XDS live suite retrieves, and the NetCDF name each
+    #: promises. The live tests assert the file contains these; this asserts
+    #: the catalog still declares them, in the lane every PR runs.
+    _EXPECTED = {
+        ("tigge-forecasts", "2m-temperature"): "t2m",
+        ("s2s-forecasts", "2m-temperature"): "t2m",
+        ("s2s-reforecasts", "maximum-2m-temperature-in-the-last-6-hours"): "mx2t6",
+        ("derived-fire-fuel-biomass", "live-fuel-moisture-content-group"): "LFMC",
+        ("projections-fire-fuel-burned-area", "burned-area"): "BAF_pred",
+    }
+
+    @pytest.mark.parametrize("key, nc_variable", sorted(_EXPECTED.items()))
+    def test_each_live_row_still_declares_its_nc_variable(self, key, nc_variable):
+        """A rename would break the live suite; catch it in the offline lane."""
+        dataset, variable = key
+        assert Catalog().get_variable(dataset, variable).nc_variable == nc_variable
+
+    @pytest.mark.parametrize("key", sorted(_EXPECTED))
+    def test_no_live_row_ships_a_placeholder_unit(self, key):
+        """A `units: unknown` row means the metadata was never verified."""
+        dataset, variable = key
+        assert Catalog().get_variable(dataset, variable).units != "unknown"
