@@ -13,6 +13,8 @@ are integration-level rather than narrow unit tests.
 
 from __future__ import annotations
 
+import pathlib
+
 import cdsapi
 import pytest
 
@@ -70,6 +72,9 @@ class TestParentClassWiring:
         class FakeClient:
             def retrieve(self, dataset, request, target):
                 retrieved.append((dataset, request, target))
+                # cdsapi always writes the file it is handed; the backend
+                # treats a retrieve that wrote nothing as a failed download.
+                pathlib.Path(target).write_bytes(b"")
 
         monkeypatch.setattr(cdsapi, "Client", FakeClient)
 

@@ -119,13 +119,29 @@ def _looks_like_throttled(exc: BaseException) -> bool:
 
 
 def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
-    """Yield `exc` and every exception it wraps, outermost first."""
+    """Yield `exc` then each linked `__cause__` / `__context__`, cycle-safe.
+
+    Args:
+        exc: The exception to walk.
+
+    Yields:
+        BaseException: Each exception in the chain, most recent first.
+    """
     seen: set[int] = set()
     current: BaseException | None = exc
     while current is not None and id(current) not in seen:
         seen.add(id(current))
         yield current
-        current = current.__cause__ or current.__context__
+        # Honour `raise ... from None`: an explicit cause wins, otherwise follow
+        # the implicit context unless the author suppressed it (matching
+        # Python's own traceback display), so a deliberately surfaced failure is
+        # not reclassified through a context it asked to hide.
+        if current.__cause__ is not None:
+            current = current.__cause__
+        elif current.__suppress_context__:
+            current = None
+        else:
+            current = current.__context__
 
 
 def _status_of(exc: BaseException) -> int | None:
@@ -147,7 +163,17 @@ def _status_of(exc: BaseException) -> int | None:
         status = getattr(getattr(link, "response", None), "status_code", None)
         if isinstance(status, int) and not isinstance(status, bool):
             return status
-    match = re.search(r"\b(\d{3})\s+(?:server|client)\s+error", str(exc), re.I)
+        # The status is often only in the text of the wrapped error, so scan
+        # each link rather than the outermost message alone.
+        parsed = _status_in_message(str(link))
+        if parsed is not None:
+            return parsed
+    return None
+
+
+def _status_in_message(text: str) -> int | None:
+    """Return the `NNN Client/Server Error` status in `text`, when present."""
+    match = re.search(r"\b(\d{3})\s+(?:server|client)\s+error", text, re.I)
     return int(match.group(1)) if match else None
 
 
@@ -203,12 +229,6 @@ def _retrieve_with_retry(
     for attempt in range(CADS_MAX_ATTEMPTS):
         try:
             client.retrieve(dataset, request, str(part))
-            # `cdsapi` always writes the file it was handed; the guard is for a
-            # stubbed client that writes nothing, so the move is skipped rather
-            # than raising a FileNotFoundError that hides what actually failed.
-            if part.exists():
-                os.replace(part, target)
-            return
         except Exception as exc:  # noqa: BLE001 - cdsapi raises many types; classified here
             part.unlink(missing_ok=True)
             if _looks_like_licence_not_accepted(exc):
@@ -231,6 +251,20 @@ def _retrieve_with_retry(
                     f"retrying in {wait:.0f}s"
                 )
                 time.sleep(wait)
+        else:
+            # Outside the `except`: a failure moving the file is not a failed
+            # retrieve, and running it in the handler's scope would unlink the
+            # bytes just downloaded. A retrieve that wrote nothing is a real
+            # failure — reporting success would hand back whatever stale file
+            # happened to be at `target`.
+            if not part.exists():
+                raise CadsUnavailableError(
+                    f"{endpoint.upper()} returned no data for {dataset!r}: the "
+                    "retrieve reported success but wrote no file.",
+                    status_code=None,
+                )
+            os.replace(part, target)
+            return
     raise CadsUnavailableError(
         f"{endpoint.upper()} refused {dataset!r} after {CADS_MAX_ATTEMPTS} "
         f"attempts: the per-dataset queue limit is in force for this account. "

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pathlib
+
 import pytest
 import requests
 
@@ -21,16 +23,20 @@ _THROTTLED = (
 class _Client:
     """A cdsapi stand-in that fails a given number of times, then succeeds."""
 
-    def __init__(self, failures, exc=None):
+    def __init__(self, failures, exc=None, payload=b""):
         self.failures = failures
         self.exc = exc or requests.HTTPError(_THROTTLED)
+        self.payload = payload
         self.calls = 0
 
     def retrieve(self, dataset, request, target):
         self.calls += 1
         if self.calls <= self.failures:
+            # A real client can leave a partial file behind before failing.
+            pathlib.Path(target).write_bytes(b"partial")
             raise self.exc
-        open(target, "w").close()
+        if self.payload is not None:
+            pathlib.Path(target).write_bytes(self.payload)
 
 
 class TestLooksLikeThrottled:
@@ -230,7 +236,6 @@ class TestDownloadWiresTheFatalHatch:
     def test_a_refusal_propagates_through_download(self, tmp_path, monkeypatch, policy):
         """Every non-raise policy still surfaces a store refusal."""
         source = self._lens(tmp_path)
-        source._errors = policy
         monkeypatch.setattr(
             backend_mod.ECMWF,
             "_download_pair",
@@ -238,8 +243,11 @@ class TestDownloadWiresTheFatalHatch:
                 CadsUnavailableError("ECDS refused every job", status_code=400)
             ),
         )
+        # The policy must be passed in: download() re-derives `self._errors`
+        # from its own argument, so seeding the attribute is a no-op and the
+        # parametrisation would silently run "warn" three times.
         with pytest.raises(CadsUnavailableError, match="refused every job"):
-            source.download(progress_bar=False)
+            source.download(progress_bar=False, errors=policy)
 
     def test_an_ordinary_failure_is_still_absorbed_by_download(
         self, tmp_path, monkeypatch
@@ -356,3 +364,50 @@ class TestEndpointResolution:
         from earthlens.ecmwf.cli import _endpoint_for
 
         assert _endpoint_for("definitely-not-a-dataset") == "cds"
+
+
+class TestRetrieveIsAtomic:
+    """The `.part` write must land, clean up, and never expose a stale file."""
+
+    def test_the_bytes_land_at_the_target(self, tmp_path):
+        """A successful retrieve moves the sidecar onto the target."""
+        target = tmp_path / "out.nc"
+        client = _Client(failures=0, payload=b"fresh")
+        helpers_mod._retrieve_with_retry(client, "ds", {}, target, "ecds")
+        assert target.read_bytes() == b"fresh"
+
+    def test_no_part_file_is_left_behind(self, tmp_path):
+        """The sidecar is gone once the retrieve succeeds."""
+        target = tmp_path / "out.nc"
+        helpers_mod._retrieve_with_retry(_Client(failures=0), "ds", {}, target, "ecds")
+        assert not (tmp_path / "out.nc.part").exists()
+
+    def test_a_failed_retrieve_leaves_a_pre_existing_file_intact(
+        self, tmp_path, monkeypatch
+    ):
+        """An exhausted retry must not truncate the good file already there."""
+        monkeypatch.setattr(helpers_mod.time, "sleep", lambda _s: None)
+        target = tmp_path / "out.nc"
+        target.write_bytes(b"previous good download")
+        with pytest.raises(CadsUnavailableError):
+            helpers_mod._retrieve_with_retry(
+                _Client(failures=99), "ds", {}, target, "ecds"
+            )
+        assert target.read_bytes() == b"previous good download"
+        assert not (tmp_path / "out.nc.part").exists()
+
+    def test_a_retrieve_that_writes_nothing_is_a_failure(self, tmp_path):
+        """Reporting success would hand back whatever stale file was there."""
+        target = tmp_path / "out.nc"
+        target.write_bytes(b"stale")
+        client = _Client(failures=0, payload=None)
+        with pytest.raises(CadsUnavailableError, match="wrote no file"):
+            helpers_mod._retrieve_with_retry(client, "ds", {}, target, "ecds")
+        assert target.read_bytes() == b"stale"
+
+    def test_a_retry_overwrites_the_previous_partial(self, tmp_path):
+        """The second attempt's bytes win, not the first attempt's stub."""
+        target = tmp_path / "out.nc"
+        client = _Client(failures=1, payload=b"second attempt")
+        helpers_mod._retrieve_with_retry(client, "ds", {}, target, "ecds")
+        assert target.read_bytes() == b"second attempt"

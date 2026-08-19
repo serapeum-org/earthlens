@@ -16,6 +16,7 @@ Holds the four pieces every test in this directory needs:
 
 from __future__ import annotations
 
+import pathlib
 import threading
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -209,6 +210,21 @@ def pressure_level_var_info():
     )
 
 
+def _writing_client() -> MagicMock:
+    """A `cdsapi` stub that writes the file it is handed, as the real one does.
+
+    The backend retrieves into a `.part` sidecar and moves it onto the target,
+    treating a retrieve that wrote nothing as a failed download. A bare
+    `MagicMock` writes nothing, so it would exercise that failure path instead
+    of the success path every caller of this fixture means to test.
+    """
+    client = MagicMock()
+    client.retrieve.side_effect = lambda dataset, request, target: pathlib.Path(
+        target
+    ).write_bytes(b"")
+    return client
+
+
 @pytest.fixture
 def ecmwf_stub(tmp_path):
     """Minimal `ECMWF` instance with the attributes `_api()` consumes.
@@ -227,7 +243,7 @@ def ecmwf_stub(tmp_path):
         ECMWF: An `ECMWF` instance ready for `_api()` invocation.
     """
     ecmwf = ECMWF.__new__(ECMWF)
-    ecmwf.client = MagicMock()
+    ecmwf.client = _writing_client()
     ecmwf.root_dir = tmp_path
     ecmwf.time = TemporalExtent(
         start_date=pd.Timestamp("2022-01-01"),
