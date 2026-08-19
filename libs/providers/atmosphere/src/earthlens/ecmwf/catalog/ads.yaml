@@ -1529,6 +1529,10 @@ datasets:
         cds_variable: global_horizontal_irradiation
         nc_variable: global_horizontal_irradiation
         units: unknown
+      # The hydrated name below is specific to the `sky_type: [clear]` pinned
+      # in this row's extras — under `sky_type: [all]` the file carries no
+      # `beam_horizontal_clear_sky_irradiation`, so changing that pin means
+      # re-probing this row rather than only the extras.
       direct-horizontal-irradiation:
         cds_variable: direct_horizontal_irradiation
         nc_variable: beam_horizontal_clear_sky_irradiation

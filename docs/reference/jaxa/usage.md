@@ -99,7 +99,7 @@ catalog) without touching disk. The second rewrites the
 `available_datasets:` index in `src/earthlens/jaxa/catalog/_index.yaml`
 with the freshly probed ids (the curated per-mission shards under the
 same `catalog/` directory are not touched). See
-`planning/jaxa/captures/build_catalog.py` for the generator that builds
+the JAXA catalog build script for the generator that builds
 the per-mission shards from scratch.
 
 ## When the live e2e tests run
