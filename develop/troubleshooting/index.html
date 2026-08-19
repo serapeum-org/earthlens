@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://serapeum-org.github.io/earthlens/develop/troubleshooting/">
       
       
-        <link rel="prev" href="../reference/cli/">
+        <link rel="prev" href="../reference/configuration/">
       
       
         <link rel="next" href="../migration/">
@@ -714,6 +714,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1015,6 +1043,17 @@
     <span class="md-ellipsis">
       
         Where did my files go?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where-did-my-cached-downloads-go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where did my cached downloads go?
       
     </span>
   </a>
@@ -13027,6 +13066,90 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/showcase/eclipse_geometry_3d/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The eclipse in 3D — Sun → Moon → Earth, and the satellites that watched it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Moon's shadow from Meteosat — the 12 Aug 2026 total solar eclipse (MTG-FCI)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/showcase/solar_eclipse_2026_goes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Watching the Moon's shadow cross the North Atlantic — the 12 Aug 2026 total solar eclipse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -23714,6 +23837,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#where-did-my-cached-downloads-go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where did my cached downloads go?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#download-returned-an-object-not-file-paths" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23981,9 +24115,19 @@ and <code>nwp</code>. On one whose fetch is a single whole-batch request, such a
 <h2 id="output"><a class="toclink" href="#output">Output</a><a class="headerlink" href="#output" title="Permanent link">#</a></h2>
 <h3 id="where-did-my-files-go"><a class="toclink" href="#where-did-my-files-go">Where did my files go?</a><a class="headerlink" href="#where-did-my-files-go" title="Permanent link">#</a></h3>
 <p>If you omit <code>path=</code>, earthlens logs where it wrote:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>No `path` given; download() writes &#39;chc&#39; output under earthlens-data\chc/ (load() uses a temp dir).
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>No `path` given; download() writes &#39;chc&#39; output under ~/.earthlens/data/chc/ (load() uses a temp dir).
 </code></pre></div>
-<p>Pass <code>path=</code> to control it.</p>
+<p>An omitted <code>path=</code> resolves to the configured output directory — <code>set_output_dir()</code>, else <code>EARTHLENS_DATA_DIR</code>,
+else <code>~/.earthlens/data</code> — and the facade adds a per-source subdirectory. Pass <code>path=</code> to control it per call, or
+see <a href="../reference/configuration/">Configuration</a> to set it once for the whole process.</p>
+<p>If you are upgrading and a script that globbed <code>./earthlens-data/**</code> now finds nothing, that is why: the default
+moved off the working directory. Pass <code>path=""</code> to write to the working directory as before. Nothing was moved for
+you, so files an earlier version wrote are still where it put them.</p>
+<h3 id="where-did-my-cached-downloads-go"><a class="toclink" href="#where-did-my-cached-downloads-go">Where did my cached downloads go?</a><a class="headerlink" href="#where-did-my-cached-downloads-go" title="Permanent link">#</a></h3>
+<p>Backends that download an archive or index on the way to their output cache it under the shared cache directory —
+<code>set_cache_dir()</code>, else <code>EARTHLENS_CACHE</code>, else the per-platform user cache — each in its own subdirectory. Nine
+backends used to cache elsewhere (inside your output <code>path=</code>, or under <code>~/.earthlens/cache/</code>); anything they left
+behind is regenerable and safe to delete. <a href="../reference/configuration/">Configuration</a> lists the old locations.</p>
 <h3 id="download-returned-an-object-not-file-paths"><a class="toclink" href="#download-returned-an-object-not-file-paths"><code>download()</code> returned an object, not file paths</a><a class="headerlink" href="#download-returned-an-object-not-file-paths" title="Permanent link">#</a></h3>
 <p>That is by design and depends on the backend's <code>OUTPUT_KIND</code>: <code>raster</code> returns <code>list[Path]</code>; <code>vector</code> returns a
 <code>FeatureCollection</code>; <code>tabular</code> returns a <code>DataFrame</code>. It never returns <code>None</code>. The matrix is in
@@ -24048,7 +24192,7 @@ the provider key, the full traceback, and your earthlens version:</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../reference/cli/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Command-line interface">
+          <a href="../reference/configuration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -24058,7 +24202,7 @@ the provider key, the full traceback, and your earthlens version:</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Command-line interface
+                Configuration
               </div>
             </div>
           </a>
