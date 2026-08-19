@@ -499,8 +499,13 @@ datasets:
     variables:
       all:
         cds_variable: all
-        nc_variable: num_covered_hours
-        units: '1'
+        # NOT hydrated: the bulk fill paired this row's pseudo-slug `all` with
+        # `num_covered_hours`, an auxiliary coverage counter, because it was the
+        # only unmatched data variable in the probe. That is a precipitation CDR,
+        # so aggregate= would have reduced the hours-covered field and written it
+        # out as rainfall. Left as a placeholder pending a real per-variable probe.
+        nc_variable: all
+        units: unknown
   satellite-precipitation-microwave-infrared:
     endpoint: cds
     request_kind: satellite_cdr

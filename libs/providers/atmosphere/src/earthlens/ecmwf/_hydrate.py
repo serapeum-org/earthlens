@@ -80,7 +80,13 @@ _AUXILIARY_SUFFIXES = (
     "_flags",
     "_zenith_angle",
     "_azimuth_angle",
+    "_covered_hours",
 )
+
+#: Prefixes of auxiliary counters that carry no science value. `num_` covers the
+#: coverage fields the satellite CDRs ship (`num_covered_hours`), which rule 4
+#: would otherwise pair with a dataset's only slug.
+_AUXILIARY_PREFIXES = ("num_", "numobs", "n_covered")
 
 #: One curated variable sub-block: a 6-space slug line + its 8-space body.
 _VARIABLE_BLOCK = re.compile(
@@ -198,6 +204,7 @@ def _is_auxiliary(name: str) -> bool:
         lower in _COORD_NAMES
         or lower in _AUXILIARY_NAMES
         or lower.startswith(("nobs", "n_obs"))
+        or lower.startswith(_AUXILIARY_PREFIXES)
         or lower.endswith(_AUXILIARY_SUFFIXES)
     )
 
@@ -286,7 +293,11 @@ def _match_variables(
 
     unmatched = [slug for slug in placeholders if slug not in chosen]
     unused = [name for name in candidates if name not in used]
-    if len(unmatched) == 1 and len(unused) == 1:
+    # `all` is a pseudo-slug standing for "every variable this dataset serves",
+    # not a name to match: it never resembles a real variable, so it is always
+    # the lone unmatched slug and rule 4 would pair it with whatever single
+    # variable happened to survive the auxiliary filter.
+    if len(unmatched) == 1 and len(unused) == 1 and unmatched[0] != "all":
         chosen[unmatched[0]] = unused[0]
 
     return {

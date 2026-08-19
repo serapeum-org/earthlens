@@ -181,3 +181,32 @@ class TestServiceRefusalIsNotAnEmptyResult:
         )
         assert results == []
         assert len(failures) == 2
+
+
+class TestHydratorDoesNotPairPseudoSlugs:
+    """The bulk fill must not invent an `nc_variable` (review H3)."""
+
+    def test_a_coverage_counter_is_auxiliary(self):
+        """`num_covered_hours` is a count, never a science variable."""
+        from earthlens.ecmwf._hydrate import _is_auxiliary
+
+        assert _is_auxiliary("num_covered_hours") is True
+
+    def test_a_real_variable_is_not_auxiliary(self):
+        """The widened filter must not swallow genuine data variables."""
+        from earthlens.ecmwf._hydrate import _is_auxiliary
+
+        assert _is_auxiliary("precipitation") is False
+
+    def test_the_all_pseudo_slug_is_never_paired(self):
+        """`all` means every variable, so it must not be matched to one."""
+        from earthlens.ecmwf._hydrate import _match_variables
+
+        assert _match_variables(["all"], {"some_variable": {"units": "mm"}}) == {}
+
+    def test_an_ordinary_lone_slug_still_pairs(self):
+        """Rule 4 still fires for a real slug with a single candidate."""
+        from earthlens.ecmwf._hydrate import _match_variables
+
+        matched = _match_variables(["burned-area"], {"BAF_pred": {"units": "1"}})
+        assert matched == {"burned-area": ("BAF_pred", "1")}
