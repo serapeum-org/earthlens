@@ -1665,16 +1665,20 @@ class EarthLens:
         temp dir here (not at construction) means a construct-only or
         download-only run allocates no temp directory.
 
-        Nothing is removed on the way. An earlier version deleted the default
-        output directory when it was empty, because construction used to create
-        it — so `load()` was clearing up a directory earthlens had just made.
-        Construction no longer creates `root_dir`, and the directory now lives
-        wherever the user configured their output, so deleting anything found
-        there would be tidying someone else's storage.
+        The `rmdir` below is now belt-and-braces: construction no longer
+        creates `root_dir` at all, so in a fresh process there is nothing to
+        remove. It still fires for a directory an earlier run left empty.
         """
+        default_dir = getattr(self.datasource, "root_dir", None)
         tmp = Path(tempfile.mkdtemp(prefix="earthlens-load-"))
         self.datasource.root_dir = tmp
         self.datasource.path = tmp
+        if default_dir is not None and default_dir != tmp:
+            try:
+                if default_dir.is_dir() and not any(default_dir.iterdir()):
+                    default_dir.rmdir()
+            except OSError:
+                pass
 
     def _dispatch_download(
         self,

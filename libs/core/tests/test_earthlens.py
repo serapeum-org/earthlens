@@ -851,9 +851,7 @@ class TestFacadePath:
         assert facade.datasource.root_dir != default, (
             "load() should redirect off the default"
         )
-        assert not default.exists(), (
-            "load() should not create the default dir when it redirects to a temp dir"
-        )
+        assert not default.exists(), "load() should remove the empty default dir"
         # An empty result holds no handle into the temp dir, so it is gone at once.
         assert not Path(temp_dir).exists(), "load() leaked its temp dir"
 
