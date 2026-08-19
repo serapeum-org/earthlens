@@ -6,7 +6,7 @@ how the facade, the backend registry, the shared base contracts, and the per-pro
 ## System overview
 
 `EarthLens` is a thin facade. It resolves a `data_source=` key to a backend class, instantiates it with the
-request you described, and delegates. Every one of the **50 provider backends** implements the same
+request you described, and delegates. Every one of the **61 provider backends** implements the same
 `AbstractDataSource` contract, so the call shape does not change when you switch providers.
 
 ```mermaid

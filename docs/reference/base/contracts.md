@@ -1,6 +1,6 @@
 # Base contracts
 
-`earthlens.base` holds the contracts every one of the 48 provider backends implements. This page documents the
+`earthlens.base` holds the contracts every one of the 61 provider backends implements. This page documents the
 shared surface — what a backend must provide, what it gets for free, and the guarantees the base layer makes about
 memory, errors, and re-runs.
 

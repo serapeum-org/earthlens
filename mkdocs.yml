@@ -631,6 +631,8 @@ nav:
       - Quickstart — impacts and footprints: examples/flodis/quickstart.ipynb
     - Flood-protection standards (FLOPROS):
       - Quickstart — protection standards: examples/flopros/quickstart.ipynb
+    - Water risk (Aqueduct):
+      - Quickstart — riverine flood risk: examples/aqueduct/quickstart.ipynb
     - Heavy-rainfall events (CatRaRE):
       - Quickstart — radar rainfall events: examples/catrare/quickstart.ipynb
     - OpenStreetMap (Overpass / ohsome):
