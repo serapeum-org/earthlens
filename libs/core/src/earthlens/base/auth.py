@@ -346,21 +346,31 @@ class SingleSecretAuth(AbstractAuth[CredentialsT]):
     def _resolve_credential(self) -> str:
         """Return the secret: explicit argument, else :attr:`ENV_VARS`, else raise.
 
+        The environment is consulted only when no explicit credential was
+        supplied — i.e. :meth:`_explicit_credential` returns `None`. An explicit
+        credential that is present but empty is treated as an error and does not
+        fall back to the environment, matching each backend's original behaviour.
+
         Returns:
             The resolved secret string.
 
         Raises:
-            AuthenticationError: When neither the explicit credential nor any of
-                :attr:`ENV_VARS` supplies a value. The message names
-                :attr:`PROVIDER` and the variables, plus :attr:`CREDENTIAL_HINT`.
+            AuthenticationError: When no explicit credential was supplied and
+                none of :attr:`ENV_VARS` is set, or when an explicit credential
+                was supplied but is empty. The message names :attr:`PROVIDER` and
+                the variables, plus :attr:`CREDENTIAL_HINT`.
         """
         explicit = self._explicit_credential()
         if explicit:
             return explicit
-        for variable in self.ENV_VARS:
-            value = os.environ.get(variable)
-            if value:
-                return value
+        # Only an *absent* explicit credential (None) falls back to the
+        # environment; a present-but-empty one is an error, so it skips the
+        # env lookup and drops straight to the raise below.
+        if explicit is None:
+            for variable in self.ENV_VARS:
+                value = os.environ.get(variable)
+                if value:
+                    return value
         names = " or ".join(self.ENV_VARS) or "a credential"
         message = (
             f"no {self.PROVIDER or type(self).__name__} credential available: "

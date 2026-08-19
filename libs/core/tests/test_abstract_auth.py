@@ -307,6 +307,19 @@ class TestSingleSecretAuth:
         assert auth.connected == 1, auth.connected
         assert auth.is_authenticated() is True
 
+    def test_empty_explicit_credential_raises_without_env_fallback(self, monkeypatch):
+        """A present-but-empty explicit secret raises and never consults the env.
+
+        Only an absent (None) explicit credential falls back to ENV_VARS; an
+        empty one is an error, matching each backend's original behaviour.
+        """
+        monkeypatch.setenv("DEMO_A", "from-env")
+        auth = _DemoAuth(_SecretCreds(token=""))
+        with pytest.raises(_DemoError) as exc_info:
+            auth.configure()
+        assert "no Demo credential available" in str(exc_info.value), exc_info.value
+        assert getattr(auth, "connected", 0) == 0, "must not connect on empty secret"
+
 
 class _EnvOnlyAuth(SingleSecretAuth[_SecretCreds]):
     """A single-secret auth that keeps the base's default `_explicit_credential`.
