@@ -21,6 +21,7 @@ from __future__ import annotations
 import re
 import urllib.error
 from collections.abc import Generator, Iterator
+from typing import NoReturn
 
 import pytest
 
@@ -208,6 +209,25 @@ def is_upstream_unavailable(exc: BaseException) -> str | None:
 #: Prefix stamped on every availability-skip reason, so the session-finish guard
 #: can tell a hook-induced skip from an ordinary `pytest.skip` (missing creds, …).
 _LIVE_SKIP_PREFIX = "live e2e skipped — "
+
+
+def skip_live_unavailable(reason: str) -> NoReturn:
+    """Skip the current live `e2e` test as an upstream-availability failure.
+
+    Stamps the same `_LIVE_SKIP_PREFIX` the automatic :func:`pytest_runtest_call`
+    hook uses, so the masked-lane guard in :func:`pytest_sessionfinish` still
+    counts the skip. A backend that raises a typed availability error which its
+    own e2e test catches — rather than letting the shared hook classify the raw
+    exception — calls this instead of a bare `pytest.skip`, so the guard stays
+    authoritative and a wholly-masked lane is never reported green.
+
+    Args:
+        reason: Human-readable reason, appended after the shared prefix.
+
+    Raises:
+        Skipped: Always — this is pytest's skip signal (never returns).
+    """
+    pytest.skip(f"{_LIVE_SKIP_PREFIX}{reason}")
 
 
 @pytest.hookimpl(wrapper=True)

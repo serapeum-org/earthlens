@@ -2,11 +2,12 @@
 
 Hits the real IUCN Red List v4 API, which requires a Bearer token, so it is
 gated behind the `e2e` marker and a skip on a missing `IUCN_TOKEN`. A
-default `pytest` run skips it.
+default `pytest` run skips it. Request a token at
+`https://api.iucnredlist.org/users/sign_up`.
 
 Run with:
 
-    pixi run -e dev pytest -m e2e tests/iucn
+    uv run --active pytest -m "e2e and iucn" libs/providers/land/tests/iucn
 """
 
 from __future__ import annotations
