@@ -83,11 +83,6 @@ _AUXILIARY_SUFFIXES = (
     "_covered_hours",
 )
 
-#: Prefixes of auxiliary counters that carry no science value. `num_` covers the
-#: coverage fields the satellite CDRs ship (`num_covered_hours`), which rule 4
-#: would otherwise pair with a dataset's only slug.
-_AUXILIARY_PREFIXES = ("num_", "numobs", "n_covered")
-
 #: One curated variable sub-block: a 6-space slug line + its 8-space body.
 _VARIABLE_BLOCK = re.compile(
     r"(?m)^ {6}(?P<slug>[A-Za-z0-9][^\s:]*):[ \t]*\n"
@@ -204,7 +199,6 @@ def _is_auxiliary(name: str) -> bool:
         lower in _COORD_NAMES
         or lower in _AUXILIARY_NAMES
         or lower.startswith(("nobs", "n_obs"))
-        or lower.startswith(_AUXILIARY_PREFIXES)
         or lower.endswith(_AUXILIARY_SUFFIXES)
     )
 
@@ -294,9 +288,15 @@ def _match_variables(
     unmatched = [slug for slug in placeholders if slug not in chosen]
     unused = [name for name in candidates if name not in used]
     # `all` is a pseudo-slug standing for "every variable this dataset serves",
-    # not a name to match: it never resembles a real variable, so it is always
-    # the lone unmatched slug and rule 4 would pair it with whatever single
-    # variable happened to survive the auxiliary filter.
+    # so it never resembles a real name and is always the lone unmatched slug —
+    # rule 4 would pair it with whatever single variable survived the auxiliary
+    # filter, which is how a precipitation CDR acquired a coverage counter.
+    #
+    # Rule 4's wider weakness is untouched here: with one slug and one variable
+    # left it pairs them on arity alone, so two unrelated names still match. A
+    # token-overlap requirement was tried and rejected — it also rejects the
+    # abbreviations rule 4 gets right (`2m-temperature` -> `t2m`,
+    # `sea-surface-temperature` -> `sst`). Tracked separately.
     if len(unmatched) == 1 and len(unused) == 1 and unmatched[0] != "all":
         chosen[unmatched[0]] = unused[0]
 
