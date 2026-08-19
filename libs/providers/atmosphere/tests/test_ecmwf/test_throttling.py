@@ -306,3 +306,53 @@ class TestExtractedHelpers:
         from earthlens.ecmwf.cli import _from_info
 
         assert _from_info({"bands": bands}) == {}
+
+
+class TestClassifierRefusesToSniffOurOwnErrors:
+    """A ValueError / AssertionError is never a throttle (review L8)."""
+
+    @pytest.mark.parametrize("exc_type", [ValueError, AssertionError])
+    def test_own_errors_are_never_throttling(self, exc_type):
+        """Even wording that would otherwise match must not be retried."""
+        exc = exc_type("the job has been rejected: queued requests temporarily limited")
+        assert helpers_mod._looks_like_throttled(exc) is False
+
+    def test_such_an_error_is_not_retried(self, tmp_path):
+        """A ValueError carrying throttle wording still fails on attempt one."""
+        client = _Client(
+            failures=99, exc=ValueError("queued requests temporarily limited")
+        )
+        with pytest.raises(ValueError):
+            helpers_mod._retrieve_with_retry(
+                client, "ds", {}, tmp_path / "o.nc", "ecds"
+            )
+        assert client.calls == 1
+
+
+class TestEndpointResolution:
+    """`_endpoint_for` covers curated, indexed and unknown ids (review M4)."""
+
+    def test_a_curated_id_uses_its_rows_endpoint(self):
+        """A curated row's own `endpoint` is authoritative."""
+        from earthlens.ecmwf.cli import _endpoint_for
+
+        assert _endpoint_for("tigge-forecasts") == "ecds"
+
+    def test_an_indexed_but_uncurated_id_resolves_from_the_index(self):
+        """The path `curate` depends on: no row, but the index knows the store."""
+        from earthlens.ecmwf import Catalog
+        from earthlens.ecmwf.cli import _endpoint_for
+
+        catalog = Catalog()
+        uncurated = next(
+            ident
+            for ident in catalog.available_datasets
+            if ident not in catalog.datasets
+        )
+        assert _endpoint_for(uncurated) == catalog.store_for(uncurated)
+
+    def test_an_unknown_id_warns_and_defaults_to_cds(self):
+        """The fallback is loud, so a stale index is visible."""
+        from earthlens.ecmwf.cli import _endpoint_for
+
+        assert _endpoint_for("definitely-not-a-dataset") == "cds"
