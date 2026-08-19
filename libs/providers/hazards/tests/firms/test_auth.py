@@ -10,6 +10,7 @@ from earthlens.firms import (
     FirmsAuth,
     FirmsCredentials,
 )
+from earthlens.firms.auth import _MAP_KEY_URL
 
 pytestmark = pytest.mark.firms
 
@@ -55,7 +56,7 @@ def test_missing_key_raises_naming_arg_env_and_url(monkeypatch: pytest.MonkeyPat
     message = str(exc.value)
     assert "api_key=" in message, message
     assert "FIRMS_MAP_KEY" in message, message
-    assert "firms.modaps.eosdis.nasa.gov" in message, message
+    assert _MAP_KEY_URL in message, message
 
 
 def test_configure_is_idempotent():
