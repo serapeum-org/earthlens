@@ -2523,7 +2523,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS + ECDS + XDS)
+    Data stores (CDS + ADS + EWDS)
   
 
     
@@ -2552,34 +2552,6 @@
     
   
     EWDS (GloFAS / floods)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../ecmwf/ecds/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -14377,34 +14349,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    TIGGE and fire fuel — the ECDS and XDS endpoints
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../examples/ecmwf/glofas_historical_intermediate/" class="md-nav__link">
         
   
@@ -23673,11 +23617,6 @@ pretending to stream.</p>
 </table>
 <p><code>ERROR_POLICIES</code> lists four accepted spellings but there are three behaviours: <code>check_errors_policy</code> normalises
 <code>"skip"</code> to <code>"ignore"</code>, so both take the same path.</p>
-<p><strong>Service failures are exempt.</strong> A backend may mark exception classes <code>fatal</code> when passing work to <code>_run_items</code>,
-and those propagate whatever <code>errors=</code> says. The policy exists to absorb a <em>per-item</em> gap — this dataset has no
-data for your window — not a refusal by the upstream to serve anything at all. Dropping the latter would report an
-outage as every item being empty. <code>earthlens.ecmwf</code> marks
-<a href="../../ecmwf/datastores/#when-a-store-is-throttling"><code>CadsUnavailableError</code></a> fatal for exactly that reason.</p>
 <h2 id="streaming-and-connection-pooling"><a class="toclink" href="#streaming-and-connection-pooling">Streaming and connection pooling</a><a class="headerlink" href="#streaming-and-connection-pooling" title="Permanent link">#</a></h2>
 <ul>
 <li><strong>Downloads are streamed and atomic.</strong> Six whole-body <code>.content</code> writes were replaced with streamed writes to a
