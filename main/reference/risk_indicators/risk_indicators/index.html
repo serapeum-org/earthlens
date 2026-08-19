@@ -6309,28 +6309,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#earthlens.risk_indicators.GfwAuth.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.risk_indicators.GfwAuth.configure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        configure
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -6719,28 +6697,6 @@
     <span class="md-ellipsis">
       
         api_key
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.risk_indicators.auth.GfwAuth.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.risk_indicators.auth.GfwAuth.configure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        configure
       
     </span>
   </a>
@@ -24104,28 +24060,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#earthlens.risk_indicators.GfwAuth.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.risk_indicators.GfwAuth.configure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        configure
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -24520,28 +24454,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#earthlens.risk_indicators.auth.GfwAuth.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#earthlens.risk_indicators.auth.GfwAuth.configure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        configure
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -24831,23 +24743,23 @@ backend's auth failure with one <code>except</code> clause.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/hazards/src/earthlens/risk_indicators/auth.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-47">47</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-46">46</a></span>
+<span class="normal"><a href="#__codelineno-0-47">47</a></span>
 <span class="normal"><a href="#__codelineno-0-48">48</a></span>
 <span class="normal"><a href="#__codelineno-0-49">49</a></span>
 <span class="normal"><a href="#__codelineno-0-50">50</a></span>
 <span class="normal"><a href="#__codelineno-0-51">51</a></span>
 <span class="normal"><a href="#__codelineno-0-52">52</a></span>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
-<span class="normal"><a href="#__codelineno-0-54">54</a></span>
-<span class="normal"><a href="#__codelineno-0-55">55</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">class</span><span class="w"> </span><span class="nc">AuthenticationError</span><span class="p">(</span><span class="n">_BaseAuthenticationError</span><span class="p">):</span>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when no usable GFW API key can be resolved.</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    Carries a message that names a fix: pass `api_key=` to</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    `EarthLens(&quot;gfw&quot;, ...)`, set the `GFW_API_KEY` environment variable, or</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    create a free key via a MyGFW account. A subclass of the cross-backend</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    :class:`earthlens.base.AuthenticationError` so callers can catch every</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    backend&#39;s auth failure with one `except` clause.</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    &quot;&quot;&quot;</span>
+<span class="normal"><a href="#__codelineno-0-54">54</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="k">class</span><span class="w"> </span><span class="nc">AuthenticationError</span><span class="p">(</span><span class="n">_BaseAuthenticationError</span><span class="p">):</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when no usable GFW API key can be resolved.</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    Carries a message that names a fix: pass `api_key=` to</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    `EarthLens(&quot;gfw&quot;, ...)`, set the `GFW_API_KEY` environment variable, or</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    create a free key via a MyGFW account. A subclass of the cross-backend</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    :class:`earthlens.base.AuthenticationError` so callers can catch every</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    backend&#39;s auth failure with one `except` clause.</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26321,13 +26233,14 @@ instance.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractAuth&lt;/code&gt; (&lt;code&gt;earthlens.base.auth.AbstractAuth&lt;/code&gt;)" href="../../base/auth-api/#earthlens.base.AbstractAuth">AbstractAuth</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;GfwCredentials&lt;/code&gt; (&lt;code&gt;earthlens.risk_indicators.auth.GfwCredentials&lt;/code&gt;)" href="#earthlens.risk_indicators.auth.GfwCredentials">GfwCredentials</a>]</code></p>
+              Bases: <code><span title="earthlens.base.auth.SingleSecretAuth">SingleSecretAuth</span>[<a class="autorefs autorefs-internal" title="&lt;code&gt;GfwCredentials&lt;/code&gt; (&lt;code&gt;earthlens.risk_indicators.auth.GfwCredentials&lt;/code&gt;)" href="#earthlens.risk_indicators.auth.GfwCredentials">GfwCredentials</a>]</code></p>
 
 
 
         <p>Resolve and hold the Global Forest Watch API key.</p>
-<p>Implements the :class:<code>earthlens.base.AbstractAuth</code> contract for a
-single-secret source. Construction does not touch the environment;
+<p>Implements the :class:<code>earthlens.base.SingleSecretAuth</code> contract for a
+single-secret source: it declares its env var and provider name and
+supplies <code>_explicit_credential</code> / <code>_connect</code>, while the inherited
 :meth:<code>configure</code> performs the resolution and is idempotent. After a
 successful <code>configure()</code>, the key is available via the :attr:<code>api_key</code>
 property for the HTTP helpers to attach as the <code>x-api-key</code> header.</p>
@@ -26385,7 +26298,8 @@ release.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/hazards/src/earthlens/risk_indicators/auth.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
+<span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
 <span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
 <span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
 <span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
@@ -26451,34 +26365,12 @@ release.</p>
 <span class="normal"><a href="#__codelineno-0-159">159</a></span>
 <span class="normal"><a href="#__codelineno-0-160">160</a></span>
 <span class="normal"><a href="#__codelineno-0-161">161</a></span>
-<span class="normal"><a href="#__codelineno-0-162">162</a></span>
-<span class="normal"><a href="#__codelineno-0-163">163</a></span>
-<span class="normal"><a href="#__codelineno-0-164">164</a></span>
-<span class="normal"><a href="#__codelineno-0-165">165</a></span>
-<span class="normal"><a href="#__codelineno-0-166">166</a></span>
-<span class="normal"><a href="#__codelineno-0-167">167</a></span>
-<span class="normal"><a href="#__codelineno-0-168">168</a></span>
-<span class="normal"><a href="#__codelineno-0-169">169</a></span>
-<span class="normal"><a href="#__codelineno-0-170">170</a></span>
-<span class="normal"><a href="#__codelineno-0-171">171</a></span>
-<span class="normal"><a href="#__codelineno-0-172">172</a></span>
-<span class="normal"><a href="#__codelineno-0-173">173</a></span>
-<span class="normal"><a href="#__codelineno-0-174">174</a></span>
-<span class="normal"><a href="#__codelineno-0-175">175</a></span>
-<span class="normal"><a href="#__codelineno-0-176">176</a></span>
-<span class="normal"><a href="#__codelineno-0-177">177</a></span>
-<span class="normal"><a href="#__codelineno-0-178">178</a></span>
-<span class="normal"><a href="#__codelineno-0-179">179</a></span>
-<span class="normal"><a href="#__codelineno-0-180">180</a></span>
-<span class="normal"><a href="#__codelineno-0-181">181</a></span>
-<span class="normal"><a href="#__codelineno-0-182">182</a></span>
-<span class="normal"><a href="#__codelineno-0-183">183</a></span>
-<span class="normal"><a href="#__codelineno-0-184">184</a></span>
-<span class="normal"><a href="#__codelineno-0-185">185</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="k">class</span><span class="w"> </span><span class="nc">GfwAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">GfwCredentials</span><span class="p">]):</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the Global Forest Watch API key.</span>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a>
-<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    Implements the :class:`earthlens.base.AbstractAuth` contract for a</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    single-secret source. Construction does not touch the environment;</span>
+<span class="normal"><a href="#__codelineno-0-162">162</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="k">class</span><span class="w"> </span><span class="nc">GfwAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">GfwCredentials</span><span class="p">]):</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the Global Forest Watch API key.</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    single-secret source: it declares its env var and provider name and</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    supplies `_explicit_credential` / `_connect`, while the inherited</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    :meth:`configure` performs the resolution and is idempotent. After a</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    successful `configure()`, the key is available via the :attr:`api_key`</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    property for the HTTP helpers to attach as the `x-api-key` header.</span>
@@ -26507,63 +26399,40 @@ release.</p>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="p">:</span> <span class="n">GfwCredentials</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store credentials; does not resolve the key yet.</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">            credentials: The :class:`GfwCredentials` value object carrying the</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">                optional API key.</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_configured</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the API key so subsequent requests can authenticate.</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="n">ENV_VARS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;GFW_API_KEY&quot;</span><span class="p">,)</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="n">PROVIDER</span> <span class="o">=</span> <span class="s2">&quot;GFW&quot;</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="n">CREDENTIAL_ARG</span> <span class="o">=</span> <span class="s2">&quot;api_key&quot;</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>    <span class="n">CREDENTIAL_HINT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Create a free key with a MyGFW account: </span><span class="si">{</span><span class="n">_CREATE_KEY_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">AUTH_ERROR</span> <span class="o">=</span> <span class="n">AuthenticationError</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="c1">#: The resolved key, set by `_connect`; `None` until `configure` runs.</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="n">_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_explicit_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the explicit `api_key` off the credentials, if any.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a>        <span class="n">api_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">api_key</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="k">return</span> <span class="n">api_key</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">api_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated` already</span>
-<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">        returns `True`. On the first call, resolves the key in this order: the</span>
-<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">        explicit `api_key` on the credentials, then the `GFW_API_KEY`</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">        environment variable.</span>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">            AuthenticationError: When neither source supplies a key. The</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">                message names the `api_key=` argument, the `GFW_API_KEY` env</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">                var, and the key-creation URL — it never blocks on an</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">                interactive prompt.</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a>            <span class="k">return</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a>        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">api_key</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">api_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a>            <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GFW_API_KEY&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a>        <span class="p">)</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a>                <span class="s2">&quot;no GFW API key available: pass api_key= to EarthLens(...) for &quot;</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a>                <span class="s2">&quot;a gfw dataset, or set the GFW_API_KEY environment variable. &quot;</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a>                <span class="sa">f</span><span class="s2">&quot;Create a free key with a MyGFW account: </span><span class="si">{</span><span class="n">_CREATE_KEY_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a>            <span class="p">)</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="n">key</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">api_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved API key; valid only after :meth:`configure`.</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            str: The GFW `x-api-key` string.</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">                resolved a key.</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>                <span class="s2">&quot;GfwAuth.configure() has not run yet; no API key resolved.&quot;</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a>            <span class="p">)</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credential</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the resolved key for the `api_key` property to read back.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="n">credential</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">api_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved API key; valid only after :meth:`configure`.</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">            str: The GFW `x-api-key` string.</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">                resolved a key.</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a>                <span class="s2">&quot;GfwAuth.configure() has not run yet; no API key resolved.&quot;</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a>            <span class="p">)</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -26648,188 +26517,6 @@ resolved a key.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.risk_indicators.GfwAuth.__init__" class="doc doc-heading"><a href="#earthlens.risk_indicators.GfwAuth.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span></code>
-
-</a><a href="#earthlens.risk_indicators.GfwAuth.__init__" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Store credentials; does not resolve the key yet.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>credentials</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="&lt;code&gt;GfwCredentials&lt;/code&gt; (&lt;code&gt;earthlens.risk_indicators.auth.GfwCredentials&lt;/code&gt;)" href="#earthlens.risk_indicators.auth.GfwCredentials">GfwCredentials</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The :class:<code>GfwCredentials</code> value object carrying the
-optional API key.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/risk_indicators/auth.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-129">129</a></span>
-<span class="normal"><a href="#__codelineno-0-130">130</a></span>
-<span class="normal"><a href="#__codelineno-0-131">131</a></span>
-<span class="normal"><a href="#__codelineno-0-132">132</a></span>
-<span class="normal"><a href="#__codelineno-0-133">133</a></span>
-<span class="normal"><a href="#__codelineno-0-134">134</a></span>
-<span class="normal"><a href="#__codelineno-0-135">135</a></span>
-<span class="normal"><a href="#__codelineno-0-136">136</a></span>
-<span class="normal"><a href="#__codelineno-0-137">137</a></span>
-<span class="normal"><a href="#__codelineno-0-138">138</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="p">:</span> <span class="n">GfwCredentials</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store credentials; does not resolve the key yet.</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        credentials: The :class:`GfwCredentials` value object carrying the</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">            optional API key.</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_configured</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.risk_indicators.GfwAuth.configure" class="doc doc-heading"><a href="#earthlens.risk_indicators.GfwAuth.configure" class="toclink">
-            <code class="highlight language-python"><span class="n">configure</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.risk_indicators.GfwAuth.configure" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Resolve the API key so subsequent requests can authenticate.</p>
-<p>Idempotent — short-circuits when :meth:<code>is_authenticated</code> already
-returns <code>True</code>. On the first call, resolves the key in this order: the
-explicit <code>api_key</code> on the credentials, then the <code>GFW_API_KEY</code>
-environment variable.</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="&lt;code&gt;AuthenticationError&lt;/code&gt; (&lt;code&gt;earthlens.risk_indicators.auth.AuthenticationError&lt;/code&gt;)" href="#earthlens.risk_indicators.auth.AuthenticationError">AuthenticationError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>When neither source supplies a key. The
-message names the <code>api_key=</code> argument, the <code>GFW_API_KEY</code> env
-var, and the key-creation URL — it never blocks on an
-interactive prompt.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/risk_indicators/auth.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-140">140</a></span>
-<span class="normal"><a href="#__codelineno-0-141">141</a></span>
-<span class="normal"><a href="#__codelineno-0-142">142</a></span>
-<span class="normal"><a href="#__codelineno-0-143">143</a></span>
-<span class="normal"><a href="#__codelineno-0-144">144</a></span>
-<span class="normal"><a href="#__codelineno-0-145">145</a></span>
-<span class="normal"><a href="#__codelineno-0-146">146</a></span>
-<span class="normal"><a href="#__codelineno-0-147">147</a></span>
-<span class="normal"><a href="#__codelineno-0-148">148</a></span>
-<span class="normal"><a href="#__codelineno-0-149">149</a></span>
-<span class="normal"><a href="#__codelineno-0-150">150</a></span>
-<span class="normal"><a href="#__codelineno-0-151">151</a></span>
-<span class="normal"><a href="#__codelineno-0-152">152</a></span>
-<span class="normal"><a href="#__codelineno-0-153">153</a></span>
-<span class="normal"><a href="#__codelineno-0-154">154</a></span>
-<span class="normal"><a href="#__codelineno-0-155">155</a></span>
-<span class="normal"><a href="#__codelineno-0-156">156</a></span>
-<span class="normal"><a href="#__codelineno-0-157">157</a></span>
-<span class="normal"><a href="#__codelineno-0-158">158</a></span>
-<span class="normal"><a href="#__codelineno-0-159">159</a></span>
-<span class="normal"><a href="#__codelineno-0-160">160</a></span>
-<span class="normal"><a href="#__codelineno-0-161">161</a></span>
-<span class="normal"><a href="#__codelineno-0-162">162</a></span>
-<span class="normal"><a href="#__codelineno-0-163">163</a></span>
-<span class="normal"><a href="#__codelineno-0-164">164</a></span>
-<span class="normal"><a href="#__codelineno-0-165">165</a></span>
-<span class="normal"><a href="#__codelineno-0-166">166</a></span>
-<span class="normal"><a href="#__codelineno-0-167">167</a></span>
-<span class="normal"><a href="#__codelineno-0-168">168</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve the API key so subsequent requests can authenticate.</span>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated` already</span>
-<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">    returns `True`. On the first call, resolves the key in this order: the</span>
-<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    explicit `api_key` on the credentials, then the `GFW_API_KEY`</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    environment variable.</span>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">        AuthenticationError: When neither source supplies a key. The</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">            message names the `api_key=` argument, the `GFW_API_KEY` env</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">            var, and the key-creation URL — it never blocks on an</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">            interactive prompt.</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a>        <span class="k">return</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a>    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">api_key</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">api_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a>        <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GFW_API_KEY&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a>    <span class="p">)</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a>        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a>            <span class="s2">&quot;no GFW API key available: pass api_key= to EarthLens(...) for &quot;</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a>            <span class="s2">&quot;a gfw dataset, or set the GFW_API_KEY environment variable. &quot;</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a>            <span class="sa">f</span><span class="s2">&quot;Create a free key with a MyGFW account: </span><span class="si">{</span><span class="n">_CREATE_KEY_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a>        <span class="p">)</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="n">key</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 
 
@@ -26916,7 +26603,8 @@ resolution to the environment variable.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/hazards/src/earthlens/risk_indicators/auth.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-58">58</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-57">57</a></span>
+<span class="normal"><a href="#__codelineno-0-58">58</a></span>
 <span class="normal"><a href="#__codelineno-0-59">59</a></span>
 <span class="normal"><a href="#__codelineno-0-60">60</a></span>
 <span class="normal"><a href="#__codelineno-0-61">61</a></span>
@@ -26950,43 +26638,42 @@ resolution to the environment variable.</p>
 <span class="normal"><a href="#__codelineno-0-89">89</a></span>
 <span class="normal"><a href="#__codelineno-0-90">90</a></span>
 <span class="normal"><a href="#__codelineno-0-91">91</a></span>
-<span class="normal"><a href="#__codelineno-0-92">92</a></span>
-<span class="normal"><a href="#__codelineno-0-93">93</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="k">class</span><span class="w"> </span><span class="nc">GfwCredentials</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen value object holding the GFW API key.</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    The key is optional at construction time: `None` means &quot;resolve from the</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    `GFW_API_KEY` environment variable at :meth:`GfwAuth.configure` time&quot;. The</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    real &quot;is there a usable key?&quot; gate is :meth:`GfwAuth.configure`, not this</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    model.</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">        api_key: The GFW `x-api-key`, stored as a :class:`pydantic.SecretStr`</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">            so it is never echoed by `repr(creds)` or in logs. `None` defers</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">            resolution to the environment variable.</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">        - Build from an explicit key; the secret is hidden in `repr`:</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">            &gt;&gt;&gt; from earthlens.risk_indicators import GfwCredentials</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">            &gt;&gt;&gt; creds = GfwCredentials(api_key=&quot;topsecret&quot;)</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">            &gt;&gt;&gt; creds.api_key.get_secret_value()</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">            &#39;topsecret&#39;</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">            &gt;&gt;&gt; &quot;topsecret&quot; in repr(creds)</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">            False</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">        - The key is optional — rely on the environment instead:</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">            &gt;&gt;&gt; from earthlens.risk_indicators import GfwCredentials</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">            &gt;&gt;&gt; GfwCredentials().api_key is None</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">            True</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="n">api_key</span><span class="p">:</span> <span class="n">SecretStr</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-92">92</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="k">class</span><span class="w"> </span><span class="nc">GfwCredentials</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen value object holding the GFW API key.</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    The key is optional at construction time: `None` means &quot;resolve from the</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    `GFW_API_KEY` environment variable at :meth:`GfwAuth.configure` time&quot;. The</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    real &quot;is there a usable key?&quot; gate is :meth:`GfwAuth.configure`, not this</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    model.</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        api_key: The GFW `x-api-key`, stored as a :class:`pydantic.SecretStr`</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            so it is never echoed by `repr(creds)` or in logs. `None` defers</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">            resolution to the environment variable.</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">        - Build from an explicit key; the secret is hidden in `repr`:</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">            &gt;&gt;&gt; from earthlens.risk_indicators import GfwCredentials</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">            &gt;&gt;&gt; creds = GfwCredentials(api_key=&quot;topsecret&quot;)</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">            &gt;&gt;&gt; creds.api_key.get_secret_value()</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">            &#39;topsecret&#39;</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">            &gt;&gt;&gt; &quot;topsecret&quot; in repr(creds)</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">            False</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">        - The key is optional — rely on the environment instead:</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">            &gt;&gt;&gt; from earthlens.risk_indicators import GfwCredentials</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">            &gt;&gt;&gt; GfwCredentials().api_key is None</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">            True</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a>    <span class="n">api_key</span><span class="p">:</span> <span class="n">SecretStr</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -33611,7 +33298,7 @@ file's <code>st_mtime_ns</code>, so any real edit invalidates the entry on its o
     <div class="doc doc-contents first">
 
         <p>Credentials and API-key resolution for the GFW datasets of the risk backend.</p>
-<p>Hosts :class:<code>GfwAuth</code>, an :class:<code>earthlens.base.AbstractAuth</code> subclass that
+<p>Hosts :class:<code>GfwAuth</code>, an :class:<code>earthlens.base.SingleSecretAuth</code> subclass that
 resolves a single Global Forest Watch <strong><code>x-api-key</code></strong> from, in priority order,
 an explicit <code>api_key=</code> argument or the <code>GFW_API_KEY</code> environment variable. The
 GFW Data API requires a key on every <code>query/json</code> and geostore request; there
@@ -33625,10 +33312,11 @@ configures a :class:<code>GfwAuth</code>. So this surface is reached <em>conditi
 <ul>
 <li>:class:<code>GfwCredentials</code> is a frozen pydantic value object carrying the
   optional API key as a :class:<code>pydantic.SecretStr</code>.</li>
-<li>:class:<code>GfwAuth</code> binds those credentials and resolves the key in
-  :meth:<code>GfwAuth.configure</code> — explicit key first, then the <code>GFW_API_KEY</code>
-  environment variable, then a clear :class:<code>AuthenticationError</code> naming how to
-  create a key (never an interactive prompt).</li>
+<li>:class:<code>GfwAuth</code> binds those credentials and lets the shared
+  :meth:<code>earthlens.base.SingleSecretAuth.configure</code> resolve the key — explicit
+  key first, then the <code>GFW_API_KEY</code> environment variable, then a clear
+  :class:<code>AuthenticationError</code> naming how to create a key (never an interactive
+  prompt).</li>
 <li><code>configure()</code> is idempotent — a second call after
   :meth:<code>GfwAuth.is_authenticated</code> returns <code>True</code> short-circuits.</li>
 </ul>
@@ -33688,23 +33376,23 @@ backend's auth failure with one <code>except</code> clause.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/hazards/src/earthlens/risk_indicators/auth.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-47">47</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-46">46</a></span>
+<span class="normal"><a href="#__codelineno-0-47">47</a></span>
 <span class="normal"><a href="#__codelineno-0-48">48</a></span>
 <span class="normal"><a href="#__codelineno-0-49">49</a></span>
 <span class="normal"><a href="#__codelineno-0-50">50</a></span>
 <span class="normal"><a href="#__codelineno-0-51">51</a></span>
 <span class="normal"><a href="#__codelineno-0-52">52</a></span>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
-<span class="normal"><a href="#__codelineno-0-54">54</a></span>
-<span class="normal"><a href="#__codelineno-0-55">55</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="k">class</span><span class="w"> </span><span class="nc">AuthenticationError</span><span class="p">(</span><span class="n">_BaseAuthenticationError</span><span class="p">):</span>
-<a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when no usable GFW API key can be resolved.</span>
-<a id="__codelineno-0-49" name="__codelineno-0-49"></a>
-<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    Carries a message that names a fix: pass `api_key=` to</span>
-<a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    `EarthLens(&quot;gfw&quot;, ...)`, set the `GFW_API_KEY` environment variable, or</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    create a free key via a MyGFW account. A subclass of the cross-backend</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    :class:`earthlens.base.AuthenticationError` so callers can catch every</span>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    backend&#39;s auth failure with one `except` clause.</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    &quot;&quot;&quot;</span>
+<span class="normal"><a href="#__codelineno-0-54">54</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-46" name="__codelineno-0-46"></a><span class="k">class</span><span class="w"> </span><span class="nc">AuthenticationError</span><span class="p">(</span><span class="n">_BaseAuthenticationError</span><span class="p">):</span>
+<a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when no usable GFW API key can be resolved.</span>
+<a id="__codelineno-0-48" name="__codelineno-0-48"></a>
+<a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    Carries a message that names a fix: pass `api_key=` to</span>
+<a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    `EarthLens(&quot;gfw&quot;, ...)`, set the `GFW_API_KEY` environment variable, or</span>
+<a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="sd">    create a free key via a MyGFW account. A subclass of the cross-backend</span>
+<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    :class:`earthlens.base.AuthenticationError` so callers can catch every</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="sd">    backend&#39;s auth failure with one `except` clause.</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -33725,13 +33413,14 @@ backend's auth failure with one <code>except</code> clause.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="&lt;code&gt;earthlens.base.AbstractAuth&lt;/code&gt; (&lt;code&gt;earthlens.base.auth.AbstractAuth&lt;/code&gt;)" href="../../base/auth-api/#earthlens.base.AbstractAuth">AbstractAuth</a>[<a class="autorefs autorefs-internal" title="&lt;code&gt;GfwCredentials&lt;/code&gt; (&lt;code&gt;earthlens.risk_indicators.auth.GfwCredentials&lt;/code&gt;)" href="#earthlens.risk_indicators.auth.GfwCredentials">GfwCredentials</a>]</code></p>
+              Bases: <code><span title="earthlens.base.auth.SingleSecretAuth">SingleSecretAuth</span>[<a class="autorefs autorefs-internal" title="&lt;code&gt;GfwCredentials&lt;/code&gt; (&lt;code&gt;earthlens.risk_indicators.auth.GfwCredentials&lt;/code&gt;)" href="#earthlens.risk_indicators.auth.GfwCredentials">GfwCredentials</a>]</code></p>
 
 
 
         <p>Resolve and hold the Global Forest Watch API key.</p>
-<p>Implements the :class:<code>earthlens.base.AbstractAuth</code> contract for a
-single-secret source. Construction does not touch the environment;
+<p>Implements the :class:<code>earthlens.base.SingleSecretAuth</code> contract for a
+single-secret source: it declares its env var and provider name and
+supplies <code>_explicit_credential</code> / <code>_connect</code>, while the inherited
 :meth:<code>configure</code> performs the resolution and is idempotent. After a
 successful <code>configure()</code>, the key is available via the :attr:<code>api_key</code>
 property for the HTTP helpers to attach as the <code>x-api-key</code> header.</p>
@@ -33789,7 +33478,8 @@ release.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/hazards/src/earthlens/risk_indicators/auth.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
+<span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
 <span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
 <span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
 <span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
@@ -33855,34 +33545,12 @@ release.</p>
 <span class="normal"><a href="#__codelineno-0-159">159</a></span>
 <span class="normal"><a href="#__codelineno-0-160">160</a></span>
 <span class="normal"><a href="#__codelineno-0-161">161</a></span>
-<span class="normal"><a href="#__codelineno-0-162">162</a></span>
-<span class="normal"><a href="#__codelineno-0-163">163</a></span>
-<span class="normal"><a href="#__codelineno-0-164">164</a></span>
-<span class="normal"><a href="#__codelineno-0-165">165</a></span>
-<span class="normal"><a href="#__codelineno-0-166">166</a></span>
-<span class="normal"><a href="#__codelineno-0-167">167</a></span>
-<span class="normal"><a href="#__codelineno-0-168">168</a></span>
-<span class="normal"><a href="#__codelineno-0-169">169</a></span>
-<span class="normal"><a href="#__codelineno-0-170">170</a></span>
-<span class="normal"><a href="#__codelineno-0-171">171</a></span>
-<span class="normal"><a href="#__codelineno-0-172">172</a></span>
-<span class="normal"><a href="#__codelineno-0-173">173</a></span>
-<span class="normal"><a href="#__codelineno-0-174">174</a></span>
-<span class="normal"><a href="#__codelineno-0-175">175</a></span>
-<span class="normal"><a href="#__codelineno-0-176">176</a></span>
-<span class="normal"><a href="#__codelineno-0-177">177</a></span>
-<span class="normal"><a href="#__codelineno-0-178">178</a></span>
-<span class="normal"><a href="#__codelineno-0-179">179</a></span>
-<span class="normal"><a href="#__codelineno-0-180">180</a></span>
-<span class="normal"><a href="#__codelineno-0-181">181</a></span>
-<span class="normal"><a href="#__codelineno-0-182">182</a></span>
-<span class="normal"><a href="#__codelineno-0-183">183</a></span>
-<span class="normal"><a href="#__codelineno-0-184">184</a></span>
-<span class="normal"><a href="#__codelineno-0-185">185</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="k">class</span><span class="w"> </span><span class="nc">GfwAuth</span><span class="p">(</span><span class="n">AbstractAuth</span><span class="p">[</span><span class="n">GfwCredentials</span><span class="p">]):</span>
-<a id="__codelineno-0-97" name="__codelineno-0-97"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the Global Forest Watch API key.</span>
-<a id="__codelineno-0-98" name="__codelineno-0-98"></a>
-<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    Implements the :class:`earthlens.base.AbstractAuth` contract for a</span>
-<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    single-secret source. Construction does not touch the environment;</span>
+<span class="normal"><a href="#__codelineno-0-162">162</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="k">class</span><span class="w"> </span><span class="nc">GfwAuth</span><span class="p">(</span><span class="n">SingleSecretAuth</span><span class="p">[</span><span class="n">GfwCredentials</span><span class="p">]):</span>
+<a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve and hold the Global Forest Watch API key.</span>
+<a id="__codelineno-0-97" name="__codelineno-0-97"></a>
+<a id="__codelineno-0-98" name="__codelineno-0-98"></a><span class="sd">    Implements the :class:`earthlens.base.SingleSecretAuth` contract for a</span>
+<a id="__codelineno-0-99" name="__codelineno-0-99"></a><span class="sd">    single-secret source: it declares its env var and provider name and</span>
+<a id="__codelineno-0-100" name="__codelineno-0-100"></a><span class="sd">    supplies `_explicit_credential` / `_connect`, while the inherited</span>
 <a id="__codelineno-0-101" name="__codelineno-0-101"></a><span class="sd">    :meth:`configure` performs the resolution and is idempotent. After a</span>
 <a id="__codelineno-0-102" name="__codelineno-0-102"></a><span class="sd">    successful `configure()`, the key is available via the :attr:`api_key`</span>
 <a id="__codelineno-0-103" name="__codelineno-0-103"></a><span class="sd">    property for the HTTP helpers to attach as the `x-api-key` header.</span>
@@ -33911,63 +33579,40 @@ release.</p>
 <a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128"></a>
-<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="p">:</span> <span class="n">GfwCredentials</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store credentials; does not resolve the key yet.</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">            credentials: The :class:`GfwCredentials` value object carrying the</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">                optional API key.</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_configured</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-139" name="__codelineno-0-139"></a>
-<a id="__codelineno-0-140" name="__codelineno-0-140"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve the API key so subsequent requests can authenticate.</span>
+<a id="__codelineno-0-129" name="__codelineno-0-129"></a>    <span class="n">ENV_VARS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;GFW_API_KEY&quot;</span><span class="p">,)</span>
+<a id="__codelineno-0-130" name="__codelineno-0-130"></a>    <span class="n">PROVIDER</span> <span class="o">=</span> <span class="s2">&quot;GFW&quot;</span>
+<a id="__codelineno-0-131" name="__codelineno-0-131"></a>    <span class="n">CREDENTIAL_ARG</span> <span class="o">=</span> <span class="s2">&quot;api_key&quot;</span>
+<a id="__codelineno-0-132" name="__codelineno-0-132"></a>    <span class="n">CREDENTIAL_HINT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Create a free key with a MyGFW account: </span><span class="si">{</span><span class="n">_CREATE_KEY_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
+<a id="__codelineno-0-133" name="__codelineno-0-133"></a>    <span class="n">AUTH_ERROR</span> <span class="o">=</span> <span class="n">AuthenticationError</span>
+<a id="__codelineno-0-134" name="__codelineno-0-134"></a>
+<a id="__codelineno-0-135" name="__codelineno-0-135"></a>    <span class="c1">#: The resolved key, set by `_connect`; `None` until `configure` runs.</span>
+<a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="n">_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-137" name="__codelineno-0-137"></a>
+<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_explicit_credential</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-139" name="__codelineno-0-139"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the explicit `api_key` off the credentials, if any.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-140" name="__codelineno-0-140"></a>        <span class="n">api_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">api_key</span>
+<a id="__codelineno-0-141" name="__codelineno-0-141"></a>        <span class="k">return</span> <span class="n">api_key</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span> <span class="k">if</span> <span class="n">api_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 <a id="__codelineno-0-142" name="__codelineno-0-142"></a>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">        Idempotent — short-circuits when :meth:`is_authenticated` already</span>
-<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">        returns `True`. On the first call, resolves the key in this order: the</span>
-<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">        explicit `api_key` on the credentials, then the `GFW_API_KEY`</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">        environment variable.</span>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">            AuthenticationError: When neither source supplies a key. The</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">                message names the `api_key=` argument, the `GFW_API_KEY` env</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">                var, and the key-creation URL — it never blocks on an</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">                interactive prompt.</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a>            <span class="k">return</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a>        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">api_key</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">api_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a>            <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GFW_API_KEY&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a>        <span class="p">)</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a>                <span class="s2">&quot;no GFW API key available: pass api_key= to EarthLens(...) for &quot;</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a>                <span class="s2">&quot;a gfw dataset, or set the GFW_API_KEY environment variable. &quot;</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a>                <span class="sa">f</span><span class="s2">&quot;Create a free key with a MyGFW account: </span><span class="si">{</span><span class="n">_CREATE_KEY_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a>            <span class="p">)</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="n">key</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">api_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved API key; valid only after :meth:`configure`.</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">            str: The GFW `x-api-key` string.</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">                resolved a key.</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>                <span class="s2">&quot;GfwAuth.configure() has not run yet; no API key resolved.&quot;</span>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a>            <span class="p">)</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span>
+<a id="__codelineno-0-143" name="__codelineno-0-143"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credential</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the resolved key for the `api_key` property to read back.&quot;&quot;&quot;</span>
+<a id="__codelineno-0-145" name="__codelineno-0-145"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="n">credential</span>
+<a id="__codelineno-0-146" name="__codelineno-0-146"></a>
+<a id="__codelineno-0-147" name="__codelineno-0-147"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-148" name="__codelineno-0-148"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">api_key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;The resolved API key; valid only after :meth:`configure`.</span>
+<a id="__codelineno-0-150" name="__codelineno-0-150"></a>
+<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">            str: The GFW `x-api-key` string.</span>
+<a id="__codelineno-0-153" name="__codelineno-0-153"></a>
+<a id="__codelineno-0-154" name="__codelineno-0-154"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-155" name="__codelineno-0-155"></a><span class="sd">            AuthenticationError: When read before :meth:`configure` has</span>
+<a id="__codelineno-0-156" name="__codelineno-0-156"></a><span class="sd">                resolved a key.</span>
+<a id="__codelineno-0-157" name="__codelineno-0-157"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-159" name="__codelineno-0-159"></a>            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+<a id="__codelineno-0-160" name="__codelineno-0-160"></a>                <span class="s2">&quot;GfwAuth.configure() has not run yet; no API key resolved.&quot;</span>
+<a id="__codelineno-0-161" name="__codelineno-0-161"></a>            <span class="p">)</span>
+<a id="__codelineno-0-162" name="__codelineno-0-162"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -34052,188 +33697,6 @@ resolved a key.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.risk_indicators.auth.GfwAuth.__init__" class="doc doc-heading"><a href="#earthlens.risk_indicators.auth.GfwAuth.__init__" class="toclink">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span></code>
-
-</a><a href="#earthlens.risk_indicators.auth.GfwAuth.__init__" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Store credentials; does not resolve the key yet.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>credentials</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="&lt;code&gt;GfwCredentials&lt;/code&gt; (&lt;code&gt;earthlens.risk_indicators.auth.GfwCredentials&lt;/code&gt;)" href="#earthlens.risk_indicators.auth.GfwCredentials">GfwCredentials</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The :class:<code>GfwCredentials</code> value object carrying the
-optional API key.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/risk_indicators/auth.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-129">129</a></span>
-<span class="normal"><a href="#__codelineno-0-130">130</a></span>
-<span class="normal"><a href="#__codelineno-0-131">131</a></span>
-<span class="normal"><a href="#__codelineno-0-132">132</a></span>
-<span class="normal"><a href="#__codelineno-0-133">133</a></span>
-<span class="normal"><a href="#__codelineno-0-134">134</a></span>
-<span class="normal"><a href="#__codelineno-0-135">135</a></span>
-<span class="normal"><a href="#__codelineno-0-136">136</a></span>
-<span class="normal"><a href="#__codelineno-0-137">137</a></span>
-<span class="normal"><a href="#__codelineno-0-138">138</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-129" name="__codelineno-0-129"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="p">:</span> <span class="n">GfwCredentials</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Store credentials; does not resolve the key yet.</span>
-<a id="__codelineno-0-131" name="__codelineno-0-131"></a>
-<a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">        credentials: The :class:`GfwCredentials` value object carrying the</span>
-<a id="__codelineno-0-134" name="__codelineno-0-134"></a><span class="sd">            optional API key.</span>
-<a id="__codelineno-0-135" name="__codelineno-0-135"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-136" name="__codelineno-0-136"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
-<a id="__codelineno-0-137" name="__codelineno-0-137"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_configured</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-0-138" name="__codelineno-0-138"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="earthlens.risk_indicators.auth.GfwAuth.configure" class="doc doc-heading"><a href="#earthlens.risk_indicators.auth.GfwAuth.configure" class="toclink">
-            <code class="highlight language-python"><span class="n">configure</span><span class="p">()</span></code>
-
-</a><a href="#earthlens.risk_indicators.auth.GfwAuth.configure" class="headerlink" title="Permanent link">#</a></h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Resolve the API key so subsequent requests can authenticate.</p>
-<p>Idempotent — short-circuits when :meth:<code>is_authenticated</code> already
-returns <code>True</code>. On the first call, resolves the key in this order: the
-explicit <code>api_key</code> on the credentials, then the <code>GFW_API_KEY</code>
-environment variable.</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="&lt;code&gt;AuthenticationError&lt;/code&gt; (&lt;code&gt;earthlens.risk_indicators.auth.AuthenticationError&lt;/code&gt;)" href="#earthlens.risk_indicators.auth.AuthenticationError">AuthenticationError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>When neither source supplies a key. The
-message names the <code>api_key=</code> argument, the <code>GFW_API_KEY</code> env
-var, and the key-creation URL — it never blocks on an
-interactive prompt.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>libs/providers/hazards/src/earthlens/risk_indicators/auth.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-140">140</a></span>
-<span class="normal"><a href="#__codelineno-0-141">141</a></span>
-<span class="normal"><a href="#__codelineno-0-142">142</a></span>
-<span class="normal"><a href="#__codelineno-0-143">143</a></span>
-<span class="normal"><a href="#__codelineno-0-144">144</a></span>
-<span class="normal"><a href="#__codelineno-0-145">145</a></span>
-<span class="normal"><a href="#__codelineno-0-146">146</a></span>
-<span class="normal"><a href="#__codelineno-0-147">147</a></span>
-<span class="normal"><a href="#__codelineno-0-148">148</a></span>
-<span class="normal"><a href="#__codelineno-0-149">149</a></span>
-<span class="normal"><a href="#__codelineno-0-150">150</a></span>
-<span class="normal"><a href="#__codelineno-0-151">151</a></span>
-<span class="normal"><a href="#__codelineno-0-152">152</a></span>
-<span class="normal"><a href="#__codelineno-0-153">153</a></span>
-<span class="normal"><a href="#__codelineno-0-154">154</a></span>
-<span class="normal"><a href="#__codelineno-0-155">155</a></span>
-<span class="normal"><a href="#__codelineno-0-156">156</a></span>
-<span class="normal"><a href="#__codelineno-0-157">157</a></span>
-<span class="normal"><a href="#__codelineno-0-158">158</a></span>
-<span class="normal"><a href="#__codelineno-0-159">159</a></span>
-<span class="normal"><a href="#__codelineno-0-160">160</a></span>
-<span class="normal"><a href="#__codelineno-0-161">161</a></span>
-<span class="normal"><a href="#__codelineno-0-162">162</a></span>
-<span class="normal"><a href="#__codelineno-0-163">163</a></span>
-<span class="normal"><a href="#__codelineno-0-164">164</a></span>
-<span class="normal"><a href="#__codelineno-0-165">165</a></span>
-<span class="normal"><a href="#__codelineno-0-166">166</a></span>
-<span class="normal"><a href="#__codelineno-0-167">167</a></span>
-<span class="normal"><a href="#__codelineno-0-168">168</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-140" name="__codelineno-0-140"></a><span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-141" name="__codelineno-0-141"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve the API key so subsequent requests can authenticate.</span>
-<a id="__codelineno-0-142" name="__codelineno-0-142"></a>
-<a id="__codelineno-0-143" name="__codelineno-0-143"></a><span class="sd">    Idempotent — short-circuits when :meth:`is_authenticated` already</span>
-<a id="__codelineno-0-144" name="__codelineno-0-144"></a><span class="sd">    returns `True`. On the first call, resolves the key in this order: the</span>
-<a id="__codelineno-0-145" name="__codelineno-0-145"></a><span class="sd">    explicit `api_key` on the credentials, then the `GFW_API_KEY`</span>
-<a id="__codelineno-0-146" name="__codelineno-0-146"></a><span class="sd">    environment variable.</span>
-<a id="__codelineno-0-147" name="__codelineno-0-147"></a>
-<a id="__codelineno-0-148" name="__codelineno-0-148"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-149" name="__codelineno-0-149"></a><span class="sd">        AuthenticationError: When neither source supplies a key. The</span>
-<a id="__codelineno-0-150" name="__codelineno-0-150"></a><span class="sd">            message names the `api_key=` argument, the `GFW_API_KEY` env</span>
-<a id="__codelineno-0-151" name="__codelineno-0-151"></a><span class="sd">            var, and the key-creation URL — it never blocks on an</span>
-<a id="__codelineno-0-152" name="__codelineno-0-152"></a><span class="sd">            interactive prompt.</span>
-<a id="__codelineno-0-153" name="__codelineno-0-153"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-154" name="__codelineno-0-154"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">():</span>
-<a id="__codelineno-0-155" name="__codelineno-0-155"></a>        <span class="k">return</span>
-<a id="__codelineno-0-156" name="__codelineno-0-156"></a>    <span class="n">key</span> <span class="o">=</span> <span class="p">(</span>
-<a id="__codelineno-0-157" name="__codelineno-0-157"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">api_key</span><span class="o">.</span><span class="n">get_secret_value</span><span class="p">()</span>
-<a id="__codelineno-0-158" name="__codelineno-0-158"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_creds</span><span class="o">.</span><span class="n">api_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-<a id="__codelineno-0-159" name="__codelineno-0-159"></a>        <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GFW_API_KEY&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-160" name="__codelineno-0-160"></a>    <span class="p">)</span>
-<a id="__codelineno-0-161" name="__codelineno-0-161"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
-<a id="__codelineno-0-162" name="__codelineno-0-162"></a>        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
-<a id="__codelineno-0-163" name="__codelineno-0-163"></a>            <span class="s2">&quot;no GFW API key available: pass api_key= to EarthLens(...) for &quot;</span>
-<a id="__codelineno-0-164" name="__codelineno-0-164"></a>            <span class="s2">&quot;a gfw dataset, or set the GFW_API_KEY environment variable. &quot;</span>
-<a id="__codelineno-0-165" name="__codelineno-0-165"></a>            <span class="sa">f</span><span class="s2">&quot;Create a free key with a MyGFW account: </span><span class="si">{</span><span class="n">_CREATE_KEY_URL</span><span class="si">}</span><span class="s2">.&quot;</span>
-<a id="__codelineno-0-166" name="__codelineno-0-166"></a>        <span class="p">)</span>
-<a id="__codelineno-0-167" name="__codelineno-0-167"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="n">key</span>
-<a id="__codelineno-0-168" name="__codelineno-0-168"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">mark_configured</span><span class="p">()</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
 
 
 
@@ -34320,7 +33783,8 @@ resolution to the environment variable.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/hazards/src/earthlens/risk_indicators/auth.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-58">58</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-57">57</a></span>
+<span class="normal"><a href="#__codelineno-0-58">58</a></span>
 <span class="normal"><a href="#__codelineno-0-59">59</a></span>
 <span class="normal"><a href="#__codelineno-0-60">60</a></span>
 <span class="normal"><a href="#__codelineno-0-61">61</a></span>
@@ -34354,43 +33818,42 @@ resolution to the environment variable.</p>
 <span class="normal"><a href="#__codelineno-0-89">89</a></span>
 <span class="normal"><a href="#__codelineno-0-90">90</a></span>
 <span class="normal"><a href="#__codelineno-0-91">91</a></span>
-<span class="normal"><a href="#__codelineno-0-92">92</a></span>
-<span class="normal"><a href="#__codelineno-0-93">93</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="k">class</span><span class="w"> </span><span class="nc">GfwCredentials</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen value object holding the GFW API key.</span>
-<a id="__codelineno-0-60" name="__codelineno-0-60"></a>
-<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    The key is optional at construction time: `None` means &quot;resolve from the</span>
-<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    `GFW_API_KEY` environment variable at :meth:`GfwAuth.configure` time&quot;. The</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    real &quot;is there a usable key?&quot; gate is :meth:`GfwAuth.configure`, not this</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="sd">    model.</span>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">        api_key: The GFW `x-api-key`, stored as a :class:`pydantic.SecretStr`</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">            so it is never echoed by `repr(creds)` or in logs. `None` defers</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">            resolution to the environment variable.</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">        - Build from an explicit key; the secret is hidden in `repr`:</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">            &gt;&gt;&gt; from earthlens.risk_indicators import GfwCredentials</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">            &gt;&gt;&gt; creds = GfwCredentials(api_key=&quot;topsecret&quot;)</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">            &gt;&gt;&gt; creds.api_key.get_secret_value()</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">            &#39;topsecret&#39;</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">            &gt;&gt;&gt; &quot;topsecret&quot; in repr(creds)</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">            False</span>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">        - The key is optional — rely on the environment instead:</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">            &gt;&gt;&gt; from earthlens.risk_indicators import GfwCredentials</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">            &gt;&gt;&gt; GfwCredentials().api_key is None</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a><span class="sd">            True</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-90" name="__codelineno-0-90"></a>
-<a id="__codelineno-0-91" name="__codelineno-0-91"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-92" name="__codelineno-0-92"></a>
-<a id="__codelineno-0-93" name="__codelineno-0-93"></a>    <span class="n">api_key</span><span class="p">:</span> <span class="n">SecretStr</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="normal"><a href="#__codelineno-0-92">92</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="k">class</span><span class="w"> </span><span class="nc">GfwCredentials</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen value object holding the GFW API key.</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">    The key is optional at construction time: `None` means &quot;resolve from the</span>
+<a id="__codelineno-0-61" name="__codelineno-0-61"></a><span class="sd">    `GFW_API_KEY` environment variable at :meth:`GfwAuth.configure` time&quot;. The</span>
+<a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    real &quot;is there a usable key?&quot; gate is :meth:`GfwAuth.configure`, not this</span>
+<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">    model.</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        api_key: The GFW `x-api-key`, stored as a :class:`pydantic.SecretStr`</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            so it is never echoed by `repr(creds)` or in logs. `None` defers</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">            resolution to the environment variable.</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">        - Build from an explicit key; the secret is hidden in `repr`:</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">            &gt;&gt;&gt; from earthlens.risk_indicators import GfwCredentials</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">            &gt;&gt;&gt; creds = GfwCredentials(api_key=&quot;topsecret&quot;)</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">            &gt;&gt;&gt; creds.api_key.get_secret_value()</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">            &#39;topsecret&#39;</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">            &gt;&gt;&gt; &quot;topsecret&quot; in repr(creds)</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">            False</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="sd">        - The key is optional — rely on the environment instead:</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a><span class="sd">            &gt;&gt;&gt; from earthlens.risk_indicators import GfwCredentials</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a><span class="sd">            &gt;&gt;&gt; GfwCredentials().api_key is None</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a><span class="sd">            True</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a>
+<a id="__codelineno-0-90" name="__codelineno-0-90"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-91" name="__codelineno-0-91"></a>
+<a id="__codelineno-0-92" name="__codelineno-0-92"></a>    <span class="n">api_key</span><span class="p">:</span> <span class="n">SecretStr</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
