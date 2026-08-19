@@ -150,9 +150,7 @@ def download_within_budget():
         if "exc" in box:
             exc = box["exc"]
             if isinstance(exc, CadsUnavailableError):
-                skip_live_unavailable(
-                    f"CADS store is throttling this account: {exc}"
-                )
+                skip_live_unavailable(f"CADS store is throttling this account: {exc}")
             raise exc
         return box["out"]
 

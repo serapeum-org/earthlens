@@ -105,6 +105,40 @@ The end-to-end flow for onboarding the full inventory is therefore: `refresh ecm
 `curate ecmwf --all --write` (seed every uncurated id) → `curate ecmwf --fill-empty --write` (hydrate the placeholders
 from live retrieves).
 
+## When a store is throttling
+
+Every CADS store limits how many requests one account may have queued **per dataset**. Over that limit the store
+accepts the job and then rejects it:
+
+```
+400 Client Error: Bad Request
+The job has been rejected
+Number queued requests for this dataset is temporarily limited
+```
+
+This is temporary and says nothing about your request — the identical call succeeds on a quieter account, or later.
+The backend retries such a refusal `CADS_MAX_ATTEMPTS` times with an exponential wait, then raises:
+
+```python
+from earthlens.core import EarthLens
+from earthlens.ecmwf import CadsUnavailableError
+
+try:
+    paths = EarthLens(data_source="ecmwf", ...).download()
+except CadsUnavailableError as exc:
+    print(exc.status_code)   # 400, when the status is discernible
+    # wait and retry — do not change the request
+```
+
+!!! warning "This raises even under `errors="ignore"`"
+    The `errors=` policy absorbs a *per-variable* failure — that variable has no data for your window. A throttled
+    store refused to serve **anything**, so honouring the policy would hand back an empty list and report an outage
+    as every variable being empty. `CadsUnavailableError` therefore propagates whatever `errors=` is set to. It is
+    the only exception on this backend that does.
+
+The practical mitigation is not to hammer one dataset: the limit is per dataset per account, so a loop over many
+variables of the same dataset trips it far sooner than the same number spread across datasets.
+
 See [EWDS (GloFAS / floods)](ewds.md) for the flood-specific walkthrough,
 [ECDS + XDS](ecds.md) for the two ECMWF-hosted stores, and
 [Catalog & tooling](catalog.md) for the catalog layout.

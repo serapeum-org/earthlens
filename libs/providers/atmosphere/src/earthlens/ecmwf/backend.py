@@ -1177,7 +1177,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             such a multi-member response cannot be aggregated. Under the
             default `errors="warn"`, variables whose download (or
             aggregate) failed are logged and omitted from the returned
-            list rather than aborting the batch.
+            list rather than aborting the batch. A store-level refusal is
+            the exception to that — see :class:`CadsUnavailableError`
+            under `Raises:`.
 
         Raises:
             ValueError: If `errors` is not a recognised policy.
@@ -1185,6 +1187,15 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 curated CDS dataset, or if a listed variable is not
                 declared under that dataset — under `errors="warn"` this
                 is logged per pair rather than raised.
+            CadsUnavailableError: The store refused to queue the job on
+                its per-dataset limit and kept refusing across
+                :data:`CADS_MAX_ATTEMPTS` attempts. Raised **whatever
+                `errors` is set to**, including `"ignore"`: a refusal by
+                the service is not the per-variable data gap the policy
+                exists to absorb, and continuing would report an outage
+                as every variable having no data.
+            PermissionError: The dataset's licence has not been accepted
+                on the Copernicus account.
             Exception: Any error :meth:`_api` propagates from
                 :meth:`cdsapi.Client.retrieve`.
 

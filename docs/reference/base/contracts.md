@@ -79,6 +79,12 @@ Backends that process a batch honour `errors=`:
 `ERROR_POLICIES` lists four accepted spellings but there are three behaviours: `check_errors_policy` normalises
 `"skip"` to `"ignore"`, so both take the same path.
 
+**Service failures are exempt.** A backend may mark exception classes `fatal` when passing work to `_run_items`,
+and those propagate whatever `errors=` says. The policy exists to absorb a *per-item* gap — this dataset has no
+data for your window — not a refusal by the upstream to serve anything at all. Dropping the latter would report an
+outage as every item being empty. `earthlens.ecmwf` marks
+[`CadsUnavailableError`](../ecmwf/datastores.md#when-a-store-is-throttling) fatal for exactly that reason.
+
 ## Streaming and connection pooling
 
 - **Downloads are streamed and atomic.** Six whole-body `.content` writes were replaced with streamed writes to a
