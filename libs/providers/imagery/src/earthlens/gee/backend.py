@@ -48,7 +48,7 @@ from __future__ import annotations
 
 import datetime as dt
 import os
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -166,13 +166,14 @@ def _validate_pure_config(
 
 
 def _validate_filters(
-    filters: Sequence[CollectionFilter] | None,
+    filters: Iterable[CollectionFilter] | None,
 ) -> tuple[CollectionFilter, ...]:
     """Normalise the constructor `filters` into a validated tuple.
 
     Args:
-        filters: The raw `filters=` argument — `None`, or a sequence of
-            `ee.ImageCollection -> ee.ImageCollection` callables.
+        filters: The raw `filters=` argument — `None`, or an iterable of
+            `ee.ImageCollection -> ee.ImageCollection` callables (a
+            one-shot generator is accepted and materialised).
 
     Returns:
         The filters as a tuple (empty when `filters is None`).
@@ -374,7 +375,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         discover_extent: bool = False,
         wait_for_export: bool = True,
         cloud_mask: CloudMask | None = None,
-        filters: Sequence[CollectionFilter] | None = None,
+        filters: Iterable[CollectionFilter] | None = None,
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
