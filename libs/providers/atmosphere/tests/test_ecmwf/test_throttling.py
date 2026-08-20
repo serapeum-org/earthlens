@@ -115,9 +115,10 @@ class TestRetrieveWithRetry:
         """Each retry waits twice as long as the one before it."""
         waits: list[float] = []
         monkeypatch.setattr(helpers_mod.time, "sleep", waits.append)
+        client = _Client(failures=99)
         with pytest.raises(CadsUnavailableError):
             helpers_mod._retrieve_with_retry(
-                _Client(failures=99), "ds", {}, tmp_path / "o.nc", "ecds"
+                client, "ds", {}, tmp_path / "o.nc", "ecds"
             )
         assert waits == [
             helpers_mod.CADS_BACKOFF_SECONDS * 2**i
@@ -409,10 +410,9 @@ class TestRetrieveIsAtomic:
         monkeypatch.setattr(helpers_mod.time, "sleep", lambda _s: None)
         target = tmp_path / "out.nc"
         target.write_bytes(b"previous good download")
+        client = _Client(failures=99)
         with pytest.raises(CadsUnavailableError):
-            helpers_mod._retrieve_with_retry(
-                _Client(failures=99), "ds", {}, target, "ecds"
-            )
+            helpers_mod._retrieve_with_retry(client, "ds", {}, target, "ecds")
         assert target.read_bytes() == b"previous good download"
         assert not (tmp_path / "out.nc.part").exists()
 

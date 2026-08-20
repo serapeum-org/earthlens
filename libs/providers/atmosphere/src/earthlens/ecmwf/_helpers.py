@@ -225,6 +225,71 @@ CADS_MAX_ATTEMPTS = 3
 CADS_BACKOFF_SECONDS = 2.0
 
 
+def _reraise_if_not_throttled(exc: BaseException, dataset: str, endpoint: str) -> None:
+    """Re-raise anything that is not a transient refusal worth retrying.
+
+    An unaccepted licence is permanent, so it is rewritten into a
+    :class:`PermissionError` naming the dataset page; any other non-throttle
+    failure propagates untouched, because retrying a malformed request only
+    reproduces the same error.
+
+    Args:
+        exc: The exception `client.retrieve(...)` raised.
+        dataset: Upstream dataset id, for the message.
+        endpoint: CADS instance slug, for the message.
+
+    Raises:
+        PermissionError: The dataset's licence has not been accepted.
+        BaseException: `exc` itself, when it is not a throttle.
+    """
+    if _looks_like_licence_not_accepted(exc):
+        base = endpoint_url(endpoint).rsplit("/api", 1)[0]
+        raise PermissionError(
+            f"{endpoint.upper()} rejected the request for {dataset!r}: "
+            f"licence not accepted. Open the dataset page at "
+            f"{base}/datasets/{dataset} and tick the licence at the "
+            "bottom of the 'Download' tab. The acceptance is permanent "
+            "and tied to your Copernicus account."
+        ) from exc
+    if not _looks_like_throttled(exc):
+        raise exc
+
+
+def _wait_before_retry(attempt: int, dataset: str, endpoint: str) -> None:
+    """Sleep the exponential backoff for `attempt`, unless it was the last."""
+    if attempt + 1 >= CADS_MAX_ATTEMPTS:
+        return
+    wait = CADS_BACKOFF_SECONDS * 2**attempt
+    logger.warning(
+        f"{endpoint.upper()} is throttling {dataset!r} "
+        f"(attempt {attempt + 1}/{CADS_MAX_ATTEMPTS}); retrying in {wait:.0f}s"
+    )
+    time.sleep(wait)
+
+
+def _commit_download(part: Path, target: Path, dataset: str, endpoint: str) -> None:
+    """Move a completed sidecar onto `target`, or fail if nothing was written.
+
+    Args:
+        part: The sidecar the retrieve was told to write.
+        target: Where the data belongs once the retrieve succeeded.
+        dataset: Upstream dataset id, for the message.
+        endpoint: CADS instance slug, for the message.
+
+    Raises:
+        CadsUnavailableError: The retrieve reported success but wrote no file;
+            returning normally would hand back whatever stale file happened to
+            be at `target`.
+    """
+    if not part.exists():
+        raise CadsUnavailableError(
+            f"{endpoint.upper()} returned no data for {dataset!r}: the "
+            "retrieve reported success but wrote no file.",
+            status_code=None,
+        )
+    os.replace(part, target)
+
+
 def _retrieve_with_retry(
     client: Any,
     dataset: str,
@@ -271,39 +336,14 @@ def _retrieve_with_retry(
             client.retrieve(dataset, request, str(part))
         except Exception as exc:  # noqa: BLE001 - cdsapi raises many types; classified here
             part.unlink(missing_ok=True)
-            if _looks_like_licence_not_accepted(exc):
-                base = endpoint_url(endpoint).rsplit("/api", 1)[0]
-                raise PermissionError(
-                    f"{endpoint.upper()} rejected the request for {dataset!r}: "
-                    f"licence not accepted. Open the dataset page at "
-                    f"{base}/datasets/{dataset} and tick the licence at the "
-                    "bottom of the 'Download' tab. The acceptance is permanent "
-                    "and tied to your Copernicus account."
-                ) from exc
-            if not _looks_like_throttled(exc):
-                raise
+            _reraise_if_not_throttled(exc, dataset, endpoint)
             last = exc
-            if attempt + 1 < CADS_MAX_ATTEMPTS:
-                wait = CADS_BACKOFF_SECONDS * 2**attempt
-                logger.warning(
-                    f"{endpoint.upper()} is throttling {dataset!r} "
-                    f"(attempt {attempt + 1}/{CADS_MAX_ATTEMPTS}); "
-                    f"retrying in {wait:.0f}s"
-                )
-                time.sleep(wait)
+            _wait_before_retry(attempt, dataset, endpoint)
         else:
             # Outside the `except`: a failure moving the file is not a failed
             # retrieve, and running it in the handler's scope would unlink the
-            # bytes just downloaded. A retrieve that wrote nothing is a real
-            # failure — reporting success would hand back whatever stale file
-            # happened to be at `target`.
-            if not part.exists():
-                raise CadsUnavailableError(
-                    f"{endpoint.upper()} returned no data for {dataset!r}: the "
-                    "retrieve reported success but wrote no file.",
-                    status_code=None,
-                )
-            os.replace(part, target)
+            # bytes just downloaded.
+            _commit_download(part, target, dataset, endpoint)
             return
     raise CadsUnavailableError(
         f"{endpoint.upper()} refused {dataset!r} after {CADS_MAX_ATTEMPTS} "
