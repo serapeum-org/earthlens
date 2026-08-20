@@ -1,18 +1,31 @@
 # Change Log
 
-## Unreleased
+## 0.16.0 (2026-08-20)
+
+### BREAKING CHANGE
+
+- an omitted path= now writes to the configured output
+directory instead of the working directory, and the facade uses
+<output_dir>/<source> rather than ./earthlens-data/<source>. path=""
+still means the working directory. Old caches are not migrated.
 
 ### Feat
 
-- **ecmwf**: add the GloFAS historical intermediate (ERA5T) reanalysis stream, with a per-row `cds_dataset` override so the consolidated and intermediate configs of one CDS dataset coexist and write to distinct output files (#1039)
+- **core**: configurable cache dir, EUMETSAT end-bound fix, and the 2026 eclipse showcase (#1070)
+- **eea_aq**: add adjacent-era fallback and split empty-result signals (#1066)
+- **ecmwf**: curate the GloFAS historical intermediate stream (#1039)
 
 ### Fix
 
-- **ecmwf**: live-verify all four GloFAS historical variables — real NetCDF names `avg_dis` / `rowe` / `sd` / `swir`, and the per-variable `timespan` (`time_mean` for discharge/runoff, `instantaneous` for snow-depth/soil-wetness) (#1039)
+- **docs**: repair the brand guide and restore the head overrides
+- **osm**: surface opaque ohsome failures as typed, logged errors (#1072)
+- **gdacs**: retry SEARCH and skip live tests on a persistent upstream failure (#1071)
+- **overture**: resolve the release live instead of globbing the bundled pin (#1069)
+- **earthdata**: force IPv4 on the shared Earthdata Login path only on a dead IPv6 route (#1035)
 
-### Docs
+### Refactor
 
-- **ecmwf**: add a runnable GloFAS historical intermediate example notebook (#1039)
+- **base**: consolidate the AOI-sidecar cache and windowed /vsicurl read (#1067)
 
 ## 0.15.0 (2026-08-14)
 

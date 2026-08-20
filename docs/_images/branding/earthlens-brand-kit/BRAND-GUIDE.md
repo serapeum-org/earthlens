@@ -51,3 +51,16 @@ Post `social/announcement-card.png` + `animation/earthlens-logo-orbit.gif` for t
 ## Clear space & don't
 Keep clear space ≥ the height of the satellite around the mark. Don't recolor the wordmark,
 stretch the mark, or place the transparent logo on a busy photo without a navy scrim.
+
+## Overlay variant — `earthlens-lockup-stacked-overlay`
+For placing the mark over **arbitrary imagery** (photos, satellite scenes, video) at watermark scale,
+down to **80 px wide**. Unlike the transparent lockup, it carries its **own rounded navy scrim**
+(`#091c30` @ 0.82, 14% corner radius) with an optional gold inset hairline — so the "navy-scrim"
+rule is already satisfied and it reads on anything from pure black to pure white.
+
+It is a reduced form: enlarged wordmark (`earth` / `lens` stacked), a simplified high-contrast globe,
+**no satellite and no tagline** (both alias away at watermark scale). Brand ink values are unchanged;
+only the globe fill is lightened to meet WCAG non-text contrast against the plate.
+
+Files: `logo/earthlens-lockup-stacked-overlay.svg` (vector source) · `logo/earthlens-lockup-stacked-overlay.png` (512 px RGBA).
+Minimum width **80 px**. Do not use it below that, and don't disable the plate when placing over imagery.
