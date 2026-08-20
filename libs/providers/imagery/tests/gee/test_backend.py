@@ -404,7 +404,7 @@ class TestInit:
 
     def test_non_iterable_filters_rejected(self, make_gee):
         """A non-iterable `filters` raises `TypeError` at construction."""
-        with pytest.raises(TypeError, match="filters must be a sequence"):
+        with pytest.raises(TypeError, match="filters must be an iterable"):
             make_gee(filters=42)
 
     def test_non_callable_filter_entry_rejected(self, make_gee):
@@ -414,8 +414,13 @@ class TestInit:
 
     def test_str_filters_rejected(self, make_gee):
         """A `str` (iterable of chars) is rejected rather than iterated per char."""
-        with pytest.raises(TypeError, match="filters must be a sequence"):
+        with pytest.raises(TypeError, match="filters must be an iterable"):
             make_gee(filters="abc")
+
+    def test_mapping_filters_rejected(self, make_gee):
+        """A mapping is rejected up front, not iterated into its keys."""
+        with pytest.raises(TypeError, match="filters must be an iterable"):
+            make_gee(filters={"a": lambda c: c})
 
     def test_generator_filters_normalised_to_tuple(self, make_gee):
         """A one-shot generator is materialised into a reusable tuple."""

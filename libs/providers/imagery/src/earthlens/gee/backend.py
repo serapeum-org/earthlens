@@ -48,7 +48,7 @@ from __future__ import annotations
 
 import datetime as dt
 import os
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -179,14 +179,14 @@ def _validate_filters(
         The filters as a tuple (empty when `filters is None`).
 
     Raises:
-        TypeError: If `filters` is a `str` / `bytes`, is not iterable, or
-            contains a non-callable entry.
+        TypeError: If `filters` is a `str` / `bytes` / mapping, is not
+            iterable, or contains a non-callable entry.
     """
     if filters is None:
         return ()
-    if isinstance(filters, (str, bytes)) or not isinstance(filters, Iterable):
+    if isinstance(filters, (str, bytes, Mapping)) or not isinstance(filters, Iterable):
         raise TypeError(
-            "filters must be a sequence of callables "
+            "filters must be an iterable of callables "
             "(ee.ImageCollection -> ee.ImageCollection) or None, got "
             f"{type(filters).__name__}"
         )
