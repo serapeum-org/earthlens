@@ -310,6 +310,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `temporal_resolution`; from :meth:`_api` on a missing scale
             or an oversized `"url"` request (unless `auto_split=True`);
             from :meth:`_download_dataset` on an unknown asset id or band.
+        TypeError: At construction when `cloud_mask` is not callable, or
+            `filters` is a `str` / `bytes` / mapping / non-iterable or
+            contains a non-callable entry.
         NotImplementedError: From :meth:`download` when `aggregate=` is
             passed (not yet supported).
         RuntimeError: From :meth:`_api` if a `"drive"` / `"gcs"` export
