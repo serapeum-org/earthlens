@@ -121,9 +121,14 @@ def sentinel2_scl(image: ee.Image) -> ee.Image:
 
     Reads the Scene Classification (`SCL`) band and keeps only pixels
     whose class is neither cloud shadow (3), cloud medium / high
-    probability (8 / 9), nor thin cirrus (10) — the standard recipe for
-    a clean surface-reflectance composite over
-    `COPERNICUS/S2_SR_HARMONIZED`.
+    probability (8 / 9), nor thin cirrus (10) — a common recipe for a
+    clean surface-reflectance composite over `COPERNICUS/S2_SR_HARMONIZED`.
+
+    It deliberately keeps some non-clear classes that other recipes also
+    drop — notably saturated / defective (1) and snow / ice (11) — so a
+    scene with those will retain them; screen them separately if that
+    matters. The masked set (:data:`_S2_SCL_MASKED_CLASSES`) is the one
+    specified for this helper and is not a universal standard.
 
     Args:
         image: An `ee.Image` from `COPERNICUS/S2_SR_HARMONIZED` (or the
