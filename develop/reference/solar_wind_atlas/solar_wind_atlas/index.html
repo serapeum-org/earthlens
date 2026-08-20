@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2528,7 +2528,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS + ECDS + XDS)
+    Data stores (CDS + ADS + EWDS)
   
 
     
@@ -2557,34 +2557,6 @@
     
   
     EWDS (GloFAS / floods)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../ecmwf/ecds/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -14919,34 +14891,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    TIGGE and fire fuel — the ECDS and XDS endpoints
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../examples/ecmwf/glofas_historical_intermediate/" class="md-nav__link">
         
   
@@ -24340,7 +24284,7 @@ are public / CC-BY-4.0, so there is no <code>auth</code> module.</p>
 Weibull / capacity-factor / air-density) climatology layers as GeoTIFFs
 (<code>OUTPUT_KIND="raster"</code>). Both atlases are keyless / CC-BY-4.0.</p>
 <p>The backend uses <strong>two transports</strong>, one per atlas (pinned in the A1 gate,
-the A1 gate captures): the Global Wind
+<code>planning/solar_wind_atlas/captures/solar-wind-sdk-facts.md</code>): the Global Wind
 Atlas layers are range-accessible COGs on figshare, read <strong>windowed</strong> over
 <code>/vsicurl/</code> so only the AOI transfers; the Global Solar Atlas layers are
 DEFLATE-compressed ZIP archives with no random access, so they are downloaded
@@ -24437,8 +24381,7 @@ is the full shipped surface, so this equals the curated keys.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-168">168</a></span>
-<span class="normal"><a href="#__codelineno-0-169">169</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-169">169</a></span>
 <span class="normal"><a href="#__codelineno-0-170">170</a></span>
 <span class="normal"><a href="#__codelineno-0-171">171</a></span>
 <span class="normal"><a href="#__codelineno-0-172">172</a></span>
@@ -24532,102 +24475,103 @@ is the full shipped surface, so this equals the curated keys.</p>
 <span class="normal"><a href="#__codelineno-0-260">260</a></span>
 <span class="normal"><a href="#__codelineno-0-261">261</a></span>
 <span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Variable / transport catalog for the Solar &amp; Wind Atlas backend.</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    Merges the bundled `catalog/` directory&#39;s per-atlas `*.yaml` files and</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    exposes their `datasets:` blocks as a map of `Layer` rows keyed by id under</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    the inherited `datasets` field (giving `cat[&quot;ghi&quot;]`, `&quot;ghi&quot; in cat`,</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">    `len(cat)`, and the did-you-mean error for free). Instantiate with no</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    arguments (`Catalog()`); `model_post_init` loads and validates the catalog</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">    through the parse cache.</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">        datasets: Map from layer id to its `Layer` row.</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        available_datasets: Every layer id from `_index.yaml`. The curated set</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            is the full shipped surface, so this equals the curated keys.</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Solar &amp; Wind Atlas catalog&quot;</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;layers&quot;</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="n">_alias_index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the bundled catalog from disk.</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            dict[str, Any]: The `datasets`, `available_datasets` read from</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">                the bundled catalog.</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="k">return</span> <span class="p">{</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>            <span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a>            <span class="s2">&quot;available_datasets&quot;</span><span class="p">:</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">,</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>        <span class="p">}</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the layer catalog from disk (directory or single file).</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            catalog_path: Catalog directory or single YAML file. Defaults to</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">                the module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            ValueError: If no file has a `datasets:` block, an id is declared</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">                in two files, a row fails `Layer` validation, or a curated id</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">                is absent from `available_datasets:`.</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="p">)</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">            Layer: The matching row.</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            ValueError: If `layer_id` is not a curated layer; the message</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            - A solar and a wind layer resolve to their atlas / transport:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">                &#39;gsa&#39;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">                &#39;vsicurl&#39;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Variable / transport catalog for the Solar &amp; Wind Atlas backend.</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Merges the bundled `catalog/` directory&#39;s per-atlas `*.yaml` files and</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    exposes their `datasets:` blocks as a map of `Layer` rows keyed by id under</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">    the inherited `datasets` field (giving `cat[&quot;ghi&quot;]`, `&quot;ghi&quot; in cat`,</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    `len(cat)`, and the did-you-mean error for free). Instantiate with no</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">    arguments (`Catalog()`); `model_post_init` loads and validates the catalog</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    through the parse cache.</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        datasets: Map from layer id to its `Layer` row.</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        available_datasets: Every layer id from `_index.yaml`. The curated set</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            is the full shipped surface, so this equals the curated keys.</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Solar &amp; Wind Atlas catalog&quot;</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;layers&quot;</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="n">_alias_index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the bundled catalog from disk.</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            dict[str, Any]: The `datasets`, `available_datasets` read from</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">                the bundled catalog.</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>        <span class="k">return</span> <span class="p">{</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a>            <span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>            <span class="s2">&quot;available_datasets&quot;</span><span class="p">:</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">,</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>        <span class="p">}</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the layer catalog from disk (directory or single file).</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            catalog_path: Catalog directory or single YAML file. Defaults to</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">                the module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            ValueError: If no file has a `datasets:` block, an id is declared</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">                in two files, a row fails `Layer` validation, or a curated id</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">                is absent from `available_datasets:`.</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>        <span class="p">)</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">            layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">            Layer: The matching row.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            ValueError: If `layer_id` is not a curated layer; the message</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            - A solar and a wind layer resolve to their atlas / transport:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                &#39;gsa&#39;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">                &#39;vsicurl&#39;</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -24683,19 +24627,19 @@ is the full shipped surface, so this equals the curated keys.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-257">257</a></span>
-<span class="normal"><a href="#__codelineno-0-258">258</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-258">258</a></span>
 <span class="normal"><a href="#__codelineno-0-259">259</a></span>
 <span class="normal"><a href="#__codelineno-0-260">260</a></span>
 <span class="normal"><a href="#__codelineno-0-261">261</a></span>
 <span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24808,8 +24752,7 @@ lists the known ids with a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-231">231</a></span>
-<span class="normal"><a href="#__codelineno-0-232">232</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-232">232</a></span>
 <span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
 <span class="normal"><a href="#__codelineno-0-235">235</a></span>
@@ -24832,31 +24775,32 @@ lists the known ids with a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-252">252</a></span>
 <span class="normal"><a href="#__codelineno-0-253">253</a></span>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
-<span class="normal"><a href="#__codelineno-0-255">255</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        Layer: The matching row.</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        ValueError: If `layer_id` is not a curated layer; the message</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        - A solar and a wind layer resolve to their atlas / transport:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            &#39;gsa&#39;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            &#39;vsicurl&#39;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Layer: The matching row.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        ValueError: If `layer_id` is not a curated layer; the message</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        - A solar and a wind layer resolve to their atlas / transport:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            &#39;gsa&#39;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            &#39;vsicurl&#39;</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24879,11 +24823,11 @@ lists the known ids with a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
-<span class="normal"><a href="#__codelineno-0-228">228</a></span>
-<span class="normal"><a href="#__codelineno-0-229">229</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24990,8 +24934,7 @@ is absent from <code>available_datasets:</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-204">204</a></span>
-<span class="normal"><a href="#__codelineno-0-205">205</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-205">205</a></span>
 <span class="normal"><a href="#__codelineno-0-206">206</a></span>
 <span class="normal"><a href="#__codelineno-0-207">207</a></span>
 <span class="normal"><a href="#__codelineno-0-208">208</a></span>
@@ -25011,28 +24954,29 @@ is absent from <code>available_datasets:</code>.</p>
 <span class="normal"><a href="#__codelineno-0-222">222</a></span>
 <span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the layer catalog from disk (directory or single file).</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        catalog_path: Catalog directory or single YAML file. Defaults to</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            the module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        ValueError: If no file has a `datasets:` block, an id is declared</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            in two files, a row fails `Layer` validation, or a curated id</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            is absent from `available_datasets:`.</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span>
+<span class="normal"><a href="#__codelineno-0-226">226</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the layer catalog from disk (directory or single file).</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        catalog_path: Catalog directory or single YAML file. Defaults to</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            the module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        ValueError: If no file has a `datasets:` block, an id is declared</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            in two files, a row fails `Layer` validation, or a curated id</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">            is absent from `available_datasets:`.</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -25171,8 +25115,7 @@ Global Solar Atlas <code>*.zip</code> URL for <code>"download_zip"</code> rows.<
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-62">62</a></span>
-<span class="normal"><a href="#__codelineno-0-63">63</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-63">63</a></span>
 <span class="normal"><a href="#__codelineno-0-64">64</a></span>
 <span class="normal"><a href="#__codelineno-0-65">65</a></span>
 <span class="normal"><a href="#__codelineno-0-66">66</a></span>
@@ -25197,33 +25140,34 @@ Global Solar Atlas <code>*.zip</code> URL for <code>"download_zip"</code> rows.<
 <span class="normal"><a href="#__codelineno-0-85">85</a></span>
 <span class="normal"><a href="#__codelineno-0-86">86</a></span>
 <span class="normal"><a href="#__codelineno-0-87">87</a></span>
-<span class="normal"><a href="#__codelineno-0-88">88</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="k">class</span><span class="w"> </span><span class="nc">Layer</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated Solar / Wind Atlas layer.</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        id: Catalog key for the row (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`). Set from the</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            catalog key by the loader.</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">        atlas: Which atlas the layer comes from — `&quot;gsa&quot;` (Global Solar Atlas)</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">            or `&quot;gwa&quot;` (Global Wind Atlas).</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">        transport: How the bbox window is read — `&quot;vsicurl&quot;` (windowed remote</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">            COG read, the wind layers) or `&quot;download_zip&quot;` (download the deflate</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">            ZIP once, then read the local member, the solar layers).</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">        url: The download URL — a figshare COG URL for `&quot;vsicurl&quot;` rows, a</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">            Global Solar Atlas `*.zip` URL for `&quot;download_zip&quot;` rows.</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">        units: Human-readable unit of the values (`&quot;kWh/m2/day&quot;`, `&quot;m/s&quot;`).</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">        long_name: One-line human-readable description.</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">        license_note: Attribution / licence text surfaced in docs and logs.</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="n">atlas</span><span class="p">:</span> <span class="n">Atlas</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="n">transport</span><span class="p">:</span> <span class="n">Transport</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="n">long_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a>    <span class="n">license_note</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="normal"><a href="#__codelineno-0-88">88</a></span>
+<span class="normal"><a href="#__codelineno-0-89">89</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="k">class</span><span class="w"> </span><span class="nc">Layer</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated Solar / Wind Atlas layer.</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">        id: Catalog key for the row (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`). Set from the</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">            catalog key by the loader.</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">        atlas: Which atlas the layer comes from — `&quot;gsa&quot;` (Global Solar Atlas)</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">            or `&quot;gwa&quot;` (Global Wind Atlas).</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">        transport: How the bbox window is read — `&quot;vsicurl&quot;` (windowed remote</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">            COG read, the wind layers) or `&quot;download_zip&quot;` (download the deflate</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">            ZIP once, then read the local member, the solar layers).</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">        url: The download URL — a figshare COG URL for `&quot;vsicurl&quot;` rows, a</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">            Global Solar Atlas `*.zip` URL for `&quot;download_zip&quot;` rows.</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">        units: Human-readable unit of the values (`&quot;kWh/m2/day&quot;`, `&quot;m/s&quot;`).</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">        long_name: One-line human-readable description.</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">        license_note: Attribution / licence text surfaced in docs and logs.</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="n">atlas</span><span class="p">:</span> <span class="n">Atlas</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">transport</span><span class="p">:</span> <span class="n">Transport</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a>    <span class="n">long_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a>    <span class="n">license_note</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -27586,7 +27530,7 @@ the Global Solar Atlas and Global Wind Atlas climatology layers. A request is a
 bbox plus a list of layer ids (<code>variables=["ghi", "wind_100m"]</code>); <code>download()</code>
 writes one cropped GeoTIFF per layer under <code>root_dir</code> and returns their paths.</p>
 <p>Each layer is fetched by the transport its catalog row declares (pinned in the
-A1 gate):</p>
+A1 gate, <code>planning/solar_wind_atlas/captures/solar-wind-sdk-facts.md</code>):</p>
 <ul>
 <li><strong>Global Wind Atlas</strong> layers (<code>transport="vsicurl"</code>) are range-accessible COGs
   read <strong>windowed</strong> over <code>/vsicurl/</code> — only the AOI's byte ranges transfer.</li>
@@ -28767,8 +28711,9 @@ The loader merges every file at construction time (the <code>ghsl</code> / <code
 <code>bathymetry</code> sharded pattern) through a <code>(path, mtime_ns)</code> parse cache.</p>
 <p>Each row pins the layer's <code>atlas</code> (<code>"gsa"</code> / <code>"gwa"</code>), its <code>transport</code>
 (<code>"vsicurl"</code> windowed COG read for the wind layers, <code>"download_zip"</code>
-download-then-localise for the solar layers — see the A1 gate), and the
-download <code>url</code>.</p>
+download-then-localise for the solar layers — see the A1 gate,
+<code>planning/solar_wind_atlas/captures/solar-wind-sdk-facts.md</code>), and the download
+<code>url</code>.</p>
 
 
 
@@ -28860,8 +28805,7 @@ is the full shipped surface, so this equals the curated keys.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-168">168</a></span>
-<span class="normal"><a href="#__codelineno-0-169">169</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-169">169</a></span>
 <span class="normal"><a href="#__codelineno-0-170">170</a></span>
 <span class="normal"><a href="#__codelineno-0-171">171</a></span>
 <span class="normal"><a href="#__codelineno-0-172">172</a></span>
@@ -28955,102 +28899,103 @@ is the full shipped surface, so this equals the curated keys.</p>
 <span class="normal"><a href="#__codelineno-0-260">260</a></span>
 <span class="normal"><a href="#__codelineno-0-261">261</a></span>
 <span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-168" name="__codelineno-0-168"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
-<a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Variable / transport catalog for the Solar &amp; Wind Atlas backend.</span>
-<a id="__codelineno-0-170" name="__codelineno-0-170"></a>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="sd">    Merges the bundled `catalog/` directory&#39;s per-atlas `*.yaml` files and</span>
-<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    exposes their `datasets:` blocks as a map of `Layer` rows keyed by id under</span>
-<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    the inherited `datasets` field (giving `cat[&quot;ghi&quot;]`, `&quot;ghi&quot; in cat`,</span>
-<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">    `len(cat)`, and the did-you-mean error for free). Instantiate with no</span>
-<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    arguments (`Catalog()`); `model_post_init` loads and validates the catalog</span>
-<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">    through the parse cache.</span>
-<a id="__codelineno-0-177" name="__codelineno-0-177"></a>
-<a id="__codelineno-0-178" name="__codelineno-0-178"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">        datasets: Map from layer id to its `Layer` row.</span>
-<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        available_datasets: Every layer id from `_index.yaml`. The curated set</span>
-<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">            is the full shipped surface, so this equals the curated keys.</span>
-<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-183" name="__codelineno-0-183"></a>
-<a id="__codelineno-0-184" name="__codelineno-0-184"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Solar &amp; Wind Atlas catalog&quot;</span>
-<a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;layers&quot;</span>
-<a id="__codelineno-0-186" name="__codelineno-0-186"></a>
-<a id="__codelineno-0-187" name="__codelineno-0-187"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="n">_alias_index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
-<a id="__codelineno-0-189" name="__codelineno-0-189"></a>
-<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-192" name="__codelineno-0-192"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the bundled catalog from disk.</span>
-<a id="__codelineno-0-193" name="__codelineno-0-193"></a>
-<a id="__codelineno-0-194" name="__codelineno-0-194"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">            dict[str, Any]: The `datasets`, `available_datasets` read from</span>
-<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">                the bundled catalog.</span>
-<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-198" name="__codelineno-0-198"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="k">return</span> <span class="p">{</span>
-<a id="__codelineno-0-200" name="__codelineno-0-200"></a>            <span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span>
-<a id="__codelineno-0-201" name="__codelineno-0-201"></a>            <span class="s2">&quot;available_datasets&quot;</span><span class="p">:</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">,</span>
-<a id="__codelineno-0-202" name="__codelineno-0-202"></a>        <span class="p">}</span>
-<a id="__codelineno-0-203" name="__codelineno-0-203"></a>
-<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="nd">@classmethod</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the layer catalog from disk (directory or single file).</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">            catalog_path: Catalog directory or single YAML file. Defaults to</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">                the module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">            A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">            ValueError: If no file has a `datasets:` block, an id is declared</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">                in two files, a row fails `Layer` validation, or a curated id</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">                is absent from `available_datasets:`.</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="p">)</span>
-<a id="__codelineno-0-226" name="__codelineno-0-226"></a>
-<a id="__codelineno-0-227" name="__codelineno-0-227"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
-<a id="__codelineno-0-230" name="__codelineno-0-230"></a>
-<a id="__codelineno-0-231" name="__codelineno-0-231"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">        Args:</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">            layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">            Layer: The matching row.</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">        Raises:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">            ValueError: If `layer_id` is not a curated layer; the message</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">        Examples:</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">            - A solar and a wind layer resolve to their atlas / transport:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">                ```python</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">                &#39;gsa&#39;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">                &#39;vsicurl&#39;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">                ```</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
-<a id="__codelineno-0-256" name="__codelineno-0-256"></a>
-<a id="__codelineno-0-257" name="__codelineno-0-257"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">        Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">            list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-169" name="__codelineno-0-169"></a><span class="k">class</span><span class="w"> </span><span class="nc">Catalog</span><span class="p">(</span><span class="n">AbstractCatalog</span><span class="p">):</span>
+<a id="__codelineno-0-170" name="__codelineno-0-170"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Variable / transport catalog for the Solar &amp; Wind Atlas backend.</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a><span class="sd">    Merges the bundled `catalog/` directory&#39;s per-atlas `*.yaml` files and</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a><span class="sd">    exposes their `datasets:` blocks as a map of `Layer` rows keyed by id under</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a><span class="sd">    the inherited `datasets` field (giving `cat[&quot;ghi&quot;]`, `&quot;ghi&quot; in cat`,</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a><span class="sd">    `len(cat)`, and the did-you-mean error for free). Instantiate with no</span>
+<a id="__codelineno-0-176" name="__codelineno-0-176"></a><span class="sd">    arguments (`Catalog()`); `model_post_init` loads and validates the catalog</span>
+<a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="sd">    through the parse cache.</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>
+<a id="__codelineno-0-179" name="__codelineno-0-179"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="sd">        datasets: Map from layer id to its `Layer` row.</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a><span class="sd">        available_datasets: Every layer id from `_index.yaml`. The curated set</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a><span class="sd">            is the full shipped surface, so this equals the curated keys.</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a>    <span class="n">_catalog_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Solar &amp; Wind Atlas catalog&quot;</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="n">_entry_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;layers&quot;</span>
+<a id="__codelineno-0-187" name="__codelineno-0-187"></a>
+<a id="__codelineno-0-188" name="__codelineno-0-188"></a>    <span class="n">datasets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a>    <span class="n">_alias_index</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_autoload</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the bundled catalog from disk.</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a><span class="sd">            dict[str, Any]: The `datasets`, `available_datasets` read from</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a><span class="sd">                the bundled catalog.</span>
+<a id="__codelineno-0-198" name="__codelineno-0-198"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-199" name="__codelineno-0-199"></a>        <span class="n">loaded</span> <span class="o">=</span> <span class="n">Catalog</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>        <span class="k">return</span> <span class="p">{</span>
+<a id="__codelineno-0-201" name="__codelineno-0-201"></a>            <span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">loaded</span><span class="o">.</span><span class="n">datasets</span><span class="p">,</span>
+<a id="__codelineno-0-202" name="__codelineno-0-202"></a>            <span class="s2">&quot;available_datasets&quot;</span><span class="p">:</span> <span class="n">loaded</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">,</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>        <span class="p">}</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="nd">@classmethod</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Read the layer catalog from disk (directory or single file).</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            catalog_path: Catalog directory or single YAML file. Defaults to</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">                the module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">            A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            ValueError: If no file has a `datasets:` block, an id is declared</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">                in two files, a row fails `Layer` validation, or a curated id</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">                is absent from `available_datasets:`.</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>            <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>            <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>        <span class="p">)</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        Args:</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">            layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">            Layer: The matching row.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        Raises:</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            ValueError: If `layer_id` is not a curated layer; the message</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">                lists the known ids with a did-you-mean hint.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        Examples:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            - A solar and a wind layer resolve to their atlas / transport:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">                ```python</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">                &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">                &#39;gsa&#39;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">                &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">                &#39;vsicurl&#39;</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">                ```</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
+<a id="__codelineno-0-257" name="__codelineno-0-257"></a>
+<a id="__codelineno-0-258" name="__codelineno-0-258"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        Returns:</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">            list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29106,19 +29051,19 @@ is the full shipped surface, so this equals the curated keys.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-257">257</a></span>
-<span class="normal"><a href="#__codelineno-0-258">258</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-258">258</a></span>
 <span class="normal"><a href="#__codelineno-0-259">259</a></span>
 <span class="normal"><a href="#__codelineno-0-260">260</a></span>
 <span class="normal"><a href="#__codelineno-0-261">261</a></span>
 <span class="normal"><a href="#__codelineno-0-262">262</a></span>
-<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-257" name="__codelineno-0-257"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
-<a id="__codelineno-0-259" name="__codelineno-0-259"></a>
-<a id="__codelineno-0-260" name="__codelineno-0-260"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">        list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
-<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span>
+<span class="normal"><a href="#__codelineno-0-264">264</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="k">def</span><span class="w"> </span><span class="nf">available</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the curated layer ids, sorted.</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a><span class="sd">        list[str]: The curated layer ids (`[&quot;air_density_100m&quot;, ...]`).</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-264" name="__codelineno-0-264"></a>    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29231,8 +29176,7 @@ lists the known ids with a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-231">231</a></span>
-<span class="normal"><a href="#__codelineno-0-232">232</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-232">232</a></span>
 <span class="normal"><a href="#__codelineno-0-233">233</a></span>
 <span class="normal"><a href="#__codelineno-0-234">234</a></span>
 <span class="normal"><a href="#__codelineno-0-235">235</a></span>
@@ -29255,31 +29199,32 @@ lists the known ids with a did-you-mean hint.</p>
 <span class="normal"><a href="#__codelineno-0-252">252</a></span>
 <span class="normal"><a href="#__codelineno-0-253">253</a></span>
 <span class="normal"><a href="#__codelineno-0-254">254</a></span>
-<span class="normal"><a href="#__codelineno-0-255">255</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-231" name="__codelineno-0-231"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
-<a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
-<a id="__codelineno-0-233" name="__codelineno-0-233"></a>
-<a id="__codelineno-0-234" name="__codelineno-0-234"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">        layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
-<a id="__codelineno-0-236" name="__codelineno-0-236"></a>
-<a id="__codelineno-0-237" name="__codelineno-0-237"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">        Layer: The matching row.</span>
-<a id="__codelineno-0-239" name="__codelineno-0-239"></a>
-<a id="__codelineno-0-240" name="__codelineno-0-240"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">        ValueError: If `layer_id` is not a curated layer; the message</span>
-<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
-<a id="__codelineno-0-243" name="__codelineno-0-243"></a>
-<a id="__codelineno-0-244" name="__codelineno-0-244"></a><span class="sd">    Examples:</span>
-<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">        - A solar and a wind layer resolve to their atlas / transport:</span>
-<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">            ```python</span>
-<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
-<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
-<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            &#39;gsa&#39;</span>
-<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
-<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            &#39;vsicurl&#39;</span>
-<a id="__codelineno-0-252" name="__codelineno-0-252"></a>
-<a id="__codelineno-0-253" name="__codelineno-0-253"></a><span class="sd">            ```</span>
-<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-232" name="__codelineno-0-232"></a><span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Layer</span><span class="p">:</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the `Layer` for a curated id, did-you-mean on miss.</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a><span class="sd">        layer_id: A curated layer id (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`).</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a><span class="sd">        Layer: The matching row.</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a><span class="sd">        ValueError: If `layer_id` is not a curated layer; the message</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a><span class="sd">            lists the known ids with a did-you-mean hint.</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a><span class="sd">    Examples:</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a><span class="sd">        - A solar and a wind layer resolve to their atlas / transport:</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a><span class="sd">            ```python</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a><span class="sd">            &gt;&gt;&gt; from earthlens.solar_wind_atlas import Catalog</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;ghi&quot;).atlas</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a><span class="sd">            &#39;gsa&#39;</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a><span class="sd">            &gt;&gt;&gt; Catalog().get(&quot;wind_100m&quot;).transport</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a><span class="sd">            &#39;vsicurl&#39;</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a><span class="sd">            ```</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_dataset</span><span class="p">(</span><span class="n">layer_id</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29302,11 +29247,11 @@ lists the known ids with a did-you-mean hint.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-227">227</a></span>
-<span class="normal"><a href="#__codelineno-0-228">228</a></span>
-<span class="normal"><a href="#__codelineno-0-229">229</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-227" name="__codelineno-0-227"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
-<a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
-<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-228" name="__codelineno-0-228"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_catalog</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Layer</span><span class="p">]:</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the layer map (satisfies the abstract contract).&quot;&quot;&quot;</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29413,8 +29358,7 @@ is absent from <code>available_datasets:</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-204">204</a></span>
-<span class="normal"><a href="#__codelineno-0-205">205</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-205">205</a></span>
 <span class="normal"><a href="#__codelineno-0-206">206</a></span>
 <span class="normal"><a href="#__codelineno-0-207">207</a></span>
 <span class="normal"><a href="#__codelineno-0-208">208</a></span>
@@ -29434,28 +29378,29 @@ is absent from <code>available_datasets:</code>.</p>
 <span class="normal"><a href="#__codelineno-0-222">222</a></span>
 <span class="normal"><a href="#__codelineno-0-223">223</a></span>
 <span class="normal"><a href="#__codelineno-0-224">224</a></span>
-<span class="normal"><a href="#__codelineno-0-225">225</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-204" name="__codelineno-0-204"></a><span class="nd">@classmethod</span>
-<a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
-<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the layer catalog from disk (directory or single file).</span>
-<a id="__codelineno-0-207" name="__codelineno-0-207"></a>
-<a id="__codelineno-0-208" name="__codelineno-0-208"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">        catalog_path: Catalog directory or single YAML file. Defaults to</span>
-<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">            the module-level `CATALOG_PATH`.</span>
-<a id="__codelineno-0-211" name="__codelineno-0-211"></a>
-<a id="__codelineno-0-212" name="__codelineno-0-212"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">        A fully-populated `Catalog`.</span>
-<a id="__codelineno-0-214" name="__codelineno-0-214"></a>
-<a id="__codelineno-0-215" name="__codelineno-0-215"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">        ValueError: If no file has a `datasets:` block, an id is declared</span>
-<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">            in two files, a row fails `Layer` validation, or a curated id</span>
-<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            is absent from `available_datasets:`.</span>
-<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-220" name="__codelineno-0-220"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
-<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
-<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
-<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
-<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span>
+<span class="normal"><a href="#__codelineno-0-226">226</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-205" name="__codelineno-0-205"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">catalog_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Catalog</span><span class="p">:</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the layer catalog from disk (directory or single file).</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a><span class="sd">        catalog_path: Catalog directory or single YAML file. Defaults to</span>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a><span class="sd">            the module-level `CATALOG_PATH`.</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a><span class="sd">        A fully-populated `Catalog`.</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a><span class="sd">        ValueError: If no file has a `datasets:` block, an id is declared</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="sd">            in two files, a row fails `Layer` validation, or a curated id</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="sd">            is absent from `available_datasets:`.</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>    <span class="n">catalog_path</span> <span class="o">=</span> <span class="n">catalog_path</span> <span class="k">if</span> <span class="n">catalog_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">CATALOG_PATH</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>    <span class="n">available</span><span class="p">,</span> <span class="n">datasets</span> <span class="o">=</span> <span class="n">_load_catalog_data</span><span class="p">(</span><span class="n">catalog_path</span><span class="p">)</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="n">datasets</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">datasets</span><span class="p">),</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>        <span class="n">available_datasets</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">available</span><span class="p">),</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -29594,8 +29539,7 @@ Global Solar Atlas <code>*.zip</code> URL for <code>"download_zip"</code> rows.<
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-62">62</a></span>
-<span class="normal"><a href="#__codelineno-0-63">63</a></span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-63">63</a></span>
 <span class="normal"><a href="#__codelineno-0-64">64</a></span>
 <span class="normal"><a href="#__codelineno-0-65">65</a></span>
 <span class="normal"><a href="#__codelineno-0-66">66</a></span>
@@ -29620,33 +29564,34 @@ Global Solar Atlas <code>*.zip</code> URL for <code>"download_zip"</code> rows.<
 <span class="normal"><a href="#__codelineno-0-85">85</a></span>
 <span class="normal"><a href="#__codelineno-0-86">86</a></span>
 <span class="normal"><a href="#__codelineno-0-87">87</a></span>
-<span class="normal"><a href="#__codelineno-0-88">88</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="k">class</span><span class="w"> </span><span class="nc">Layer</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
-<a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated Solar / Wind Atlas layer.</span>
-<a id="__codelineno-0-64" name="__codelineno-0-64"></a>
-<a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="sd">    Attributes:</span>
-<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">        id: Catalog key for the row (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`). Set from the</span>
-<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">            catalog key by the loader.</span>
-<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">        atlas: Which atlas the layer comes from — `&quot;gsa&quot;` (Global Solar Atlas)</span>
-<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">            or `&quot;gwa&quot;` (Global Wind Atlas).</span>
-<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">        transport: How the bbox window is read — `&quot;vsicurl&quot;` (windowed remote</span>
-<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">            COG read, the wind layers) or `&quot;download_zip&quot;` (download the deflate</span>
-<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">            ZIP once, then read the local member, the solar layers).</span>
-<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">        url: The download URL — a figshare COG URL for `&quot;vsicurl&quot;` rows, a</span>
-<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">            Global Solar Atlas `*.zip` URL for `&quot;download_zip&quot;` rows.</span>
-<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">        units: Human-readable unit of the values (`&quot;kWh/m2/day&quot;`, `&quot;m/s&quot;`).</span>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">        long_name: One-line human-readable description.</span>
-<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">        license_note: Attribution / licence text surfaced in docs and logs.</span>
-<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-79" name="__codelineno-0-79"></a>
-<a id="__codelineno-0-80" name="__codelineno-0-80"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-81" name="__codelineno-0-81"></a>
-<a id="__codelineno-0-82" name="__codelineno-0-82"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="n">atlas</span><span class="p">:</span> <span class="n">Atlas</span>
-<a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="n">transport</span><span class="p">:</span> <span class="n">Transport</span>
-<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="n">long_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-0-88" name="__codelineno-0-88"></a>    <span class="n">license_note</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="normal"><a href="#__codelineno-0-88">88</a></span>
+<span class="normal"><a href="#__codelineno-0-89">89</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="k">class</span><span class="w"> </span><span class="nc">Layer</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-0-64" name="__codelineno-0-64"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;One curated Solar / Wind Atlas layer.</span>
+<a id="__codelineno-0-65" name="__codelineno-0-65"></a>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="sd">    Attributes:</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="sd">        id: Catalog key for the row (`&quot;ghi&quot;`, `&quot;wind_100m&quot;`). Set from the</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a><span class="sd">            catalog key by the loader.</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a><span class="sd">        atlas: Which atlas the layer comes from — `&quot;gsa&quot;` (Global Solar Atlas)</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a><span class="sd">            or `&quot;gwa&quot;` (Global Wind Atlas).</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a><span class="sd">        transport: How the bbox window is read — `&quot;vsicurl&quot;` (windowed remote</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a><span class="sd">            COG read, the wind layers) or `&quot;download_zip&quot;` (download the deflate</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a><span class="sd">            ZIP once, then read the local member, the solar layers).</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a><span class="sd">        url: The download URL — a figshare COG URL for `&quot;vsicurl&quot;` rows, a</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="sd">            Global Solar Atlas `*.zip` URL for `&quot;download_zip&quot;` rows.</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="sd">        units: Human-readable unit of the values (`&quot;kWh/m2/day&quot;`, `&quot;m/s&quot;`).</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a><span class="sd">        long_name: One-line human-readable description.</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a><span class="sd">        license_note: Attribution / licence text surfaced in docs and logs.</span>
+<a id="__codelineno-0-79" name="__codelineno-0-79"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-80" name="__codelineno-0-80"></a>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a>    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a>    <span class="n">atlas</span><span class="p">:</span> <span class="n">Atlas</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>    <span class="n">transport</span><span class="p">:</span> <span class="n">Transport</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+<a id="__codelineno-0-87" name="__codelineno-0-87"></a>    <span class="n">units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-88" name="__codelineno-0-88"></a>    <span class="n">long_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-0-89" name="__codelineno-0-89"></a>    <span class="n">license_note</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -29692,23 +29637,23 @@ invalidates the entry on its own.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/providers/atmosphere/src/earthlens/solar_wind_atlas/catalog.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-51">51</a></span>
-<span class="normal"><a href="#__codelineno-0-52">52</a></span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-52">52</a></span>
 <span class="normal"><a href="#__codelineno-0-53">53</a></span>
 <span class="normal"><a href="#__codelineno-0-54">54</a></span>
 <span class="normal"><a href="#__codelineno-0-55">55</a></span>
 <span class="normal"><a href="#__codelineno-0-56">56</a></span>
 <span class="normal"><a href="#__codelineno-0-57">57</a></span>
 <span class="normal"><a href="#__codelineno-0-58">58</a></span>
-<span class="normal"><a href="#__codelineno-0-59">59</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_catalog_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Empty the module-level catalog parse cache.</span>
-<a id="__codelineno-0-53" name="__codelineno-0-53"></a>
-<a id="__codelineno-0-54" name="__codelineno-0-54"></a><span class="sd">    Useful in tests that rewrite the catalog on disk and want to force a</span>
-<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    re-parse. Production callers do not need this — the cache keys include</span>
-<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    every contributing file&#39;s `st_mtime_ns`, so any real file mutation</span>
-<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    invalidates the entry on its own.</span>
-<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-59" name="__codelineno-0-59"></a>    <span class="n">_CATALOG_CACHE</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="normal"><a href="#__codelineno-0-59">59</a></span>
+<span class="normal"><a href="#__codelineno-0-60">60</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_catalog_cache</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-53" name="__codelineno-0-53"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Empty the module-level catalog parse cache.</span>
+<a id="__codelineno-0-54" name="__codelineno-0-54"></a>
+<a id="__codelineno-0-55" name="__codelineno-0-55"></a><span class="sd">    Useful in tests that rewrite the catalog on disk and want to force a</span>
+<a id="__codelineno-0-56" name="__codelineno-0-56"></a><span class="sd">    re-parse. Production callers do not need this — the cache keys include</span>
+<a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">    every contributing file&#39;s `st_mtime_ns`, so any real file mutation</span>
+<a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">    invalidates the entry on its own.</span>
+<a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-60" name="__codelineno-0-60"></a>    <span class="n">_CATALOG_CACHE</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
