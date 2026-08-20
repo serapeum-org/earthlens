@@ -2,7 +2,7 @@
 
 These factor the per-product progress-aware composition that FIRMS and
 OpenAQ previously duplicated (M3 in
-`planning/align/provider-api-consistency.md`).
+the provider-API consistency alignment).
 """
 
 from __future__ import annotations

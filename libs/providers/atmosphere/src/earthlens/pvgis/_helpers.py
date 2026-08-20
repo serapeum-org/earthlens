@@ -1,7 +1,7 @@
 """Pure, network-light helpers for the PVGIS backend.
 
 Every function here is stateless and grounded in the live API facts pinned
-under `planning/pvgis/captures/pvgis-sdk-facts.md`: the point sampler that
+under the A1 gate captures: the point sampler that
 turns a bbox into `(lat, lon)` pairs (`point_grid`), the keyless REST URL
 builder (`build_url`), the rate-limited GET with `429` backoff
 (`throttled_get`), and the two JSON parsers that fold a `seriescalc` /

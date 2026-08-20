@@ -1,19 +1,30 @@
 """Per-endpoint CADS client routing for the ECMWF backend.
 
-`earthlens.ecmwf` talks to more than one Copernicus Data Store instance through
-the same `cdsapi` client: the Climate Data Store (CDS), the Atmosphere Data
-Store (ADS), and the CEMS Early Warning Data Store (EWDS — GloFAS / EFAS / fire
-danger). They share the request/retrieve protocol but differ by **URL**. Each
-catalog `Dataset` carries an `endpoint:` slug (default `"cds"`); this module
-maps that slug to a `(url, key)` pair and builds the matching
-`cdsapi.Client`.
+`earthlens.ecmwf` talks to more than one data-store instance through the same
+`cdsapi` client:
 
-Credential model (verified live 2026-07-01): a single Personal Access Token
-authenticates across CDS / ADS / EWDS, so a non-CDS endpoint falls back to the
-CDS key (`CDSAPI_KEY`, else the `key:` line in `~/.cdsapirc`) when its own
-`<ENDPOINT>_KEY` environment variable is unset. Only the URL has to differ. The
-plain CDS path stays byte-identical to the historic bare `cdsapi.Client()` so
-existing users are unaffected.
+* the Climate Data Store (CDS),
+* the Atmosphere Data Store (ADS),
+* the CEMS Early Warning Data Store (EWDS — GloFAS / EFAS / fire danger),
+* the ECMWF Data Store (ECDS — TIGGE and S2S ensemble forecasts), and
+* the ECMWF Cross Data Store (XDS — fire fuel and burned area).
+
+They share the request/retrieve protocol but differ by **URL**. Each catalog
+`Dataset` carries an `endpoint:` slug (default `"cds"`); this module maps that
+slug to a `(url, key)` pair and builds the matching `cdsapi.Client`.
+
+Credential model (verified live 2026-07-01 for CDS / ADS / EWDS, 2026-08-16 for
+ECDS / XDS): a single Personal Access Token authenticates across **all five**
+stores — probing `profiles/v1/account` on each returns the same account — so a
+non-CDS endpoint falls back to the CDS key (`CDSAPI_KEY`, else the `key:` line
+in `~/.cdsapirc`) when its own `<ENDPOINT>_KEY` environment variable is unset.
+Only the URL has to differ. The plain CDS path stays byte-identical to the
+historic bare `cdsapi.Client()` so existing users are unaffected.
+
+The two ECMWF-hosted stores are not Copernicus-branded, but they run the same
+CADS software and the same catalogue API (`catalogue/v1/collections/<id>/
+form.json` and `constraints.json`), so pre-flight constraint validation works
+against them unchanged.
 """
 
 from __future__ import annotations
@@ -46,6 +57,8 @@ ENDPOINTS: dict[str, tuple[str, str, str]] = {
     "cds": ("https://cds.climate.copernicus.eu/api", "CDSAPI_URL", "CDSAPI_KEY"),
     "ads": ("https://ads.atmosphere.copernicus.eu/api", "ADS_URL", "ADS_KEY"),
     "ewds": ("https://ewds.climate.copernicus.eu/api", "EWDS_URL", "EWDS_KEY"),
+    "ecds": ("https://ecds.ecmwf.int/api", "ECDS_URL", "ECDS_KEY"),
+    "xds": ("https://xds.ecmwf.int/api", "XDS_URL", "XDS_KEY"),
 }
 
 
@@ -57,13 +70,41 @@ def endpoint_url(endpoint: str) -> str:
     user points `<ENDPOINT>_URL` at a staging host.
 
     Args:
-        endpoint: One of the slugs in `ENDPOINTS` (`"cds"` / `"ads"` / `"ewds"`).
+        endpoint: One of the slugs in `ENDPOINTS` (`"cds"` / `"ads"` / `"ewds"` /
+            `"ecds"` / `"xds"`).
 
     Returns:
         str: The resolved API root URL.
 
     Raises:
         ValueError: If `endpoint` is not a known slug.
+
+    Examples:
+        - Resolve the two ECMWF-hosted stores:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import endpoint_url
+            >>> endpoint_url("ecds")
+            'https://ecds.ecmwf.int/api'
+            >>> endpoint_url("xds")
+            'https://xds.ecmwf.int/api'
+
+            ```
+        - Derive a store's profile page from its API root:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import endpoint_url
+            >>> endpoint_url("ewds").rsplit("/api", 1)[0] + "/profile"
+            'https://ewds.climate.copernicus.eu/profile'
+
+            ```
+        - An unknown slug is rejected and the message lists the valid ones:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import endpoint_url
+            >>> endpoint_url("mars")
+            Traceback (most recent call last):
+                ...
+            ValueError: unknown ECMWF endpoint 'mars'; expected one of ['ads', 'cds', 'ecds', 'ewds', 'xds']
+
+            ```
     """
     if endpoint not in ENDPOINTS:
         raise ValueError(
@@ -86,6 +127,30 @@ def constraints_base_url(endpoint: str) -> str | None:
 
     Returns:
         str | None: The base URL, or `None` for CDS.
+
+    Examples:
+        - CDS keeps its historic `None`, so the default template is used:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import constraints_base_url
+            >>> constraints_base_url("cds") is None
+            True
+
+            ```
+        - Every other store validates against its own host:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import constraints_base_url
+            >>> constraints_base_url("ecds")
+            'https://ecds.ecmwf.int/api'
+
+            ```
+        - Build the URL a dataset's constraints are actually fetched from:
+            ```python
+            >>> from earthlens.ecmwf.endpoints import constraints_base_url
+            >>> base = constraints_base_url("xds")
+            >>> f"{base}/catalogue/v1/collections/derived-fire-fuel-biomass/constraints.json"
+            'https://xds.ecmwf.int/api/catalogue/v1/collections/derived-fire-fuel-biomass/constraints.json'
+
+            ```
     """
     return None if endpoint == "cds" else endpoint_url(endpoint)
 
@@ -128,7 +193,8 @@ def open_client(endpoint: str = DEFAULT_ENDPOINT) -> cdsapi.Client | ModernClien
     """Build a `cdsapi.Client` bound to the named CADS endpoint.
 
     Args:
-        endpoint: One of the slugs in `ENDPOINTS` (`"cds"`, `"ads"`, `"ewds"`).
+        endpoint: One of the slugs in `ENDPOINTS` (`"cds"`, `"ads"`, `"ewds"`,
+            `"ecds"`, `"xds"`).
             Defaults to `"cds"`.
 
     Returns:

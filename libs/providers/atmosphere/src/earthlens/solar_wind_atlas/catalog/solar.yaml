@@ -3,7 +3,7 @@
 # Every Global Solar Atlas world product is distributed as a DEFLATE-compressed
 # GeoTIFF ZIP archive on api.globalsolaratlas.info (there is no range-accessible
 # COG and no reachable AOI-clip endpoint — see the A1 gate,
-# planning/solar_wind_atlas/captures/solar-wind-sdk-facts.md). A deflate ZIP
+# the A1 gate captures). A deflate ZIP
 # member cannot be range-windowed, so these rows use the `download_zip`
 # transport: the ~2.7 GB (1 km) archive is fetched once into a cache and the
 # bbox window is read from the local member. The single-file 1 km

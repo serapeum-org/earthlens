@@ -2,9 +2,9 @@
 
 Registered with core's catalog-tooling commands through the `earthlens.cli`
 entry-point group (see `earthlens._atmosphere_cli`). The refresher / writer /
-coverage / prober / emitter read the three public CADS stores (CDS / ADS / EWDS);
-the deep prober, live-validator, hydrator and seeder are credentialed
-(`~/.cdsapirc`).
+coverage / prober / emitter read every public CADS store (CDS / ADS / EWDS /
+ECDS / XDS); the deep prober, live-validator, hydrator and seeder are
+credentialed (`~/.cdsapirc`).
 """
 
 from __future__ import annotations
@@ -19,32 +19,47 @@ from earthlens.cli.toolkit import (
 )
 from earthlens.ecmwf import _hydrate, _seed
 from earthlens.ecmwf._categories import categorise_dataset  # noqa: F401 — role target
+from earthlens.ecmwf._helpers import endpoint_for as _endpoint_for
+from earthlens.ecmwf.endpoints import ENDPOINTS, endpoint_url
 
 #: Cap on `/collections` pages followed via `rel="next"`.
 _MAX_PAGES = 50
 
-#: The three Copernicus Data Store public STAC catalogues, by `endpoint` slug.
-#: Listing each `/collections` needs no credentials (only data *retrieval*
-#: does); the slugs match `earthlens.ecmwf.endpoints.ENDPOINTS`.
-_ECMWF_STORE_COLLECTIONS_URLS: dict[str, str] = {
-    "cds": "https://cds.climate.copernicus.eu/api/catalogue/v1/collections",
-    "ads": "https://ads.atmosphere.copernicus.eu/api/catalogue/v1/collections",
-    "ewds": "https://ewds.climate.copernicus.eu/api/catalogue/v1/collections",
-}
 
-#: The three Copernicus store API roots, by `endpoint` slug.
-_ECMWF_STORE_URLS = {
-    "cds": "https://cds.climate.copernicus.eu/api",
-    "ads": "https://ads.atmosphere.copernicus.eu/api",
-    "ewds": "https://ewds.climate.copernicus.eu/api",
-}
+def _store_urls() -> dict[str, str]:
+    """Every store's API root, by `endpoint` slug.
+
+    Derived from the single `ENDPOINTS` registry rather than restated, so
+    adding a store is one edit there. Resolved through `endpoint_url` on each
+    call so a `<ENDPOINT>_URL` override reaches the catalog tooling exactly as
+    it reaches the retrieve client — a frozen module-level dict would silently
+    ignore it.
+
+    Returns:
+        dict[str, str]: Slug to API root for all five stores.
+    """
+    return {slug: endpoint_url(slug) for slug in ENDPOINTS}
+
+
+def _store_collections_urls() -> dict[str, str]:
+    """Every store's public STAC catalogue endpoint, by `endpoint` slug.
+
+    Listing `/collections` needs no credentials (only data *retrieval* does).
+
+    Returns:
+        dict[str, str]: Slug to `/catalogue/v1/collections` URL.
+    """
+    return {
+        slug: f"{root}/catalogue/v1/collections" for slug, root in _store_urls().items()
+    }
+
 
 #: Persist a live fetch back into the bundled `available_datasets` index.
 writer = index_writer("available_datasets", grouped=True)
 
 
 def refresher(_catalog: Any) -> dict[str, list[str]]:
-    """List Copernicus dataset ids per store (CDS + ADS + EWDS), live (public).
+    """List dataset ids per store (CDS / ADS / EWDS / ECDS / XDS), live (public).
 
     Enumerates each store's `/catalogue/v1/collections`, following `rel="next"`
     pagination (bounded by `_MAX_PAGES`). Each collection's `id` is a
@@ -54,11 +69,11 @@ def refresher(_catalog: Any) -> dict[str, list[str]]:
         _catalog: The loaded ECMWF `Catalog` (unused; the endpoints are fixed).
 
     Returns:
-        A per-store mapping `{"cds": [...], "ads": [...], "ewds": [...]}` of
-        sorted, de-duplicated dataset ids.
+        A per-store mapping — one key per `ENDPOINTS` slug (`cds`, `ads`,
+        `ewds`, `ecds`, `xds`) — of sorted, de-duplicated dataset ids.
     """
     grouped: dict[str, list[str]] = {}
-    for store, base in _ECMWF_STORE_COLLECTIONS_URLS.items():
+    for store, base in _store_collections_urls().items():
         ids: set[str] = set()
         url: str | None = base
         pages = 0
@@ -82,9 +97,9 @@ def refresher(_catalog: Any) -> dict[str, list[str]]:
 
 
 def coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
-    """Classify every `available_datasets:` id across the three Copernicus stores.
+    """Classify every `available_datasets:` id across all five stores.
 
-    The per-store availability index (CDS + ADS + EWDS, written by
+    The per-store availability index (CDS / ADS / EWDS / ECDS / XDS, written by
     `refresh ecmwf --write`) is unioned into `catalog.available_datasets`. A
     dataset with a curated row is `DONE`; every other id is `addressable`
     (reachable now via the raw-request passthrough, curatable on demand).
@@ -119,13 +134,10 @@ def _ecmwf_constraints(dataset: str) -> list[dict[str, Any]]:
     are fetched from their own catalogue host rather than the CDS host (which
     would 404 and silently return no rows).
     """
-    from earthlens.ecmwf.catalog import Catalog
     from earthlens.ecmwf.constraints import fetch_constraints
     from earthlens.ecmwf.endpoints import constraints_base_url
 
-    record = Catalog().datasets.get(dataset)
-    endpoint = record.endpoint if record is not None else "cds"
-    return fetch_constraints(dataset, constraints_base_url(endpoint))
+    return fetch_constraints(dataset, constraints_base_url(_endpoint_for(dataset)))
 
 
 def prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
@@ -151,6 +163,26 @@ def prober(catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:
     return {str(variable): {} for variable in variables}
 
 
+def _from_info(info: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Extract per-band `NETCDF_VARNAME` / long_name / units from `gdal.Info`.
+
+    Args:
+        info: A `gdal.Info(..., format="json")` mapping for one NetCDF handle.
+
+    Returns:
+        A `{variable_name: {"long_name": ..., "units": ...}}` mapping covering
+        every band that carries a `long_name` or `units` attribute.
+    """
+    out: dict[str, dict[str, Any]] = {}
+    for band in info.get("bands", []) or []:
+        meta = band.get("metadata", {}).get("", {})
+        name = meta.get("NETCDF_VARNAME")
+        long_name, units = meta.get("long_name", ""), meta.get("units", "")
+        if name and (long_name or units):
+            out[str(name)] = {"long_name": long_name, "units": units}
+    return out
+
+
 def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     """Read each NetCDF variable's `long_name` / `units` via GDAL.
 
@@ -168,17 +200,6 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     from osgeo import gdal
 
     gdal.UseExceptions()
-
-    def _from_info(info: dict[str, Any]) -> dict[str, dict[str, Any]]:
-        """Extract per-band `NETCDF_VARNAME` / long_name / units from gdal.Info."""
-        out: dict[str, dict[str, Any]] = {}
-        for band in info.get("bands", []) or []:
-            meta = band.get("metadata", {}).get("", {})
-            name = meta.get("NETCDF_VARNAME")
-            long_name, units = meta.get("long_name", ""), meta.get("units", "")
-            if name and (long_name or units):
-                out[str(name)] = {"long_name": long_name, "units": units}
-        return out
 
     top = gdal.Info(path, format="json")
     subs = top.get("metadata", {}).get("SUBDATASETS", {})
@@ -201,15 +222,19 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     are carried and the retrieve is a valid combination rather than a 400.
     Only keys the entry actually enumerates are sent, so a product that does
     not partition by day/time (obs4mips CO2/CH4) is not handed a spurious one.
-    Retrieves via `cdsapi` (`~/.cdsapirc`); a zip-of-NetCDF response (satellite
-    CDRs deliver one) is unwrapped to its first member before the variable
-    metadata is read via GDAL.
+
+    The retrieve goes to the dataset's **own** store, resolved from the catalog
+    the same way :func:`_ecmwf_constraints` resolves it: a bare client would
+    always talk to CDS and every ADS / EWDS / ECDS / XDS dataset would 404 with
+    `process not found`. A zip-of-NetCDF response (satellite CDRs deliver one)
+    is unwrapped to its first member before the variable metadata is read via
+    GDAL.
     """
     import shutil
     import tempfile
     import zipfile
 
-    import cdsapi
+    from earthlens.ecmwf.endpoints import open_client
 
     rows = _ecmwf_constraints(dataset)
     if not rows:
@@ -223,7 +248,8 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     # A dataset with no variable dimension still needs the widget's "all".
     request.setdefault("variable", ["all"])
     target = Path(tempfile.mkdtemp()) / "probe.nc"
-    cdsapi.Client().retrieve(dataset, request, str(target))
+    client = open_client(_endpoint_for(dataset))
+    client.retrieve(dataset, request, str(target))
     if zipfile.is_zipfile(target):
         with zipfile.ZipFile(target) as archive:
             members = [name for name in archive.namelist() if name.endswith(".nc")]
@@ -288,6 +314,30 @@ def _ecmwf_form_variables(form: list[Any]) -> list[str]:
     return out
 
 
+def _hindcast_request_kind(fields: set[str | None]) -> str:
+    """Pick the hindcast kind for a form that carries `hyear`.
+
+    Three shapes exist. A form with `hyear` but no `hday` is a seasonal
+    reforecast (year/month only). A form with `hday` *and* the plain `day` axis
+    carries **both** dates — the model cycle and the reforecast — which are
+    paired, so it needs `s2s_reforecast` (which copies month/day across);
+    `glofas_hindcast` would rename `year` to `hyear` and delete the model-cycle
+    date. A form with `hday` and no `day` is the GloFAS/EFAS shape, where the
+    hindcast date is the only one.
+
+    Args:
+        fields: The `name` of every widget in the dataset's `form.json`. The
+            caller has already established that `hyear` is among them; a form
+            without it is not a hindcast and never reaches here.
+
+    Returns:
+        str: One of `seasonal_hindcast`, `s2s_reforecast`, `glofas_hindcast`.
+    """
+    if "hday" not in fields:
+        return "seasonal_hindcast"
+    return "s2s_reforecast" if "day" in fields else "glofas_hindcast"
+
+
 def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
     """Guess the `request_kind` from a dataset id + its `form.json` fields.
 
@@ -304,7 +354,7 @@ def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
         return "fire"
     fields = {f.get("name") for f in form if isinstance(f, dict)}
     if "hyear" in fields:
-        return "glofas_hindcast" if "hday" in fields else "seasonal_hindcast"
+        return _hindcast_request_kind(fields)
     # A real seasonal forecast keys on `leadtime_month`. Without it, a
     # year/month-only form is a monthly reanalysis / emission inventory /
     # radiative-forcing product, not a seasonal forecast — so require the lead
@@ -332,9 +382,9 @@ def _ecmwf_request_kind(form: list[Any], upstream_id: str = "") -> str:
 def emitter(catalog: Any, upstream_id: str, **_opts: Any) -> dict[str, Any]:
     """Seed an ECMWF `datasets:` row from the live CADS `form.json`.
 
-    Resolves the dataset's store (CDS / ADS / EWDS) from the per-store index,
-    fetches its `form.json`, guesses the `request_kind` from the date/selector
-    fields, and enumerates every variable the `variable` widget exposes.
+    Resolves the dataset's store from the per-store index, fetches its
+    `form.json`, guesses the `request_kind` from the date/selector fields, and
+    enumerates every variable the `variable` widget exposes.
     `nc_variable` / `units` are placeholders (the form does not carry them) —
     confirm them from a live retrieve (`curate ecmwf --fill-empty`).
 
@@ -350,7 +400,7 @@ def emitter(catalog: Any, upstream_id: str, **_opts: Any) -> dict[str, Any]:
     endpoint = _ecmwf_endpoint_for(catalog, upstream_id)
     token = _ecmwf_token()
     headers = {"PRIVATE-TOKEN": token} if token else None
-    url = f"{_ECMWF_STORE_URLS[endpoint]}/catalogue/v1/collections/{upstream_id}/form.json"
+    url = f"{_store_urls()[endpoint]}/catalogue/v1/collections/{upstream_id}/form.json"
     raw: Any = get_json(url, headers=headers)
     # CADS form.json is usually {"form": [...]} but is sometimes the bare
     # [...] list; `raw` is Any so both shapes narrow without a mypy conflict.

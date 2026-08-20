@@ -1930,6 +1930,7 @@ class AbstractDataSource(ABC):
         label: str = "item",
         describe: Callable[[Any], str] | None = None,
         on_failure: Callable[[Any, BaseException], Any] | None = None,
+        fatal: tuple[type[Exception], ...] = (),
     ) -> tuple[list[Any], list[tuple[str, BaseException]]]:
         """Map `fn` over `items`, applying the caller's partial-failure policy.
 
@@ -1953,6 +1954,10 @@ class AbstractDataSource(ABC):
                 vector backends need, where a failed provider still occupies a
                 slot with an empty `FeatureCollection`. When omitted, failures
                 are simply absent from `results`.
+            fatal: Exception classes that always propagate, whatever `errors`
+                says — for a failure of the *service* rather than of one item,
+                where continuing would report an upstream outage as a set of
+                empty results.
 
         Returns:
             `(results, failures)` — one result per succeeding item, in order,
@@ -1961,7 +1966,8 @@ class AbstractDataSource(ABC):
 
         Raises:
             ValueError: If `errors` is not a recognised policy.
-            BaseException: The first item's exception when `errors="raise"`.
+            BaseException: The first item's exception when `errors="raise"`,
+                or any exception matching `fatal` under **every** policy.
         """
         policy = self.check_errors_policy(errors)
         failures: list[tuple[str, BaseException]] = []
@@ -1974,6 +1980,7 @@ class AbstractDataSource(ABC):
                 describe=describe,
                 on_failure=on_failure,
                 failures=failures,
+                fatal=fatal,
             )
         )
         if failures and policy == "warn":
@@ -2026,6 +2033,7 @@ class AbstractDataSource(ABC):
         describe: Callable[[Any], str] | None,
         on_failure: Callable[[Any, BaseException], Any] | None,
         failures: list[tuple[str, BaseException]],
+        fatal: tuple[type[Exception], ...] = (),
     ) -> Iterator[Any]:
         """Apply `fn` to each item under the failure policy, yielding as it goes.
 
@@ -2048,6 +2056,11 @@ class AbstractDataSource(ABC):
             failures: Accumulator the caller owns; each failure is appended as
                 `(description, exception)` so a caller that stops early still
                 sees what failed before it stopped.
+            fatal: Exception classes that always propagate, whatever the policy
+                — a service-level failure (the upstream refused to serve *any*
+                request) is not the per-item data gap `errors="warn"` exists to
+                absorb, and silently returning fewer items would report it as
+                "this item has no data".
 
         Yields:
             Any: Each successful `fn(item)` result, plus any `on_failure`
@@ -2055,7 +2068,8 @@ class AbstractDataSource(ABC):
 
         Raises:
             BaseException: The first item's exception when the policy is
-                `"raise"`.
+                `"raise"`, or any exception matching `fatal` under **every**
+                policy.
         """
         name = describe or str
         for item in items:
@@ -2067,7 +2081,7 @@ class AbstractDataSource(ABC):
             try:
                 value = fn(item)
             except Exception as exc:  # noqa: BLE001 - policy decides the fate
-                if errors is None or errors == "raise":
+                if errors is None or errors == "raise" or isinstance(exc, fatal):
                     raise
                 placeholder = self._record_failure(
                     item,

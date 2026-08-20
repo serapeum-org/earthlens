@@ -1,4 +1,4 @@
-# Copernicus Data Store catalog for the ECMWF backend (CDS + ADS + EWDS).
+# CADS catalog for the ECMWF backend (CDS + ADS + EWDS + ECDS + XDS).
 #
 # Schema:
 #
@@ -51,9 +51,9 @@
 #                                      emitted by CDS (used in the
 #                                      output filename).
 #
-# Refreshed from all three Copernicus Data Store `/collections` endpoints
-# (CDS + ADS + EWDS) — `available_datasets` is a per-store mapping totalling
-# 169 ids (cds: 141, ads: 16, ewds: 12). Regenerate with
+# Refreshed from all five CADS `/collections` endpoints (CDS + ADS + EWDS +
+# ECDS + XDS) — `available_datasets` is a per-store mapping totalling 174 ids
+# (cds: 141, ads: 16, ewds: 12, ecds: 3, xds: 2). Regenerate with
 # `earthlens datasets refresh ecmwf --write`.
 #
 # See: https://cds.climate.copernicus.eu/datasets,
@@ -95,6 +95,11 @@ available_datasets:
   - projections-cmip6
   - projections-cmip6-decadal-prototype
   - projections-cordex-domains-single-levels
+  # Catalogue entry for the external C3S Data Rescue Service portal, not a
+  # retrievable dataset: it publishes neither `form.json` nor
+  # `constraints.json` (both 404), so no request can be built for it.
+  # Deliberately left uncurated - this is the one `addressable` id that
+  # `audit ecmwf --coverage` will never be able to move to DONE.
   - provider-c3s-data-rescue-without
   - reanalysis-carra-height-levels
   - reanalysis-carra-means
@@ -234,3 +239,12 @@ available_datasets:
   - efas-reforecast
   - efas-seasonal
   - efas-seasonal-reforecast
+  # ECMWF Data Store — the complete store, enumerated live 2026-08-16.
+  ecds:
+  - s2s-forecasts
+  - s2s-reforecasts
+  - tigge-forecasts
+  # ECMWF Cross Data Store — the complete store, enumerated live 2026-08-16.
+  xds:
+  - derived-fire-fuel-biomass
+  - projections-fire-fuel-burned-area

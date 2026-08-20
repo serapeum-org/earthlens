@@ -11,7 +11,7 @@ Three concerns are factored here so `osm/backend.py` only routes:
   geometry is built here (`G4`). Under the `out geom;` QL the backend uses,
   way coordinates ride on `way.attributes["geometry"]` (a list of `{lat, lon}`
   dicts), *not* on `way.nodes` (which raises `DataIncomplete` under
-  `out geom`) — see `planning/osm/captures/osm-sdk-facts.md`.
+  `out geom`) — see the A1 gate captures.
 * `to_fc` / `empty_fc` — wrap a `GeoDataFrame` into a pyramids
   `FeatureCollection` (`G7`), normalising the CRS to EPSG:4326. The ohsome
   path's `.as_dataframe()` is already a `GeoDataFrame`, so it goes straight to

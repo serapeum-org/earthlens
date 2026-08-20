@@ -34,9 +34,12 @@ variable, validates each request against the dataset's `constraints.json`
 before it consumes a queue slot, and writes the result as
 `<path>/<cds_variable>_<dataset>.nc`.
 
-Beyond CDS, the same backend can reach the **CEMS Early Warning Data Store
-(EWDS)** — GloFAS flood forecasts — with the very same token; see
-[EWDS (GloFAS / floods)](ewds.md).
+Beyond CDS, the same backend reaches four more stores with the very same
+token: the **Atmosphere Data Store (ADS)**, the **CEMS Early Warning Data Store
+(EWDS)** — GloFAS flood forecasts, see [EWDS (GloFAS / floods)](ewds.md) — and
+the two ECMWF-hosted stores, the **ECMWF Data Store (ECDS)** (TIGGE and S2S
+ensemble forecasts) and the **Cross Data Store (XDS)** (fire fuel and burned
+area); see [ECDS + XDS](ecds.md).
 
 ## Authentication
 
