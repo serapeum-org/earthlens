@@ -1195,6 +1195,26 @@ class TestBuildCollection:
         assert col.method_names() == ["filterBounds", "filter", "map", "select"]
         assert any("static single-image" in w for w in warnings), warnings
 
+    @pytest.mark.parametrize(
+        "hooks",
+        [
+            {"filters": [lambda c: c.filter("cc")]},
+            {"cloud_mask": _identity_mask},
+        ],
+    )
+    def test_static_image_single_hook_warns(self, make_gee, monkeypatch, hooks):
+        """A static image warns when only one of filters / cloud_mask is set."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee(**hooks)
+        ds = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._build_collection(
+            ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
+        )
+        assert any("static single-image" in w for w in warnings), warnings
+
 
 class TestComposite:
     """Tests for `GEE._composite`."""
