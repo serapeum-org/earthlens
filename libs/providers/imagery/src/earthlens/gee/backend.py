@@ -181,12 +181,15 @@ def _validate_filters(
         The filters as a tuple (empty when `filters is None`).
 
     Raises:
-        TypeError: If `filters` is a `str` / `bytes` / mapping, is not
-            iterable, or contains a non-callable entry.
+        TypeError: If `filters` is a `str`, a bytes-like object
+            (`bytes` / `bytearray` / `memoryview`), or a mapping; is not
+            iterable; or contains a non-callable entry.
     """
     if filters is None:
         return ()
-    if isinstance(filters, (str, bytes, Mapping)) or not isinstance(filters, Iterable):
+    if isinstance(
+        filters, (str, bytes, bytearray, memoryview, Mapping)
+    ) or not isinstance(filters, Iterable):
         raise TypeError(
             "filters must be an iterable of callables "
             "(ee.ImageCollection -> ee.ImageCollection) or None, got "
@@ -315,7 +318,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             or an oversized `"url"` request (unless `auto_split=True`);
             from :meth:`_download_dataset` on an unknown asset id or band.
         TypeError: At construction when `cloud_mask` is not callable, or
-            `filters` is a `str` / `bytes` / mapping / non-iterable or
+            `filters` is a `str` / bytes-like / mapping / non-iterable or
             contains a non-callable entry.
         NotImplementedError: From :meth:`download` when `aggregate=` is
             passed (not yet supported).

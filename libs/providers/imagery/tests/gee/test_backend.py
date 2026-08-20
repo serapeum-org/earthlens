@@ -423,10 +423,11 @@ class TestInit:
         with pytest.raises(TypeError, match="filters must be an iterable"):
             make_gee(filters={"a": lambda c: c})
 
-    def test_bytes_filters_rejected(self, make_gee):
-        """A `bytes` value is rejected like `str`, not iterated per byte."""
+    @pytest.mark.parametrize("value", [b"abc", bytearray(b"abc"), memoryview(b"abc")])
+    def test_bytes_like_filters_rejected(self, make_gee, value):
+        """bytes / bytearray / memoryview are rejected up front, not iterated per byte."""
         with pytest.raises(TypeError, match="filters must be an iterable"):
-            make_gee(filters=b"abc")
+            make_gee(filters=value)
 
     @pytest.mark.parametrize(
         "kwargs, match",
