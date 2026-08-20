@@ -23599,9 +23599,10 @@ collections + G-Portal datasets so a stale local YAML can be regenerated:</p>
 catalog) without touching disk. The second rewrites the
 <code>available_datasets:</code> index in <code>src/earthlens/jaxa/catalog/_index.yaml</code>
 with the freshly probed ids (the curated per-mission shards under the
-same <code>catalog/</code> directory are not touched). See
-the JAXA catalog build script for the generator that builds
-the per-mission shards from scratch.</p>
+same <code>catalog/</code> directory are not touched). The per-mission shards are
+generated from scratch by a build script kept with the maintainer's
+capture notes, not shipped in the package — regenerate them by re-running
+<code>earthlens datasets refresh jaxa --write</code> and re-probing.</p>
 <h2 id="when-the-live-e2e-tests-run"><a class="toclink" href="#when-the-live-e2e-tests-run">When the live e2e tests run</a><a class="headerlink" href="#when-the-live-e2e-tests-run" title="Permanent link">#</a></h2>
 <p>The end-to-end tests are gated:</p>
 <ul>

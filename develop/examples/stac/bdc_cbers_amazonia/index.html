@@ -24178,7 +24178,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <h1 id="brazil-data-cube-cbers-4-amazonia-1-modis-vi">Brazil Data Cube — CBERS-4 / AMAZONIA-1 / MODIS VI<a class="anchor-link" href="#brazil-data-cube-cbers-4-amazonia-1-modis-vi">¶</a></h1><p>The <code>bdc</code> endpoint (INPE's Brazil Data Cube STAC v1) is the <strong>only global source</strong> of CBERS-4 /
 CBERS-4A and AMAZONIA-1 imagery, plus 16-day MODIS Terra/Aqua vegetation indices over South
 America. Every currently-exposed BDC collection reads <strong>anonymously</strong> (verified by the A1 token
-probe in the A1 gate).</p>
+probe).</p>
 <p>Forward-compat note: earthlens ships a <code>BdcTokenSigner</code> + <code>Collection.requires_token</code> infra so a
 future BDC tier requiring <code>$BDC_ACCESS_TOKEN</code> can land catalog-only. Today no curated row uses
 either.</p>
