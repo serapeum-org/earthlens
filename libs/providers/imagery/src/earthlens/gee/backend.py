@@ -173,7 +173,9 @@ def _validate_filters(
     Args:
         filters: The raw `filters=` argument — `None`, or an iterable of
             `ee.ImageCollection -> ee.ImageCollection` callables (a
-            one-shot generator is accepted and materialised).
+            one-shot generator is accepted and materialised). Order is
+            preserved, so an *ordered* iterable is expected (a `set`
+            applies in arbitrary order).
 
     Returns:
         The filters as a tuple (empty when `filters is None`).
@@ -290,8 +292,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `by_property_in` / ...), whose first argument is the
             collection, with `functools.partial` or a lambda —
             `partial(by_cloud_cover_lte, max_pct=60)`. Applied left to
-            right; like `cloud_mask`, meant for image collections.
-            Defaults to `None` (no extra filters).
+            right, so pass an *ordered* iterable (a `set` would apply in
+            arbitrary order); like `cloud_mask`, meant for image
+            collections. Defaults to `None` (no extra filters).
 
     Credentials are not constructor arguments — the constructor describes
     only what to fetch. Supply them at the authentication step:
@@ -426,6 +429,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self.auto_split = bool(auto_split)
         self.discover_extent = bool(discover_extent)
         self.wait_for_export = bool(wait_for_export)
+        #: The per-image `cloud_mask` hook (or `None`), `.map`-applied
+        #: before the reducer in :meth:`_build_collection`.
         self.cloud_mask = cloud_mask
         #: The validated `filters` as a tuple (empty when none were given),
         #: applied left to right in :meth:`_build_collection`.
