@@ -807,10 +807,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         `filters` and `cloud_mask` are meant for image collections. On a
         static `ee_type="image"` dataset they are still applied verbatim
-        (and a `logger.warning` is emitted): a metadata filter, or a mask
-        reading a band the asset lacks, empties the one-image collection
-        and surfaces later as an opaque Earth Engine error at download
-        time rather than here.
+        (and a `logger.warning` is emitted): a metadata filter can drop
+        the single wrapped image and empty the collection, while a mask
+        reading a band the asset lacks fails when the graph is computed —
+        either way it surfaces later as an opaque Earth Engine error at
+        download time rather than here.
 
         Args:
             var_info: The catalog entry.
@@ -833,9 +834,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 logger.warning(
                     f"filters / cloud_mask were set but {var_info.id!r} is a "
                     "static single-image dataset (ee_type='image'); they are "
-                    "applied verbatim, and a metadata filter or a mask reading "
-                    "a band the asset lacks will empty the collection and fail "
-                    "server-side at download time."
+                    "applied verbatim — a metadata filter can empty the "
+                    "collection, and a mask reading an absent band fails when "
+                    "the graph is computed; either way it surfaces as an opaque "
+                    "Earth Engine error at download time."
                 )
         collection = collection.filterBounds(self._ee_region())
         for image_filter in self.filters:
