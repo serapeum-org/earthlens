@@ -270,22 +270,27 @@ class GEE(LazyClientMixin, AbstractDataSource):
             which is always synchronous.
         cloud_mask: Optional per-image mask `.map`-applied to every image
             in the stack *before* the reducer, so the composite is built
-            from cloud-screened pixels — the standard way to get a clean
+            from cloud-screened pixels — the usual way to get a clean
             optical mosaic. A callable `ee.Image -> ee.Image`; see
             :mod:`earthlens.gee.cloud_masks` (`landsat_sr` /
             `sentinel2_scl`). It runs before the band `select`, so it may
             read quality bands (`QA_PIXEL` / `SCL`) that are not listed in
-            `variables`. Defaults to `None` (no masking).
-        filters: Optional sequence of `ee.ImageCollection ->
-            ee.ImageCollection` filters applied to the stack after
-            `filterDate` / `filterBounds` and before the `cloud_mask` and
+            `variables`. Meant for image collections; on a static
+            `ee_type="image"` dataset it is applied verbatim and a warning
+            is logged (see :meth:`_build_collection`). Defaults to `None`
+            (no masking).
+        filters: Optional iterable of `ee.ImageCollection ->
+            ee.ImageCollection` filters applied to the stack after the
+            spatial / temporal filters (`filterBounds`, and `filterDate`
+            for image collections) and before the `cloud_mask` and
             reducer — e.g. a metadata cloud-cover cap. Each entry takes
             the collection and returns it; wrap the
             :mod:`earthlens.gee.filters` helpers (`by_cloud_cover_lte` /
             `by_property_in` / ...), whose first argument is the
             collection, with `functools.partial` or a lambda —
             `partial(by_cloud_cover_lte, max_pct=60)`. Applied left to
-            right. Defaults to `None` (no extra filters).
+            right; like `cloud_mask`, meant for image collections.
+            Defaults to `None` (no extra filters).
 
     Credentials are not constructor arguments — the constructor describes
     only what to fetch. Supply them at the authentication step:
@@ -783,12 +788,20 @@ class GEE(LazyClientMixin, AbstractDataSource):
         bumped by one day by :meth:`_clamp_window_to_extent` so the
         user's inclusive end date is covered.
 
-        The pipeline is `filterDate` → `filterBounds` → the constructor
-        `filters` (left to right) → the per-image `cloud_mask` (`.map`) →
-        `select(bands)`. The `cloud_mask` runs *before* `select` on
-        purpose: an optical mask reads a quality band (`QA_PIXEL` /
-        `SCL`) that the user's `bands` usually omit, so selecting the
-        requested bands first would strip it.
+        The pipeline is `filterDate` (image collections only) →
+        `filterBounds` → the constructor `filters` (left to right) → the
+        per-image `cloud_mask` (`.map`) → `select(bands)`. The
+        `cloud_mask` runs *before* `select` on purpose: an optical mask
+        reads a quality band (`QA_PIXEL` / `SCL`) that the user's `bands`
+        usually omit, so selecting the requested bands first would strip
+        it.
+
+        `filters` and `cloud_mask` are meant for image collections. On a
+        static `ee_type="image"` dataset they are still applied verbatim
+        (and a `logger.warning` is emitted): a metadata filter, or a mask
+        reading a band the asset lacks, empties the one-image collection
+        and surfaces later as an opaque Earth Engine error at download
+        time rather than here.
 
         Args:
             var_info: The catalog entry.
@@ -807,6 +820,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # A static image: no temporal filtering (the asset may not
             # carry a `system:time_start` inside the request window).
             collection = ee.ImageCollection([ee.Image(var_info.id)])
+            if self.filters or self.cloud_mask is not None:
+                logger.warning(
+                    f"filters / cloud_mask were set but {var_info.id!r} is a "
+                    "static single-image dataset (ee_type='image'); they are "
+                    "applied verbatim, and a metadata filter or a mask reading "
+                    "a band the asset lacks will empty the collection and fail "
+                    "server-side at download time."
+                )
         collection = collection.filterBounds(self._ee_region())
         for image_filter in self.filters:
             collection = image_filter(collection)

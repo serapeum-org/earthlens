@@ -1112,12 +1112,12 @@ class TestBuildCollection:
             "select",
         ]
 
-    def test_static_image_applies_filters_and_cloud_mask(self, make_gee):
-        """A static `image` dataset also runs `filters` / `cloud_mask` before select.
-
-        The hooks sit between `filterBounds` and `select` for both branches, so a
-        single-image dataset is masked the same way (no `filterDate` is issued).
-        """
+    def test_static_image_applies_filters_and_cloud_mask(self, make_gee, monkeypatch):
+        """A static image dataset applies the hooks before select and logs a warning."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
         gee = make_gee(
             filters=[lambda c: c.filter("cc")],
             cloud_mask=_identity_mask,
@@ -1127,6 +1127,7 @@ class TestBuildCollection:
             ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
         )
         assert col.method_names() == ["filterBounds", "filter", "map", "select"]
+        assert any("static single-image" in w for w in warnings), warnings
 
 
 class TestComposite:
