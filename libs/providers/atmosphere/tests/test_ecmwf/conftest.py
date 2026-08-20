@@ -158,13 +158,19 @@ def download_within_budget():
             # to finish the write it is in; if it outlives that, say so rather
             # than leaving a confusing teardown error as the only trace.
             worker.join(_ABANDON_GRACE_SECONDS)
-            stray = " (a retrieve is still running and holds a queue slot)" * (
-                worker.is_alive()
-            )
-            pytest.fail(
-                f"live retrieve exceeded the {budget_s:.0f}s budget "
-                f"(CDS queue hang); failing fast so the e2e lane survives{stray}"
-            )
+            # A retrieve that lands during the grace produced a real result, so
+            # use it rather than failing the test on a deadline it then beat.
+            if not box:
+                stray = (
+                    " (a retrieve is still running and holds a queue slot)"
+                    if worker.is_alive()
+                    else ""
+                )
+                pytest.fail(
+                    f"live retrieve exceeded the {budget_s:.0f}s budget "
+                    f"(CDS queue hang); failing fast so the e2e lane "
+                    f"survives{stray}"
+                )
         if "exc" in box:
             exc = box["exc"]
             if isinstance(exc, CadsUnavailableError):

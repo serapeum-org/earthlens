@@ -117,7 +117,9 @@ Number queued requests for this dataset is temporarily limited
 ```
 
 This is temporary and says nothing about your request — the identical call succeeds on a quieter account, or later.
-The backend retries such a refusal `CADS_MAX_ATTEMPTS` times with an exponential wait, then raises:
+The backend retries such a refusal three times with an exponential wait (2 s, then 4 s), then raises. A
+`429` or any `5xx` is treated the same way; a `400` naming a bad value is not retried, because retrying a
+malformed request only produces the same error three times:
 
 ```python
 from earthlens.core import EarthLens
@@ -133,8 +135,10 @@ except CadsUnavailableError as exc:
 !!! warning "This raises even under `errors="ignore"`"
     The `errors=` policy absorbs a *per-variable* failure — that variable has no data for your window. A throttled
     store refused to serve **anything**, so honouring the policy would hand back an empty list and report an outage
-    as every variable being empty. `CadsUnavailableError` therefore propagates whatever `errors=` is set to. It is
-    the only exception on this backend that does.
+    as every variable being empty. `CadsUnavailableError` therefore propagates whatever `errors=` is set to.
+
+    On the [raw-request passthrough](#download-anything--the-raw-request-passthrough) the policy never applies at
+    all: that path is a single retrieve, so every error propagates and `errors=` is not consulted.
 
 The practical mitigation is not to hammer one dataset: the limit is per dataset per account, so a loop over many
 variables of the same dataset trips it far sooner than the same number spread across datasets.

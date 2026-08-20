@@ -52,11 +52,11 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.ecmwf._helpers import CadsUnavailableError
 from earthlens.ecmwf.backend import (
     ECMWF,
     ERA5_GRID_DEGREES,
     AuthenticationError,
-    CadsUnavailableError,
 )
 from earthlens.ecmwf.catalog import CATALOG_PATH, Catalog, Dataset, Variable
 

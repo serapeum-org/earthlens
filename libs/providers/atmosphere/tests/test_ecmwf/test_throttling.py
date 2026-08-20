@@ -369,9 +369,18 @@ class TestEndpointResolution:
 
     def test_an_unknown_id_warns_and_defaults_to_cds(self):
         """The fallback is loud, so a stale index is visible."""
+        from loguru import logger
+
         from earthlens.ecmwf.cli import _endpoint_for
 
-        assert _endpoint_for("definitely-not-a-dataset") == "cds"
+        messages: list[str] = []
+        sink = logger.add(messages.append, level="WARNING")
+        try:
+            assert _endpoint_for("definitely-not-a-dataset") == "cds"
+        finally:
+            logger.remove(sink)
+        assert any("definitely-not-a-dataset" in m for m in messages)
+        assert any("refresh ecmwf" in m for m in messages)
 
 
 class TestRetrieveIsAtomic:

@@ -1017,8 +1017,8 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 declared under that dataset — under `errors="warn"` this
                 is logged per pair rather than raised.
             CadsUnavailableError: The store refused to queue the job on
-                its per-dataset limit and kept refusing across
-                :data:`CADS_MAX_ATTEMPTS` attempts. Raised **whatever
+                its per-dataset limit and kept refusing across all three
+                attempts (roughly six seconds of backoff). Raised **whatever
                 `errors` is set to**, including `"ignore"`: a refusal by
                 the service is not the per-variable data gap the policy
                 exists to absorb, and continuing would report an outage

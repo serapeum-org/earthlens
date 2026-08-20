@@ -114,6 +114,12 @@ def _looks_like_throttled(exc: BaseException) -> bool:
     # then let a live test *skip* over a real failure.
     if isinstance(exc, ValueError | AssertionError):
         return False
+    # A 429, or any 5xx, is transient by definition and worth the same retry as
+    # the CADS queue limit; classifying only on the queue wording would let a
+    # store's rate limiter or a bad gateway fail on the first attempt.
+    status = _status_of(exc)
+    if status is not None and (status == 429 or 500 <= status < 600):
+        return True
     message = str(exc).lower()
     return "temporarily limited" in message or "queued requests" in message
 
