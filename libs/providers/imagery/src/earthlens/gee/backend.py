@@ -85,7 +85,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 
     from earthlens.base.http import HttpClient
 
-__all__ = ["GEE", "AuthenticationError"]
+__all__ = ["GEE", "AuthenticationError", "CloudMask", "CollectionFilter"]
 
 # `temporal_resolution` → pandas frequency alias for the per-bucket
 # date range. `"raw"` is special-cased (one bucket spanning the whole

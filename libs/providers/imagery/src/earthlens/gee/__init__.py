@@ -19,6 +19,10 @@ Public surface (re-exported from this package):
   call :meth:`GEE.download`.
 * :class:`AuthenticationError` — raised when Earth Engine cannot be
   initialised (missing/invalid key, unregistered project, missing IAM role).
+* :data:`CloudMask` / :data:`CollectionFilter` — the callable type
+  aliases for the `GEE(cloud_mask=..., filters=...)` hooks
+  (`ee.Image -> ee.Image` and `ee.ImageCollection -> ee.ImageCollection`);
+  handy for annotating your own masks / filters.
 * :class:`Catalog` — pydantic-backed loader for the bundled per-category
   catalog under `src/earthlens/gee/catalog/`, exposing
   `available_datasets`, `datasets`, `providers`, and
@@ -103,7 +107,7 @@ Examples:
 from __future__ import annotations
 
 from earthlens.gee.auth import AuthenticationError, EarthEngineAuth
-from earthlens.gee.backend import GEE
+from earthlens.gee.backend import GEE, CloudMask, CollectionFilter
 from earthlens.gee.catalog import (
     CATALOG_PATH,
     PROVIDERS_PATH,
@@ -133,6 +137,8 @@ from earthlens.gee.sampling import sample_points, sample_points_to_gdf
 __all__ = [
     "GEE",
     "AuthenticationError",
+    "CloudMask",
+    "CollectionFilter",
     "Catalog",
     "Dataset",
     "Band",
