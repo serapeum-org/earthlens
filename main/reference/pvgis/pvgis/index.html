@@ -2528,7 +2528,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS)
+    Data stores (CDS + ADS + EWDS + ECDS + XDS)
   
 
     
@@ -2557,6 +2557,34 @@
     
   
     EWDS (GloFAS / floods)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ecmwf/ecds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -14794,6 +14822,34 @@
     
   
     Flood forecasting with GloFAS — the EWDS endpoint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIGGE and fire fuel — the ECDS and XDS endpoints
   
 
     
@@ -29725,7 +29781,7 @@ the file's <code>st_mtime_ns</code>, so any real edit invalidates the entry.</p>
 
         <p>Pure, network-light helpers for the PVGIS backend.</p>
 <p>Every function here is stateless and grounded in the live API facts pinned
-under <code>planning/pvgis/captures/pvgis-sdk-facts.md</code>: the point sampler that
+under the A1 gate captures: the point sampler that
 turns a bbox into <code>(lat, lon)</code> pairs (<code>point_grid</code>), the keyless REST URL
 builder (<code>build_url</code>), the rate-limited GET with <code>429</code> backoff
 (<code>throttled_get</code>), and the two JSON parsers that fold a <code>seriescalc</code> /
