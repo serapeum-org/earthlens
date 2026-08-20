@@ -207,15 +207,28 @@ def _status_of(exc: BaseException) -> int | None:
             neither yields one, as a transport drop carries no status.
     """
     for link in _exception_chain(exc):
-        status = getattr(getattr(link, "response", None), "status_code", None)
-        if isinstance(status, int) and not isinstance(status, bool):
-            return status
-        # The status is often only in the text of the wrapped error, so scan
-        # each link rather than the outermost message alone.
-        parsed = _status_in_message(str(link))
-        if parsed is not None:
-            return parsed
+        found = _status_of_one(link)
+        if found is not None:
+            return found
     return None
+
+
+def _status_of_one(error: Exception) -> int | None:
+    """Return the HTTP status one exception carries, from `response` or text.
+
+    Args:
+        error: A single link from the exception chain.
+
+    Returns:
+        int | None: Its status, or `None` when it carries none. `bool` is
+            rejected explicitly because it is a subclass of `int`.
+    """
+    code = getattr(getattr(error, "response", None), "status_code", None)
+    if isinstance(code, int) and not isinstance(code, bool):
+        return code
+    # The status is often only in the text of the wrapped error, so each link
+    # is scanned rather than the outermost message alone.
+    return _status_in_message(str(error))
 
 
 def _status_in_message(text: str) -> int | None:
