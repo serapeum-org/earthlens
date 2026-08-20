@@ -232,8 +232,8 @@ CADS_MAX_ATTEMPTS = 3
 CADS_BACKOFF_SECONDS = 2.0
 
 
-def _reraise_if_not_throttled(exc: BaseException, dataset: str, endpoint: str) -> None:
-    """Re-raise anything that is not a transient refusal worth retrying.
+def _is_retryable_failure(exc: BaseException, dataset: str, endpoint: str) -> bool:
+    """Say whether a failed retrieve is a transient refusal worth retrying.
 
     An unaccepted licence is permanent, so it is rewritten into a
     :class:`PermissionError` naming the dataset page; any other non-throttle
@@ -245,9 +245,15 @@ def _reraise_if_not_throttled(exc: BaseException, dataset: str, endpoint: str) -
         dataset: Upstream dataset id, for the message.
         endpoint: CADS instance slug, for the message.
 
+    Returns:
+        bool: `True` when the store was throttling and the retrieve should be
+            tried again; `False` when the failure is the caller's to re-raise.
+            The caller does that with a bare `raise` inside its own handler,
+            which keeps the original traceback rather than restarting it here.
+
     Raises:
-        PermissionError: The dataset's licence has not been accepted.
-        BaseException: `exc` itself, when it is not a throttle.
+        PermissionError: The dataset's licence has not been accepted — that is
+            permanent, so it is rewritten here rather than retried.
     """
     if _looks_like_licence_not_accepted(exc):
         base = endpoint_url(endpoint).rsplit("/api", 1)[0]
@@ -258,8 +264,7 @@ def _reraise_if_not_throttled(exc: BaseException, dataset: str, endpoint: str) -
             "bottom of the 'Download' tab. The acceptance is permanent "
             "and tied to your Copernicus account."
         ) from exc
-    if not _looks_like_throttled(exc):
-        raise exc
+    return _looks_like_throttled(exc)
 
 
 def _wait_before_retry(attempt: int, dataset: str, endpoint: str) -> None:
@@ -343,7 +348,8 @@ def _retrieve_with_retry(
             client.retrieve(dataset, request, str(part))
         except Exception as exc:  # noqa: BLE001 - cdsapi raises many types; classified here
             part.unlink(missing_ok=True)
-            _reraise_if_not_throttled(exc, dataset, endpoint)
+            if not _is_retryable_failure(exc, dataset, endpoint):
+                raise
             last = exc
             _wait_before_retry(attempt, dataset, endpoint)
         else:
