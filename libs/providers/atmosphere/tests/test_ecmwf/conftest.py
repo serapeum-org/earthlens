@@ -1,6 +1,6 @@
 """Shared pytest fixtures for the ECMWF test suite.
 
-Holds the four pieces every test in this directory needs:
+Holds the shared pieces every test in this directory needs:
 
 * :func:`_block_real_cdsapi` — autouse safeguard that prevents any
   test (other than `TestApiE2E`) from constructing a real
@@ -12,6 +12,11 @@ Holds the four pieces every test in this directory needs:
   `self.root_dir`, `self.time`, `self.space`) set by hand.
   Bypasses :meth:`AbstractDataSource.__init__` so unit tests can run
   without going through cdsapi or the file system.
+* :func:`download_within_budget` — wraps a **live** retrieve in a
+  wall-clock budget so one wedged job cannot consume the whole e2e
+  lane, skips (via :func:`earthlens.testing.skip_live_unavailable`)
+  when the store is throttling, and re-raises anything else. Every
+  live retrieve in this directory goes through it.
 """
 
 from __future__ import annotations

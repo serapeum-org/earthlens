@@ -59,6 +59,7 @@ from earthlens.config import resolve_output_path
 from earthlens.ecmwf._helpers import (
     CadsUnavailableError,
     _retrieve_with_retry,
+    endpoint_for,
 )
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
@@ -1166,8 +1167,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     def _resolve_endpoint(self, dataset: str) -> str:
         """Resolve which store hosts `dataset` for a passthrough retrieve.
 
-        A curated row's `endpoint` wins; otherwise the per-store availability
-        index (`Catalog.store_for`) decides; falling back to `"cds"`.
+        Delegates to :func:`earthlens.ecmwf._helpers.endpoint_for`, the one
+        resolver the CLI tooling shares: a curated row's `endpoint` wins, then
+        the per-store availability index, then `"cds"` with a warning.
 
         Args:
             dataset: The Copernicus dataset id being retrieved.
@@ -1175,11 +1177,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         Returns:
             str: The store slug (`"cds"` / `"ads"` / `"ewds"`).
         """
-        catalog = Catalog()
-        row = catalog.datasets.get(dataset)
-        if row is not None:
-            return row.endpoint
-        return catalog.store_for(dataset) or "cds"
+        return endpoint_for(dataset)
 
     def _passthrough_target(self, dataset: str, request: dict[str, Any]) -> str:
         """Pick an output filename for a raw retrieve from the request format.

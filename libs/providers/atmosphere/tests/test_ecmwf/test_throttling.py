@@ -20,6 +20,11 @@ _THROTTLED = (
 )
 
 
+def _raise(exc: BaseException) -> None:
+    """Raise `exc` — a `lambda` cannot, and the repo does not nest defs."""
+    raise exc
+
+
 class _Client:
     """A cdsapi stand-in that fails a given number of times, then succeeds."""
 
@@ -236,8 +241,6 @@ class TestDownloadWiresTheFatalHatch:
         source = backend_mod.ECMWF.__new__(backend_mod.ECMWF)
         source.vars = {"tigge-forecasts": ["2m-temperature"]}
         source.root_dir = tmp_path
-        source._errors = "warn"
-        source._aggregate = None
         return source
 
     @pytest.mark.parametrize("policy", ["warn", "ignore", "skip"])
@@ -247,7 +250,7 @@ class TestDownloadWiresTheFatalHatch:
         monkeypatch.setattr(
             backend_mod.ECMWF,
             "_download_pair",
-            lambda self, pair, **kw: (_ for _ in ()).throw(
+            lambda self, pair, **kw: _raise(
                 CadsUnavailableError("ECDS refused every job", status_code=400)
             ),
         )
@@ -265,7 +268,7 @@ class TestDownloadWiresTheFatalHatch:
         monkeypatch.setattr(
             backend_mod.ECMWF,
             "_download_pair",
-            lambda self, pair, **kw: (_ for _ in ()).throw(ValueError("no data")),
+            lambda self, pair, **kw: _raise(ValueError("no data")),
         )
         assert source.download(progress_bar=False) == []
 

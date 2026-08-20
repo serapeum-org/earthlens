@@ -12,8 +12,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, cast
 
-from loguru import logger
-
 from earthlens.cli.toolkit import (
     COVERAGE_BUCKETS,
     get_json,
@@ -21,6 +19,7 @@ from earthlens.cli.toolkit import (
 )
 from earthlens.ecmwf import _hydrate, _seed
 from earthlens.ecmwf._categories import categorise_dataset  # noqa: F401 — role target
+from earthlens.ecmwf._helpers import endpoint_for as _endpoint_for
 from earthlens.ecmwf.endpoints import ENDPOINTS, endpoint_url
 
 #: Cap on `/collections` pages followed via `rel="next"`.
@@ -126,40 +125,6 @@ def coverage(catalog: Any) -> tuple[dict[str, int], list[str]]:
         buckets.setdefault(bucket, []).append(dataset_id)
     counts = {bucket: len(buckets.get(bucket, [])) for bucket in COVERAGE_BUCKETS}
     return counts, sorted(buckets.get("addressable", []))
-
-
-def _endpoint_for(dataset: str) -> str:
-    """Resolve which CADS store serves `dataset`.
-
-    Checks the curated rows first, since a row's `endpoint` is authoritative
-    for the dataset it describes, then the per-store availability index — which
-    covers every id the stores publish, curated or not. That second lookup is
-    the one that matters for `curate`, whose whole purpose is datasets with no
-    curated row yet: without it those resolve to `cds` and every ADS / EWDS /
-    ECDS / XDS id fails with `process not found`.
-
-    Args:
-        dataset: The upstream dataset id.
-
-    Returns:
-        str: The store slug, defaulting to `"cds"` for an id neither the
-            curated rows nor the index knows.
-    """
-    from earthlens.ecmwf.catalog import Catalog
-
-    catalog = Catalog()
-    record = catalog.datasets.get(dataset)
-    if record is not None:
-        return record.endpoint
-    store = catalog.store_for(dataset)
-    if store is not None:
-        return store
-    logger.warning(
-        f"{dataset!r} is in neither the curated rows nor the availability "
-        "index; assuming the CDS store. Run `earthlens datasets refresh ecmwf` "
-        "if it is new upstream."
-    )
-    return "cds"
 
 
 def _ecmwf_constraints(dataset: str) -> list[dict[str, Any]]:
@@ -283,7 +248,8 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     # A dataset with no variable dimension still needs the widget's "all".
     request.setdefault("variable", ["all"])
     target = Path(tempfile.mkdtemp()) / "probe.nc"
-    open_client(_endpoint_for(dataset)).retrieve(dataset, request, str(target))
+    client = open_client(_endpoint_for(dataset))
+    client.retrieve(dataset, request, str(target))
     if zipfile.is_zipfile(target):
         with zipfile.ZipFile(target) as archive:
             members = [name for name in archive.namelist() if name.endswith(".nc")]

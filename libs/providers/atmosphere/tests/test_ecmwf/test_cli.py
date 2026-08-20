@@ -330,11 +330,7 @@ class TestDeepProber:
         assert seen == [expected]
 
     def test_deep_sample_uses_the_index_for_an_uncurated_dataset(self, monkeypatch):
-        """An uncurated id resolves via the index, not the CDS default.
-
-        This is the population `curate` exists for, so defaulting them to CDS
-        would 404 every ADS / EWDS / ECDS / XDS id it was asked to seed.
-        """
+        """An uncurated id resolves via the index, not the CDS default."""
         monkeypatch.setattr(
             ecmwf_cli, "_ecmwf_constraints", lambda d: [{"variable": ["x"]}]
         )

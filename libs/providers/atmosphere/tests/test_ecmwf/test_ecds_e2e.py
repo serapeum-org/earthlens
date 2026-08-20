@@ -71,8 +71,10 @@ def _time_stamps(path: Path) -> list[pd.Timestamp]:
         return [pd.Timestamp(value) for value in dataset[name].values.ravel()]
 
 
-#: How far back to reach for an S2S real-time cycle. Far enough inside the
-#: rolling retention window to be safe, recent enough to still be served.
+#: How far back to reach for an S2S real-time cycle. The real-time stream is a
+#: rolling archive, so a pinned recent date silently ages out and the case then
+#: fails on the calendar rather than on the code; this is far enough inside the
+#: retention window to be safe and recent enough to still be served.
 _S2S_LAG_DAYS = 14
 
 
@@ -126,12 +128,7 @@ class TestEcdsE2E:
     def test_live_s2s_forecast_returns_2m_temperature(
         self, tmp_path, download_within_budget
     ):
-        """An S2S real-time forecast returns the `t2m` field.
-
-        The cycle is derived from today rather than pinned: the real-time
-        stream is a rolling archive, so a fixed recent date silently ages out
-        and the case starts failing on the calendar instead of on the code.
-        """
+        """An S2S real-time forecast returns the `t2m` field."""
         cycle = f"{_recent_s2s_cycle():%Y-%m-%d}"
         path = _fetch(
             "s2s-forecasts",

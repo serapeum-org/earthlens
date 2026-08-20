@@ -48,6 +48,40 @@ def _looks_like_licence_not_accepted(exc: BaseException) -> bool:
     )
 
 
+def endpoint_for(dataset: str) -> str:
+    """Resolve which CADS store serves `dataset`.
+
+    Checks the curated rows first, since a row's `endpoint` is authoritative
+    for the dataset it describes, then the per-store availability index — which
+    covers every id the stores publish, curated or not. That second lookup is
+    the one that matters for `curate`, whose whole purpose is datasets with no
+    curated row yet: without it those resolve to `cds` and every ADS / EWDS /
+    ECDS / XDS id fails with `process not found`.
+
+    Args:
+        dataset: The upstream dataset id.
+
+    Returns:
+        str: The store slug, defaulting to `"cds"` for an id neither the
+            curated rows nor the index knows.
+    """
+    from earthlens.ecmwf.catalog import Catalog
+
+    catalog = Catalog()
+    record = catalog.datasets.get(dataset)
+    if record is not None:
+        return record.endpoint
+    store = catalog.store_for(dataset)
+    if store is not None:
+        return store
+    logger.warning(
+        f"{dataset!r} is in neither the curated rows nor the availability "
+        "index; assuming the CDS store. Run `earthlens datasets refresh ecmwf` "
+        "if it is new upstream."
+    )
+    return "cds"
+
+
 class CadsUnavailableError(RuntimeError):
     """A CADS store refused the retrieve after the backend's retries.
 
