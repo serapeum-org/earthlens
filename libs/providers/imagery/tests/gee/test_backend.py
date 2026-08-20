@@ -23,6 +23,7 @@ from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
 from earthlens.gee.catalog import Dataset, Extent
+from earthlens.gee.cloud_masks import sentinel2_scl
 
 # -- fakes ------------------------------------------------------------------
 
@@ -421,6 +422,43 @@ class TestInit:
         """A mapping is rejected up front, not iterated into its keys."""
         with pytest.raises(TypeError, match="filters must be an iterable"):
             make_gee(filters={"a": lambda c: c})
+
+    def test_bytes_filters_rejected(self, make_gee):
+        """A `bytes` value is rejected like `str`, not iterated per byte."""
+        with pytest.raises(TypeError, match="filters must be an iterable"):
+            make_gee(filters=b"abc")
+
+    @pytest.mark.parametrize(
+        "kwargs, match",
+        [
+            ({"cloud_mask": "x"}, r"cloud_mask must be a callable"),
+            ({"filters": 42}, r"filters must be an iterable"),
+            ({"filters": [object()]}, r"each entry in filters"),
+        ],
+    )
+    def test_bad_hooks_fail_before_catalog_load(
+        self, monkeypatch, tmp_path, kwargs, match
+    ):
+        """A bad `cloud_mask` / `filters` raises before the catalog parse."""
+        from earthlens.gee import backend as backend_module
+
+        class _ExplodingCatalog:
+            def __init__(self, *_a, **_k):
+                raise AssertionError(
+                    "Catalog() must not be constructed before hook validation"
+                )
+
+        monkeypatch.setattr(backend_module, "Catalog", _ExplodingCatalog)
+        with pytest.raises(TypeError, match=match):
+            GEE(
+                start="2000-02-11",
+                end="2000-02-12",
+                variables={"USGS/SRTMGL1_003": ["elevation"]},
+                lat_lim=[29.9, 30.0],
+                lon_lim=[31.2, 31.3],
+                path=str(tmp_path),
+                **kwargs,
+            )
 
     def test_generator_filters_normalised_to_tuple(self, make_gee):
         """A one-shot generator is materialised into a reusable tuple."""
@@ -1117,6 +1155,19 @@ class TestBuildCollection:
             "select",
         ]
 
+    def test_real_cloud_mask_threaded_through_build(self, make_gee):
+        """A real mask (`sentinel2_scl`) is the exact callable handed to `.map`."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            cloud_mask=sentinel2_scl,
+        )
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert [args for name, args in col.calls if name == "map"] == [(sentinel2_scl,)]
+
     def test_static_image_applies_filters_and_cloud_mask(self, make_gee, monkeypatch):
         """A static image dataset applies the hooks before select and logs a warning."""
         warnings: list[str] = []
@@ -1179,6 +1230,27 @@ class TestComposite:
             dt.datetime(2020, 6, 1),
             dt.datetime(2020, 7, 1),
         ]
+        assert all(img.reducer == "mean" for _, img in buckets)
+
+    def test_monthly_maps_cloud_mask_once_not_per_bucket(self, make_gee):
+        """The `cloud_mask` is `.map`-applied once at build, not re-applied per bucket."""
+        gee = make_gee(
+            start="2020-06-01",
+            end="2020-07-31",
+            temporal_resolution="monthly",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            cloud_mask=_identity_mask,
+        )
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 8, 1)
+        )
+        assert col.method_names().count("map") == 1
+        buckets = list(
+            gee._composite(col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 8, 1))
+        )
+        assert len(buckets) == 2
         assert all(img.reducer == "mean" for _, img in buckets)
 
     def test_static_image_one_bucket_regardless_of_resolution(self, make_gee):
