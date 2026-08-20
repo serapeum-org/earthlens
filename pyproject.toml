@@ -49,6 +49,7 @@ earthdata = ["earthlens-imagery[earthdata]"]
 ecmwf = ["earthlens-atmosphere[ecmwf]"]
 ecmwf-modern = ["earthlens-atmosphere[ecmwf-modern]"]
 eea_aq = ["earthlens-atmosphere[eea_aq]"]
+eedai = ["earthlens-imagery[eedai]"]
 emdat = ["earthlens-hazards[emdat]"]
 erddap = ["earthlens-ocean[erddap]"]
 eumetsat = ["earthlens-imagery[eumetsat]"]
@@ -90,6 +91,7 @@ all = [
     "earthlens[ecmwf]",
     "earthlens[ecmwf-modern]",
     "earthlens[eea_aq]",
+    "earthlens[eedai]",
     "earthlens[emdat]",
     "earthlens[erddap]",
     "earthlens[eumetsat]",
