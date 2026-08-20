@@ -431,3 +431,26 @@ class TestRetrieveIsAtomic:
         client = _Client(failures=1, payload=b"second attempt")
         helpers_mod._retrieve_with_retry(client, "ds", {}, target, "ecds")
         assert target.read_bytes() == b"second attempt"
+
+
+class TestChainWalkSkipsNonExceptions:
+    """The chain yields only `Exception` links, but still walks past others."""
+
+    def test_a_status_below_a_base_exception_is_still_found(self):
+        """A KeyboardInterrupt in the chain must not hide the status under it."""
+        try:
+            try:
+                try:
+                    response = requests.Response()
+                    response.status_code = 503
+                    raise requests.HTTPError("503 Server Error", response=response)
+                except requests.HTTPError as inner:
+                    raise KeyboardInterrupt from inner
+            except KeyboardInterrupt as interrupt:
+                raise RuntimeError("wrapped") from interrupt
+        except RuntimeError as exc:
+            assert helpers_mod._status_of(exc) == 503
+
+    def test_a_base_exception_contributes_no_status(self):
+        """A bare KeyboardInterrupt carries nothing to read a status from."""
+        assert helpers_mod._status_of(KeyboardInterrupt()) is None

@@ -158,20 +158,27 @@ def _looks_like_throttled(exc: BaseException) -> bool:
     return "temporarily limited" in message or "queued requests" in message
 
 
-def _exception_chain(exc: BaseException) -> Iterator[BaseException]:
+def _exception_chain(exc: BaseException) -> Iterator[Exception]:
     """Yield `exc` then each linked `__cause__` / `__context__`, cycle-safe.
+
+    Only `Exception` links are yielded. A `KeyboardInterrupt` or `SystemExit`
+    caught up in a chain carries no HTTP status and must not be message-sniffed
+    for one — the same reasoning that keeps `_looks_like_throttled` off
+    `ValueError` and `AssertionError`. The walk still traverses *through* such a
+    link, so a status further down the chain is not lost.
 
     Args:
         exc: The exception to walk.
 
     Yields:
-        BaseException: Each exception in the chain, most recent first.
+        Exception: Each `Exception` in the chain, most recent first.
     """
     seen: set[int] = set()
     current: BaseException | None = exc
     while current is not None and id(current) not in seen:
         seen.add(id(current))
-        yield current
+        if isinstance(current, Exception):
+            yield current
         # Honour `raise ... from None`: an explicit cause wins, otherwise follow
         # the implicit context unless the author suppressed it (matching
         # Python's own traceback display), so a deliberately surfaced failure is
