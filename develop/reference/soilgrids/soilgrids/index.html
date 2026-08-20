@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2528,7 +2528,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS)
+    Data stores (CDS + ADS + EWDS + ECDS + XDS)
   
 
     
@@ -2557,6 +2557,34 @@
     
   
     EWDS (GloFAS / floods)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ecmwf/ecds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -14750,6 +14778,34 @@
     
   
     Flood forecasting with GloFAS — the EWDS endpoint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIGGE and fire fuel — the ECDS and XDS endpoints
   
 
     
@@ -28802,7 +28858,7 @@ The loader merges every file at construction time (the <code>ghsl</code> / <code
 metadata (<code>unit</code> / <code>mapped_units</code> / <code>scale_factor</code>) — SoilGrids stores every
 value as an integer that must be divided by <code>scale_factor</code> to reach the
 conventional <code>unit</code> (verified live 2026-07-01; see
-<code>planning/soilgrids/captures/soilgrids-sdk-facts.md</code>).</p>
+the A1 gate captures).</p>
 
 
 

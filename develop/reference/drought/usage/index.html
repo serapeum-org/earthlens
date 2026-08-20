@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2528,7 +2528,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS)
+    Data stores (CDS + ADS + EWDS + ECDS + XDS)
   
 
     
@@ -2557,6 +2557,34 @@
     
   
     EWDS (GloFAS / floods)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ecmwf/ecds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -14497,6 +14525,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIGGE and fire fuel — the ECDS and XDS endpoints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../examples/ecmwf/glofas_historical_intermediate/" class="md-nav__link">
         
   
@@ -23596,7 +23652,7 @@ outside that range surfaces the Copernicus message verbatim:</p>
 </code></pre></div>
 <p>The list of curated EDO/GDO ids lives in <code>src/earthlens/drought/catalog/edo.yaml</code>
 and <code>gdo.yaml</code>. The indicator codes + the <code>TIME</code> / <code>SELECTED_TIMESCALE</code>
-param shape were verified live (see <code>planning/drought/captures/</code>). Every
+param shape were verified live in the A1 gate. Every
 <code>gdo-*</code> row uses the same <code>map=DO_WCS</code> endpoint as the EDO rows — there is
 no separate <code>GDO_WCS</code> map.</p>
 <h2 id="aliases"><a class="toclink" href="#aliases">Aliases</a><a class="headerlink" href="#aliases" title="Permanent link">#</a></h2>

@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2528,7 +2528,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS)
+    Data stores (CDS + ADS + EWDS + ECDS + XDS)
   
 
     
@@ -2557,6 +2557,34 @@
     
   
     EWDS (GloFAS / floods)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ecmwf/ecds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -14480,6 +14508,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIGGE and fire fuel — the ECDS and XDS endpoints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../examples/ecmwf/glofas_historical_intermediate/" class="md-nav__link">
         
   
@@ -23544,7 +23600,7 @@ catalog) without touching disk. The second rewrites the
 <code>available_datasets:</code> index in <code>src/earthlens/jaxa/catalog/_index.yaml</code>
 with the freshly probed ids (the curated per-mission shards under the
 same <code>catalog/</code> directory are not touched). See
-<code>planning/jaxa/captures/build_catalog.py</code> for the generator that builds
+the JAXA catalog build script for the generator that builds
 the per-mission shards from scratch.</p>
 <h2 id="when-the-live-e2e-tests-run"><a class="toclink" href="#when-the-live-e2e-tests-run">When the live e2e tests run</a><a class="headerlink" href="#when-the-live-e2e-tests-run" title="Permanent link">#</a></h2>
 <p>The end-to-end tests are gated:</p>

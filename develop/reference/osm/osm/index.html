@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -2528,7 +2528,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS)
+    Data stores (CDS + ADS + EWDS + ECDS + XDS)
   
 
     
@@ -2557,6 +2557,34 @@
     
   
     EWDS (GloFAS / floods)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ecmwf/ecds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -15210,6 +15238,34 @@
     
   
     Flood forecasting with GloFAS — the EWDS endpoint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIGGE and fire fuel — the ECDS and XDS endpoints
   
 
     
@@ -36916,7 +36972,7 @@ belonging to a different protocol.</p>
   geometry is built here (<code>G4</code>). Under the <code>out geom;</code> QL the backend uses,
   way coordinates ride on <code>way.attributes["geometry"]</code> (a list of <code>{lat, lon}</code>
   dicts), <em>not</em> on <code>way.nodes</code> (which raises <code>DataIncomplete</code> under
-  <code>out geom</code>) — see <code>planning/osm/captures/osm-sdk-facts.md</code>.</li>
+  <code>out geom</code>) — see the A1 gate captures.</li>
 <li><code>to_fc</code> / <code>empty_fc</code> — wrap a <code>GeoDataFrame</code> into a pyramids
   <code>FeatureCollection</code> (<code>G7</code>), normalising the CRS to EPSG:4326. The ohsome
   path's <code>.as_dataframe()</code> is already a <code>GeoDataFrame</code>, so it goes straight to
