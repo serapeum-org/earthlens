@@ -2919,7 +2919,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS)
+    Data stores (CDS + ADS + EWDS + ECDS + XDS)
   
 
     
@@ -2948,6 +2948,34 @@
     
   
     EWDS (GloFAS / floods)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/ecmwf/ecds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -14745,6 +14773,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIGGE and fire fuel — the ECDS and XDS endpoints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../examples/ecmwf/glofas_historical_intermediate/" class="md-nav__link">
         
   
@@ -24102,6 +24158,10 @@ harder.</p>
 <a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">lens</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">&quot;raise&quot;</span><span class="p">)</span>    <span class="c1"># abort on the first failure</span>
 </code></pre></div>
 <p><code>"skip"</code> is accepted as an alias of <code>"ignore"</code>.</p>
+<p>A failure of the <em>service</em> rather than of one item is exempt from all three: it propagates even under
+<code>"ignore"</code>, because continuing would report an upstream outage as every item having no data. On the ECMWF
+backend that is <code>CadsUnavailableError</code> — see
+<a href="../reference/ecmwf/datastores/#when-a-store-is-throttling">when a store is throttling</a>.</p>
 <h3 id="a-vector-or-tabular-request-exhausts-memory"><a class="toclink" href="#a-vector-or-tabular-request-exhausts-memory">A vector or tabular request exhausts memory</a><a class="headerlink" href="#a-vector-or-tabular-request-exhausts-memory" title="Permanent link">#</a></h3>
 <p>Cap it. <code>limit=</code> is an exact cap that stops the work rather than truncating at the end:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">lens</span><span class="o">.</span><span class="n">datasource</span><span class="o">.</span><span class="n">iter_download</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
