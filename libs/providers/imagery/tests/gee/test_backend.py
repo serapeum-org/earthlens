@@ -1085,8 +1085,12 @@ class TestBuildCollection:
         )
         assert col.method_names() == ["filterDate", "filterBounds", "select"]
 
-    def test_static_image_skips_filter_date(self, make_gee):
-        """A static `image` dataset is *not* date-filtered."""
+    def test_static_image_skips_filter_date(self, make_gee, monkeypatch):
+        """A hookless static image dataset is not date-filtered and logs no warning."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
         gee = make_gee()
         ds = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         col = gee._build_collection(
@@ -1094,6 +1098,7 @@ class TestBuildCollection:
         )
         assert col.method_names() == ["filterBounds", "select"]
         assert gee.client.image_log == ["USGS/SRTMGL1_003"]
+        assert warnings == []
 
     def test_filters_applied_after_bounds_before_select(self, make_gee):
         """Constructor `filters` are applied left to right, after bounds."""
@@ -1135,8 +1140,12 @@ class TestBuildCollection:
             (_identity_mask,)
         ]
 
-    def test_filters_then_cloud_mask_then_select(self, make_gee):
-        """With both, the order is filters → cloud_mask → select."""
+    def test_filters_then_cloud_mask_then_select(self, make_gee, monkeypatch):
+        """On a collection the order is filters → cloud_mask → select, with no warning."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
         gee = make_gee(
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
@@ -1154,6 +1163,7 @@ class TestBuildCollection:
             "map",
             "select",
         ]
+        assert warnings == []
 
     def test_real_cloud_mask_threaded_through_build(self, make_gee):
         """A real mask (`sentinel2_scl`) is the exact callable handed to `.map`."""
