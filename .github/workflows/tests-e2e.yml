@@ -77,20 +77,11 @@ jobs:
           CDSAPI_URL: ${{ secrets.CDSAPI_URL }}
           CDSAPI_KEY: ${{ secrets.CDSAPI_KEY }}
         run: |
-          # The marker exclusions drop the suites that have their own lane
-          # below; the deselect drops the one test that segfaults the
-          # interpreter on Linux (issue #925) - it passes locally in ~6 s, so
-          # it is dropped here rather than skipped in the test file. Removing
-          # this line once #925 is fixed also brings back the three admin
-          # tests that sit behind it in the same file.
-          #
-          # The node id is relative to the PACKAGE, not the repo: each package
-          # ships its own [tool.pytest.ini_options], so passing a package path
-          # moves pytest's rootdir there. A repo-relative id silently matches
-          # nothing.
+          # The marker exclusions drop the suites that have their own lane below.
+          # The geoBoundaries ADM1 test that segfaults GDAL (#925) skips itself
+          # in the test file now, so no --deselect is needed here.
           uv run --locked pytest ${{ matrix.package }} -v \
-            -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat and not caravan" \
-            --deselect "tests/admin/test_admin_e2e.py::TestAdminLiveFetch::test_geoboundaries_country_adm1"
+            -m "e2e and not gee and not stac and not sentinel_hub and not nwp and not emdat and not caravan"
 
   e2e-caravan:
     runs-on: ubuntu-latest
