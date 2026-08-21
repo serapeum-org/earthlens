@@ -106,7 +106,8 @@ def test_live_srtm_eedai_matches_ee(tmp_path):
     """
     ee_path = _download_srtm(tmp_path, "ee")
     eedai_path = _download_srtm(tmp_path, "eedai")
-    assert eedai_path.is_file() and eedai_path.stat().st_size > 0
+    assert eedai_path.is_file(), f"EEDAI output missing: {eedai_path}"
+    assert eedai_path.stat().st_size > 0, "EEDAI GeoTIFF is empty"
 
     ee_mean = _valid_mean(ee_path)
     eedai_mean = _valid_mean(eedai_path)

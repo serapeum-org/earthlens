@@ -1755,8 +1755,9 @@ class TestEedaiEligibility:
             variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
             scale=5566.0,
         )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         with pytest.raises(ValueError, match="engine='eedai' cannot serve"):
-            gee._use_eedai(gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY"))
+            gee._use_eedai(var_info)
 
 
 class TestExportViaEedai:
