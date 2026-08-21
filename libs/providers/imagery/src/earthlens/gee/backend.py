@@ -651,6 +651,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             self._service_key = service_key
         if project is not None:
             self._project = project
+        # Re-authenticating may switch identity, so the reader's cached
+        # credential must not outlive the values it was built from.
+        self._eedai_credential = None
         # LazyClientMixin: first access to `client` runs `_open_client` (auth).
         _ = self.client
         return self
@@ -832,6 +835,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """
         # Trigger the lazy Earth Engine auth/init before any `ee` call.
         _ = self.client
+        self._cog_warned = False  # the cog= notice is once per run, not per object
         outputs: list[Path | str | TaskInfo] = []
         assert isinstance(
             self.vars, dict

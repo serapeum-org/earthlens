@@ -2107,6 +2107,15 @@ class TestExportViaEedai:
         _asset_id, kwargs = fake_reader.calls[0]
         assert kwargs["geometry"] is region
 
+    def test_reauthenticating_drops_the_cached_credential(self, make_gee, fake_reader):
+        """A new `authenticate()` must not reuse the previous identity's credential."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "a")
+        gee.authenticate(service_account="other@x.iam", service_key="other.json")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "b")
+        assert fake_reader.credential_builds == ["key.json", "other.json"]
+
     def test_api_uses_getdownloadurl_when_engine_is_ee(self, make_gee, fake_reader):
         """`engine="ee"` keeps the historical `getDownloadURL` path."""
         gee = make_gee(engine="ee")
