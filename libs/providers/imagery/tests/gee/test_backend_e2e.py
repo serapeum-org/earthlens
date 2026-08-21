@@ -135,7 +135,8 @@ def test_live_srtm_eedai_matches_ee(tmp_path):
 
     ee_finite = ee_values[np.isfinite(ee_values)]
     eedai_finite = eedai_values[np.isfinite(eedai_values)]
-    assert ee_finite.size and eedai_finite.size, "a raster has no valid pixels"
+    assert ee_finite.size, "the Earth Engine raster has no valid pixels"
+    assert eedai_finite.size, "the EEDAI raster has no valid pixels"
     # Compare the elevation distributions rather than the means: a mean alone
     # would survive a shifted AOI or a transposed grid over flat terrain.
     for quantile in (0.05, 0.5, 0.95):
