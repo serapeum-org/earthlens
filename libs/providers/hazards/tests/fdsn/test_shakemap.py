@@ -212,6 +212,35 @@ class TestParseComcatId:
         """An empty or missing identifier yields None."""
         assert _helpers.parse_comcat_id(value) is None
 
+    @pytest.mark.parametrize("length", [1, 63, 64])
+    def test_ids_up_to_the_bound_are_accepted(self, length: int):
+        """An id at or under the length bound parses."""
+        comcat_id = "a" * length
+        assert _helpers.parse_comcat_id(f"q?eventid={comcat_id}&f=q") == comcat_id
+
+    @pytest.mark.parametrize("length", [65, 200])
+    def test_ids_past_the_bound_are_refused(self, length: int):
+        """An overlong id is refused rather than handed to the filesystem."""
+        assert _helpers.parse_comcat_id(f"q?eventid={'a' * length}&f=q") is None
+
+    def test_id_at_the_end_of_the_identifier(self):
+        """An id terminating the string, with no trailing separator, parses."""
+        assert _helpers.parse_comcat_id("q?eventid=us6000jlqa") == "us6000jlqa"
+
+    def test_id_as_a_later_parameter(self):
+        """The id is found when it is not the first query parameter."""
+        assert (
+            _helpers.parse_comcat_id("q?format=quakeml&eventid=us6000jlqa")
+            == "us6000jlqa"
+        )
+
+    @pytest.mark.parametrize(
+        "encoded", ["%2e%2e", "..%2fetc", "us/evil", "C:", "us evil"]
+    )
+    def test_encoded_and_separator_forms_are_refused(self, encoded: str):
+        """Percent-encoded dots and path separators never survive the parse."""
+        assert _helpers.parse_comcat_id(f"q?eventid={encoded}&f=q") is None
+
 
 class TestNormalizeLayers:
     """Validating and de-duplicating a requested layer selection."""
@@ -241,6 +270,16 @@ class TestNormalizeLayers:
             _helpers.SHAKEMAP_LAYERS
         )
 
+    @pytest.mark.parametrize("bad", [[None], [1], [object()]])
+    def test_non_string_members_are_refused(self, bad: list):
+        """A non-string layer name is refused rather than stringified."""
+        with pytest.raises(ValueError, match="unknown ShakeMap layer"):
+            _helpers.normalize_layers(bad)
+
+    def test_accepts_any_iterable(self):
+        """A tuple works as well as a list."""
+        assert _helpers.normalize_layers(("pga_mean",)) == ("pga_mean",)
+
 
 class TestShakemapRasterUrl:
     """Walking a detail document to the raster archive URL."""
@@ -264,6 +303,25 @@ class TestShakemapRasterUrl:
         """A document with no properties at all yields None."""
         assert _helpers.shakemap_raster_url({}) is None
 
+    def test_empty_shakemap_list_is_none(self):
+        """A shakemap key holding no entries yields None."""
+        detail = {"properties": {"products": {"shakemap": []}}}
+        assert _helpers.shakemap_raster_url(detail) is None
+
+    def test_null_shakemap_entry_is_none(self):
+        """A null first entry does not raise."""
+        detail = {"properties": {"products": {"shakemap": [None]}}}
+        assert _helpers.shakemap_raster_url(detail) is None
+
+    def test_raster_entry_without_url_is_none(self):
+        """A raster entry carrying no url yields None."""
+        detail = {
+            "properties": {
+                "products": {"shakemap": [{"contents": {"download/raster.zip": {}}}]}
+            }
+        }
+        assert _helpers.shakemap_raster_url(detail) is None
+
 
 class TestExtractLayers:
     """Unpacking the requested grids out of the archive."""
@@ -276,6 +334,26 @@ class TestExtractLayers:
         assert set(extracted) == {"mmi_mean"}
         assert extracted["mmi_mean"].is_file()
         assert (tmp_path / "out" / "mmi_mean.hdr").is_file()
+
+    def test_traversing_member_is_never_extracted(self, tmp_path: Path):
+        """A member named to escape the destination is not read at all.
+
+        Only member names built from the requested layers are opened, so a
+        hostile archive cannot place a file outside dest_dir.
+        """
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as bundle:
+            bundle.writestr("../evil.flt", b"xxxx")
+            bundle.writestr("../evil.hdr", "NROWS 1")
+            bundle.writestr("mmi_mean.flt", b"xxxx")
+            bundle.writestr("mmi_mean.hdr", "NROWS 1")
+        archive = tmp_path / "raster.zip"
+        archive.write_bytes(buffer.getvalue())
+
+        extracted = _helpers.extract_layers(archive, ["mmi_mean"], tmp_path / "out")
+
+        assert sorted(extracted) == ["mmi_mean"]
+        assert not (tmp_path / "evil.flt").exists(), "nothing may escape dest_dir"
 
     def test_missing_layer_is_skipped(self, tmp_path: Path):
         """A layer the archive lacks is skipped, not raised."""
@@ -312,6 +390,75 @@ class TestFltToGeotiff:
             )
         finally:
             dataset = None
+
+
+class TestFltToGeotiffFailures:
+    """Conversion inputs that cannot produce a raster."""
+
+    def test_missing_header_raises_and_publishes_nothing(self, tmp_path: Path):
+        """A .flt with no .hdr sibling fails without leaving an output."""
+        grid = tmp_path / "mmi_mean.flt"
+        grid.write_bytes(bytes(16))
+
+        with pytest.raises(RuntimeError):
+            _helpers.flt_to_geotiff(grid, tmp_path / "mmi_mean.tif")
+
+        assert not (tmp_path / "mmi_mean.tif").exists(), "no raster may be published"
+        assert list(tmp_path.glob("*.partial.tif")) == [], "no staged partial"
+
+
+class TestManifestRoundTrip:
+    """The per-event manifest read/write pair."""
+
+    def test_absent_manifest_reads_as_none(self, tmp_path: Path):
+        """A directory with no manifest reads as None."""
+        assert _helpers.read_manifest(tmp_path) is None
+
+    def test_round_trip(self, tmp_path: Path):
+        """What is written is read back, sorted and de-duplicated."""
+        _helpers.write_manifest(
+            tmp_path, ["pga_mean", "mmi_mean", "mmi_mean"], ["mmi_mean"]
+        )
+        manifest = _helpers.read_manifest(tmp_path)
+        assert manifest["requested"] == ["mmi_mean", "pga_mean"]
+        assert manifest["produced"] == ["mmi_mean"]
+
+    def test_write_creates_the_directory(self, tmp_path: Path):
+        """The event directory is created if it does not exist yet."""
+        target = tmp_path / "us6000jlqa"
+        _helpers.write_manifest(target, ["mmi_mean"], [])
+        assert (target / _helpers.MANIFEST_NAME).is_file()
+
+    def test_non_dict_json_reads_as_none(self, tmp_path: Path):
+        """A manifest holding a JSON list is treated as absent."""
+        (tmp_path / _helpers.MANIFEST_NAME).write_text("[1, 2]", encoding="utf-8")
+        assert _helpers.read_manifest(tmp_path) is None
+
+
+class TestClientLifecycle:
+    """Building and releasing the pooled ComCat client."""
+
+    def test_close_without_a_client_is_a_no_op(self, tmp_path: Path):
+        """Closing before any client was built does not raise."""
+        backend = _backend(tmp_path)
+        backend._close_client()
+
+    def test_close_is_idempotent(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A second close after a download does not raise or double-close."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        backend.download(progress_bar=False)
+        backend._close_client()
+        assert fake_http.session.closed == 1, "the session closes exactly once"
+
+    def test_client_is_reused_within_one_call(
+        self, tmp_path: Path, fake_fdsn: _FakeFdsn, fake_http: _FakeHttp, make_event
+    ):
+        """Two events in one download share a single client."""
+        fake_fdsn.default_result = _usgs_catalog(make_event, "us1111", "us2222")
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+        assert fake_http.session.closed == 1, "one client for the whole batch"
 
 
 class TestBackendConstruction:
