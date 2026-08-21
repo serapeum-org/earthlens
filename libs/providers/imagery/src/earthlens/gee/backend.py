@@ -114,8 +114,21 @@ _EEDAI_TILE_PIXELS: int = 2048
 
 #: Most tiles one streamed read may be split into. The mosaic step opens every
 #: tile at once, and each tile is its own fetch-warp-write round trip, so a
-#: request needing more than this is refused rather than started.
-_EEDAI_MAX_TILES: int = 256
+#: request needing more than this is refused rather than started. Set high
+#: enough that tiling can serve a near-native read past Earth Engine's
+#: 32768-px cap, which is the case tiling exists for.
+_EEDAI_MAX_TILES: int = 1024
+
+#: How much coarser than the asset's own resolution a read may be and still be
+#: worth tiling. Above this Earth Engine wins outright: it aggregates
+#: server-side and returns a small raster, where the reader would fetch
+#: `ratio**2` native pixels per output pixel just to discard most of them.
+_EEDAI_MAX_TILING_RATIO: float = 4.0
+
+#: Total native pixels (across every tile and band) one streamed read may
+#: fetch. The tile budget bounds memory; this bounds the *work* — bytes over
+#: the wire, quota and wall clock — which tile size alone does not.
+_EEDAI_MAX_NATIVE_PIXELS: int = 4_000_000_000
 
 #: Total pixels (per band) the EEDAI reader may materialise for one read. The
 #: driver has no overviews worth trusting, so it fetches the AOI at the asset's
@@ -1164,10 +1177,27 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         A window too large to materialise is no longer a dead end: the reader
         can stream it to disk one tile at a time and mosaic the result, which
-        is what retires `auto_split` for this path. Tiling is unavailable in
-        two cases, and both fall back to Earth Engine: upstream refuses
-        `tile_size` together with a polygon cutline, and an asset with no
-        catalogued native resolution cannot have its per-tile read sized.
+        is what retires `auto_split` for this path.
+
+        Tiling is declined — and the request falls back to Earth Engine — in
+        five cases:
+
+        * the asset has no catalogued native resolution, so a per-tile read
+          cannot be sized;
+        * the request is much coarser than the asset (`native_ratio` above
+          :data:`_EEDAI_MAX_TILING_RATIO`), where Earth Engine's server-side
+          aggregation returns a small raster instead of fetching `ratio**2`
+          native pixels per output pixel;
+        * the whole read would still fetch more than
+          :data:`_EEDAI_MAX_NATIVE_PIXELS` — the tile budget bounds memory,
+          this bounds the work;
+        * `resample` is not `"nearest"`, which upstream refuses because an
+          interpolating kernel would disagree at the tile seams;
+        * a polygon cutline is set, which upstream also refuses.
+
+        The ratio bound is what keeps a tile from ever collapsing below one
+        pixel: at four-times-native or finer, the per-tile budget always
+        leaves a workable tile.
 
         Args:
             var_info: The catalog entry being fetched.
@@ -1188,6 +1218,31 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return False, None, reason
         if cutline is not None:
             return False, None, f"{reason}, and it cannot be tiled behind a cutline"
+        scale_m = float(self.scale or native_scale)
+        native_ratio = max(scale_m / float(native_scale), 1.0)
+        if native_ratio > _EEDAI_MAX_TILING_RATIO:
+            return (
+                False,
+                None,
+                (
+                    f"{reason}, and tiling it would be worse than Earth Engine: at "
+                    f"scale={scale_m:g} m over a {native_scale:g} m asset the reader "
+                    f"fetches about {native_ratio**2:,.0f} native px per output px, "
+                    "which Earth Engine aggregates server-side instead"
+                ),
+            )
+        native_rows, native_cols = self._eedai_grid(bbox, float(native_scale))
+        native_total = native_rows * native_cols * max(band_count, 1)
+        if native_total > _EEDAI_MAX_NATIVE_PIXELS:
+            return (
+                False,
+                None,
+                (
+                    f"{reason}, and tiling it would still fetch about "
+                    f"{native_total:,} native px, over the "
+                    f"{_EEDAI_MAX_NATIVE_PIXELS:,}-px ceiling on one read's total work"
+                ),
+            )
         if self.resample != _EEDAI_TILING_RESAMPLE:
             return (
                 False,
@@ -1198,12 +1253,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     "from the un-tiled read at the tile seams"
                 ),
             )
-        scale = float(self.scale or native_scale)
         # One tile's native read is `tile_size * scale / native_scale` px per
         # side and is held in memory whole, so shrink the tile until that read
         # satisfies *both* budgets the single-pass gate applies — the per-axis
         # cap and the total-pixel one.
-        native_ratio = max(scale / float(native_scale), 1.0)
         tile_size = int(
             min(
                 _EEDAI_TILE_PIXELS,
@@ -1211,17 +1264,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 math.sqrt(_EEDAI_MAX_PIXELS / max(band_count, 1)) / native_ratio,
             )
         )
-        if tile_size < 1:
-            return (
-                False,
-                None,
-                (
-                    f"{reason}, and no tile is small enough: one output pixel at "
-                    f"scale={scale:g} m already reads {native_ratio:,.0f} native px "
-                    "per side"
-                ),
-            )
-        rows, cols = self._eedai_grid(bbox, scale)
+        rows, cols = self._eedai_grid(bbox, scale_m)
         tiles = math.ceil(rows / tile_size) * math.ceil(cols / tile_size)
         if tiles > _EEDAI_MAX_TILES:
             return (
@@ -1521,6 +1564,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"{native_scale} m resolution, over the {EE_MAX_DIMENSION}-px "
                 "per-axis budget the reader would hold in memory"
             )
+        # A `scale` finer than the asset's own resolution makes the warped
+        # output bigger than the native window, and the warp holds that too, so
+        # gate on whichever grid is larger.
+        out_rows, out_cols = self._eedai_grid(bbox, float(self.scale or native_scale))
+        rows, cols = max(rows, out_rows), max(cols, out_cols)
         total_px = rows * cols * max(band_count, 1)
         if total_px > _EEDAI_MAX_PIXELS:
             return False, (

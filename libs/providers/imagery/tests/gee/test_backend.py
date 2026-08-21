@@ -1998,7 +1998,7 @@ class TestExportViaEedai:
 
     def test_oversized_read_is_served_by_tiling(self, make_gee, fake_reader):
         """A window too large for one pass is streamed in tiles, not refused."""
-        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         can_serve, tile_size, _reason = gee._eedai_plan(var_info)
         assert can_serve is True
@@ -2008,17 +2008,17 @@ class TestExportViaEedai:
 
     def test_tile_size_keeps_each_tile_native_read_within_budget(self, make_gee):
         """The tile shrinks so one tile's native-resolution read stays bounded."""
-        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         _can_serve, tile_size, _reason = gee._eedai_plan(var_info)
-        native_ratio = 5000.0 / var_info.spatial_resolution
+        native_ratio = 30.0 / var_info.spatial_resolution
         assert tile_size * native_ratio <= backend_module.EE_MAX_DIMENSION
 
     def test_oversized_read_streams_to_a_path_in_tiles(self, make_gee, fake_reader):
         """The tiled read hands the reader `tile_size` and a destination path."""
-        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        target = gee._export_via_eedai(var_info, ["elevation"], 5000.0, "srtm_big")
+        target = gee._export_via_eedai(var_info, ["elevation"], 30.0, "srtm_big")
         _asset_id, kwargs = fake_reader.calls[0]
         assert kwargs["tile_size"] >= 1
         assert kwargs["path"].endswith(".partial.tif")
@@ -2062,7 +2062,7 @@ class TestExportViaEedai:
         so this must fall back rather than surface upstream's raw error.
         """
         gee = make_gee(
-            lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0, resample="average"
+            lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0, resample="average"
         )
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         can_serve, tile_size, reason = gee._eedai_plan(var_info)
@@ -2078,10 +2078,10 @@ class TestExportViaEedai:
         materialise ~32768**2 px — many times the total-pixel budget the
         single-pass path refuses.
         """
-        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         _can_serve, tile_size, _reason = gee._eedai_plan(var_info)
-        native_side = tile_size * (5000.0 / var_info.spatial_resolution)
+        native_side = tile_size * (30.0 / var_info.spatial_resolution)
         assert native_side <= backend_module.EE_MAX_DIMENSION
         assert native_side**2 <= backend_module._EEDAI_MAX_PIXELS
 
@@ -2097,23 +2097,31 @@ class TestExportViaEedai:
         can_serve, tile_size, reason = gee._eedai_plan(var_info)
         assert can_serve is False
         assert tile_size is None
-        assert "tile ceiling" in reason
+        assert "total work" in reason
         assert gee._use_eedai(var_info) is False
 
-    def test_no_tile_small_enough_falls_back(self, make_gee, fake_reader):
-        """When one output pixel already exceeds the budget, tiling cannot help."""
-        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=500_000.0)
+    def test_a_much_coarser_read_falls_back_to_earth_engine(
+        self, make_gee, fake_reader
+    ):
+        """Far-coarser-than-native reads belong on Earth Engine, not the reader.
+
+        Tiling one would fetch `ratio**2` native pixels per output pixel only
+        to discard them, where Earth Engine aggregates server-side and returns
+        a small raster in one round trip.
+        """
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         can_serve, tile_size, reason = gee._eedai_plan(var_info)
         assert can_serve is False
         assert tile_size is None
-        assert "no tile is small enough" in reason
+        assert "worse than Earth Engine" in reason
+        assert gee._use_eedai(var_info) is False
 
     def test_tiled_cog_write_leaves_no_staging_files(self, make_gee, fake_reader):
         """A tiled read plus `cog=True` stages through two names and cleans both."""
-        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0, cog=True)
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0, cog=True)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        target = gee._export_via_eedai(var_info, ["elevation"], 5000.0, "srtm_big")
+        target = gee._export_via_eedai(var_info, ["elevation"], 30.0, "srtm_big")
         _asset_id, kwargs = fake_reader.calls[0]
         assert kwargs["tile_size"] >= 1
         assert target.read_bytes() == b"eedai-cog"
@@ -2124,10 +2132,10 @@ class TestExportViaEedai:
     ):
         """A mosaic that fails partway must not leave its staged file behind."""
         monkeypatch.setattr(fake_reader, "from_earthengine", _stage_then_fail)
-        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         with pytest.raises(RuntimeError, match="mosaic failed"):
-            gee._export_via_eedai(var_info, ["elevation"], 5000.0, "srtm_big")
+            gee._export_via_eedai(var_info, ["elevation"], 30.0, "srtm_big")
         assert not list(gee.root_dir.glob("*.partial*.tif"))
         assert not (gee.root_dir / "srtm_big.tif").exists()
 
@@ -2146,16 +2154,6 @@ class TestExportViaEedai:
         assert many_bands is False
         assert "13 band(s)" in reason
 
-    def test_tile_shrinks_for_a_multi_band_read(self, make_gee):
-        """More bands mean a smaller tile, since they share the memory budget."""
-        gee = make_gee(lat_lim=[0.0, 10.0], lon_lim=[0.0, 10.0], scale=1000.0)
-        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        ok_one, tile_one, _r1 = gee._eedai_plan(var_info, 1)
-        ok_many, tile_many, _r2 = gee._eedai_plan(var_info, 4)
-        assert ok_one is True
-        assert ok_many is True
-        assert tile_many < tile_one
-
     def test_more_bands_never_loosen_the_plan(self, make_gee):
         """Adding bands only ever constrains the plan — never relaxes it.
 
@@ -2163,7 +2161,7 @@ class TestExportViaEedai:
         than the ceiling allows, at which point the plan declines outright;
         both outcomes are stricter, never looser.
         """
-        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         ok_one, tile_one, _r1 = gee._eedai_plan(var_info, 1)
         ok_many, tile_many, _r2 = gee._eedai_plan(var_info, 9)
