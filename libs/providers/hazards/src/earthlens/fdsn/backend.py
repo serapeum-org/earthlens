@@ -43,6 +43,7 @@ day/month — so `temporal_resolution` carries the sentinel `"all"`.
 from __future__ import annotations
 
 import shutil
+from contextlib import suppress
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
@@ -86,8 +87,8 @@ _SHAKEMAP_DIR = "shakemap"
 _STAGING_DIR = "_staging"
 
 #: Default ceiling on how many events one call fetches a ShakeMap for.
-#: Each event is a separate ComCat request plus an ~8.5 MB archive, so an
-#: unbounded window is gigabytes; 100 events is roughly a gigabyte, which is
+#: Each event is a separate ComCat request plus a multi-megabyte archive, so an
+#: unbounded window is gigabytes; 100 events is a gigabyte or two, which is
 #: a defensible accident rather than a catastrophic one.
 _DEFAULT_MAX_SHAKEMAP_EVENTS = 100
 
@@ -96,6 +97,11 @@ _DEFAULT_MAX_SHAKEMAP_EVENTS = 100
 #: itself was a single call; USGS publishes no rate limit, and this is a
 #: politeness floor rather than a documented requirement.
 _COMCAT_MIN_INTERVAL = 0.2
+
+#: `(connect, read)` budget for a ComCat request. The read half is generous
+#: because the archive is several megabytes; the connect half fails a dead
+#: host quickly instead of stalling a long batch on its first event.
+_COMCAT_TIMEOUT = (10.0, 120.0)
 
 
 class FDSN(AbstractDataSource):
@@ -215,7 +221,7 @@ class FDSN(AbstractDataSource):
                 **USGS only** — ShakeMap is a ComCat product, not part
                 of the FDSN event standard, so a non-USGS network in the
                 same request contributes events but no rasters. Costs
-                one extra ComCat request plus an ~8.5 MB archive per
+                one extra ComCat request plus a multi-megabyte archive per
                 event, so bound the event count with `limit=` before
                 turning it on for a busy window; beyond
                 `max_shakemap_events` the side-output stops and says how
@@ -225,11 +231,17 @@ class FDSN(AbstractDataSource):
             max_shakemap_events: Ceiling on how many events one call
                 will fetch a ShakeMap for, guarding against a broad
                 query quietly pulling gigabytes (each event is a
-                separate request plus an ~8.5 MB archive). Events past
+                separate request plus a multi-megabyte archive). Events past
                 the ceiling are skipped with a warning naming the count
-                — never silently. Raise it deliberately for a large
-                job, or narrow the query with `limit=` /
-                `min_magnitude=`.
+                — never silently. The events kept are the first
+                `max_shakemap_events` in the order the networks returned
+                them, which `orderby=` controls (`"magnitude"` puts the
+                largest first, the usual intent when capping). Because
+                an event already on disk is skipped without spending
+                budget, re-running the same request walks further
+                through the list each time. Raise the ceiling
+                deliberately for a large job, or narrow the query with
+                `limit=` / `min_magnitude=`.
             shakemap_layers: Which ShakeMap grids to write when
                 `with_shakemap` is on. `None` (the default) writes
                 `["mmi_mean"]` — macroseismic intensity, the headline
@@ -367,7 +379,9 @@ class FDSN(AbstractDataSource):
                 provider.
         """
         products: list[RemoteProduct] = []
-        for key in self.vars:
+        # De-duplicated, order preserved: a repeated key would otherwise issue
+        # the same query twice and union the same events into the result.
+        for key in dict.fromkeys(self.vars):
             provider: Provider = self._catalog.get_provider(key)
             products.append(
                 RemoteProduct(
@@ -559,7 +573,9 @@ class FDSN(AbstractDataSource):
                 Leave it at `"warn"` unless a missing raster should
                 genuinely abort the request.
             force: Refetch a ShakeMap whose GeoTIFFs are already on
-                disk instead of reusing them. The rasters are written
+                disk instead of reusing them. A `download()` argument,
+                not a constructor one — `EarthLens(...).download(force=True)`,
+                not `EarthLens(force=True, ...)`. The rasters are written
                 atomically, so a present file is a finished one and the
                 default reuse is safe; this is the escape hatch for a
                 file damaged after the fact, or for picking up a
@@ -570,7 +586,9 @@ class FDSN(AbstractDataSource):
                 than a total across networks — and accepted here so it can be
                 passed through `EarthLens(...).download(limit=...)` like the
                 other bounded backends. `None` (the default) keeps whatever the
-                constructor set.
+                constructor set — note that a value passed here is **sticky**:
+                it replaces the constructor's for this and every later call on
+                the same instance, as `force=` and `errors=` do not.
 
         Returns:
             FeatureCollection: The row-wise union of every requested
@@ -653,8 +671,16 @@ class FDSN(AbstractDataSource):
             # the whole batch; retrying transport errors matches flodis/hanze.
             # The default user-agent is already `earthlens/{version}`.
             self._http = HttpClient(
+                timeout=_COMCAT_TIMEOUT,
                 min_interval=_COMCAT_MIN_INTERVAL,
-                retry_on_exceptions=(requests.ConnectionError, requests.Timeout),
+                # ChunkedEncodingError is the one a multi-megabyte body actually hits:
+                # the connection survives the handshake and dies mid-stream, which
+                # is neither a ConnectionError nor a Timeout.
+                retry_on_exceptions=(
+                    requests.ConnectionError,
+                    requests.Timeout,
+                    requests.exceptions.ChunkedEncodingError,
+                ),
             )
         return self._http
 
@@ -668,7 +694,15 @@ class FDSN(AbstractDataSource):
         built per call and used for a bounded burst.
         """
         if self._http is not None:
-            self._http.session.close()
+            # `session` is annotated `requests.Session`, but `HttpClient`
+            # accepts any session-like object and `RequestsGet` — the
+            # per-call adapter earthlens.testing swaps in as the default
+            # transport — has no `close()`. Closing unconditionally therefore
+            # fails against a perfectly valid transport, which is why this is
+            # a probe rather than a direct call.
+            closer = getattr(self._http.session, "close", None)
+            if callable(closer):
+                closer()
             self._http = None
 
     def _download_shakemaps(
@@ -718,7 +752,7 @@ class FDSN(AbstractDataSource):
                 f"with_shakemap=True matched {len(event_ids)} USGS events, over "
                 f"the max_shakemap_events={self._max_shakemap_events} ceiling: "
                 f"fetching the first {self._max_shakemap_events} and skipping "
-                f"{dropped}. Each event costs a request plus an ~8.5 MB archive. "
+                f"{dropped}. Each event costs a request plus a multi-megabyte archive. "
                 "Raise max_shakemap_events= to take them all, or narrow the "
                 "query with limit= / min_magnitude=."
             )
@@ -739,6 +773,53 @@ class FDSN(AbstractDataSource):
             on_failure=lambda _event_id, _exc: [],
         )
         return [path for paths in results for path in paths]
+
+    def _reuse_existing(self, dest_dir: Path, comcat_id: str) -> list[Path] | None:
+        """Return an event's cached rasters, or `None` to fetch it again.
+
+        Reuse is decided from the event's manifest rather than from the
+        requested layer names, because an archive need not carry every
+        layer that was asked for. Without the manifest, an event whose
+        archive permanently lacks one requested grid could never satisfy
+        an "all requested rasters present" check and would re-download
+        its multi-megabyte archive on every single run.
+
+        Args:
+            dest_dir: The event's output directory.
+            comcat_id: The event's ComCat id, for the log line.
+
+        Returns:
+            list[Path] | None: The rasters already on disk for this
+                request — possibly empty, when the event publishes no
+                ShakeMap at all — or `None` when the event must be
+                fetched.
+        """
+        if self._force:
+            return None
+        manifest = _helpers.read_manifest(dest_dir)
+        if manifest is None:
+            return None
+        # A previous call may have asked for fewer layers than this one. Reuse
+        # only when the earlier request covered everything now wanted.
+        previously = set(manifest.get("requested", []))
+        if not set(self._shakemap_layers).issubset(previously):
+            return None
+        produced = [
+            layer
+            for layer in self._shakemap_layers
+            if layer in manifest.get("produced", [])
+        ]
+        cached = [dest_dir / f"{layer}.tif" for layer in produced]
+        if not all(self._is_complete(path) for path in cached):
+            return None
+        if cached:
+            logger.info(f"ShakeMap for {comcat_id} already on disk — skipping.")
+        else:
+            logger.info(
+                f"event {comcat_id} is known to publish no ShakeMap raster for "
+                "the requested layer(s) — skipping."
+            )
+        return cached
 
     def _shakemap_for_event(
         self, event_id: str, progress_bar: bool = True
@@ -782,10 +863,9 @@ class FDSN(AbstractDataSource):
             )
             return []
 
-        expected = [dest_dir / f"{layer}.tif" for layer in self._shakemap_layers]
-        if all(self._is_complete(path, force=self._force) for path in expected):
-            logger.info(f"ShakeMap for {comcat_id} already on disk — skipping.")
-            return expected
+        reused = self._reuse_existing(dest_dir, comcat_id)
+        if reused is not None:
+            return reused
 
         detail = self._client().get_json(_helpers.detail_url(comcat_id))
         url = _helpers.shakemap_raster_url(detail)
@@ -793,6 +873,9 @@ class FDSN(AbstractDataSource):
             logger.info(
                 f"event {comcat_id} publishes no ShakeMap raster — skipping it."
             )
+            # Recorded so a re-run does not re-request this event's detail
+            # document only to reach the same conclusion.
+            _helpers.write_manifest(dest_dir, self._shakemap_layers, [])
             return []
 
         # Everything the fetch and the conversion touch is confined to a staging
@@ -816,12 +899,25 @@ class FDSN(AbstractDataSource):
                 written.append(
                     _helpers.flt_to_geotiff(flt_path, dest_dir / f"{layer}.tif")
                 )
+            # Only after every conversion succeeded: a manifest written on a
+            # partial failure would cache an incomplete result as final.
+            _helpers.write_manifest(dest_dir, self._shakemap_layers, list(extracted))
         finally:
             shutil.rmtree(staging, ignore_errors=True)
+            if staging.exists():
+                # Reported, not swallowed. On Windows this means something still
+                # holds a handle on an extracted grid; silently leaving it would
+                # accumulate one scratch directory per failed event inside the
+                # user's output.
+                logger.warning(
+                    f"could not remove the ShakeMap staging directory {staging} — "
+                    "it is left behind; remove it by hand if it persists."
+                )
             # An event whose archive was unusable leaves no rasters, and an
             # empty directory named after it reads like a successful fetch.
-            if dest_dir.is_dir() and not any(dest_dir.iterdir()):
-                dest_dir.rmdir()
+            with suppress(OSError):
+                if dest_dir.is_dir() and not any(dest_dir.iterdir()):
+                    dest_dir.rmdir()
         return written
 
     def _write(self, provider_key: str, collection: FeatureCollection) -> Path:
