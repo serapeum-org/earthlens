@@ -104,7 +104,7 @@ class TestShakemapLiveSideOutput:
 
     def test_writes_georeferenced_shakemap(self, tmp_path: Path):
         """A large USGS event yields a georeferenced ShakeMap GeoTIFF."""
-        from osgeo import gdal
+        from osgeo import gdal, osr
 
         fc = FDSN(
             start="2023-02-06",
@@ -122,14 +122,21 @@ class TestShakemapLiveSideOutput:
         assert rasters, "expected a ShakeMap GeoTIFF per event"
 
         dataset = gdal.Open(str(rasters[0]))
-        assert dataset.GetDriver().ShortName == "GTiff"
-        assert "4326" in dataset.GetProjection(), "CRS should be assigned"
-        assert dataset.RasterXSize > 1 and dataset.RasterYSize > 1
+        try:
+            assert dataset.GetDriver().ShortName == "GTiff"
+            spatial_ref = osr.SpatialReference(wkt=dataset.GetProjection())
+            assert spatial_ref.GetAuthorityCode(None) == "4326", (
+                "the CRS should carry an EPSG authority code"
+            )
+            assert dataset.RasterXSize > 1 and dataset.RasterYSize > 1
+        finally:
+            dataset = None
 
         # Exact contents, not an allowlist of forbidden suffixes: GDAL drops a
         # `.prj` beside the grid when its CRS is assigned, which a suffix filter
         # would not notice.
         for event_dir in (tmp_path / "shakemap").iterdir():
-            assert sorted(p.name for p in event_dir.iterdir()) == ["mmi_mean.tif"], (
-                f"{event_dir.name} should hold only the requested raster"
-            )
+            assert sorted(p.name for p in event_dir.iterdir()) == [
+                ".shakemap.json",
+                "mmi_mean.tif",
+            ], f"{event_dir.name} should hold only the raster and its manifest"

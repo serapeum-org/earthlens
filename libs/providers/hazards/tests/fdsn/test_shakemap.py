@@ -128,6 +128,11 @@ class _FakeHttp:
             raise RuntimeError(f"archive transfer died mid-stream for {url}")
         if any(marker in str(dest) for marker in self.fail_download_for):
             raise RuntimeError(f"archive transfer failed for {url}")
+        magic = kwargs.get("expect_magic")
+        if magic is not None and not self.archive.startswith(magic):
+            # The real client discards the body and raises rather than letting
+            # an HTML error page land as a .zip.
+            raise ValueError(f"body for {url} does not start with {magic!r}")
         dest.write_bytes(self.archive)
         return dest
 
@@ -287,7 +292,7 @@ class TestFltToGeotiff:
 
     def test_writes_georeferenced_tif(self, tmp_path: Path):
         """The GeoTIFF carries EPSG:4326 and the grid's shape."""
-        from osgeo import gdal
+        from osgeo import gdal, osr
 
         archive = tmp_path / "raster.zip"
         archive.write_bytes(_make_archive(layers=("mmi_mean",)))
@@ -296,10 +301,17 @@ class TestFltToGeotiff:
 
         assert dest.is_file()
         dataset = gdal.Open(str(dest))
-        assert dataset.GetDriver().ShortName == "GTiff"
-        assert dataset.RasterXSize == _COLS
-        assert dataset.RasterYSize == _ROWS
-        assert "4326" in dataset.GetProjection()
+        try:
+            assert dataset.GetDriver().ShortName == "GTiff"
+            assert dataset.RasterXSize == _COLS
+            assert dataset.RasterYSize == _ROWS
+            spatial_ref = osr.SpatialReference(wkt=dataset.GetProjection())
+            assert spatial_ref.GetAuthorityCode(None) == "4326", (
+                "the CRS should carry an EPSG authority code, not merely the "
+                "digits 4326 somewhere in its WKT"
+            )
+        finally:
+            dataset = None
 
 
 class TestBackendConstruction:
@@ -353,7 +365,10 @@ class TestBackendShakemapDownload:
         _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
 
         event_dir = tmp_path / "shakemap" / "us6000jlqa"
-        assert sorted(p.name for p in event_dir.iterdir()) == ["mmi_mean.tif"]
+        assert sorted(p.name for p in event_dir.iterdir()) == [
+            _helpers.MANIFEST_NAME,
+            "mmi_mean.tif",
+        ]
 
     def test_skips_network_on_rerun(
         self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
@@ -806,3 +821,225 @@ class TestShakemapDefenceInDepth:
         assert list((tmp_path / "shakemap").rglob("*.tif")) == [], (
             "an over-large member must not be written"
         )
+
+
+class TestShakemapManifestReuse:
+    """A rerun distinguishes 'not fetched' from 'not published upstream'."""
+
+    def test_partial_archive_is_not_refetched(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """An archive permanently missing a layer stops re-downloading."""
+        fake_http.archive = _make_archive(layers=("mmi_mean",))
+        backend = _backend(
+            tmp_path, with_shakemap=True, shakemap_layers=["mmi_mean", "pga_mean"]
+        )
+        backend.download(progress_bar=False)
+        first = len(fake_http.downloads)
+
+        backend.download(progress_bar=False)
+        assert len(fake_http.downloads) == first, (
+            "the missing layer does not exist upstream, so a rerun must not refetch"
+        )
+
+    def test_event_without_shakemap_is_not_re_requested(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """An event publishing no ShakeMap is not asked about twice."""
+        fake_http.detail = {"properties": {"products": {}}}
+        backend = _backend(tmp_path, with_shakemap=True)
+        backend.download(progress_bar=False)
+        first = len(fake_http.json_urls)
+
+        backend.download(progress_bar=False)
+        assert len(fake_http.json_urls) == first, "the negative result is cached"
+
+    def test_widening_the_request_refetches(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """Asking for more layers than last time fetches again."""
+        _backend(tmp_path, with_shakemap=True, shakemap_layers=["mmi_mean"]).download(
+            progress_bar=False
+        )
+        first = len(fake_http.downloads)
+
+        _backend(
+            tmp_path, with_shakemap=True, shakemap_layers=["mmi_mean", "pga_mean"]
+        ).download(progress_bar=False)
+        assert len(fake_http.downloads) == first + 1, "a wider request must refetch"
+
+    def test_unreadable_manifest_refetches(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A corrupt manifest is treated as absent rather than trusted."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        backend.download(progress_bar=False)
+        first = len(fake_http.downloads)
+
+        manifest = tmp_path / "shakemap" / "us6000jlqa" / _helpers.MANIFEST_NAME
+        manifest.write_text("{not json", encoding="utf-8")
+        backend.download(progress_bar=False)
+        assert len(fake_http.downloads) == first + 1, "a corrupt manifest refetches"
+
+
+class TestShakemapConversionFailure:
+    """The atomic-write failure path, which the success path cannot reach."""
+
+    def test_failed_conversion_publishes_nothing(
+        self,
+        tmp_path: Path,
+        usgs_events: _FakeFdsn,
+        fake_http: _FakeHttp,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """A conversion that dies leaves no raster and no staged partial."""
+
+        def _boom(self, path, *args, **kwargs):
+            Path(path).write_bytes(b"partial")
+            raise RuntimeError("conversion failed")
+
+        monkeypatch.setattr("pyramids.dataset.Dataset.to_file", _boom, raising=True)
+
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert list(tmp_path.rglob("*.tif")) == [], "nothing should be published"
+        assert list(tmp_path.rglob("*.partial.tif")) == [], "no staged partial"
+
+    def test_failed_conversion_leaves_no_staging_directory(
+        self,
+        tmp_path: Path,
+        usgs_events: _FakeFdsn,
+        fake_http: _FakeHttp,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """The scratch directory is gone even when the conversion raised.
+
+        The GDAL handle on the extracted grid must be released before the
+        caller cleans up, or Windows refuses to unlink it and the scratch
+        directory survives inside the user's output.
+        """
+
+        def _boom(self, path, *args, **kwargs):
+            raise RuntimeError("conversion failed")
+
+        monkeypatch.setattr("pyramids.dataset.Dataset.to_file", _boom, raising=True)
+
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        staging = list(tmp_path.rglob("_staging"))
+        assert staging == [], f"the scratch directory must not survive: {staging}"
+
+    def test_missing_output_is_refused(self, tmp_path: Path, monkeypatch):
+        """A conversion that writes nothing raises instead of renaming."""
+
+        def _silent(self, path, *args, **kwargs):
+            return None
+
+        archive = tmp_path / "raster.zip"
+        archive.write_bytes(_make_archive(layers=("mmi_mean",)))
+        extracted = _helpers.extract_layers(archive, ["mmi_mean"], tmp_path / "in")
+        monkeypatch.setattr("pyramids.dataset.Dataset.to_file", _silent, raising=True)
+
+        with pytest.raises(RuntimeError, match="produced no output"):
+            _helpers.flt_to_geotiff(extracted["mmi_mean"], tmp_path / "out.tif")
+
+
+class TestShakemapMagicGuard:
+    """The zip-magic guard the real client applies."""
+
+    def test_html_error_page_is_refused(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A 200 carrying an HTML error page never lands as an archive."""
+        fake_http.archive = b"<!DOCTYPE html><html>error</html>"
+
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert list(tmp_path.rglob("*.tif")) == [], "no raster from an HTML body"
+
+
+class TestSearchDeduplication:
+    """A repeated network key must not be queried twice."""
+
+    def test_repeated_network_yields_one_product(self, tmp_path: Path):
+        """Duplicate keys collapse to a single product."""
+        backend = _backend(tmp_path, variables=["USGS", "USGS", "EMSC"])
+        assert [p.id for p in backend._search()] == ["USGS", "EMSC"]
+
+
+class TestShakemapErrorsIgnore:
+    """The third partial-failure policy on the ShakeMap loop."""
+
+    def test_ignore_continues_without_warning(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """errors='ignore' skips a failed event and keeps the healthy one."""
+        fake_fdsn.default_result = _usgs_catalog(make_event, "us1111", "us2222")
+        fake_http.fail_json_for = {"us1111"}
+
+        fc = _backend(tmp_path, with_shakemap=True).download(
+            progress_bar=False, errors="ignore"
+        )
+
+        assert len(fc) == 2, "the event table is unaffected"
+        rastered = sorted(p.name for p in (tmp_path / "shakemap").iterdir())
+        assert rastered == ["us2222"], f"only the healthy event: {rastered}"
+
+
+class TestShakemapStagingLeakIsReported:
+    """A scratch directory that cannot be removed is announced, not hidden."""
+
+    def test_unremovable_staging_is_logged(
+        self,
+        tmp_path: Path,
+        usgs_events: _FakeFdsn,
+        fake_http: _FakeHttp,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """A failed rmtree produces a warning naming the directory."""
+        from loguru import logger as loguru_logger
+
+        monkeypatch.setattr(fdsn_backend.shutil, "rmtree", lambda *a, **k: None)
+
+        messages: list[str] = []
+        sink_id = loguru_logger.add(lambda message: messages.append(str(message)))
+        try:
+            _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+        finally:
+            loguru_logger.remove(sink_id)
+
+        assert any("staging directory" in m for m in messages), (
+            f"a surviving scratch directory should be reported, got: {messages}"
+        )
+
+
+class _CloselessSession:
+    """A session-like object with no `close`, as `RequestsGet` is."""
+
+
+class TestShakemapCloselessSession:
+    """Closing must tolerate a transport that cannot be closed."""
+
+    def test_session_without_close_is_survived(
+        self,
+        tmp_path: Path,
+        usgs_events: _FakeFdsn,
+        fake_http: _FakeHttp,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """A RequestsGet-style session does not break the download.
+
+        `earthlens.testing` swaps `HttpClient`'s default transport for
+        `RequestsGet`, which has no `close()`, so this is the shape the whole
+        suite and any backend using that adapter actually sees.
+        """
+        monkeypatch.setattr(fake_http, "session", _CloselessSession())
+
+        fc = _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert len(fc) == 1, "the download should complete regardless"
+        assert list((tmp_path / "shakemap").rglob("*.tif")), "rasters still written"

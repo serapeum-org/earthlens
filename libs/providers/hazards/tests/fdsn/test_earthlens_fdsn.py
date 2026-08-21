@@ -88,3 +88,32 @@ class TestFacadeDownload:
         fc = _make_facade(tmp_path).download()
         assert isinstance(fc, GeoDataFrame)
         assert len(fc) == 1, f"expected 1 event, got {len(fc)}"
+
+
+@pytest.mark.fdsn
+class TestFacadeShakemapKeywords:
+    """The ShakeMap keywords ride through the facade's `**backend_kwargs`."""
+
+    def test_shakemap_keywords_forwarded(self, tmp_path: Path):
+        """with_shakemap, layers and the ceiling reach the backend."""
+        facade = _make_facade(
+            tmp_path,
+            with_shakemap=True,
+            shakemap_layers=["mmi_mean", "pga_mean"],
+            max_shakemap_events=7,
+        )
+        backend = facade.datasource
+        assert backend._with_shakemap is True
+        assert backend._shakemap_layers == ("mmi_mean", "pga_mean")
+        assert backend._max_shakemap_events == 7
+
+    def test_output_kind_unchanged_by_shakemap(self, tmp_path: Path):
+        """The facade still sees a vector backend with the flag on."""
+        facade = _make_facade(tmp_path, with_shakemap=True)
+        assert facade.datasource.OUTPUT_KIND == "vector"
+
+    def test_force_is_a_download_argument(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """force= is accepted by download(), not by the constructor."""
+        facade = _make_facade(tmp_path)
+        fc = facade.download(force=True)
+        assert isinstance(fc, GeoDataFrame)
