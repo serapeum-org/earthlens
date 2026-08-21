@@ -100,8 +100,9 @@ def test_live_srtm_eedai_matches_ee(tmp_path):
     """The EEDAI fast-path returns the same elevations as `getDownloadURL`.
 
     Fetches the identical tiny SRTM AOI twice — once forced onto Earth
-    Engine, once forced onto the pyramids-eo reader — and compares the
-    valid-pixel means. The two paths grid the AOI slightly differently
+    Engine, once forced onto the pyramids-eo reader — and compares their
+    CRS, bounds, per-engine resolution and elevation distribution. The two
+    paths grid the AOI differently
     (EE renders server-side; EEDAI reads block-aligned native pixels then
     warps), so the check is a physical-agreement tolerance, not pixel
     equality.

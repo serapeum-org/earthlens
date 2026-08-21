@@ -16,15 +16,17 @@ Two caveats worth knowing at the call site:
 * The extra does **not** replace `[gee]`. A request is still built through
   `earthengine-api` before its pixels are fetched, so Earth Engine
   credentials remain required.
-* pyramids-eo installs its credentials into GDAL's process-global EEDAI
-  state, so two `GEE` instances using different service accounts in one
-  process can read under whichever was configured last.
+* pyramids-eo configures GDAL's EEDAI credentials process-globally for the
+  duration of a read, so two `GEE` instances using different service
+  accounts concurrently in one process can race over which identity is in
+  effect. Sequential reads are unaffected — each configures its own.
 """
 
 from __future__ import annotations
 
 import importlib
 from types import ModuleType
+from typing import Any
 
 #: The `pip` target that provides the reader (both the meta-package extra and
 #: the provider-distribution extra activate `pyramids-eo`).
@@ -100,7 +102,7 @@ def eedai_available() -> bool:
     return True
 
 
-def credentials_for(service_key: str | None):
+def credentials_for(service_key: str | None) -> Any:
     """Adapt earthlens's resolved GEE `service_key` to a pyramids-eo credential.
 
     earthlens accepts either a path to a service-account JSON key or the

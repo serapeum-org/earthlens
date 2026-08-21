@@ -1009,8 +1009,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
         left in the destination for the caller to pull; for `"asset"`
         a new EE asset is created at `<asset_id>/<prefix>`.
 
+        A raw, no-compute request may instead be served by the pyramids-eo
+        EEDAI reader — see :meth:`_use_eedai` for when, and
+        :meth:`_export_via_eedai` for what that path does. The composited
+        `image` is then unused: the reader materialises the asset's own
+        pixels.
+
         Args:
-            image: The `ee.Image` to export.
+            image: The `ee.Image` to export (unused on the EEDAI path).
             var_info: The catalog entry (for the asset slug and the
                 fallback `spatial_resolution`).
             bands: The band ids in `image` (used in the filename / prefix).
@@ -1023,9 +1029,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `"ee://<asset_id>/<prefix>"`).
 
         Raises:
-            ValueError: If no output scale can be resolved, or (for
-                `"url"` with `auto_split=False`) the estimated request
-                exceeds the 32768-px limit.
+            ValueError: If no output scale can be resolved; for `"url"` with
+                `auto_split=False`, when the estimated request exceeds the
+                32768-px limit; or, for a forced `engine="eedai"`, when the
+                request cannot be served by the reader.
+            AuthenticationError: If the EEDAI path cannot build credentials.
+            ImportError: If `engine="eedai"` is forced without the `[eedai]`
+                extra installed.
             RuntimeError: If Earth Engine returns a zip instead of a
                 GeoTIFF (`"url"`), or a `"drive"` / `"gcs"` / `"asset"`
                 export task does not complete.
@@ -1037,13 +1047,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "GEE(...) — the catalog has no nominal spatial_resolution for it."
             )
         prefix = f"{slug_asset_id(var_info.id)}_{'-'.join(bands)}_{when:%Y%m%d}"
+        if self.export_via == "url" and self._use_eedai(var_info):
+            return self._export_via_eedai(var_info, bands, float(scale), prefix)
+        self._warn_cog_ignored(var_info)
+        # Only the Earth Engine paths need the `ee.Geometry`; the reader clips
+        # to its own bbox / cutline.
         region = self._ee_region()
         if self.export_via == "url":
-            if self._use_eedai(var_info):
-                return self._export_via_eedai(var_info, bands, float(scale), prefix)
-            self._warn_cog_ignored(var_info)
             return self._export_via_url(image, var_info, float(scale), region, prefix)
-        self._warn_cog_ignored(var_info)
         return self._export_via_batch(image, float(scale), region, prefix)
 
     def _export_via_url(
