@@ -173,9 +173,27 @@ events one call will fetch: past the ceiling the rest are skipped with a
 warning naming the count — never silently. Raise it deliberately, or
 narrow the query with `limit=` / `min_magnitude=`.
 
-A re-run reuses whatever an earlier run recorded for that event — including
-"this archive carries no such layer" and "this event publishes no ShakeMap" —
-so a repeat costs nothing. Pass `download(force=True)` to refetch anyway.
+### Re-running
+
+Each event directory carries a hidden `.shakemap.json` manifest recording which
+layers that event's archive actually produced. A re-run consults it, so a repeat
+costs nothing — including for an event whose archive simply does not carry a
+layer you asked for, which would otherwise be refetched forever.
+
+Three consequences worth knowing:
+
+- **Reuse requires the earlier run to have asked for at least what you now ask
+  for.** Widening `shakemap_layers` refetches; narrowing it does not, and does
+  not discard what is already on disk.
+- **"This event published no ShakeMap" is remembered only for a week.** ShakeMap
+  is generated minutes to hours after an event, so a query over a recent window
+  is re-checked on a later run rather than cached as empty forever. Such an
+  event leaves a directory containing only the hidden manifest.
+- **A revised grid is not detected.** USGS republishes ShakeMaps for years (the
+  2023 Kahramanmaraş grid is on its twelfth version). A run with the rasters
+  already on disk does not re-check; pass `download(force=True)` to refetch.
+
+To clear one event's cache, delete its directory under `out/shakemap/`.
 
 By default only `mmi_mean` (macroseismic intensity) is written. The
 archive carries fourteen grids — `mmi`, `pga`, `pgv`, `psa0p3`,
