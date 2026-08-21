@@ -2039,6 +2039,61 @@ class TestExportViaEedai:
         with pytest.raises(ImportError, match="eedai"):
             gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
 
+    def test_non_nearest_resample_cannot_be_tiled(self, make_gee, fake_reader):
+        """Upstream refuses `tile_size` with an interpolating resampler.
+
+        `resample="average"` is the documented choice for coarser-than-native
+        reads of continuous data — exactly the requests that trigger tiling —
+        so this must fall back rather than surface upstream's raw error.
+        """
+        gee = make_gee(
+            lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0, resample="average"
+        )
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        can_serve, tile_size, reason = gee._eedai_plan(var_info)
+        assert can_serve is False
+        assert tile_size is None
+        assert "resample" in reason
+        assert gee._use_eedai(var_info) is False
+
+    def test_tile_respects_the_total_pixel_budget_not_just_the_axis_cap(self, make_gee):
+        """One tile's native read must satisfy both budgets, not only per-axis.
+
+        Sizing a tile so its native side lands on the per-axis cap would
+        materialise ~32768**2 px — many times the total-pixel budget the
+        single-pass path refuses.
+        """
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        _can_serve, tile_size, _reason = gee._eedai_plan(var_info)
+        native_side = tile_size * (5000.0 / var_info.spatial_resolution)
+        assert native_side <= backend_module.EE_MAX_DIMENSION
+        assert native_side**2 <= backend_module._EEDAI_MAX_PIXELS
+
+    def test_too_many_tiles_falls_back_rather_than_starting(
+        self, make_gee, fake_reader
+    ):
+        """A job needing thousands of tiles is refused, not silently started.
+
+        Every tile is its own fetch, and the mosaic opens them together.
+        """
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=30.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        can_serve, tile_size, reason = gee._eedai_plan(var_info)
+        assert can_serve is False
+        assert tile_size is None
+        assert "tile ceiling" in reason
+        assert gee._use_eedai(var_info) is False
+
+    def test_no_tile_small_enough_falls_back(self, make_gee, fake_reader):
+        """When one output pixel already exceeds the budget, tiling cannot help."""
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=500_000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        can_serve, tile_size, reason = gee._eedai_plan(var_info)
+        assert can_serve is False
+        assert tile_size is None
+        assert "no tile is small enough" in reason
+
     def test_a_cutline_cannot_be_tiled_so_it_falls_back(self, make_gee, fake_reader):
         """Upstream refuses `tile_size` with a polygon cutline, so `auto` falls back."""
         region = _FakePolygonAoi(total_bounds=(0.0, 0.0, 40.0, 40.0))

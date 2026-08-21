@@ -107,14 +107,25 @@ _DEFAULT_HTTP_TIMEOUT_S: float = 300.0
 _EEDAI_NATIVE_CRS: str = "EPSG:4326"
 
 #: Output pixels per side of one streamed tile when an EEDAI read is too big to
-#: materialise in one piece. Capped further so each tile's *native* read stays
-#: inside the per-axis budget (see :meth:`GEE._eedai_plan`).
+#: materialise in one piece. It is only a ceiling: :meth:`GEE._eedai_plan`
+#: shrinks it until one tile's *native* read fits both budgets below, since the
+#: reader materialises that native window in memory per tile.
 _EEDAI_TILE_PIXELS: int = 2048
+
+#: Most tiles one streamed read may be split into. The mosaic step opens every
+#: tile at once, and each tile is its own fetch-warp-write round trip, so a
+#: request needing more than this is refused rather than started.
+_EEDAI_MAX_TILES: int = 256
 
 #: Total pixels (per band) the EEDAI reader may materialise for one read. The
 #: driver has no overviews worth trusting, so it fetches the AOI at the asset's
 #: native resolution into memory before downsampling.
 _EEDAI_MAX_PIXELS: int = 200_000_000
+
+#: The only resampler a tiled read may use. Upstream refuses anything else,
+#: because an interpolating kernel would disagree with the un-tiled result at
+#: the tile seams.
+_EEDAI_TILING_RESAMPLE: str = "nearest"
 
 #: Metres per degree of latitude on a sphere of Earth's mean radius. Used to
 #: turn the EEDAI path's metre `scale` into a pixel grid over a lat/lon AOI;
@@ -1153,12 +1164,52 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return False, None, reason
         if cutline is not None:
             return False, None, f"{reason}, and it cannot be tiled behind a cutline"
-        scale = self.scale or native_scale
+        if self.resample != _EEDAI_TILING_RESAMPLE:
+            return (
+                False,
+                None,
+                (
+                    f"{reason}, and it cannot be tiled with resample="
+                    f"{self.resample!r} — an interpolating resampler would differ "
+                    "from the un-tiled read at the tile seams"
+                ),
+            )
+        scale = float(self.scale or native_scale)
         # One tile's native read is `tile_size * scale / native_scale` px per
-        # side, so shrink the tile until that fits the per-axis budget.
-        native_ratio = max(float(scale) / float(native_scale), 1.0)
-        tile_size = int(min(_EEDAI_TILE_PIXELS, EE_MAX_DIMENSION / native_ratio))
-        return True, max(1, tile_size), ""
+        # side and is held in memory whole, so shrink the tile until that read
+        # satisfies *both* budgets the single-pass gate applies — the per-axis
+        # cap and the total-pixel one.
+        native_ratio = max(scale / float(native_scale), 1.0)
+        tile_size = int(
+            min(
+                _EEDAI_TILE_PIXELS,
+                EE_MAX_DIMENSION / native_ratio,
+                math.sqrt(_EEDAI_MAX_PIXELS) / native_ratio,
+            )
+        )
+        if tile_size < 1:
+            return (
+                False,
+                None,
+                (
+                    f"{reason}, and no tile is small enough: one output pixel at "
+                    f"scale={scale:g} m already reads {native_ratio:,.0f} native px "
+                    "per side"
+                ),
+            )
+        rows, cols = self._eedai_grid(bbox, scale)
+        tiles = math.ceil(rows / tile_size) * math.ceil(cols / tile_size)
+        if tiles > _EEDAI_MAX_TILES:
+            return (
+                False,
+                None,
+                (
+                    f"{reason}, and tiling it would take {tiles:,} tiles (over the "
+                    f"{_EEDAI_MAX_TILES:,}-tile ceiling); every tile is its own "
+                    "fetch and they are opened together to mosaic"
+                ),
+            )
+        return True, tile_size, ""
 
     def _use_eedai(self, var_info: Dataset) -> bool:
         """Resolve the configured `engine` against this request's eligibility.
