@@ -206,6 +206,25 @@ def _validate_pure_config(
         )
 
 
+def _discard_quietly(path: Path) -> None:
+    """Remove a staging file, tolerating a lock that outlives its reader.
+
+    A tiled read leaves GDAL handles on the mosaic it just wrote, and on
+    Windows those keep the file locked briefly after the reader is closed —
+    long enough that unlinking it can raise while the *real* output has
+    already been renamed into place. Losing a staging file matters far less
+    than masking a successful download, so the failure is swallowed and
+    logged.
+
+    Args:
+        path: The staging file to remove; a missing file is not an error.
+    """
+    try:
+        path.unlink(missing_ok=True)
+    except OSError as exc:
+        logger.debug(f"Could not remove the staging file {path}: {exc}")
+
+
 def _validate_filters(
     filters: Iterable[CollectionFilter] | None,
 ) -> tuple[CollectionFilter, ...]:
@@ -352,8 +371,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             synchronous cap does not apply and `auto_split` is unnecessary —
             a window too large to materialise is streamed to disk in tiles
             and mosaicked. It cannot run server-side compute, which is why
-            composited requests stay on Earth Engine. Ignored for the asynchronous `"drive"` / `"gcs"` /
-            `"asset"` sinks, which are Earth Engine-only.
+            composited requests stay on Earth Engine. Ignored for the
+            asynchronous `"drive"` / `"gcs"` / `"asset"` sinks, which are
+            Earth Engine-only.
 
             The two engines do not produce byte-identical rasters. Earth
             Engine reads `scale` in a geographic CRS as a uniform
@@ -1457,21 +1477,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
     ) -> tuple[bool, str]:
         """Report whether the reader's native-resolution read is bounded.
 
-        Dropping `getDownloadURL` also drops its 32768-px guard and
-        `auto_split`, but the reader is not free of limits: the EEDAI
-        driver's overviews are unreliable, so it fetches the AOI at the
-        asset's *native* resolution block by block and materialises it in
-        memory before downsampling. A wide AOI over a fine-resolution asset
-        is therefore an unbounded read, however coarse the requested
-        `scale`.
+        The EEDAI driver's overviews are unreliable, so the reader fetches
+        the AOI at the asset's *native* resolution and materialises it in
+        memory before downsampling — a wide AOI over a fine-resolution asset
+        is a huge read however coarse the requested `scale`.
 
-        An asset with no catalogued `spatial_resolution` is treated as
-        *unbounded*, not as safe: an unknown native grid is exactly the case
-        that cannot be sized up front.
+        An asset with no catalogued `spatial_resolution` counts as not
+        fitting, rather than as safe: an unknown native grid is exactly the
+        case that cannot be sized up front.
 
-        This reports rather than raises so the caller can decide: `"auto"`
-        falls back to Earth Engine (which has its own cap and `auto_split`),
-        while `engine="eedai"` turns the same reason into an error.
+        This answers only "can one pass hold it?". A window that does not fit
+        is not necessarily refused — :meth:`_eedai_plan` may still serve it by
+        streaming in tiles — so this reports rather than raises.
 
         Args:
             var_info: The catalog entry (for the asset's native resolution).
@@ -1545,32 +1562,41 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # truncated raster sitting at the final name for a later run to read
         # as a finished product.
         staged = self.root_dir / f"{prefix}.partial.tif"
+        # A tiled read has already written `staged`, so a COG conversion needs a
+        # second name rather than using its source as its own destination.
+        cog_staged = self.root_dir / f"{prefix}.partial-cog.tif"
         bbox, cutline = self._eedai_window()
-        _can_serve, tile_size, _reason = self._eedai_plan(var_info)
+        can_serve, tile_size, reason = self._eedai_plan(var_info)
+        if not can_serve:
+            # Only reachable if a caller bypasses `_use_eedai`; taking the read
+            # anyway would be the unguarded path the plan exists to prevent.
+            raise ValueError(f"the EEDAI reader cannot serve {var_info.id}: {reason}")
         read_options: dict[str, Any] = {}
         if tile_size is not None:
             # Too large for one pass: have the reader stream the mosaic to disk
             # a tile at a time rather than hold the whole window in memory.
             read_options = {"tile_size": tile_size, "path": str(staged)}
+            rows, cols = self._eedai_grid(bbox, scale)
+            tiles = math.ceil(rows / tile_size) * math.ceil(cols / tile_size)
             logger.info(
-                f"Streaming {var_info.id} through the EEDAI reader in "
-                f"{tile_size}-px tiles."
+                f"Streaming {var_info.id} through the EEDAI reader as {tiles:,} "
+                f"tile(s) of {tile_size} px into a {cols}x{rows} mosaic."
             )
-        dataset = reader.from_earthengine(
-            var_info.id,
-            bands=list(bands),
-            crs=self.crs,
-            bbox=bbox,
-            geometry=cutline,
-            shape=self._eedai_grid(bbox, scale),
-            resample=self.resample,
-            credentials=credentials,
-            **read_options,
-        )
-        # A tiled read has already written `staged`, so a COG conversion needs
-        # a second name rather than using the source as its own destination.
-        cog_staged = self.root_dir / f"{prefix}.partial-cog.tif"
+        # The tiled read writes `staged` itself, so it belongs inside the same
+        # `try` as the write: a mosaic that fails partway would otherwise leave
+        # its partial file behind.
         try:
+            dataset = reader.from_earthengine(
+                var_info.id,
+                bands=list(bands),
+                crs=self.crs,
+                bbox=bbox,
+                geometry=cutline,
+                shape=self._eedai_grid(bbox, scale),
+                resample=self.resample,
+                credentials=credentials,
+                **read_options,
+            )
             try:
                 if self.cog:
                     dataset.cog.to_cog(str(cog_staged))
@@ -1580,8 +1606,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 close_quietly(dataset)
             os.replace(cog_staged if self.cog else staged, target)
         finally:
-            staged.unlink(missing_ok=True)
-            cog_staged.unlink(missing_ok=True)
+            _discard_quietly(staged)
+            _discard_quietly(cog_staged)
         logger.info(f"Wrote {target} (EEDAI{', COG' if self.cog else ''})")
         return target
 

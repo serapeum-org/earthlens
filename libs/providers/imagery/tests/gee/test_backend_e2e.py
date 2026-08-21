@@ -168,10 +168,14 @@ def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
     from earthlens.gee import backend as backend_module
 
     single = _download_srtm(tmp_path / "single", "eedai")
-    monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 100)
+    # 400 px is small enough that this AOI cannot be read in one pass, while
+    # still leaving the tile count well inside the ceiling; a much smaller
+    # budget would shrink the tile until the job is refused instead.
+    monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 400)
     tiled = _download_srtm(tmp_path / "tiled", "eedai")
 
     assert tiled.is_file(), f"tiled output missing: {tiled}"
+    assert tiled != single, "the tiled read reused the single-pass output"
     assert not list(tiled.parent.glob("*.partial*")), "staged tiles left behind"
 
     single_values, single_epsg, single_bbox = _open_raster(single)

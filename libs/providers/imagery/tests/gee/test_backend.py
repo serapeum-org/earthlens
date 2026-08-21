@@ -287,6 +287,12 @@ def _raise_missing_extra(service_key):
     raise ImportError("pip install earthlens[eedai]")
 
 
+def _stage_then_fail(asset_id, **kwargs):
+    """Write the staged mosaic then fail, as a partway mosaic error would."""
+    Path(kwargs["path"]).write_bytes(b"partial-mosaic")
+    raise RuntimeError("mosaic failed")
+
+
 def _write_then_fail(path):
     """Write a truncated raster then fail, as a driver dying mid-write would."""
     Path(path).write_bytes(b"trunc")
@@ -1708,6 +1714,15 @@ class _FakeReaderModule:
 
     def from_earthengine(self, asset_id, **kwargs):
         self.calls.append((asset_id, kwargs))
+        # Mirror the combinations upstream's `_validate_read_request` rejects,
+        # so a plan that produces one fails here instead of passing silently.
+        if kwargs.get("tile_size") is not None:
+            if kwargs.get("resample", "nearest") != "nearest":
+                raise ValueError("'tile_size' supports only resample='nearest'")
+            if kwargs.get("geometry") is not None:
+                raise ValueError("'tile_size' cannot be combined with a 'geometry'")
+            if kwargs.get("path") is None:
+                raise ValueError("'tile_size' needs 'path'")
         path = kwargs.get("path")
         if path is not None:
             # A tiled read streams the mosaic to `path` itself.
@@ -2093,6 +2108,28 @@ class TestExportViaEedai:
         assert can_serve is False
         assert tile_size is None
         assert "no tile is small enough" in reason
+
+    def test_tiled_cog_write_leaves_no_staging_files(self, make_gee, fake_reader):
+        """A tiled read plus `cog=True` stages through two names and cleans both."""
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0, cog=True)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(var_info, ["elevation"], 5000.0, "srtm_big")
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["tile_size"] >= 1
+        assert target.read_bytes() == b"eedai-cog"
+        assert not list(target.parent.glob("*.partial*.tif"))
+
+    def test_a_failed_tiled_write_leaves_no_staging_file(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A mosaic that fails partway must not leave its staged file behind."""
+        monkeypatch.setattr(fake_reader, "from_earthengine", _stage_then_fail)
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        with pytest.raises(RuntimeError, match="mosaic failed"):
+            gee._export_via_eedai(var_info, ["elevation"], 5000.0, "srtm_big")
+        assert not list(gee.root_dir.glob("*.partial*.tif"))
+        assert not (gee.root_dir / "srtm_big.tif").exists()
 
     def test_a_cutline_cannot_be_tiled_so_it_falls_back(self, make_gee, fake_reader):
         """Upstream refuses `tile_size` with a polygon cutline, so `auto` falls back."""
