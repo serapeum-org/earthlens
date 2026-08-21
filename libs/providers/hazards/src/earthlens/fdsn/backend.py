@@ -875,6 +875,10 @@ class FDSN(AbstractDataSource):
             dest_dir: The event's output directory.
             produced: The layers the archive actually carried.
             product_version: The ShakeMap product's `updateTime`, if known.
+
+        Returns:
+            None: The manifest is written as a side effect; a failure is
+                logged rather than raised.
         """
         try:
             _helpers.write_manifest(

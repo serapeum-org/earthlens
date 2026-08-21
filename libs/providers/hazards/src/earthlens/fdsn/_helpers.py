@@ -518,8 +518,10 @@ def read_manifest(dest_dir: Path) -> dict[str, Any] | None:
 
     Returns:
         The parsed manifest, or `None` when the event has never been
-            fetched or its manifest is unreadable — both of which mean
-            "fetch it again".
+            fetched, its manifest is unreadable, or the payload does not
+            match `MANIFEST_SCHEMA` — every one of which means "fetch it
+            again". A structurally wrong manifest is reported and treated
+            as absent rather than raising, so the next write repairs it.
 
     Examples:
         - A directory with no manifest reads as `None`:
@@ -543,6 +545,26 @@ def read_manifest(dest_dir: Path) -> dict[str, Any] | None:
             >>> shutil.rmtree(workspace)
 
             ```
+        - A manifest from a different layout version reads as absent, so the
+          event is refetched rather than half-understood:
+            ```python
+            >>> import json, shutil, tempfile
+            >>> from pathlib import Path
+            >>> from earthlens.fdsn._helpers import MANIFEST_NAME, read_manifest
+            >>> workspace = Path(tempfile.mkdtemp())
+            >>> _ = (workspace / MANIFEST_NAME).write_text(
+            ...     json.dumps({"schema": 99, "requested": [], "produced": [],
+            ...                 "checked": 0.0})
+            ... )
+            >>> read_manifest(workspace) is None
+            True
+            >>> shutil.rmtree(workspace)
+
+            ```
+
+    See Also:
+        write_manifest: Produces the file read here.
+        MANIFEST_SCHEMA: The layout version this accepts.
     """
     path = dest_dir / MANIFEST_NAME
     if not path.is_file():
