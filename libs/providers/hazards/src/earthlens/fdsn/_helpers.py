@@ -32,6 +32,7 @@ earthlens only decides *which* grid to ask for.
 from __future__ import annotations
 
 import re
+import shutil
 import zipfile
 from collections.abc import Iterable, Mapping
 from pathlib import Path
@@ -81,10 +82,22 @@ SHAKEMAP_EPSG = 4326
 #: Key of the raster bundle inside a ShakeMap product's `contents` map.
 RASTER_CONTENT_KEY = "download/raster.zip"
 
+#: Ceiling on a single decompressed archive member. A real ShakeMap grid is
+#: well under a megabyte (a 30 arc-second raster over one event's footprint),
+#: so this is generous for legitimate data while refusing an archive whose
+#: declared expansion is absurd rather than reading it into memory first.
+MAX_MEMBER_BYTES = 256 * 1024 * 1024
+
 # The QuakeML resource identifier USGS returns embeds the ComCat id as a
 # query parameter, e.g.
 # `quakeml:earthquake.usgs.gov/fdsnws/event/1/query?eventid=us6000jlqa&format=quakeml`.
-_EVENT_ID_PATTERN = re.compile(r"[?&]eventid=([A-Za-z0-9_.-]+)")
+#
+# The captured id becomes a directory name, so the character class deliberately
+# excludes `.`: a capture of `.` or `..` would resolve the event directory to
+# somewhere the caller never asked for. Real ComCat ids are a network code plus
+# alphanumerics (`us6000jlqa`, `nc73872510`, `official20110311054624120_30`) and
+# never contain a dot, so excluding it costs nothing.
+_EVENT_ID_PATTERN = re.compile(r"[?&]eventid=([A-Za-z0-9_-]+)")
 
 
 def parse_comcat_id(event_id: str | None) -> str | None:
@@ -118,6 +131,16 @@ def parse_comcat_id(event_id: str | None) -> str | None:
             True
 
             ```
+        - A degenerate id that would escape the output directory is refused:
+            ```python
+            >>> from earthlens.fdsn._helpers import parse_comcat_id
+            >>> parse_comcat_id("quakeml:x?eventid=..&format=quakeml") is None
+            True
+
+            ```
+
+    See Also:
+        detail_url: Builds the request URL from the id returned here.
     """
     if not event_id:
         return None
@@ -137,6 +160,8 @@ def normalize_layers(layers: Iterable[str] | None) -> tuple[str, ...]:
         The requested layers as a tuple, in first-seen order.
 
     Raises:
+        TypeError: If a bare string is passed. A string is iterable, so
+            it would otherwise be read one character at a time.
         ValueError: If a name is not one of `SHAKEMAP_LAYERS`, or if an
             explicitly empty selection is passed — asking for the
             ShakeMap side-output and then for no layer of it is a
@@ -163,6 +188,11 @@ def normalize_layers(layers: Iterable[str] | None) -> tuple[str, ...]:
     """
     if layers is None:
         return DEFAULT_SHAKEMAP_LAYERS
+    if isinstance(layers, str):
+        raise TypeError(
+            f"shakemap_layers must be a sequence of layer names, not the bare "
+            f"string {layers!r} — pass [{layers!r}] for a single layer."
+        )
     requested = list(layers)
     if not requested:
         raise ValueError(
@@ -284,7 +314,7 @@ def extract_layers(
     Examples:
         - Pull one layer out of a two-layer archive:
             ```python
-            >>> import tempfile, zipfile
+            >>> import shutil, tempfile, zipfile
             >>> from pathlib import Path
             >>> from earthlens.fdsn._helpers import extract_layers
             >>> workspace = Path(tempfile.mkdtemp())
@@ -300,11 +330,12 @@ def extract_layers(
             'mmi_mean.flt'
             >>> (workspace / "out" / "mmi_mean.hdr").is_file()
             True
+            >>> shutil.rmtree(workspace)
 
             ```
         - A layer the archive lacks is skipped rather than raised:
             ```python
-            >>> import tempfile, zipfile
+            >>> import shutil, tempfile, zipfile
             >>> from pathlib import Path
             >>> from earthlens.fdsn._helpers import extract_layers
             >>> workspace = Path(tempfile.mkdtemp())
@@ -314,6 +345,7 @@ def extract_layers(
             ...     bundle.writestr("mmi_mean.hdr", "NROWS 1")
             >>> sorted(extract_layers(archive, ["mmi_mean", "pgv_std"], workspace / "out"))
             ['mmi_mean']
+            >>> shutil.rmtree(workspace)
 
             ```
 
@@ -333,8 +365,23 @@ def extract_layers(
                     f"(expected {members[0]} + {members[1]}) — skipping it."
                 )
                 continue
+            oversized = [
+                name
+                for name in members
+                if bundle.getinfo(name).file_size > MAX_MEMBER_BYTES
+            ]
+            if oversized:
+                logger.warning(
+                    f"ShakeMap archive {archive.name} declares {oversized} larger "
+                    f"than {MAX_MEMBER_BYTES} bytes — refusing {layer!r}."
+                )
+                continue
             for member in members:
-                (dest_dir / member).write_bytes(bundle.read(member))
+                with (
+                    bundle.open(member) as source,
+                    (dest_dir / member).open("wb") as target,
+                ):
+                    shutil.copyfileobj(source, target)
             extracted[layer] = dest_dir / members[0]
     return extracted
 
@@ -347,6 +394,13 @@ def flt_to_geotiff(flt_path: Path, dest: Path) -> Path:
     cell size, and nodata value but no projection, so `EPSG:4326` is
     assigned before writing.
 
+    Assigning it means opening the source read-write, and the `EHdr`
+    driver persists a projection by dropping a `<basename>.prj` beside
+    the grid. That mutation is deliberate but confined: callers pass a
+    grid they extracted into a scratch directory, which is discarded
+    wholesale, so nothing GDAL writes alongside the source reaches the
+    caller's output.
+
     Args:
         flt_path: The extracted `.flt` payload.
         dest: Destination GeoTIFF path; parents are created.
@@ -357,7 +411,7 @@ def flt_to_geotiff(flt_path: Path, dest: Path) -> Path:
     Examples:
         - Convert a small grid and read back its georeferencing:
             ```python
-            >>> import struct, tempfile
+            >>> import shutil, struct, tempfile
             >>> from pathlib import Path
             >>> from earthlens.fdsn._helpers import flt_to_geotiff
             >>> workspace = Path(tempfile.mkdtemp())
@@ -382,6 +436,8 @@ def flt_to_geotiff(flt_path: Path, dest: Path) -> Path:
             4326
             >>> converted.rows, converted.columns
             (2, 2)
+            >>> del converted
+            >>> shutil.rmtree(workspace)
 
             ```
 
@@ -390,7 +446,19 @@ def flt_to_geotiff(flt_path: Path, dest: Path) -> Path:
         SHAKEMAP_EPSG: The CRS assigned during the conversion.
     """
     dest.parent.mkdir(parents=True, exist_ok=True)
-    dataset = Dataset.read_file(str(flt_path), read_only=False)
-    dataset.set_crs(epsg=SHAKEMAP_EPSG)
-    dataset.to_file(str(dest))
+    # Written to a sibling and renamed on success. `Dataset.to_file` writes
+    # straight to the path it is given, so without this a run interrupted
+    # mid-write (Ctrl-C, a full disk) would leave a non-empty but unreadable
+    # `.tif` — and the caller's skip-if-present check, which can only ask
+    # whether a file exists and is non-empty, would honour it forever. The
+    # staged name keeps the `.tif` suffix so GDAL still infers the driver.
+    staged = dest.with_name(f".{dest.stem}.partial.tif")
+    try:
+        dataset = Dataset.read_file(str(flt_path), read_only=False)
+        dataset.set_crs(epsg=SHAKEMAP_EPSG)
+        dataset.to_file(str(staged))
+        del dataset
+        staged.replace(dest)
+    finally:
+        staged.unlink(missing_ok=True)
     return dest
