@@ -42,6 +42,21 @@ def import_earthengine_reader() -> ModuleType:
     Raises:
         ImportError: If `pyramids-eo` (the `[eedai]` extra) is not installed;
             the message names the extra to install.
+
+    Examples:
+        - Read one asset's pixels straight through the reader:
+            ```python
+            >>> from earthlens.gee._eedai import import_earthengine_reader
+            >>> reader = import_earthengine_reader()  # doctest: +SKIP
+            >>> dataset = reader.from_earthengine(  # doctest: +SKIP
+            ...     "USGS/SRTMGL1_003",
+            ...     bands=["elevation"],
+            ...     bbox=(31.25, 29.95, 31.3, 30.0),
+            ... )
+            >>> dataset.shape  # doctest: +SKIP
+            (1, 63, 62)
+
+            ```
     """
     try:
         return importlib.import_module(_READER_MODULE)
@@ -58,6 +73,16 @@ def eedai_available() -> bool:
 
     Returns:
         `True` if `pyramids_eo.earthengine` imports, `False` otherwise.
+
+    Examples:
+        - Pick the fetch engine from what is installed:
+            ```python
+            >>> from earthlens.gee._eedai import eedai_available
+            >>> engine = "eedai" if eedai_available() else "ee"
+            >>> engine in {"eedai", "ee"}
+            True
+
+            ```
     """
     try:
         importlib.import_module(_READER_MODULE)
@@ -84,6 +109,23 @@ def credentials_for(service_key: str | None):
 
     Raises:
         ImportError: If `pyramids-eo` (the `[eedai]` extra) is not installed.
+
+    Examples:
+        - A key file on disk resolves to a service-account credential:
+            ```python
+            >>> from earthlens.gee._eedai import credentials_for
+            >>> credentials_for("/keys/ee-sa.json")  # doctest: +SKIP
+            <EarthEngineCredentials ...>
+
+            ```
+        - The key's JSON content works too, for secrets kept out of files:
+            ```python
+            >>> import json
+            >>> payload = json.dumps({"type": "service_account"})
+            >>> credentials_for(payload)  # doctest: +SKIP
+            <EarthEngineCredentials ...>
+
+            ```
     """
     credentials = import_earthengine_reader().EarthEngineCredentials
     if service_key is None:

@@ -365,6 +365,23 @@ class GEE(LazyClientMixin, AbstractDataSource):
             ...     service_account="sa@my-project.iam.gserviceaccount.com",
             ...     service_key="/path/to/key.json",
             ... ).download()
+
+            ```
+        - Read the same raw asset through the pyramids-eo EEDAI reader and write
+          a Cloud Optimized GeoTIFF (no 32768-px cap, no `auto_split`):
+            ```python
+            >>> from earthlens.gee import GEE  # doctest: +SKIP
+            >>> gee = GEE(  # doctest: +SKIP
+            ...     start="2000-02-11", end="2000-02-12",
+            ...     variables={"USGS/SRTMGL1_003": ["elevation"]},
+            ...     lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3],
+            ...     path="data/gee", scale=90,
+            ...     engine="eedai", cog=True,
+            ... )
+            >>> paths = gee.authenticate().download()  # doctest: +SKIP
+            >>> paths[0].name  # doctest: +SKIP
+            'USGS_SRTMGL1_003_elevation_20000211.tif'
+
             ```
     """
 
