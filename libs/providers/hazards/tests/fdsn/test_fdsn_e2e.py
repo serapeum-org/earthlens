@@ -7,7 +7,7 @@ skips them.
 
 Run with:
 
-    pixi run -e dev pytest -m e2e tests/fdsn
+    uv run pytest -m e2e libs/providers/hazards/tests/fdsn
 """
 
 from __future__ import annotations
@@ -95,3 +95,40 @@ class TestEarthscopeLiveQuery:
 
         assert len(fc) > 0, "expected at least one M5+ event from EarthScope"
         assert fc.crs.to_epsg() == 4326
+
+
+@pytest.mark.e2e
+@pytest.mark.fdsn
+class TestShakemapLiveSideOutput:
+    """Live ShakeMap side-output against USGS ComCat."""
+
+    def test_writes_georeferenced_shakemap(self, tmp_path: Path):
+        """A large USGS event yields a georeferenced ShakeMap GeoTIFF."""
+        from osgeo import gdal
+
+        fc = FDSN(
+            start="2023-02-06",
+            end="2023-02-07",
+            variables=["USGS"],
+            lat_lim=[35.0, 39.0],
+            lon_lim=[35.0, 39.0],
+            path=str(tmp_path),
+            min_magnitude=7.0,
+            with_shakemap=True,
+        ).download()
+
+        assert len(fc) > 0, "expected at least one M7+ event in the window"
+        rasters = sorted((tmp_path / "shakemap").rglob("mmi_mean.tif"))
+        assert rasters, "expected a ShakeMap GeoTIFF per event"
+
+        dataset = gdal.Open(str(rasters[0]))
+        assert dataset.GetDriver().ShortName == "GTiff"
+        assert "4326" in dataset.GetProjection(), "CRS should be assigned"
+        assert dataset.RasterXSize > 1 and dataset.RasterYSize > 1
+
+        leftovers = [
+            path.name
+            for path in (tmp_path / "shakemap").rglob("*")
+            if path.suffix in {".zip", ".flt", ".hdr"}
+        ]
+        assert leftovers == [], f"intermediates should be cleaned up: {leftovers}"

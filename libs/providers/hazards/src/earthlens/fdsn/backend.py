@@ -13,11 +13,23 @@ by :mod:`earthlens.fdsn.events`.
 
 This is the first `vector` backend: the on-the-wire result is a table
 of point features, not a gridded array, so `OUTPUT_KIND = "vector"`
-and the :class:`earthlens.earthlens.EarthLens` facade rejects an
-`aggregate=` argument (there is no meaningful gridded reduction of an
-event table). `download()` returns the in-memory FeatureCollection
-(the union across requested networks) and, as a side effect, writes
-one vector file per network to `path`.
+and an `aggregate=` argument is refused (there is no meaningful
+gridded reduction of an event table). The refusal itself lives in
+:meth:`earthlens.base.AbstractDataSource._refuse_unsupported_aggregate`,
+which every backend's `download` routes through, so a direct
+`FDSN(...).download(aggregate=...)` is rejected identically to one
+made through the :class:`earthlens.earthlens.EarthLens` facade.
+`download()` returns the in-memory FeatureCollection (the union across
+requested networks) and, as a side effect, writes one vector file per
+network to `path`.
+
+Optionally the backend also writes a **raster** side-output: with
+`with_shakemap=True` each USGS event's gridded ShakeMap is fetched and
+written as a GeoTIFF alongside the vector files, which makes the
+instance's `OUTPUT_KIND` `"mixed"` for that request. ShakeMap is a
+USGS ComCat product and is not exposed through the FDSN event standard
+at all, so that path is USGS-only and costs one extra request per
+event — see :mod:`earthlens.fdsn._helpers`.
 
 Provider selection follows the FDSN-specific reading of `variables`
 (see the package docstring): `variables` is a `list[str]` of network
@@ -40,7 +52,8 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
 )
-from earthlens.fdsn import events
+from earthlens.base.http import HttpClient
+from earthlens.fdsn import _helpers, events
 from earthlens.fdsn.auth import resolve_earthscope_token
 from earthlens.fdsn.catalog import Catalog, Provider
 
@@ -58,6 +71,16 @@ _DRIVERS: dict[str, tuple[str, str]] = {
 
 #: Default network when `variables` is empty.
 _DEFAULT_PROVIDERS = ["USGS"]
+
+#: Subdirectory of `root_dir` holding the ShakeMap side-output, one
+#: folder per event so a multi-event query stays navigable.
+_SHAKEMAP_DIR = "shakemap"
+
+#: Seconds between consecutive ComCat detail requests. ShakeMap costs one
+#: request per event, so a busy window fans out where the event query
+#: itself was a single call; USGS publishes no rate limit, and this is a
+#: politeness floor rather than a documented requirement.
+_COMCAT_MIN_INTERVAL = 0.2
 
 
 class FDSN(AbstractDataSource):
@@ -78,14 +101,17 @@ class FDSN(AbstractDataSource):
 
     Attributes:
         OUTPUT_KIND: `"vector"` — the result is a table of point
-            features (events), so the facade rejects `aggregate=`
-            with `NotImplementedError`. This backend is the first
-            end-to-end exercise of that facade guard.
+            features (events), so `aggregate=` is refused with
+            `NotImplementedError`. Resolved per instance: a request
+            built with `with_shakemap=True` also emits GeoTIFF rasters,
+            which makes it `"mixed"`. `aggregate=` stays refused either
+            way, because the ShakeMap grids are a per-event side-output
+            with no time axis to reduce over.
     """
 
     OUTPUT_KIND: OutputKind = "vector"
 
-    AGGREGATE_REFUSAL_REASON = "seismic events are vector point features, not gridded rasters, so there is no meaningful gridded reduction. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
+    AGGREGATE_REFUSAL_REASON = "seismic events are vector point features, not gridded rasters, so there is no meaningful gridded reduction — and the optional with_shakemap= rasters are a per-event side-output with no time axis to reduce over. Call download() without aggregate= and post-process the returned FeatureCollection (a GeoDataFrame) directly"
 
     #: Partial-failure policy for the per-provider loop; `download(errors=...)`
     #: overrides it per call.
@@ -111,6 +137,8 @@ class FDSN(AbstractDataSource):
         limit: int | None = None,
         earthscope_token: str | None = None,
         file_format: FileFormat = "gpkg",
+        with_shakemap: bool = False,
+        shakemap_layers: list[str] | None = None,
     ):
         """Initialise an FDSN backend instance.
 
@@ -160,6 +188,31 @@ class FDSN(AbstractDataSource):
                 Used only for a provider that requires a token.
             file_format: Output vector format — `"gpkg"` (default,
                 GeoPackage) or `"geojson"`.
+            with_shakemap: Also fetch each event's gridded ShakeMap and
+                write it as a GeoTIFF under `path/shakemap/<event>/`.
+                **USGS only** — ShakeMap is a ComCat product, not part
+                of the FDSN event standard, so a non-USGS network in the
+                same request contributes events but no rasters. Costs
+                one extra ComCat request plus an ~8.5 MB archive per
+                event, so bound the event count with `limit=` before
+                turning it on for a busy window. Turning it on makes
+                this instance's `OUTPUT_KIND` `"mixed"`.
+            shakemap_layers: Which ShakeMap grids to write when
+                `with_shakemap` is on. `None` (the default) writes
+                `["mmi_mean"]` — macroseismic intensity, the headline
+                shaking field. The archive carries fourteen grids
+                (`mmi`, `pga`, `pgv`, `psa0p3`, `psa0p6`, `psa1p0`,
+                `psa3p0`, each `_mean` and `_std`); all are reachable,
+                none but the default are written unless asked for.
+                Ignored when `with_shakemap` is `False`.
+
+        Raises:
+            ValueError: If `file_format` is not a supported vector
+                format, if `limit` is zero or negative, or if
+                `shakemap_layers` names a grid the archive does not
+                carry.
+            TypeError: If `variables` is a mapping — for this backend it
+                selects seismic networks, not data variables.
         """
         self._min_magnitude = min_magnitude
         self._max_magnitude = max_magnitude
@@ -182,6 +235,14 @@ class FDSN(AbstractDataSource):
                 f"file_format must be one of {sorted(_DRIVERS)}, got {file_format!r}."
             )
         self._file_format: FileFormat = file_format
+        self._with_shakemap = bool(with_shakemap)
+        # Validated even when the flag is off, so a typo'd layer name is a
+        # construction-time error rather than a surprise the day someone
+        # turns the flag on.
+        self._shakemap_layers = _helpers.normalize_layers(shakemap_layers)
+        self._http: HttpClient | None = None
+        if self._with_shakemap:
+            self.OUTPUT_KIND = "mixed"
         if isinstance(variables, dict):
             raise TypeError(
                 "FDSN `variables` must be a list of network keys (e.g. "
@@ -433,6 +494,14 @@ class FDSN(AbstractDataSource):
         (every network matched nothing) returns a schema-correct empty
         FeatureCollection and writes nothing.
 
+        When the instance was built with `with_shakemap=True`, each USGS
+        event additionally gets its ShakeMap grids written as GeoTIFFs
+        under `path/shakemap/<event>/`. Those rasters are a side effect
+        only — the return value stays the event FeatureCollection. An
+        event whose ShakeMap cannot be fetched is logged and skipped
+        under the same `errors=` policy as a failed network, so one
+        missing grid never costs the event table.
+
         Args:
             progress_bar: Accepted for signature parity with the other
                 backends; obspy's `get_events` has no progress bar, so
@@ -466,6 +535,12 @@ class FDSN(AbstractDataSource):
             if len(collection):
                 written.append(self._write(product.id, collection))
 
+        rasters: list[Path] = []
+        if self._with_shakemap:
+            # Before the concat: the per-network split is what says which
+            # events came from USGS, and the union has thrown that away.
+            rasters = self._download_shakemaps(products, collections)
+
         combined = events.concat_fcs(collections)
         # `concat_fcs` has copied every network's events, so the per-network
         # copies are dead weight from here on. This does not lower the *peak* —
@@ -474,15 +549,150 @@ class FDSN(AbstractDataSource):
         # caller keeps the result.
         collections.clear()
         if written:
+            raster_note = (
+                f" plus {len(rasters)} ShakeMap raster(s)"
+                if self._with_shakemap
+                else ""
+            )
             logger.info(
                 f"FDSN download summary: {len(combined)} events across "
-                f"{len(written)} file(s) written to {self.root_dir}"
+                f"{len(written)} file(s){raster_note} written to {self.root_dir}"
             )
         else:
             logger.warning(
                 "FDSN download summary: no events matched the request, nothing written"
             )
         return combined
+
+    def _client(self) -> HttpClient:
+        """Return this instance's pooled ComCat client, built on first use.
+
+        Only the ShakeMap path needs HTTP — the event query itself goes
+        through obspy — so the client is built lazily and a request
+        without `with_shakemap=True` never opens a session at all.
+
+        Returns:
+            HttpClient: The same instance on every later call.
+        """
+        if self._http is None:
+            from earthlens.core import __version__
+
+            self._http = HttpClient(
+                user_agent=f"earthlens/{__version__}",
+                min_interval=_COMCAT_MIN_INTERVAL,
+            )
+        return self._http
+
+    def _download_shakemaps(
+        self,
+        products: list[RemoteProduct],
+        collections: list[FeatureCollection],
+    ) -> list[Path]:
+        """Write the ShakeMap side-output for every USGS event fetched.
+
+        ShakeMap is a USGS ComCat product with no counterpart in the FDSN
+        event standard, so a non-USGS network that returned events is
+        logged once and skipped rather than silently producing nothing.
+
+        Args:
+            products: The products from :meth:`_search`.
+            collections: The per-product FeatureCollections from
+                :meth:`_fetch`, still split by network.
+
+        Returns:
+            list[Path]: Every GeoTIFF written, across all events.
+        """
+        event_ids: list[str] = []
+        for product, collection in zip(products, collections):
+            if product.metadata.get("fdsn_id") != _helpers.COMCAT_PROVIDER:
+                if len(collection):
+                    logger.warning(
+                        f"with_shakemap=True but {product.id!r} is not "
+                        f"{_helpers.COMCAT_PROVIDER}: ShakeMap is a USGS ComCat "
+                        "product, so this network contributes events but no "
+                        "rasters."
+                    )
+                continue
+            event_ids.extend(str(value) for value in collection["event_id"])
+
+        if not event_ids:
+            return []
+
+        logger.info(
+            f"Fetching ShakeMap {list(self._shakemap_layers)} for "
+            f"{len(event_ids)} USGS event(s)"
+        )
+        results, _failed = self._run_items(
+            event_ids,
+            self._shakemap_for_event,
+            errors=self._errors,
+            label="ShakeMap",
+            describe=repr,
+            on_failure=lambda _event_id, _exc: [],
+        )
+        return [path for paths in results for path in paths]
+
+    def _shakemap_for_event(self, event_id: str) -> list[Path]:
+        """Fetch, unpack, and convert one event's requested ShakeMap grids.
+
+        Skips the network entirely when every requested GeoTIFF is
+        already on disk, so a re-run costs nothing. The downloaded
+        archive and the intermediate `.flt` / `.hdr` pairs are removed
+        once converted — they are several times the size of the GeoTIFFs
+        and carry nothing the GeoTIFF does not.
+
+        Args:
+            event_id: The event's `event_id` column value, a QuakeML
+                resource identifier carrying the ComCat id.
+
+        Returns:
+            list[Path]: The GeoTIFFs written for this event; empty when
+                the identifier carries no ComCat id, the event has no
+                ShakeMap product, or the archive lacked every requested
+                grid.
+        """
+        comcat_id = _helpers.parse_comcat_id(event_id)
+        if comcat_id is None:
+            logger.warning(
+                f"cannot resolve a ComCat id from event_id {event_id!r} — "
+                "skipping its ShakeMap."
+            )
+            return []
+
+        dest_dir = self.root_dir / _SHAKEMAP_DIR / comcat_id
+        expected = [dest_dir / f"{layer}.tif" for layer in self._shakemap_layers]
+        if expected and all(self._is_complete(path) for path in expected):
+            logger.info(f"ShakeMap for {comcat_id} already on disk — skipping.")
+            return expected
+
+        detail = self._client().get_json(_helpers.detail_url(comcat_id))
+        url = _helpers.shakemap_raster_url(detail)
+        if url is None:
+            logger.info(
+                f"event {comcat_id} publishes no ShakeMap raster — skipping it."
+            )
+            return []
+
+        archive = dest_dir / "raster.zip"
+        written: list[Path] = []
+        try:
+            # `expect_magic` keeps an HTML error page served with a 200 from
+            # landing as a .zip and failing later as a confusing bad-archive.
+            self._client().download(url, archive, expect_magic=b"PK", progress=False)
+            extracted = _helpers.extract_layers(
+                archive, self._shakemap_layers, dest_dir
+            )
+            for layer, flt_path in extracted.items():
+                written.append(
+                    _helpers.flt_to_geotiff(flt_path, dest_dir / f"{layer}.tif")
+                )
+        finally:
+            for leftover in dest_dir.glob("*.flt"):
+                leftover.unlink(missing_ok=True)
+            for leftover in dest_dir.glob("*.hdr"):
+                leftover.unlink(missing_ok=True)
+            archive.unlink(missing_ok=True)
+        return written
 
     def _write(self, provider_key: str, collection: FeatureCollection) -> Path:
         """Write one network's events to a vector file under `root_dir`.

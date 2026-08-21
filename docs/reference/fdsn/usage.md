@@ -136,6 +136,56 @@ events.to_file("all_events.gpkg", driver="GPKG")     # GeoPackage
 events.to_file("all_events.geojson", driver="GeoJSON")  # GeoJSON
 ```
 
+## ShakeMap rasters (USGS only)
+
+Pass `with_shakemap=True` to also pull each event's gridded **ShakeMap**
+and write it as a GeoTIFF beside the vector output:
+
+```python
+events = EarthLens(
+    variables=["USGS"],
+    data_source="fdsn",
+    start="2023-02-06",
+    end="2023-02-07",
+    lat_lim=[35.0, 39.0],
+    lon_lim=[35.0, 39.0],
+    path="out",
+    min_magnitude=7.0,
+    with_shakemap=True,
+).download()
+```
+
+That writes `out/shakemap/<event-id>/mmi_mean.tif` per event, alongside
+the usual `out/usgs.gpkg`. The return value is unchanged — still the
+event `FeatureCollection`; the rasters are a side effect.
+
+**USGS only.** ShakeMap is a USGS ComCat product and is not part of the
+FDSN event standard, so a non-USGS network in the same request still
+contributes events but no rasters (it is logged once). ShakeMap costs
+one extra request and an ~8.5 MB archive **per event**, so bound the
+event count with `limit=` or a high `min_magnitude` before enabling it
+on a busy window.
+
+By default only `mmi_mean` (macroseismic intensity) is written. The
+archive carries fourteen grids — `mmi`, `pga`, `pgv`, `psa0p3`,
+`psa0p6`, `psa1p0`, `psa3p0`, each as `_mean` and `_std` — and any
+subset can be requested:
+
+```python
+EarthLens(
+    ...,
+    with_shakemap=True,
+    shakemap_layers=["mmi_mean", "pga_mean", "pgv_mean"],
+).download()
+```
+
+The grids are published as ESRI float rasters carrying no projection;
+earthlens assigns `EPSG:4326` (their true graticule) during the
+conversion to GeoTIFF.
+
+PAGER is **not** included: its ComCat product ships PDFs, PNGs, and
+JSON summaries, with no raster grid to write.
+
 ## Aggregation is not supported
 
 FDSN output is vector, so the `aggregate=` argument is rejected:
@@ -147,6 +197,10 @@ EarthLens(variables=["USGS"], data_source="fdsn", ...).download(aggregate=cfg)
 
 The aggregator only reduces gridded raster outputs. Post-process the
 returned FeatureCollection directly instead (it is a GeoDataFrame).
+
+This holds with `with_shakemap=True` too, even though that makes the
+instance `"mixed"`: the ShakeMap grids are a per-event side-output with
+no time axis to reduce over.
 
 ## EarthScope token (optional)
 

@@ -28,15 +28,25 @@ imagery). FDSN is different in two ways that shape the backend:
   [pyramids](https://github.com/serapeum-org/pyramids)
   `FeatureCollection` (a `geopandas.GeoDataFrame` subclass) rather than
   writing a raster. Because there is no meaningful gridded reduction of
-  an event table, the `EarthLens` facade rejects an `aggregate=`
-  argument for this backend with `NotImplementedError`.
+  an event table, an `aggregate=` argument is refused with
+  `NotImplementedError` — by the shared guard in
+  `AbstractDataSource`, so a direct `FDSN(...).download(aggregate=...)`
+  is rejected exactly like one made through the `EarthLens` facade.
+  The one exception to the vector rule is opt-in: `with_shakemap=True`
+  additionally writes each USGS event's gridded ShakeMap as a GeoTIFF,
+  which makes that instance `"mixed"` (`aggregate=` stays refused).
+  See [Usage](usage.md#shakemap-rasters-usgs-only).
 
 - **There is no dataset catalog to curate.** FDSN is a *fixed query
   protocol*, not a 600-dataset archive. The entire "catalog" is a
   six-row provider-dispatch table mapping a user-facing network name
-  to an `obspy` URL mapping. There is no `refresh` / `probe` / `audit`
-  tooling and no growth task — adding another network later (ORFEUS,
-  GFZ, …) is a hand-edit of one YAML row.
+  to an `obspy` URL mapping. There is no growth task — adding another
+  network later (ORFEUS, GFZ, …) is a hand-edit of one YAML row. The
+  backend still ships `refresh` / `audit` / `validate` handlers
+  (`earthlens datasets refresh fdsn`, `… audit fdsn`, `… validate
+  fdsn`); `refresh` diffs the data centres `obspy` can reach against
+  the curated rows, so a centre `obspy` gains or drops is surfaced
+  rather than missed. There is no `probe` handler.
 
 ## The networks
 
