@@ -277,7 +277,7 @@ class CHIRPS(AbstractDataSource):
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "daily",
         fmt: str = "%Y-%m-%d",
-        path: Path | str = "",
+        path: Path | str | None = None,
     ):
         """Initialize a CHIRPS backend.
 
@@ -303,7 +303,9 @@ class CHIRPS(AbstractDataSource):
             end: Inclusive end date as a string. `None` defaults to
                 today.
             path: Output directory. Created if it does not exist.
-                Defaults to the current working directory.
+                Defaults to the configured earthlens output directory
+                (`set_output_dir()` / `EARTHLENS_DATA_DIR`); see
+                `earthlens.config`.
             fmt: `strptime` format for `start` / `end`. Defaults to
                 `"%Y-%m-%d"`.
 

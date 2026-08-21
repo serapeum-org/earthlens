@@ -6,7 +6,7 @@ bbox plus a list of layer ids (`variables=["ghi", "wind_100m"]`); `download()`
 writes one cropped GeoTIFF per layer under `root_dir` and returns their paths.
 
 Each layer is fetched by the transport its catalog row declares (pinned in the
-A1 gate, `planning/solar_wind_atlas/captures/solar-wind-sdk-facts.md`):
+A1 gate):
 
 * **Global Wind Atlas** layers (`transport="vsicurl"`) are range-accessible COGs
   read **windowed** over `/vsicurl/` — only the AOI's byte ranges transfer.
@@ -34,6 +34,7 @@ from earthlens.base import (
     RemoteProduct,
     TemporalExtent,
 )
+from earthlens.config import cache_dir as _shared_cache_dir
 from earthlens.solar_wind_atlas._helpers import (
     bbox_from_extent,
     download_cache_crop,
@@ -93,7 +94,7 @@ class SolarWindAtlas(AbstractDataSource):
         lon_lim: list[float] | None = None,
         variables: list[str] | None = None,
         temporal_resolution: str = "static",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         cache_dir: Path | str | None = None,
         timeout: float = 600.0,
@@ -115,7 +116,9 @@ class SolarWindAtlas(AbstractDataSource):
             path: Output directory for the written GeoTIFF(s).
             fmt: Accepted for facade parity; unused.
             cache_dir: Directory the Global Solar Atlas ZIP archives are cached
-                in. Defaults to `<path>/_cache/gsa`.
+                in. Defaults to `solar_wind_atlas/` under the shared earthlens
+                cache directory (`set_cache_dir()` / `EARTHLENS_CACHE`), not
+                under `path`.
             timeout: Per-request HTTP timeout (seconds) for a solar ZIP download.
             catalog: Optional pre-built `Catalog` (tests inject a faked one);
                 defaults to the bundled catalog.
@@ -181,12 +184,13 @@ class SolarWindAtlas(AbstractDataSource):
         """Directory the Global Solar Atlas ZIP archives are cached in.
 
         Returns:
-            Path: The `cache_dir=` argument, or `<root_dir>/_cache/gsa` by
-                default.
+            Path: The `cache_dir=` argument, or `solar_wind_atlas/` under the
+                shared earthlens cache directory (`set_cache_dir()` /
+                `EARTHLENS_CACHE`) by default.
         """
         if self._cache_dir_arg is not None:
             return Path(self._cache_dir_arg)
-        return self.root_dir / "_cache" / "gsa"
+        return _shared_cache_dir() / "solar_wind_atlas"
 
     def _search(self) -> list[RemoteProduct]:
         """Name one product per requested layer (metadata = the `Layer` row).

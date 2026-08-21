@@ -250,6 +250,8 @@ class TestFacadeConstruction:
             drive_folder="ee_out",
             gcs_bucket="b",
             region="a-geodataframe-sentinel",
+            cloud_mask="a-cloud-mask-sentinel",
+            filters=["a-filter-sentinel"],
         )
         EarthLens(**_gee_kwargs(**extra))
         kwargs = fake_gee.call_args.kwargs

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import glob
 import os
+import pathlib
 import shutil
 from collections.abc import Mapping
 from typing import List
@@ -269,6 +270,9 @@ class TestECMWFBackend:
         class FakeClient:
             def retrieve(self, dataset, request, target):
                 retrieved.append((dataset, request, target))
+                # cdsapi always writes the file it is handed; the backend
+                # treats a retrieve that wrote nothing as a failed download.
+                pathlib.Path(target).write_bytes(b"")
 
         monkeypatch.setattr(cdsapi, "Client", FakeClient)
 
@@ -421,10 +425,14 @@ class TestTopLevelReExports:
             "EarthLens",
             "PolygonAoiWarning",
             "aggregate_netcdf",
+            "cache_dir",
             "download",
             "find",
             "iter_aggregate_netcdf",
+            "output_dir",
             "search",
+            "set_cache_dir",
+            "set_output_dir",
             "sources",
         ], f"Unexpected top-level __all__: {earthlens.core.__all__!r}"
 
@@ -793,17 +801,20 @@ class TestFacadePath:
     def test_omitted_path_download_persists_to_named_subdir(
         self, tmp_path, monkeypatch
     ):
-        """download() with an omitted path persists under ./earthlens-data/<source>/."""
+        """download() with an omitted path persists under <output_dir()>/<source>/."""
         from pathlib import Path
 
+        from earthlens.config import set_output_dir
+
         monkeypatch.chdir(tmp_path)
+        set_output_dir(tmp_path / "configured")
         facade = EarthLens(
             data_source="chc",
             variables=["precipitation"],
             start="2009-01-01",
             end="2009-01-02",
         )
-        expected = Path.cwd() / "earthlens-data" / "chc"
+        expected = Path(tmp_path / "configured").resolve() / "chc"
         assert facade.datasource.root_dir == expected, (
             f"got {facade.datasource.root_dir}"
         )
@@ -817,10 +828,13 @@ class TestFacadePath:
         assert expected.is_dir(), "download() should create the default directory"
 
     def test_omitted_path_load_uses_tempdir(self, tmp_path, monkeypatch):
-        """load() redirects to a temp dir and removes the empty ./earthlens-data default."""
+        """load() redirects to a temp dir and removes the empty default."""
         from pathlib import Path
 
+        from earthlens.config import set_output_dir
+
         monkeypatch.chdir(tmp_path)
+        set_output_dir(tmp_path / "configured")
         facade = EarthLens(
             data_source="chc",
             variables=["precipitation"],
@@ -837,7 +851,7 @@ class TestFacadePath:
 
         monkeypatch.setattr(facade.datasource, "download", _capture)
         facade.load(progress_bar=False)
-        default = Path.cwd() / "earthlens-data" / "chc"
+        default = Path(tmp_path / "configured").resolve() / "chc"
         assert facade.datasource.root_dir != default, (
             "load() should redirect off the default"
         )
@@ -845,11 +859,14 @@ class TestFacadePath:
         # An empty result holds no handle into the temp dir, so it is gone at once.
         assert not Path(temp_dir).exists(), "load() leaked its temp dir"
 
-    def test_empty_path_still_uses_cwd(self, tmp_path, monkeypatch):
-        """An explicit path='' opts into the current working directory."""
+    def test_blank_path_still_means_the_working_directory(self, tmp_path, monkeypatch):
+        """An explicit path="" opts into the cwd even when an output dir is configured."""
         from pathlib import Path
 
+        from earthlens.config import set_output_dir
+
         monkeypatch.chdir(tmp_path)
+        set_output_dir(tmp_path / "configured")
         backend = EarthLens(
             data_source="chc",
             variables=["precipitation"],
@@ -857,6 +874,7 @@ class TestFacadePath:
             end="2009-01-02",
             path="",
         ).datasource
+        set_output_dir(None)
         assert backend.root_dir == Path.cwd(), f"got {backend.root_dir}"
 
 

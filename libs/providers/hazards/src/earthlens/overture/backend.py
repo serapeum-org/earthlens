@@ -119,7 +119,7 @@ class Overture(AbstractDataSource):
         start: str | None = None,
         end: str | None = None,
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         release: str | None = None,
         max_features: int | None = None,

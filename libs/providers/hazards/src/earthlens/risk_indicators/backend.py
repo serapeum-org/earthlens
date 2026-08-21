@@ -96,7 +96,7 @@ class RiskIndicators(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "annual",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         country: str | None = None,
         admin_code: str | None = None,

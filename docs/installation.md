@@ -147,7 +147,7 @@ Engine and nothing else.
 directly and skip the others' backends entirely:
 
 ```bash
-pip install earthlens-imagery[gee]     # Earth Engine, without the other 40 backends
+pip install earthlens-imagery[gee]     # Earth Engine, without the other 53 backends
 pip install earthlens-ocean[argo,cmems]
 pip install earthlens-atmosphere[all]  # every atmosphere SDK
 ```

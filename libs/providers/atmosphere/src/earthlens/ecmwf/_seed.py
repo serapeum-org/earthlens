@@ -7,8 +7,8 @@ shard (auto-categorised by :func:`earthlens.ecmwf._categories.categorise_dataset
 A seed only — `nc_variable` / `units` are placeholders the `--fill-empty`
 hydrate step fills from a live retrieve.
 
-The live `form.json` fetch sits behind :func:`earthlens.cli.stanza.emit_stanza`
-(monkeypatch-able), so the driver stays fully testable offline.
+The live `form.json` fetch sits behind :func:`earthlens.cli.stanza.emit_stanza`,
+so the driver itself performs no I/O.
 """
 
 from __future__ import annotations

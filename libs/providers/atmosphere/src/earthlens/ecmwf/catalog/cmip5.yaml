@@ -151,8 +151,8 @@ datasets:
         units: unknown
       near-surface-specific-humidity:
         cds_variable: near_surface_specific_humidity
-        nc_variable: near_surface_specific_humidity
-        units: unknown
+        nc_variable: huss
+        units: '1'
       snowfall:
         cds_variable: snowfall
         nc_variable: snowfall

@@ -8,8 +8,8 @@ the comments and ordering of the surrounding rows are preserved, only the
 placeholder fields are rewritten.
 
 Credentialed and licence-gated: the CDS retrieve sits behind
-:func:`_retrieve_netcdf_vars` (monkeypatch-able), so the stanza-rewriting core
-(:func:`_rewrite_stanza`) stays pure and fully testable offline. A dataset
+:func:`_retrieve_netcdf_vars`, an isolated seam that keeps the
+stanza-rewriting core (:func:`_rewrite_stanza`) pure and offline. A dataset
 whose retrieve fails (unaccepted licence, CDS outage) is skipped, never fatal —
 the fill is best-effort and partial by design (one retrieve confirms the
 variable it sampled).
@@ -80,6 +80,7 @@ _AUXILIARY_SUFFIXES = (
     "_flags",
     "_zenith_angle",
     "_azimuth_angle",
+    "_covered_hours",
 )
 
 #: One curated variable sub-block: a 6-space slug line + its 8-space body.
@@ -101,7 +102,8 @@ def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
     The credentialed seam — delegates to the ECMWF deep sampler, which builds a
     minimal request from the dataset's constraints, retrieves it via `cdsapi`
     (`~/.cdsapirc`), and reads each NetCDF variable's `long_name` / `units`.
-    Wrapped as a module-level function so tests can monkeypatch it offline.
+    Kept a module-level function so the one credentialed call is isolated
+    from the pure rewriting logic around it.
 
     Args:
         dataset_id: The Copernicus dataset id to sample.
@@ -285,7 +287,17 @@ def _match_variables(
 
     unmatched = [slug for slug in placeholders if slug not in chosen]
     unused = [name for name in candidates if name not in used]
-    if len(unmatched) == 1 and len(unused) == 1:
+    # `all` is a pseudo-slug standing for "every variable this dataset serves",
+    # so it never resembles a real name and is always the lone unmatched slug —
+    # rule 4 would pair it with whatever single variable survived the auxiliary
+    # filter, which is how a precipitation CDR acquired a coverage counter.
+    #
+    # Rule 4's wider weakness is untouched here: with one slug and one variable
+    # left it pairs them on arity alone, so two unrelated names still match. A
+    # token-overlap requirement was tried and rejected — it also rejects the
+    # abbreviations rule 4 gets right (`2m-temperature` -> `t2m`,
+    # `sea-surface-temperature` -> `sst`). Tracked separately.
+    if len(unmatched) == 1 and len(unused) == 1 and unmatched[0] != "all":
         chosen[unmatched[0]] = unused[0]
 
     return {

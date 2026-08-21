@@ -175,7 +175,7 @@ class ERDDAP(AbstractDataSource):
         dataset: str = "",
         variables: list[str] | None = None,
         temporal_resolution: str = "daily",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         output_format: OutputFormat = "csv",
         timeout: float = 120.0,

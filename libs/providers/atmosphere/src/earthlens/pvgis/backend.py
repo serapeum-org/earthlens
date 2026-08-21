@@ -94,7 +94,7 @@ class PVGIS(AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "hourly",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         point: tuple[float, float] | None = None,
         spacing_deg: float = DEFAULT_SPACING_DEG,

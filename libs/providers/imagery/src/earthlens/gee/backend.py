@@ -13,7 +13,9 @@ Per `(asset, band-set, time-bucket)` the pipeline is:
 
 * :meth:`_build_collection` — `ee.ImageCollection(asset_id)` (or the
   single `ee.Image` wrapped in one), `.filterDate(...)`,
-  `.filterBounds(region)`, `.select(bands)`. Pure: no I/O.
+  `.filterBounds(region)`, then any constructor `filters` and the
+  per-image `cloud_mask` (`.map`-applied), and finally `.select(bands)`.
+  Pure: no I/O.
 * :meth:`_composite` — split the request window into buckets at the
   requested cadence and collapse each with the dataset's
   `default_reducer` (or the constructor `reducer` override) — `mean`
@@ -46,7 +48,7 @@ from __future__ import annotations
 
 import datetime as dt
 import os
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -83,7 +85,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 
     from earthlens.base.http import HttpClient
 
-__all__ = ["GEE", "AuthenticationError"]
+__all__ = ["GEE", "AuthenticationError", "CloudMask", "CollectionFilter"]
 
 # `temporal_resolution` → pandas frequency alias for the per-bucket
 # date range. `"raw"` is special-cased (one bucket spanning the whole
@@ -92,6 +94,14 @@ _RESOLUTION_FREQ: dict[str, str] = {"daily": "D", "monthly": "MS", "yearly": "YS
 
 _DEFAULT_HTTP_TIMEOUT_S: float = 300.0
 _ZIP_MAGIC: bytes = b"PK\x03\x04"
+
+#: A per-image cloud/quality mask — `ee.Image -> ee.Image` — `.map`-applied
+#: to the collection before the reducer (see `earthlens.gee.cloud_masks`).
+CloudMask = Callable[[ee.Image], ee.Image]
+
+#: An `ee.ImageCollection` filter — collection in, filtered collection out —
+#: applied after `filterDate` / `filterBounds` (see `earthlens.gee.filters`).
+CollectionFilter = Callable[[ee.ImageCollection], ee.ImageCollection]
 
 # Cache of EE-discovered temporal extents per asset id, shared across
 # all `GEE` instances in this process. `_discover_ee_extent` issues an
@@ -155,6 +165,47 @@ def _validate_pure_config(
         )
 
 
+def _validate_filters(
+    filters: Iterable[CollectionFilter] | None,
+) -> tuple[CollectionFilter, ...]:
+    """Normalise the constructor `filters` into a validated tuple.
+
+    Args:
+        filters: The raw `filters=` argument — `None`, or an iterable of
+            `ee.ImageCollection -> ee.ImageCollection` callables (a
+            one-shot generator is accepted and materialised). Order is
+            preserved, so an *ordered* iterable is expected (a `set`
+            applies in arbitrary order).
+
+    Returns:
+        The filters as a tuple (empty when `filters is None`).
+
+    Raises:
+        TypeError: If `filters` is a `str`, a bytes-like object
+            (`bytes` / `bytearray` / `memoryview`), or a mapping; is not
+            iterable; or contains a non-callable entry.
+    """
+    if filters is None:
+        return ()
+    if isinstance(
+        filters, (str, bytes, bytearray, memoryview, Mapping)
+    ) or not isinstance(filters, Iterable):
+        raise TypeError(
+            "filters must be an iterable of callables "
+            "(ee.ImageCollection -> ee.ImageCollection) or None, got "
+            f"{type(filters).__name__}"
+        )
+    collection_filters = tuple(filters)
+    for image_filter in collection_filters:
+        if not callable(image_filter):
+            raise TypeError(
+                "each entry in filters must be a callable "
+                "ee.ImageCollection -> ee.ImageCollection, got "
+                f"{type(image_filter).__name__}"
+            )
+    return collection_filters
+
+
 class GEE(LazyClientMixin, AbstractDataSource):
     """Google Earth Engine data source.
 
@@ -169,7 +220,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         temporal_resolution: How to composite over time — `"raw"` (one
             image: reduce the whole window), `"daily"`, `"monthly"`, or
             `"yearly"`. Defaults to `"raw"`.
-        path: Output directory (created if absent). Defaults to the cwd.
+        path: Output directory (created if absent). Defaults to the configured
+            earthlens output directory (`set_output_dir()` /
+            `EARTHLENS_DATA_DIR`); see `earthlens.config`.
         fmt: `strptime` format for `start` / `end`. Defaults to `"%Y-%m-%d"`.
         scale: Output pixel size in metres. If omitted, each dataset's
             nominal `spatial_resolution` is used.
@@ -221,6 +274,30 @@ class GEE(LazyClientMixin, AbstractDataSource):
             so the caller can track them asynchronously via
             :mod:`earthlens.gee.jobs`. Ignored for `export_via="url"`,
             which is always synchronous.
+        cloud_mask: Optional per-image mask `.map`-applied to every image
+            in the stack *before* the reducer, so the composite is built
+            from cloud-screened pixels — the usual way to get a clean
+            optical mosaic. A callable `ee.Image -> ee.Image`; see
+            :mod:`earthlens.gee.cloud_masks` (`landsat_sr` /
+            `sentinel2_scl`). It runs before the band `select`, so it may
+            read quality bands (`QA_PIXEL` / `SCL`) that are not listed in
+            `variables`. Meant for image collections; on a static
+            `ee_type="image"` dataset it is applied verbatim and a warning
+            is logged (see :meth:`_build_collection`). Defaults to `None`
+            (no masking).
+        filters: Optional iterable of `ee.ImageCollection ->
+            ee.ImageCollection` filters applied to the stack after the
+            spatial / temporal filters (`filterBounds`, and `filterDate`
+            for image collections) and before the `cloud_mask` and
+            reducer — e.g. a metadata cloud-cover cap. Each entry takes
+            the collection and returns it; wrap the
+            :mod:`earthlens.gee.filters` helpers (`by_cloud_cover_lte` /
+            `by_property_in` / ...), whose first argument is the
+            collection, with `functools.partial` or a lambda —
+            `partial(by_cloud_cover_lte, max_pct=60)`. Applied left to
+            right, so pass an *ordered* iterable (a `set` would apply in
+            arbitrary order); like `cloud_mask`, meant for image
+            collections. Defaults to `None` (no extra filters).
 
     Credentials are not constructor arguments — the constructor describes
     only what to fetch. Supply them at the authentication step:
@@ -240,6 +317,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `temporal_resolution`; from :meth:`_api` on a missing scale
             or an oversized `"url"` request (unless `auto_split=True`);
             from :meth:`_download_dataset` on an unknown asset id or band.
+        TypeError: At construction when `cloud_mask` is not callable, or
+            `filters` is a `str` / bytes-like / mapping / non-iterable or
+            contains a non-callable entry.
         NotImplementedError: From :meth:`download` when `aggregate=` is
             passed (not yet supported).
         RuntimeError: From :meth:`_api` if a `"drive"` / `"gcs"` export
@@ -285,7 +365,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "raw",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         *,
         scale: float | None = None,
@@ -300,6 +380,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         auto_split: bool = False,
         discover_extent: bool = False,
         wait_for_export: bool = True,
+        cloud_mask: CloudMask | None = None,
+        filters: Iterable[CollectionFilter] | None = None,
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
@@ -317,6 +399,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "export_via='asset' requires asset_id= (the parent folder "
                 "asset, e.g. 'projects/my-project/assets/my-folder')"
             )
+        if cloud_mask is not None and not callable(cloud_mask):
+            raise TypeError(
+                "cloud_mask must be a callable ee.Image -> ee.Image (or None), "
+                f"got {type(cloud_mask).__name__}"
+            )
+        collection_filters = _validate_filters(filters)
         _validate_pure_config(start, end, temporal_resolution, fmt)
 
         # These must be set before `super().__init__` runs, because the
@@ -344,6 +432,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self.auto_split = bool(auto_split)
         self.discover_extent = bool(discover_extent)
         self.wait_for_export = bool(wait_for_export)
+        #: The per-image `cloud_mask` hook (or `None`), `.map`-applied
+        #: before the reducer in :meth:`_build_collection`.
+        self.cloud_mask = cloud_mask
+        #: The validated `filters` as a tuple (empty when none were given),
+        #: applied left to right in :meth:`_build_collection`.
+        self.filters: tuple[CollectionFilter, ...] = collection_filters
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
 
         super().__init__(
@@ -697,7 +791,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
     def _build_collection(
         self, var_info: Dataset, bands: list[str], start: dt.datetime, end: dt.datetime
     ):
-        """Build the filtered, band-selected `ee.ImageCollection`.
+        """Build the filtered, cloud-masked, band-selected `ee.ImageCollection`.
 
         For an `ee_type="image"` dataset the single `ee.Image` is wrapped
         in a one-element collection so the rest of the pipeline is
@@ -705,6 +799,22 @@ class GEE(LazyClientMixin, AbstractDataSource):
         (Earth Engine convention); the `end` passed here is already
         bumped by one day by :meth:`_clamp_window_to_extent` so the
         user's inclusive end date is covered.
+
+        The pipeline is `filterDate` (image collections only) →
+        `filterBounds` → the constructor `filters` (left to right) → the
+        per-image `cloud_mask` (`.map`) → `select(bands)`. The
+        `cloud_mask` runs *before* `select` on purpose: an optical mask
+        reads a quality band (`QA_PIXEL` / `SCL`) that the user's `bands`
+        usually omit, so selecting the requested bands first would strip
+        it.
+
+        `filters` and `cloud_mask` are meant for image collections. On a
+        static `ee_type="image"` dataset they are still applied verbatim
+        (and a `logger.warning` is emitted): a metadata filter can drop
+        the single wrapped image and empty the collection, while a mask
+        reading a band the asset lacks fails when the graph is computed —
+        either way it surfaces later as an opaque Earth Engine error at
+        download time rather than here.
 
         Args:
             var_info: The catalog entry.
@@ -723,7 +833,21 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # A static image: no temporal filtering (the asset may not
             # carry a `system:time_start` inside the request window).
             collection = ee.ImageCollection([ee.Image(var_info.id)])
-        return collection.filterBounds(self._ee_region()).select(list(bands))
+            if self.filters or self.cloud_mask is not None:
+                logger.warning(
+                    f"filters / cloud_mask were set but {var_info.id!r} is a "
+                    "static single-image dataset (ee_type='image'); they are "
+                    "applied verbatim — a metadata filter can empty the "
+                    "collection, and a mask reading an absent band fails when "
+                    "the graph is computed; either way it surfaces as an opaque "
+                    "Earth Engine error at download time."
+                )
+        collection = collection.filterBounds(self._ee_region())
+        for image_filter in self.filters:
+            collection = image_filter(collection)
+        if self.cloud_mask is not None:
+            collection = collection.map(self.cloud_mask)
+        return collection.select(list(bands))
 
     def _composite(
         self, collection, var_info: Dataset, start: dt.datetime, end: dt.datetime

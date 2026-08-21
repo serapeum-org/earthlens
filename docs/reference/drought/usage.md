@@ -159,7 +159,7 @@ ValueError: Copernicus EDO/GDO rejected 'edo-cdiad' (HTTP 422): Requested date .
 
 The list of curated EDO/GDO ids lives in `src/earthlens/drought/catalog/edo.yaml`
 and `gdo.yaml`. The indicator codes + the `TIME` / `SELECTED_TIMESCALE`
-param shape were verified live (see `planning/drought/captures/`). Every
+param shape were verified live in the A1 gate. Every
 `gdo-*` row uses the same `map=DO_WCS` endpoint as the EDO rows — there is
 no separate `GDO_WCS` map.
 

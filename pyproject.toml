@@ -1,6 +1,6 @@
 [project]
 name = "earthlens"
-version = "0.15.0"
+version = "0.16.0"
 description = "remote sensing package"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -30,12 +30,12 @@ requires-python = ">=3.11,<4"
 # five is conflict-free — the irreconcilable pins only meet if a user asks for
 # two conflicting extras at once, exactly as before the split.
 dependencies = [
-    "earthlens-core ==0.15.0",
-    "earthlens-atmosphere ==0.15.0",
-    "earthlens-ocean ==0.15.0",
-    "earthlens-imagery ==0.15.0",
-    "earthlens-land ==0.15.0",
-    "earthlens-hazards ==0.15.0",
+    "earthlens-core ==0.16.0",
+    "earthlens-atmosphere ==0.16.0",
+    "earthlens-ocean ==0.16.0",
+    "earthlens-imagery ==0.16.0",
+    "earthlens-land ==0.16.0",
+    "earthlens-hazards ==0.16.0",
 ]
 
 
@@ -149,6 +149,11 @@ dev = [
     "mypy >=1.11",
     "pytest >=8.2.2",
     "pytest-cov >=5.0.0",
+    # hypothesis: property-based tests for the pure base helpers (resolve_aoi,
+    # date_windows / split_time) and the frozen extent models. A derandomized
+    # profile (libs/core/tests/base/conftest.py) keeps CI failures reproducible
+    # from the log alone.
+    "hypothesis >=6.100",
     "coverage",
     "build>=1.0.0",
     "twine>=5.0.0",
@@ -157,6 +162,28 @@ dev = [
     "notebook",
     "jupyter",
     "commitizen>=4.8.4",
+]
+# The eclipse showcase notebooks need a heavy geostationary-imagery stack that the
+# rest of the project does not. It is kept out of `dev` deliberately: pulling satpy
+# into the group every CI job syncs moves the resolved xarray/GDAL line, which broke
+# the pip-audit gate and a pyramids GeoTIFF write on 3.13. These notebooks also need
+# the plotting and credential tooling in `dev`, so run them with
+# `uv sync --group dev --group notebooks`.
+notebooks = [
+    # satpy + pyresample: build the day/night true-colour composites from raw MTG FCI
+    # and GOES ABI granules and resample them into the two perspective views.
+    "satpy >=0.55",
+    "pyresample >=1.28",
+    # pyspectral: satpy's `true_color` Rayleigh correction is an optional satpy
+    # dependency, so it has to be asked for by name. It downloads its own look-up
+    # tables (several hundred MB) on first use.
+    "pyspectral >=0.13",
+    # scipy: feathers the disc edge and softens the limb (ndimage.binary_erosion /
+    # gaussian_filter).
+    "scipy >=1.11",
+    # imageio-ffmpeg: the geometry notebook calls get_ffmpeg_exe() to encode its
+    # clip; it was only ever present transitively.
+    "imageio-ffmpeg >=0.5",
 ]
 docs = [
     "mkdocs >=1.5.3",

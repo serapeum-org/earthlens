@@ -118,7 +118,7 @@ class GDACS(AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "all",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         alert_level: list[str] | None = None,
         file_format: FileFormat = "gpkg",

@@ -98,9 +98,10 @@ The first form prints a summary (collection count, drift vs the bundled
 catalog) without touching disk. The second rewrites the
 `available_datasets:` index in `src/earthlens/jaxa/catalog/_index.yaml`
 with the freshly probed ids (the curated per-mission shards under the
-same `catalog/` directory are not touched). See
-`planning/jaxa/captures/build_catalog.py` for the generator that builds
-the per-mission shards from scratch.
+same `catalog/` directory are not touched). The per-mission shards are
+generated from scratch by a build script kept with the maintainer's
+capture notes, not shipped in the package — regenerate them by re-running
+`earthlens datasets refresh jaxa --write` and re-probing.
 
 ## When the live e2e tests run
 

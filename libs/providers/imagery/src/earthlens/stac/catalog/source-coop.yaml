@@ -3,7 +3,7 @@
 # A1 probe (2026-06-17): the three named candidate repos all return HTTP 403
 # on the direct https://data.source.coop/<owner>/<name>/catalog.json URL,
 # indicating they are **flat S3 prefixes** rather than static STAC catalogs
-# or STAC APIs. Per `G4` in planning/stac-extensions, flat-S3 Source
+# or STAC APIs. Per `G4` in the STAC extensions plan, flat-S3 Source
 # Cooperative repos are out of scope for the STAC backend; they belong as
 # future `earthlens.s3` (or `worldpop`-shaped) dataset rows.
 #

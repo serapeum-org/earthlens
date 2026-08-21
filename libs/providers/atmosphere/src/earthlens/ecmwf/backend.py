@@ -1,3 +1,37 @@
+"""ECMWF / Copernicus data-store backend — :class:`ECMWF`, an :class:`AbstractDataSource`.
+
+Downloads from the five CADS data stores through one `cdsapi` client:
+the Copernicus trio (CDS, ADS, EWDS) and the two ECMWF-hosted stores
+(ECDS, XDS). A request is `{dataset: [variable, ...], ...}` plus a date
+range, a bbox and a temporal resolution; the dataset ids, variable
+metadata and per-store routing all come from
+:class:`earthlens.ecmwf.Catalog` (loaded from the per-family
+`catalog/*.yaml` shards). Nothing about a dataset is hardcoded here.
+
+Each row's `endpoint` picks the store, resolved to an API root and a
+credential by :mod:`earthlens.ecmwf.endpoints`; one client is cached per
+endpoint, so a single :meth:`ECMWF.download` may span several stores.
+
+The pipeline (per `(dataset, variable)` pair) is:
+
+1. :meth:`ECMWF._build_request` — build the request from the catalog row,
+   then shape its date keys by `request_kind` (see
+   :data:`_REQUEST_KIND_STRIPS`): kinds strip the template fields their
+   dataset rejects, and the reforecast kinds rewrite the date axes —
+   `glofas_hindcast` *renames* `year`/`month`/`day` to the `h*` keys,
+   while `s2s_reforecast` *copies* them, keeping both dates.
+2. :class:`earthlens.ecmwf.constraints.RequestValidator` — pre-flight the
+   request against the store's `constraints.json` before anything is queued.
+3. :meth:`ECMWF._api` — submit through `cdsapi`, then normalise the
+   response: a zipped or archived NetCDF is unpacked
+   (:func:`_unpack_netcdf_archive`) so `download()` always returns the
+   written data files.
+
+Authentication failures are surfaced as :class:`AuthenticationError`,
+which distinguishes missing credentials from an unaccepted licence — the
+two most common ways a retrieve is refused.
+"""
+
 from __future__ import annotations
 
 import os
@@ -21,9 +55,15 @@ from earthlens.base import (
     to_datetime,
 )
 from earthlens.base import AuthenticationError as _BaseAuthenticationError
+from earthlens.config import resolve_output_path
+from earthlens.ecmwf._helpers import (
+    CadsUnavailableError,
+    _retrieve_with_retry,
+    endpoint_for,
+)
 from earthlens.ecmwf.catalog import Catalog, Variable
 from earthlens.ecmwf.constraints import RequestValidator
-from earthlens.ecmwf.endpoints import constraints_base_url, endpoint_url
+from earthlens.ecmwf.endpoints import constraints_base_url
 from earthlens.ecmwf.endpoints import open_client as _open_endpoint_client
 
 __all__ = ["AuthenticationError", "ECMWF", "ERA5_GRID_DEGREES"]
@@ -55,6 +95,14 @@ _REQUEST_KIND_STRIPS: dict[str, tuple[str, ...]] = {
     # GloFAS/EFAS hindcast (reforecast): keys on `hyear`/`hmonth`/`hday`
     # (remapped in `_build_request`) + `leadtime_hour`; drop `time`.
     "glofas_hindcast": ("time",),
+    # S2S reforecast (ECDS): unlike `glofas_hindcast` this keeps BOTH date
+    # axes — `year`/`month`/`day` select the model cycle and
+    # `hyear`/`hmonth`/`hday` the reforecast — so the month/day are *copied*
+    # into the h-keys rather than renamed. `hyear` alone comes from `extras`.
+    # The strip tuple is deliberately empty: the form accepts every template
+    # key including `time`, so there is nothing to drop (the row's `extras`
+    # pin the single `time` slot the dataset serves).
+    "s2s_reforecast": (),
     # Seasonal (GloFAS/EFAS/CDS seasonal): keyed by `year`/`month` + a lead
     # (`leadtime_month`/`leadtime_hour`) + `originating_centre`/`system` from
     # `extras`; no `day`, no time-of-day.
@@ -134,33 +182,6 @@ def _looks_like_missing_credentials(exc: BaseException) -> bool:
     no_credentials = not cdsapirc_present and not env_present
     message_indicates_auth = any(keyword in message for keyword in auth_keywords)
     return no_credentials or message_indicates_auth
-
-
-def _looks_like_licence_not_accepted(exc: BaseException) -> bool:
-    """Heuristic: does this exception come from an unaccepted CDS licence?
-
-    CDS returns HTTP 403 with a body that mentions "Required licences
-    not accepted" (or "licence" depending on locale) when the user has
-    a valid Personal Access Token but has not ticked the licence on
-    the dataset's download page. cdsapi raises this through to the
-    caller as a generic exception; we detect it by message scan so we
-    can rewrite into a :class:`PermissionError` that names the
-    dataset URL.
-
-    Args:
-        exc: The exception raised by `client.retrieve(...)`.
-
-    Returns:
-        True if the message looks like a licence-acceptance failure;
-        False otherwise.
-    """
-    message = str(exc).lower()
-    return (
-        "licence" in message
-        or "license" in message
-        or "403" in message
-        and ("accept" in message or "term" in message)
-    )
 
 
 def _unwrap_zipped_netcdf(target: Path) -> None:
@@ -354,14 +375,68 @@ def _remap_date_keys(
             request[dst_key] = request.pop(src_key)
 
 
+def _reject_multi_day_reforecast(request: dict[str, Any], var_info: Variable) -> None:
+    """Refuse an S2S-reforecast window that spans more than one model-cycle day.
+
+    The model-cycle and reforecast dates are paired, but a CDS form request
+    treats every list as an independent cross-product axis, so a window of `n`
+    days would submit `n x n` `day`/`hday` combinations of which only the `n`
+    diagonal pairs exist. There is no request shape that expresses the pairing,
+    so ask for one day at a time.
+
+    Args:
+        request: The request assembled so far.
+        var_info: The catalog row being requested (named in the error).
+
+    Raises:
+        ValueError: If the window covers more than one day.
+    """
+    days = request.get("day") or []
+    months = request.get("month") or []
+    if not days:
+        raise ValueError(
+            f"{var_info.cds_dataset!r} selects a reforecast by the model run's "
+            "own calendar day, so it needs a `day`. Request it with "
+            "temporal_resolution='daily'."
+        )
+    if len(days) > 1 or len(months) > 1:
+        raise ValueError(
+            f"{var_info.cds_dataset!r} pairs the model-cycle date with the "
+            "reforecast date, and a CDS form request cannot express that "
+            f"pairing: a {len(days)}-day window would submit "
+            f"{len(days) * len(days)} day/hday combinations of which only "
+            f"{len(days)} exist. Request one model-cycle date at a time "
+            "(start == end)."
+        )
+    # A 29 February model cycle has no reforecast in a non-leap `hyear`. The
+    # row's `extras` are merged after this hook runs, so read `hyear` from the
+    # catalog row rather than from the half-built request.
+    hyears = var_info.extras.get("hyear") or []
+    if months == ["02"] and days == ["29"]:
+        non_leap = [
+            year
+            for year in hyears
+            if not (int(year) % 4 == 0 and (int(year) % 100 or int(year) % 400 == 0))
+        ]
+        if non_leap:
+            raise ValueError(
+                f"{var_info.cds_dataset!r}: a 29 February model cycle has no "
+                f"reforecast in the non-leap hyear(s) {non_leap}. Pick a leap "
+                "`hyear` in the row's extras, or another model-cycle date."
+            )
+
+
 def _apply_request_kind_dates(
     request: dict[str, Any], var_info: Variable, start_date: Any, end_date: Any
 ) -> None:
     """Rewrite the request's date keys for the date-representation kinds (G11).
 
     `cams_date` replaces year/month/day with a single `date` range string;
-    `glofas_hindcast` / `seasonal_hindcast` remap year/month(/day) to the
-    `hyear`/`hmonth`(/`hday`) hindcast-reference keys. Any other kind is a no-op.
+    `glofas_hindcast` / `seasonal_hindcast` *rename* year/month(/day) to the
+    `hyear`/`hmonth`(/`hday`) hindcast-reference keys; `s2s_reforecast`
+    *copies* month/day into them instead, because that dataset needs both the
+    model-cycle and the reforecast date (and rejects a window it cannot
+    express). Any other kind is a no-op.
 
     Args:
         request: The request dict assembled so far (mutated in place).
@@ -383,6 +458,22 @@ def _apply_request_kind_dates(
     elif var_info.request_kind == "seasonal_hindcast":
         # Seasonal reforecast: hindcast year/month, no day (stripped elsewhere).
         _remap_date_keys(request, (("year", "hyear"), ("month", "hmonth")))
+    elif var_info.request_kind == "s2s_reforecast":
+        # S2S reforecasts carry two coupled date axes: the model cycle
+        # (`year`/`month`/`day`) and the reforecast (`hyear`/`hmonth`/`hday`).
+        # The store only serves a reforecast on the model run's own calendar
+        # day, so the two must be *paired*, not crossed — and a CDS form
+        # request cannot express "zip these two lists": every list is a
+        # cross-product axis. A multi-day window would therefore submit
+        # `day x hday` combinations of which only the diagonal exists, so
+        # refuse it explicitly rather than send a request the store rejects
+        # (or, worse, one it partially serves).
+        _reject_multi_day_reforecast(request, var_info)
+        for src_key, dst_key in (("month", "hmonth"), ("day", "hday")):
+            if src_key in request:
+                # Copy by value: assigning the list itself would alias the two
+                # keys, so a later edit to `day` would silently move `hday`.
+                request[dst_key] = list(request[src_key])
 
 
 def _apply_extras_and_strips(request: dict[str, Any], var_info: Variable) -> None:
@@ -451,7 +542,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         lat_lim: list[float] | None = None,
         lon_lim: list[float] | None = None,
         temporal_resolution: str = "daily",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         skip_constraints: bool = False,
         request: dict[str, Any] | None = None,
@@ -481,8 +572,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             temporal_resolution: Either `"daily"` or `"monthly"`.
                 Defaults to `"daily"`.
             path: Output directory. Created by the parent if it does
-                not exist. Defaults to `""` (the current working
-                directory).
+                not exist. When omitted it falls back to the
+                configured earthlens output directory (`set_output_dir()` /
+                `EARTHLENS_DATA_DIR`); see `earthlens.config`.
             fmt: `strptime` format for `start` / `end`.
                 Defaults to `"%Y-%m-%d"`.
             skip_constraints: When `True`, every CDS pre-flight
@@ -494,7 +586,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 dataset, or when running offline. Defaults to `False`.
         """
         self.skip_constraints = skip_constraints
-        # Per-endpoint cdsapi client cache (cds / ads / ewds). Populated
+        # Per-endpoint cdsapi client cache (one per ENDPOINTS slug). Populated
         # lazily by `_client_for` so a multi-endpoint download reuses one
         # connection per CADS instance. `_injected_client` holds a client
         # bound via the `client` setter (used for every endpoint); it stays
@@ -529,7 +621,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             # Construction stays read-only: the base `download` wrapper's
             # `_ensure_root_dir` creates (and unwinds on failure) the output
             # directory at download time, exactly as the typed path relies on.
-            self.root_dir = Path(path).absolute()
+            self.root_dir = resolve_output_path(path)
             self.path = self.root_dir
             return
 
@@ -915,7 +1007,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             such a multi-member response cannot be aggregated. Under the
             default `errors="warn"`, variables whose download (or
             aggregate) failed are logged and omitted from the returned
-            list rather than aborting the batch.
+            list rather than aborting the batch. A store-level refusal is
+            the exception to that — see :class:`CadsUnavailableError`
+            under `Raises:`.
 
         Raises:
             ValueError: If `errors` is not a recognised policy.
@@ -923,6 +1017,15 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 curated CDS dataset, or if a listed variable is not
                 declared under that dataset — under `errors="warn"` this
                 is logged per pair rather than raised.
+            CadsUnavailableError: The store refused to queue the job on
+                its per-dataset limit and kept refusing across all three
+                attempts (roughly six seconds of backoff). Raised **whatever
+                `errors` is set to**, including `"ignore"`: a refusal by
+                the service is not the per-variable data gap the policy
+                exists to absorb, and continuing would report an outage
+                as every variable having no data.
+            PermissionError: The dataset's licence has not been accepted
+                on the Copernicus account.
             Exception: Any error :meth:`_api` propagates from
                 :meth:`cdsapi.Client.retrieve`.
 
@@ -991,6 +1094,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             errors=self._errors,
             label="variable",
             describe=_describe_pair,
+            # A throttled store refused to serve anything; continuing would
+            # report that as every variable having no data.
+            fatal=(CadsUnavailableError,),
         )
         if not failures:
             logger.info(
@@ -1061,8 +1167,9 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
     def _resolve_endpoint(self, dataset: str) -> str:
         """Resolve which store hosts `dataset` for a passthrough retrieve.
 
-        A curated row's `endpoint` wins; otherwise the per-store availability
-        index (`Catalog.store_for`) decides; falling back to `"cds"`.
+        Delegates to :func:`earthlens.ecmwf._helpers.endpoint_for`, the one
+        resolver the CLI tooling shares: a curated row's `endpoint` wins, then
+        the per-store availability index, then `"cds"` with a warning.
 
         Args:
             dataset: The Copernicus dataset id being retrieved.
@@ -1070,11 +1177,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         Returns:
             str: The store slug (`"cds"` / `"ads"` / `"ewds"`).
         """
-        catalog = Catalog()
-        row = catalog.datasets.get(dataset)
-        if row is not None:
-            return row.endpoint
-        return catalog.store_for(dataset) or "cds"
+        return endpoint_for(dataset)
 
     def _passthrough_target(self, dataset: str, request: dict[str, Any]) -> str:
         """Pick an output filename for a raw retrieve from the request format.
@@ -1137,19 +1240,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             f"Passthrough retrieve {dataset!r} via {endpoint.upper()}; "
             "this may take several minutes"
         )
-        try:
-            client.retrieve(dataset, request, str(target))
-        except Exception as exc:  # noqa: BLE001
-            # Broad catch on purpose: classify a licence rejection into a clear
-            # PermissionError and re-raise everything else unchanged.
-            if _looks_like_licence_not_accepted(exc):
-                base = endpoint_url(endpoint).rsplit("/api", 1)[0]
-                raise PermissionError(
-                    f"{endpoint.upper()} rejected {dataset!r}: licence not "
-                    f"accepted. Open {base}/datasets/{dataset} and tick the "
-                    "licence at the bottom of the 'Download' tab."
-                ) from exc
-            raise
+        _retrieve_with_retry(client, dataset, request, target, endpoint)
         return self._passthrough_postprocess(target)
 
     def _passthrough_postprocess(self, target: Path) -> list[Path]:
@@ -1347,19 +1438,7 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             f"Requesting {dataset} from {var_info.endpoint.upper()}; "
             "this may take several minutes"
         )
-        try:
-            client.retrieve(dataset, request, str(target))
-        except Exception as exc:  # noqa: BLE001 - cdsapi raises a variety of types; classify here and re-raise as PermissionError when licence-related
-            if _looks_like_licence_not_accepted(exc):
-                base = endpoint_url(var_info.endpoint).rsplit("/api", 1)[0]
-                raise PermissionError(
-                    f"{var_info.endpoint.upper()} rejected the request for "
-                    f"{dataset!r}: licence not accepted. Open the dataset page "
-                    f"at {base}/datasets/{dataset} and tick the licence at the "
-                    "bottom of the 'Download' tab. The acceptance is permanent "
-                    "and tied to your Copernicus account."
-                ) from exc
-            raise
+        _retrieve_with_retry(client, dataset, request, target, var_info.endpoint)
         # A zip-of-NetCDF response (satellite CDRs, CAMS netcdf_zip) is unpacked
         # by the C3 handler — single-member in place, multi-member into a
         # sibling dir — so a multi-timestep curated retrieve does not crash.

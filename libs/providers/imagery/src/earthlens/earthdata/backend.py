@@ -43,6 +43,8 @@ from earthlens.base import (
     OutputKind,
     RemoteProduct,
     TemporalExtent,
+    end_is_date_only,
+    expand_bare_date_end,
     region_affinity,
 )
 from earthlens.earthdata.auth import EarthdataAuth, EarthdataCredentials
@@ -82,7 +84,7 @@ class Earthdata(AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "daily",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         daac: str | None = None,
         region: str | None = None,
@@ -282,6 +284,7 @@ class Earthdata(AbstractDataSource):
         Raises:
             ValueError: If `start` parses to a date later than `end`.
         """
+        self._end_is_date_only = end_is_date_only(end)
         return self._cadence_extent(
             start,
             end,
@@ -323,12 +326,12 @@ class Earthdata(AbstractDataSource):
             self.space.east,
             self.space.north,
         )
-        # The end date is inclusive of its whole calendar day. `start`/`end`
-        # parse to midnight, so passing them verbatim would make a same-day
-        # request a zero-width instant at 00:00 and match few or no granules;
-        # extend the end bound to the end of `end_date`'s day.
-        end_of_day = self.time.end_date.replace(
-            hour=23, minute=59, second=59, microsecond=999999
+        # A date-only end is inclusive of its whole calendar day: it parses to
+        # midnight, so passing it verbatim would make a same-day request a
+        # zero-width instant and match few or no granules. An end naming a time
+        # means that instant and is left alone.
+        end_of_day = expand_bare_date_end(
+            self.time.end_date, date_only=self._end_is_date_only
         )
         temporal = (
             self.time.start_date.isoformat(),

@@ -23,6 +23,7 @@ from earthlens.base import SpatialExtent, TemporalExtent
 from earthlens.gee import backend as backend_module
 from earthlens.gee.backend import GEE
 from earthlens.gee.catalog import Dataset, Extent
+from earthlens.gee.cloud_masks import sentinel2_scl
 
 # -- fakes ------------------------------------------------------------------
 
@@ -71,6 +72,12 @@ class _FakeImageCollection:
 
     def filterBounds(self, geom):  # noqa: N802
         return self._chain("filterBounds", geom)
+
+    def filter(self, filt):
+        return self._chain("filter", filt)
+
+    def map(self, fn):
+        return self._chain("map", fn)
 
     def select(self, bands):
         return self._chain("select", tuple(bands))
@@ -274,6 +281,11 @@ class _FakePyramidsDataset:
 _FAKE_TIFF_BYTES = b"MM\x00*" + b"\x00" * 64
 
 
+def _identity_mask(image):
+    """A no-op `cloud_mask` used to assert `.map` wiring (returns the image)."""
+    return image
+
+
 # -- fixtures ---------------------------------------------------------------
 
 
@@ -372,6 +384,89 @@ class TestInit:
         """An unknown `export_via` raises `ValueError` at construction."""
         with pytest.raises(ValueError, match="export_via must be"):
             make_gee(export_via="ftp")
+
+    def test_cloud_mask_and_filters_default_to_none(self, make_gee):
+        """Omitting the hooks leaves `cloud_mask=None` and `filters=()`."""
+        gee = make_gee()
+        assert gee.cloud_mask is None
+        assert gee.filters == ()
+
+    def test_cloud_mask_and_filters_captured(self, make_gee):
+        """The hooks are stored; `filters` is normalised to a tuple."""
+        first, second = (lambda c: c), (lambda c: c)
+        gee = make_gee(cloud_mask=_identity_mask, filters=[first, second])
+        assert gee.cloud_mask is _identity_mask
+        assert gee.filters == (first, second)
+
+    def test_non_callable_cloud_mask_rejected(self, make_gee):
+        """A non-callable `cloud_mask` raises `TypeError` at construction."""
+        with pytest.raises(TypeError, match="cloud_mask must be a callable"):
+            make_gee(cloud_mask="not-callable")
+
+    def test_non_iterable_filters_rejected(self, make_gee):
+        """A non-iterable `filters` raises `TypeError` at construction."""
+        with pytest.raises(TypeError, match="filters must be an iterable"):
+            make_gee(filters=42)
+
+    def test_non_callable_filter_entry_rejected(self, make_gee):
+        """A non-callable entry in `filters` raises `TypeError`."""
+        with pytest.raises(TypeError, match="each entry in filters"):
+            make_gee(filters=[lambda c: c, "nope"])
+
+    def test_str_filters_rejected(self, make_gee):
+        """A `str` (iterable of chars) is rejected rather than iterated per char."""
+        with pytest.raises(TypeError, match="filters must be an iterable"):
+            make_gee(filters="abc")
+
+    def test_mapping_filters_rejected(self, make_gee):
+        """A mapping is rejected up front, not iterated into its keys."""
+        with pytest.raises(TypeError, match="filters must be an iterable"):
+            make_gee(filters={"a": lambda c: c})
+
+    @pytest.mark.parametrize("value", [b"abc", bytearray(b"abc"), memoryview(b"abc")])
+    def test_bytes_like_filters_rejected(self, make_gee, value):
+        """bytes / bytearray / memoryview are rejected up front, not iterated per byte."""
+        with pytest.raises(TypeError, match="filters must be an iterable"):
+            make_gee(filters=value)
+
+    @pytest.mark.parametrize(
+        "kwargs, match",
+        [
+            ({"cloud_mask": "x"}, r"cloud_mask must be a callable"),
+            ({"filters": 42}, r"filters must be an iterable"),
+            ({"filters": [object()]}, r"each entry in filters"),
+        ],
+    )
+    def test_bad_hooks_fail_before_catalog_load(
+        self, monkeypatch, tmp_path, kwargs, match
+    ):
+        """A bad `cloud_mask` / `filters` raises before the catalog parse."""
+        from earthlens.gee import backend as backend_module
+
+        class _ExplodingCatalog:
+            def __init__(self, *_a, **_k):
+                raise AssertionError(
+                    "Catalog() must not be constructed before hook validation"
+                )
+
+        monkeypatch.setattr(backend_module, "Catalog", _ExplodingCatalog)
+        with pytest.raises(TypeError, match=match):
+            GEE(
+                start="2000-02-11",
+                end="2000-02-12",
+                variables={"USGS/SRTMGL1_003": ["elevation"]},
+                lat_lim=[29.9, 30.0],
+                lon_lim=[31.2, 31.3],
+                path=str(tmp_path),
+                **kwargs,
+            )
+
+    def test_generator_filters_normalised_to_tuple(self, make_gee):
+        """A one-shot generator is materialised into a reusable tuple."""
+        first, second = (lambda c: c), (lambda c: c)
+        gee = make_gee(filters=(f for f in (first, second)))
+        assert gee.filters == (first, second)
+        assert isinstance(gee.filters, tuple)
 
     def test_bad_export_via_fails_before_catalog_load(self, monkeypatch, tmp_path):
         """A typo'd `export_via` raises before paying for the catalog parse (M3)."""
@@ -991,8 +1086,12 @@ class TestBuildCollection:
         )
         assert col.method_names() == ["filterDate", "filterBounds", "select"]
 
-    def test_static_image_skips_filter_date(self, make_gee):
-        """A static `image` dataset is *not* date-filtered."""
+    def test_static_image_skips_filter_date(self, make_gee, monkeypatch):
+        """A hookless static image dataset is not date-filtered and logs no warning."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
         gee = make_gee()
         ds = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         col = gee._build_collection(
@@ -1000,6 +1099,122 @@ class TestBuildCollection:
         )
         assert col.method_names() == ["filterBounds", "select"]
         assert gee.client.image_log == ["USGS/SRTMGL1_003"]
+        assert warnings == []
+
+    def test_filters_applied_after_bounds_before_select(self, make_gee):
+        """Constructor `filters` are applied left to right, after bounds."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            filters=[lambda c: c.filter("a"), lambda c: c.filter("b")],
+        )
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert col.method_names() == [
+            "filterDate",
+            "filterBounds",
+            "filter",
+            "filter",
+            "select",
+        ]
+        assert [args for name, args in col.calls if name == "filter"] == [
+            ("a",),
+            ("b",),
+        ]
+
+    def test_cloud_mask_mapped_before_select(self, make_gee):
+        """A `cloud_mask` is `.map`-applied before the band `select`."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            cloud_mask=_identity_mask,
+        )
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert col.method_names() == ["filterDate", "filterBounds", "map", "select"]
+        # The exact callable is threaded through to `.map`.
+        assert [args for name, args in col.calls if name == "map"] == [
+            (_identity_mask,)
+        ]
+
+    def test_filters_then_cloud_mask_then_select(self, make_gee, monkeypatch):
+        """On a collection the order is filters → cloud_mask → select, with no warning."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            filters=[lambda c: c.filter("cc")],
+            cloud_mask=_identity_mask,
+        )
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert col.method_names() == [
+            "filterDate",
+            "filterBounds",
+            "filter",
+            "map",
+            "select",
+        ]
+        assert warnings == []
+
+    def test_real_cloud_mask_threaded_through_build(self, make_gee):
+        """A real mask (`sentinel2_scl`) is the exact callable handed to `.map`."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            cloud_mask=sentinel2_scl,
+        )
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 6, 2)
+        )
+        assert [args for name, args in col.calls if name == "map"] == [(sentinel2_scl,)]
+
+    def test_static_image_applies_filters_and_cloud_mask(self, make_gee, monkeypatch):
+        """A static image dataset applies the hooks before select and logs a warning."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee(
+            filters=[lambda c: c.filter("cc")],
+            cloud_mask=_identity_mask,
+        )
+        ds = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        col = gee._build_collection(
+            ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
+        )
+        assert col.method_names() == ["filterBounds", "filter", "map", "select"]
+        assert any("static single-image" in w for w in warnings), warnings
+
+    @pytest.mark.parametrize(
+        "hooks",
+        [
+            {"filters": [lambda c: c.filter("cc")]},
+            {"cloud_mask": _identity_mask},
+        ],
+    )
+    def test_static_image_single_hook_warns(self, make_gee, monkeypatch, hooks):
+        """A static image warns when only one of filters / cloud_mask is set."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee(**hooks)
+        ds = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._build_collection(
+            ds, ["elevation"], dt.datetime(2000, 2, 11), dt.datetime(2000, 2, 13)
+        )
+        assert any("static single-image" in w for w in warnings), warnings
 
 
 class TestComposite:
@@ -1046,6 +1261,27 @@ class TestComposite:
             dt.datetime(2020, 6, 1),
             dt.datetime(2020, 7, 1),
         ]
+        assert all(img.reducer == "mean" for _, img in buckets)
+
+    def test_monthly_maps_cloud_mask_once_not_per_bucket(self, make_gee):
+        """The `cloud_mask` is `.map`-applied once at build, not re-applied per bucket."""
+        gee = make_gee(
+            start="2020-06-01",
+            end="2020-07-31",
+            temporal_resolution="monthly",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+            cloud_mask=_identity_mask,
+        )
+        ds = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        col = gee._build_collection(
+            ds, ["precipitation"], dt.datetime(2020, 6, 1), dt.datetime(2020, 8, 1)
+        )
+        assert col.method_names().count("map") == 1
+        buckets = list(
+            gee._composite(col, ds, dt.datetime(2020, 6, 1), dt.datetime(2020, 8, 1))
+        )
+        assert len(buckets) == 2
         assert all(img.reducer == "mean" for _, img in buckets)
 
     def test_static_image_one_bucket_regardless_of_resolution(self, make_gee):

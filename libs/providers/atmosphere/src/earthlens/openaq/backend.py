@@ -117,7 +117,7 @@ class OpenAQ(AbstractDataSource):
         lat_lim: list[float],
         lon_lim: list[float],
         temporal_resolution: str = "daily",
-        path: Path | str = "",
+        path: Path | str | None = None,
         fmt: str = "%Y-%m-%d",
         api_key: str | None = None,
         max_locations: int | None = 500,

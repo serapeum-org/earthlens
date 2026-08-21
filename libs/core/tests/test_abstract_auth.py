@@ -17,7 +17,7 @@ from __future__ import annotations
 import pytest
 from pydantic import BaseModel, ConfigDict, SecretStr
 
-from earthlens.base import AbstractAuth, AuthenticationError
+from earthlens.base import AbstractAuth, AuthenticationError, SingleSecretAuth
 
 
 class _Creds(BaseModel):
@@ -221,3 +221,144 @@ class TestProviderErrorHierarchy:
         assert len(set(classes.values())) == len(classes), (
             f"two providers share an error class: {sorted(classes)}"
         )
+
+
+class _SecretCreds(BaseModel):
+    """Credentials value object carrying one optional secret."""
+
+    model_config = ConfigDict(frozen=True)
+
+    token: SecretStr | None = None
+
+
+class _DemoError(AuthenticationError):
+    """A provider-specific error so the raised type can be asserted."""
+
+
+class _DemoAuth(SingleSecretAuth[_SecretCreds]):
+    """Minimal single-secret auth resolving `DEMO_A` then `DEMO_B`."""
+
+    ENV_VARS = ("DEMO_A", "DEMO_B")
+    PROVIDER = "Demo"
+    CREDENTIAL_ARG = "demo_key"
+    CREDENTIAL_HINT = "Get one at example.test."
+    AUTH_ERROR = _DemoError
+
+    def _explicit_credential(self) -> str | None:
+        """Unwrap the explicit token off the credentials, if present."""
+        token = self._creds.token
+        return token.get_secret_value() if token is not None else None
+
+    def _connect(self, credential: str) -> None:
+        """Record the resolved secret and count the calls."""
+        self.connected = getattr(self, "connected", 0) + 1
+        self.secret = credential
+
+
+class TestSingleSecretAuth:
+    """The shared explicit -> env -> raise -> memoise ceremony."""
+
+    def test_explicit_credential_wins(self, monkeypatch):
+        """An explicit credential is used even when an env var is also set."""
+        monkeypatch.setenv("DEMO_A", "from-env")
+        auth = _DemoAuth(_SecretCreds(token="explicit"))
+        auth.configure()
+        assert auth.secret == "explicit", auth.secret
+
+    def test_env_fallback_in_priority_order(self, monkeypatch):
+        """With no explicit value, the first set ENV_VAR (in order) wins."""
+        monkeypatch.delenv("DEMO_A", raising=False)
+        monkeypatch.setenv("DEMO_B", "second")
+        auth = _DemoAuth(_SecretCreds())
+        auth.configure()
+        assert auth.secret == "second", auth.secret
+
+    def test_first_env_var_takes_priority(self, monkeypatch):
+        """DEMO_A is preferred over DEMO_B when both are set."""
+        monkeypatch.setenv("DEMO_A", "first")
+        monkeypatch.setenv("DEMO_B", "second")
+        auth = _DemoAuth(_SecretCreds())
+        auth.configure()
+        assert auth.secret == "first", auth.secret
+
+    def test_missing_raises_provider_error_with_consistent_message(self, monkeypatch):
+        """No credential raises the provider's error type, naming provider+vars+hint."""
+        monkeypatch.delenv("DEMO_A", raising=False)
+        monkeypatch.delenv("DEMO_B", raising=False)
+        auth = _DemoAuth(_SecretCreds())
+        with pytest.raises(_DemoError) as exc_info:
+            auth.configure()
+        message = str(exc_info.value)
+        assert "Demo" in message, message
+        assert "pass demo_key=" in message, message
+        assert "DEMO_A or DEMO_B" in message, message
+        assert "Get one at example.test." in message, message
+
+    def test_missing_error_is_catchable_as_base(self, monkeypatch):
+        """The provider error is still a base AuthenticationError for the broad catch."""
+        monkeypatch.delenv("DEMO_A", raising=False)
+        monkeypatch.delenv("DEMO_B", raising=False)
+        auth = _DemoAuth(_SecretCreds())
+        with pytest.raises(AuthenticationError):
+            auth.configure()
+
+    def test_configure_is_idempotent(self, monkeypatch):
+        """A second configure() after success does not re-connect."""
+        monkeypatch.setenv("DEMO_A", "x")
+        auth = _DemoAuth(_SecretCreds())
+        auth.configure()
+        auth.configure()
+        assert auth.connected == 1, auth.connected
+        assert auth.is_authenticated() is True
+
+    def test_empty_explicit_credential_raises_without_env_fallback(self, monkeypatch):
+        """A present-but-empty explicit secret raises and never consults the env.
+
+        Only an absent (None) explicit credential falls back to ENV_VARS; an
+        empty one is an error, matching each backend's original behaviour.
+        """
+        monkeypatch.setenv("DEMO_A", "from-env")
+        auth = _DemoAuth(_SecretCreds(token=""))
+        with pytest.raises(_DemoError) as exc_info:
+            auth.configure()
+        assert "no Demo credential available" in str(exc_info.value), exc_info.value
+        assert getattr(auth, "connected", 0) == 0, "must not connect on empty secret"
+
+
+class _EnvOnlyAuth(SingleSecretAuth[_SecretCreds]):
+    """A single-secret auth that keeps the base's default `_explicit_credential`.
+
+    It declares only an env var and provider name and no `CREDENTIAL_HINT`, so it
+    exercises the inherited `_explicit_credential` (always `None`, env-only) and
+    the missing-credential message with no trailing hint sentence.
+    """
+
+    ENV_VARS = ("ENVONLY_VAR",)
+    PROVIDER = "EnvOnly"
+
+    def _connect(self, credential: str) -> None:
+        """Record the resolved secret."""
+        self.secret = credential
+
+
+class TestSingleSecretAuthDefaults:
+    """The base defaults: env-only resolution and the hint-free error message."""
+
+    def test_env_resolution_uses_the_inherited_explicit_credential(self, monkeypatch):
+        """With no `_explicit_credential` override, the env var supplies the secret."""
+        monkeypatch.setenv("ENVONLY_VAR", "from-env")
+        auth = _EnvOnlyAuth(_SecretCreds(token="ignored-because-not-read"))
+        auth.configure()
+        assert auth.secret == "from-env", auth.secret
+
+    def test_missing_credential_without_hint_omits_the_hint_sentence(self, monkeypatch):
+        """A backend with no CREDENTIAL_HINT raises the bare provider-named message."""
+        monkeypatch.delenv("ENVONLY_VAR", raising=False)
+        auth = _EnvOnlyAuth(_SecretCreds())
+        with pytest.raises(AuthenticationError) as exc_info:
+            auth.configure()
+        message = str(exc_info.value)
+        assert (
+            message == "no EnvOnly credential available: pass it explicitly or set "
+            "ENVONLY_VAR."
+        ), message

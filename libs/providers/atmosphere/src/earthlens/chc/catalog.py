@@ -134,7 +134,7 @@ class Variable(FluxableLeaf):
     units: str
 
     # `is_flux` property inherited from `FluxableLeaf` (N1 in
-    # planning/catalog-cross-backend-comparison.md).
+    # the cross-backend catalog comparison).
 
 
 class Dataset(BaseModel):
@@ -811,7 +811,7 @@ class Catalog(AbstractCatalog):
     # `get_dataset(name)` (with the did-you-mean hint) and the dict-like
     # dunders are inherited from
     # :class:`earthlens.base.AbstractCatalog` (M1 in
-    # planning/catalog-cross-backend-comparison.md).
+    # the cross-backend catalog comparison).
 
     def health(self) -> dict[str, list[str]]:
         """Report structural hygiene issues across the loaded catalog.

@@ -3,7 +3,7 @@
 # The higher-resolution European companion to GloFAS (Rhine / Danube / Elbe),
 # on the EWDS store. Request shapes are derived from the live `form.json`
 # (field names + allowed values are authoritative; see
-# `planning/ecmwf/captures/a1_form_efas-*.json`, pinned 2026-08-01). Each family
+# the A1 gate captures, pinned 2026-08-01). Each family
 # keeps `time` (unlike GloFAS) so the hindcast rows carry `time` in `extras`,
 # which skips the request-kind `time` strip. `nc_variable` follows the GloFAS
 # convention (`dis24`/`dis06`) and the exact time/leadtime combos are confirmed
