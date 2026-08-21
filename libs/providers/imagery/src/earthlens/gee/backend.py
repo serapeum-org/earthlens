@@ -47,6 +47,7 @@ no key is given, an interactive `ee.Authenticate()` against an explicit
 from __future__ import annotations
 
 import datetime as dt
+import math
 import os
 from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
@@ -104,6 +105,11 @@ _DEFAULT_HTTP_TIMEOUT_S: float = 300.0
 #: would silently read the wrong ground area; those requests stay on Earth
 #: Engine (see `GEE._eedai_eligible`).
 _EEDAI_NATIVE_CRS: str = "EPSG:4326"
+
+#: Metres per degree of latitude on a sphere of Earth's mean radius. Used to
+#: turn the EEDAI path's metre `scale` into a pixel grid over a lat/lon AOI;
+#: longitude is scaled by `cos(latitude)` at the AOI's mid-latitude.
+_METRES_PER_DEGREE: float = 111_320.0
 
 #: Accepted `engine` values: which layer materialises the pixels.
 _ENGINES: frozenset[str] = frozenset({"auto", "ee", "eedai"})
@@ -1098,28 +1104,62 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return True
         return eligible and eedai_available()
 
-    def _eedai_aoi(self) -> dict[str, Any]:
-        """Return the AOI keyword the pyramids-eo reader should clip to.
+    def _eedai_window(self) -> tuple[tuple[float, float, float, float], Any]:
+        """Return the AOI the reader should read, as `(bbox, cutline)`.
 
-        Prefers a polygon cutline when the request carries one the reader
-        accepts (it needs a `total_bounds`-bearing object, e.g. a
-        `GeoDataFrame`), and otherwise falls back to the lat/lon bbox.
+        The reader takes `bbox` as the read window and only falls back to a
+        `geometry`'s envelope when no `bbox` is given, so both are returned
+        together: the bbox always describes the window the pixel grid is
+        sized for, and the cutline (when a `region` was passed) clips the
+        result to the exact polygon. Deriving the bbox from the region's own
+        bounds is what keeps the window and the grid in agreement — sizing a
+        bbox-shaped grid for a region-shaped window would silently change the
+        ground resolution by the ratio of the two extents.
 
         Returns:
-            Either `{"geometry": <polygon>}` or `{"bbox": (min_x, min_y,
-            max_x, max_y)}`, ready to splat into `from_earthengine`.
+            `(bbox, cutline)` — the lat/lon `(min_x, min_y, max_x, max_y)`
+            window, and the `region` to clip to or `None`.
         """
-        for candidate in (self.region, getattr(self.space, "geometry", None)):
-            if candidate is not None and hasattr(candidate, "total_bounds"):
-                return {"geometry": candidate}
-        return {
-            "bbox": (
-                self.space.longitude_min,
-                self.space.latitude_min,
-                self.space.longitude_max,
-                self.space.latitude_max,
-            )
-        }
+        region = self.region
+        if region is not None:
+            min_x, min_y, max_x, max_y = (float(v) for v in region.total_bounds)
+            return (min_x, min_y, max_x, max_y), region
+        return (
+            self.space.longitude_min,
+            self.space.latitude_min,
+            self.space.longitude_max,
+            self.space.latitude_max,
+        ), None
+
+    @staticmethod
+    def _eedai_grid(
+        bbox: tuple[float, float, float, float], scale: float
+    ) -> tuple[int, int]:
+        """Size a pixel grid for a lat/lon `bbox` at a metre `scale`.
+
+        The reader sizes its output in the units of the output CRS (degrees
+        here), so the metre `scale` has to become an explicit grid. This is
+        deliberately not :meth:`SpatialExtent.estimate_pixel_dims`, which
+        pyramids documents as a worst-case *upper bound* for cap pre-checks
+        — it over-counts both axes (and unevenly, so a square AOI comes out
+        non-square). Here the real span is used, with longitude degrees
+        shortened by `cos(latitude)` at the AOI's mid-latitude, so the pixels
+        are square on the ground at the requested `scale`.
+
+        Args:
+            bbox: The lat/lon window `(min_x, min_y, max_x, max_y)`.
+            scale: Target ground sample distance in metres.
+
+        Returns:
+            `(rows, cols)` — at least one pixel per axis.
+        """
+        min_x, min_y, max_x, max_y = bbox
+        mid_latitude = math.radians((min_y + max_y) / 2.0)
+        height_m = (max_y - min_y) * _METRES_PER_DEGREE
+        width_m = (max_x - min_x) * _METRES_PER_DEGREE * math.cos(mid_latitude)
+        rows = max(1, round(height_m / scale))
+        cols = max(1, round(abs(width_m) / scale))
+        return rows, cols
 
     def _export_via_eedai(
         self, var_info: Dataset, bands: list[str], scale: float, prefix: str
@@ -1132,12 +1172,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         `getDownloadURL` round-trip, so Earth Engine's 32768-px synchronous
         cap (and `auto_split`) does not apply.
 
-        The reader sizes its output in the units of `crs` (degrees for a
-        geographic CRS), whereas `scale` here is Earth Engine's metres. The
-        two are reconciled by resolving `scale` to an explicit pixel grid
-        with :meth:`SpatialExtent.estimate_pixel_dims` — the same conversion
-        the `"url"` size guard uses — and passing that as `shape`, so the
-        EEDAI grid matches what Earth Engine would render at this `scale`.
+        The reader sizes its output in the units of `crs` (degrees, since
+        this path is EPSG:4326-only), whereas `scale` here is Earth Engine's
+        metres. :meth:`_eedai_grid` reconciles the two by turning `scale`
+        into an explicit `shape` over the same window
+        :meth:`_eedai_window` hands the reader, so the grid and the read
+        window always describe the same ground area.
 
         The raster is written as a plain GeoTIFF, or as a Cloud Optimized
         GeoTIFF (tiled, with overviews) when `cog=True` was passed to the
@@ -1158,14 +1198,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
         reader = import_earthengine_reader()
         _service_account, service_key, _project = self._resolve_credentials()
         target = self.root_dir / f"{prefix}.tif"
-        width_px, height_px = self.space.estimate_pixel_dims(scale)
+        bbox, cutline = self._eedai_window()
         dataset = reader.from_earthengine(
             var_info.id,
             bands=list(bands),
             crs=self.crs,
-            shape=(height_px, width_px),
+            bbox=bbox,
+            geometry=cutline,
+            shape=self._eedai_grid(bbox, scale),
             credentials=credentials_for(service_key),
-            **self._eedai_aoi(),
         )
         try:
             if self.cog:

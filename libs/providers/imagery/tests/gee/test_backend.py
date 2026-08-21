@@ -11,6 +11,7 @@ with a stub that returns a fixed project. The real shipped
 from __future__ import annotations
 
 import datetime as dt
+import math
 import zipfile
 from pathlib import Path
 from types import SimpleNamespace
@@ -1640,7 +1641,8 @@ class TestGeeStreams:
 class _FakePolygonAoi:
     """Stand-in for a `GeoDataFrame` AOI: only `total_bounds` is consulted."""
 
-    total_bounds = (31.2, 29.9, 31.3, 30.0)
+    def __init__(self):
+        self.total_bounds = (31.2, 29.9, 31.3, 30.0)
 
 
 class _FakeCogWriter:
@@ -1805,7 +1807,7 @@ class TestExportViaEedai:
         assert kwargs["bands"] == ["elevation"]
         assert kwargs["crs"] == "EPSG:4326"
         assert kwargs["bbox"] == (31.2, 29.9, 31.3, 30.0)
-        assert "geometry" not in kwargs
+        assert kwargs["geometry"] is None
 
     def test_metre_scale_becomes_an_explicit_pixel_grid(self, make_gee, fake_reader):
         """`scale` (metres) is resolved to `shape=(rows, cols)`, not passed through.
@@ -1817,10 +1819,28 @@ class TestExportViaEedai:
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
         _asset_id, kwargs = fake_reader.calls[0]
-        width_px, height_px = gee.space.estimate_pixel_dims(90.0)
-        assert kwargs["shape"] == (height_px, width_px)
+        assert kwargs["shape"] == gee._eedai_grid(kwargs["bbox"], 90.0)
         assert "scale" not in kwargs
         assert all(axis > 1 for axis in kwargs["shape"]), kwargs["shape"]
+
+    def test_grid_has_square_ground_pixels(self, make_gee):
+        """The grid resolves to ~`scale` metres on both axes, not a worst-case bound.
+
+        `estimate_pixel_dims` deliberately over-counts (it guards a pixel cap),
+        which would skew a square AOI into non-square pixels.
+        """
+        gee = make_gee()
+        bbox = (31.2, 29.9, 31.3, 30.0)
+        rows, cols = gee._eedai_grid(bbox, 90.0)
+        height_m = (bbox[3] - bbox[1]) * 111_320.0
+        width_m = (bbox[2] - bbox[0]) * 111_320.0 * math.cos(math.radians(29.95))
+        assert abs(height_m / rows - 90.0) < 1.0
+        assert abs(width_m / cols - 90.0) < 1.0
+
+    def test_tiny_aoi_still_yields_at_least_one_pixel(self, make_gee):
+        """A sub-pixel AOI never rounds down to a zero-sized grid."""
+        gee = make_gee()
+        assert gee._eedai_grid((31.2, 29.9, 31.2001, 29.9001), 90.0) == (1, 1)
 
     def test_api_routes_eligible_requests_to_eedai(self, make_gee, fake_reader):
         """`_api` takes the EEDAI path instead of `getDownloadURL`."""
@@ -1856,7 +1876,24 @@ class TestExportViaEedai:
         gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
         _asset_id, kwargs = fake_reader.calls[0]
         assert kwargs["geometry"] is region
-        assert "bbox" not in kwargs
+        assert kwargs["bbox"] == region.total_bounds
+
+    def test_region_window_and_grid_agree(self, make_gee, fake_reader):
+        """The grid is sized for the region's window, not the wider lat/lon bbox.
+
+        The reader windows on the bbox, so sizing the grid from a different
+        extent would scale the ground resolution by the ratio between them.
+        """
+        region = _FakePolygonAoi()
+        region.total_bounds = (31.20, 29.90, 31.22, 29.92)
+        gee = make_gee(region=region, lat_lim=[29.0, 30.0], lon_lim=[31.0, 32.0])
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["bbox"] == region.total_bounds
+        assert kwargs["shape"] == gee._eedai_grid(region.total_bounds, 90.0)
+        wide = gee._eedai_grid((31.0, 29.0, 32.0, 30.0), 90.0)
+        assert kwargs["shape"] != wide, "grid was sized from the bbox, not the region"
 
     def test_api_uses_getdownloadurl_when_engine_is_ee(self, make_gee, fake_reader):
         """`engine="ee"` keeps the historical `getDownloadURL` path."""
