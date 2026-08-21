@@ -1292,6 +1292,31 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Raises:
             ValueError: If any bound is not finite, or `scale` is not a
                 positive number of metres.
+
+        Examples:
+            - A 0.1° box over Cairo at 90 m is taller than it is wide in
+              pixels, because a degree of longitude is shorter there:
+                ```python
+                >>> from earthlens.gee.backend import GEE
+                >>> GEE._eedai_grid((31.2, 29.9, 31.3, 30.0), 90.0)
+                (124, 108)
+
+                ```
+            - On the equator the same span is square, since a degree of
+              longitude and one of latitude are the same length:
+                ```python
+                >>> from earthlens.gee.backend import GEE
+                >>> GEE._eedai_grid((0.0, 0.0, 1.0, 1.0), 1000.0)
+                (112, 112)
+
+                ```
+            - An AOI smaller than one pixel still yields a readable raster:
+                ```python
+                >>> from earthlens.gee.backend import GEE
+                >>> GEE._eedai_grid((31.2, 29.9, 31.2001, 29.9001), 90.0)
+                (1, 1)
+
+                ```
         """
         min_x, min_y, max_x, max_y = bbox
         if not all(math.isfinite(bound) for bound in bbox):
