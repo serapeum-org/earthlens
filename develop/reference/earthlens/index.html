@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -25806,7 +25806,7 @@ holds the concrete backend that :meth:<code>download</code> routes to.</p>
 <a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">                explicitly (e.g. ECMWF&#39;s `skip_constraints`, or GEE&#39;s</span>
 <a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">                `scale` / `crs` / `reducer` / `export_via` /</span>
 <a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">                `drive_folder` / `gcs_bucket` / `region` / `cloud_mask` /</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">                `filters` / `engine` / `cog`). Credentials are</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">                `filters`). Credentials are</span>
 <a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">                not constructor kwargs: backends that defer auth take them</span>
 <a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">                on `authenticate()` instead (e.g. GEE&#39;s `service_account`</span>
 <a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">                / `service_key` / `project`), so forwarding those through</span>
@@ -27446,7 +27446,7 @@ backend-specific options the facade does not name
 explicitly (e.g. ECMWF's <code>skip_constraints</code>, or GEE's
 <code>scale</code> / <code>crs</code> / <code>reducer</code> / <code>export_via</code> /
 <code>drive_folder</code> / <code>gcs_bucket</code> / <code>region</code> / <code>cloud_mask</code> /
-<code>filters</code> / <code>engine</code> / <code>cog</code>). Credentials are
+<code>filters</code>). Credentials are
 not constructor kwargs: backends that defer auth take them
 on <code>authenticate()</code> instead (e.g. GEE's <code>service_account</code>
 / <code>service_key</code> / <code>project</code>), so forwarding those through
@@ -28127,7 +28127,7 @@ installed (e.g. <code>data_source="gee"</code> without
 <a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">            explicitly (e.g. ECMWF&#39;s `skip_constraints`, or GEE&#39;s</span>
 <a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">            `scale` / `crs` / `reducer` / `export_via` /</span>
 <a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">            `drive_folder` / `gcs_bucket` / `region` / `cloud_mask` /</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">            `filters` / `engine` / `cog`). Credentials are</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">            `filters`). Credentials are</span>
 <a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">            not constructor kwargs: backends that defer auth take them</span>
 <a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">            on `authenticate()` instead (e.g. GEE&#39;s `service_account`</span>
 <a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">            / `service_key` / `project`), so forwarding those through</span>
