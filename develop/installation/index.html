@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23813,6 +23813,11 @@ you install the meta-package or a thematic distribution directly:
 <td><code>earthengine-api &gt;=1.7.26</code>, <code>google-api-python-client &gt;=2.0</code>, <code>google-cloud-storage &gt;=2.0</code>, <code>Rtree &gt;=1.0.0</code>, <code>urllib3 &gt;=1.26</code></td>
 </tr>
 <tr>
+<td><code>eedai</code></td>
+<td><a href="https://serapeum-org.github.io/earthlens/reference/gee/usage/">Google Earth Engine</a> — optional EEDAI fetch path</td>
+<td><code>pyramids-eo &gt;=0.2.0,&lt;0.3</code></td>
+</tr>
+<tr>
 <td><code>cmems</code></td>
 <td><a href="https://serapeum-org.github.io/earthlens/reference/cmems/introduction/">Copernicus Marine Service</a></td>
 <td><code>copernicusmarine &gt;=2.0.0,&lt;3</code></td>
@@ -24031,8 +24036,8 @@ cleanly on its own. Splitting the backends across packages then lets you install
 one domain's dependencies without inheriting every other domain's constraints.</p>
 <h3 id="what-earthlensall-excludes-and-why"><a class="toclink" href="#what-earthlensall-excludes-and-why">What <code>earthlens[all]</code> excludes, and why</a><a class="headerlink" href="#what-earthlensall-excludes-and-why" title="Permanent link">#</a></h3>
 <p><code>earthlens[all]</code> is the union of <strong>every backend extra that can honestly share
-one environment</strong> — that is every extra in the table above <strong>except two</strong>:
-<code>argo</code> and <code>osm-pbf</code>. Each is left out for a concrete, upstream reason:</p>
+one environment</strong> — that is every extra in the table above <strong>except three</strong>:
+<code>argo</code>, <code>osm-pbf</code> and <code>eedai</code>. Each is left out for a concrete reason:</p>
 <table>
 <thead>
 <tr>
@@ -24054,6 +24059,7 @@ one environment</strong> — that is every extra in the table above <strong>exce
 </tr>
 </tbody>
 </table>
+<p>| <code>eedai</code> | <code>pyramids-eo</code> | It resolves cleanly — this one is about <em>behaviour</em>, not packaging. Installing it activates the GEE backend's default <code>engine="auto"</code>, which serves raw single-asset reads through the EEDAI reader; that path samples and grids differently from Earth Engine (see the <a href="../reference/gee/usage/">GEE usage page</a>). Holding it out of <code>all</code> means an upgrade never silently changes an existing user's pixels. |</p>
 <p>(<code>osm</code> itself <strong>is</strong> in <code>all</code> — see the resolution note below for why.)</p>
 <p>Each still installs <strong>on its own</strong>, in a separate environment:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span>earthlens<span class="o">[</span>argo<span class="o">]</span><span class="w">      </span><span class="c1"># its own env — pulls xarray&gt;=2025.7</span>

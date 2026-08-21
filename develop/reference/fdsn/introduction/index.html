@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23582,26 +23582,16 @@ imagery). FDSN is different in two ways that shape the backend:</p>
   <a href="https://github.com/serapeum-org/pyramids">pyramids</a>
   <code>FeatureCollection</code> (a <code>geopandas.GeoDataFrame</code> subclass) rather than
   writing a raster. Because there is no meaningful gridded reduction of
-  an event table, an <code>aggregate=</code> argument is refused with
-  <code>NotImplementedError</code> — by the shared guard in
-  <code>AbstractDataSource</code>, so a direct <code>FDSN(...).download(aggregate=...)</code>
-  is rejected exactly like one made through the <code>EarthLens</code> facade.
-  The one exception to the vector rule is opt-in: <code>with_shakemap=True</code>
-  additionally writes each USGS event's gridded ShakeMap as a GeoTIFF,
-  which makes that instance <code>"mixed"</code> (<code>aggregate=</code> stays refused).
-  See <a href="../usage/#shakemap-rasters-usgs-only">Usage</a>.</p>
+  an event table, the <code>EarthLens</code> facade rejects an <code>aggregate=</code>
+  argument for this backend with <code>NotImplementedError</code>.</p>
 </li>
 <li>
 <p><strong>There is no dataset catalog to curate.</strong> FDSN is a <em>fixed query
   protocol</em>, not a 600-dataset archive. The entire "catalog" is a
   six-row provider-dispatch table mapping a user-facing network name
-  to an <code>obspy</code> URL mapping. There is no growth task — adding another
-  network later (ORFEUS, GFZ, …) is a hand-edit of one YAML row. The
-  backend still ships <code>refresh</code> / <code>audit</code> / <code>validate</code> handlers
-  (<code>earthlens datasets refresh fdsn</code>, <code>… audit fdsn</code>, <code>… validate
-  fdsn</code>); <code>refresh</code> diffs the data centres <code>obspy</code> can reach against
-  the curated rows, so a centre <code>obspy</code> gains or drops is surfaced
-  rather than missed. There is no <code>probe</code> handler.</p>
+  to an <code>obspy</code> URL mapping. There is no <code>refresh</code> / <code>probe</code> / <code>audit</code>
+  tooling and no growth task — adding another network later (ORFEUS,
+  GFZ, …) is a hand-edit of one YAML row.</p>
 </li>
 </ul>
 <h2 id="the-networks"><a class="toclink" href="#the-networks">The networks</a><a class="headerlink" href="#the-networks" title="Permanent link">#</a></h2>
