@@ -1733,6 +1733,18 @@ class TestEedaiEligibility:
         gee = make_gee(**hooks)
         assert not gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
 
+    def test_projected_crs_is_not_eligible(self, make_gee):
+        """A projected `crs` stays on Earth Engine (the reader takes a CRS bbox)."""
+        gee = make_gee(crs="EPSG:32636")
+        assert not gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
+
+    def test_engine_eedai_names_the_crs_limit(self, make_gee, fake_reader):
+        """Forcing the reader with a projected `crs` explains the CRS limit."""
+        gee = make_gee(engine="eedai", crs="EPSG:32636")
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        with pytest.raises(ValueError, match="EPSG:4326"):
+            gee._use_eedai(var_info)
+
     def test_batch_sink_is_not_eligible(self, make_gee):
         """The asynchronous sinks are Earth Engine-only."""
         gee = make_gee(export_via="drive", drive_folder="out")

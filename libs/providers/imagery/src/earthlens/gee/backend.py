@@ -99,6 +99,12 @@ _RESOLUTION_FREQ: dict[str, str] = {"daily": "D", "monthly": "MS", "yearly": "YS
 
 _DEFAULT_HTTP_TIMEOUT_S: float = 300.0
 
+#: The only output CRS the EEDAI path serves. The reader takes its `bbox` in
+#: the target CRS while this backend's AOI is lat/lon, so a projected `crs`
+#: would silently read the wrong ground area; those requests stay on Earth
+#: Engine (see `GEE._eedai_eligible`).
+_EEDAI_NATIVE_CRS: str = "EPSG:4326"
+
 #: Accepted `engine` values: which layer materialises the pixels.
 _ENGINES: frozenset[str] = frozenset({"auto", "ee", "eedai"})
 _ZIP_MAGIC: bytes = b"PK\x03\x04"
@@ -309,8 +315,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         engine: Which layer materialises the pixels for `export_via="url"`.
             `"auto"` (the default) uses the pyramids-eo EEDAI reader when
             the request is a raw read of a materialised asset — no reducer
-            over a collection, no `cloud_mask`, no `filters` — and the
-            `[eedai]` extra is installed, falling back to Earth Engine's
+            over a collection, no `cloud_mask`, no `filters`, and
+            `crs="EPSG:4326"` — and the `[eedai]` extra is installed,
+            falling back to Earth Engine's
             `getDownloadURL` otherwise. `"ee"` always uses `getDownloadURL`
             (the historical behaviour). `"eedai"` forces the reader and
             raises if the request is not eligible. The EEDAI path reads
@@ -1037,9 +1044,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
         The pyramids-eo reader materialises pixels from a real asset id; it
         cannot execute an Earth Engine computation graph. So it can only
         stand in for `getDownloadURL` when nothing server-side shapes the
-        image: a single materialised asset (not a reduced collection), no
-        per-image `cloud_mask`, and no collection `filters`. The
-        asynchronous sinks are Earth Engine-only.
+        image: a single materialised `ee_type="image"` asset, no per-image
+        `cloud_mask`, and no collection `filters`. The asynchronous sinks
+        are Earth Engine-only.
+
+        It is also limited to `crs="EPSG:4326"`. The reader interprets its
+        `bbox` in the *target* CRS, while this backend's AOI is lat/lon; for
+        a projected `crs` those degrees would be read as projected units and
+        silently produce a valid-looking raster of the wrong ground area, so
+        such requests stay on Earth Engine.
 
         Args:
             var_info: The catalog entry for the dataset being fetched.
@@ -1051,7 +1064,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
             self.export_via == "url"
             and self.cloud_mask is None
             and not self.filters
-            and not var_info.is_image_collection
+            and var_info.ee_type == "image"
+            and self.crs.upper() == _EEDAI_NATIVE_CRS
         )
 
     def _use_eedai(self, var_info: Dataset) -> bool:
@@ -1075,10 +1089,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
             if not eligible:
                 raise ValueError(
                     f"engine='eedai' cannot serve {var_info.id}: the EEDAI "
-                    "reader materialises pixels from an asset id and cannot run "
-                    "server-side compute (a reduced collection, cloud_mask, "
-                    "filters, or a drive/gcs/asset sink). Use engine='auto' or "
-                    "engine='ee'."
+                    "reader materialises pixels from an asset id, so it cannot "
+                    "run server-side compute (a reduced collection, cloud_mask "
+                    "or filters) and only writes "
+                    f"crs={_EEDAI_NATIVE_CRS!r} (got {self.crs!r}). Use "
+                    "engine='auto' or engine='ee'."
                 )
             return True
         return eligible and eedai_available()
