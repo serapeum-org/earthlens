@@ -36,6 +36,7 @@ import re
 import shutil
 import zipfile
 from collections.abc import Iterable, Mapping
+from contextlib import suppress
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
@@ -86,6 +87,11 @@ RASTER_CONTENT_KEY = "download/raster.zip"
 #: Name of the per-event manifest recording what its archive yielded.
 MANIFEST_NAME = ".shakemap.json"
 
+#: Layout version of the manifest payload. A manifest written by a different
+#: version is treated as absent rather than guessed at, so the event is simply
+#: refetched — which is always safe, if occasionally wasteful.
+MANIFEST_SCHEMA = 1
+
 #: Ceiling on a single decompressed archive member. A real ShakeMap grid is
 #: well under a megabyte (a 30 arc-second raster over one event's footprint,
 #: ~810 KB for the 2023 Kahramanmaras event), so 64 MB leaves two orders of
@@ -105,6 +111,10 @@ MAX_MEMBER_BYTES = 64 * 1024 * 1024
 # Length-bounded as well: the id becomes a directory name, and a pathological
 # identifier should be refused rather than handed to the filesystem. Real ComCat
 # ids are well under 40 characters (`official20110311054624120_30` is 28).
+#
+# The capture must be terminated by `&` or the end of the string, so a value
+# carrying anything outside the character class is refused outright rather than
+# silently truncated to its leading run of legal characters.
 _EVENT_ID_PATTERN = re.compile(r"[?&]eventid=([A-Za-z0-9_-]{1,64})(?:&|$)")
 
 
@@ -214,8 +224,12 @@ def normalize_layers(layers: Iterable[str] | None) -> tuple[str, ...]:
         )
     unknown = [name for name in requested if name not in SHAKEMAP_LAYERS]
     if unknown:
+        # Rendered by repr and sorted as text: a mixed-type list would make a
+        # plain `sorted` raise TypeError, hiding the layer-name error behind an
+        # unrelated one.
+        rendered = sorted(repr(name) for name in unknown)
         raise ValueError(
-            f"unknown ShakeMap layer(s): {sorted(unknown)}. "
+            f"unknown ShakeMap layer(s): [{', '.join(rendered)}]. "
             f"Choose from {list(SHAKEMAP_LAYERS)}."
         )
     seen: dict[str, None] = {}
@@ -468,7 +482,10 @@ def flt_to_geotiff(flt_path: Path, dest: Path) -> Path:
     # `.tif` — and the caller's skip-if-present check, which can only ask
     # whether a file exists and is non-empty, would honour it forever. The
     # staged name keeps the `.tif` suffix so GDAL still infers the driver.
-    staged = dest.with_name(f".{dest.stem}.partial.tif")
+    # Staged beside the *source* grid — which the caller keeps in a scratch
+    # directory — rather than beside the destination, so an interrupted run
+    # leaves nothing at all in the user's output folder.
+    staged = flt_path.parent / f".{dest.stem}.partial.tif"
     try:
         # The context manager, not a trailing `del`: on failure the exception's
         # traceback keeps this frame — and any local still bound to the dataset
@@ -485,9 +502,11 @@ def flt_to_geotiff(flt_path: Path, dest: Path) -> Path:
             )
         staged.replace(dest)
     finally:
-        # Only ever removes the staged name. A successful `replace` has already
-        # moved it, so this cannot touch a finished output.
-        staged.unlink(missing_ok=True)
+        # Only ever removes the staged name, and never at the cost of the real
+        # error: a failed cleanup here would otherwise replace the exception
+        # that explains why the conversion failed.
+        with suppress(OSError):
+            staged.unlink(missing_ok=True)
     return dest
 
 
@@ -533,13 +552,46 @@ def read_manifest(dest_dir: Path) -> dict[str, Any] | None:
     except (OSError, ValueError):
         logger.warning(f"unreadable ShakeMap manifest at {path} — refetching.")
         return None
-    return loaded if isinstance(loaded, dict) else None
+    if not _is_valid_manifest(loaded):
+        # Structurally wrong, not merely unreadable: treated as absent so the
+        # event refetches and the next write repairs the file, rather than
+        # letting a bad type escape as an error from somewhere downstream.
+        logger.warning(f"malformed ShakeMap manifest at {path} — refetching.")
+        return None
+    validated: dict[str, Any] = loaded
+    return validated
+
+
+def _is_valid_manifest(loaded: object) -> bool:
+    """Report whether a parsed manifest has the shape this version writes.
+
+    Args:
+        loaded: The object `json.loads` produced from the manifest file.
+
+    Returns:
+        `True` when every field is present with the expected type and the
+            schema version matches, `False` otherwise.
+    """
+    if not isinstance(loaded, dict):
+        return False
+    if loaded.get("schema") != MANIFEST_SCHEMA:
+        return False
+    for key in ("requested", "produced"):
+        value = loaded.get(key)
+        if not isinstance(value, list) or not all(
+            isinstance(item, str) for item in value
+        ):
+            return False
+    checked = loaded.get("checked")
+    return isinstance(checked, (int, float))
 
 
 def write_manifest(
     dest_dir: Path,
     requested: Iterable[str],
     produced: Iterable[str],
+    checked: float = 0.0,
+    product_version: str | None = None,
 ) -> None:
     """Record what one event's archive actually yielded.
 
@@ -556,7 +608,14 @@ def write_manifest(
             narrower result.
         produced: The layers the archive actually carried. Empty when the
             event publishes no ShakeMap at all, which is itself worth
-            recording so the detail request is not repeated.
+            recording so the detail request is not repeated. Merged with
+            anything already recorded rather than replacing it.
+        checked: POSIX timestamp of this check, used to age out a negative
+            result. `0.0` (the default) reads as "long ago", so an entry
+            written without one is re-checked.
+        product_version: The ShakeMap product's `updateTime`, when the detail
+            document supplied one. Recorded so a later version can tell a
+            revised grid from the one on disk; nothing reads it yet.
 
     Returns:
         None: The manifest is written to `dest_dir` as a side effect.
@@ -609,7 +668,70 @@ def write_manifest(
         MANIFEST_NAME: The filename written inside `dest_dir`.
     """
     dest_dir.mkdir(parents=True, exist_ok=True)
-    payload = {"requested": sorted(set(requested)), "produced": sorted(set(produced))}
-    (dest_dir / MANIFEST_NAME).write_text(
-        json.dumps(payload, indent=2), encoding="utf-8"
-    )
+    # Merged with whatever is already recorded, never replaced. Narrowing the
+    # requested layers on a later run would otherwise drop the record of
+    # rasters still sitting on disk, so the next widening run would refetch an
+    # archive it already has.
+    existing = read_manifest(dest_dir) or {}
+    payload = {
+        "schema": MANIFEST_SCHEMA,
+        "requested": sorted(set(existing.get("requested", [])) | set(requested)),
+        "produced": sorted(set(existing.get("produced", [])) | set(produced)),
+        "checked": checked,
+        "product_version": product_version,
+    }
+    # Staged and renamed, like the rasters it describes: a manifest truncated
+    # by an interrupted write would otherwise be read back as malformed.
+    staged = dest_dir / f".{MANIFEST_NAME}.partial"
+    try:
+        staged.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        staged.replace(dest_dir / MANIFEST_NAME)
+    finally:
+        with suppress(OSError):
+            staged.unlink(missing_ok=True)
+
+
+def shakemap_product_version(detail: Mapping[str, Any]) -> str | None:
+    """Return the ShakeMap product's `updateTime`, when the document has one.
+
+    ComCat republishes ShakeMaps — the 2023 Kahramanmaras grid is on its
+    twelfth version, last updated in 2025 — so the value is recorded
+    alongside a fetch to give a later version something to compare against.
+
+    Args:
+        detail: A parsed ComCat event-detail GeoJSON document.
+
+    Returns:
+        The `updateTime` as a string, or `None` when the event has no
+            ShakeMap product or the product omits it.
+
+    Examples:
+        - Read the version off a minimal detail document:
+            ```python
+            >>> from earthlens.fdsn._helpers import shakemap_product_version
+            >>> shakemap_product_version(
+            ...     {"properties": {"products": {"shakemap": [
+            ...         {"updateTime": 1756575631263}
+            ...     ]}}}
+            ... )
+            '1756575631263'
+
+            ```
+        - An event with no ShakeMap yields `None`:
+            ```python
+            >>> from earthlens.fdsn._helpers import shakemap_product_version
+            >>> shakemap_product_version({"properties": {"products": {}}}) is None
+            True
+
+            ```
+
+    See Also:
+        write_manifest: Records the value returned here.
+    """
+    properties = detail.get("properties") or {}
+    products = properties.get("products") or {}
+    entries = products.get("shakemap") or []
+    if not entries:
+        return None
+    update_time = (entries[0] or {}).get("updateTime")
+    return None if update_time is None else str(update_time)
