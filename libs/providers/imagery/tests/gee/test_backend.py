@@ -1637,6 +1637,12 @@ class TestGeeStreams:
         assert seen[0].get("stream") is True, f"the GET must stream: {seen[0]}"
 
 
+class _FakePolygonAoi:
+    """Stand-in for a `GeoDataFrame` AOI: only `total_bounds` is consulted."""
+
+    total_bounds = (31.2, 29.9, 31.3, 30.0)
+
+
 class _FakeCogWriter:
     """Stand-in for `Dataset.cog`, recording `to_cog` writes."""
 
@@ -1748,6 +1754,11 @@ class TestEedaiEligibility:
         gee = make_gee()
         assert gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003")) is False
 
+    def test_engine_eedai_forces_the_reader_when_eligible(self, make_gee, fake_reader):
+        """`engine="eedai"` takes the reader for an eligible request."""
+        gee = make_gee(engine="eedai")
+        assert gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003")) is True
+
     def test_engine_eedai_rejects_ineligible_request(self, make_gee, fake_reader):
         """Forcing the reader on a composited request raises `ValueError`."""
         gee = make_gee(
@@ -1824,6 +1835,16 @@ class TestExportViaEedai:
         target = gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
         assert fake_reader.dataset.wrote_cog is True
         assert target.read_bytes() == b"eedai-cog"
+
+    def test_polygon_region_is_passed_as_a_cutline(self, make_gee, fake_reader):
+        """A `region` exposing `total_bounds` is forwarded as `geometry=`."""
+        region = _FakePolygonAoi()
+        gee = make_gee(region=region)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["geometry"] is region
+        assert "bbox" not in kwargs
 
     def test_api_uses_getdownloadurl_when_engine_is_ee(self, make_gee, fake_reader):
         """`engine="ee"` keeps the historical `getDownloadURL` path."""
