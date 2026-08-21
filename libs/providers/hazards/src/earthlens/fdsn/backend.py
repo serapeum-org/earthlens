@@ -42,7 +42,9 @@ day/month — so `temporal_resolution` carries the sentinel `"all"`.
 
 from __future__ import annotations
 
+import os
 import shutil
+import time
 from contextlib import suppress
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
@@ -80,11 +82,14 @@ _DEFAULT_PROVIDERS = ["USGS"]
 #: folder per event so a multi-event query stays navigable.
 _SHAKEMAP_DIR = "shakemap"
 
-#: Scratch subdirectory inside an event's folder. The archive is fetched and
-#: unpacked here and the whole directory is removed afterwards, so no
-#: intermediate — including the `.prj` GDAL writes when the grid's CRS is
-#: assigned — can survive in the user-facing output.
-_STAGING_DIR = "_staging"
+#: Prefix of the scratch subdirectory inside an event's folder. The archive is
+#: fetched and unpacked there and the whole directory is removed afterwards, so
+#: no intermediate — including the `.prj` GDAL writes when the grid's CRS is
+#: assigned — can survive in the user-facing output. The process id is appended
+#: so two runs sharing an output root cannot delete each other's scratch space
+#: mid-fetch; a crashed run's directory is left for its owner to clean up
+#: rather than removed by a stranger.
+_STAGING_PREFIX = "_staging"
 
 #: Default ceiling on how many events one call fetches a ShakeMap for.
 #: Each event is a separate ComCat request plus a multi-megabyte archive, so an
@@ -97,6 +102,14 @@ _DEFAULT_MAX_SHAKEMAP_EVENTS = 100
 #: itself was a single call; USGS publishes no rate limit, and this is a
 #: politeness floor rather than a documented requirement.
 _COMCAT_MIN_INTERVAL = 0.2
+
+#: How long a *negative* manifest entry — "this event published no ShakeMap
+#: raster" — is trusted before the event is checked again. ShakeMap is
+#: generated minutes to hours after an event and can lag much longer for
+#: moderate ones, so caching that answer permanently would make a query over a
+#: recent window return nothing forever. A positive entry does not expire: the
+#: rasters are on disk, and `download(force=True)` picks up a revision.
+_NEGATIVE_CACHE_SECONDS = 7 * 24 * 60 * 60
 
 #: `(connect, read)` budget for a ComCat request. The read half is generous
 #: because the archive is several megabytes; the connect half fails a dead
@@ -801,33 +814,163 @@ class FDSN(AbstractDataSource):
         if not event_ids:
             return []
 
-        if len(event_ids) > self._max_shakemap_events:
-            dropped = len(event_ids) - self._max_shakemap_events
+        # The ceiling bounds *work*, not events. An event already satisfied on
+        # disk costs nothing, so spending budget on it would stall a re-run at
+        # the same place forever instead of letting it advance through the list.
+        pending = [event_id for event_id in event_ids if not self._is_cached(event_id)]
+        if len(pending) > self._max_shakemap_events:
+            deferred = set(pending[self._max_shakemap_events :])
             logger.warning(
-                f"with_shakemap=True matched {len(event_ids)} USGS events, over "
-                f"the max_shakemap_events={self._max_shakemap_events} ceiling: "
-                f"fetching the first {self._max_shakemap_events} and skipping "
-                f"{dropped}. Each event costs a request plus a multi-megabyte archive. "
-                "Raise max_shakemap_events= to take them all, or narrow the "
+                f"with_shakemap=True needs {len(pending)} fetches, over the "
+                f"max_shakemap_events={self._max_shakemap_events} ceiling: taking "
+                f"the first {self._max_shakemap_events} and deferring "
+                f"{len(deferred)}. Each fetch costs a request plus a "
+                "multi-megabyte archive. Re-run to take the next batch, raise "
+                "max_shakemap_events= to take them all at once, or narrow the "
                 "query with limit= / min_magnitude=."
             )
-            event_ids = event_ids[: self._max_shakemap_events]
+            event_ids = [event_id for event_id in event_ids if event_id not in deferred]
 
         logger.info(
             f"Fetching ShakeMap {list(self._shakemap_layers)} for "
             f"{len(event_ids)} USGS event(s)"
         )
+        # A per-archive bar is useful for a single fetch and unreadable for
+        # fifty, so a batch reports through the log line above instead.
+        per_archive_bar = progress_bar and len(event_ids) == 1
         results, _failed = self._run_items(
             event_ids,
             lambda event_id: self._shakemap_for_event(
-                event_id, progress_bar=progress_bar
+                event_id, progress_bar=per_archive_bar
             ),
             errors=self._errors,
             label="ShakeMap",
             describe=repr,
             on_failure=lambda _event_id, _exc: [],
         )
-        return [path for paths in results for path in paths]
+        written = [path for paths in results for path in paths]
+        shakemap_root = self.root_dir / _SHAKEMAP_DIR
+        # An empty `shakemap/` reads as "asked for, produced nothing" only if it
+        # is there at all; removing it keeps a fruitless run from looking like a
+        # partial success.
+        with suppress(OSError):
+            if shakemap_root.is_dir() and not any(shakemap_root.iterdir()):
+                shakemap_root.rmdir()
+        return written
+
+    def _record_manifest(
+        self,
+        dest_dir: Path,
+        produced: list[str],
+        product_version: str | None = None,
+    ) -> None:
+        """Record an event's outcome, warning rather than failing if it cannot.
+
+        The manifest is a cache, not the deliverable: a raster already written
+        must not be lost because its bookkeeping could not be saved. A failure
+        is surfaced, though, because the only symptom otherwise is a re-run
+        that silently refetches everything.
+
+        Args:
+            dest_dir: The event's output directory.
+            produced: The layers the archive actually carried.
+            product_version: The ShakeMap product's `updateTime`, if known.
+        """
+        try:
+            _helpers.write_manifest(
+                dest_dir,
+                self._shakemap_layers,
+                produced,
+                checked=time.time(),
+                product_version=product_version,
+            )
+        except OSError as error:
+            logger.warning(
+                f"could not record the ShakeMap manifest in {dest_dir}: {error}. "
+                "The rasters are written, but a re-run will fetch them again."
+            )
+
+    def _event_dir(self, comcat_id: str) -> Path | None:
+        """Resolve an event's output directory, refusing one that escapes.
+
+        Args:
+            comcat_id: The event's ComCat id.
+
+        Returns:
+            Path | None: The directory, or `None` when it does not resolve
+                inside the ShakeMap root.
+        """
+        shakemap_root = self.root_dir / _SHAKEMAP_DIR
+        dest_dir = shakemap_root / comcat_id
+        # Defence in depth. `parse_comcat_id` already refuses an id that could
+        # traverse, but the id comes from an upstream server and this directory
+        # is deleted from, so the containment is asserted rather than assumed.
+        if not dest_dir.resolve().is_relative_to(shakemap_root.resolve()):
+            logger.warning(
+                f"refusing ComCat id {comcat_id!r}: it does not resolve inside "
+                f"{shakemap_root} — skipping its ShakeMap."
+            )
+            return None
+        return dest_dir
+
+    def _cached_rasters(self, dest_dir: Path) -> list[Path] | None:
+        """Decide whether an event can be served from disk, without logging.
+
+        Split from :meth:`_reuse_existing` so the fan-out ceiling can ask the
+        same question about an event it may not process, without emitting a
+        skip line for work it never started.
+
+        Args:
+            dest_dir: The event's output directory.
+
+        Returns:
+            list[Path] | None: The rasters to reuse — empty for an event known
+                to publish none — or `None` when the event must be fetched.
+        """
+        if self._force:
+            return None
+        manifest = _helpers.read_manifest(dest_dir)
+        if manifest is None:
+            return None
+        # A previous call may have asked for fewer layers than this one. Reuse
+        # only when the earlier request covered everything now wanted.
+        previously = set(manifest.get("requested", []))
+        if not set(self._shakemap_layers).issubset(previously):
+            return None
+        produced = [
+            layer
+            for layer in self._shakemap_layers
+            if layer in manifest.get("produced", [])
+        ]
+        if not produced:
+            # A negative result, which ages out: the grid may simply not have
+            # been published yet when the event was first seen.
+            age = time.time() - float(manifest.get("checked", 0.0))
+            if age > _NEGATIVE_CACHE_SECONDS:
+                return None
+            return []
+        cached = [dest_dir / f"{layer}.tif" for layer in produced]
+        if not all(self._is_complete(path) for path in cached):
+            return None
+        return cached
+
+    def _is_cached(self, event_id: str) -> bool:
+        """Report whether an event needs no work this run.
+
+        Args:
+            event_id: The event's `event_id` column value.
+
+        Returns:
+            bool: `True` when the event is already satisfied on disk, so the
+                fan-out ceiling should not spend budget on it.
+        """
+        comcat_id = _helpers.parse_comcat_id(event_id)
+        if comcat_id is None:
+            return False
+        dest_dir = self._event_dir(comcat_id)
+        if dest_dir is None:
+            return False
+        return self._cached_rasters(dest_dir) is not None
 
     def _reuse_existing(self, dest_dir: Path, comcat_id: str) -> list[Path] | None:
         """Return an event's cached rasters, or `None` to fetch it again.
@@ -849,30 +992,15 @@ class FDSN(AbstractDataSource):
                 ShakeMap at all — or `None` when the event must be
                 fetched.
         """
-        if self._force:
-            return None
-        manifest = _helpers.read_manifest(dest_dir)
-        if manifest is None:
-            return None
-        # A previous call may have asked for fewer layers than this one. Reuse
-        # only when the earlier request covered everything now wanted.
-        previously = set(manifest.get("requested", []))
-        if not set(self._shakemap_layers).issubset(previously):
-            return None
-        produced = [
-            layer
-            for layer in self._shakemap_layers
-            if layer in manifest.get("produced", [])
-        ]
-        cached = [dest_dir / f"{layer}.tif" for layer in produced]
-        if not all(self._is_complete(path) for path in cached):
+        cached = self._cached_rasters(dest_dir)
+        if cached is None:
             return None
         if cached:
             logger.info(f"ShakeMap for {comcat_id} already on disk — skipping.")
         else:
             logger.info(
-                f"event {comcat_id} is known to publish no ShakeMap raster for "
-                "the requested layer(s) — skipping."
+                f"as of the last run, event {comcat_id} published no ShakeMap "
+                "raster for the requested layer(s) — skipping."
             )
         return cached
 
@@ -881,11 +1009,17 @@ class FDSN(AbstractDataSource):
     ) -> list[Path]:
         """Fetch, unpack, and convert one event's requested ShakeMap grids.
 
-        Skips the network entirely when every requested GeoTIFF is
-        already on disk, so a re-run costs nothing. The downloaded
-        archive and the intermediate `.flt` / `.hdr` pairs are removed
-        once converted — they are several times the size of the GeoTIFFs
-        and carry nothing the GeoTIFF does not.
+        Skips the network when the event's manifest says this run's
+        layers are already accounted for — either their GeoTIFFs are on
+        disk, or the archive was checked recently and carries none of
+        them. The skip is decided from what a previous run *recorded*,
+        not from whether every requested file exists, because an archive
+        need not carry every layer that was asked for.
+
+        Everything the fetch and the conversion touch stays inside a
+        staging directory that is removed wholesale, so no intermediate
+        — the archive, the `.flt` / `.hdr` pairs, or the `.prj` GDAL
+        writes when the CRS is assigned — reaches the output folder.
 
         Args:
             event_id: The event's `event_id` column value, a QuakeML
@@ -906,16 +1040,8 @@ class FDSN(AbstractDataSource):
             )
             return []
 
-        shakemap_root = self.root_dir / _SHAKEMAP_DIR
-        dest_dir = shakemap_root / comcat_id
-        # Defence in depth. `parse_comcat_id` already refuses an id that could
-        # traverse, but the id comes from an upstream server and this directory
-        # is deleted from, so the containment is asserted rather than assumed.
-        if not dest_dir.resolve().is_relative_to(shakemap_root.resolve()):
-            logger.warning(
-                f"refusing ComCat id {comcat_id!r}: it does not resolve inside "
-                f"{shakemap_root} — skipping its ShakeMap."
-            )
+        dest_dir = self._event_dir(comcat_id)
+        if dest_dir is None:
             return []
 
         reused = self._reuse_existing(dest_dir, comcat_id)
@@ -930,7 +1056,7 @@ class FDSN(AbstractDataSource):
             )
             # Recorded so a re-run does not re-request this event's detail
             # document only to reach the same conclusion.
-            _helpers.write_manifest(dest_dir, self._shakemap_layers, [])
+            self._record_manifest(dest_dir, [])
             return []
 
         # Everything the fetch and the conversion touch is confined to a staging
@@ -939,7 +1065,7 @@ class FDSN(AbstractDataSource):
         # by-products out of the result: opening the `EHdr` grid read-write to
         # assign its CRS makes the driver drop a `<layer>.prj` beside the `.flt`,
         # which a suffix-based sweep would leave behind in the output folder.
-        staging = dest_dir / _STAGING_DIR
+        staging = dest_dir / f"{_STAGING_PREFIX}-{os.getpid()}"
         archive = staging / "raster.zip"
         written: list[Path] = []
         try:
@@ -956,7 +1082,11 @@ class FDSN(AbstractDataSource):
                 )
             # Only after every conversion succeeded: a manifest written on a
             # partial failure would cache an incomplete result as final.
-            _helpers.write_manifest(dest_dir, self._shakemap_layers, list(extracted))
+            self._record_manifest(
+                dest_dir,
+                list(extracted),
+                product_version=_helpers.shakemap_product_version(detail),
+            )
         finally:
             shutil.rmtree(staging, ignore_errors=True)
             if staging.exists():
