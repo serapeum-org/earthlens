@@ -75,19 +75,21 @@ def _download_srtm(tmp_path, engine: str):
     return paths[0]
 
 
-def _valid_mean(path):
-    """Return the mean of a raster's valid (non-nodata) pixels."""
+def _open_raster(path):
+    """Return `(array, crs, bounds)` for a written raster."""
     import numpy as np
     from pyramids.dataset import Dataset
 
     raster = Dataset.read_file(str(path))
     values = np.asarray(raster.read_array(), dtype="float64")
+    if values.ndim == 2:
+        # A single-band read comes back as (rows, cols); normalise so callers
+        # can index bands/rows/cols uniformly.
+        values = values[np.newaxis, :, :]
     nodata = raster.no_data_value[0] if raster.no_data_value else None
     if nodata is not None:
-        values = values[values != nodata]
-    values = values[np.isfinite(values)]
-    assert values.size, f"{path} has no valid pixels"
-    return float(values.mean())
+        values = np.where(values == nodata, np.nan, values)
+    return values, raster.epsg, raster.bbox
 
 
 @_skip_without_creds
@@ -104,13 +106,40 @@ def test_live_srtm_eedai_matches_ee(tmp_path):
     warps), so the check is a physical-agreement tolerance, not pixel
     equality.
     """
+    import numpy as np
+
     ee_path = _download_srtm(tmp_path, "ee")
     eedai_path = _download_srtm(tmp_path, "eedai")
     assert eedai_path.is_file(), f"EEDAI output missing: {eedai_path}"
     assert eedai_path.stat().st_size > 0, "EEDAI GeoTIFF is empty"
 
-    ee_mean = _valid_mean(ee_path)
-    eedai_mean = _valid_mean(eedai_path)
-    assert abs(ee_mean - eedai_mean) < 5.0, (
-        f"EEDAI mean {eedai_mean:.2f} m differs from Earth Engine {ee_mean:.2f} m"
-    )
+    ee_values, ee_epsg, ee_bbox = _open_raster(ee_path)
+    eedai_values, eedai_epsg, eedai_bbox = _open_raster(eedai_path)
+
+    assert eedai_epsg == ee_epsg, f"CRS differs: {eedai_epsg} vs {ee_epsg}"
+    assert eedai_values.shape[0] == ee_values.shape[0], "band count differs"
+    for got, want in zip(eedai_bbox, ee_bbox, strict=True):
+        assert abs(got - want) < 1e-3, f"AOI differs: {eedai_bbox} vs {ee_bbox}"
+    # The two engines grid independently — Earth Engine treats `scale` in a
+    # geographic CRS as a uniform degree-equivalent, while the EEDAI grid is
+    # sized for square metres on the ground — so the column counts legitimately
+    # differ away from the equator. Latitude is the axis where both use the
+    # same metres-per-degree, so that is where the resolutions must agree.
+    span_m = (ee_bbox[3] - ee_bbox[1]) * 111_320.0
+    for name, values in (("ee", ee_values), ("eedai", eedai_values)):
+        rows = values.shape[1]
+        assert abs(span_m / rows - 90.0) < 9.0, (
+            f"{name} latitude resolution {span_m / rows:.1f} m is not ~90 m"
+        )
+
+    ee_finite = ee_values[np.isfinite(ee_values)]
+    eedai_finite = eedai_values[np.isfinite(eedai_values)]
+    assert ee_finite.size and eedai_finite.size, "a raster has no valid pixels"
+    # Compare the elevation distributions rather than the means: a mean alone
+    # would survive a shifted AOI or a transposed grid over flat terrain.
+    for quantile in (0.05, 0.5, 0.95):
+        got = float(np.quantile(eedai_finite, quantile))
+        want = float(np.quantile(ee_finite, quantile))
+        assert abs(got - want) < 5.0, (
+            f"EEDAI q{quantile} {got:.2f} m differs from Earth Engine {want:.2f} m"
+        )
