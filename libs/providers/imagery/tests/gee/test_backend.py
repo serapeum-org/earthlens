@@ -1644,11 +1644,28 @@ class TestGeeStreams:
         assert seen[0].get("stream") is True, f"the GET must stream: {seen[0]}"
 
 
-class _FakePolygonAoi:
-    """Stand-in for a `GeoDataFrame` AOI: only `total_bounds` is consulted."""
+class _FakeCrs:
+    """Stand-in for a pyproj CRS: only `to_epsg()` is consulted."""
 
-    def __init__(self):
-        self.total_bounds = (31.2, 29.9, 31.3, 30.0)
+    def __init__(self, epsg):
+        self._epsg = epsg
+
+    def to_epsg(self):
+        return self._epsg
+
+
+class _FakePolygonAoi:
+    """Stand-in for a `GeoDataFrame` AOI: `total_bounds`, `crs`, `to_crs`."""
+
+    def __init__(self, epsg=None, total_bounds=(31.2, 29.9, 31.3, 30.0)):
+        self.total_bounds = total_bounds
+        self.crs = _FakeCrs(epsg) if epsg is not None else None
+        self.reprojected_to = None
+
+    def to_crs(self, crs):
+        out = _FakePolygonAoi(epsg=4326)
+        out.reprojected_to = crs
+        return out
 
 
 class _FakeCogWriter:
@@ -2025,6 +2042,35 @@ class TestExportViaEedai:
                 when=dt.datetime(2000, 2, 11),
             )
         assert len([w for w in warnings if "cog=True has no effect" in w]) == 1
+
+    def test_projected_region_is_reprojected_before_windowing(
+        self, make_gee, fake_reader
+    ):
+        """A projected region is moved to lat/lon so bbox and cutline agree.
+
+        The reader reprojects a CRS-carrying geometry but reads `bbox` as
+        already being in the target CRS, so projected bounds would window a
+        different part of the planet than the cutline clips.
+        """
+        region = _FakePolygonAoi(
+            epsg=32636, total_bounds=(330000.0, 3310000.0, 340000.0, 3320000.0)
+        )
+        gee = make_gee(region=region)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["geometry"] is not region, "the projected region was reused"
+        assert kwargs["geometry"].reprojected_to == "EPSG:4326"
+        assert kwargs["bbox"] == kwargs["geometry"].total_bounds
+
+    def test_wgs84_region_is_used_as_is(self, make_gee, fake_reader):
+        """A region already in EPSG:4326 is not needlessly reprojected."""
+        region = _FakePolygonAoi(epsg=4326)
+        gee = make_gee(region=region)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["geometry"] is region
 
     def test_api_uses_getdownloadurl_when_engine_is_ee(self, make_gee, fake_reader):
         """`engine="ee"` keeps the historical `getDownloadURL` path."""

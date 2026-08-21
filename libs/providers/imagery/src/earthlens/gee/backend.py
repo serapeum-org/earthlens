@@ -1158,7 +1158,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             `(bbox, cutline)` — the lat/lon `(min_x, min_y, max_x, max_y)`
             window, and the `region` to clip to or `None`.
         """
-        region = self.region
+        region = self._region_in_native_crs(self.region)
         if region is not None:
             min_x, min_y, max_x, max_y = (float(v) for v in region.total_bounds)
             return (min_x, min_y, max_x, max_y), region
@@ -1168,6 +1168,35 @@ class GEE(LazyClientMixin, AbstractDataSource):
             self.space.longitude_max,
             self.space.latitude_max,
         ), None
+
+    @staticmethod
+    def _region_in_native_crs(region: Any) -> Any:
+        """Return `region` in the lat/lon CRS the reader's `bbox` is read in.
+
+        The reader reprojects a CRS-carrying `geometry` to the target CRS but
+        takes `bbox` as already being in it. Handing over a projected
+        region's bounds unchanged would therefore window in metres-read-as-
+        degrees while the cutline landed correctly — two different parts of
+        the planet. Reprojecting the region once keeps its bounds and its
+        cutline in the same space.
+
+        Args:
+            region: The constructor `region`, or `None`.
+
+        Returns:
+            The region in EPSG:4326 (`None` passes through). A region with
+            no CRS is assumed to be lat/lon already, matching how the Earth
+            Engine path treats it.
+        """
+        if region is None:
+            return None
+        crs = getattr(region, "crs", None)
+        if crs is None:
+            return region
+        to_epsg = getattr(crs, "to_epsg", None)
+        if callable(to_epsg) and to_epsg() == 4326:
+            return region
+        return region.to_crs(_EEDAI_NATIVE_CRS)
 
     @staticmethod
     def _eedai_grid(
