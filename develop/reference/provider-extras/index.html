@@ -946,10 +946,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#backends-with-an-extra-31-backends-33-extras" class="md-nav__link">
+  <a href="#backends-with-an-extra-31-backends-34-extras" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Backends with an extra (31 backends, 33 extras)
+        Backends with an extra (31 backends, 34 extras)
       
     </span>
   </a>
@@ -23423,10 +23423,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#backends-with-an-extra-31-backends-33-extras" class="md-nav__link">
+  <a href="#backends-with-an-extra-31-backends-34-extras" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Backends with an extra (31 backends, 33 extras)
+        Backends with an extra (31 backends, 34 extras)
       
     </span>
   </a>
@@ -23491,7 +23491,7 @@
 <h1 id="provider-extra-mapping"><a class="toclink" href="#provider-extra-mapping">Provider → extra mapping</a><a class="headerlink" href="#provider-extra-mapping" title="Permanent link">#</a></h1>
 <p>Which pip <strong>extra</strong> (if any) each earthlens backend needs, the <strong>SDK</strong> it pulls, its <strong>distribution</strong>, and whether
 it is bundled in <code>earthlens[all]</code>.</p>
-<p><strong>At a glance:</strong> <strong>61 backends</strong> · <strong>33 extras</strong> (31 in <code>all</code>, 2 held out) · <strong>30 backends are SDK-free</strong> (no extra
+<p><strong>At a glance:</strong> <strong>61 backends</strong> · <strong>34 extras</strong> (31 in <code>all</code>, 3 held out) · <strong>30 backends are SDK-free</strong> (no extra
 — they ship with their thematic distribution and just work).</p>
 <ul>
 <li><strong>SDK-bearing backend</strong> → <code>pip install "earthlens[&lt;extra&gt;]"</code>.</li>
@@ -23500,7 +23500,7 @@ it is bundled in <code>earthlens[all]</code>.</p>
 <li>The extra <strong>name</strong> is what you type in <code>pip install "earthlens[&lt;name&gt;]"</code>; note the casing (<code>eea_aq</code>,
   <code>sentinel-hub</code>, <code>usgs-water</code>, <code>ecmwf-modern</code>, <code>osm-pbf</code>).</li>
 </ul>
-<h2 id="backends-with-an-extra-31-backends-33-extras"><a class="toclink" href="#backends-with-an-extra-31-backends-33-extras">Backends with an extra (31 backends, 33 extras)</a><a class="headerlink" href="#backends-with-an-extra-31-backends-33-extras" title="Permanent link">#</a></h2>
+<h2 id="backends-with-an-extra-31-backends-34-extras"><a class="toclink" href="#backends-with-an-extra-31-backends-34-extras">Backends with an extra (31 backends, 34 extras)</a><a class="headerlink" href="#backends-with-an-extra-31-backends-34-extras" title="Permanent link">#</a></h2>
 <table>
 <thead>
 <tr>
@@ -23609,6 +23609,13 @@ it is bundled in <code>earthlens[all]</code>.</p>
 <td><code>gbif</code></td>
 <td><code>pygbif</code></td>
 <td style="text-align: center;">✅</td>
+</tr>
+<tr>
+<td><code>gee</code></td>
+<td>imagery</td>
+<td><code>eedai</code></td>
+<td><code>pyramids-eo</code> (optional EEDAI fetch path)</td>
+<td style="text-align: center;">❌ held out</td>
 </tr>
 <tr>
 <td><code>gee</code></td>
@@ -23852,17 +23859,20 @@ with their thematic distribution and work out of the box.</p>
 </table>
 <h2 id="notes"><a class="toclink" href="#notes">Notes</a><a class="headerlink" href="#notes" title="Permanent link">#</a></h2>
 <ul>
-<li><strong><code>all</code> bundles 31 of the 33 extras.</strong> Two are deliberately held out (still installable on their own):</li>
+<li><strong><code>all</code> bundles 31 of the 34 extras.</strong> Three are deliberately held out (still installable on their own):</li>
 <li><strong><code>argo</code></strong> — <code>argopy</code> pins <code>xarray&gt;=2025.7</code> while <code>openeo</code> pins <code>xarray&lt;2025.1.2</code>; the two can't co-resolve
     (see <code>#789</code>).</li>
 <li><strong><code>osm-pbf</code></strong> — <code>pyrosm</code>'s transitive <code>cykhash</code> dependency is <strong>sdist-only</strong> (no wheel), so it can't go in the
     everything-install.</li>
+<li><strong><code>eedai</code></strong> — installing it flips the GEE backend's default <code>engine="auto"</code> onto the <code>pyramids-eo</code> EEDAI
+    reader, which samples and grids differently from Earth Engine. It resolves cleanly; it is held out so an
+    <code>all</code> upgrade never changes an existing user's pixels.</li>
 <li><strong>Two empty extras</strong> — <code>cmip6</code> and <code>ghsl</code> are declared (<code>= []</code>) but pull <strong>no</strong> dependency; the backend works
   without the extra. They exist for API/CLI symmetry.</li>
 <li><strong>Extras that reuse the S3 client</strong> — <code>s3</code>, <code>radar</code>, <code>goes</code>, <code>dem</code>, <code>nwm</code> pull <code>earthlens-core[s3]</code> (boto3) rather
   than a bespoke SDK.</li>
-<li><strong><code>ecmwf</code> and <code>osm</code> each have two extras</strong> — a base one and a variant (<code>ecmwf-modern</code>, <code>osm-pbf</code>) — which is why
-  33 extras cover 31 backends.</li>
+<li><strong><code>ecmwf</code>, <code>osm</code> and <code>gee</code> each have more than one extra</strong> — a base one and a variant (<code>ecmwf-modern</code>,
+  <code>osm-pbf</code>, <code>eedai</code>) — which is why 34 extras cover 31 backends.</li>
 <li><strong>Distributions:</strong> <code>earthlens-atmosphere</code>, <code>-ocean</code>, <code>-imagery</code>, <code>-land</code>, <code>-hazards</code>. The meta-package
   <code>earthlens</code> depends on all five; installing a single distribution gives you that theme's backends (SDK-free ones
   usable immediately; SDK-bearing ones after their extra).</li>
