@@ -2528,7 +2528,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS)
+    Data stores (CDS + ADS + EWDS + ECDS + XDS)
   
 
     
@@ -2557,6 +2557,34 @@
     
   
     EWDS (GloFAS / floods)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ecmwf/ecds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -14739,6 +14767,34 @@
     
   
     Flood forecasting with GloFAS — the EWDS endpoint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIGGE and fire fuel — the ECDS and XDS endpoints
   
 
     
@@ -28187,7 +28243,7 @@ is curated as config-as-code in the bundled <code>catalog/</code> directory — 
 loader merges every file at construction time (the ghsl / bathymetry sharded
 pattern) through a <code>(path, mtime_ns)</code> parse cache.</p>
 <p>Every shipped row is reached through one of the four transports pinned in the A1
-gate (<code>planning/admin/captures/admin-sdk-facts.md</code>); the actual URL resolution
+gate; the actual URL resolution
 lives in <code>earthlens.admin._helpers</code>, and the read always goes through pyramids
 <code>FeatureCollection.read_file</code> (never a bare <code>geopandas.read_file</code>). <code>GADM</code> is
 deliberately omitted (its no-commercial / no-redistribute license is

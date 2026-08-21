@@ -2610,7 +2610,7 @@
   <span class="md-ellipsis">
     
   
-    Data stores (CDS + ADS + EWDS)
+    Data stores (CDS + ADS + EWDS + ECDS + XDS)
   
 
     
@@ -2639,6 +2639,34 @@
     
   
     EWDS (GloFAS / floods)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ecds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ECDS + XDS (TIGGE / S2S / fire fuel)
   
 
     
@@ -14436,6 +14464,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../examples/ecmwf/ecds_xds_stores/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIGGE and fire fuel — the ECDS and XDS endpoints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../examples/ecmwf/glofas_historical_intermediate/" class="md-nav__link">
         
   
@@ -23492,9 +23548,12 @@ how to extend it.</p>
 variable, validates each request against the dataset's <code>constraints.json</code>
 before it consumes a queue slot, and writes the result as
 <code>&lt;path&gt;/&lt;cds_variable&gt;_&lt;dataset&gt;.nc</code>.</p>
-<p>Beyond CDS, the same backend can reach the <strong>CEMS Early Warning Data Store
-(EWDS)</strong> — GloFAS flood forecasts — with the very same token; see
-<a href="../ewds/">EWDS (GloFAS / floods)</a>.</p>
+<p>Beyond CDS, the same backend reaches four more stores with the very same
+token: the <strong>Atmosphere Data Store (ADS)</strong>, the <strong>CEMS Early Warning Data Store
+(EWDS)</strong> — GloFAS flood forecasts, see <a href="../ewds/">EWDS (GloFAS / floods)</a> — and
+the two ECMWF-hosted stores, the <strong>ECMWF Data Store (ECDS)</strong> (TIGGE and S2S
+ensemble forecasts) and the <strong>Cross Data Store (XDS)</strong> (fire fuel and burned
+area); see <a href="../ecds/">ECDS + XDS</a>.</p>
 <h2 id="authentication"><a class="toclink" href="#authentication">Authentication</a><a class="headerlink" href="#authentication" title="Permanent link">#</a></h2>
 <p>CDS access needs a personal API token in a <code>~/.cdsapirc</code> file:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="na">url</span><span class="o">:</span><span class="w"> </span><span class="s">https://cds.climate.copernicus.eu/api</span>
