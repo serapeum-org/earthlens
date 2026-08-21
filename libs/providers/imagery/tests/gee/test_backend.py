@@ -1895,6 +1895,21 @@ class TestExportViaEedai:
         wide = gee._eedai_grid((31.0, 29.0, 32.0, 30.0), 90.0)
         assert kwargs["shape"] != wide, "grid was sized from the bbox, not the region"
 
+    def test_oversized_native_read_is_refused(self, make_gee, fake_reader):
+        """A huge AOI over a fine asset fails fast instead of reading into RAM."""
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        with pytest.raises(ValueError, match="native"):
+            gee._export_via_eedai(var_info, ["elevation"], 5000.0, "srtm_big")
+        assert not fake_reader.calls, "the reader should not be called"
+
+    def test_modest_aoi_passes_the_preflight(self, make_gee, fake_reader):
+        """A small AOI is not blocked by the native-resolution budget."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        assert fake_reader.calls
+
     def test_api_uses_getdownloadurl_when_engine_is_ee(self, make_gee, fake_reader):
         """`engine="ee"` keeps the historical `getDownloadURL` path."""
         gee = make_gee(engine="ee")

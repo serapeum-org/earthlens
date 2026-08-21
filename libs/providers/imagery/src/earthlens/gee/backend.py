@@ -1161,6 +1161,43 @@ class GEE(LazyClientMixin, AbstractDataSource):
         cols = max(1, round(abs(width_m) / scale))
         return rows, cols
 
+    def _eedai_preflight(
+        self, var_info: Dataset, bbox: tuple[float, float, float, float]
+    ) -> None:
+        """Refuse an EEDAI read whose native-resolution window is unbounded.
+
+        Dropping `getDownloadURL` also drops its 32768-px guard and
+        `auto_split`, but the reader is not free of limits: the EEDAI
+        driver's overviews are unreliable, so it fetches the AOI at the
+        asset's *native* resolution block by block and materialises it in
+        memory before downsampling. A wide AOI over a fine-resolution asset
+        is therefore an unbounded read — an OOM or a hang — where the Earth
+        Engine path used to fail immediately with an actionable message.
+        This keeps that fast failure, measured against the native grid
+        rather than the requested one.
+
+        Args:
+            var_info: The catalog entry (for the asset's native resolution).
+            bbox: The lat/lon window the reader will materialise.
+
+        Raises:
+            ValueError: If the native-resolution window exceeds
+                :data:`EE_MAX_DIMENSION` on either axis.
+        """
+        native_scale = var_info.spatial_resolution
+        if not native_scale:
+            return
+        rows, cols = self._eedai_grid(bbox, float(native_scale))
+        if max(rows, cols) <= EE_MAX_DIMENSION:
+            return
+        raise ValueError(
+            f"{var_info.id}: the EEDAI reader fetches the AOI at the asset's "
+            f"native {native_scale} m resolution, which is about {cols}x{rows} "
+            f"px here — over the {EE_MAX_DIMENSION}-px per-axis budget and read "
+            "into memory in one piece. Use a smaller bbox, engine='ee' (with "
+            "auto_split=True to tile), or export_via='drive'."
+        )
+
     def _export_via_eedai(
         self, var_info: Dataset, bands: list[str], scale: float, prefix: str
     ) -> Path:
@@ -1194,11 +1231,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Raises:
             ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
+            ValueError: If the native-resolution read would exceed the
+                budget (see :meth:`_eedai_preflight`).
         """
         reader = import_earthengine_reader()
         _service_account, service_key, _project = self._resolve_credentials()
         target = self.root_dir / f"{prefix}.tif"
         bbox, cutline = self._eedai_window()
+        self._eedai_preflight(var_info, bbox)
         dataset = reader.from_earthengine(
             var_info.id,
             bands=list(bands),
