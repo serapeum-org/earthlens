@@ -282,6 +282,11 @@ class _FakePyramidsDataset:
 _FAKE_TIFF_BYTES = b"MM\x00*" + b"\x00" * 64
 
 
+def _raise_missing_extra(service_key):
+    """Stand in for `credentials_for` when the optional extra is absent."""
+    raise ImportError("pip install earthlens[eedai]")
+
+
 def _write_then_fail(path):
     """Write a truncated raster then fail, as a driver dying mid-write would."""
     Path(path).write_bytes(b"trunc")
@@ -1982,7 +1987,8 @@ class TestExportViaEedai:
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         can_serve, tile_size, _reason = gee._eedai_plan(var_info)
         assert can_serve is True
-        assert tile_size is not None and tile_size >= 1
+        assert tile_size is not None
+        assert tile_size >= 1
         assert gee._use_eedai(var_info) is True
 
     def test_tile_size_keeps_each_tile_native_read_within_budget(self, make_gee):
@@ -2005,13 +2011,42 @@ class TestExportViaEedai:
         assert target.read_bytes() == b"eedai-tiled"
         assert not list(target.parent.glob("*.partial*.tif"))
 
+    def test_total_pixel_budget_is_enforced_below_the_per_axis_cap(
+        self, make_gee, fake_reader
+    ):
+        """A window under the per-axis cap can still be too big overall.
+
+        Memory scales with the pixel count, not the longest side, so a wide
+        square AOI can sit inside the per-axis budget and still be far past
+        what one read may hold.
+        """
+        gee = make_gee(lat_lim=[0.0, 5.4], lon_lim=[0.0, 5.4], scale=1000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        bbox, _cutline = gee._eedai_window()
+        rows, cols = gee._eedai_grid(bbox, var_info.spatial_resolution)
+        assert max(rows, cols) <= backend_module.EE_MAX_DIMENSION, "per-axis cap hit"
+        fits, reason = gee._eedai_native_fits(var_info, bbox)
+        assert fits is False
+        assert "budget" in reason
+
+    def test_missing_extra_propagates_from_the_credential_build(
+        self, make_gee, monkeypatch
+    ):
+        """An absent `[eedai]` extra surfaces as ImportError, not AuthenticationError."""
+        monkeypatch.setattr(backend_module, "credentials_for", _raise_missing_extra)
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        with pytest.raises(ImportError, match="eedai"):
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+
     def test_a_cutline_cannot_be_tiled_so_it_falls_back(self, make_gee, fake_reader):
         """Upstream refuses `tile_size` with a polygon cutline, so `auto` falls back."""
         region = _FakePolygonAoi(total_bounds=(0.0, 0.0, 40.0, 40.0))
         gee = make_gee(region=region, scale=5000.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         can_serve, tile_size, reason = gee._eedai_plan(var_info)
-        assert can_serve is False and tile_size is None
+        assert can_serve is False
+        assert tile_size is None
         assert "cutline" in reason
         assert gee._use_eedai(var_info) is False
 
