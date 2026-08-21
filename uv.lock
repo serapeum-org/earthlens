@@ -2258,7 +2258,7 @@ dev = [
     { name = "pip" },
     { name = "pre-commit", specifier = ">=3.7.1" },
     { name = "pre-commit-hooks", specifier = ">=4.6.0" },
-    { name = "pyramids-eo", specifier = ">=0.1.0,<0.2" },
+    { name = "pyramids-eo", specifier = ">=0.2.0,<0.3" },
     { name = "pyramids-gis", extras = ["viz"], specifier = ">=0.53.0" },
     { name = "pytest", specifier = ">=8.2.2" },
     { name = "pytest-cov", specifier = ">=5.0.0" },
@@ -2527,7 +2527,7 @@ requires-dist = [
     { name = "gportal", marker = "extra == 'jaxa'", specifier = ">=0.4,<0.5" },
     { name = "jaxa-earth", marker = "extra == 'jaxa'", specifier = ">=0.1.6,<0.2" },
     { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
-    { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.1.0,<0.2" },
+    { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.2.0,<0.3" },
     { name = "pyramids-gis", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.53.0" },
     { name = "rtree", marker = "extra == 'gee'", specifier = ">=1.0.0" },
     { name = "sentinelhub", marker = "extra == 'sentinel-hub'", specifier = ">=3.11.5" },
@@ -7211,7 +7211,7 @@ wheels = [
 
 [[package]]
 name = "pyramids-eo"
-version = "0.1.0"
+version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
@@ -7219,9 +7219,9 @@ dependencies = [
     { name = "pyramids-gis" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a9/06/45ed8139cdd2a5177be4ec6927e114822b7e8d55ca13fdfc90117826fbe8/pyramids_eo-0.1.0.tar.gz", hash = "sha256:041e8382148fa555d75b2b2042dc7e8fa001024fd4f74a7030b6731727ea1e47", size = 110939, upload-time = "2026-08-17T17:57:49.366Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ad/70/0cfd7c8cb7deb5859c113a8425b2c68c3ccf65f06c2d9aad08f8846d8861/pyramids_eo-0.2.0.tar.gz", hash = "sha256:26bb3e715c6e07f98db0e3fc816d5b3bacaf10031235e0b47f0870b35bd1a891", size = 119266, upload-time = "2026-08-21T21:37:26.528Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/68/5e/acd50894e4c685f9dc85c8e490708631b49570d6e51ac8e2524641f6cbbc/pyramids_eo-0.1.0-py3-none-any.whl", hash = "sha256:1697234bfcacc5db6de0d13b895aa7c7807623ef9ab96ddc33f26033aebdf697", size = 76733, upload-time = "2026-08-17T17:57:48.039Z" },
+    { url = "https://files.pythonhosted.org/packages/2d/31/a5a7c5c042b2358314755fad441aa2953159e37fb586863252f35fe3217a/pyramids_eo-0.2.0-py3-none-any.whl", hash = "sha256:acdb518e30ce4250fdc13c20dc104b71c475cd123cba36e68acdc79d4126a142", size = 80987, upload-time = "2026-08-21T21:37:25.336Z" },
 ]
 
 [[package]]
