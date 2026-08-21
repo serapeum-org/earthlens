@@ -507,6 +507,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         #: Write the EEDAI path's output as a Cloud Optimized GeoTIFF.
         self.cog = bool(cog)
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
+        self._eedai_credential: Any = None  # lazily built in `_eedai_credentials`
 
         super().__init__(
             start=start,
@@ -1161,6 +1162,50 @@ class GEE(LazyClientMixin, AbstractDataSource):
         cols = max(1, round(abs(width_m) / scale))
         return rows, cols
 
+    def _eedai_credentials(self) -> Any:
+        """Return the pyramids-eo credential for EEDAI reads, built once.
+
+        `EarthEngineCredentials` writes inline key material to a private
+        temp file whose removal is left to the garbage collector, so
+        rebuilding it per bucket would scatter transient key files across a
+        multi-band, multi-date download. It is therefore resolved once per
+        instance and reused.
+
+        The Earth Engine `project` is deliberately not forwarded: the reader
+        authenticates GDAL's `EEDAI:` driver with the key alone. When no key
+        resolves at all the reader falls back to Application Default
+        Credentials, which may be a *different* identity from the one the
+        Earth Engine half uses, so that case is logged rather than silent.
+
+        Returns:
+            The `pyramids_eo.earthengine.EarthEngineCredentials` to read with.
+
+        Raises:
+            AuthenticationError: If the credential cannot be built, so the
+                failure matches this backend's error contract rather than
+                surfacing pyramids-eo's own exception type.
+            ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
+        """
+        if self._eedai_credential is not None:
+            return self._eedai_credential
+        _service_account, service_key, _project = self._resolve_credentials()
+        if service_key is None:
+            logger.warning(
+                "No Earth Engine service key resolved for the EEDAI read; falling "
+                "back to Application Default Credentials, which may authenticate "
+                "as a different identity than the Earth Engine half of this "
+                "request. Pass service_key= (or set GEE_SERVICE_KEY) to pin it."
+            )
+        try:
+            self._eedai_credential = credentials_for(service_key)
+        except ImportError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - re-raised as AuthenticationError
+            raise AuthenticationError(
+                f"could not build Earth Engine credentials for the EEDAI read: {exc}"
+            ) from exc
+        return self._eedai_credential
+
     def _eedai_preflight(
         self, var_info: Dataset, bbox: tuple[float, float, float, float]
     ) -> None:
@@ -1231,11 +1276,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Raises:
             ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
+            AuthenticationError: If the reader's credentials cannot be built.
             ValueError: If the native-resolution read would exceed the
                 budget (see :meth:`_eedai_preflight`).
         """
         reader = import_earthengine_reader()
-        _service_account, service_key, _project = self._resolve_credentials()
+        credentials = self._eedai_credentials()
         target = self.root_dir / f"{prefix}.tif"
         bbox, cutline = self._eedai_window()
         self._eedai_preflight(var_info, bbox)
@@ -1246,7 +1292,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bbox=bbox,
             geometry=cutline,
             shape=self._eedai_grid(bbox, scale),
-            credentials=credentials_for(service_key),
+            credentials=credentials,
         )
         try:
             if self.cog:

@@ -1688,7 +1688,12 @@ def fake_reader(monkeypatch):
     """Patch the guarded pyramids-eo loader with an in-memory fake reader."""
     reader = _FakeReaderModule()
     monkeypatch.setattr(backend_module, "import_earthengine_reader", lambda: reader)
-    monkeypatch.setattr(backend_module, "credentials_for", lambda key: ("creds", key))
+    reader.credential_builds = []
+    monkeypatch.setattr(
+        backend_module,
+        "credentials_for",
+        lambda key: reader.credential_builds.append(key) or ("creds", key),
+    )
     monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
     return reader
 
@@ -1909,6 +1914,47 @@ class TestExportViaEedai:
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
         assert fake_reader.calls
+
+    def test_credentials_are_built_once_and_reused(self, make_gee, fake_reader):
+        """The credential is resolved once per instance, not per written bucket.
+
+        Inline key material lands in a temp file whose removal is left to the
+        GC, so rebuilding per bucket would scatter transient key files.
+        """
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "a")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "b")
+        assert len(fake_reader.credential_builds) == 1
+        assert len(fake_reader.calls) == 2
+
+    def test_missing_key_warns_before_falling_back_to_adc(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """No resolvable key logs the ADC fallback instead of switching silently."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee()
+        monkeypatch.setattr(gee, "_resolve_credentials", lambda: (None, None, None))
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        assert any("Application Default Credentials" in w for w in warnings), warnings
+
+    def test_credential_failure_becomes_an_authentication_error(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A reader credential failure surfaces as earthlens's AuthenticationError."""
+        monkeypatch.setattr(
+            backend_module,
+            "credentials_for",
+            lambda key: (_ for _ in ()).throw(RuntimeError("bad key")),
+        )
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        with pytest.raises(backend_module.AuthenticationError, match="EEDAI"):
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
 
     def test_api_uses_getdownloadurl_when_engine_is_ee(self, make_gee, fake_reader):
         """`engine="ee"` keeps the historical `getDownloadURL` path."""
