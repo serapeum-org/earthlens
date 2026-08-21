@@ -128,7 +128,8 @@ class TestShakemapLiveSideOutput:
             assert spatial_ref.GetAuthorityCode(None) == "4326", (
                 "the CRS should carry an EPSG authority code"
             )
-            assert dataset.RasterXSize > 1 and dataset.RasterYSize > 1
+            assert dataset.RasterXSize > 1, "the grid should have real width"
+            assert dataset.RasterYSize > 1, "the grid should have real height"
         finally:
             dataset = None
 
