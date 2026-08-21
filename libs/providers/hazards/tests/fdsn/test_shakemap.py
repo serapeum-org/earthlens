@@ -76,6 +76,16 @@ def _quakeml_id(comcat_id: str) -> str:
     )
 
 
+class _FakeSession:
+    """Stand-in for the `requests.Session` an `HttpClient` owns."""
+
+    def __init__(self) -> None:
+        self.closed = 0
+
+    def close(self) -> None:
+        self.closed += 1
+
+
 class _FakeHttp:
     """Stand-in for `HttpClient` serving one detail document and archive.
 
@@ -93,8 +103,12 @@ class _FakeHttp:
         self.archive = _make_archive() if archive is None else archive
         self.json_urls: list[str] = []
         self.downloads: list[tuple[str, Path]] = []
+        self.download_kwargs: list[dict[str, Any]] = []
+        self.init_kwargs: dict[str, Any] = {}
         self.fail_json_for: set[str] = set()
         self.fail_download_for: set[str] = set()
+        self.partial_download_for: set[str] = set()
+        self.session = _FakeSession()
 
     def get_json(self, url: str, **_kwargs: Any) -> dict[str, Any]:
         self.json_urls.append(url)
@@ -102,21 +116,35 @@ class _FakeHttp:
             raise RuntimeError(f"ComCat detail unavailable for {url}")
         return self.detail
 
-    def download(self, url: str, dest: str | Path, **_kwargs: Any) -> Path:
+    def download(self, url: str, dest: str | Path, **kwargs: Any) -> Path:
         dest = Path(dest)
         self.downloads.append((url, dest))
+        self.download_kwargs.append(kwargs)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if any(marker in str(dest) for marker in self.partial_download_for):
+            # Mirror a non-atomic transport dying mid-stream: bytes on disk,
+            # but not a usable archive.
+            dest.write_bytes(self.archive[: len(self.archive) // 2])
+            raise RuntimeError(f"archive transfer died mid-stream for {url}")
         if any(marker in str(dest) for marker in self.fail_download_for):
             raise RuntimeError(f"archive transfer failed for {url}")
-        dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(self.archive)
         return dest
+
+
+def _build_fake_http(fake: _FakeHttp, **kwargs: Any) -> _FakeHttp:
+    """Record the kwargs the backend built its client with, then serve it."""
+    fake.init_kwargs = kwargs
+    return fake
 
 
 @pytest.fixture
 def fake_http(monkeypatch: pytest.MonkeyPatch) -> _FakeHttp:
     """Patch the backend's `HttpClient` with the canned fake."""
     fake = _FakeHttp()
-    monkeypatch.setattr(fdsn_backend, "HttpClient", lambda **_kwargs: fake)
+    monkeypatch.setattr(
+        fdsn_backend, "HttpClient", lambda **kwargs: _build_fake_http(fake, **kwargs)
+    )
     return fake
 
 
@@ -281,17 +309,17 @@ class TestBackendConstruction:
         """Without the flag the backend stays a vector backend."""
         assert _backend(tmp_path).OUTPUT_KIND == "vector"
 
-    def test_shakemap_makes_output_kind_mixed(self, tmp_path: Path):
-        """With the flag the instance emits rasters too."""
-        assert _backend(tmp_path, with_shakemap=True).OUTPUT_KIND == "mixed"
+    def test_shakemap_keeps_output_kind_vector(self, tmp_path: Path):
+        """The rasters are a side effect, so the return shape is unchanged."""
+        assert _backend(tmp_path, with_shakemap=True).OUTPUT_KIND == "vector"
 
     def test_bad_layer_rejected_even_when_flag_off(self, tmp_path: Path):
         """A typo'd layer name fails at construction, flag or not."""
         with pytest.raises(ValueError, match="unknown ShakeMap layer"):
             _backend(tmp_path, shakemap_layers=["nope"])
 
-    def test_aggregate_still_refused_when_mixed(self, tmp_path: Path):
-        """A mixed-output instance still refuses the aggregator."""
+    def test_aggregate_still_refused_with_shakemap(self, tmp_path: Path):
+        """A ShakeMap instance still refuses the aggregator."""
         backend = _backend(tmp_path, with_shakemap=True)
         with pytest.raises(NotImplementedError, match="aggregate="):
             backend.download(aggregate=object())
@@ -313,17 +341,19 @@ class TestBackendShakemapDownload:
         written = sorted(p.name for p in (tmp_path / "shakemap").rglob("*.tif"))
         assert written == ["mmi_mean.tif", "pga_mean.tif"]
 
-    def test_intermediates_are_cleaned_up(
+    def test_event_directory_holds_exactly_the_rasters(
         self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
     ):
-        """The archive and extracted grids do not survive conversion."""
+        """Nothing but the requested GeoTIFFs survives in the output folder.
+
+        Asserts the exact directory listing rather than the absence of a few
+        suffixes: GDAL writes a `.prj` beside the grid when its CRS is
+        assigned, which an allowlist of forbidden extensions would miss.
+        """
         _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
-        leftovers = [
-            p.name
-            for p in (tmp_path / "shakemap").rglob("*")
-            if p.suffix in {".zip", ".flt", ".hdr"}
-        ]
-        assert leftovers == []
+
+        event_dir = tmp_path / "shakemap" / "us6000jlqa"
+        assert sorted(p.name for p in event_dir.iterdir()) == ["mmi_mean.tif"]
 
     def test_skips_network_on_rerun(
         self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
@@ -433,15 +463,22 @@ class TestShakemapFailurePolicy:
         assert len(fc) == 1, "the event table survives a failed transfer"
         assert list((tmp_path / "shakemap").rglob("*.tif")) == []
 
-    def test_failed_download_leaves_no_partial_archive(
+    def test_partially_written_archive_is_cleaned_up(
         self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
     ):
-        """A failed transfer cleans up rather than leaving an archive behind."""
-        fake_http.fail_download_for = {"us6000jlqa"}
+        """A transfer that dies mid-stream leaves no half-archive behind.
+
+        The fake writes real bytes before raising, so the cleanup has
+        something to actually remove.
+        """
+        fake_http.partial_download_for = {"us6000jlqa"}
         _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
 
-        leftovers = [p.name for p in tmp_path.rglob("raster.zip")]
+        leftovers = [str(p.relative_to(tmp_path)) for p in tmp_path.rglob("*.zip")]
         assert leftovers == [], f"no archive should survive: {leftovers}"
+        assert not (tmp_path / "shakemap" / "us6000jlqa").exists(), (
+            "an event that produced no raster should leave no directory"
+        )
 
 
 class TestShakemapArchiveProblems:
@@ -562,3 +599,210 @@ class TestShakemapUnresolvableId:
         assert len(fc) == 1, "the event itself still arrives"
         assert fake_http.json_urls == [], "no detail request without a ComCat id"
         assert list((tmp_path / "shakemap").rglob("*.tif")) == []
+
+
+class TestShakemapPathSafety:
+    """The ComCat id becomes a directory name, so it is constrained."""
+
+    @pytest.mark.parametrize("degenerate", ["..", ".", "../../etc"])
+    def test_traversing_id_is_not_parsed(self, degenerate: str):
+        """An id that would escape the output directory is refused outright."""
+        assert _helpers.parse_comcat_id(f"quakeml:x?eventid={degenerate}&f=q") is None
+
+    def test_traversing_id_deletes_nothing(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """A traversing id leaves files in the output root untouched."""
+        from obspy.core.event import Catalog
+
+        event = make_event()
+        event.resource_id = "quakeml:x?eventid=..&format=quakeml"
+        fake_fdsn.default_result = Catalog(events=[event])
+
+        keep_flt = tmp_path / "keepme.flt"
+        keep_hdr = tmp_path / "keepme.hdr"
+        keep_flt.write_bytes(b"keep")
+        keep_hdr.write_text("keep")
+
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert keep_flt.is_file(), "an unrelated .flt must not be deleted"
+        assert keep_hdr.is_file(), "an unrelated .hdr must not be deleted"
+
+
+class TestShakemapAtomicWrite:
+    """A GeoTIFF on disk is a finished one."""
+
+    def test_no_partial_file_survives(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """The staged partial name is never left in the output directory."""
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        event_dir = tmp_path / "shakemap" / "us6000jlqa"
+        partials = [p.name for p in event_dir.iterdir() if "partial" in p.name]
+        assert partials == [], f"staged partials should be renamed away: {partials}"
+
+    def test_force_refetches_an_existing_raster(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """force=True re-fetches instead of trusting what is on disk."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        backend.download(progress_bar=False)
+        first = len(fake_http.downloads)
+
+        backend.download(progress_bar=False, force=True)
+        assert len(fake_http.downloads) == first + 1, "force should refetch"
+
+    def test_without_force_a_present_raster_is_reused(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """The default still reuses a finished raster."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        backend.download(progress_bar=False)
+        first = len(fake_http.downloads)
+
+        backend.download(progress_bar=False)
+        assert len(fake_http.downloads) == first, "no refetch without force"
+
+
+class TestShakemapFanOutCeiling:
+    """The per-event fan-out is bounded rather than merely documented."""
+
+    def test_events_beyond_the_ceiling_are_skipped(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """Only up to max_shakemap_events events are fetched."""
+        fake_fdsn.default_result = _usgs_catalog(
+            make_event, "us1111", "us2222", "us3333"
+        )
+        backend = _backend(tmp_path, with_shakemap=True, max_shakemap_events=2)
+        fc = backend.download(progress_bar=False)
+
+        assert len(fc) == 3, "every event still reaches the table"
+        fetched = sorted(p.name for p in (tmp_path / "shakemap").iterdir())
+        assert fetched == ["us1111", "us2222"], f"ceiling not applied: {fetched}"
+
+    def test_the_skip_is_announced(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """Dropping events past the ceiling is logged, never silent."""
+        from loguru import logger as loguru_logger
+
+        messages: list[str] = []
+        sink_id = loguru_logger.add(lambda message: messages.append(str(message)))
+        try:
+            fake_fdsn.default_result = _usgs_catalog(make_event, "us1111", "us2222")
+            _backend(tmp_path, with_shakemap=True, max_shakemap_events=1).download(
+                progress_bar=False
+            )
+        finally:
+            loguru_logger.remove(sink_id)
+
+        assert any(
+            "max_shakemap_events" in m and "skipping 1" in m for m in messages
+        ), f"the dropped count should be announced, got: {messages}"
+
+    def test_ceiling_rejects_non_positive(self, tmp_path: Path):
+        """A zero or negative ceiling is refused at construction."""
+        with pytest.raises(ValueError):
+            _backend(tmp_path, with_shakemap=True, max_shakemap_events=0)
+
+
+class TestShakemapClientWiring:
+    """The real HttpClient contract the fake stands in for."""
+
+    def test_archive_fetch_asserts_zip_magic(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """The archive download demands a zip magic prefix."""
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert fake_http.download_kwargs, "the archive should have been fetched"
+        assert fake_http.download_kwargs[0]["expect_magic"] == b"PK", (
+            "an HTML error page served with a 200 must not land as a .zip"
+        )
+
+    def test_client_is_throttled_and_retries_transport_errors(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """The client is built with a politeness interval and transport retries."""
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert fake_http.init_kwargs.get("min_interval"), "expected a throttle"
+        assert fake_http.init_kwargs.get("retry_on_exceptions"), (
+            "expected transport-exception retries, as flodis/hanze do"
+        )
+
+    def test_progress_flag_reaches_the_archive_fetch(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """progress_bar governs the long part of the call."""
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=True)
+        assert fake_http.download_kwargs[0]["progress"] is True
+
+    def test_client_is_closed_after_the_loop(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """The pooled session is released once the ShakeMap work is done."""
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+        assert fake_http.session.closed == 1, "the session should close once"
+
+
+class TestShakemapLayersTypeGuard:
+    """A bare string is a sequence of characters, not a layer list."""
+
+    def test_bare_string_is_refused(self, tmp_path: Path):
+        """Passing one layer as a bare string raises a legible TypeError."""
+        with pytest.raises(TypeError, match="not the bare string"):
+            _backend(tmp_path, shakemap_layers="mmi_mean")
+
+
+class TestShakemapDefenceInDepth:
+    """Guards that a tightened parser should already make unreachable."""
+
+    def test_containment_guard_refuses_an_escaping_id(
+        self,
+        tmp_path: Path,
+        usgs_events: _FakeFdsn,
+        fake_http: _FakeHttp,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """An id that escapes the shakemap root is refused before any fetch.
+
+        Forces the guard by making the parser hand back a traversing id, which
+        the tightened pattern would otherwise never produce.
+        """
+        monkeypatch.setattr(fdsn_backend._helpers, "parse_comcat_id", lambda _id: "..")
+
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert fake_http.json_urls == [], "no request should be made for a bad id"
+
+    def test_oversized_member_is_refused(
+        self,
+        tmp_path: Path,
+        usgs_events: _FakeFdsn,
+        fake_http: _FakeHttp,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """A member whose declared size is absurd is skipped, not expanded."""
+        monkeypatch.setattr(fdsn_backend._helpers, "MAX_MEMBER_BYTES", 1)
+
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert list((tmp_path / "shakemap").rglob("*.tif")) == [], (
+            "an over-large member must not be written"
+        )

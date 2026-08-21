@@ -126,9 +126,10 @@ class TestShakemapLiveSideOutput:
         assert "4326" in dataset.GetProjection(), "CRS should be assigned"
         assert dataset.RasterXSize > 1 and dataset.RasterYSize > 1
 
-        leftovers = [
-            path.name
-            for path in (tmp_path / "shakemap").rglob("*")
-            if path.suffix in {".zip", ".flt", ".hdr"}
-        ]
-        assert leftovers == [], f"intermediates should be cleaned up: {leftovers}"
+        # Exact contents, not an allowlist of forbidden suffixes: GDAL drops a
+        # `.prj` beside the grid when its CRS is assigned, which a suffix filter
+        # would not notice.
+        for event_dir in (tmp_path / "shakemap").iterdir():
+            assert sorted(p.name for p in event_dir.iterdir()) == ["mmi_mean.tif"], (
+                f"{event_dir.name} should hold only the requested raster"
+            )
