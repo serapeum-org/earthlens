@@ -72,6 +72,9 @@ by the facade's `**backend_kwargs`):
 | `orderby` | `"time"`, `"time-asc"`, `"magnitude"`, `"magnitude-asc"` | `"time"` |
 | `limit` | max events per network | `None` |
 | `file_format` | `"gpkg"` or `"geojson"` | `"gpkg"` |
+| `with_shakemap` | also write each USGS event's ShakeMap as GeoTIFF | `False` |
+| `shakemap_layers` | which ShakeMap grids to write | `["mmi_mean"]` |
+| `max_shakemap_events` | ceiling on events fetched a ShakeMap for | `100` |
 
 `min_magnitude=None` (the default) falls back **per network** to that
 provider's catalog floor — USGS / EMSC / EarthScope / ISC use `4.5`,
@@ -161,10 +164,16 @@ event `FeatureCollection`; the rasters are a side effect.
 
 **USGS only.** ShakeMap is a USGS ComCat product and is not part of the
 FDSN event standard, so a non-USGS network in the same request still
-contributes events but no rasters (it is logged once). ShakeMap costs
-one extra request and an ~8.5 MB archive **per event**, so bound the
-event count with `limit=` or a high `min_magnitude` before enabling it
-on a busy window.
+contributes events but no rasters (each such network is logged once).
+ShakeMap costs one extra request and an ~8.5 MB archive **per event**,
+so a broad
+window is gigabytes. `max_shakemap_events` (default `100`) caps how many
+events one call will fetch: past the ceiling the rest are skipped with a
+warning naming the count — never silently. Raise it deliberately, or
+narrow the query with `limit=` / `min_magnitude=`.
+
+A re-run reuses rasters already on disk; pass `download(force=True)` to
+refetch them.
 
 By default only `mmi_mean` (macroseismic intensity) is written. The
 archive carries fourteen grids — `mmi`, `pga`, `pgv`, `psa0p3`,
@@ -198,9 +207,10 @@ EarthLens(variables=["USGS"], data_source="fdsn", ...).download(aggregate=cfg)
 The aggregator only reduces gridded raster outputs. Post-process the
 returned FeatureCollection directly instead (it is a GeoDataFrame).
 
-This holds with `with_shakemap=True` too, even though that makes the
-instance `"mixed"`: the ShakeMap grids are a per-event side-output with
-no time axis to reduce over.
+This holds with `with_shakemap=True` too. That flag does not change
+`OUTPUT_KIND` — `download()` still returns the event FeatureCollection,
+and the ShakeMap grids are an on-disk side effect with no time axis to
+reduce over.
 
 ## EarthScope token (optional)
 
