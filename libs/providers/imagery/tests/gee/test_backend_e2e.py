@@ -79,6 +79,13 @@ def _download_srtm(tmp_path, engine: str):
     return paths[0]
 
 
+def _record_plan(plan, sink):
+    """Record a plan's tile size, then hand the plan back unchanged."""
+    _can_serve, tile_size, _reason = plan
+    sink.append(tile_size)
+    return plan
+
+
 def _open_raster(path):
     """Return `(array, crs, bounds)` for a written raster."""
     import numpy as np
@@ -172,7 +179,21 @@ def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
     # still leaving the tile count well inside the ceiling; a much smaller
     # budget would shrink the tile until the job is refused instead.
     monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 400)
+    tiled_calls: list[int] = []
+    original_plan = backend_module.GEE._eedai_plan
+    monkeypatch.setattr(
+        backend_module.GEE,
+        "_eedai_plan",
+        lambda self, var_info, band_count=1: _record_plan(
+            original_plan(self, var_info, band_count), tiled_calls
+        ),
+    )
     tiled = _download_srtm(tmp_path / "tiled", "eedai")
+    # Without this the test would silently compare two single-pass reads and
+    # pass, proving nothing about tiling.
+    assert tiled_calls and all(size is not None for size in tiled_calls), (
+        f"the read was not tiled: planned tile sizes {tiled_calls}"
+    )
 
     assert tiled.is_file(), f"tiled output missing: {tiled}"
     assert tiled != single, "the tiled read reused the single-pass output"

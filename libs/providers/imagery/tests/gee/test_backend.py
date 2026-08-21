@@ -2131,6 +2131,45 @@ class TestExportViaEedai:
         assert not list(gee.root_dir.glob("*.partial*.tif"))
         assert not (gee.root_dir / "srtm_big.tif").exists()
 
+    def test_budget_is_spent_per_band(self, make_gee, fake_reader):
+        """Band count divides the budget: the reader holds every band at once.
+
+        A window that fits for one band can be several times over the limit
+        for a multi-band request.
+        """
+        gee = make_gee(lat_lim=[0.0, 3.0], lon_lim=[0.0, 3.0], scale=90.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        bbox, _cutline = gee._eedai_window()
+        one_band, _reason = gee._eedai_native_fits(var_info, bbox, 1)
+        many_bands, reason = gee._eedai_native_fits(var_info, bbox, 13)
+        assert one_band is True
+        assert many_bands is False
+        assert "13 band(s)" in reason
+
+    def test_tile_shrinks_for_a_multi_band_read(self, make_gee):
+        """More bands mean a smaller tile, since they share the memory budget."""
+        gee = make_gee(lat_lim=[0.0, 10.0], lon_lim=[0.0, 10.0], scale=1000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        ok_one, tile_one, _r1 = gee._eedai_plan(var_info, 1)
+        ok_many, tile_many, _r2 = gee._eedai_plan(var_info, 4)
+        assert ok_one is True
+        assert ok_many is True
+        assert tile_many < tile_one
+
+    def test_more_bands_never_loosen_the_plan(self, make_gee):
+        """Adding bands only ever constrains the plan — never relaxes it.
+
+        Past some band count the tile shrinks until the job needs more tiles
+        than the ceiling allows, at which point the plan declines outright;
+        both outcomes are stricter, never looser.
+        """
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        ok_one, tile_one, _r1 = gee._eedai_plan(var_info, 1)
+        ok_many, tile_many, _r2 = gee._eedai_plan(var_info, 9)
+        assert ok_one is True
+        assert (ok_many is False) or (tile_many < tile_one)
+
     def test_a_cutline_cannot_be_tiled_so_it_falls_back(self, make_gee, fake_reader):
         """Upstream refuses `tile_size` with a polygon cutline, so `auto` falls back."""
         region = _FakePolygonAoi(total_bounds=(0.0, 0.0, 40.0, 40.0))

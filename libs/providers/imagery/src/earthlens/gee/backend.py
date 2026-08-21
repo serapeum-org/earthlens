@@ -1084,7 +1084,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "GEE(...) — the catalog has no nominal spatial_resolution for it."
             )
         prefix = f"{slug_asset_id(var_info.id)}_{'-'.join(bands)}_{when:%Y%m%d}"
-        if self.export_via == "url" and self._use_eedai(var_info):
+        if self.export_via == "url" and self._use_eedai(var_info, len(bands)):
             return self._export_via_eedai(var_info, bands, float(scale), prefix)
         self._warn_cog_ignored(var_info)
         # Only the Earth Engine paths need the `ee.Geometry`; the reader clips
@@ -1157,7 +1157,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             and self.crs.upper() == _EEDAI_NATIVE_CRS
         )
 
-    def _eedai_plan(self, var_info: Dataset) -> tuple[bool, int | None, str]:
+    def _eedai_plan(
+        self, var_info: Dataset, band_count: int = 1
+    ) -> tuple[bool, int | None, str]:
         """Decide how — or whether — the reader can serve this request.
 
         A window too large to materialise is no longer a dead end: the reader
@@ -1169,6 +1171,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Args:
             var_info: The catalog entry being fetched.
+            band_count: How many bands the read asks for; the reader holds
+                them all, so they divide the per-tile budget.
 
         Returns:
             `(can_serve, tile_size, reason)` — `tile_size` is `None` for a
@@ -1176,7 +1180,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             line or the forced-engine error.
         """
         bbox, cutline = self._eedai_window()
-        fits, reason = self._eedai_native_fits(var_info, bbox)
+        fits, reason = self._eedai_native_fits(var_info, bbox, band_count)
         if fits:
             return True, None, ""
         native_scale = var_info.spatial_resolution
@@ -1204,7 +1208,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             min(
                 _EEDAI_TILE_PIXELS,
                 EE_MAX_DIMENSION / native_ratio,
-                math.sqrt(_EEDAI_MAX_PIXELS) / native_ratio,
+                math.sqrt(_EEDAI_MAX_PIXELS / max(band_count, 1)) / native_ratio,
             )
         )
         if tile_size < 1:
@@ -1231,7 +1235,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         return True, tile_size, ""
 
-    def _use_eedai(self, var_info: Dataset) -> bool:
+    def _use_eedai(self, var_info: Dataset, band_count: int = 1) -> bool:
         """Resolve the configured `engine` against this request's eligibility.
 
         Args:
@@ -1261,7 +1265,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     f"crs={_EEDAI_NATIVE_CRS!r} (got {self.crs!r}). Use "
                     "engine='auto' or engine='ee'."
                 )
-            can_serve, _tile_size, reason = self._eedai_plan(var_info)
+            can_serve, _tile_size, reason = self._eedai_plan(var_info, band_count)
             if not can_serve:
                 raise ValueError(
                     f"engine='eedai' cannot serve {var_info.id}: {reason}. Use a "
@@ -1271,7 +1275,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return True
         if not (eligible and eedai_available()):
             return False
-        can_serve, _tile_size, reason = self._eedai_plan(var_info)
+        can_serve, _tile_size, reason = self._eedai_plan(var_info, band_count)
         if not can_serve:
             logger.info(
                 f"Serving {var_info.id} through Earth Engine rather than the EEDAI "
@@ -1473,7 +1477,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         return self._eedai_credential
 
     def _eedai_native_fits(
-        self, var_info: Dataset, bbox: tuple[float, float, float, float]
+        self,
+        var_info: Dataset,
+        bbox: tuple[float, float, float, float],
+        band_count: int = 1,
     ) -> tuple[bool, str]:
         """Report whether the reader's native-resolution read is bounded.
 
@@ -1493,6 +1500,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Args:
             var_info: The catalog entry (for the asset's native resolution).
             bbox: The lat/lon window the reader would materialise.
+            band_count: How many bands the read asks for. The reader holds
+                every requested band of the window at once, so the budget is
+                spent per band.
 
         Returns:
             `(fits, reason)` — `reason` is empty when it fits, and otherwise
@@ -1511,11 +1521,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"{native_scale} m resolution, over the {EE_MAX_DIMENSION}-px "
                 "per-axis budget the reader would hold in memory"
             )
-        if rows * cols > _EEDAI_MAX_PIXELS:
+        total_px = rows * cols * max(band_count, 1)
+        if total_px > _EEDAI_MAX_PIXELS:
             return False, (
-                f"the AOI is about {cols * rows:,} px at {var_info.id}'s native "
-                f"{native_scale} m resolution, over the {_EEDAI_MAX_PIXELS:,}-px "
-                "budget the reader would hold in memory (per band)"
+                f"the AOI is about {cols * rows:,} px across {band_count} band(s) "
+                f"= {total_px:,} px at {var_info.id}'s native {native_scale} m "
+                f"resolution, over the {_EEDAI_MAX_PIXELS:,}-px budget the reader "
+                "would hold in memory"
             )
         return True, ""
 
@@ -1566,7 +1578,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # second name rather than using its source as its own destination.
         cog_staged = self.root_dir / f"{prefix}.partial-cog.tif"
         bbox, cutline = self._eedai_window()
-        can_serve, tile_size, reason = self._eedai_plan(var_info)
+        can_serve, tile_size, reason = self._eedai_plan(var_info, len(bands))
         if not can_serve:
             # Only reachable if a caller bypasses `_use_eedai`; taking the read
             # anyway would be the unguarded path the plan exists to prevent.
