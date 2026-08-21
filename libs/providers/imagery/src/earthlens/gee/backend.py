@@ -1087,10 +1087,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
         """Materialise one raw asset through the pyramids-eo EEDAI reader.
 
         Reads the requested bands straight from the asset via GDAL's `EEDAI`
-        driver into a pyramids `Dataset` — reprojected to `crs` at `scale`,
-        clipped to the AOI — and writes it to `<prefix>.tif`. There is no
+        driver into a pyramids `Dataset` — reprojected to `crs`, clipped to
+        the AOI — and writes it to `<prefix>.tif`. There is no
         `getDownloadURL` round-trip, so Earth Engine's 32768-px synchronous
         cap (and `auto_split`) does not apply.
+
+        The reader sizes its output in the units of `crs` (degrees for a
+        geographic CRS), whereas `scale` here is Earth Engine's metres. The
+        two are reconciled by resolving `scale` to an explicit pixel grid
+        with :meth:`SpatialExtent.estimate_pixel_dims` — the same conversion
+        the `"url"` size guard uses — and passing that as `shape`, so the
+        EEDAI grid matches what Earth Engine would render at this `scale`.
 
         Args:
             var_info: The catalog entry; its `id` is the Earth Engine asset.
@@ -1107,11 +1114,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         reader = import_earthengine_reader()
         _service_account, service_key, _project = self._resolve_credentials()
         target = self.root_dir / f"{prefix}.tif"
+        width_px, height_px = self.space.estimate_pixel_dims(scale)
         dataset = reader.from_earthengine(
             var_info.id,
             bands=list(bands),
             crs=self.crs,
-            scale=scale,
+            shape=(height_px, width_px),
             credentials=credentials_for(service_key),
             **self._eedai_aoi(),
         )

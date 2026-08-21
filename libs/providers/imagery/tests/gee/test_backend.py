@@ -1756,17 +1756,32 @@ class TestExportViaEedai:
         assert target.exists()
         assert fake_reader.dataset.written == str(target)
 
-    def test_forwards_asset_bands_crs_scale_and_bbox(self, make_gee, fake_reader):
-        """Asset id, bands, crs, scale, credentials and the bbox AOI are passed."""
+    def test_forwards_asset_bands_crs_shape_and_bbox(self, make_gee, fake_reader):
+        """Asset id, bands, crs, credentials and the bbox AOI are passed."""
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
         asset_id, kwargs = fake_reader.calls[0]
         assert asset_id == "USGS/SRTMGL1_003"
         assert kwargs["bands"] == ["elevation"]
-        assert kwargs["crs"] == "EPSG:4326" and kwargs["scale"] == 90.0
+        assert kwargs["crs"] == "EPSG:4326"
         assert kwargs["bbox"] == (31.2, 29.9, 31.3, 30.0)
         assert "geometry" not in kwargs
+
+    def test_metre_scale_becomes_an_explicit_pixel_grid(self, make_gee, fake_reader):
+        """`scale` (metres) is resolved to `shape=(rows, cols)`, not passed through.
+
+        The reader sizes output in CRS units (degrees here), so a raw metre
+        `scale` would produce a one-pixel raster.
+        """
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        _asset_id, kwargs = fake_reader.calls[0]
+        width_px, height_px = gee.space.estimate_pixel_dims(90.0)
+        assert kwargs["shape"] == (height_px, width_px)
+        assert "scale" not in kwargs
+        assert all(axis > 1 for axis in kwargs["shape"]), kwargs["shape"]
 
     def test_api_routes_eligible_requests_to_eedai(self, make_gee, fake_reader):
         """`_api` takes the EEDAI path instead of `getDownloadURL`."""
