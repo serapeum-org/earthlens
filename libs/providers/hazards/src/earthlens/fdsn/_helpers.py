@@ -31,6 +31,7 @@ earthlens only decides *which* grid to ask for.
 
 from __future__ import annotations
 
+import json
 import re
 import shutil
 import zipfile
@@ -72,7 +73,7 @@ SHAKEMAP_LAYERS: tuple[str, ...] = tuple(
 
 #: Written when the caller asks for no layer explicitly. Macroseismic
 #: intensity is the headline shaking field, and one layer per event keeps
-#: a multi-event query from writing fourteen rasters and ~8.5 MB apiece.
+#: a multi-event query from writing fourteen rasters and several megabytes apiece.
 DEFAULT_SHAKEMAP_LAYERS: tuple[str, ...] = ("mmi_mean",)
 
 #: The grids are lon/lat WGS84 but their `.hdr` headers say no such
@@ -82,11 +83,15 @@ SHAKEMAP_EPSG = 4326
 #: Key of the raster bundle inside a ShakeMap product's `contents` map.
 RASTER_CONTENT_KEY = "download/raster.zip"
 
+#: Name of the per-event manifest recording what its archive yielded.
+MANIFEST_NAME = ".shakemap.json"
+
 #: Ceiling on a single decompressed archive member. A real ShakeMap grid is
-#: well under a megabyte (a 30 arc-second raster over one event's footprint),
-#: so this is generous for legitimate data while refusing an archive whose
-#: declared expansion is absurd rather than reading it into memory first.
-MAX_MEMBER_BYTES = 256 * 1024 * 1024
+#: well under a megabyte (a 30 arc-second raster over one event's footprint,
+#: ~810 KB for the 2023 Kahramanmaras event), so 64 MB leaves two orders of
+#: magnitude of headroom for legitimate data while refusing an archive whose
+#: declared expansion is absurd, before any of it is written.
+MAX_MEMBER_BYTES = 64 * 1024 * 1024
 
 # The QuakeML resource identifier USGS returns embeds the ComCat id as a
 # query parameter, e.g.
@@ -97,7 +102,10 @@ MAX_MEMBER_BYTES = 256 * 1024 * 1024
 # somewhere the caller never asked for. Real ComCat ids are a network code plus
 # alphanumerics (`us6000jlqa`, `nc73872510`, `official20110311054624120_30`) and
 # never contain a dot, so excluding it costs nothing.
-_EVENT_ID_PATTERN = re.compile(r"[?&]eventid=([A-Za-z0-9_-]+)")
+# Length-bounded as well: the id becomes a directory name, and a pathological
+# identifier should be refused rather than handed to the filesystem. Real ComCat
+# ids are well under 40 characters (`official20110311054624120_30` is 28).
+_EVENT_ID_PATTERN = re.compile(r"[?&]eventid=([A-Za-z0-9_-]{1,64})(?:&|$)")
 
 
 def parse_comcat_id(event_id: str | None) -> str | None:
@@ -454,11 +462,96 @@ def flt_to_geotiff(flt_path: Path, dest: Path) -> Path:
     # staged name keeps the `.tif` suffix so GDAL still infers the driver.
     staged = dest.with_name(f".{dest.stem}.partial.tif")
     try:
-        dataset = Dataset.read_file(str(flt_path), read_only=False)
-        dataset.set_crs(epsg=SHAKEMAP_EPSG)
-        dataset.to_file(str(staged))
-        del dataset
+        # The context manager, not a trailing `del`: on failure the exception's
+        # traceback keeps this frame — and any local still bound to the dataset
+        # — alive, so GDAL's handle on the grid outlives the call. Windows then
+        # refuses to unlink the file and the caller's scratch directory survives
+        # inside the user's output. `__exit__` closes it on both paths.
+        with Dataset.read_file(str(flt_path), read_only=False) as dataset:
+            dataset.set_crs(epsg=SHAKEMAP_EPSG)
+            dataset.to_file(str(staged))
+        if not staged.is_file():
+            raise RuntimeError(
+                f"converting {flt_path.name} produced no output at {staged} — "
+                "refusing to publish a missing raster."
+            )
         staged.replace(dest)
     finally:
+        # Only ever removes the staged name. A successful `replace` has already
+        # moved it, so this cannot touch a finished output.
         staged.unlink(missing_ok=True)
     return dest
+
+
+def read_manifest(dest_dir: Path) -> dict[str, Any] | None:
+    """Read an event directory's ShakeMap manifest, if it has one.
+
+    Args:
+        dest_dir: The event's output directory.
+
+    Returns:
+        The parsed manifest, or `None` when the event has never been
+            fetched or its manifest is unreadable — both of which mean
+            "fetch it again".
+
+    Examples:
+        - A directory with no manifest reads as `None`:
+            ```python
+            >>> import tempfile
+            >>> from pathlib import Path
+            >>> from earthlens.fdsn._helpers import read_manifest
+            >>> read_manifest(Path(tempfile.mkdtemp())) is None
+            True
+
+            ```
+        - A written manifest round-trips:
+            ```python
+            >>> import shutil, tempfile
+            >>> from pathlib import Path
+            >>> from earthlens.fdsn._helpers import read_manifest, write_manifest
+            >>> workspace = Path(tempfile.mkdtemp())
+            >>> write_manifest(workspace, ["mmi_mean", "pga_mean"], ["mmi_mean"])
+            >>> read_manifest(workspace)["produced"]
+            ['mmi_mean']
+            >>> shutil.rmtree(workspace)
+
+            ```
+    """
+    path = dest_dir / MANIFEST_NAME
+    if not path.is_file():
+        return None
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        logger.warning(f"unreadable ShakeMap manifest at {path} — refetching.")
+        return None
+    return loaded if isinstance(loaded, dict) else None
+
+
+def write_manifest(
+    dest_dir: Path,
+    requested: Iterable[str],
+    produced: Iterable[str],
+) -> None:
+    """Record what one event's archive actually yielded.
+
+    Without this, a rerun cannot tell an event it has never fetched from
+    one whose archive simply does not carry a requested layer. The
+    skip-if-present check compares against the layers that *exist*, so an
+    archive permanently missing a grid stops being re-downloaded on every
+    run.
+
+    Args:
+        dest_dir: The event's output directory; created if absent.
+        requested: The layers this call asked for. Recorded so a later
+            call asking for *more* layers refetches rather than reusing a
+            narrower result.
+        produced: The layers the archive actually carried. Empty when the
+            event publishes no ShakeMap at all, which is itself worth
+            recording so the detail request is not repeated.
+    """
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    payload = {"requested": sorted(set(requested)), "produced": sorted(set(produced))}
+    (dest_dir / MANIFEST_NAME).write_text(
+        json.dumps(payload, indent=2), encoding="utf-8"
+    )
