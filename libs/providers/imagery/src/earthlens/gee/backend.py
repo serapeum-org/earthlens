@@ -352,6 +352,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
             plain GeoTIFF. Applies only to the EEDAI path — the Earth
             Engine `getDownloadURL` and batch-export sinks are unaffected.
             Defaults to `False`.
+        resample: Resampling kernel the EEDAI reader warps the native grid
+            with — `"nearest"` (the default), `"average"`, `"bilinear"`, … .
+            This path always warps from the asset's native resolution to the
+            requested `scale`, so for continuous fields (elevation,
+            temperature, reflectance) being read coarser than native,
+            `"average"` is closer to Earth Engine's server-side aggregation
+            than the point-sampling default; keep `"nearest"` for
+            categorical data such as land cover. Ignored on the Earth Engine
+            path, which resamples server-side.
 
     Credentials are not constructor arguments — the constructor describes
     only what to fetch. Supply them at the authentication step:
@@ -455,6 +464,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         filters: Iterable[CollectionFilter] | None = None,
         engine: Literal["auto", "ee", "eedai"] = "auto",
         cog: bool = False,
+        resample: str = "nearest",
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
@@ -521,6 +531,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self.engine = engine
         #: Write the EEDAI path's output as a Cloud Optimized GeoTIFF.
         self.cog = bool(cog)
+        #: Resampling kernel the EEDAI reader warps with (`nearest` by default).
+        self.resample = resample
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
         self._eedai_credential: Any = None  # lazily built in `_eedai_credentials`
         self._cog_warned = False  # one-shot guard for the `cog=` notice
@@ -1218,14 +1230,32 @@ class GEE(LazyClientMixin, AbstractDataSource):
             scale: Target ground sample distance in metres.
 
         Returns:
-            `(rows, cols)` — at least one pixel per axis.
+            `(rows, cols)` — at least one pixel per axis, so a sub-pixel AOI
+            still yields a readable raster rather than a zero-sized one, and
+            never coarser on the ground than the requested `scale`.
+
+        Raises:
+            ValueError: If any bound is not finite, or `scale` is not a
+                positive number of metres.
         """
         min_x, min_y, max_x, max_y = bbox
-        mid_latitude = math.radians((min_y + max_y) / 2.0)
-        height_m = (max_y - min_y) * _METRES_PER_DEGREE
-        width_m = (max_x - min_x) * _METRES_PER_DEGREE * math.cos(mid_latitude)
-        rows = max(1, round(height_m / scale))
-        cols = max(1, round(abs(width_m) / scale))
+        if not all(math.isfinite(bound) for bound in bbox):
+            raise ValueError(f"the AOI bounds must be finite, got {bbox}")
+        if scale <= 0 or not math.isfinite(scale):
+            raise ValueError(f"scale must be a positive number of metres, got {scale}")
+        # Take `cos` at the poleward edge rather than the mid-latitude: for a
+        # tall AOI the mid-latitude value would under-count columns nearer the
+        # pole, sampling coarser than asked. The poleward edge only ever errs
+        # finer. Clamped away from the pole itself, where `cos` reaches zero.
+        poleward = min(max(abs(min_y), abs(max_y)), 89.9)
+        height_m = abs(max_y - min_y) * _METRES_PER_DEGREE
+        width_m = (
+            abs(max_x - min_x) * _METRES_PER_DEGREE * math.cos(math.radians(poleward))
+        )
+        # Round up, not to nearest: rounding down would leave the raster a
+        # little coarser than the scale that was asked for.
+        rows = max(1, math.ceil(height_m / scale))
+        cols = max(1, math.ceil(width_m / scale))
         return rows, cols
 
     def _warn_cog_ignored(self, var_info: Dataset) -> None:
@@ -1392,6 +1422,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bbox=bbox,
             geometry=cutline,
             shape=self._eedai_grid(bbox, scale),
+            resample=self.resample,
             credentials=credentials,
         )
         try:

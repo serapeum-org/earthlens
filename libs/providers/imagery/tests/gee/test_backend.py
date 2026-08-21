@@ -1849,6 +1849,7 @@ class TestExportViaEedai:
         assert kwargs["crs"] == "EPSG:4326"
         assert kwargs["bbox"] == (31.2, 29.9, 31.3, 30.0)
         assert kwargs["geometry"] is None
+        assert kwargs["resample"] == "nearest"
 
     def test_metre_scale_becomes_an_explicit_pixel_grid(self, make_gee, fake_reader):
         """`scale` (metres) is resolved to `shape=(rows, cols)`, not passed through.
@@ -1882,6 +1883,40 @@ class TestExportViaEedai:
         """A sub-pixel AOI never rounds down to a zero-sized grid."""
         gee = make_gee()
         assert gee._eedai_grid((31.2, 29.9, 31.2001, 29.9001), 90.0) == (1, 1)
+
+    @pytest.mark.parametrize(
+        "bbox, scale, match",
+        [
+            ((31.2, 29.9, float("nan"), 30.0), 90.0, "finite"),
+            ((31.2, 29.9, 31.3, 30.0), 0.0, "positive"),
+            ((31.2, 29.9, 31.3, 30.0), -90.0, "positive"),
+        ],
+    )
+    def test_degenerate_grid_inputs_are_rejected(self, make_gee, bbox, scale, match):
+        """Non-finite bounds and a non-positive scale raise instead of sizing."""
+        gee = make_gee()
+        with pytest.raises(ValueError, match=match):
+            gee._eedai_grid(bbox, scale)
+
+    def test_grid_uses_the_poleward_edge_of_a_tall_aoi(self, make_gee):
+        """A tall high-latitude AOI is sized so no row samples coarser than asked.
+
+        Taking `cos` at the mid-latitude would under-count columns near the
+        poleward edge, quietly sampling coarser than the requested scale.
+        """
+        gee = make_gee()
+        tall = (0.0, 60.0, 1.0, 70.0)
+        _rows, cols = gee._eedai_grid(tall, 1000.0)
+        width_at_pole_m = 1.0 * 111_320.0 * math.cos(math.radians(70.0))
+        assert width_at_pole_m / cols <= 1000.0 + 1.0
+
+    def test_resample_is_forwarded(self, make_gee, fake_reader):
+        """An explicit `resample` reaches the reader instead of its default."""
+        gee = make_gee(resample="average")
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["resample"] == "average"
 
     def test_api_routes_eligible_requests_to_eedai(self, make_gee, fake_reader):
         """`_api` takes the EEDAI path instead of `getDownloadURL`."""
