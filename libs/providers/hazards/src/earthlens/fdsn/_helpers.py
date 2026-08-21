@@ -193,6 +193,10 @@ def normalize_layers(layers: Iterable[str] | None) -> tuple[str, ...]:
             ValueError: unknown ShakeMap layer(s): ['mmi_median']. Choose from [...].
 
             ```
+
+    See Also:
+        SHAKEMAP_LAYERS: The fourteen names accepted here.
+        DEFAULT_SHAKEMAP_LAYERS: What `None` resolves to.
     """
     if layers is None:
         return DEFAULT_SHAKEMAP_LAYERS
@@ -289,6 +293,10 @@ def shakemap_raster_url(detail: Mapping[str, Any]) -> str | None:
             True
 
             ```
+
+    See Also:
+        detail_url: Addresses the document this walks.
+        RASTER_CONTENT_KEY: The `contents` key looked up here.
     """
     properties = detail.get("properties") or {}
     products = properties.get("products") or {}
@@ -549,6 +557,56 @@ def write_manifest(
         produced: The layers the archive actually carried. Empty when the
             event publishes no ShakeMap at all, which is itself worth
             recording so the detail request is not repeated.
+
+    Returns:
+        None: The manifest is written to `dest_dir` as a side effect.
+
+    Examples:
+        - Record a fetch that produced one of the two requested grids:
+            ```python
+            >>> import shutil, tempfile
+            >>> from pathlib import Path
+            >>> from earthlens.fdsn._helpers import read_manifest, write_manifest
+            >>> workspace = Path(tempfile.mkdtemp())
+            >>> write_manifest(workspace, ["mmi_mean", "pga_mean"], ["mmi_mean"])
+            >>> manifest = read_manifest(workspace)
+            >>> manifest["requested"]
+            ['mmi_mean', 'pga_mean']
+            >>> manifest["produced"]
+            ['mmi_mean']
+            >>> shutil.rmtree(workspace)
+
+            ```
+        - Record an event that publishes no ShakeMap, so the next run can
+          skip it without re-requesting its detail document:
+            ```python
+            >>> import shutil, tempfile
+            >>> from pathlib import Path
+            >>> from earthlens.fdsn._helpers import read_manifest, write_manifest
+            >>> workspace = Path(tempfile.mkdtemp())
+            >>> write_manifest(workspace, ["mmi_mean"], [])
+            >>> read_manifest(workspace)["produced"]
+            []
+            >>> shutil.rmtree(workspace)
+
+            ```
+        - The event directory is created if it does not exist yet:
+            ```python
+            >>> import shutil, tempfile
+            >>> from pathlib import Path
+            >>> from earthlens.fdsn._helpers import MANIFEST_NAME, write_manifest
+            >>> workspace = Path(tempfile.mkdtemp())
+            >>> event_dir = workspace / "us6000jlqa"
+            >>> write_manifest(event_dir, ["mmi_mean"], ["mmi_mean"])
+            >>> (event_dir / MANIFEST_NAME).is_file()
+            True
+            >>> shutil.rmtree(workspace)
+
+            ```
+
+    See Also:
+        read_manifest: Reads back what this records.
+        MANIFEST_NAME: The filename written inside `dest_dir`.
     """
     dest_dir.mkdir(parents=True, exist_ok=True)
     payload = {"requested": sorted(set(requested)), "produced": sorted(set(produced))}

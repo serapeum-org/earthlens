@@ -130,6 +130,61 @@ class FDSN(AbstractDataSource):
             side effect, not a second return shape — `"mixed"` is
             reserved for a backend whose returned format is only known
             at download time and which honours `aggregate=` itself.
+
+    Examples:
+        - Build a plain event query and inspect what it resolved:
+            ```python
+            >>> from earthlens.fdsn import FDSN
+            >>> backend = FDSN(
+            ...     start="2024-01-01",
+            ...     end="2024-01-31",
+            ...     variables=["USGS"],
+            ...     lat_lim=[30.0, 45.0],
+            ...     lon_lim=[130.0, 145.0],
+            ... )
+            >>> backend.vars
+            ['USGS']
+            >>> backend.time.resolution
+            'all'
+            >>> backend.space.south, backend.space.east
+            (30.0, 145.0)
+
+            ```
+        - An empty network list falls back to USGS, and the products the
+          query will issue carry the resolved obspy client id:
+            ```python
+            >>> from earthlens.fdsn import FDSN
+            >>> backend = FDSN(
+            ...     start="2024-01-01",
+            ...     end="2024-01-02",
+            ...     variables=[],
+            ...     lat_lim=[-90.0, 90.0],
+            ...     lon_lim=[-180.0, 180.0],
+            ... )
+            >>> backend.vars
+            ['USGS']
+            >>> [product.metadata["fdsn_id"] for product in backend._search()]
+            ['USGS']
+
+            ```
+        - Asking for the ShakeMap side-output selects one grid by default
+          and leaves the returned shape a vector table:
+            ```python
+            >>> from earthlens.fdsn import FDSN
+            >>> backend = FDSN(
+            ...     start="2023-02-06",
+            ...     end="2023-02-07",
+            ...     variables=["USGS"],
+            ...     lat_lim=[35.0, 39.0],
+            ...     lon_lim=[35.0, 39.0],
+            ...     with_shakemap=True,
+            ... )
+            >>> backend.OUTPUT_KIND
+            'vector'
+            >>> backend._shakemap_layers
+            ('mmi_mean',)
+
+            ```
     """
 
     OUTPUT_KIND: OutputKind = "vector"
