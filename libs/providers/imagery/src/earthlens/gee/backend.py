@@ -106,6 +106,11 @@ _DEFAULT_HTTP_TIMEOUT_S: float = 300.0
 #: Engine (see `GEE._eedai_eligible`).
 _EEDAI_NATIVE_CRS: str = "EPSG:4326"
 
+#: Output pixels per side of one streamed tile when an EEDAI read is too big to
+#: materialise in one piece. Capped further so each tile's *native* read stays
+#: inside the per-axis budget (see :meth:`GEE._eedai_plan`).
+_EEDAI_TILE_PIXELS: int = 2048
+
 #: Total pixels (per band) the EEDAI reader may materialise for one read. The
 #: driver has no overviews worth trusting, so it fetches the AOI at the asset's
 #: native resolution into memory before downsampling.
@@ -333,9 +338,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             (the historical behaviour). `"eedai"` forces the reader and
             raises if the request is not eligible. The EEDAI path reads
             pixels straight from the asset, so Earth Engine's 32768-px
-            synchronous cap (and `auto_split`) does not apply; it cannot run
-            server-side compute, which is why composited requests stay on
-            Earth Engine. Ignored for the asynchronous `"drive"` / `"gcs"` /
+            synchronous cap does not apply and `auto_split` is unnecessary —
+            a window too large to materialise is streamed to disk in tiles
+            and mosaicked. It cannot run server-side compute, which is why
+            composited requests stay on Earth Engine. Ignored for the asynchronous `"drive"` / `"gcs"` /
             `"asset"` sinks, which are Earth Engine-only.
 
             The two engines do not produce byte-identical rasters. Earth
@@ -1120,6 +1126,40 @@ class GEE(LazyClientMixin, AbstractDataSource):
             and self.crs.upper() == _EEDAI_NATIVE_CRS
         )
 
+    def _eedai_plan(self, var_info: Dataset) -> tuple[bool, int | None, str]:
+        """Decide how — or whether — the reader can serve this request.
+
+        A window too large to materialise is no longer a dead end: the reader
+        can stream it to disk one tile at a time and mosaic the result, which
+        is what retires `auto_split` for this path. Tiling is unavailable in
+        two cases, and both fall back to Earth Engine: upstream refuses
+        `tile_size` together with a polygon cutline, and an asset with no
+        catalogued native resolution cannot have its per-tile read sized.
+
+        Args:
+            var_info: The catalog entry being fetched.
+
+        Returns:
+            `(can_serve, tile_size, reason)` — `tile_size` is `None` for a
+            single read, and `reason` explains a `False` for the fallback log
+            line or the forced-engine error.
+        """
+        bbox, cutline = self._eedai_window()
+        fits, reason = self._eedai_native_fits(var_info, bbox)
+        if fits:
+            return True, None, ""
+        native_scale = var_info.spatial_resolution
+        if not native_scale:
+            return False, None, reason
+        if cutline is not None:
+            return False, None, f"{reason}, and it cannot be tiled behind a cutline"
+        scale = self.scale or native_scale
+        # One tile's native read is `tile_size * scale / native_scale` px per
+        # side, so shrink the tile until that fits the per-axis budget.
+        native_ratio = max(float(scale) / float(native_scale), 1.0)
+        tile_size = int(min(_EEDAI_TILE_PIXELS, EE_MAX_DIMENSION / native_ratio))
+        return True, max(1, tile_size), ""
+
     def _use_eedai(self, var_info: Dataset) -> bool:
         """Resolve the configured `engine` against this request's eligibility.
 
@@ -1150,8 +1190,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     f"crs={_EEDAI_NATIVE_CRS!r} (got {self.crs!r}). Use "
                     "engine='auto' or engine='ee'."
                 )
-            fits, reason = self._eedai_native_fits(var_info, self._eedai_window()[0])
-            if not fits:
+            can_serve, _tile_size, reason = self._eedai_plan(var_info)
+            if not can_serve:
                 raise ValueError(
                     f"engine='eedai' cannot serve {var_info.id}: {reason}. Use a "
                     "smaller bbox, engine='ee' (with auto_split=True to tile), or "
@@ -1160,8 +1200,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return True
         if not (eligible and eedai_available()):
             return False
-        fits, reason = self._eedai_native_fits(var_info, self._eedai_window()[0])
-        if not fits:
+        can_serve, _tile_size, reason = self._eedai_plan(var_info)
+        if not can_serve:
             logger.info(
                 f"Serving {var_info.id} through Earth Engine rather than the EEDAI "
                 f"reader: {reason}."
@@ -1430,6 +1470,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # as a finished product.
         staged = self.root_dir / f"{prefix}.partial.tif"
         bbox, cutline = self._eedai_window()
+        _can_serve, tile_size, _reason = self._eedai_plan(var_info)
+        read_options: dict[str, Any] = {}
+        if tile_size is not None:
+            # Too large for one pass: have the reader stream the mosaic to disk
+            # a tile at a time rather than hold the whole window in memory.
+            read_options = {"tile_size": tile_size, "path": str(staged)}
+            logger.info(
+                f"Streaming {var_info.id} through the EEDAI reader in "
+                f"{tile_size}-px tiles."
+            )
         dataset = reader.from_earthengine(
             var_info.id,
             bands=list(bands),
@@ -1439,18 +1489,23 @@ class GEE(LazyClientMixin, AbstractDataSource):
             shape=self._eedai_grid(bbox, scale),
             resample=self.resample,
             credentials=credentials,
+            **read_options,
         )
+        # A tiled read has already written `staged`, so a COG conversion needs
+        # a second name rather than using the source as its own destination.
+        cog_staged = self.root_dir / f"{prefix}.partial-cog.tif"
         try:
             try:
                 if self.cog:
-                    dataset.cog.to_cog(str(staged))
-                else:
+                    dataset.cog.to_cog(str(cog_staged))
+                elif tile_size is None:
                     dataset.to_file(str(staged))
             finally:
                 close_quietly(dataset)
-            os.replace(staged, target)
+            os.replace(cog_staged if self.cog else staged, target)
         finally:
             staged.unlink(missing_ok=True)
+            cog_staged.unlink(missing_ok=True)
         logger.info(f"Wrote {target} (EEDAI{', COG' if self.cog else ''})")
         return target
 

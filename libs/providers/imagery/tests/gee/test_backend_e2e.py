@@ -58,7 +58,11 @@ def test_live_srtm_download(tmp_path):
 
 
 def _download_srtm(tmp_path, engine: str):
-    """Fetch the shared tiny SRTM tile through one engine, returning its path."""
+    """Fetch the shared tiny SRTM tile through one engine, returning its path.
+
+    `tmp_path` is the directory to write under; the engine name is appended so
+    two engines' outputs never collide.
+    """
     el = EarthLens(
         data_source="gee",
         start="2000-02-11",
@@ -145,3 +149,39 @@ def test_live_srtm_eedai_matches_ee(tmp_path):
         assert abs(got - want) < 5.0, (
             f"EEDAI q{quantile} {got:.2f} m differs from Earth Engine {want:.2f} m"
         )
+
+
+@_skip_without_creds
+@pytest.mark.skipif(
+    not eedai_available(), reason="the [eedai] extra (pyramids-eo) is not installed"
+)
+def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
+    """A tiled EEDAI read returns the same raster as a single-pass one.
+
+    Tiling only engages for windows too large to materialise at once, and a
+    genuinely oversized AOI would pull an enormous native-resolution read.
+    The single-read budget is lowered instead, so the same tiny AOI takes the
+    streaming path against the live service for a few KB.
+    """
+    import numpy as np
+
+    from earthlens.gee import backend as backend_module
+
+    single = _download_srtm(tmp_path / "single", "eedai")
+    monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 100)
+    tiled = _download_srtm(tmp_path / "tiled", "eedai")
+
+    assert tiled.is_file(), f"tiled output missing: {tiled}"
+    assert not list(tiled.parent.glob("*.partial*")), "staged tiles left behind"
+
+    single_values, single_epsg, single_bbox = _open_raster(single)
+    tiled_values, tiled_epsg, tiled_bbox = _open_raster(tiled)
+    assert tiled_epsg == single_epsg
+    assert tiled_values.shape == single_values.shape
+    for got, want in zip(tiled_bbox, single_bbox, strict=True):
+        assert abs(got - want) < 1e-6, f"AOI moved: {tiled_bbox} vs {single_bbox}"
+    both_finite = np.isfinite(single_values) & np.isfinite(tiled_values)
+    assert both_finite.any(), "no comparable pixels"
+    assert np.allclose(
+        tiled_values[both_finite], single_values[both_finite], equal_nan=True
+    ), "the tiled mosaic differs from the single-pass read"

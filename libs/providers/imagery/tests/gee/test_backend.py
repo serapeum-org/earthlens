@@ -1703,6 +1703,11 @@ class _FakeReaderModule:
 
     def from_earthengine(self, asset_id, **kwargs):
         self.calls.append((asset_id, kwargs))
+        path = kwargs.get("path")
+        if path is not None:
+            # A tiled read streams the mosaic to `path` itself.
+            Path(path).write_bytes(b"eedai-tiled")
+            self.dataset.written = str(path)
         return self.dataset
 
 
@@ -1971,28 +1976,51 @@ class TestExportViaEedai:
         wide = gee._eedai_grid((31.0, 29.0, 32.0, 30.0), 90.0)
         assert kwargs["shape"] != wide, "grid was sized from the bbox, not the region"
 
-    def test_auto_falls_back_when_the_native_read_is_unbounded(
-        self, make_gee, fake_reader
-    ):
-        """`engine="auto"` routes an unbounded native read to Earth Engine.
-
-        The user asked for a download, not for this engine, so an oversized
-        native window must fall through to `getDownloadURL` (which has its
-        own cap and `auto_split`) rather than fail.
-        """
+    def test_oversized_read_is_served_by_tiling(self, make_gee, fake_reader):
+        """A window too large for one pass is streamed in tiles, not refused."""
         gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        can_serve, tile_size, _reason = gee._eedai_plan(var_info)
+        assert can_serve is True
+        assert tile_size is not None and tile_size >= 1
+        assert gee._use_eedai(var_info) is True
+
+    def test_tile_size_keeps_each_tile_native_read_within_budget(self, make_gee):
+        """The tile shrinks so one tile's native-resolution read stays bounded."""
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        _can_serve, tile_size, _reason = gee._eedai_plan(var_info)
+        native_ratio = 5000.0 / var_info.spatial_resolution
+        assert tile_size * native_ratio <= backend_module.EE_MAX_DIMENSION
+
+    def test_oversized_read_streams_to_a_path_in_tiles(self, make_gee, fake_reader):
+        """The tiled read hands the reader `tile_size` and a destination path."""
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(var_info, ["elevation"], 5000.0, "srtm_big")
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["tile_size"] >= 1
+        assert kwargs["path"].endswith(".partial.tif")
+        assert target.name == "srtm_big.tif"
+        assert target.read_bytes() == b"eedai-tiled"
+        assert not list(target.parent.glob("*.partial*.tif"))
+
+    def test_a_cutline_cannot_be_tiled_so_it_falls_back(self, make_gee, fake_reader):
+        """Upstream refuses `tile_size` with a polygon cutline, so `auto` falls back."""
+        region = _FakePolygonAoi(total_bounds=(0.0, 0.0, 40.0, 40.0))
+        gee = make_gee(region=region, scale=5000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        can_serve, tile_size, reason = gee._eedai_plan(var_info)
+        assert can_serve is False and tile_size is None
+        assert "cutline" in reason
         assert gee._use_eedai(var_info) is False
 
-    def test_forced_eedai_reports_the_unbounded_native_read(
-        self, make_gee, fake_reader
-    ):
-        """`engine="eedai"` turns the same condition into an actionable error."""
-        gee = make_gee(
-            engine="eedai", lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0
-        )
+    def test_forced_eedai_reports_an_untileable_read(self, make_gee, fake_reader):
+        """`engine="eedai"` turns an untileable oversized read into an error."""
+        region = _FakePolygonAoi(total_bounds=(0.0, 0.0, 40.0, 40.0))
+        gee = make_gee(engine="eedai", region=region, scale=5000.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        with pytest.raises(ValueError, match="native"):
+        with pytest.raises(ValueError, match="cutline"):
             gee._use_eedai(var_info)
 
     def test_unknown_native_resolution_is_treated_as_unbounded(

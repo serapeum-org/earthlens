@@ -180,8 +180,14 @@ so `auto_split` is unnecessary. What to know before switching:
   required.
 - **The reader fetches at the asset's native resolution** (its overviews
   are unreliable) and downsamples locally, so a wide AOI over a fine
-  asset is a large read. earthlens refuses one that would exceed the
-  per-axis budget rather than letting it exhaust memory.
+  asset is a large read. A window too big to hold in memory is streamed
+  to disk one tile at a time and mosaicked, so `auto_split` is not needed
+  here — but the *fetch* is still native-resolution, so a very wide AOI
+  over a fine asset is slow and heavy however it is written. Two cases
+  cannot be tiled and fall back to Earth Engine instead: a polygon
+  cutline (upstream forbids the combination), and an asset whose native
+  resolution the catalog does not record, which cannot be sized up
+  front.
 - **Pixels are not byte-identical to the Earth Engine path.** Earth
   Engine reads `scale` in a geographic CRS as a uniform
   degree-equivalent, while the EEDAI grid is sized for square metres on
