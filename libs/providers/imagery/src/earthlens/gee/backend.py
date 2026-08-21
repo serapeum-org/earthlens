@@ -319,6 +319,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
             server-side compute, which is why composited requests stay on
             Earth Engine. Ignored for the asynchronous `"drive"` / `"gcs"` /
             `"asset"` sinks, which are Earth Engine-only.
+        cog: Write the EEDAI path's raster as a Cloud Optimized GeoTIFF
+            (tiled, with overviews) via `Dataset.cog.to_cog` instead of a
+            plain GeoTIFF. Applies only to the EEDAI path — the Earth
+            Engine `getDownloadURL` and batch-export sinks are unaffected.
+            Defaults to `False`.
 
     Credentials are not constructor arguments — the constructor describes
     only what to fetch. Supply them at the authentication step:
@@ -404,6 +409,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         cloud_mask: CloudMask | None = None,
         filters: Iterable[CollectionFilter] | None = None,
         engine: Literal["auto", "ee", "eedai"] = "auto",
+        cog: bool = False,
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
@@ -468,6 +474,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         #: EEDAI reader when the request is eligible and installed, else
         #: Earth Engine), `"ee"`, or `"eedai"`.
         self.engine = engine
+        #: Write the EEDAI path's output as a Cloud Optimized GeoTIFF.
+        self.cog = bool(cog)
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
 
         super().__init__(
@@ -1099,6 +1107,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         the `"url"` size guard uses — and passing that as `shape`, so the
         EEDAI grid matches what Earth Engine would render at this `scale`.
 
+        The raster is written as a plain GeoTIFF, or as a Cloud Optimized
+        GeoTIFF (tiled, with overviews) when `cog=True` was passed to the
+        constructor.
+
         Args:
             var_info: The catalog entry; its `id` is the Earth Engine asset.
             bands: Band ids to read.
@@ -1124,10 +1136,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
             **self._eedai_aoi(),
         )
         try:
-            dataset.to_file(str(target))
+            if self.cog:
+                dataset.cog.to_cog(str(target))
+            else:
+                dataset.to_file(str(target))
         finally:
             close_quietly(dataset)
-        logger.info(f"Wrote {target} (EEDAI)")
+        logger.info(f"Wrote {target} (EEDAI{', COG' if self.cog else ''})")
         return target
 
     def _client(self) -> HttpClient:

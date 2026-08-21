@@ -1637,11 +1637,26 @@ class TestGeeStreams:
         assert seen[0].get("stream") is True, f"the GET must stream: {seen[0]}"
 
 
+class _FakeCogWriter:
+    """Stand-in for `Dataset.cog`, recording `to_cog` writes."""
+
+    def __init__(self, dataset):
+        self._dataset = dataset
+
+    def to_cog(self, path, **kwargs):
+        self._dataset.written = str(path)
+        self._dataset.wrote_cog = True
+        Path(path).write_bytes(b"eedai-cog")
+        return Path(path)
+
+
 class _FakeEedaiDataset:
     """Stand-in for the pyramids `Dataset` the EEDAI reader returns."""
 
     def __init__(self):
         self.written: str | None = None
+        self.wrote_cog = False
+        self.cog = _FakeCogWriter(self)
 
     def to_file(self, path):
         self.written = str(path)
@@ -1792,6 +1807,22 @@ class TestExportViaEedai:
         assert out.suffix == ".tif"
         assert fake_reader.calls, "the EEDAI reader was not used"
         assert image.download_params is None, "getDownloadURL should not be called"
+
+    def test_plain_geotiff_by_default(self, make_gee, fake_reader):
+        """Without `cog=True` the raster is written via `to_file`."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        assert fake_reader.dataset.wrote_cog is False
+
+    def test_cog_option_writes_a_cloud_optimized_geotiff(self, make_gee, fake_reader):
+        """`cog=True` routes the write through `Dataset.cog.to_cog`."""
+        gee = make_gee(cog=True)
+        assert gee.cog is True
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        assert fake_reader.dataset.wrote_cog is True
+        assert target.read_bytes() == b"eedai-cog"
 
     def test_api_uses_getdownloadurl_when_engine_is_ee(self, make_gee, fake_reader):
         """`engine="ee"` keeps the historical `getDownloadURL` path."""
