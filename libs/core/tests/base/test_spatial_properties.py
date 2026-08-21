@@ -21,6 +21,15 @@ _LONS = st.floats(
 )
 _LON_PAIR = st.lists(_LONS, min_size=2, max_size=2)
 _LAT_PAIR = st.lists(_LATS, min_size=2, max_size=2)
+# Whole-degree pairs for the multi-shape equivalence test: integers survive the
+# round-trip through WKT / GeoJSON text exactly, and `unique=True` gives a
+# non-degenerate rectangle (west < east, south < north).
+_INT_LON_PAIR = st.lists(
+    st.integers(min_value=-180, max_value=180), min_size=2, max_size=2, unique=True
+)
+_INT_LAT_PAIR = st.lists(
+    st.integers(min_value=-90, max_value=90), min_size=2, max_size=2, unique=True
+)
 
 
 @pytest.mark.unit
@@ -68,6 +77,47 @@ class TestResolveAoiProperties:
             {"west": west, "south": south, "east": east, "north": north}
         )[:2]
         assert from_list == from_dict, (from_list, from_dict)
+
+    @given(lons=_INT_LON_PAIR, lats=_INT_LAT_PAIR)
+    def test_every_bbox_shape_normalises_to_the_same_extent(self, lons, lats):
+        """List, compass dict, WKT, shapely geometry and GeoJSON give one extent."""
+        from shapely.geometry import box
+
+        west, east = sorted(lons)
+        south, north = sorted(lats)
+        rect = box(west, south, east, north)
+        shapes = [
+            [west, south, east, north],
+            {"west": west, "south": south, "east": east, "north": north},
+            rect.wkt,
+            rect,
+            {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [west, south],
+                        [east, south],
+                        [east, north],
+                        [west, north],
+                        [west, south],
+                    ]
+                ],
+            },
+        ]
+        expected = ([float(south), float(north)], [float(west), float(east)])
+        for shape in shapes:
+            lat_lim, lon_lim, _geom = resolve_aoi(shape)
+            assert (lat_lim, lon_lim) == expected, (shape, lat_lim, lon_lim)
+
+    @given(
+        bad=st.one_of(
+            st.integers(), st.floats(allow_nan=False, allow_infinity=False), st.none()
+        )
+    )
+    def test_unsupported_aoi_type_raises_type_error(self, bad):
+        """An aoi that is not a bbox / geometry / mapping is rejected with TypeError."""
+        with pytest.raises(TypeError):
+            resolve_aoi(bad)
 
     @given(
         lon=_LONS,

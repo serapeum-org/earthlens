@@ -37,9 +37,12 @@ class TestDateWindowsProperties:
         end = start + dt.timedelta(days=span)
         idx = date_windows(start, end, freq)
         assert idx.is_monotonic_increasing and idx.is_unique
-        if len(idx):
-            regenerated = pd.date_range(idx[0], periods=len(idx), freq=freq)
-            assert idx.equals(regenerated), "windows are not evenly freq-spaced"
+        # Contiguity checked independently of pd.date_range: each consecutive
+        # pair differs by exactly one freq offset, so there is no gap or overlap
+        # between windows.
+        offset = pd.tseries.frequencies.to_offset(freq)
+        for prev, cur in zip(idx[:-1], idx[1:]):
+            assert cur == prev + offset, (prev, cur, freq)
 
     @given(start=_DATES, span=_SPANS, freq=_FREQS)
     def test_windows_stay_within_the_requested_span(self, start, span, freq):
@@ -102,3 +105,20 @@ class TestSplitTimeProperties:
         assert split_time(slice(start, end)) == (start, end)
         with pytest.raises(ValueError, match="step"):
             split_time(slice(start, end, step))
+
+    @given(instant=st.one_of(st.dates(), st.datetimes()))
+    def test_date_or_datetime_is_an_instant(self, instant):
+        """A bare date / datetime value is an instant returned as `(value, value)`."""
+        assert split_time(instant) == (instant, instant)
+
+    @given(
+        bad=st.one_of(
+            st.integers(),
+            st.floats(allow_nan=False, allow_infinity=False),
+            st.dictionaries(st.text(max_size=3), st.integers(), max_size=3),
+        )
+    )
+    def test_unsupported_type_raises_type_error(self, bad):
+        """A value that is not a string / pair / slice / date is rejected."""
+        with pytest.raises(TypeError):
+            split_time(bad)
