@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import io
 import json
+import os
+import time
 import zipfile
 from pathlib import Path
 from typing import Any
@@ -1456,4 +1458,93 @@ class TestManifestWriteFailure:
         assert list(tmp_path.rglob("*.tif")), "the raster must still be written"
         assert any("could not record the ShakeMap manifest" in m for m in messages), (
             f"the failure should be reported, got: {messages}"
+        )
+
+
+class TestForceAndCeiling:
+    """force= makes every event pending, so the ceiling applies to all."""
+
+    def test_force_makes_cached_events_spend_budget(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """Under force= a cached event counts against the ceiling again."""
+        fake_fdsn.default_result = _usgs_catalog(make_event, "us1111", "us2222")
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+        before = len(fake_http.downloads)
+
+        _backend(tmp_path, with_shakemap=True, max_shakemap_events=1).download(
+            progress_bar=False, force=True
+        )
+        assert len(fake_http.downloads) == before + 1, (
+            "force= should refetch exactly one event under a ceiling of one"
+        )
+
+
+class TestCachedRastersSemantics:
+    """`None` means fetch; an empty list means nothing to fetch."""
+
+    def test_absent_manifest_is_none(self, tmp_path: Path):
+        """An event never seen before must be fetched."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        assert backend._cached_rasters(tmp_path / "nope") is None
+
+    def test_known_empty_is_an_empty_list(self, tmp_path: Path):
+        """A fresh no-ShakeMap record is a hit that yields no rasters."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        _helpers.write_manifest(tmp_path, ["mmi_mean"], [], checked=time.time())
+        assert backend._cached_rasters(tmp_path) == []
+
+    def test_force_overrides_a_hit(self, tmp_path: Path):
+        """force= turns any hit back into a fetch."""
+        _helpers.write_manifest(tmp_path, ["mmi_mean"], [], checked=time.time())
+        backend = _backend(tmp_path, with_shakemap=True)
+        backend._force = True
+        assert backend._cached_rasters(tmp_path) is None
+
+    def test_is_cached_matches_the_decision(self, tmp_path: Path):
+        """`_is_cached` agrees with `_cached_rasters` for both hit kinds."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        event_id = _quakeml_id("us6000jlqa")
+        assert backend._is_cached(event_id) is False
+
+        event_dir = backend._event_dir("us6000jlqa")
+        _helpers.write_manifest(event_dir, ["mmi_mean"], [], checked=time.time())
+        assert backend._is_cached(event_id) is True
+
+    def test_unparseable_id_is_not_cached(self, tmp_path: Path):
+        """An id yielding no ComCat id counts as work, not as a hit."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        assert backend._is_cached("smi:local/whatever") is False
+
+
+class TestStagingIsProcessUnique:
+    """Two runs over one output root must not share scratch space."""
+
+    def test_staging_directory_carries_the_pid(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """The scratch directory name includes the process id."""
+        seen: list[str] = []
+
+        original = _helpers.extract_layers
+
+        def _record(archive: Path, layers: Any, dest_dir: Path):
+            seen.append(dest_dir.name)
+            return original(archive, layers, dest_dir)
+
+        fake_http.detail = _detail()
+        backend = _backend(tmp_path, with_shakemap=True)
+        import pytest as _pytest
+
+        with _pytest.MonkeyPatch.context() as patch:
+            patch.setattr(fdsn_backend._helpers, "extract_layers", _record)
+            backend.download(progress_bar=False)
+
+        assert seen, "the archive should have been extracted"
+        assert seen[0] == f"_staging-{os.getpid()}", (
+            f"the scratch directory should be process-unique, got {seen[0]}"
         )
