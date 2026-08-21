@@ -1986,7 +1986,7 @@ class AbstractDataSource(ABC):
         if failures and policy == "warn":
             logger.warning(
                 f"{type(self).__name__}: {len(failures)} of {len(items)} "
-                f"{label}(s) failed; {len(results)} succeeded."
+                f"{label}(s) failed; {len(items) - len(failures)} succeeded."
             )
         return results, failures
 
