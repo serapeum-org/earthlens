@@ -3118,6 +3118,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#shakemap-rasters-usgs-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ShakeMap rasters (USGS only)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#aggregation-is-not-supported" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23580,6 +23591,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#shakemap-rasters-usgs-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ShakeMap rasters (USGS only)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#aggregation-is-not-supported" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -23726,6 +23748,21 @@ by the facade's <code>**backend_kwargs</code>):</p>
 <td><code>"gpkg"</code> or <code>"geojson"</code></td>
 <td><code>"gpkg"</code></td>
 </tr>
+<tr>
+<td><code>with_shakemap</code></td>
+<td>also write each USGS event's ShakeMap as GeoTIFF</td>
+<td><code>False</code></td>
+</tr>
+<tr>
+<td><code>shakemap_layers</code></td>
+<td>which ShakeMap grids to write</td>
+<td><code>["mmi_mean"]</code></td>
+</tr>
+<tr>
+<td><code>max_shakemap_events</code></td>
+<td>ceiling on events fetched a ShakeMap for</td>
+<td><code>100</code></td>
+</tr>
 </tbody>
 </table>
 <p><code>min_magnitude=None</code> (the default) falls back <strong>per network</strong> to that
@@ -23778,18 +23815,68 @@ network, e.g. <code>usgs.gpkg</code>). To write the combined collection yourself
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">events</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;all_events.gpkg&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>     <span class="c1"># GeoPackage</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">events</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;all_events.geojson&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>  <span class="c1"># GeoJSON</span>
 </code></pre></div>
+<h2 id="shakemap-rasters-usgs-only"><a class="toclink" href="#shakemap-rasters-usgs-only">ShakeMap rasters (USGS only)</a><a class="headerlink" href="#shakemap-rasters-usgs-only" title="Permanent link">#</a></h2>
+<p>Pass <code>with_shakemap=True</code> to also pull each event's gridded <strong>ShakeMap</strong>
+and write it as a GeoTIFF beside the vector output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">events</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;USGS&quot;</span><span class="p">],</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2023-02-06&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2023-02-07&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">],</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">35.0</span><span class="p">,</span> <span class="mf">39.0</span><span class="p">],</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;out&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="n">min_magnitude</span><span class="o">=</span><span class="mf">7.0</span><span class="p">,</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="n">with_shakemap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<p>That writes <code>out/shakemap/&lt;event-id&gt;/mmi_mean.tif</code> per event, alongside
+the usual <code>out/usgs.gpkg</code>. The return value is unchanged — still the
+event <code>FeatureCollection</code>; the rasters are a side effect.</p>
+<p><strong>USGS only.</strong> ShakeMap is a USGS ComCat product and is not part of the
+FDSN event standard, so a non-USGS network in the same request still
+contributes events but no rasters (each such network is logged once).
+ShakeMap costs one extra request and a multi-megabyte archive <strong>per
+event</strong> — measured at 8 MB and 20 MB for the two events of the 2023
+Kahramanmaraş sequence, and it scales with the event's footprint — so a
+broad window is gigabytes. <code>max_shakemap_events</code> (default <code>100</code>) caps how many
+events one call will fetch: past the ceiling the rest are skipped with a
+warning naming the count — never silently. Raise it deliberately, or
+narrow the query with <code>limit=</code> / <code>min_magnitude=</code>.</p>
+<p>A re-run reuses whatever an earlier run recorded for that event — including
+"this archive carries no such layer" and "this event publishes no ShakeMap" —
+so a repeat costs nothing. Pass <code>download(force=True)</code> to refetch anyway.</p>
+<p>By default only <code>mmi_mean</code> (macroseismic intensity) is written. The
+archive carries fourteen grids — <code>mmi</code>, <code>pga</code>, <code>pgv</code>, <code>psa0p3</code>,
+<code>psa0p6</code>, <code>psa1p0</code>, <code>psa3p0</code>, each as <code>_mean</code> and <code>_std</code> — and any
+subset can be requested:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="o">...</span><span class="p">,</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">with_shakemap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">shakemap_layers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mmi_mean&quot;</span><span class="p">,</span> <span class="s2">&quot;pga_mean&quot;</span><span class="p">,</span> <span class="s2">&quot;pgv_mean&quot;</span><span class="p">],</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</code></pre></div>
+<p>The grids are published as ESRI float rasters carrying no projection;
+earthlens assigns <code>EPSG:4326</code> (their true graticule) during the
+conversion to GeoTIFF.</p>
+<p>PAGER is <strong>not</strong> included: its ComCat product ships PDFs, PNGs, and
+JSON summaries, with no raster grid to write.</p>
 <h2 id="aggregation-is-not-supported"><a class="toclink" href="#aggregation-is-not-supported">Aggregation is not supported</a><a class="headerlink" href="#aggregation-is-not-supported" title="Permanent link">#</a></h2>
 <p>FDSN output is vector, so the <code>aggregate=</code> argument is rejected:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;USGS&quot;</span><span class="p">],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">cfg</span><span class="p">)</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># NotImplementedError: aggregate= is not supported ... (OUTPUT_KIND=&#39;vector&#39;)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;USGS&quot;</span><span class="p">],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">aggregate</span><span class="o">=</span><span class="n">cfg</span><span class="p">)</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c1"># NotImplementedError: aggregate= is not supported ... (OUTPUT_KIND=&#39;vector&#39;)</span>
 </code></pre></div>
 <p>The aggregator only reduces gridded raster outputs. Post-process the
 returned FeatureCollection directly instead (it is a GeoDataFrame).</p>
+<p>This holds with <code>with_shakemap=True</code> too. That flag does not change
+<code>OUTPUT_KIND</code> — <code>download()</code> still returns the event FeatureCollection,
+and the ShakeMap grids are an on-disk side effect with no time axis to
+reduce over.</p>
 <h2 id="earthscope-token-optional"><a class="toclink" href="#earthscope-token-optional">EarthScope token (optional)</a><a class="headerlink" href="#earthscope-token-optional" title="Permanent link">#</a></h2>
 <p>EarthScope's restricted endpoints can take an access token; the public
 event service does not need one. If you have a token:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;EARTHSCOPE&quot;</span><span class="p">],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>          <span class="n">earthscope_token</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>   <span class="c1"># or set EARTHSCOPE_TOKEN / ~/.earthscope_token</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">EarthLens</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;EARTHSCOPE&quot;</span><span class="p">],</span> <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;fdsn&quot;</span><span class="p">,</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>          <span class="n">earthscope_token</span><span class="o">=</span><span class="s2">&quot;…&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>   <span class="c1"># or set EARTHSCOPE_TOKEN / ~/.earthscope_token</span>
 </code></pre></div>
 
 
