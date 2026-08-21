@@ -47,6 +47,7 @@ no key is given, an interactive `ee.Authenticate()` against an explicit
 from __future__ import annotations
 
 import datetime as dt
+import gc
 import math
 import os
 from collections.abc import Callable, Iterable, Mapping
@@ -219,23 +220,48 @@ def _validate_pure_config(
         )
 
 
+def _rename_when_unlocked(source: Path, target: Path) -> None:
+    """Rename `source` onto `target`, retrying once past a lingering GDAL lock.
+
+    A tiled read leaves GDAL handles on the mosaic it just wrote, and on
+    Windows those can keep the file locked for a moment after the reader is
+    closed — long enough for the rename to fail with `PermissionError` after
+    every tile has already been fetched. Collecting first drops the last
+    references, which is the same remedy pyramids-eo applies internally, and
+    the rename is then retried once.
+
+    Args:
+        source: The staged raster to move.
+        target: Its final path.
+
+    Raises:
+        OSError: If the rename still fails after the retry — losing the
+            output silently would be far worse than surfacing it.
+    """
+    try:
+        os.replace(source, target)
+    except PermissionError:
+        gc.collect()
+        os.replace(source, target)
+
+
 def _discard_quietly(path: Path) -> None:
     """Remove a staging file, tolerating a lock that outlives its reader.
 
-    A tiled read leaves GDAL handles on the mosaic it just wrote, and on
-    Windows those keep the file locked briefly after the reader is closed —
-    long enough that unlinking it can raise while the *real* output has
-    already been renamed into place. Losing a staging file matters far less
-    than masking a successful download, so the failure is swallowed and
-    logged.
+    Same lingering-handle hazard as :func:`_rename_when_unlocked`, but the
+    stakes are reversed: this runs after the real output is already in place,
+    so a failure here costs a stray temp file while raising would mask a
+    successful download. Sidecars GDAL may have written next to the raster
+    (`.aux.xml` and friends) are removed with it.
 
     Args:
-        path: The staging file to remove; a missing file is not an error.
+        path: The staging raster to remove; a missing file is not an error.
     """
-    try:
-        path.unlink(missing_ok=True)
-    except OSError as exc:
-        logger.debug(f"Could not remove the staging file {path}: {exc}")
+    for stray in (path, *path.parent.glob(f"{path.name}.*")):
+        try:
+            stray.unlink(missing_ok=True)
+        except OSError as exc:
+            logger.debug(f"Could not remove the staging file {stray}: {exc}")
 
 
 def _validate_filters(
@@ -1664,7 +1690,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     dataset.to_file(str(staged))
             finally:
                 close_quietly(dataset)
-            os.replace(cog_staged if self.cog else staged, target)
+            _rename_when_unlocked(cog_staged if self.cog else staged, target)
         finally:
             _discard_quietly(staged)
             _discard_quietly(cog_staged)

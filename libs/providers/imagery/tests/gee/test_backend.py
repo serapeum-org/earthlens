@@ -293,6 +293,11 @@ def _stage_then_fail(asset_id, **kwargs):
     raise RuntimeError("mosaic failed")
 
 
+def _always_permission_error(source, target):
+    """Stand in for a rename that never gets past the lock."""
+    raise PermissionError("file is in use")
+
+
 def _write_then_fail(path):
     """Write a truncated raster then fail, as a driver dying mid-write would."""
     Path(path).write_bytes(b"trunc")
@@ -2167,6 +2172,56 @@ class TestExportViaEedai:
         ok_many, tile_many, _r2 = gee._eedai_plan(var_info, 9)
         assert ok_one is True
         assert (ok_many is False) or (tile_many < tile_one)
+
+    def test_rename_retries_past_a_lingering_lock(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A `PermissionError` from a lingering GDAL handle is retried, not fatal.
+
+        The rename happens after every tile has been fetched, so failing there
+        would throw away the whole read.
+        """
+        attempts: list[int] = []
+
+        def flaky_replace(source, target):
+            attempts.append(1)
+            if len(attempts) == 1:
+                raise PermissionError("file is in use")
+            Path(target).write_bytes(Path(source).read_bytes())
+            Path(source).unlink()
+
+        monkeypatch.setattr(backend_module.os, "replace", flaky_replace)
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        assert len(attempts) == 2, "the rename was not retried"
+        assert target.exists()
+
+    def test_a_persistent_lock_is_not_swallowed(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """If the rename keeps failing, that surfaces — losing the output silently
+        would be worse than the error."""
+        monkeypatch.setattr(backend_module.os, "replace", _always_permission_error)
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        with pytest.raises(PermissionError):
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+
+    def test_staging_sidecars_are_cleaned_up(self, make_gee, fake_reader):
+        """GDAL sidecars written next to a staged raster go with it."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        sidecar = gee.root_dir / "srtm_elev.partial.tif.aux.xml"
+
+        def write_with_sidecar(path):
+            Path(path).write_bytes(b"eedai-tif")
+            sidecar.write_text("<PAMDataset/>")
+
+        fake_reader.dataset.to_file = write_with_sidecar
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        assert not sidecar.exists(), "the .aux.xml sidecar leaked"
+        assert not list(gee.root_dir.glob("*.partial*"))
 
     def test_a_cutline_cannot_be_tiled_so_it_falls_back(self, make_gee, fake_reader):
         """Upstream refuses `tile_size` with a polygon cutline, so `auto` falls back."""
