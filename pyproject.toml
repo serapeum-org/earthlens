@@ -127,7 +127,7 @@ dev = [
     # runtime dep of earthlens itself. 0.52.0 adopts cleopatra 0.31's RgbBands
     # in the ArrayGlyph constructor (pyramids #972) and its [viz] extra pulls
     # cleopatra[tiles] >=0.31.0.
-    "pyramids-gis[viz] >=0.53.0",
+    "pyramids-gis[viz] >=0.54.0",
     # cleopatra: the showcase notebooks import it directly (ArrayGlyph,
     # animation.embed_gif, ArrayGlyph.save_animation); add_reference_map /
     # save_animation(crf=...) landed in 0.22.0, the animate() default
@@ -173,7 +173,7 @@ docs = [
     # matplotlib: mkdocs-jupyter runs the notebooks at build time.
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
-    "pyramids-gis[viz] >=0.53.0",
+    "pyramids-gis[viz] >=0.54.0",
     "cleopatra >=0.31.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",

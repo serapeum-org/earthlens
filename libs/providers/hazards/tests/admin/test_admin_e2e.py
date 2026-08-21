@@ -51,9 +51,6 @@ def _assert_polygons_4326(fc) -> None:
 class TestAdminLiveFetch:
     """Live boundary pulls from the four public sources (no credentials)."""
 
-    @pytest.mark.skip(
-        reason="geoBoundaries ADM1 (KEN) read segfaults GDAL on Linux - see #925"
-    )
     def test_geoboundaries_country_adm1(self):
         """A geoBoundaries ADM1 pull for one country returns polygons in 4326."""
         fc = EarthLens(
