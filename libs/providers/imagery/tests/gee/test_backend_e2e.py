@@ -191,7 +191,8 @@ def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
     tiled = _download_srtm(tmp_path / "tiled", "eedai")
     # Without this the test would silently compare two single-pass reads and
     # pass, proving nothing about tiling.
-    assert tiled_calls and all(size is not None for size in tiled_calls), (
+    assert tiled_calls, "no read was planned at all"
+    assert all(size is not None for size in tiled_calls), (
         f"the read was not tiled: planned tile sizes {tiled_calls}"
     )
 
