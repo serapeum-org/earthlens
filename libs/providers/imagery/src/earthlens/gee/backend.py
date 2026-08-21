@@ -508,6 +508,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self.cog = bool(cog)
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
         self._eedai_credential: Any = None  # lazily built in `_eedai_credentials`
+        self._cog_warned = False  # one-shot guard for the `cog=` notice
 
         super().__init__(
             start=start,
@@ -1009,7 +1010,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         if self.export_via == "url":
             if self._use_eedai(var_info):
                 return self._export_via_eedai(var_info, bands, float(scale), prefix)
+            self._warn_cog_ignored(var_info)
             return self._export_via_url(image, var_info, float(scale), region, prefix)
+        self._warn_cog_ignored(var_info)
         return self._export_via_batch(image, float(scale), region, prefix)
 
     def _export_via_url(
@@ -1162,6 +1165,25 @@ class GEE(LazyClientMixin, AbstractDataSource):
         cols = max(1, round(abs(width_m) / scale))
         return rows, cols
 
+    def _warn_cog_ignored(self, var_info: Dataset) -> None:
+        """Say so, once, when `cog=True` cannot apply to this request.
+
+        `cog=` only reaches the EEDAI writer, so a request that stays on
+        Earth Engine silently yields a plain GeoTIFF. Without a notice the
+        only symptom is an output that is not a COG.
+
+        Args:
+            var_info: The catalog entry being written (named in the notice).
+        """
+        if not self.cog or self._cog_warned:
+            return
+        self._cog_warned = True
+        logger.warning(
+            f"cog=True has no effect for {var_info.id}: it applies to the EEDAI "
+            "path, and this request is served by Earth Engine (see engine=). A "
+            "plain GeoTIFF is written instead."
+        )
+
     def _eedai_credentials(self) -> Any:
         """Return the pyramids-eo credential for EEDAI reads, built once.
 
@@ -1283,6 +1305,11 @@ class GEE(LazyClientMixin, AbstractDataSource):
         reader = import_earthengine_reader()
         credentials = self._eedai_credentials()
         target = self.root_dir / f"{prefix}.tif"
+        # Write beside the target and rename on success: `to_file` / `to_cog`
+        # write in place, so a mid-write failure would otherwise leave a
+        # truncated raster sitting at the final name for a later run to read
+        # as a finished product.
+        staged = self.root_dir / f"{prefix}.partial.tif"
         bbox, cutline = self._eedai_window()
         self._eedai_preflight(var_info, bbox)
         dataset = reader.from_earthengine(
@@ -1295,12 +1322,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
             credentials=credentials,
         )
         try:
-            if self.cog:
-                dataset.cog.to_cog(str(target))
-            else:
-                dataset.to_file(str(target))
+            try:
+                if self.cog:
+                    dataset.cog.to_cog(str(staged))
+                else:
+                    dataset.to_file(str(staged))
+            finally:
+                close_quietly(dataset)
+            os.replace(staged, target)
         finally:
-            close_quietly(dataset)
+            staged.unlink(missing_ok=True)
         logger.info(f"Wrote {target} (EEDAI{', COG' if self.cog else ''})")
         return target
 

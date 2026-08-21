@@ -282,6 +282,12 @@ class _FakePyramidsDataset:
 _FAKE_TIFF_BYTES = b"MM\x00*" + b"\x00" * 64
 
 
+def _write_then_fail(path):
+    """Write a truncated raster then fail, as a driver dying mid-write would."""
+    Path(path).write_bytes(b"trunc")
+    raise RuntimeError("write failed")
+
+
 def _identity_mask(image):
     """A no-op `cloud_mask` used to assert `.map` wiring (returns the image)."""
     return image
@@ -1800,7 +1806,20 @@ class TestExportViaEedai:
         target = gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
         assert target.name == "srtm_elev.tif"
         assert target.exists()
-        assert fake_reader.dataset.written == str(target)
+        assert target.read_bytes() == b"eedai-tif"
+        assert not list(target.parent.glob("*.partial.tif")), "staged file left behind"
+
+    def test_a_failed_write_leaves_no_file_at_the_final_name(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A mid-write failure must not leave a truncated raster at the target."""
+        monkeypatch.setattr(fake_reader.dataset, "to_file", _write_then_fail)
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        with pytest.raises(RuntimeError, match="write failed"):
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        assert not (gee.root_dir / "srtm_elev.tif").exists()
+        assert not list(gee.root_dir.glob("*.partial.tif"))
 
     def test_forwards_asset_bands_crs_shape_and_bbox(self, make_gee, fake_reader):
         """Asset id, bands, crs, credentials and the bbox AOI are passed."""
@@ -1955,6 +1974,23 @@ class TestExportViaEedai:
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         with pytest.raises(backend_module.AuthenticationError, match="EEDAI"):
             gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+
+    def test_cog_on_an_ee_request_warns_once(self, make_gee, fake_reader, monkeypatch):
+        """`cog=True` cannot apply on the Earth Engine path, so it says so once."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee(engine="ee", cog=True)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        for _ in range(2):
+            gee._api(
+                var_info=var_info,
+                image=_FakeImage(),
+                bands=["elevation"],
+                when=dt.datetime(2000, 2, 11),
+            )
+        assert len([w for w in warnings if "cog=True has no effect" in w]) == 1
 
     def test_api_uses_getdownloadurl_when_engine_is_ee(self, make_gee, fake_reader):
         """`engine="ee"` keeps the historical `getDownloadURL` path."""
