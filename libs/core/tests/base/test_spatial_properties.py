@@ -44,7 +44,8 @@ class TestResolveAoiProperties:
         lat_lim, lon_lim, geom = resolve_aoi([west, south, east, north])
         assert lat_lim == [south, north], lat_lim
         assert lon_lim == [west, east], lon_lim
-        assert lat_lim[0] <= lat_lim[1] and lon_lim[0] <= lon_lim[1]
+        assert lat_lim[0] <= lat_lim[1], lat_lim
+        assert lon_lim[0] <= lon_lim[1], lon_lim
         assert geom is None, "a plain bbox has no polygon mask"
 
     @given(lons=_LON_PAIR, lats=_LAT_PAIR)
@@ -104,10 +105,12 @@ class TestResolveAoiProperties:
                 ],
             },
         ]
-        expected = ([float(south), float(north)], [float(west), float(east)])
+        exp_lat = [float(south), float(north)]
+        exp_lon = [float(west), float(east)]
         for shape in shapes:
             lat_lim, lon_lim, _geom = resolve_aoi(shape)
-            assert (lat_lim, lon_lim) == expected, (shape, lat_lim, lon_lim)
+            assert lat_lim == exp_lat, (shape, lat_lim)
+            assert lon_lim == exp_lon, (shape, lon_lim)
 
     @given(
         bad=st.one_of(

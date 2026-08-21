@@ -36,7 +36,8 @@ class TestDateWindowsProperties:
         """Every cadence gives a strictly increasing, evenly freq-spaced index."""
         end = start + dt.timedelta(days=span)
         idx = date_windows(start, end, freq)
-        assert idx.is_monotonic_increasing and idx.is_unique
+        assert idx.is_monotonic_increasing, idx
+        assert idx.is_unique, idx
         # Contiguity checked independently of pd.date_range: each consecutive
         # pair differs by exactly one freq offset, so there is no gap or overlap
         # between windows.
@@ -53,7 +54,8 @@ class TestDateWindowsProperties:
         if not len(idx):
             return
         offset = pd.tseries.frequencies.to_offset(freq)
-        assert idx[0] >= start_ts and idx[-1] <= end_ts
+        assert idx[0] >= start_ts, (idx[0], start_ts)
+        assert idx[-1] <= end_ts, (idx[-1], end_ts)
         assert idx[0] - offset < start_ts, "an earlier window was omitted"
         assert idx[-1] + offset > end_ts, "a trailing window was omitted"
 
@@ -103,8 +105,9 @@ class TestSplitTimeProperties:
     def test_slice_round_trips_and_a_step_is_rejected(self, start, end, step):
         """A stepless slice gives `(start, stop)`; a step has no meaning and raises."""
         assert split_time(slice(start, end)) == (start, end)
+        stepped = slice(start, end, step)
         with pytest.raises(ValueError, match="step"):
-            split_time(slice(start, end, step))
+            split_time(stepped)
 
     @given(instant=st.one_of(st.dates(), st.datetimes()))
     def test_date_or_datetime_is_an_instant(self, instant):

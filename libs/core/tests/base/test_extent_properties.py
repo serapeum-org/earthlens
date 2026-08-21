@@ -95,10 +95,11 @@ class TestSpatialExtentProperties:
     @given(bad_lat=_OUT_OF_LAT)
     def test_out_of_range_latitude_is_rejected(self, bad_lat):
         """A latitude outside [-90, 90] fails the per-field bound."""
+        lat_min, lat_max = min(bad_lat, 0.0), max(bad_lat, 0.0)
         with pytest.raises(ValidationError):
             SpatialExtent(
-                latitude_min=min(bad_lat, 0.0),
-                latitude_max=max(bad_lat, 0.0),
+                latitude_min=lat_min,
+                latitude_max=lat_max,
                 longitude_min=0.0,
                 longitude_max=0.0,
             )
@@ -106,12 +107,13 @@ class TestSpatialExtentProperties:
     @given(bad_lon=_OUT_OF_LON)
     def test_out_of_range_longitude_is_rejected(self, bad_lon):
         """A longitude outside [-180, 180] fails the per-field bound."""
+        lon_min, lon_max = min(bad_lon, 0.0), max(bad_lon, 0.0)
         with pytest.raises(ValidationError):
             SpatialExtent(
                 latitude_min=0.0,
                 latitude_max=0.0,
-                longitude_min=min(bad_lon, 0.0),
-                longitude_max=max(bad_lon, 0.0),
+                longitude_min=lon_min,
+                longitude_max=lon_max,
             )
 
     @given(
@@ -150,7 +152,8 @@ class TestTemporalExtentProperties:
         extent = TemporalExtent(
             start_date=start, end_date=end, resolution="D", dates=()
         )
-        assert extent.start_date == start and extent.end_date == end
+        assert extent.start_date == start, extent.start_date
+        assert extent.end_date == end, extent.end_date
 
     @given(dates=st.lists(_DATES, min_size=2, max_size=2))
     def test_inverted_bounds_are_rejected(self, dates):
