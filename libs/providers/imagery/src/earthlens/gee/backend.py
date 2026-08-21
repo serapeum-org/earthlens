@@ -106,6 +106,11 @@ _DEFAULT_HTTP_TIMEOUT_S: float = 300.0
 #: Engine (see `GEE._eedai_eligible`).
 _EEDAI_NATIVE_CRS: str = "EPSG:4326"
 
+#: Total pixels (per band) the EEDAI reader may materialise for one read. The
+#: driver has no overviews worth trusting, so it fetches the AOI at the asset's
+#: native resolution into memory before downsampling.
+_EEDAI_MAX_PIXELS: int = 200_000_000
+
 #: Metres per degree of latitude on a sphere of Earth's mean radius. Used to
 #: turn the EEDAI path's metre `scale` into a pixel grid over a lat/lon AOI;
 #: longitude is scaled by `cos(latitude)` at the AOI's mid-latitude.
@@ -1096,11 +1101,14 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Returns:
             `True` to take the EEDAI fast-path, `False` for `getDownloadURL`.
+            Under `"auto"` an unbounded native read falls back rather than
+            failing — the user asked for a download, not for this engine.
 
         Raises:
             ValueError: If `engine="eedai"` was forced but the request needs
-                server-side compute (a reduced collection, a `cloud_mask`,
-                `filters`, or an asynchronous sink).
+                server-side compute (a reduced collection, a `cloud_mask` or
+                `filters`), targets a projected `crs`, or would trigger an
+                unbounded native-resolution read.
         """
         if self.engine == "ee":
             return False
@@ -1115,8 +1123,24 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     f"crs={_EEDAI_NATIVE_CRS!r} (got {self.crs!r}). Use "
                     "engine='auto' or engine='ee'."
                 )
+            fits, reason = self._eedai_native_fits(var_info, self._eedai_window()[0])
+            if not fits:
+                raise ValueError(
+                    f"engine='eedai' cannot serve {var_info.id}: {reason}. Use a "
+                    "smaller bbox, engine='ee' (with auto_split=True to tile), or "
+                    "export_via='drive'."
+                )
             return True
-        return eligible and eedai_available()
+        if not (eligible and eedai_available()):
+            return False
+        fits, reason = self._eedai_native_fits(var_info, self._eedai_window()[0])
+        if not fits:
+            logger.info(
+                f"Serving {var_info.id} through Earth Engine rather than the EEDAI "
+                f"reader: {reason}."
+            )
+            return False
+        return True
 
     def _eedai_window(self) -> tuple[tuple[float, float, float, float], Any]:
         """Return the AOI the reader should read, as `(bbox, cutline)`.
@@ -1238,42 +1262,55 @@ class GEE(LazyClientMixin, AbstractDataSource):
             ) from exc
         return self._eedai_credential
 
-    def _eedai_preflight(
+    def _eedai_native_fits(
         self, var_info: Dataset, bbox: tuple[float, float, float, float]
-    ) -> None:
-        """Refuse an EEDAI read whose native-resolution window is unbounded.
+    ) -> tuple[bool, str]:
+        """Report whether the reader's native-resolution read is bounded.
 
         Dropping `getDownloadURL` also drops its 32768-px guard and
         `auto_split`, but the reader is not free of limits: the EEDAI
         driver's overviews are unreliable, so it fetches the AOI at the
         asset's *native* resolution block by block and materialises it in
         memory before downsampling. A wide AOI over a fine-resolution asset
-        is therefore an unbounded read — an OOM or a hang — where the Earth
-        Engine path used to fail immediately with an actionable message.
-        This keeps that fast failure, measured against the native grid
-        rather than the requested one.
+        is therefore an unbounded read, however coarse the requested
+        `scale`.
+
+        An asset with no catalogued `spatial_resolution` is treated as
+        *unbounded*, not as safe: an unknown native grid is exactly the case
+        that cannot be sized up front.
+
+        This reports rather than raises so the caller can decide: `"auto"`
+        falls back to Earth Engine (which has its own cap and `auto_split`),
+        while `engine="eedai"` turns the same reason into an error.
 
         Args:
             var_info: The catalog entry (for the asset's native resolution).
-            bbox: The lat/lon window the reader will materialise.
+            bbox: The lat/lon window the reader would materialise.
 
-        Raises:
-            ValueError: If the native-resolution window exceeds
-                :data:`EE_MAX_DIMENSION` on either axis.
+        Returns:
+            `(fits, reason)` — `reason` is empty when it fits, and otherwise
+            explains why in a form suitable for a log line or an error.
         """
         native_scale = var_info.spatial_resolution
         if not native_scale:
-            return
+            return False, (
+                f"{var_info.id} has no catalogued native resolution, so the "
+                "reader's native-resolution read cannot be bounded up front"
+            )
         rows, cols = self._eedai_grid(bbox, float(native_scale))
-        if max(rows, cols) <= EE_MAX_DIMENSION:
-            return
-        raise ValueError(
-            f"{var_info.id}: the EEDAI reader fetches the AOI at the asset's "
-            f"native {native_scale} m resolution, which is about {cols}x{rows} "
-            f"px here — over the {EE_MAX_DIMENSION}-px per-axis budget and read "
-            "into memory in one piece. Use a smaller bbox, engine='ee' (with "
-            "auto_split=True to tile), or export_via='drive'."
-        )
+        if max(rows, cols) > EE_MAX_DIMENSION:
+            return False, (
+                f"the AOI is about {cols}x{rows} px at {var_info.id}'s native "
+                f"{native_scale} m resolution, over the {EE_MAX_DIMENSION}-px "
+                "per-axis budget the reader would hold in memory"
+            )
+        if rows * cols > _EEDAI_MAX_PIXELS:
+            return False, (
+                f"the AOI is about {cols * rows:,} px at {var_info.id}'s native "
+                f"{native_scale} m resolution, over the {_EEDAI_MAX_PIXELS:,}-px "
+                "budget the reader would hold in memory (per band)"
+            )
+        return True, ""
 
     def _export_via_eedai(
         self, var_info: Dataset, bands: list[str], scale: float, prefix: str
@@ -1309,8 +1346,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
         Raises:
             ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
             AuthenticationError: If the reader's credentials cannot be built.
-            ValueError: If the native-resolution read would exceed the
-                budget (see :meth:`_eedai_preflight`).
         """
         reader = import_earthengine_reader()
         credentials = self._eedai_credentials()
@@ -1321,7 +1356,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # as a finished product.
         staged = self.root_dir / f"{prefix}.partial.tif"
         bbox, cutline = self._eedai_window()
-        self._eedai_preflight(var_info, bbox)
         dataset = reader.from_earthengine(
             var_info.id,
             bands=list(bands),

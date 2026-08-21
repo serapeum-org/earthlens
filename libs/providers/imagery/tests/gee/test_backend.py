@@ -1919,18 +1919,52 @@ class TestExportViaEedai:
         wide = gee._eedai_grid((31.0, 29.0, 32.0, 30.0), 90.0)
         assert kwargs["shape"] != wide, "grid was sized from the bbox, not the region"
 
-    def test_oversized_native_read_is_refused(self, make_gee, fake_reader):
-        """A huge AOI over a fine asset fails fast instead of reading into RAM."""
+    def test_auto_falls_back_when_the_native_read_is_unbounded(
+        self, make_gee, fake_reader
+    ):
+        """`engine="auto"` routes an unbounded native read to Earth Engine.
+
+        The user asked for a download, not for this engine, so an oversized
+        native window must fall through to `getDownloadURL` (which has its
+        own cap and `auto_split`) rather than fail.
+        """
         gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        assert gee._use_eedai(var_info) is False
+
+    def test_forced_eedai_reports_the_unbounded_native_read(
+        self, make_gee, fake_reader
+    ):
+        """`engine="eedai"` turns the same condition into an actionable error."""
+        gee = make_gee(
+            engine="eedai", lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0
+        )
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         with pytest.raises(ValueError, match="native"):
-            gee._export_via_eedai(var_info, ["elevation"], 5000.0, "srtm_big")
-        assert not fake_reader.calls, "the reader should not be called"
+            gee._use_eedai(var_info)
+
+    def test_unknown_native_resolution_is_treated_as_unbounded(
+        self, make_gee, fake_reader
+    ):
+        """An asset with no catalogued resolution cannot be sized, so it falls back.
+
+        15 of the shipped `ee_type="image"` rows have no `spatial_resolution`,
+        and an unknown native grid is the case that most needs bounding.
+        """
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003").model_copy(
+            update={"spatial_resolution": None}
+        )
+        fits, reason = gee._eedai_native_fits(var_info, (31.2, 29.9, 31.3, 30.0))
+        assert fits is False
+        assert "no catalogued native resolution" in reason
+        assert gee._use_eedai(var_info) is False
 
     def test_modest_aoi_passes_the_preflight(self, make_gee, fake_reader):
         """A small AOI is not blocked by the native-resolution budget."""
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        assert gee._use_eedai(var_info) is True
         gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
         assert fake_reader.calls
 
