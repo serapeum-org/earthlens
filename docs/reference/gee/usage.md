@@ -145,6 +145,10 @@ optional [`pyramids-eo`](https://pypi.org/project/pyramids-eo/) reader:
 pip install "earthlens[eedai]"
 ```
 
+`earthlens[all]` deliberately does **not** include it: installing the
+extra flips the default `engine="auto"` onto the reader, and the two
+engines sample differently (see below), so it is opt-in.
+
 ```python
 gee = GEE(
     start="2000-02-11", end="2000-02-12",

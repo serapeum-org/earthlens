@@ -1994,7 +1994,7 @@ dependencies = [
 all = [
     { name = "earthlens-atmosphere", extra = ["ecmwf", "ecmwf-modern", "eea-aq", "goes", "isimip", "mswep", "nwp", "radar", "s3", "tropycal"] },
     { name = "earthlens-hazards", extra = ["emdat", "fdsn", "hdx", "osm", "overture"] },
-    { name = "earthlens-imagery", extra = ["asf", "earthdata", "eedai", "eumetsat", "gee", "jaxa", "sentinel-hub", "stac"] },
+    { name = "earthlens-imagery", extra = ["asf", "earthdata", "eumetsat", "gee", "jaxa", "sentinel-hub", "stac"] },
     { name = "earthlens-imagery", extra = ["openeo"], marker = "extra == 'extra-17-earthlens-imagery-openeo'" },
     { name = "earthlens-land", extra = ["dem", "gbif", "worldpop"] },
     { name = "earthlens-ocean", extra = ["cmems", "erddap", "nwm", "obis", "usgs-water"] },
@@ -2172,7 +2172,6 @@ requires-dist = [
     { name = "earthlens", extras = ["ecmwf"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["ecmwf-modern"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["eea-aq"], marker = "extra == 'all'" },
-    { name = "earthlens", extras = ["eedai"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["emdat"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["erddap"], marker = "extra == 'all'" },
     { name = "earthlens", extras = ["eumetsat"], marker = "extra == 'all'" },

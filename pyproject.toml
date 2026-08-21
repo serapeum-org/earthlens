@@ -81,7 +81,10 @@ worldpop = ["earthlens-land[worldpop]"]
 # own extra on earthlens itself. `argo` (xarray clash with openeo -- see #789)
 # and `osm-pbf` (pyrosm's transitive cykhash dep is sdist-only) stay out; `osm`
 # is included because openeo already pins pandas<3, so ohsome's pandas<3 no
-# longer collides.
+# longer collides. `eedai` stays out deliberately: installing it flips the GEE
+# backend's default `engine="auto"` onto the pyramids-eo reader, which samples
+# and grids differently from Earth Engine, so it is opt-in rather than
+# something `all` turns on under an existing user.
 all = [
     "earthlens[asf]",
     "earthlens[cmems]",
@@ -91,7 +94,6 @@ all = [
     "earthlens[ecmwf]",
     "earthlens[ecmwf-modern]",
     "earthlens[eea_aq]",
-    "earthlens[eedai]",
     "earthlens[emdat]",
     "earthlens[erddap]",
     "earthlens[eumetsat]",
