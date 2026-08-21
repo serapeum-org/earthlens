@@ -77,7 +77,12 @@ def _quakeml_id(comcat_id: str) -> str:
 
 
 class _FakeHttp:
-    """Stand-in for `HttpClient` serving one detail document and archive."""
+    """Stand-in for `HttpClient` serving one detail document and archive.
+
+    Failures are injectable: `fail_json_for` / `fail_download_for` raise for
+    any request whose URL mentions one of the given ComCat ids, so a
+    multi-event run can fail one event and keep another healthy.
+    """
 
     def __init__(
         self,
@@ -88,16 +93,22 @@ class _FakeHttp:
         self.archive = _make_archive() if archive is None else archive
         self.json_urls: list[str] = []
         self.downloads: list[tuple[str, Path]] = []
+        self.fail_json_for: set[str] = set()
+        self.fail_download_for: set[str] = set()
 
     def get_json(self, url: str, **_kwargs: Any) -> dict[str, Any]:
         self.json_urls.append(url)
+        if any(marker in url for marker in self.fail_json_for):
+            raise RuntimeError(f"ComCat detail unavailable for {url}")
         return self.detail
 
     def download(self, url: str, dest: str | Path, **_kwargs: Any) -> Path:
         dest = Path(dest)
+        self.downloads.append((url, dest))
+        if any(marker in str(dest) for marker in self.fail_download_for):
+            raise RuntimeError(f"archive transfer failed for {url}")
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(self.archive)
-        self.downloads.append((url, dest))
         return dest
 
 
@@ -107,6 +118,18 @@ def fake_http(monkeypatch: pytest.MonkeyPatch) -> _FakeHttp:
     fake = _FakeHttp()
     monkeypatch.setattr(fdsn_backend, "HttpClient", lambda **_kwargs: fake)
     return fake
+
+
+def _usgs_catalog(make_event: Any, *comcat_ids: str) -> Any:
+    """Build a catalog whose events carry the given ComCat ids."""
+    from obspy.core.event import Catalog
+
+    events = []
+    for index, comcat_id in enumerate(comcat_ids):
+        event = make_event(lon=139.0 + index, lat=35.0 + index)
+        event.resource_id = _quakeml_id(comcat_id)
+        events.append(event)
+    return Catalog(events=events)
 
 
 @pytest.fixture
@@ -344,3 +367,198 @@ class TestBackendShakemapDownload:
         """The detail request is keyed by the event's ComCat id."""
         _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
         assert fake_http.json_urls == [_helpers.detail_url("us6000jlqa")]
+
+
+class TestShakemapFailurePolicy:
+    """Partial failure across the per-event ShakeMap loop."""
+
+    def test_one_failed_event_does_not_lose_the_others(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """A failing event is skipped while healthy ones still land."""
+        fake_fdsn.default_result = _usgs_catalog(make_event, "us1111", "us2222")
+        fake_http.fail_json_for = {"us1111"}
+
+        fc = _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert len(fc) == 2, "both events stay in the table"
+        written = sorted(p.parent.name for p in (tmp_path / "shakemap").rglob("*.tif"))
+        assert written == ["us2222"], (
+            f"only the healthy event yields a raster: {written}"
+        )
+
+    def test_failed_event_does_not_lose_the_event_table(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """Every ShakeMap failing still returns the events themselves."""
+        fake_fdsn.default_result = _usgs_catalog(make_event, "us1111", "us2222")
+        fake_http.fail_json_for = {"us1111", "us2222"}
+
+        fc = _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert len(fc) == 2, "the vector output is independent of the side-output"
+        assert list((tmp_path / "shakemap").rglob("*.tif")) == []
+
+    def test_raise_policy_propagates(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """errors='raise' surfaces the first ShakeMap failure."""
+        fake_fdsn.default_result = _usgs_catalog(make_event, "us1111")
+        fake_http.fail_json_for = {"us1111"}
+
+        backend = _backend(tmp_path, with_shakemap=True)
+        with pytest.raises(RuntimeError, match="ComCat detail unavailable"):
+            backend.download(progress_bar=False, errors="raise")
+
+    def test_download_failure_is_skipped_under_warn(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """An archive transfer that fails mid-way skips the event."""
+        fake_http.fail_download_for = {"us6000jlqa"}
+
+        fc = _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert len(fc) == 1, "the event table survives a failed transfer"
+        assert list((tmp_path / "shakemap").rglob("*.tif")) == []
+
+    def test_failed_download_leaves_no_partial_archive(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A failed transfer cleans up rather than leaving an archive behind."""
+        fake_http.fail_download_for = {"us6000jlqa"}
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        leftovers = [p.name for p in tmp_path.rglob("raster.zip")]
+        assert leftovers == [], f"no archive should survive: {leftovers}"
+
+
+class TestShakemapArchiveProblems:
+    """Archives that are unusable or missing the requested grids."""
+
+    def test_corrupt_archive_is_skipped(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A body that is not a zip is skipped, not raised."""
+        fake_http.archive = b"this is not a zip file"
+
+        fc = _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert len(fc) == 1, "the event table is unaffected"
+        assert list((tmp_path / "shakemap").rglob("*.tif")) == []
+
+    def test_archive_missing_every_requested_layer(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """An archive carrying none of the requested grids writes nothing."""
+        fake_http.archive = _make_archive(layers=("pgv_std",))
+
+        backend = _backend(tmp_path, with_shakemap=True, shakemap_layers=["mmi_mean"])
+        fc = backend.download(progress_bar=False)
+
+        assert len(fc) == 1
+        assert list((tmp_path / "shakemap").rglob("*.tif")) == []
+
+    def test_archive_missing_one_of_several_layers(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """The grids the archive does carry are still written."""
+        fake_http.archive = _make_archive(layers=("mmi_mean",))
+
+        backend = _backend(
+            tmp_path, with_shakemap=True, shakemap_layers=["mmi_mean", "pga_mean"]
+        )
+        backend.download(progress_bar=False)
+
+        written = sorted(p.name for p in (tmp_path / "shakemap").rglob("*.tif"))
+        assert written == ["mmi_mean.tif"], (
+            f"partial archive still yields what it has: {written}"
+        )
+
+
+class TestShakemapRerun:
+    """Skip-if-present behaviour across repeated runs."""
+
+    def test_partially_present_layers_are_refetched(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A run missing one of its GeoTIFFs refetches rather than half-skipping."""
+        backend = _backend(
+            tmp_path, with_shakemap=True, shakemap_layers=["mmi_mean", "pga_mean"]
+        )
+        backend.download(progress_bar=False)
+        first = len(fake_http.downloads)
+
+        next((tmp_path / "shakemap").rglob("pga_mean.tif")).unlink()
+        backend.download(progress_bar=False)
+
+        assert len(fake_http.downloads) == first + 1, "the incomplete event refetches"
+        written = sorted(p.name for p in (tmp_path / "shakemap").rglob("*.tif"))
+        assert written == ["mmi_mean.tif", "pga_mean.tif"], "both grids present again"
+
+
+class TestShakemapMultiNetwork:
+    """Requests mixing USGS with another network."""
+
+    def test_only_usgs_events_yield_rasters(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """A mixed request keeps every event but rasters only USGS."""
+        fake_fdsn.set_result("USGS", _usgs_catalog(make_event, "us1111"))
+        fake_fdsn.set_result("EMSC", _usgs_catalog(make_event, "em9999"))
+
+        backend = _backend(tmp_path, variables=["USGS", "EMSC"], with_shakemap=True)
+        fc = backend.download(progress_bar=False)
+
+        assert len(fc) == 2, "both networks contribute events"
+        rastered = sorted(p.parent.name for p in (tmp_path / "shakemap").rglob("*.tif"))
+        assert rastered == ["us1111"], f"only USGS is rastered: {rastered}"
+
+    def test_empty_non_usgs_network_is_quiet(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """A non-USGS network that matched nothing needs no warning."""
+        from obspy.core.event import Catalog
+
+        fake_fdsn.set_result("USGS", _usgs_catalog(make_event, "us1111"))
+        fake_fdsn.set_result("EMSC", Catalog(events=[]))
+
+        backend = _backend(tmp_path, variables=["USGS", "EMSC"], with_shakemap=True)
+        fc = backend.download(progress_bar=False)
+
+        assert len(fc) == 1, "only USGS matched"
+        rastered = sorted(p.parent.name for p in (tmp_path / "shakemap").rglob("*.tif"))
+        assert rastered == ["us1111"]
+
+
+class TestShakemapUnresolvableId:
+    """Events whose identifier carries no ComCat id."""
+
+    def test_unparseable_event_id_is_skipped(
+        self, tmp_path: Path, fake_fdsn: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A USGS row with a local identifier is skipped without erroring."""
+        fc = _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert len(fc) == 1, "the event itself still arrives"
+        assert fake_http.json_urls == [], "no detail request without a ComCat id"
+        assert list((tmp_path / "shakemap").rglob("*.tif")) == []
