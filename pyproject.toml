@@ -161,6 +161,12 @@ dev = [
     "notebook",
     "jupyter",
     "commitizen>=4.8.4",
+    # pyramids-eo: the GEE backend's optional EEDAI reader. It is deliberately
+    # out of the `all` extra (installing it activates engine="auto"), so it is
+    # pulled in here instead -- otherwise the tests that pin its
+    # `from_earthengine` signature would skip everywhere and a 0.x contract
+    # change would only surface on a live run.
+    "pyramids-eo >=0.1.0,<0.2",
 ]
 # The eclipse showcase notebooks need a heavy geostationary-imagery stack that the
 # rest of the project does not. It is kept out of `dev` deliberately: pulling satpy
