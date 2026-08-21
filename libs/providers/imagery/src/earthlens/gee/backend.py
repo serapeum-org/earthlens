@@ -332,6 +332,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
             server-side compute, which is why composited requests stay on
             Earth Engine. Ignored for the asynchronous `"drive"` / `"gcs"` /
             `"asset"` sinks, which are Earth Engine-only.
+
+            The two engines do not produce byte-identical rasters. Earth
+            Engine reads `scale` in a geographic CRS as a uniform
+            degree-equivalent, while the EEDAI grid is sized for square
+            metres on the ground, so away from the equator the column counts
+            differ; and the reader downsamples locally (nearest by default)
+            where Earth Engine aggregates server-side. The AOI, CRS and
+            values agree — the sampling does not. `"eedai"` still needs the
+            `[gee]` extra and Earth Engine credentials: the request is built
+            through `ee` before the pixels are fetched.
         cog: Write the EEDAI path's raster as a Cloud Optimized GeoTIFF
             (tiled, with overviews) via `Dataset.cog.to_cog` instead of a
             plain GeoTIFF. Applies only to the EEDAI path — the Earth

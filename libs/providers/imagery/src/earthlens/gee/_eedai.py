@@ -10,6 +10,15 @@ reaches it lazily.
 Import it through :func:`import_earthengine_reader` so a missing install
 surfaces as one clear, actionable error at the fetch seam rather than a bare
 `ModuleNotFoundError` from deep in the pipeline.
+
+Two caveats worth knowing at the call site:
+
+* The extra does **not** replace `[gee]`. A request is still built through
+  `earthengine-api` before its pixels are fetched, so Earth Engine
+  credentials remain required.
+* pyramids-eo installs its credentials into GDAL's process-global EEDAI
+  state, so two `GEE` instances using different service accounts in one
+  process can read under whichever was configured last.
 """
 
 from __future__ import annotations

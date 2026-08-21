@@ -2526,7 +2526,7 @@ requires-dist = [
     { name = "gportal", marker = "extra == 'jaxa'", specifier = ">=0.4,<0.5" },
     { name = "jaxa-earth", marker = "extra == 'jaxa'", specifier = ">=0.1.6,<0.2" },
     { name = "openeo", marker = "extra == 'openeo'", specifier = ">=0.47,<0.52" },
-    { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.1.0" },
+    { name = "pyramids-eo", marker = "extra == 'eedai'", specifier = ">=0.1.0,<0.2" },
     { name = "pyramids-gis", extras = ["stac"], marker = "extra == 'stac'", specifier = ">=0.53.0" },
     { name = "rtree", marker = "extra == 'gee'", specifier = ">=1.0.0" },
     { name = "sentinelhub", marker = "extra == 'sentinel-hub'", specifier = ">=3.11.5" },
