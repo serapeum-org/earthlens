@@ -8,12 +8,14 @@ runs offline.
 from __future__ import annotations
 
 import io
+import json
 import zipfile
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pytest
+import requests
 
 import earthlens.fdsn.backend as fdsn_backend
 from earthlens.fdsn import _helpers
@@ -108,6 +110,7 @@ class _FakeHttp:
         self.fail_json_for: set[str] = set()
         self.fail_download_for: set[str] = set()
         self.partial_download_for: set[str] = set()
+        self.builds = 0
         self.session = _FakeSession()
 
     def get_json(self, url: str, **_kwargs: Any) -> dict[str, Any]:
@@ -140,6 +143,7 @@ class _FakeHttp:
 def _build_fake_http(fake: _FakeHttp, **kwargs: Any) -> _FakeHttp:
     """Record the kwargs the backend built its client with, then serve it."""
     fake.init_kwargs = kwargs
+    fake.builds += 1
     return fake
 
 
@@ -458,6 +462,9 @@ class TestClientLifecycle:
         """Two events in one download share a single client."""
         fake_fdsn.default_result = _usgs_catalog(make_event, "us1111", "us2222")
         _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+        assert fake_http.builds == 1, (
+            f"the client should be built once for the batch, got {fake_http.builds}"
+        )
         assert fake_http.session.closed == 1, "one client for the whole batch"
 
 
@@ -874,8 +881,8 @@ class TestShakemapFanOutCeiling:
             loguru_logger.remove(sink_id)
 
         assert any(
-            "max_shakemap_events" in m and "skipping 1" in m for m in messages
-        ), f"the dropped count should be announced, got: {messages}"
+            "max_shakemap_events" in m and "deferring 1" in m for m in messages
+        ), f"the deferred count should be announced, got: {messages}"
 
     def test_ceiling_rejects_non_positive(self, tmp_path: Path):
         """A zero or negative ceiling is refused at construction."""
@@ -903,9 +910,13 @@ class TestShakemapClientWiring:
         """The client is built with a politeness interval and transport retries."""
         _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
 
-        assert fake_http.init_kwargs.get("min_interval"), "expected a throttle"
-        assert fake_http.init_kwargs.get("retry_on_exceptions"), (
-            "expected transport-exception retries, as flodis/hanze do"
+        assert fake_http.init_kwargs.get("min_interval") > 0, "expected a throttle"
+        assert fake_http.init_kwargs.get("timeout"), "expected an explicit timeout"
+        retried = fake_http.init_kwargs.get("retry_on_exceptions") or ()
+        assert requests.ConnectionError in retried, "a dropped connection retries"
+        assert requests.Timeout in retried, "a timeout retries"
+        assert requests.exceptions.ChunkedEncodingError in retried, (
+            "a multi-megabyte body dies mid-stream, which is neither of the above"
         )
 
     def test_progress_flag_reaches_the_archive_fetch(
@@ -1128,13 +1139,25 @@ class TestShakemapErrorsIgnore:
         fake_fdsn.default_result = _usgs_catalog(make_event, "us1111", "us2222")
         fake_http.fail_json_for = {"us1111"}
 
-        fc = _backend(tmp_path, with_shakemap=True).download(
-            progress_bar=False, errors="ignore"
+        from loguru import logger as loguru_logger
+
+        messages: list[str] = []
+        sink_id = loguru_logger.add(
+            lambda message: messages.append(str(message)), level="WARNING"
         )
+        try:
+            fc = _backend(tmp_path, with_shakemap=True).download(
+                progress_bar=False, errors="ignore"
+            )
+        finally:
+            loguru_logger.remove(sink_id)
 
         assert len(fc) == 2, "the event table is unaffected"
         rastered = sorted(p.name for p in (tmp_path / "shakemap").iterdir())
         assert rastered == ["us2222"], f"only the healthy event: {rastered}"
+        assert not [m for m in messages if "us1111" in m], (
+            f"errors='ignore' should not warn about the skipped event: {messages}"
+        )
 
 
 class TestShakemapStagingLeakIsReported:
@@ -1190,3 +1213,247 @@ class TestShakemapCloselessSession:
 
         assert len(fc) == 1, "the download should complete regardless"
         assert list((tmp_path / "shakemap").rglob("*.tif")), "rasters still written"
+
+
+class TestCeilingAdvancesAcrossRuns:
+    """The ceiling bounds work, so a re-run reaches events it deferred."""
+
+    def test_rerun_walks_further_through_the_list(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """Three events under a ceiling of two are all reached in two runs."""
+        fake_fdsn.default_result = _usgs_catalog(
+            make_event, "us1111", "us2222", "us3333"
+        )
+        backend = _backend(tmp_path, with_shakemap=True, max_shakemap_events=2)
+
+        backend.download(progress_bar=False)
+        first = sorted(p.name for p in (tmp_path / "shakemap").iterdir())
+        assert first == ["us1111", "us2222"], f"first run takes two: {first}"
+
+        backend.download(progress_bar=False)
+        second = sorted(p.name for p in (tmp_path / "shakemap").iterdir())
+        assert second == ["us1111", "us2222", "us3333"], (
+            f"the re-run must reach the deferred event, got {second}"
+        )
+
+    def test_cached_events_do_not_consume_budget(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """An event already on disk costs no ceiling budget."""
+        fake_fdsn.default_result = _usgs_catalog(make_event, "us1111", "us2222")
+        _backend(tmp_path, with_shakemap=True, max_shakemap_events=1).download(
+            progress_bar=False
+        )
+        _backend(tmp_path, with_shakemap=True, max_shakemap_events=1).download(
+            progress_bar=False
+        )
+
+        fetched = sorted(p.name for p in (tmp_path / "shakemap").iterdir())
+        assert fetched == ["us1111", "us2222"], f"both reached in two runs: {fetched}"
+
+
+class TestNegativeCacheExpiry:
+    """A no-ShakeMap answer ages out rather than sticking forever."""
+
+    def test_fresh_negative_is_reused(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A recent negative result still skips the detail request."""
+        fake_http.detail = {"properties": {"products": {}}}
+        backend = _backend(tmp_path, with_shakemap=True)
+        backend.download(progress_bar=False)
+        first = len(fake_http.json_urls)
+
+        backend.download(progress_bar=False)
+        assert len(fake_http.json_urls) == first, "a fresh negative is cached"
+
+    def test_stale_negative_is_rechecked(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """An aged negative result is checked again, so a late grid is found."""
+        fake_http.detail = {"properties": {"products": {}}}
+        backend = _backend(tmp_path, with_shakemap=True)
+        backend.download(progress_bar=False)
+
+        manifest_path = tmp_path / "shakemap" / "us6000jlqa" / _helpers.MANIFEST_NAME
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        payload["checked"] -= fdsn_backend._NEGATIVE_CACHE_SECONDS + 1
+        manifest_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        fake_http.detail = _detail()
+        backend.download(progress_bar=False)
+
+        assert list((tmp_path / "shakemap").rglob("*.tif")), (
+            "the grid published since the last run should now be fetched"
+        )
+
+    def test_positive_result_does_not_expire(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """Rasters on disk are reused however old the manifest is."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        backend.download(progress_bar=False)
+        first = len(fake_http.downloads)
+
+        manifest_path = tmp_path / "shakemap" / "us6000jlqa" / _helpers.MANIFEST_NAME
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        payload["checked"] = 0.0
+        manifest_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        backend.download(progress_bar=False)
+        assert len(fake_http.downloads) == first, "a present raster is still reused"
+
+
+class TestManifestMerge:
+    """Narrowing the requested layers must not lose what is on disk."""
+
+    def test_narrowing_then_widening_does_not_refetch(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """mmi, then pga, then mmi again costs two fetches, not three."""
+        for layers in (["mmi_mean"], ["pga_mean"], ["mmi_mean"]):
+            _backend(tmp_path, with_shakemap=True, shakemap_layers=layers).download(
+                progress_bar=False
+            )
+
+        assert len(fake_http.downloads) == 2, (
+            "the third run repeats the first, which is already on disk: "
+            f"{len(fake_http.downloads)} fetches"
+        )
+
+    def test_manifest_describes_everything_on_disk(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """After two narrow runs the manifest lists both rasters."""
+        for layers in (["mmi_mean"], ["pga_mean"]):
+            _backend(tmp_path, with_shakemap=True, shakemap_layers=layers).download(
+                progress_bar=False
+            )
+
+        event_dir = tmp_path / "shakemap" / "us6000jlqa"
+        manifest = _helpers.read_manifest(event_dir)
+        on_disk = sorted(p.stem for p in event_dir.glob("*.tif"))
+        assert manifest["produced"] == on_disk, (
+            f"manifest should describe disk, got {manifest['produced']} vs {on_disk}"
+        )
+
+
+class TestManifestValidation:
+    """A structurally invalid manifest refetches instead of raising."""
+
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            {"schema": 1, "requested": 5, "produced": [], "checked": 0.0},
+            {"schema": 1, "requested": [], "produced": "no", "checked": 0.0},
+            {"schema": 1, "requested": [1], "produced": [], "checked": 0.0},
+            {"schema": 99, "requested": [], "produced": [], "checked": 0.0},
+            {"requested": [], "produced": [], "checked": 0.0},
+            {"schema": 1, "requested": [], "produced": [], "checked": "soon"},
+        ],
+    )
+    def test_invalid_payload_reads_as_absent(self, tmp_path: Path, payload: dict):
+        """Any wrong field type or schema reads as no manifest at all."""
+        (tmp_path / _helpers.MANIFEST_NAME).write_text(
+            json.dumps(payload), encoding="utf-8"
+        )
+        assert _helpers.read_manifest(tmp_path) is None
+
+    def test_invalid_manifest_refetches_and_self_heals(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A bad manifest causes a refetch and is rewritten valid."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        backend.download(progress_bar=False)
+        first = len(fake_http.downloads)
+
+        manifest_path = tmp_path / "shakemap" / "us6000jlqa" / _helpers.MANIFEST_NAME
+        manifest_path.write_text('{"requested": 5}', encoding="utf-8")
+
+        backend.download(progress_bar=False)
+        assert len(fake_http.downloads) == first + 1, "a bad manifest refetches"
+        assert _helpers.read_manifest(manifest_path.parent) is not None, (
+            "the rewrite should repair the manifest"
+        )
+
+
+class TestCorruptArchiveIsBadZip:
+    """A body that passes the magic check but is not a usable zip."""
+
+    def test_truncated_zip_is_skipped(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A PK-prefixed but truncated archive is skipped, not raised."""
+        fake_http.archive = _make_archive()[:40]
+
+        fc = _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        assert len(fc) == 1, "the event table is unaffected"
+        assert list(tmp_path.rglob("*.tif")) == [], "no raster from a broken zip"
+
+
+class TestShakemapProductVersion:
+    """Reading the ShakeMap product's updateTime off a detail document."""
+
+    def test_reads_update_time(self):
+        """A product carrying updateTime yields it as a string."""
+        detail = {
+            "properties": {"products": {"shakemap": [{"updateTime": 1756575631263}]}}
+        }
+        assert _helpers.shakemap_product_version(detail) == "1756575631263"
+
+    def test_missing_update_time_is_none(self):
+        """A product without updateTime yields None rather than raising."""
+        detail = {"properties": {"products": {"shakemap": [{}]}}}
+        assert _helpers.shakemap_product_version(detail) is None
+
+    def test_null_entry_is_none(self):
+        """A null first product entry yields None."""
+        detail = {"properties": {"products": {"shakemap": [None]}}}
+        assert _helpers.shakemap_product_version(detail) is None
+
+    def test_no_product_is_none(self):
+        """An event with no ShakeMap yields None."""
+        assert (
+            _helpers.shakemap_product_version({"properties": {"products": {}}}) is None
+        )
+
+
+class TestManifestWriteFailure:
+    """A manifest that cannot be saved must not cost the rasters."""
+
+    def test_unwritable_manifest_warns_but_keeps_rasters(
+        self,
+        tmp_path: Path,
+        usgs_events: _FakeFdsn,
+        fake_http: _FakeHttp,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        """The raster survives and the failure is reported."""
+        from loguru import logger as loguru_logger
+
+        def _refuse(*_args: Any, **_kwargs: Any) -> None:
+            raise OSError("read-only file system")
+
+        monkeypatch.setattr(fdsn_backend._helpers, "write_manifest", _refuse)
+
+        messages: list[str] = []
+        sink_id = loguru_logger.add(lambda message: messages.append(str(message)))
+        try:
+            _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+        finally:
+            loguru_logger.remove(sink_id)
+
+        assert list(tmp_path.rglob("*.tif")), "the raster must still be written"
+        assert any("could not record the ShakeMap manifest" in m for m in messages), (
+            f"the failure should be reported, got: {messages}"
+        )

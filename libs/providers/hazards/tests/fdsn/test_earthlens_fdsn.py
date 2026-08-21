@@ -117,3 +117,12 @@ class TestFacadeShakemapKeywords:
         facade = _make_facade(tmp_path)
         fc = facade.download(force=True)
         assert isinstance(fc, GeoDataFrame)
+
+    def test_force_with_shakemap_refetches(self, tmp_path: Path, fake_fdsn: _FakeFdsn):
+        """force= reaches the ShakeMap path through the facade."""
+        import earthlens.fdsn.backend as fdsn_backend
+
+        facade = _make_facade(tmp_path, with_shakemap=True)
+        facade.download(force=True)
+        assert facade.datasource._force is True, "force should reach the backend"
+        assert fdsn_backend  # the ShakeMap path is the one under test
