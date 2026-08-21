@@ -360,6 +360,12 @@ class FDSN(AbstractDataSource):
         list stays positionally aligned with `products`. Only a
         **total** failure (every network errored) raises.
 
+        The partial-failure policy is whatever `download(errors=...)`
+        recorded on the instance: `"warn"` (the default) logs each failed
+        network and continues, `"raise"` propagates the first failure, and
+        `"ignore"` continues silently. An all-failed batch raises
+        regardless of the policy.
+
         Args:
             products: The list returned by :meth:`_search`.
 
@@ -367,13 +373,6 @@ class FDSN(AbstractDataSource):
             list[FeatureCollection]: One collection per product, in the
                 same order; empty collections for no-data or failed
                 networks.
-
-        Args:
-            progress_bar: Whether to show per-provider progress.
-            errors: Partial-failure policy for the per-provider loop —
-                `"warn"` (default) logs each failed network and continues,
-                `"raise"` propagates the first failure, `"ignore"` continues
-                silently. An all-failed batch still raises regardless.
 
         Raises:
             RuntimeError: When **every** network's query failed, so a

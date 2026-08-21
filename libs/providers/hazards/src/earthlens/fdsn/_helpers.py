@@ -196,10 +196,25 @@ def detail_url(comcat_id: str) -> str:
         - Address one event's detail document:
             ```python
             >>> from earthlens.fdsn._helpers import detail_url
-            >>> detail_url("us6000jlqa").endswith("eventid=us6000jlqa")
-            True
+            >>> detail_url("us6000jlqa")
+            'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventid=us6000jlqa'
 
             ```
+        - Chain it onto an id recovered from an event row:
+            ```python
+            >>> from earthlens.fdsn._helpers import detail_url, parse_comcat_id
+            >>> row_id = (
+            ...     "quakeml:earthquake.usgs.gov/fdsnws/event/1/query"
+            ...     "?eventid=nc73872510&format=quakeml"
+            ... )
+            >>> detail_url(parse_comcat_id(row_id)).split("eventid=")[1]
+            'nc73872510'
+
+            ```
+
+    See Also:
+        parse_comcat_id: Recovers the id this URL is built from.
+        shakemap_raster_url: Walks the document this URL returns.
     """
     query = urlencode({"format": "geojson", "eventid": comcat_id})
     return f"{COMCAT_DETAIL_URL}?{query}"
@@ -265,6 +280,46 @@ def extract_layers(
     Returns:
         A mapping of layer name to the extracted `.flt` path, holding
             only the layers the archive actually carried.
+
+    Examples:
+        - Pull one layer out of a two-layer archive:
+            ```python
+            >>> import tempfile, zipfile
+            >>> from pathlib import Path
+            >>> from earthlens.fdsn._helpers import extract_layers
+            >>> workspace = Path(tempfile.mkdtemp())
+            >>> archive = workspace / "raster.zip"
+            >>> with zipfile.ZipFile(archive, "w") as bundle:
+            ...     for layer in ("mmi_mean", "pga_mean"):
+            ...         bundle.writestr(f"{layer}.flt", bytes(4))
+            ...         bundle.writestr(f"{layer}.hdr", "NROWS 1")
+            >>> found = extract_layers(archive, ["mmi_mean"], workspace / "out")
+            >>> sorted(found)
+            ['mmi_mean']
+            >>> found["mmi_mean"].name
+            'mmi_mean.flt'
+            >>> (workspace / "out" / "mmi_mean.hdr").is_file()
+            True
+
+            ```
+        - A layer the archive lacks is skipped rather than raised:
+            ```python
+            >>> import tempfile, zipfile
+            >>> from pathlib import Path
+            >>> from earthlens.fdsn._helpers import extract_layers
+            >>> workspace = Path(tempfile.mkdtemp())
+            >>> archive = workspace / "raster.zip"
+            >>> with zipfile.ZipFile(archive, "w") as bundle:
+            ...     bundle.writestr("mmi_mean.flt", bytes(4))
+            ...     bundle.writestr("mmi_mean.hdr", "NROWS 1")
+            >>> sorted(extract_layers(archive, ["mmi_mean", "pgv_std"], workspace / "out"))
+            ['mmi_mean']
+
+            ```
+
+    See Also:
+        normalize_layers: Validates the layer names passed here.
+        flt_to_geotiff: Converts an extracted `.flt` into a GeoTIFF.
     """
     dest_dir.mkdir(parents=True, exist_ok=True)
     extracted: dict[str, Path] = {}
@@ -298,6 +353,41 @@ def flt_to_geotiff(flt_path: Path, dest: Path) -> Path:
 
     Returns:
         `dest`, for chaining.
+
+    Examples:
+        - Convert a small grid and read back its georeferencing:
+            ```python
+            >>> import struct, tempfile
+            >>> from pathlib import Path
+            >>> from earthlens.fdsn._helpers import flt_to_geotiff
+            >>> workspace = Path(tempfile.mkdtemp())
+            >>> header = [
+            ...     "BYTEORDER  LSBFIRST", "LAYOUT  BIL", "NROWS  2", "NCOLS  2",
+            ...     "NBANDS  1", "NBITS  32", "BANDROWBYTES  8", "TOTALROWBYTES  8",
+            ...     "PIXELTYPE  FLOAT", "ULXMAP  35.0", "ULYMAP  39.0",
+            ...     "XDIM  0.5", "YDIM  0.5", "NODATA  999.0",
+            ... ]
+            >>> _ = (workspace / "mmi_mean.hdr").write_text(chr(10).join(header))
+            >>> _ = (workspace / "mmi_mean.flt").write_bytes(
+            ...     struct.pack("<4f", 5.0, 6.0, 7.0, 8.0)
+            ... )
+            >>> written = flt_to_geotiff(
+            ...     workspace / "mmi_mean.flt", workspace / "mmi_mean.tif"
+            ... )
+            >>> written.name
+            'mmi_mean.tif'
+            >>> from pyramids.dataset import Dataset
+            >>> converted = Dataset.read_file(str(written))
+            >>> converted.epsg
+            4326
+            >>> converted.rows, converted.columns
+            (2, 2)
+
+            ```
+
+    See Also:
+        extract_layers: Produces the `.flt` / `.hdr` pair this reads.
+        SHAKEMAP_EPSG: The CRS assigned during the conversion.
     """
     dest.parent.mkdir(parents=True, exist_ok=True)
     dataset = Dataset.read_file(str(flt_path), read_only=False)
