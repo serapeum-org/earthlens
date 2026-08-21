@@ -8,6 +8,11 @@ import pytest
 
 from earthlens.gee import _eedai
 
+_requires_extra = pytest.mark.skipif(
+    not _eedai.eedai_available(),
+    reason="the [eedai] extra (pyramids-eo) is not installed",
+)
+
 _READER_EXPORTS = (
     "from_earthengine",
     "collection_from_earthengine",
@@ -23,6 +28,7 @@ def _raise_import_error(name):
 class TestImportEarthengineReader:
     """Tests for `import_earthengine_reader`."""
 
+    @_requires_extra
     def test_returns_reader_module_when_installed(self):
         """With the `[eedai]` extra installed, the pyramids-eo reader is returned."""
         module = _eedai.import_earthengine_reader()
@@ -40,6 +46,7 @@ class TestImportEarthengineReader:
 class TestEedaiAvailable:
     """Tests for `eedai_available`."""
 
+    @_requires_extra
     def test_true_when_installed(self):
         """Returns True when the reader imports."""
         assert _eedai.eedai_available() is True
@@ -98,3 +105,39 @@ class TestCredentialsFor:
         assert recording_credentials.calls == [
             ("from_service_account", "/keys/sa.json")
         ]
+
+
+@_requires_extra
+class TestReaderContract:
+    """Guards the upstream `from_earthengine` signature the backend relies on."""
+
+    def test_backend_kwargs_bind_to_the_real_signature(self):
+        """Every kwarg `_export_via_eedai` sends is accepted by the real reader.
+
+        The backend's own tests use a fake reader that swallows any keyword, so
+        without this a rename or reordering upstream would go unnoticed until a
+        live run.
+        """
+        import inspect
+
+        from_earthengine = _eedai.import_earthengine_reader().from_earthengine
+        inspect.signature(from_earthengine).bind(
+            "USGS/SRTMGL1_003",
+            bands=["elevation"],
+            crs="EPSG:4326",
+            bbox=(31.2, 29.9, 31.3, 30.0),
+            geometry=None,
+            shape=(124, 107),
+            credentials=None,
+        )
+
+    def test_scale_and_shape_are_mutually_exclusive(self):
+        """The reader rejects `scale` alongside `shape` — the backend sends only shape."""
+        from_earthengine = _eedai.import_earthengine_reader().from_earthengine
+        with pytest.raises(ValueError, match="at most one of"):
+            from_earthengine(
+                "USGS/SRTMGL1_003",
+                bbox=(31.2, 29.9, 31.3, 30.0),
+                scale=90.0,
+                shape=(124, 107),
+            )
