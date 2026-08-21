@@ -43,11 +43,12 @@ imagery). FDSN is different in two ways that shape the backend:
   six-row provider-dispatch table mapping a user-facing network name
   to an `obspy` URL mapping. There is no growth task — adding another
   network later (ORFEUS, GFZ, …) is a hand-edit of one YAML row. The
-  backend still ships `refresh` / `audit` / `validate` handlers
-  (`earthlens datasets refresh fdsn`, `… audit fdsn`, `… validate
-  fdsn`); `refresh` diffs the data centres `obspy` can reach against
-  the curated rows, so a centre `obspy` gains or drops is surfaced
-  rather than missed. There is no `probe` handler.
+  backend still ships `refresh` and `validate` handlers
+  (`earthlens datasets refresh fdsn`, `… validate fdsn`); `refresh`
+  diffs the data centres `obspy` can reach against the curated rows, so
+  a centre `obspy` gains or drops is surfaced rather than missed.
+  `audit fdsn` works too, derived from the refresher's drift axis rather
+  than from an FDSN-owned handler. There is no `probe` handler.
 
 ## The networks
 

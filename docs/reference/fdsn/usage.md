@@ -165,15 +165,17 @@ event `FeatureCollection`; the rasters are a side effect.
 **USGS only.** ShakeMap is a USGS ComCat product and is not part of the
 FDSN event standard, so a non-USGS network in the same request still
 contributes events but no rasters (each such network is logged once).
-ShakeMap costs one extra request and an ~8.5 MB archive **per event**,
-so a broad
-window is gigabytes. `max_shakemap_events` (default `100`) caps how many
+ShakeMap costs one extra request and a multi-megabyte archive **per
+event** — measured at 8 MB and 20 MB for the two events of the 2023
+Kahramanmaraş sequence, and it scales with the event's footprint — so a
+broad window is gigabytes. `max_shakemap_events` (default `100`) caps how many
 events one call will fetch: past the ceiling the rest are skipped with a
 warning naming the count — never silently. Raise it deliberately, or
 narrow the query with `limit=` / `min_magnitude=`.
 
-A re-run reuses rasters already on disk; pass `download(force=True)` to
-refetch them.
+A re-run reuses whatever an earlier run recorded for that event — including
+"this archive carries no such layer" and "this event publishes no ShakeMap" —
+so a repeat costs nothing. Pass `download(force=True)` to refetch anyway.
 
 By default only `mmi_mean` (macroseismic intensity) is written. The
 archive carries fourteen grids — `mmi`, `pga`, `pgv`, `psa0p3`,
