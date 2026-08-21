@@ -64,3 +64,30 @@ def eedai_available() -> bool:
     except ImportError:
         return False
     return True
+
+
+def credentials_for(service_key: str | None):
+    """Adapt earthlens's resolved GEE `service_key` to a pyramids-eo credential.
+
+    earthlens accepts either a path to a service-account JSON key or the
+    key's JSON content inline — the two forms `earthlens.gee.auth` already
+    understands — and pyramids-eo exposes a named constructor for each, plus
+    Application Default Credentials when nothing is supplied.
+
+    Args:
+        service_key: Path to a service-account JSON key, that key's JSON
+            content, or `None` to fall back to Application Default
+            Credentials.
+
+    Returns:
+        The `pyramids_eo.earthengine.EarthEngineCredentials` for this key.
+
+    Raises:
+        ImportError: If `pyramids-eo` (the `[eedai]` extra) is not installed.
+    """
+    credentials = import_earthengine_reader().EarthEngineCredentials
+    if service_key is None:
+        return credentials.application_default()
+    if service_key.lstrip().startswith("{"):
+        return credentials.from_service_account_info(service_key)
+    return credentials.from_service_account(service_key)

@@ -68,6 +68,11 @@ from earthlens.base import (
     date_windows,
     to_datetime,
 )
+from earthlens.gee._eedai import (
+    credentials_for,
+    eedai_available,
+    import_earthengine_reader,
+)
 from earthlens.gee._helpers import (
     EE_MAX_DIMENSION,
     reduce_collection,
@@ -93,6 +98,9 @@ __all__ = ["GEE", "AuthenticationError", "CloudMask", "CollectionFilter"]
 _RESOLUTION_FREQ: dict[str, str] = {"daily": "D", "monthly": "MS", "yearly": "YS"}
 
 _DEFAULT_HTTP_TIMEOUT_S: float = 300.0
+
+#: Accepted `engine` values: which layer materialises the pixels.
+_ENGINES: frozenset[str] = frozenset({"auto", "ee", "eedai"})
 _ZIP_MAGIC: bytes = b"PK\x03\x04"
 
 #: A per-image cloud/quality mask — `ee.Image -> ee.Image` — `.map`-applied
@@ -298,6 +306,19 @@ class GEE(LazyClientMixin, AbstractDataSource):
             right, so pass an *ordered* iterable (a `set` would apply in
             arbitrary order); like `cloud_mask`, meant for image
             collections. Defaults to `None` (no extra filters).
+        engine: Which layer materialises the pixels for `export_via="url"`.
+            `"auto"` (the default) uses the pyramids-eo EEDAI reader when
+            the request is a raw read of a materialised asset — no reducer
+            over a collection, no `cloud_mask`, no `filters` — and the
+            `[eedai]` extra is installed, falling back to Earth Engine's
+            `getDownloadURL` otherwise. `"ee"` always uses `getDownloadURL`
+            (the historical behaviour). `"eedai"` forces the reader and
+            raises if the request is not eligible. The EEDAI path reads
+            pixels straight from the asset, so Earth Engine's 32768-px
+            synchronous cap (and `auto_split`) does not apply; it cannot run
+            server-side compute, which is why composited requests stay on
+            Earth Engine. Ignored for the asynchronous `"drive"` / `"gcs"` /
+            `"asset"` sinks, which are Earth Engine-only.
 
     Credentials are not constructor arguments — the constructor describes
     only what to fetch. Supply them at the authentication step:
@@ -382,6 +403,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         wait_for_export: bool = True,
         cloud_mask: CloudMask | None = None,
         filters: Iterable[CollectionFilter] | None = None,
+        engine: Literal["auto", "ee", "eedai"] = "auto",
     ):
         # Validate the cheap (no-I/O) config first so user typos surface
         # before the ~3.3 s cold-cache catalog parse below.
@@ -405,6 +427,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"got {type(cloud_mask).__name__}"
             )
         collection_filters = _validate_filters(filters)
+        if engine not in _ENGINES:
+            raise ValueError(
+                f"engine must be one of {sorted(_ENGINES)}, got {engine!r}"
+            )
         _validate_pure_config(start, end, temporal_resolution, fmt)
 
         # These must be set before `super().__init__` runs, because the
@@ -438,6 +464,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         #: The validated `filters` as a tuple (empty when none were given),
         #: applied left to right in :meth:`_build_collection`.
         self.filters: tuple[CollectionFilter, ...] = collection_filters
+        #: Which layer materialises the pixels: `"auto"` (the pyramids-eo
+        #: EEDAI reader when the request is eligible and installed, else
+        #: Earth Engine), `"ee"`, or `"eedai"`.
+        self.engine = engine
         self._ee_geometry: Any = None  # lazily built in `_ee_region`
 
         super().__init__(
@@ -938,6 +968,8 @@ class GEE(LazyClientMixin, AbstractDataSource):
         prefix = f"{slug_asset_id(var_info.id)}_{'-'.join(bands)}_{when:%Y%m%d}"
         region = self._ee_region()
         if self.export_via == "url":
+            if self._use_eedai(var_info):
+                return self._export_via_eedai(var_info, bands, float(scale), prefix)
             return self._export_via_url(image, var_info, float(scale), region, prefix)
         return self._export_via_batch(image, float(scale), region, prefix)
 
@@ -973,6 +1005,122 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "auto_split=True."
             )
         return self._download_one_url_tile(image, region, scale, prefix)
+
+    def _eedai_eligible(self, var_info: Dataset) -> bool:
+        """Return whether this request is a raw read the EEDAI reader can serve.
+
+        The pyramids-eo reader materialises pixels from a real asset id; it
+        cannot execute an Earth Engine computation graph. So it can only
+        stand in for `getDownloadURL` when nothing server-side shapes the
+        image: a single materialised asset (not a reduced collection), no
+        per-image `cloud_mask`, and no collection `filters`. The
+        asynchronous sinks are Earth Engine-only.
+
+        Args:
+            var_info: The catalog entry for the dataset being fetched.
+
+        Returns:
+            `True` when the request is a raw, no-compute read.
+        """
+        return (
+            self.export_via == "url"
+            and self.cloud_mask is None
+            and not self.filters
+            and not var_info.is_image_collection
+        )
+
+    def _use_eedai(self, var_info: Dataset) -> bool:
+        """Resolve the configured `engine` against this request's eligibility.
+
+        Args:
+            var_info: The catalog entry for the dataset being fetched.
+
+        Returns:
+            `True` to take the EEDAI fast-path, `False` for `getDownloadURL`.
+
+        Raises:
+            ValueError: If `engine="eedai"` was forced but the request needs
+                server-side compute (a reduced collection, a `cloud_mask`,
+                `filters`, or an asynchronous sink).
+        """
+        if self.engine == "ee":
+            return False
+        eligible = self._eedai_eligible(var_info)
+        if self.engine == "eedai":
+            if not eligible:
+                raise ValueError(
+                    f"engine='eedai' cannot serve {var_info.id}: the EEDAI "
+                    "reader materialises pixels from an asset id and cannot run "
+                    "server-side compute (a reduced collection, cloud_mask, "
+                    "filters, or a drive/gcs/asset sink). Use engine='auto' or "
+                    "engine='ee'."
+                )
+            return True
+        return eligible and eedai_available()
+
+    def _eedai_aoi(self) -> dict[str, Any]:
+        """Return the AOI keyword the pyramids-eo reader should clip to.
+
+        Prefers a polygon cutline when the request carries one the reader
+        accepts (it needs a `total_bounds`-bearing object, e.g. a
+        `GeoDataFrame`), and otherwise falls back to the lat/lon bbox.
+
+        Returns:
+            Either `{"geometry": <polygon>}` or `{"bbox": (min_x, min_y,
+            max_x, max_y)}`, ready to splat into `from_earthengine`.
+        """
+        for candidate in (self.region, getattr(self.space, "geometry", None)):
+            if candidate is not None and hasattr(candidate, "total_bounds"):
+                return {"geometry": candidate}
+        return {
+            "bbox": (
+                self.space.longitude_min,
+                self.space.latitude_min,
+                self.space.longitude_max,
+                self.space.latitude_max,
+            )
+        }
+
+    def _export_via_eedai(
+        self, var_info: Dataset, bands: list[str], scale: float, prefix: str
+    ) -> Path:
+        """Materialise one raw asset through the pyramids-eo EEDAI reader.
+
+        Reads the requested bands straight from the asset via GDAL's `EEDAI`
+        driver into a pyramids `Dataset` — reprojected to `crs` at `scale`,
+        clipped to the AOI — and writes it to `<prefix>.tif`. There is no
+        `getDownloadURL` round-trip, so Earth Engine's 32768-px synchronous
+        cap (and `auto_split`) does not apply.
+
+        Args:
+            var_info: The catalog entry; its `id` is the Earth Engine asset.
+            bands: Band ids to read.
+            scale: Output pixel size in metres.
+            prefix: Output filename stem (no extension).
+
+        Returns:
+            The :class:`pathlib.Path` of the written GeoTIFF.
+
+        Raises:
+            ImportError: If `pyramids-eo` (the `[eedai]` extra) is missing.
+        """
+        reader = import_earthengine_reader()
+        _service_account, service_key, _project = self._resolve_credentials()
+        target = self.root_dir / f"{prefix}.tif"
+        dataset = reader.from_earthengine(
+            var_info.id,
+            bands=list(bands),
+            crs=self.crs,
+            scale=scale,
+            credentials=credentials_for(service_key),
+            **self._eedai_aoi(),
+        )
+        try:
+            dataset.to_file(str(target))
+        finally:
+            close_quietly(dataset)
+        logger.info(f"Wrote {target} (EEDAI)")
+        return target
 
     def _client(self) -> HttpClient:
         """Return this instance's HTTP client, built once.

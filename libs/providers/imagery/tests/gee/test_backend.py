@@ -1318,6 +1318,11 @@ class TestComposite:
 class TestApi:
     """Tests for `GEE._api`."""
 
+    @pytest.fixture(autouse=True)
+    def _force_ee_engine(self, monkeypatch):
+        """Keep these `getDownloadURL` tests on Earth Engine (no `[eedai]`)."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+
     def test_size_guard_rejects_oversized_request(self, make_gee):
         """A bbox×scale exceeding 32768 px per axis raises a clear `ValueError`."""
         gee = make_gee(
@@ -1412,6 +1417,11 @@ class TestApi:
 
 class TestAutoSplit:
     """Tests for `auto_split=True` (H2 — auto-split oversized URL downloads)."""
+
+    @pytest.fixture(autouse=True)
+    def _force_ee_engine(self, monkeypatch):
+        """Keep these `getDownloadURL` tests on Earth Engine (no `[eedai]`)."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
 
     def test_default_keeps_existing_value_error(self, make_gee):
         """`auto_split=False` (the default) preserves the historical guard."""
@@ -1583,6 +1593,11 @@ class TestGeeStreams:
     only site without one, and its fake still exposed `.content`.
     """
 
+    @pytest.fixture(autouse=True)
+    def _force_ee_engine(self, monkeypatch):
+        """Keep these `getDownloadURL` tests on Earth Engine (no `[eedai]`)."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+
     def test_tile_fetch_never_touches_response_content(self, make_gee, monkeypatch):
         """A regression to `response.content` fails this test."""
 
@@ -1620,3 +1635,154 @@ class TestGeeStreams:
         make_gee().download(progress_bar=False)
         assert seen, "the tile URL should have been fetched"
         assert seen[0].get("stream") is True, f"the GET must stream: {seen[0]}"
+
+
+class _FakeEedaiDataset:
+    """Stand-in for the pyramids `Dataset` the EEDAI reader returns."""
+
+    def __init__(self):
+        self.written: str | None = None
+
+    def to_file(self, path):
+        self.written = str(path)
+        Path(path).write_bytes(b"eedai-tif")
+
+
+class _FakeReaderModule:
+    """Stand-in for `pyramids_eo.earthengine`; records `from_earthengine`."""
+
+    def __init__(self):
+        self.calls: list[tuple[str, dict]] = []
+        self.dataset = _FakeEedaiDataset()
+
+    def from_earthengine(self, asset_id, **kwargs):
+        self.calls.append((asset_id, kwargs))
+        return self.dataset
+
+
+@pytest.fixture
+def fake_reader(monkeypatch):
+    """Patch the guarded pyramids-eo loader with an in-memory fake reader."""
+    reader = _FakeReaderModule()
+    monkeypatch.setattr(backend_module, "import_earthengine_reader", lambda: reader)
+    monkeypatch.setattr(backend_module, "credentials_for", lambda key: ("creds", key))
+    monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+    return reader
+
+
+class TestEngineOption:
+    """Tests for the `engine` constructor option."""
+
+    def test_defaults_to_auto(self, make_gee):
+        """`engine` defaults to `"auto"`."""
+        assert make_gee().engine == "auto"
+
+    @pytest.mark.parametrize("engine", ["auto", "ee", "eedai"])
+    def test_accepts_known_engines(self, make_gee, engine):
+        """Each supported engine name is captured verbatim."""
+        assert make_gee(engine=engine).engine == engine
+
+    def test_unknown_engine_rejected(self, make_gee):
+        """An unknown engine raises `ValueError` at construction."""
+        with pytest.raises(ValueError, match="engine must be one of"):
+            make_gee(engine="gdal")
+
+
+class TestEedaiEligibility:
+    """Tests for `_eedai_eligible` / `_use_eedai`."""
+
+    def test_static_image_without_hooks_is_eligible(self, make_gee):
+        """A raw single-asset read with no server-side compute is eligible."""
+        gee = make_gee()
+        assert gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
+
+    def test_image_collection_is_not_eligible(self, make_gee):
+        """A reduced collection needs server-side compute, so it is not."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]}, scale=5566.0
+        )
+        assert not gee._eedai_eligible(gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY"))
+
+    @pytest.mark.parametrize(
+        "hooks",
+        [{"cloud_mask": _identity_mask}, {"filters": [lambda c: c]}],
+    )
+    def test_server_side_hooks_make_it_ineligible(self, make_gee, hooks):
+        """A `cloud_mask` or `filters` keeps the request on Earth Engine."""
+        gee = make_gee(**hooks)
+        assert not gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
+
+    def test_batch_sink_is_not_eligible(self, make_gee):
+        """The asynchronous sinks are Earth Engine-only."""
+        gee = make_gee(export_via="drive", drive_folder="out")
+        assert not gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
+
+    def test_engine_ee_never_uses_eedai(self, make_gee, fake_reader):
+        """`engine="ee"` stays on `getDownloadURL` even when eligible."""
+        gee = make_gee(engine="ee")
+        assert gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003")) is False
+
+    def test_engine_auto_uses_eedai_when_available(self, make_gee, fake_reader):
+        """`engine="auto"` takes the fast-path when eligible and installed."""
+        gee = make_gee()
+        assert gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003")) is True
+
+    def test_engine_auto_falls_back_when_not_installed(self, make_gee, monkeypatch):
+        """Without the extra, `engine="auto"` falls back to Earth Engine."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+        gee = make_gee()
+        assert gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003")) is False
+
+    def test_engine_eedai_rejects_ineligible_request(self, make_gee, fake_reader):
+        """Forcing the reader on a composited request raises `ValueError`."""
+        gee = make_gee(
+            engine="eedai",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+        )
+        with pytest.raises(ValueError, match="engine='eedai' cannot serve"):
+            gee._use_eedai(gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY"))
+
+
+class TestExportViaEedai:
+    """Tests for `_export_via_eedai` and the `_api` routing."""
+
+    def test_writes_the_tif_through_the_reader(self, make_gee, fake_reader):
+        """The reader's dataset is written to `<prefix>.tif`."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        assert target.name == "srtm_elev.tif"
+        assert target.exists()
+        assert fake_reader.dataset.written == str(target)
+
+    def test_forwards_asset_bands_crs_scale_and_bbox(self, make_gee, fake_reader):
+        """Asset id, bands, crs, scale, credentials and the bbox AOI are passed."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev")
+        asset_id, kwargs = fake_reader.calls[0]
+        assert asset_id == "USGS/SRTMGL1_003"
+        assert kwargs["bands"] == ["elevation"]
+        assert kwargs["crs"] == "EPSG:4326" and kwargs["scale"] == 90.0
+        assert kwargs["bbox"] == (31.2, 29.9, 31.3, 30.0)
+        assert "geometry" not in kwargs
+
+    def test_api_routes_eligible_requests_to_eedai(self, make_gee, fake_reader):
+        """`_api` takes the EEDAI path instead of `getDownloadURL`."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        image = _FakeImage()
+        out = gee._api(image, var_info, ["elevation"], dt.datetime(2000, 2, 11))
+        assert out.suffix == ".tif"
+        assert fake_reader.calls, "the EEDAI reader was not used"
+        assert image.download_params is None, "getDownloadURL should not be called"
+
+    def test_api_uses_getdownloadurl_when_engine_is_ee(self, make_gee, fake_reader):
+        """`engine="ee"` keeps the historical `getDownloadURL` path."""
+        gee = make_gee(engine="ee")
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        image = _FakeImage()
+        gee._api(image, var_info, ["elevation"], dt.datetime(2000, 2, 11))
+        assert not fake_reader.calls
+        assert image.download_params is not None

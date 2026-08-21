@@ -795,7 +795,7 @@ class EarthLens:
                 explicitly (e.g. ECMWF's `skip_constraints`, or GEE's
                 `scale` / `crs` / `reducer` / `export_via` /
                 `drive_folder` / `gcs_bucket` / `region` / `cloud_mask` /
-                `filters`). Credentials are
+                `filters` / `engine`). Credentials are
                 not constructor kwargs: backends that defer auth take them
                 on `authenticate()` instead (e.g. GEE's `service_account`
                 / `service_key` / `project`), so forwarding those through
