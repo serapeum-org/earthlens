@@ -464,10 +464,12 @@ _TEMPORAL_AGGREGATE_TOKENS = (
 def _denotes_temporal_aggregate(value: Any) -> bool:
     """Whether a `time_aggregation` / `temporal_resolution` value marks an aggregate.
 
-    Returns `True` for a daily-or-coarser statistic (`"daily"`, `"1_month_mean"`,
+    Returns `True` for a daily-or-coarser mean (`"daily"`, `"1_month_mean"`,
     `"monthly_mean"`, ...) and `False` for a raw / sub-daily / instantaneous value
-    (`"instantaneous"`, `"1_hour"`, ...) or an empty one. Accepts a scalar or a
-    list (CDS spells these both ways).
+    (`"instantaneous"`, `"1_hour"`, `"sub-daily"`, ...) or an empty one. Accepts a
+    scalar or a list (CDS spells these both ways). Cadence-only values (`"daily"`,
+    `"monthly"`) are assumed to name a mean — sum tokens are deliberately excluded,
+    since the flag routes `op="auto"` to `"mean"` (see `is_pre_aggregated`).
 
     Args:
         value: The `time_aggregation` / `temporal_resolution` extra, or `None`.
@@ -647,6 +649,17 @@ class Variable(FluxableLeaf):
         (or the dataset id), not the `product_type` field, which stays
         `[reanalysis]` on these rows — hence the extra checks below.
 
+        Every flagged family is treated as a temporal **mean**, mirroring the
+        established `reanalysis-era5-*-monthly-means` convention: the flagged
+        flux families are all mean products — `ecv-for-climate-change`
+        (`1_month_mean`), `-cordex-` (`monthly_mean`), CMIP5 monthly
+        (`mean-*-flux` variables) and CARRA / pan-CARRA (the `*-means` datasets).
+        A family whose samples were pre-aggregated as a *total* (accumulation)
+        would need `sum`, not `mean`, and so must not be flagged here; none
+        exists in the shipped catalog. The extra-based branch additionally flags
+        many non-flux (`state`) satellite / in-situ / CMIP6 rows, where the flag
+        is a functional no-op (`_resolve_op` maps `state` to `mean` regardless).
+
         `earthlens.aggregate._resolve_op` reads this so `op="auto"` reduces such
         variables with `"mean"` rather than `"sum"` — a plain `sum` over samples
         that are themselves daily/monthly aggregates multiplies by the number of
@@ -716,8 +729,11 @@ class Variable(FluxableLeaf):
             return True
         if _denotes_temporal_aggregate(self.extras.get("temporal_resolution")):
             return True
-        # Monthly-projection datasets (CMIP5) carry no in-row aggregation marker;
-        # their only signal is the `-monthly` dataset id.
+        # CMIP5 monthly projections carry no in-row aggregation marker, so fall
+        # back to the `-monthly` dataset-id suffix. Validated against the shipped
+        # catalog: every `-monthly` id is a genuine monthly aggregate (no raw /
+        # sub-monthly dataset id contains `-monthly`); a future id that did would
+        # need an explicit `time_aggregation` / `temporal_resolution` marker.
         return "-monthly" in self.cds_dataset
 
 
