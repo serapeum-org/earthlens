@@ -356,6 +356,13 @@ class FDSN(AbstractDataSource):
         # Validated inline rather than through `check_limit`, which is typed
         # for an optional cap: this one is always an int, and keeping it that
         # way lets the ceiling comparison stay a plain `>`.
+        if not isinstance(max_shakemap_events, int) or isinstance(
+            max_shakemap_events, bool
+        ):
+            raise TypeError(
+                "max_shakemap_events must be an integer, got "
+                f"{type(max_shakemap_events).__name__}."
+            )
         if max_shakemap_events <= 0:
             raise ValueError(
                 "max_shakemap_events must be a positive integer, got "
@@ -810,7 +817,19 @@ class FDSN(AbstractDataSource):
                     )
                 continue
             event_ids.extend(str(value) for value in collection["event_id"])
+        # Two networks can report the same ComCat event, and a catalog can
+        # repeat one; de-duplicated so the ceiling counts each event once.
+        event_ids = list(dict.fromkeys(event_ids))
 
+        if not event_ids:
+            return []
+
+        # Drop what can never succeed before anything is counted. An id that
+        # yields no ComCat id, or one whose directory fails the containment
+        # assertion, is not work waiting to be done — left in, it would sit at
+        # the head of the queue spending budget on every run and starve the
+        # events behind it.
+        event_ids = [event_id for event_id in event_ids if self._is_fetchable(event_id)]
         if not event_ids:
             return []
 
@@ -831,9 +850,10 @@ class FDSN(AbstractDataSource):
             )
             event_ids = [event_id for event_id in event_ids if event_id not in deferred]
 
+        fetching = sum(1 for event_id in event_ids if not self._is_cached(event_id))
         logger.info(
-            f"Fetching ShakeMap {list(self._shakemap_layers)} for "
-            f"{len(event_ids)} USGS event(s)"
+            f"ShakeMap {list(self._shakemap_layers)}: {fetching} event(s) to fetch, "
+            f"{len(event_ids) - fetching} already on disk"
         )
         # A per-archive bar is useful for a single fetch and unreadable for
         # fifty, so a batch reports through the log line above instead.
@@ -941,22 +961,74 @@ class FDSN(AbstractDataSource):
         previously = set(manifest.get("requested", []))
         if not set(self._shakemap_layers).issubset(previously):
             return None
-        produced = [
-            layer
-            for layer in self._shakemap_layers
-            if layer in manifest.get("produced", [])
-        ]
-        if not produced:
-            # A negative result, which ages out: the grid may simply not have
-            # been published yet when the event was first seen.
-            age = time.time() - float(manifest.get("checked", 0.0))
-            if age > _NEGATIVE_CACHE_SECONDS:
-                return None
-            return []
+        recorded = set(manifest.get("produced", []))
+        produced = [layer for layer in self._shakemap_layers if layer in recorded]
+        missing = [layer for layer in self._shakemap_layers if layer not in recorded]
+        if missing and self._record_is_stale(manifest):
+            # Any requested layer the last run did not produce is a negative
+            # result, and negative results age out — whether or not some *other*
+            # requested layer happens to be on disk. Checking this only when the
+            # intersection was empty meant a partially-published event cached its
+            # missing grids permanently, which is exactly the case the manifest
+            # was introduced for.
+            return None
         cached = [dest_dir / f"{layer}.tif" for layer in produced]
         if not all(self._is_complete(path) for path in cached):
             return None
+        if missing:
+            logger.warning(
+                f"ShakeMap layer(s) {missing} are not available for this event and "
+                f"were last checked recently; returning {len(cached)} of "
+                f"{len(self._shakemap_layers)} requested. Pass force=True to "
+                "re-check now."
+            )
         return cached
+
+    @staticmethod
+    def _record_is_stale(manifest: dict[str, object]) -> bool:
+        """Report whether a manifest's negative half should be re-checked.
+
+        Args:
+            manifest: The parsed manifest.
+
+        Returns:
+            bool: `True` when the record is older than the negative-cache
+                window, or carries a timestamp that cannot be trusted — a
+                future one, or a non-finite one. An unusable clock reading
+                fails towards refetching rather than towards caching an
+                answer forever.
+        """
+        stamp = manifest.get("checked", 0.0)
+        if not isinstance(stamp, (int, float)) or isinstance(stamp, bool):
+            return True
+        age = time.time() - float(stamp)
+        # Written as a range test so a negative age (a future stamp) and a NaN
+        # age (every comparison False) both come out stale.
+        return not (0.0 <= age <= _NEGATIVE_CACHE_SECONDS)
+
+    def _is_fetchable(self, event_id: str) -> bool:
+        """Report whether an event could ever yield a ShakeMap.
+
+        Separated from :meth:`_is_cached` because the two answer different
+        questions: this one asks whether the event is *addressable* at all,
+        and an event that is not can never become cached, so counting it as
+        pending work would let it block the queue indefinitely.
+
+        Args:
+            event_id: The event's `event_id` column value.
+
+        Returns:
+            bool: `False` when no ComCat id can be parsed, or the resolved
+                directory would escape the ShakeMap root.
+        """
+        comcat_id = _helpers.parse_comcat_id(event_id)
+        if comcat_id is None:
+            logger.warning(
+                f"cannot resolve a ComCat id from event_id {event_id!r} — "
+                "skipping its ShakeMap."
+            )
+            return False
+        return self._event_dir(comcat_id) is not None
 
     def _is_cached(self, event_id: str) -> bool:
         """Report whether an event needs no work this run.
@@ -1105,8 +1177,21 @@ class FDSN(AbstractDataSource):
             # An event whose archive was unusable leaves no rasters, and an
             # empty directory named after it reads like a successful fetch.
             with suppress(OSError):
-                if dest_dir.is_dir() and not any(dest_dir.iterdir()):
-                    dest_dir.rmdir()
+                if dest_dir.is_dir():
+                    remaining = list(dest_dir.iterdir())
+                    if not remaining:
+                        dest_dir.rmdir()
+                    elif all(
+                        item.name.startswith(_STAGING_PREFIX) for item in remaining
+                    ):
+                        # Another process's scratch space, or one left by a run
+                        # that died. Not ours to delete, but silence would let it
+                        # accumulate unnoticed and keep this directory alive.
+                        logger.warning(
+                            f"{dest_dir} holds only orphaned scratch "
+                            f"director(ies) {[item.name for item in remaining]} "
+                            "from an interrupted run; remove them by hand."
+                        )
         return written
 
     def _write(self, provider_key: str, collection: FeatureCollection) -> Path:
