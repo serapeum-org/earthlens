@@ -1642,19 +1642,24 @@ class GEE(LazyClientMixin, AbstractDataSource):
         out_rows, out_cols = self._eedai_grid(bbox, float(self.scale or native_scale))
         rows = max(native_rows, out_rows)
         cols = max(native_cols, out_cols)
+        binding = (
+            "native"
+            if (rows, cols) == (native_rows, native_cols)
+            else f"{self.scale or native_scale} m output"
+        )
         if max(rows, cols) > EE_MAX_DIMENSION:
             return False, (
-                f"the AOI is about {cols}x{rows} px at {var_info.id}'s native "
-                f"{native_scale} m resolution, over the {EE_MAX_DIMENSION}-px "
-                "per-axis budget the reader would hold in memory"
+                f"the AOI is about {cols}x{rows} px on {var_info.id}'s {binding} "
+                f"grid, over the {EE_MAX_DIMENSION}-px per-axis budget the reader "
+                "would hold in memory"
             )
-        total_px = rows * cols * max(band_count, 1)
+        bands_held = max(band_count, 1)
+        total_px = rows * cols * bands_held
         if total_px > _EEDAI_MAX_PIXELS:
             return False, (
-                f"the AOI is about {cols * rows:,} px across {band_count} band(s) "
-                f"= {total_px:,} px at {var_info.id}'s native {native_scale} m "
-                f"resolution, over the {_EEDAI_MAX_PIXELS:,}-px budget the reader "
-                "would hold in memory"
+                f"the AOI is about {cols * rows:,} px across {bands_held} band(s) "
+                f"= {total_px:,} px on {var_info.id}'s {binding} grid, over the "
+                f"{_EEDAI_MAX_PIXELS:,}-px budget the reader would hold in memory"
             )
         return True, ""
 
