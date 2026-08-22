@@ -395,6 +395,14 @@ class TestEmptyHint:
         b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
         assert b._empty_hint() == ""
 
+    def test_rows_without_a_country_filter_are_not_blamed_on_a_country(
+        self, monkeypatch, tmp_path
+    ):
+        """Served rows that vanish with no country filter are reported as shaping."""
+        b = _build(monkeypatch, variables=["inform:risk"], path=tmp_path)
+        b._upstream_rows = 5
+        assert "did not survive shaping" in b._empty_hint()
+
     def test_silent_for_other_providers(self, monkeypatch, tmp_path):
         """A non-INFORM dataset gets no INFORM-specific hint."""
         b = _build(

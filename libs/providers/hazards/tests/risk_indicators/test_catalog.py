@@ -87,6 +87,11 @@ class TestGet:
         assert row.workflow_id == 503
         assert row.indicator_id == indicator_id
 
+    def test_get_catalog_returns_the_dataset_map(self):
+        """The abstract get_catalog() contract hands back the same datasets map."""
+        catalog = Catalog()
+        assert catalog.get_catalog() is catalog.datasets
+
     def test_climate_risk_pins_the_served_scenario(self):
         """The climate row reads the one Climate Change workflow that holds scores."""
         row = Catalog().get("inform:climate_risk")
