@@ -650,6 +650,62 @@ class Variable(FluxableLeaf):
         variables with `"mean"` rather than `"sum"` — a plain `sum` over samples
         that are themselves daily/monthly aggregates multiplies by the number of
         samples per window (e.g. ~30× for monthly windows over daily statistics).
+
+        Returns:
+            `True` when each sample is a server-side temporal aggregate — so
+            `op="auto"` should average rather than sum — and `False` otherwise.
+
+        Examples:
+            - An ERA5 monthly-means flux variable is pre-aggregated (its product
+              type is `monthly_averaged_*`):
+
+                ```python
+                >>> from earthlens.ecmwf.catalog import Variable
+                >>> monthly = Variable(
+                ...     cds_dataset="reanalysis-era5-single-levels-monthly-means",
+                ...     cds_variable="total_precipitation",
+                ...     nc_variable="tp",
+                ...     units="m",
+                ...     product_type=["monthly_averaged_reanalysis"],
+                ...     types="flux",
+                ... )
+                >>> monthly.is_pre_aggregated
+                True
+
+                ```
+            - A CARRA-means variable is flagged via its `time_aggregation` extra,
+              even though its product type is not `monthly_averaged_*`:
+
+                ```python
+                >>> from earthlens.ecmwf.catalog import Variable
+                >>> carra = Variable(
+                ...     cds_dataset="reanalysis-carra-means",
+                ...     cds_variable="10m_wind_gust",
+                ...     nc_variable="fg10",
+                ...     units="m s**-1",
+                ...     types="flux",
+                ...     extras={"time_aggregation": "daily"},
+                ... )
+                >>> carra.is_pre_aggregated
+                True
+
+                ```
+            - A raw hourly ERA5 flux variable is not, so `op="auto"` still sums it:
+
+                ```python
+                >>> from earthlens.ecmwf.catalog import Variable
+                >>> raw = Variable(
+                ...     cds_dataset="reanalysis-era5-single-levels",
+                ...     cds_variable="total_precipitation",
+                ...     nc_variable="tp",
+                ...     units="m",
+                ...     product_type=["reanalysis"],
+                ...     types="flux",
+                ... )
+                >>> raw.is_pre_aggregated
+                False
+
+                ```
         """
         if self.extras.get("daily_statistic"):
             return True

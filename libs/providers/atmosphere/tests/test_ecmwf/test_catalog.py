@@ -11,6 +11,10 @@ from __future__ import annotations
 import pytest
 
 from earthlens.ecmwf import Catalog, Variable
+from earthlens.ecmwf.catalog import (
+    _TEMPORAL_AGGREGATE_TOKENS,
+    _denotes_temporal_aggregate,
+)
 
 pytestmark = [pytest.mark.unit]
 
@@ -1039,3 +1043,174 @@ class TestCatalogHealth:
         unused = Catalog().health()["unused_provider"]
         assert isinstance(unused, list)
         assert unused == sorted(unused), "unused providers are reported sorted"
+
+
+class TestDenotesTemporalAggregate:
+    """Tests for the `_denotes_temporal_aggregate` catalog helper (#1097)."""
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "1_month_mean",
+            "monthly_mean",
+            "monthly",
+            "daily",
+            "1_day_mean",
+            "seasonal",
+            "annual",
+            "yearly",
+            "dekadal",
+            "pentad",
+            "weekly",
+            "climatology",
+            "time-average",
+            "running_sum",
+        ],
+    )
+    def test_daily_or_coarser_values_are_aggregates(self, value):
+        """Daily-or-coarser mean / statistic strings are detected as aggregates.
+
+        Args:
+            value: A `time_aggregation` / `temporal_resolution` string naming a
+                daily-or-coarser temporal reduction.
+
+        Test scenario:
+            Real-world CDS values that reduce over a day or longer window
+            (`1_month_mean`, `daily`, `seasonal`, ...) return True.
+        """
+        assert _denotes_temporal_aggregate(value) is True, (
+            f"{value!r} should count as a temporal aggregate"
+        )
+
+    @pytest.mark.parametrize("token", _TEMPORAL_AGGREGATE_TOKENS)
+    def test_every_declared_token_triggers_detection(self, token):
+        """Each token in the module list independently marks a value as an aggregate.
+
+        Args:
+            token: One entry of `_TEMPORAL_AGGREGATE_TOKENS`.
+
+        Test scenario:
+            The helper's positive signal is exactly membership of the declared
+            token list, so every token alone must resolve to True.
+        """
+        assert _denotes_temporal_aggregate(token) is True, (
+            f"declared token {token!r} should be detected"
+        )
+
+    @pytest.mark.parametrize("value", [None, "", [], (), 0, False])
+    def test_empty_values_are_not_aggregates(self, value):
+        """Falsy / empty inputs short-circuit to False.
+
+        Args:
+            value: An empty or falsy `time_aggregation` value.
+
+        Test scenario:
+            A missing extra (`None`), an empty string, and empty containers all
+            return False without inspecting tokens.
+        """
+        assert _denotes_temporal_aggregate(value) is False, (
+            f"empty value {value!r} should not be an aggregate"
+        )
+
+    @pytest.mark.parametrize(
+        "value",
+        ["instantaneous", "instant", "1_hour", "hourly", "6_hourly", "3-hourly"],
+    )
+    def test_sub_daily_and_instantaneous_values_are_not_aggregates(self, value):
+        """Instantaneous / sub-daily (hourly) values are treated as raw.
+
+        Args:
+            value: A raw sub-daily or instantaneous string.
+
+        Test scenario:
+            Values carrying `instant` or `hour` are raw samples that `op="auto"`
+            should still sum, so the helper returns False.
+        """
+        assert _denotes_temporal_aggregate(value) is False, (
+            f"sub-daily/instant value {value!r} should not be an aggregate"
+        )
+
+    @pytest.mark.parametrize(
+        "value",
+        ["hourly_mean", "6_hourly_mean", "instantaneous_mean"],
+    )
+    def test_sub_daily_veto_wins_over_an_aggregate_token(self, value):
+        """The hour / instant veto takes precedence even when a mean token co-occurs.
+
+        Args:
+            value: A value carrying both a sub-daily marker and a mean token.
+
+        Test scenario:
+            A sub-daily mean is still sub-daily; the helper returns False despite
+            the `mean` token being present, so `op="auto"` sums it.
+        """
+        assert _denotes_temporal_aggregate(value) is False, (
+            f"{value!r} is sub-daily; the hour/instant veto must win"
+        )
+
+    @pytest.mark.parametrize("value", ["raw", "forecast", "analysis", "reanalysis"])
+    def test_values_without_a_token_are_not_aggregates(self, value):
+        """Strings carrying none of the tokens are not aggregates.
+
+        Args:
+            value: A string with no temporal-aggregate token.
+
+        Test scenario:
+            Provider / product words that do not name a temporal reduction return
+            False.
+        """
+        assert _denotes_temporal_aggregate(value) is False, (
+            f"{value!r} carries no aggregate token"
+        )
+
+    @pytest.mark.parametrize(
+        "value, expected",
+        [
+            (["monthly_mean"], True),
+            (["daily"], True),
+            (("1_month_mean",), True),
+            (["1", "daily"], True),
+            (["instantaneous"], False),
+            (["1_hour"], False),
+            (["raw"], False),
+        ],
+    )
+    def test_accepts_list_and_tuple_values(self, value, expected):
+        """CDS spells `time_aggregation` as a scalar or a list; both are handled.
+
+        Args:
+            value: A list / tuple form of the extra.
+            expected: Whether it denotes an aggregate.
+
+        Test scenario:
+            List and tuple members are joined and matched as one lowercased text,
+            so a token anywhere in the sequence is detected and the veto still
+            applies.
+        """
+        assert _denotes_temporal_aggregate(value) is expected, (
+            f"{value!r} should resolve to {expected}"
+        )
+
+    def test_detection_is_case_insensitive(self):
+        """Values are lower-cased before matching, so casing does not matter.
+
+        Test scenario:
+            Upper- and mixed-case aggregate strings still flag, and an upper-case
+            sub-daily value is still vetoed.
+        """
+        assert _denotes_temporal_aggregate("MONTHLY_MEAN") is True, "upper aggregate"
+        assert _denotes_temporal_aggregate("Daily") is True, "mixed-case aggregate"
+        assert _denotes_temporal_aggregate("1_HOUR") is False, "upper sub-daily vetoed"
+
+    def test_tokens_constant_is_lowercase_tuple(self):
+        """`_TEMPORAL_AGGREGATE_TOKENS` is a non-empty tuple of lowercase tokens.
+
+        Test scenario:
+            The matcher lowercases the text, so every declared token must be
+            lowercase for the membership test to work.
+        """
+        assert isinstance(_TEMPORAL_AGGREGATE_TOKENS, tuple), "tokens are a tuple"
+        assert _TEMPORAL_AGGREGATE_TOKENS, "tokens list is non-empty"
+        assert all(t == t.lower() for t in _TEMPORAL_AGGREGATE_TOKENS), (
+            "every token is lowercase so matching against lowercased text works"
+        )
