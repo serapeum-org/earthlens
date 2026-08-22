@@ -1138,7 +1138,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # An empty request is not one band: upstream opens every band the
             # asset has, so budget for that rather than under-counting.
             use_reader, plan = self._use_eedai(
-                var_info, len(bands) or len(var_info.bands)
+                var_info, max(len(bands) or len(var_info.bands), 1)
             )
             if use_reader:
                 assert plan is not None  # a yes always carries its plan
