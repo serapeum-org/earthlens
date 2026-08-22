@@ -382,7 +382,9 @@ class TestCatalog:
             "total-precipitation"
         ]
         # All three are flux; only the pre-aggregated two must flag.
-        assert daily_tp.is_flux and monthly_tp.is_flux and raw_tp.is_flux
+        assert daily_tp.is_flux, "daily-statistics tp should be flux"
+        assert monthly_tp.is_flux, "monthly-means tp should be flux"
+        assert raw_tp.is_flux, "raw ERA5 tp should be flux"
         assert daily_tp.is_pre_aggregated is True, "daily-statistics flux var"
         assert monthly_tp.is_pre_aggregated is True, "monthly-means flux var"
         assert raw_tp.is_pre_aggregated is False, "raw hourly ERA5 flux var"
