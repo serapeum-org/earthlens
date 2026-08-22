@@ -126,8 +126,13 @@ class Dataset(BaseModel):
         citation: The source's citation string, logged once on use.
         hazard: ThinkHazard hazard mnemonic (`"FL"`, `"EQ"`, …); `None` for the
             `thinkhazard:all` row that returns every hazard.
-        workflow_id: INFORM model WorkflowId (e.g. `505` for INFORM Risk 2026).
+        workflow_id: INFORM model WorkflowId (e.g. `503` for INFORM Risk Mid
+            2025).
         indicator_id: INFORM indicator id (`"INFORM"`, `"HA"`, `"VU"`, `"CC"`).
+        release_column: Column holding this indicator's score in the INFORM
+            Risk release workbook (`"INFORM RISK"`, `"VULNERABILITY"`, …).
+            Set on the rows the published spreadsheet covers; a row without
+            it can only be read from the API.
         gfw_dataset: GFW Data API dataset id (`"gadm__tcl__iso_change"`).
         gfw_version: GFW dataset version (`"v20260424"`).
         sql_template: GFW SQL template parameterised by `{iso}`.
@@ -165,6 +170,7 @@ class Dataset(BaseModel):
     # INFORM
     workflow_id: int | None = None
     indicator_id: str | None = None
+    release_column: str | None = None
     # GFW
     gfw_dataset: str | None = None
     gfw_version: str | None = None

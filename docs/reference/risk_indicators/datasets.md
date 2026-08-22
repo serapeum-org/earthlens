@@ -37,8 +37,12 @@ Natural-hazard screening across 11 hazards. Returns one row per hazard with
 ## INFORM Risk (public, tabular)
 
 The composite index and its three dimensions, plus the climate variant. Returns
-`iso3`, `indicator_id`, `indicator_score`, `validity_year`. `country=` filters
-to one country; omit it for every country.
+`iso3`, `indicator_id`, `indicator_score`, `validity_year`, `workflow_id` and
+`source`. The four Risk datasets read JRC's published release workbook by default
+(the current release) and the Scores API when asked — see
+[which release you get](usage.md#which-release-you-get) — and every row records
+which channel served it. `country=` filters to one country; omit it for every
+country.
 
 | dataset id | output kind | description |
 |---|---|---|
@@ -46,7 +50,15 @@ to one country; omit it for every country.
 | `inform:hazard_exposure` | tabular | Hazard & Exposure dimension |
 | `inform:vulnerability` | tabular | Vulnerability dimension |
 | `inform:coping_capacity` | tabular | Lack of Coping Capacity dimension |
-| `inform:climate_risk` | tabular | INFORM Climate Change Risk (SSP5 2050) |
+| `inform:climate_risk` | tabular | INFORM Climate Change Risk 2050 (RCP4.5-SSP1) |
+
+`inform:climate_risk` reads INFORM's separate Climate Change model, not the Risk release the
+other four rows come from. INFORM publishes two pathways — "optimistic" (RCP4.5-SSP1) and
+"pessimistic" (RCP8.5-SSP3), at 2050 and 2080 — but its API serves scores for only the
+optimistic 2050 run, so that is the one this dataset returns. The pessimistic runs are
+available from the [Climate Change results
+page](https://drmkc.jrc.ec.europa.eu/inform-index/INFORM-Climate-Change/Results-and-data)
+as a spreadsheet.
 
 ## Global Forest Watch (needs `GFW_API_KEY`)
 
