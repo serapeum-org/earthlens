@@ -3126,6 +3126,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="ShakeMap rasters (USGS only)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#re-running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Re-running
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -23599,6 +23616,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="ShakeMap rasters (USGS only)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#re-running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Re-running
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -23843,9 +23877,25 @@ broad window is gigabytes. <code>max_shakemap_events</code> (default <code>100</
 events one call will fetch: past the ceiling the rest are skipped with a
 warning naming the count — never silently. Raise it deliberately, or
 narrow the query with <code>limit=</code> / <code>min_magnitude=</code>.</p>
-<p>A re-run reuses whatever an earlier run recorded for that event — including
-"this archive carries no such layer" and "this event publishes no ShakeMap" —
-so a repeat costs nothing. Pass <code>download(force=True)</code> to refetch anyway.</p>
+<h3 id="re-running"><a class="toclink" href="#re-running">Re-running</a><a class="headerlink" href="#re-running" title="Permanent link">#</a></h3>
+<p>Each event directory carries a hidden <code>.shakemap.json</code> manifest recording which
+layers that event's archive actually produced. A re-run consults it, so a repeat
+costs nothing — including for an event whose archive simply does not carry a
+layer you asked for, which would otherwise be refetched forever.</p>
+<p>Three consequences worth knowing:</p>
+<ul>
+<li><strong>Reuse requires the earlier run to have asked for at least what you now ask
+  for.</strong> Widening <code>shakemap_layers</code> refetches; narrowing it does not, and does
+  not discard what is already on disk.</li>
+<li><strong>"This event published no ShakeMap" is remembered only for a week.</strong> ShakeMap
+  is generated minutes to hours after an event, so a query over a recent window
+  is re-checked on a later run rather than cached as empty forever. Such an
+  event leaves a directory containing only the hidden manifest.</li>
+<li><strong>A revised grid is not detected.</strong> USGS republishes ShakeMaps for years (the
+  2023 Kahramanmaraş grid is on its twelfth version). A run with the rasters
+  already on disk does not re-check; pass <code>download(force=True)</code> to refetch.</li>
+</ul>
+<p>To clear one event's cache, delete its directory under <code>out/shakemap/</code>.</p>
 <p>By default only <code>mmi_mean</code> (macroseismic intensity) is written. The
 archive carries fourteen grids — <code>mmi</code>, <code>pga</code>, <code>pgv</code>, <code>psa0p3</code>,
 <code>psa0p6</code>, <code>psa1p0</code>, <code>psa3p0</code>, each as <code>_mean</code> and <code>_std</code> — and any
