@@ -134,7 +134,13 @@ THINKHAZARD_COLUMNS: list[str] = [
 ]
 
 #: Canonical column order for an INFORM country-score table.
-INFORM_COLUMNS: list[str] = ["iso3", "indicator_id", "indicator_score", "validity_year"]
+INFORM_COLUMNS: list[str] = [
+    "iso3",
+    "indicator_id",
+    "indicator_score",
+    "validity_year",
+    "workflow_id",
+]
 
 #: ThinkHazard hazard-level title -> mnemonic. The all-hazards list returns the
 #: mnemonic (`"HIG"`) while the single-hazard report returns the title word
@@ -372,13 +378,22 @@ def thinkhazard_to_frame(
     return frame.reindex(columns=THINKHAZARD_COLUMNS)
 
 
-def inform_to_frame(payload: list, *, country: str | None = None) -> pd.DataFrame:
+def inform_to_frame(
+    payload: list, *, country: str | None = None, workflow_id: int | None = None
+) -> pd.DataFrame:
     """Reshape INFORM country scores into the canonical score table.
+
+    INFORM leaves `ValidityYear` at `0` on every row, so the payload itself does
+    not say which model release produced it. `workflow_id` is stamped into each
+    row to close that gap: a written table is then attributable to one release
+    rather than being indistinguishable from a pull of any other.
 
     Args:
         payload: The score rows from :func:`inform_query`.
         country: Optional ISO3 to filter to a single country (case-insensitive);
             `None` keeps every country.
+        workflow_id: The WorkflowId the payload was fetched with, recorded in
+            the `workflow_id` column; `None` leaves the column empty.
 
     Returns:
         pd.DataFrame: Columns :data:`INFORM_COLUMNS` — one row per country (or
@@ -390,6 +405,7 @@ def inform_to_frame(payload: list, *, country: str | None = None) -> pd.DataFram
             "indicator_id": row.get("IndicatorId"),
             "indicator_score": row.get("IndicatorScore"),
             "validity_year": row.get("ValidityYear"),
+            "workflow_id": workflow_id,
         }
         for row in (payload or [])
     ]

@@ -83,11 +83,12 @@ def test_inform_live(tmp_path: Path) -> None:
     ).download()
     assert len(df) == 1 and df.iloc[0]["iso3"] == "KEN"
     assert 0.0 <= float(df.iloc[0]["indicator_score"]) <= 10.0
+    assert int(df.iloc[0]["workflow_id"]) == 503
 
 
 @_inform_skip
 def test_inform_climate_risk_live(tmp_path: Path) -> None:
-    """A live INFORM climate-change pull for Kenya returns a numeric 2050 score."""
+    """A live INFORM climate-change pull for Kenya returns the 2050 projection."""
     df = EarthLens(
         data_source="inform",
         variables=["inform:climate_risk"],
@@ -96,6 +97,9 @@ def test_inform_climate_risk_live(tmp_path: Path) -> None:
     ).download()
     assert len(df) == 1 and df.iloc[0]["iso3"] == "KEN"
     assert 0.0 <= float(df.iloc[0]["indicator_score"]) <= 10.0
+    # The climate projection is a separate, static 2022-era model, so the row
+    # must come from workflow 451 - not from whichever Risk workflow is pinned.
+    assert int(df.iloc[0]["workflow_id"]) == 451
 
 
 @_gfw_skip

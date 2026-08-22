@@ -216,6 +216,26 @@ class TestRouting:
         ).download()
         assert fake_http.calls[0]["params"]["WorkflowId"] == 503
 
+    def test_inform_frame_records_the_workflow(self, fake_http, monkeypatch, tmp_path):
+        """The returned rows carry the workflow they were fetched with."""
+        df = _build(
+            monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
+        ).download()
+        assert df.iloc[0]["workflow_id"] == 503
+
+    def test_inform_frame_records_an_overridden_workflow(
+        self, fake_http, monkeypatch, tmp_path
+    ):
+        """An overridden workflow is the one stamped into the rows."""
+        df = _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            workflow_id=493,
+            path=tmp_path,
+        ).download()
+        assert df.iloc[0]["workflow_id"] == 493
+
     def test_inform_workflow_id_overrides_catalog(
         self, fake_http, monkeypatch, tmp_path
     ):

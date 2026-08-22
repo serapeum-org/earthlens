@@ -50,7 +50,7 @@ df = EarthLens(
     variables=["inform:risk"],     # or hazard_exposure / vulnerability / coping_capacity / climate_risk
     country="KEN",
 ).download()
-# columns: iso3, indicator_id, indicator_score, validity_year
+# columns: iso3, indicator_id, indicator_score, validity_year, workflow_id
 ```
 
 Omitting `country=` returns the score for **every** country in one frame.
@@ -72,10 +72,11 @@ df = EarthLens(
 ).download()
 ```
 
-INFORM leaves `validity_year` at `0` on every row, so the frame does not record
-which release produced it — the pin (or the `workflow_id=` you passed) is the
-only signal. When a workflow serves nothing, the empty result is logged with the
-workflow id and this override, rather than as an unexplained empty table.
+INFORM leaves `validity_year` at `0` on every row, so the `workflow_id` column
+is what identifies the release a table came from — it records the workflow the
+rows were actually fetched with, pinned or overridden. When a workflow serves
+nothing, the empty result is logged with that id and this override, rather than
+as an unexplained empty table.
 
 `inform:climate_risk` reads a different model — INFORM's Climate Change
 projection for 2050 under the optimistic RCP4.5-SSP1 pathway — so its scores are

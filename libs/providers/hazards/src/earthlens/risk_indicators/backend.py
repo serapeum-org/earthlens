@@ -394,7 +394,9 @@ class RiskIndicators(AbstractDataSource):
                 workflow_id, cast("str", dataset.indicator_id)
             )
             self._upstream_rows = len(payload)
-            return _helpers.inform_to_frame(payload, country=country)
+            return _helpers.inform_to_frame(
+                payload, country=country, workflow_id=workflow_id
+            )
         # provider == "gfw" — GFW keys on upper-case ISO3, so normalise the
         # country before interpolating it (the other two providers already
         # resolve / filter case-insensitively).

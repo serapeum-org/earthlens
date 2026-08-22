@@ -37,8 +37,9 @@ Natural-hazard screening across 11 hazards. Returns one row per hazard with
 ## INFORM Risk (public, tabular)
 
 The composite index and its three dimensions, plus the climate variant. Returns
-`iso3`, `indicator_id`, `indicator_score`, `validity_year`. `country=` filters
-to one country; omit it for every country.
+`iso3`, `indicator_id`, `indicator_score`, `validity_year` and `workflow_id` (the
+INFORM model release the scores came from). `country=` filters to one country;
+omit it for every country.
 
 | dataset id | output kind | description |
 |---|---|---|
