@@ -11,6 +11,10 @@ from __future__ import annotations
 import pytest
 
 from earthlens.ecmwf import Catalog, Variable
+from earthlens.ecmwf.catalog import (
+    _TEMPORAL_AGGREGATE_TOKENS,
+    _denotes_temporal_aggregate,
+)
 
 pytestmark = [pytest.mark.unit]
 
@@ -388,6 +392,49 @@ class TestCatalog:
         assert daily_tp.is_pre_aggregated is True, "daily-statistics flux var"
         assert monthly_tp.is_pre_aggregated is True, "monthly-means flux var"
         assert raw_tp.is_pre_aggregated is False, "raw hourly ERA5 flux var"
+
+    @pytest.mark.parametrize(
+        "dataset, code",
+        [
+            ("ecv-for-climate-change", "precipitation-ecv"),
+            (
+                "projections-cmip5-monthly-single-levels",
+                "mean-precipitation-flux-cmip5m",
+            ),
+            (
+                "projections-cordex-domains-single-levels",
+                "mean-precipitation-flux-cordex",
+            ),
+            ("reanalysis-carra-means", "10m-wind-gust-carra-means"),
+            ("reanalysis-pan-carra-means", "evaporation-pancarra-means"),
+            ("seasonal-monthly-single-levels", "total-precipitation-seasonal"),
+        ],
+    )
+    def test_is_pre_aggregated_flags_extra_and_monthly_id_families(self, dataset, code):
+        """Flux vars flagged via a temporal-aggregate extra or a -monthly id (#1097)."""
+        var = Catalog().datasets[dataset].variables[code]
+        assert var.is_flux, f"{dataset}::{code} should be flux"
+        assert var.is_pre_aggregated is True, (
+            f"{dataset}::{code} should be pre-aggregated"
+        )
+
+    @pytest.mark.parametrize(
+        "dataset, code",
+        [
+            ("derived-near-surface-meteorological-variables", "rainfall-flux-nsmv"),
+            ("reanalysis-cerra-single-levels", "evaporation-cerra"),
+            ("reanalysis-carra-single-levels", "percolation-carra"),
+            ("seasonal-original-single-levels", "evaporation-seasonal-orig"),
+            ("reanalysis-era5-single-levels", "total-precipitation"),
+        ],
+    )
+    def test_is_pre_aggregated_does_not_flag_raw_flux_datasets(self, dataset, code):
+        """Raw flux datasets stay unflagged so `op="auto"` still sums them."""
+        var = Catalog().datasets[dataset].variables[code]
+        assert var.is_flux, f"{dataset}::{code} should be flux"
+        assert var.is_pre_aggregated is False, (
+            f"{dataset}::{code} must NOT be pre-aggregated"
+        )
 
     def test_minimal_valid_request_picks_entry_with_variable(self, monkeypatch):
         """`minimal_valid_request` returns a known-valid request dict."""
@@ -982,3 +1029,128 @@ class TestCatalogHealth:
         unused = Catalog().health()["unused_provider"]
         assert isinstance(unused, list)
         assert unused == sorted(unused), "unused providers are reported sorted"
+
+
+class TestDenotesTemporalAggregate:
+    """Tests for the `_denotes_temporal_aggregate` catalog helper (#1097)."""
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "1_month_mean",
+            "monthly_mean",
+            "monthly",
+            "daily",
+            "1_day_mean",
+            "seasonal",
+            "annual",
+            "yearly",
+            "dekadal",
+            "pentad",
+            "weekly",
+            "climatology",
+            "time-average",
+        ],
+    )
+    def test_daily_or_coarser_values_are_aggregates(self, value):
+        """Daily-or-coarser mean strings are detected as aggregates."""
+        assert _denotes_temporal_aggregate(value) is True, (
+            f"{value!r} should count as a temporal aggregate"
+        )
+
+    @pytest.mark.parametrize("token", _TEMPORAL_AGGREGATE_TOKENS)
+    def test_every_declared_token_triggers_detection(self, token):
+        """Each declared token, on its own, marks a value as an aggregate."""
+        assert _denotes_temporal_aggregate(token) is True, (
+            f"declared token {token!r} should be detected"
+        )
+
+    @pytest.mark.parametrize("value", [None, "", [], (), 0, False])
+    def test_empty_values_are_not_aggregates(self, value):
+        """Falsy / empty inputs short-circuit to False."""
+        assert _denotes_temporal_aggregate(value) is False, (
+            f"empty value {value!r} should not be an aggregate"
+        )
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "instantaneous",
+            "instant",
+            "1_hour",
+            "hourly",
+            "6_hourly",
+            "3-hourly",
+            "sub-daily",
+            "sub_daily",
+            "subdaily",
+        ],
+    )
+    def test_sub_daily_and_instantaneous_values_are_not_aggregates(self, value):
+        """Instantaneous / sub-daily values are treated as raw, not aggregates."""
+        assert _denotes_temporal_aggregate(value) is False, (
+            f"sub-daily/instant value {value!r} should not be an aggregate"
+        )
+
+    @pytest.mark.parametrize(
+        "value",
+        ["hourly_mean", "6_hourly_mean", "instantaneous_mean"],
+    )
+    def test_sub_daily_veto_wins_over_an_aggregate_token(self, value):
+        """The sub-daily veto wins even when a mean token co-occurs."""
+        assert _denotes_temporal_aggregate(value) is False, (
+            f"{value!r} is sub-daily; the hour/instant veto must win"
+        )
+
+    @pytest.mark.parametrize("value", ["raw", "forecast", "analysis", "reanalysis"])
+    def test_values_without_a_token_are_not_aggregates(self, value):
+        """Strings carrying none of the tokens are not aggregates."""
+        assert _denotes_temporal_aggregate(value) is False, (
+            f"{value!r} carries no aggregate token"
+        )
+
+    @pytest.mark.parametrize("value", ["subseasonal", "subseasonal_mean"])
+    def test_coarse_sub_cadence_is_not_vetoed(self, value):
+        """A coarser-than-daily `sub*` cadence (subseasonal) is not vetoed as sub-daily."""
+        assert _denotes_temporal_aggregate(value) is True, (
+            f"{value!r} is coarser than daily and should flag"
+        )
+
+    @pytest.mark.parametrize("value", ["sum", "running_sum", "accumulated_sum"])
+    def test_sum_type_values_are_not_aggregates(self, value):
+        """A value whose only signal is a sum is not flagged (the flag forces mean)."""
+        assert _denotes_temporal_aggregate(value) is False, (
+            f"{value!r} is a sum, not a mean; it must not be flagged as pre-aggregated"
+        )
+
+    @pytest.mark.parametrize(
+        "value, expected",
+        [
+            (["monthly_mean"], True),
+            (["daily"], True),
+            (("1_month_mean",), True),
+            (["1", "daily"], True),
+            (["instantaneous"], False),
+            (["1_hour"], False),
+            (["raw"], False),
+        ],
+    )
+    def test_accepts_list_and_tuple_values(self, value, expected):
+        """Scalar, list, and tuple forms of the extra are all handled."""
+        assert _denotes_temporal_aggregate(value) is expected, (
+            f"{value!r} should resolve to {expected}"
+        )
+
+    def test_detection_is_case_insensitive(self):
+        """Detection is case-insensitive (values are lower-cased first)."""
+        assert _denotes_temporal_aggregate("MONTHLY_MEAN") is True, "upper aggregate"
+        assert _denotes_temporal_aggregate("Daily") is True, "mixed-case aggregate"
+        assert _denotes_temporal_aggregate("1_HOUR") is False, "upper sub-daily vetoed"
+
+    def test_tokens_constant_is_lowercase_tuple(self):
+        """`_TEMPORAL_AGGREGATE_TOKENS` is a non-empty tuple of lowercase tokens."""
+        assert isinstance(_TEMPORAL_AGGREGATE_TOKENS, tuple), "tokens are a tuple"
+        assert _TEMPORAL_AGGREGATE_TOKENS, "tokens list is non-empty"
+        assert all(t == t.lower() for t in _TEMPORAL_AGGREGATE_TOKENS), (
+            "every token is lowercase so matching against lowercased text works"
+        )
