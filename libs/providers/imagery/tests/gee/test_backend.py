@@ -2244,10 +2244,9 @@ class TestExportViaEedai:
         gee = make_gee(cog=True)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         fake_reader.dataset.cog.to_cog = _cog_then_fail
+        plan = _plan_for(gee, var_info)
         with pytest.raises(RuntimeError, match="cog conversion failed"):
-            gee._export_via_eedai(
-                var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
-            )
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", plan)
         assert not list(gee.root_dir.glob("*.partial*")), (
             "a staging file survived the failed conversion"
         )
