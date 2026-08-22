@@ -2386,6 +2386,10 @@ class TestExportViaEedai:
         assert can_serve is False
         assert tile_size is None
         assert "tile ceiling" in reason
+        assert "native px" not in reason, (
+            "the work budget declined first, so this no longer covers the tile "
+            f"ceiling: {reason}"
+        )
 
     def test_a_cutline_cannot_be_tiled_so_it_falls_back(self, make_gee, fake_reader):
         """Upstream refuses `tile_size` with a polygon cutline, so `auto` falls back."""
