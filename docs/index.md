@@ -25,8 +25,6 @@ catalog lookup, request shaping, and writing the output.
 <figcaption markdown>
 34 of the spacecraft behind earthlens' providers, drawn on their published orbits. Each trailing band is
 that instrument's real ground swath, and the trapezoid above it is the field of view sweeping it out.
-Basemap: VIIRS Earth at Night, NASA GIBS / EOSDIS.
-[How it is built](examples/showcase/earthlens-satellites.ipynb)
 </figcaption>
 
 ## Supported data sources
