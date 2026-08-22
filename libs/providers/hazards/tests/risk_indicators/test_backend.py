@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 import pandas as pd
@@ -264,6 +265,41 @@ class TestRouting:
                 source="release",
                 path=tmp_path,
             )
+
+    def test_non_inform_never_routes_to_the_release(self, monkeypatch, tmp_path):
+        """The release channel is INFORM-only, whatever the default source is."""
+        b = _build(
+            monkeypatch,
+            variables=["thinkhazard:flood_river"],
+            country="KEN",
+            path=tmp_path,
+        )
+        assert b._reads_release is False
+
+    def test_cached_workbook_skips_the_download_notice(
+        self, fake_http, monkeypatch, tmp_path, release_workbook, captured_logs
+    ):
+        """A workbook already in the cache is read without announcing a download."""
+        cache = tmp_path / "wb"
+        cache.mkdir()
+        shutil.copy2(release_workbook, cache / "INFORM_Risk_2026_v072.xlsx")
+        monkeypatch.setattr(
+            _helpers,
+            "inform_release_url",
+            lambda **kwargs: (
+                "https://drmkc.jrc.ec.europa.eu/x/INFORM_Risk_2026_v072.xlsx",
+                2026,
+            ),
+        )
+        _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            cache_dir=cache,
+            path=tmp_path,
+        ).download()
+        assert "downloading the INFORM" not in "".join(captured_logs)
+        assert "reading the INFORM 2026 release workbook" in "".join(captured_logs)
 
     def test_cache_dir_overrides_the_shared_cache(self, monkeypatch, tmp_path):
         """An explicit cache_dir is where the workbook lands."""

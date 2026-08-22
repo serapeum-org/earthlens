@@ -93,6 +93,21 @@ def release_workbook(tmp_path_factory) -> Path:
 
 
 @pytest.fixture
+def captured_logs() -> Iterator[list[str]]:
+    """Collect every INFO-and-above loguru line a test provokes.
+
+    Yields:
+        list[str]: The formatted records, appended as they are emitted.
+    """
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="INFO")
+    try:
+        yield messages
+    finally:
+        logger.remove(sink_id)
+
+
+@pytest.fixture
 def captured_warnings() -> Iterator[list[str]]:
     """Collect the loguru WARNING lines a test provokes.
 
