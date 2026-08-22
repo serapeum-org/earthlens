@@ -19,8 +19,8 @@ import os
 import time
 from collections import Counter
 
-import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 import numpy as np
+import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -108,7 +108,9 @@ def main() -> None:
         print(f"    {n:5d}  {prefix}")
     print()
 
-    print(f"  {'asked':>6} {'actual':>7} {'reads':>6} {'debug':>7} {'secs':>7}  {'pixels':>26}")
+    print(
+        f"  {'asked':>6} {'actual':>7} {'reads':>6} {'debug':>7} {'secs':>7}  {'pixels':>26}"
+    )
     print("  " + "-" * 70)
     for block in CANDIDATES:
         ds = _open(block)
@@ -120,16 +122,22 @@ def main() -> None:
         try:
             arr = _blockwise(band, x0, y0, SIDE, actual)
         except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
-            print(f"  {block:>6} {actual:>7} {n_reads:>6} {'-':>7} {'-':>7}  "
-                  f"RAISED {type(exc).__name__}: {str(exc)[:28]}")
+            print(
+                f"  {block:>6} {actual:>7} {n_reads:>6} {'-':>7} {'-':>7}  "
+                f"RAISED {type(exc).__name__}: {str(exc)[:28]}"
+            )
             continue
         secs = time.time() - started
         debug_lines = len(_MESSAGES)
         ok, detail = _judge(arr)
-        same = bool(np.allclose(np.nan_to_num(arr), np.nan_to_num(reference), rtol=0, atol=1e-6))
+        same = bool(
+            np.allclose(np.nan_to_num(arr), np.nan_to_num(reference), rtol=0, atol=1e-6)
+        )
         verdict = "ok" if ok and same else ("MISMATCH" if ok else "BAD")
-        print(f"  {block:>6} {actual:>7} {n_reads:>6} {debug_lines:>7} {secs:>7.1f}  "
-              f"{verdict:>8} {detail}")
+        print(
+            f"  {block:>6} {actual:>7} {n_reads:>6} {debug_lines:>7} {secs:>7.1f}  "
+            f"{verdict:>8} {detail}"
+        )
 
     gdal.PopErrorHandler()
 

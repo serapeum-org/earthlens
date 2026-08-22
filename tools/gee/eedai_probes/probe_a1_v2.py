@@ -11,8 +11,8 @@ from __future__ import annotations
 import json
 import os
 
-import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 import numpy as np
+import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -34,7 +34,9 @@ def _open(asset: str, band: str | None):
     opts = [f"BLOCK_SIZE={BLOCK}"]
     if band:
         opts.append(f"BANDS={band}")
-    ds = gdal.OpenEx(f"EEDAI:{asset}", gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts)
+    ds = gdal.OpenEx(
+        f"EEDAI:{asset}", gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts
+    )
     if ds is None:
         raise SystemExit(f"could not open {asset}: {gdal.GetLastErrorMsg()}")
     return ds
@@ -78,15 +80,19 @@ def _describe(label: str, arr: np.ndarray, nodata: float | None) -> np.ndarray:
     return clean
 
 
-def probe(asset: str, band_name: str | None, lon: float, lat: float, place: str) -> None:
+def probe(
+    asset: str, band_name: str | None, lon: float, lat: float, place: str
+) -> None:
     """Compare each overview level against a locally-downsampled native read."""
     print(f"\n{'=' * 78}\n{asset}   @ {place} ({lon}, {lat})\n{'=' * 78}")
     _activate()
     ds = _open(asset, band_name)
     band = ds.GetRasterBand(1)
     nodata = band.GetNoDataValue()
-    print(f"  {ds.RasterXSize}x{ds.RasterYSize}  {gdal.GetDataTypeName(band.DataType)}  "
-          f"nodata={nodata}  overviews={band.GetOverviewCount()}")
+    print(
+        f"  {ds.RasterXSize}x{ds.RasterYSize}  {gdal.GetDataTypeName(band.DataType)}  "
+        f"nodata={nodata}  overviews={band.GetOverviewCount()}"
+    )
 
     side = BLOCK * 4
     px, py = _pixel_of(ds, lon, lat)

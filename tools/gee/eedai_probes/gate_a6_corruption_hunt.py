@@ -25,8 +25,8 @@ import sys
 import time
 from collections import deque
 
-import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 import numpy as np
+import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -89,8 +89,10 @@ def _judge(arr: np.ndarray) -> tuple[bool, str]:
         return False, "no observed pixels"
     outside = int(((observed < BOUNDS[0]) | (observed > BOUNDS[1])).sum())
     if outside:
-        return False, (f"{outside} px outside {BOUNDS} "
-                       f"(observed [{observed.min():.0f},{observed.max():.0f}])")
+        return False, (
+            f"{outside} px outside {BOUNDS} "
+            f"(observed [{observed.min():.0f},{observed.max():.0f}])"
+        )
     if float(observed.std()) < 1e-6:
         return False, "degenerate"
     return True, f"[{observed.min():.0f},{observed.max():.0f}]"
@@ -100,7 +102,13 @@ def _ov_window(ds, level: int, x0: int, y0: int):
     """Map the native window onto one overview level."""
     ov = ds.GetRasterBand(1).GetOverview(level)
     fx, fy = ds.RasterXSize / ov.XSize, ds.RasterYSize / ov.YSize
-    return ov, int(round(x0 / fx)), int(round(y0 / fy)), int(round(SIDE / fx)), int(round(SIDE / fy))
+    return (
+        ov,
+        int(round(x0 / fx)),
+        int(round(y0 / fy)),
+        int(round(SIDE / fx)),
+        int(round(SIDE / fy)),
+    )
 
 
 def main() -> None:
@@ -114,8 +122,10 @@ def main() -> None:
     px, py = int((LON - gt[0]) / gt[1]), int((LAT - gt[3]) / gt[5])
     x0 = (px - SIDE // 2) // BLOCK * BLOCK
     y0 = (py - SIDE // 2) // BLOCK * BLOCK
-    print(f"{ASSET} @ Everest  window {x0},{y0} {SIDE}x{SIDE}  levels {LEVELS}  "
-          f"rounds {ROUNDS}\n")
+    print(
+        f"{ASSET} @ Everest  window {x0},{y0} {SIDE}x{SIDE}  levels {LEVELS}  "
+        f"rounds {ROUNDS}\n"
+    )
 
     references: dict[int, np.ndarray] = {}
     for level in LEVELS:
@@ -126,7 +136,9 @@ def main() -> None:
             ok, detail = _judge(references[level])
             print(f"  reference ov[{level}]: {'ok ' if ok else 'BAD'} {detail}")
         except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
-            print(f"  reference ov[{level}]: RAISED {type(exc).__name__}: {str(exc)[:70]}")
+            print(
+                f"  reference ov[{level}]: RAISED {type(exc).__name__}: {str(exc)[:70]}"
+            )
 
     caught = 0
     started = time.time()
@@ -141,7 +153,9 @@ def main() -> None:
             except Exception as exc:  # noqa: BLE001
                 caught += 1
                 marks.append(f"L{level}:{type(exc).__name__[:9]}")
-                print(f"\n  !! round {r} level {level} RAISED {type(exc).__name__}: {exc}")
+                print(
+                    f"\n  !! round {r} level {level} RAISED {type(exc).__name__}: {exc}"
+                )
                 print("  --- transport log ---")
                 for line in list(_LOG)[-25:]:
                     print(f"    {line[:150]}")
@@ -156,7 +170,9 @@ def main() -> None:
                 continue
             caught += 1
             marks.append(f"L{level}:CAUGHT")
-            print(f"\n  !! round {r} level {level}: healthy={ok} stable={stable} {detail}")
+            print(
+                f"\n  !! round {r} level {level}: healthy={ok} stable={stable} {detail}"
+            )
             print("  --- transport log ---")
             for line in list(_LOG)[-25:]:
                 print(f"    {line[:150]}")

@@ -17,8 +17,8 @@ import json
 import os
 import time
 
-import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 import numpy as np
+import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -71,7 +71,9 @@ def main() -> None:
     px, py = int((LON - gt[0]) / gt[1]), int((LAT - gt[3]) / gt[5])
     x0 = (px - side // 2) // BLOCK * BLOCK
     y0 = (py - side // 2) // BLOCK * BLOCK
-    print(f"soak: {ROUNDS} rounds x overview levels 0-2, window {x0},{y0} {side}x{side}\n")
+    print(
+        f"soak: {ROUNDS} rounds x overview levels 0-2, window {x0},{y0} {side}x{side}\n"
+    )
 
     stats = {0: [0, 0], 1: [0, 0], 2: [0, 0]}  # level -> [attempts, failures]
     started = time.time()
@@ -83,8 +85,13 @@ def main() -> None:
                 d = _open()
                 ov = d.GetRasterBand(1).GetOverview(level)
                 fx, fy = d.RasterXSize / ov.XSize, d.RasterYSize / ov.YSize
-                arr = _blockwise(ov, int(round(x0 / fx)), int(round(y0 / fy)),
-                                 int(round(side / fx)), int(round(side / fy)))
+                arr = _blockwise(
+                    ov,
+                    int(round(x0 / fx)),
+                    int(round(y0 / fy)),
+                    int(round(side / fx)),
+                    int(round(side / fy)),
+                )
             except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
                 stats[level][1] += 1
                 marks.append(f"L{level}:{type(exc).__name__[:9]}")
@@ -93,8 +100,10 @@ def main() -> None:
             impl = int(((finite < PLAUSIBLE[0]) | (finite > PLAUSIBLE[1])).sum())
             if impl:
                 stats[level][1] += 1
-                marks.append(f"L{level}:CORRUPT({impl}px,"
-                             f"[{np.nanmin(arr):.0f},{np.nanmax(arr):.0f}])")
+                marks.append(
+                    f"L{level}:CORRUPT({impl}px,"
+                    f"[{np.nanmin(arr):.0f},{np.nanmax(arr):.0f}])"
+                )
             else:
                 marks.append(f"L{level}:ok")
         print(f"  round {r:02d}  " + "  ".join(marks))

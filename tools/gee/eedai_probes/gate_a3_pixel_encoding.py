@@ -18,8 +18,8 @@ import json
 import os
 import time
 
-import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 import numpy as np
+import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -53,7 +53,9 @@ def _open(asset: str, bands: list[str] | None, encoding: str | None):
         opts.append("BANDS=" + ",".join(bands))
     if encoding:
         opts.append(f"PIXEL_ENCODING={encoding}")
-    return gdal.OpenEx(f"EEDAI:{asset}", gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts)
+    return gdal.OpenEx(
+        f"EEDAI:{asset}", gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts
+    )
 
 
 def _read(ds, x0: int, y0: int, side: int) -> np.ndarray:
@@ -65,7 +67,9 @@ def _read(ds, x0: int, y0: int, side: int) -> np.ndarray:
         for by in range(y0, y0 + side, BLOCK):
             for bx in range(x0, x0 + side, BLOCK):
                 w, h = min(BLOCK, x0 + side - bx), min(BLOCK, y0 + side - by)
-                out[by - y0 : by - y0 + h, bx - x0 : bx - x0 + w] = band.ReadAsArray(bx, by, w, h)
+                out[by - y0 : by - y0 + h, bx - x0 : bx - x0 + w] = band.ReadAsArray(
+                    bx, by, w, h
+                )
         planes.append(out)
     return np.stack(planes)
 
@@ -88,8 +92,10 @@ def main() -> None:
         except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
             print(f"  {asset:42s} UNAVAILABLE: {type(exc).__name__}")
             continue
-        types = {gdal.GetDataTypeName(ds.GetRasterBand(i).DataType)
-                 for i in range(1, ds.RasterCount + 1)}
+        types = {
+            gdal.GetDataTypeName(ds.GetRasterBand(i).DataType)
+            for i in range(1, ds.RasterCount + 1)
+        }
         print(f"  {asset:42s} bands={ds.RasterCount:2d}  dtypes={sorted(types)}")
         profiles.append((asset, bands, lon, lat, ds.RasterCount, types))
 
@@ -97,7 +103,9 @@ def main() -> None:
         encodings = ["AUTO", "NPY", "GEO_TIFF"]
         if types <= BYTE_TYPES:
             encodings += ["PNG", "AUTO_JPEG_PNG"]
-        print(f"\n{'=' * 76}\n{asset}   bands={count}  dtypes={sorted(types)}\n{'=' * 76}")
+        print(
+            f"\n{'=' * 76}\n{asset}   bands={count}  dtypes={sorted(types)}\n{'=' * 76}"
+        )
         ds0 = _open(asset, bands, "NPY")
         x0, y0 = _window(ds0, lon, lat)
         reference = None
@@ -122,11 +130,16 @@ def main() -> None:
                 reference = arr
                 verdict = "reference"
             else:
-                same = bool(np.allclose(np.nan_to_num(arr), np.nan_to_num(reference),
-                                        rtol=0, atol=1e-6))
+                same = bool(
+                    np.allclose(
+                        np.nan_to_num(arr), np.nan_to_num(reference), rtol=0, atol=1e-6
+                    )
+                )
                 verdict = "identical" if same else "DIFFERS from NPY"
-            print(f"  {enc:>14} {min(times):>10.2f}   {verdict:>18}  "
-                  f"[{np.nanmin(arr):.1f},{np.nanmax(arr):.1f}]")
+            print(
+                f"  {enc:>14} {min(times):>10.2f}   {verdict:>18}  "
+                f"[{np.nanmin(arr):.1f},{np.nanmax(arr):.1f}]"
+            )
 
 
 if __name__ == "__main__":

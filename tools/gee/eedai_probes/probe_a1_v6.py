@@ -19,8 +19,8 @@ from __future__ import annotations
 import json
 import os
 
-import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 import numpy as np
+import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -79,8 +79,10 @@ def _trial(label: str, reader, reference: np.ndarray | None) -> np.ndarray | Non
         return None
     bad = _implausible(arr)
     if reference is None:
-        print(f"    {label}: reference  range=[{np.nanmin(arr):.0f},{np.nanmax(arr):.0f}]"
-              f"  implausible={bad}")
+        print(
+            f"    {label}: reference  range=[{np.nanmin(arr):.0f},{np.nanmax(arr):.0f}]"
+            f"  implausible={bad}"
+        )
         return arr
     same = np.allclose(np.nan_to_num(arr), np.nan_to_num(reference), rtol=0, atol=1e-6)
     mark = "ok " if same and bad == 0 else "BAD"
@@ -101,11 +103,19 @@ def main() -> None:
     print(f"{ASSET} @ Everest   window {x0},{y0} {side}x{side}   trials={TRIALS}\n")
 
     print("  NATIVE (the path earthlens ships):")
-    ref_native = _trial("  init", lambda: _blockwise(_open().GetRasterBand(1), x0, y0, side, side), None)
+    ref_native = _trial(
+        "  init", lambda: _blockwise(_open().GetRasterBand(1), x0, y0, side, side), None
+    )
     native_bad = 0
     for t in range(TRIALS):
-        got = _trial(f"  t{t:02d}", lambda: _blockwise(_open().GetRasterBand(1), x0, y0, side, side), ref_native)
-        if got is None or not np.allclose(np.nan_to_num(got), np.nan_to_num(ref_native), rtol=0, atol=1e-6):
+        got = _trial(
+            f"  t{t:02d}",
+            lambda: _blockwise(_open().GetRasterBand(1), x0, y0, side, side),
+            ref_native,
+        )
+        if got is None or not np.allclose(
+            np.nan_to_num(got), np.nan_to_num(ref_native), rtol=0, atol=1e-6
+        ):
             native_bad += 1
 
     def read_ov():
@@ -113,19 +123,28 @@ def main() -> None:
         d = _open()
         ov = d.GetRasterBand(1).GetOverview(0)
         fx, fy = d.RasterXSize / ov.XSize, d.RasterYSize / ov.YSize
-        return _blockwise(ov, int(round(x0 / fx)), int(round(y0 / fy)),
-                          int(round(side / fx)), int(round(side / fy)))
+        return _blockwise(
+            ov,
+            int(round(x0 / fx)),
+            int(round(y0 / fy)),
+            int(round(side / fx)),
+            int(round(side / fy)),
+        )
 
     print("\n  OVERVIEW level 0:")
     ref_ov = _trial("  init", read_ov, None)
     ov_bad = 0
     for t in range(TRIALS):
         got = _trial(f"  t{t:02d}", read_ov, ref_ov)
-        if got is None or not np.allclose(np.nan_to_num(got), np.nan_to_num(ref_ov), rtol=0, atol=1e-6):
+        if got is None or not np.allclose(
+            np.nan_to_num(got), np.nan_to_num(ref_ov), rtol=0, atol=1e-6
+        ):
             ov_bad += 1
 
-    print(f"\n  RESULT: native mismatches {native_bad}/{TRIALS}, "
-          f"overview mismatches {ov_bad}/{TRIALS}")
+    print(
+        f"\n  RESULT: native mismatches {native_bad}/{TRIALS}, "
+        f"overview mismatches {ov_bad}/{TRIALS}"
+    )
 
 
 if __name__ == "__main__":

@@ -16,8 +16,8 @@ from __future__ import annotations
 import json
 import os
 
-import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 import numpy as np
+import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -40,7 +40,9 @@ def _open(encoding: str | None = None):
     opts = [f"BLOCK_SIZE={BLOCK}", f"BANDS={BAND}"]
     if encoding:
         opts.append(f"PIXEL_ENCODING={encoding}")
-    return gdal.OpenEx(f"EEDAI:{ASSET}", gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts)
+    return gdal.OpenEx(
+        f"EEDAI:{ASSET}", gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts
+    )
 
 
 def _blockwise(band, x0: int, y0: int, w: int, h: int) -> np.ndarray:
@@ -70,7 +72,13 @@ def _ov_window(ds, level: int, x0: int, y0: int, side: int):
     """Map the native window onto one overview level."""
     ov = ds.GetRasterBand(1).GetOverview(level)
     fx, fy = ds.RasterXSize / ov.XSize, ds.RasterYSize / ov.YSize
-    return ov, int(round(x0 / fx)), int(round(y0 / fy)), int(round(side / fx)), int(round(side / fy))
+    return (
+        ov,
+        int(round(x0 / fx)),
+        int(round(y0 / fy)),
+        int(round(side / fx)),
+        int(round(side / fy)),
+    )
 
 
 def _summary(arr: np.ndarray) -> str:
@@ -96,7 +104,9 @@ def main() -> None:
             print(f"  A cold handle, overview only : {_summary(cold)}")
         except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
             cold = None
-            print(f"  A cold handle, overview only : RAISED {type(exc).__name__}: {str(exc)[:70]}")
+            print(
+                f"  A cold handle, overview only : RAISED {type(exc).__name__}: {str(exc)[:70]}"
+            )
 
         # Case B: the same read, but after pulling the native window first.
         dsb = _open()
@@ -107,10 +117,14 @@ def main() -> None:
             print(f"  B after a native read        : {_summary(warm)}")
         except Exception as exc:  # noqa: BLE001
             warm = None
-            print(f"  B after a native read        : RAISED {type(exc).__name__}: {str(exc)[:70]}")
+            print(
+                f"  B after a native read        : RAISED {type(exc).__name__}: {str(exc)[:70]}"
+            )
 
         if cold is not None and warm is not None:
-            same = np.allclose(np.nan_to_num(cold), np.nan_to_num(warm), rtol=0, atol=1e-6)
+            same = np.allclose(
+                np.nan_to_num(cold), np.nan_to_num(warm), rtol=0, atol=1e-6
+            )
             print(f"  -> cold and warm agree: {same}")
         print()
 

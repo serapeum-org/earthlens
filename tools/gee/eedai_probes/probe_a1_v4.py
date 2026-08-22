@@ -17,8 +17,8 @@ from __future__ import annotations
 import json
 import os
 
-import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 import numpy as np
+import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -89,8 +89,10 @@ def main() -> None:
     y0 = (py - side // 2) // BLOCK * BLOCK
     truth_full = _blockwise(base.GetRasterBand(1), x0, y0, side, side)
     print(f"{asset} @ Everest  window {x0},{y0} {side}x{side}")
-    print(f"native ground truth (NPY): mean={np.nanmean(truth_full):.1f} "
-          f"range=[{np.nanmin(truth_full):.0f},{np.nanmax(truth_full):.0f}]\n")
+    print(
+        f"native ground truth (NPY): mean={np.nanmean(truth_full):.1f} "
+        f"range=[{np.nanmin(truth_full):.0f},{np.nanmax(truth_full):.0f}]\n"
+    )
 
     header = f"  {'lvl':>3} {'factor':>6} " + " ".join(f"{e:>24}" for e in ENCODINGS)
     print(header)
@@ -112,12 +114,18 @@ def main() -> None:
                 cells.append("-")
                 continue
             fh_, fw_ = side // oh, side // ow
-            truth = truth_full[: oh * fh_, : ow * fw_].reshape(oh, fh_, ow, fw_).mean(axis=(1, 3))
+            truth = (
+                truth_full[: oh * fh_, : ow * fw_]
+                .reshape(oh, fh_, ow, fw_)
+                .mean(axis=(1, 3))
+            )
             try:
                 arr = _blockwise(ov, ox0, oy0, ow, oh)
                 c, r = _agree(truth, arr)
                 lo, hi = np.nanmin(arr), np.nanmax(arr)
-                cells.append(f"c={c:+.3f} [{lo:.0f},{hi:.0f}]" if np.isfinite(c) else "flat")
+                cells.append(
+                    f"c={c:+.3f} [{lo:.0f},{hi:.0f}]" if np.isfinite(c) else "flat"
+                )
             except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
                 cells.append(type(exc).__name__[:20])
         if all(c == "-" for c in cells):

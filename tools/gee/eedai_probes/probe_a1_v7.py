@@ -16,8 +16,8 @@ from __future__ import annotations
 import json
 import os
 
-import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 import numpy as np
+import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -64,8 +64,13 @@ def _ov_read(ds, x0: int, y0: int, side: int, level: int = 0) -> np.ndarray:
     """Read overview `level` over the ground area of the native window."""
     ov = ds.GetRasterBand(1).GetOverview(level)
     fx, fy = ds.RasterXSize / ov.XSize, ds.RasterYSize / ov.YSize
-    return _blockwise(ov, int(round(x0 / fx)), int(round(y0 / fy)),
-                      int(round(side / fx)), int(round(side / fy)))
+    return _blockwise(
+        ov,
+        int(round(x0 / fx)),
+        int(round(y0 / fy)),
+        int(round(side / fx)),
+        int(round(side / fy)),
+    )
 
 
 def _verdict(arr: np.ndarray, ref: np.ndarray) -> str:
@@ -73,8 +78,10 @@ def _verdict(arr: np.ndarray, ref: np.ndarray) -> str:
     finite = arr[np.isfinite(arr)]
     bad = int(((finite < PLAUSIBLE[0]) | (finite > PLAUSIBLE[1])).sum())
     same = np.allclose(np.nan_to_num(arr), np.nan_to_num(ref), rtol=0, atol=1e-6)
-    return (f"{'CLEAN' if same and not bad else 'CORRUPT'}  match={same} "
-            f"implausible={bad}  range=[{np.nanmin(arr):.0f},{np.nanmax(arr):.0f}]")
+    return (
+        f"{'CLEAN' if same and not bad else 'CORRUPT'}  match={same} "
+        f"implausible={bad}  range=[{np.nanmin(arr):.0f},{np.nanmax(arr):.0f}]"
+    )
 
 
 def main() -> None:
@@ -89,7 +96,9 @@ def main() -> None:
     print(f"{ASSET} @ Everest   native window {x0},{y0} {side}x{side}\n")
 
     ref = _ov_read(_open(), x0, y0, side)
-    print(f"  reference overview[0]: range=[{np.nanmin(ref):.0f},{np.nanmax(ref):.0f}]\n")
+    print(
+        f"  reference overview[0]: range=[{np.nanmin(ref):.0f},{np.nanmax(ref):.0f}]\n"
+    )
 
     print("  Does a preceding native read poison the overview?")
     d1 = _open()
@@ -106,18 +115,24 @@ def main() -> None:
     print("\n  Native repeatability (handle held for the read):")
     hold = _open()
     ref_native = _blockwise(hold.GetRasterBand(1), x0, y0, side, side)
-    print(f"    reference: range=[{np.nanmin(ref_native):.0f},{np.nanmax(ref_native):.0f}]")
+    print(
+        f"    reference: range=[{np.nanmin(ref_native):.0f},{np.nanmax(ref_native):.0f}]"
+    )
     bad = 0
     for t in range(6):
         h = _open()
         got = _blockwise(h.GetRasterBand(1), x0, y0, side, side)
-        same = np.allclose(np.nan_to_num(got), np.nan_to_num(ref_native), rtol=0, atol=1e-6)
+        same = np.allclose(
+            np.nan_to_num(got), np.nan_to_num(ref_native), rtol=0, atol=1e-6
+        )
         finite = got[np.isfinite(got)]
         impl = int(((finite < PLAUSIBLE[0]) | (finite > PLAUSIBLE[1])).sum())
         if not same or impl:
             bad += 1
-        print(f"    t{t}: match={same} implausible={impl} "
-              f"range=[{np.nanmin(got):.0f},{np.nanmax(got):.0f}]")
+        print(
+            f"    t{t}: match={same} implausible={impl} "
+            f"range=[{np.nanmin(got):.0f},{np.nanmax(got):.0f}]"
+        )
     print(f"\n  native mismatches: {bad}/6")
 
 

@@ -18,8 +18,8 @@ import json
 import os
 import sys
 
-import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 import numpy as np
+import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -41,7 +41,9 @@ def _open(asset: str, band: str | None = None, block: int = BLOCK):
     opts = [f"BLOCK_SIZE={block}"]
     if band:
         opts.append(f"BANDS={band}")
-    ds = gdal.OpenEx(f"EEDAI:{asset}", gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts)
+    ds = gdal.OpenEx(
+        f"EEDAI:{asset}", gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts
+    )
     if ds is None:
         raise SystemExit(f"could not open {asset}: {gdal.GetLastErrorMsg()}")
     return ds
@@ -82,8 +84,10 @@ def _stats(label: str, arr: np.ndarray) -> dict:
         "n_unique": int(np.unique(finite).size) if finite.size else 0,
         "all_zero": bool(finite.size and np.all(finite == 0)),
     }
-    print(f"  {label:28s} {info['shape']}  mean={info['mean']}  std={info['std']}  "
-          f"min={info['min']}  max={info['max']}  uniq={info['n_unique']}  all_zero={info['all_zero']}")
+    print(
+        f"  {label:28s} {info['shape']}  mean={info['mean']}  std={info['std']}  "
+        f"min={info['min']}  max={info['max']}  uniq={info['n_unique']}  all_zero={info['all_zero']}"
+    )
     return info
 
 
@@ -93,8 +97,10 @@ def probe(asset: str, band_name: str | None, window_blocks: int = 4) -> None:
     _activate()
     ds = _open(asset, band_name)
     band = ds.GetRasterBand(1)
-    print(f"  size={ds.RasterXSize}x{ds.RasterYSize} dtype={gdal.GetDataTypeName(band.DataType)} "
-          f"bands={ds.RasterCount} block={band.GetBlockSize()}")
+    print(
+        f"  size={ds.RasterXSize}x{ds.RasterYSize} dtype={gdal.GetDataTypeName(band.DataType)} "
+        f"bands={ds.RasterCount} block={band.GetBlockSize()}"
+    )
 
     n_ov = band.GetOverviewCount()
     print(f"  overview count: {n_ov}")
@@ -104,8 +110,10 @@ def probe(asset: str, band_name: str | None, window_blocks: int = 4) -> None:
     for i in range(n_ov):
         ov = band.GetOverview(i)
         fx = ds.RasterXSize / ov.XSize
-        print(f"    ov[{i}]: {ov.XSize}x{ov.YSize}  factor~{fx:.1f}  "
-              f"block={ov.GetBlockSize()}")
+        print(
+            f"    ov[{i}]: {ov.XSize}x{ov.YSize}  factor~{fx:.1f}  "
+            f"block={ov.GetBlockSize()}"
+        )
 
     # A window at native res, block-aligned, near the middle of the asset.
     side = BLOCK * window_blocks
@@ -129,8 +137,10 @@ def probe(asset: str, band_name: str | None, window_blocks: int = 4) -> None:
         if multi is None:
             print("  !! multi-block ReadAsArray returned None")
         else:
-            s = _stats("native (multi-block)", multi)
-            same = np.allclose(np.nan_to_num(multi), np.nan_to_num(native), rtol=0, atol=1e-6)
+            _stats("native (multi-block)", multi)
+            same = np.allclose(
+                np.nan_to_num(multi), np.nan_to_num(native), rtol=0, atol=1e-6
+            )
             print(f"  multi-block matches block-wise: {same}")
     except Exception as exc:  # noqa: BLE001
         print(f"  !! multi-block ReadAsArray raised: {type(exc).__name__}: {exc}")
@@ -175,7 +185,9 @@ def probe(asset: str, band_name: str | None, window_blocks: int = 4) -> None:
         bias = float(np.mean(b[ok] - a[ok]))
         rel = float(np.mean(np.abs(b[ok] - a[ok])) / (np.abs(a[ok]).mean() + 1e-9))
         verdict = "PLAUSIBLE" if corr > 0.95 and rel < 0.10 else "SUSPECT"
-        print(f"    corr={corr:.4f}  mean_bias={bias:.3f}  mean_rel_err={rel:.4f}  -> {verdict}")
+        print(
+            f"    corr={corr:.4f}  mean_bias={bias:.3f}  mean_rel_err={rel:.4f}  -> {verdict}"
+        )
 
 
 if __name__ == "__main__":

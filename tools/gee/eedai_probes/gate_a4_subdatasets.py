@@ -42,7 +42,8 @@ def _activate() -> None:
 def _first_scene() -> str | None:
     """Find one scene connection string via the EEDA vector driver."""
     catalog = gdal.OpenEx(
-        "EEDA:", gdal.OF_VECTOR | gdal.OF_VERBOSE_ERROR,
+        "EEDA:",
+        gdal.OF_VECTOR | gdal.OF_VERBOSE_ERROR,
         open_options=[f"COLLECTION={COLLECTION}"],
     )
     if catalog is None:
@@ -53,8 +54,10 @@ def _first_scene() -> str | None:
         f"startTime >= '{WINDOW[0]}T00:00:00' AND startTime < '{WINDOW[1]}T00:00:00'"
     )
     layer.SetSpatialFilterRect(*AOI)
-    fields = [layer.GetLayerDefn().GetFieldDefn(i).GetName()
-              for i in range(layer.GetLayerDefn().GetFieldCount())]
+    fields = [
+        layer.GetLayerDefn().GetFieldDefn(i).GetName()
+        for i in range(layer.GetLayerDefn().GetFieldCount())
+    ]
     print(f"  EEDA layer fields ({len(fields)}): {fields}")
     for feature in layer:
         connection = feature.GetFieldAsString("gdal_dataset")
@@ -63,7 +66,9 @@ def _first_scene() -> str | None:
             print(f"    startTime      = {feature.GetFieldAsString('startTime')}")
             print(f"    band_count     = {feature.GetFieldAsString('band_count')}")
             print(f"    band_max_width = {feature.GetFieldAsString('band_max_width')}")
-            print(f"    min_pixel_size = {feature.GetFieldAsString('band_min_pixel_size')}")
+            print(
+                f"    min_pixel_size = {feature.GetFieldAsString('band_min_pixel_size')}"
+            )
             props = feature.GetFieldAsString("other_properties")
             if props:
                 try:
@@ -87,7 +92,9 @@ def _report(label: str, connection: str, bands: list[str] | None) -> None:
         opts.append("BANDS=" + ",".join(bands))
     print(f"\n  --- {label} ---")
     try:
-        ds = gdal.OpenEx(connection, gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts)
+        ds = gdal.OpenEx(
+            connection, gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts
+        )
     except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
         print(f"    RAISED {type(exc).__name__}: {str(exc)[:110]}")
         return
@@ -95,23 +102,29 @@ def _report(label: str, connection: str, bands: list[str] | None) -> None:
         print(f"    returned None: {gdal.GetLastErrorMsg()[:110]}")
         return
     subs = ds.GetSubDatasets()
-    print(f"    size={ds.RasterXSize}x{ds.RasterYSize} bands={ds.RasterCount} "
-          f"subdatasets={len(subs)}")
+    print(
+        f"    size={ds.RasterXSize}x{ds.RasterYSize} bands={ds.RasterCount} "
+        f"subdatasets={len(subs)}"
+    )
     gt = ds.GetGeoTransform()
     print(f"    pixel size: {abs(gt[1]):g} x {abs(gt[5]):g} (CRS units)")
     for name, desc in subs[:8]:
         print(f"      SUB: {name}   |   {desc}")
     for i in range(1, min(ds.RasterCount, 8) + 1):
         b = ds.GetRasterBand(i)
-        print(f"      band {i}: {b.GetDescription() or '(unnamed)'} "
-              f"{gdal.GetDataTypeName(b.DataType)} block={b.GetBlockSize()} "
-              f"overviews={b.GetOverviewCount()}")
+        print(
+            f"      band {i}: {b.GetDescription() or '(unnamed)'} "
+            f"{gdal.GetDataTypeName(b.DataType)} block={b.GetBlockSize()} "
+            f"overviews={b.GetOverviewCount()}"
+        )
 
 
 def main() -> None:
     """Discover an S2 scene and record how EEDAI presents its mixed bands."""
     _activate()
-    print(f"discovering a scene from {COLLECTION} over {AOI} in {WINDOW[0]}..{WINDOW[1]}")
+    print(
+        f"discovering a scene from {COLLECTION} over {AOI} in {WINDOW[0]}..{WINDOW[1]}"
+    )
     connection = _first_scene()
     if not connection:
         return

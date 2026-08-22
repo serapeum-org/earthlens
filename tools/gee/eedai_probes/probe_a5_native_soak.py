@@ -30,8 +30,8 @@ import os
 import sys
 import time
 
-import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 import numpy as np
+import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -42,20 +42,38 @@ ROUNDS = int(sys.argv[1]) if len(sys.argv) > 1 else 6
 
 # asset, band, plausible (lo, hi), fill sentinels, sample locations
 TARGETS = [
-    ("USGS/SRTMGL1_003", "elevation", (-500.0, 9000.0), (-32768.0, -32767.0), [
-        ("Everest", 86.925, 27.988),
-        ("Matterhorn", 7.659, 45.976),
-        ("Andes", -70.011, -32.653),
-    ]),
-    ("NASA/NASADEM_HGT/001", "elevation", (-500.0, 9000.0), (-32768.0, -32767.0), [
-        ("Everest", 86.925, 27.988),
-        ("Alps", 7.659, 45.976),
-    ]),
+    (
+        "USGS/SRTMGL1_003",
+        "elevation",
+        (-500.0, 9000.0),
+        (-32768.0, -32767.0),
+        [
+            ("Everest", 86.925, 27.988),
+            ("Matterhorn", 7.659, 45.976),
+            ("Andes", -70.011, -32.653),
+        ],
+    ),
+    (
+        "NASA/NASADEM_HGT/001",
+        "elevation",
+        (-500.0, 9000.0),
+        (-32768.0, -32767.0),
+        [
+            ("Everest", 86.925, 27.988),
+            ("Alps", 7.659, 45.976),
+        ],
+    ),
     # GSW `occurrence` is a 0-100 percentage; Int8 -128 is its unobserved fill.
-    ("JRC/GSW1_4/GlobalSurfaceWater", "occurrence", (0.0, 100.0), (-128.0,), [
-        ("Amazon", -59.95, -3.13),
-        ("Nile", 31.23, 30.05),
-    ]),
+    (
+        "JRC/GSW1_4/GlobalSurfaceWater",
+        "occurrence",
+        (0.0, 100.0),
+        (-128.0,),
+        [
+            ("Amazon", -59.95, -3.13),
+            ("Nile", 31.23, 30.05),
+        ],
+    ),
 ]
 WINDOWS = [BLOCK * 2, BLOCK * 4]
 
@@ -111,19 +129,25 @@ def _valid(arr: np.ndarray, fill: tuple[float, ...]) -> np.ndarray:
     return out[np.isfinite(out)]
 
 
-def _judge(arr: np.ndarray, bounds: tuple[float, float], fill: tuple[float, ...]) -> tuple[bool, str]:
+def _judge(
+    arr: np.ndarray, bounds: tuple[float, float], fill: tuple[float, ...]
+) -> tuple[bool, str]:
     """Judge a read on fill-masked bounds and on degeneracy."""
     observed = _valid(arr, fill)
     if observed.size == 0:
         return False, "no observed pixels once the fill was masked"
     outside = int(((observed < bounds[0]) | (observed > bounds[1])).sum())
     if outside:
-        return False, (f"{outside} px outside {bounds} "
-                       f"(observed [{observed.min():.1f},{observed.max():.1f}])")
+        return False, (
+            f"{outside} px outside {bounds} "
+            f"(observed [{observed.min():.1f},{observed.max():.1f}])"
+        )
     if float(observed.std()) < 1e-6:
         return False, f"degenerate - every observed pixel is {observed.flat[0]:.1f}"
-    return True, (f"[{observed.min():7.1f},{observed.max():7.1f}] std={observed.std():6.1f} "
-                  f"valid={observed.size / arr.size:.0%}")
+    return True, (
+        f"[{observed.min():7.1f},{observed.max():7.1f}] std={observed.std():6.1f} "
+        f"valid={observed.size / arr.size:.0%}"
+    )
 
 
 def main() -> None:
@@ -143,12 +167,18 @@ def main() -> None:
                 handle = _open(asset, band_name)
                 ref = _blockwise(handle.GetRasterBand(1), x0, y0, side, side)
                 ok, detail = _judge(ref, bounds, fill)
-                combos.append((asset, band_name, bounds, fill, place, x0, y0, side, ref))
-                print(f"  ref {asset.split('/')[-1][:22]:22s} {place:11s} {side:>4}px  "
-                      f"{'ok ' if ok else 'BAD'} {detail}")
+                combos.append(
+                    (asset, band_name, bounds, fill, place, x0, y0, side, ref)
+                )
+                print(
+                    f"  ref {asset.split('/')[-1][:22]:22s} {place:11s} {side:>4}px  "
+                    f"{'ok ' if ok else 'BAD'} {detail}"
+                )
 
-    print(f"\nsoaking {len(combos)} combos x {ROUNDS} rounds "
-          f"({len(combos) * ROUNDS} native reads)\n")
+    print(
+        f"\nsoaking {len(combos)} combos x {ROUNDS} rounds "
+        f"({len(combos) * ROUNDS} native reads)\n"
+    )
     anomalies: list[str] = []
     started = time.time()
 
@@ -160,13 +190,19 @@ def main() -> None:
                 h = _open(asset, band_name)
                 got = _blockwise(h.GetRasterBand(1), x0, y0, side, side)
             except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
-                anomalies.append(f"round {r} {tag}: RAISED {type(exc).__name__}: {str(exc)[:80]}")
+                anomalies.append(
+                    f"round {r} {tag}: RAISED {type(exc).__name__}: {str(exc)[:80]}"
+                )
                 marks.append(f"{tag}:ERR")
                 continue
             ok, detail = _judge(got, bounds, fill)
-            stable = bool(np.allclose(np.nan_to_num(got), np.nan_to_num(ref), rtol=0, atol=1e-6))
+            stable = bool(
+                np.allclose(np.nan_to_num(got), np.nan_to_num(ref), rtol=0, atol=1e-6)
+            )
             if not ok or not stable:
-                anomalies.append(f"round {r} {tag}: healthy={ok} stable={stable} {detail}")
+                anomalies.append(
+                    f"round {r} {tag}: healthy={ok} stable={stable} {detail}"
+                )
                 marks.append(f"{tag}:BAD")
             else:
                 marks.append(f"{tag}:ok")

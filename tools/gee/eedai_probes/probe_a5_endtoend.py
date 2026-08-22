@@ -32,14 +32,36 @@ REPEATS = 4
 # asset, band, bbox (west, south, east, north), shape, plausible bounds, fill
 FILL = (-32768.0, -32767.0)
 CASES = [
-    ("USGS/SRTMGL1_003", "elevation", (7.60, 45.93, 7.72, 46.02), (128, 128), (-500.0, 9000.0), FILL),
-    ("USGS/SRTMGL1_003", "elevation", (86.87, 27.95, 86.99, 28.03), (192, 192), (-500.0, 9000.0), FILL),
-    ("NASA/NASADEM_HGT/001", "elevation", (7.60, 45.93, 7.72, 46.02), (128, 128), (-500.0, 9000.0), FILL),
+    (
+        "USGS/SRTMGL1_003",
+        "elevation",
+        (7.60, 45.93, 7.72, 46.02),
+        (128, 128),
+        (-500.0, 9000.0),
+        FILL,
+    ),
+    (
+        "USGS/SRTMGL1_003",
+        "elevation",
+        (86.87, 27.95, 86.99, 28.03),
+        (192, 192),
+        (-500.0, 9000.0),
+        FILL,
+    ),
+    (
+        "NASA/NASADEM_HGT/001",
+        "elevation",
+        (7.60, 45.93, 7.72, 46.02),
+        (128, 128),
+        (-500.0, 9000.0),
+        FILL,
+    ),
 ]
 
 
-def _check(arr: np.ndarray, bounds: tuple[float, float],
-           fill: tuple[float, ...]) -> tuple[bool, str]:
+def _check(
+    arr: np.ndarray, bounds: tuple[float, float], fill: tuple[float, ...]
+) -> tuple[bool, str]:
     """Judge one read on fill-masked bounds, degeneracy and finiteness."""
     observed = arr.astype("float64").copy()
     for sentinel in fill:
@@ -52,8 +74,10 @@ def _check(arr: np.ndarray, bounds: tuple[float, float],
         return False, f"{outside} px outside {bounds}"
     if float(observed.std()) < 1e-6:
         return False, f"degenerate - every observed pixel is {observed.flat[0]:.1f}"
-    return True, (f"range=[{observed.min():.0f},{observed.max():.0f}] "
-                  f"std={observed.std():.1f} shape={arr.shape}")
+    return True, (
+        f"range=[{observed.min():.0f},{observed.max():.0f}] "
+        f"std={observed.std():.1f} shape={arr.shape}"
+    )
 
 
 def main() -> None:
@@ -72,7 +96,9 @@ def main() -> None:
                 )
                 arr = np.asarray(ds.read_array(), dtype="float64")
             except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
-                anomalies.append(f"{asset} try{attempt}: {type(exc).__name__}: {str(exc)[:90]}")
+                anomalies.append(
+                    f"{asset} try{attempt}: {type(exc).__name__}: {str(exc)[:90]}"
+                )
                 print(f"    try{attempt}: RAISED {type(exc).__name__}: {str(exc)[:70]}")
                 continue
             good, detail = _check(arr, bounds, fill)
@@ -80,11 +106,18 @@ def main() -> None:
                 reference = arr
                 stable = True
             else:
-                stable = bool(np.allclose(np.nan_to_num(arr), np.nan_to_num(reference),
-                                          rtol=0, atol=1e-6))
+                stable = bool(
+                    np.allclose(
+                        np.nan_to_num(arr), np.nan_to_num(reference), rtol=0, atol=1e-6
+                    )
+                )
             if not good or not stable:
-                anomalies.append(f"{asset} try{attempt}: good={good} stable={stable} {detail}")
-            print(f"    try{attempt}: {'ok ' if good and stable else 'BAD'} stable={stable}  {detail}")
+                anomalies.append(
+                    f"{asset} try{attempt}: good={good} stable={stable} {detail}"
+                )
+            print(
+                f"    try{attempt}: {'ok ' if good and stable else 'BAD'} stable={stable}  {detail}"
+            )
 
     print(f"\n  elapsed {time.time() - started:.0f}s   anomalies: {len(anomalies)}")
     for line in anomalies:
