@@ -69,65 +69,77 @@ _GLOBAL_LON: list[float] = [-180.0, 180.0]
 class RiskIndicators(AbstractDataSource):
     """Country/admin-indexed risk-indicator backend (mixed output).
 
-        Resolves one dataset id to its catalog row, routes the request to that
-        row's provider (ThinkHazard / INFORM / GFW), and returns a
-        :class:`pandas.DataFrame` (`tabular`) or a
-        :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) per the
-        row's `output_kind`. The query is a search/fetch split: :meth:`_search`
-        pins the one product (dataset + resolved selector), and :meth:`_fetch`
-        issues the provider call and parses it.
+    Resolves one dataset id to its catalog row, routes the request to that
+    row's provider (ThinkHazard / INFORM / GFW), and returns a
+    :class:`pandas.DataFrame` (`tabular`) or a
+    :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) per the
+    row's `output_kind`. The query is a search/fetch split: :meth:`_search`
+    pins the one product (dataset + resolved selector), and :meth:`_fetch`
+    issues the provider call and parses it.
 
-        Auth is conditional: only a `gfw` dataset builds a :class:`GfwAuth` (`G3`);
-        ThinkHazard / INFORM need no credentials. `aggregate=` is rejected — these
-        are pre-computed indices, not gridded rasters (`G8`).
+    Auth is conditional: only a `gfw` dataset builds a :class:`GfwAuth` (`G3`);
+    ThinkHazard / INFORM need no credentials. `aggregate=` is rejected — these
+    are pre-computed indices, not gridded rasters (`G8`).
 
-    An INFORM row has two possible channels: the release workbook JRC publishes
-        on its results page — the current release, and the default for the rows the
-        workbook covers — and the Scores API, which serves one model release per
-        request, identified by a WorkflowId. `source=` picks the channel and
-        `workflow_id=` picks the API's release; the returned rows record both, so a
-        table says which channel produced it. The split exists because the two
-        disagree: the API stopped serving the 2026 workflows while the results page
-        kept publishing the 2026 release.
+    An INFORM row has two channels: the release workbook JRC publishes on its
+    results page — the current release, and the default for the rows the
+    workbook covers — and the Scores API, which serves one model release per
+    request, identified by a WorkflowId. `source=` picks the channel and
+    `workflow_id=` picks the API's release; every returned row records which
+    channel produced it. The split exists because the two disagree — the API
+    stopped serving the 2026 workflows while the results page kept publishing
+    the 2026 release.
 
-        Attributes:
-            OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved
-                dataset's `output_kind` (`"tabular"` or `"vector"`). The facade
-                reads it to gate `aggregate=` and to know the return shape.
+    Attributes:
+        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved
+            dataset's `output_kind` (`"tabular"` or `"vector"`). The facade
+            reads it to gate `aggregate=` and to know the return shape.
 
-        Examples:
-            - Resolve an INFORM dataset and read the shape it will return:
-                ```python
-                >>> from earthlens.risk_indicators import RiskIndicators
-                >>> backend = RiskIndicators(variables=["inform:risk"], country="KEN")
-                >>> backend.OUTPUT_KIND
-                'tabular'
-                >>> backend.vars
-                ['inform:risk']
+    Examples:
+        - Resolve an INFORM dataset and read the shape it will return:
+            ```python
+            >>> from earthlens.risk_indicators import RiskIndicators
+            >>> backend = RiskIndicators(variables=["inform:risk"], country="KEN")
+            >>> backend.OUTPUT_KIND
+            'tabular'
+            >>> backend.vars
+            ['inform:risk']
 
-                ```
-            - A GFW geometry dataset resolves to the vector shape instead:
-                ```python
-                >>> from earthlens.risk_indicators import RiskIndicators
-                >>> backend = RiskIndicators(
-                ...     variables=["gfw:admin_boundary"], country="KEN", api_key="k"
-                ... )
-                >>> backend.OUTPUT_KIND
-                'vector'
+            ```
+        - A GFW geometry dataset resolves to the vector shape instead:
+            ```python
+            >>> from earthlens.risk_indicators import RiskIndicators
+            >>> backend = RiskIndicators(
+            ...     variables=["gfw:admin_boundary"], country="KEN", api_key="k"
+            ... )
+            >>> backend.OUTPUT_KIND
+            'vector'
 
-                ```
-            - A workflow id outside the valid domain is refused before it reaches
-              the query string, where INFORM would answer 200 with an empty body:
-                ```python
-                >>> from earthlens.risk_indicators import RiskIndicators
-                >>> RiskIndicators(
-                ...     variables=["inform:risk"], country="KEN", workflow_id=0
-                ... )
-                Traceback (most recent call last):
-                    ...
-                ValueError: workflow_id must be a positive INFORM WorkflowId integer, got 0.
+            ```
+        - A workflow id outside the valid domain is refused before it reaches
+          the query string, where INFORM would answer 200 with an empty body:
+            ```python
+            >>> from earthlens.risk_indicators import RiskIndicators
+            >>> RiskIndicators(
+            ...     variables=["inform:risk"], country="KEN", workflow_id=0
+            ... )
+            Traceback (most recent call last):
+                ...
+            ValueError: workflow_id must be a positive INFORM WorkflowId integer, got 0.
 
-                ```
+            ```
+        - Forcing the workbook on the row it does not cover is refused at
+          construction, not at download time:
+            ```python
+            >>> from earthlens.risk_indicators import RiskIndicators
+            >>> RiskIndicators(
+            ...     variables=["inform:climate_risk"], country="KEN", source="release"
+            ... )
+            Traceback (most recent call last):
+                ...
+            ValueError: source='release' is not available for 'inform:climate_risk': the INFORM Risk release workbook does not carry it. Use source='api'.
+
+            ```
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
@@ -256,6 +268,7 @@ class RiskIndicators(AbstractDataSource):
         self.OUTPUT_KIND = self._dataset.output_kind
 
         self._validate_selector()
+        self._validate_source(workflow_id)
 
         if workflow_id is not None and self._dataset.provider != "inform":
             logger.warning(
@@ -284,6 +297,35 @@ class RiskIndicators(AbstractDataSource):
             fmt=fmt,
             path=path,
         )
+
+    def _validate_source(self, workflow_id: int | None) -> None:
+        """Reject a `source=` the resolved dataset cannot honour.
+
+        Checked at construction rather than at download time, so a request that
+        can never work fails before any network call.
+
+        Args:
+            workflow_id: The override as passed, so a contradiction with
+                `source="release"` (a workbook has no workflow) is caught here.
+
+        Raises:
+            ValueError: If `source="release"` names a dataset the release
+                workbook does not cover, or is combined with a `workflow_id`.
+        """
+        if self._source != "release":
+            return
+        if self._dataset.release_column is None:
+            raise ValueError(
+                f"source='release' is not available for {self._dataset.id!r}: "
+                "the INFORM Risk release workbook does not carry it. Use "
+                "source='api'."
+            )
+        if workflow_id is not None:
+            raise ValueError(
+                "source='release' reads the published workbook, which has no "
+                f"workflow; workflow_id={workflow_id} names an API release. Pass "
+                "one or the other."
+            )
 
     def _validate_selector(self) -> None:
         """Check the request carries the selector the resolved provider needs.
@@ -506,27 +548,17 @@ class RiskIndicators(AbstractDataSource):
         `"auto"` prefers the workbook for a row the release covers, because that
         is the current published release — but an explicit `workflow_id=` names
         an API workflow, so it keeps the API. `"release"` and `"api"` force the
-        choice, and `"release"` on a row the workbook does not cover is rejected
-        at construction rather than silently answered from the API.
+        choice; the combinations neither channel can honour are rejected in
+        :meth:`_validate_source`, so this only reports the decision.
 
         Returns:
             bool: True when the release workbook is the source for this request.
-
-        Raises:
-            ValueError: If `source="release"` names a dataset the workbook does
-                not cover (the Climate Change model is published separately).
         """
         if self._dataset.provider != "inform":
             return False
         covered = self._dataset.release_column is not None
         if self._source == "release":
-            if not covered:
-                raise ValueError(
-                    f"source='release' is not available for {self._dataset.id!r}: "
-                    "the INFORM Risk release workbook does not carry it. Use "
-                    "source='api'."
-                )
-            return True
+            return covered
         if self._source == "api":
             return False
         return covered and self._workflow_id is None
@@ -590,21 +622,21 @@ class RiskIndicators(AbstractDataSource):
         """
         if self._dataset.provider != "inform" or self._upstream_rows is None:
             return ""
-        workflow = (
-            "the release workbook"
+        channel = (
+            "the INFORM release workbook"
             if self._reads_release
-            else f"workflow {self._resolved_workflow_id}"
+            else f"INFORM workflow {self._resolved_workflow_id}"
         )
         if self._upstream_rows == 0:
             return (
-                f" INFORM {workflow} served no rows at all; it may have been "
-                "withdrawn upstream — pass workflow_id= (or source=) to read "
-                "another release."
+                f" {channel} served no rows at all; it may have been withdrawn "
+                "upstream — pass workflow_id= (or source=) to read another "
+                "release."
             )
         # Rows were served, so only the country filter can have emptied the
         # frame - without one, shaping keeps every row.
         return (
-            f" INFORM {workflow} served {self._upstream_rows} row(s), none for "
+            f" {channel} served {self._upstream_rows} row(s), none for "
             f"country={self._country!r}; the code may be misspelt or outside the "
             "country set INFORM scores."
         )

@@ -255,14 +255,14 @@ class TestRouting:
 
     def test_non_inform_never_reads_the_release(self, monkeypatch, tmp_path):
         """The release channel is INFORM-only; another provider never routes to it."""
-        b = _build(
-            monkeypatch,
-            variables=["thinkhazard:flood_river"],
-            country="KEN",
-            source="release",
-            path=tmp_path,
-        )
-        assert b._reads_release is False
+        with pytest.raises(ValueError, match="source='release' is not available"):
+            _build(
+                monkeypatch,
+                variables=["thinkhazard:flood_river"],
+                country="KEN",
+                source="release",
+                path=tmp_path,
+            )
 
     def test_source_api_reads_the_scores_endpoint(
         self, fake_http, monkeypatch, tmp_path
@@ -299,16 +299,29 @@ class TestRouting:
         assert fake_http.calls[0]["params"]["WorkflowId"] == 451
 
     def test_source_release_rejected_for_climate_risk(self, monkeypatch, tmp_path):
-        """Forcing the workbook on a row it does not cover says so."""
-        b = _build(
-            monkeypatch,
-            variables=["inform:climate_risk"],
-            country="KEN",
-            source="release",
-            path=tmp_path,
-        )
+        """Forcing the workbook on a row it does not cover fails before any request."""
         with pytest.raises(ValueError, match="source='release' is not available"):
-            b.download()
+            _build(
+                monkeypatch,
+                variables=["inform:climate_risk"],
+                country="KEN",
+                source="release",
+                path=tmp_path,
+            )
+
+    def test_source_release_with_a_workflow_id_is_contradictory(
+        self, monkeypatch, tmp_path
+    ):
+        """A workbook has no workflow, so naming both is rejected rather than ranked."""
+        with pytest.raises(ValueError, match="names an API release"):
+            _build(
+                monkeypatch,
+                variables=["inform:risk"],
+                country="KEN",
+                source="release",
+                workflow_id=503,
+                path=tmp_path,
+            )
 
     def test_inform_uses_catalog_workflow(self, fake_http, monkeypatch, tmp_path):
         """An INFORM request sends the workflow the catalog pins."""
