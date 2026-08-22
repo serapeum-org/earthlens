@@ -175,6 +175,11 @@ lens.download(errors="raise")    # abort on the first failure
 
 `"skip"` is accepted as an alias of `"ignore"`.
 
+A failure of the *service* rather than of one item is exempt from all three: it propagates even under
+`"ignore"`, because continuing would report an upstream outage as every item having no data. On the ECMWF
+backend that is `CadsUnavailableError` — see
+[when a store is throttling](reference/ecmwf/datastores.md#when-a-store-is-throttling).
+
 ### A vector or tabular request exhausts memory
 
 Cap it. `limit=` is an exact cap that stops the work rather than truncating at the end:

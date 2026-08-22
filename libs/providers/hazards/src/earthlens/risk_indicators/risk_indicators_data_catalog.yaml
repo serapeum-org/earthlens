@@ -5,7 +5,7 @@
 # and the Global Forest Watch Data API. Each dataset row pins its provider, its
 # output_kind (tabular -> DataFrame, vector -> FeatureCollection), and the
 # provider-specific request detail. Endpoints/shapes live-verified 2026-06-27
-# (see planning/risk_indicators/captures/risk-sdk-facts.md).
+# (see the A1 gate captures).
 #
 # admin_codes: ISO3 -> ThinkHazard ADM0 division code (== FAO GAUL 2015 ADM0
 # code), used by resolve_admin() to turn a country= ISO3 into a ThinkHazard code.

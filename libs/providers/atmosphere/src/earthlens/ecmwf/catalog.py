@@ -1,7 +1,7 @@
 """Variable-catalog loader for the CDS-backed ECMWF data source.
 
 Hosts :class:`Catalog`, the pydantic-backed reader for the bundled
-Copernicus Data Store catalog spanning all three stores. The catalog
+CADS catalog spanning all five stores. The catalog
 ships as a directory of per-family YAML files under
 `src/earthlens/ecmwf/catalog/` — one `<family>.yaml` per product
 family (CDS: `era5.yaml`, `carra.yaml`, `cerra.yaml`, `cmip5.yaml`,
@@ -19,7 +19,7 @@ The two consumed top-level sections each map to a typed field on
 :class:`Catalog`:
 
 * `available_datasets` (informational per-store index of dataset
-  names across CDS / ADS / EWDS) → :attr:`Catalog.available_datasets`
+  names across all five stores) → :attr:`Catalog.available_datasets`
 * `datasets` (structural map of CDS datasets, each carrying a
   monthly variant and a per-variable map) → :attr:`Catalog.datasets`,
   with each value a :class:`Dataset`
@@ -74,7 +74,7 @@ from earthlens.ecmwf.constraints import fetch_constraints
 
 # `read_cdsapirc` / `download_job` / `list_recent_jobs` were split out of this
 # module into `earthlens.ecmwf.jobs` (N3 in
-# planning/catalog-cross-backend-comparison.md). `Catalog` still delegates to
+# the cross-backend catalog comparison). `Catalog` still delegates to
 # `download_job` / `list_recent_jobs` internally, so import them under private
 # names; `_read_cdsapirc` is re-exported only so any external caller using
 # `from earthlens.ecmwf.catalog import _read_cdsapirc` keeps working.
@@ -127,7 +127,7 @@ def _merge_available(
 
     Args:
         block: A file's `available_datasets` value — a flat list of ids, or a
-            per-store `{cds: [...], ads: [...], ewds: [...]}` mapping (in which
+            per-store `{cds: [...], ads: [...], ...}` mapping (in which
             case each id is also recorded against its store for endpoint
             auto-resolution).
         available: Accumulator for the flat id list (mutated in place).
@@ -501,7 +501,7 @@ class Variable(FluxableLeaf):
             for CMIP6. Keys not enumerated in this model are not
             silently dropped: they live here and reach the server.
         endpoint: CADS instance this dataset lives on — `"cds"`
-            (default), `"ads"`, or `"ewds"`. Propagated from the parent
+            (default), `"ads"`, `"ewds"`, `"ecds"` or `"xds"`. Propagated from the parent
             dataset; selects the retrieve URL via
             `earthlens.ecmwf.endpoints.open_client`.
         grid_resolution: Native grid spacing in degrees for the
@@ -560,7 +560,7 @@ class Variable(FluxableLeaf):
         return _validate_grid_resolution(value)
 
     # `is_flux` property is inherited from `FluxableLeaf` (N1 in
-    # planning/catalog-cross-backend-comparison.md).
+    # the cross-backend catalog comparison).
 
 
 class Dataset(BaseModel):
@@ -588,7 +588,7 @@ class Dataset(BaseModel):
             `experiment`, `model`) that the dataset's request shape
             requires beyond the ERA5 standard set.
         endpoint: CADS instance the dataset lives on — `"cds"`
-            (default), `"ads"`, or `"ewds"`. Inherited by every child
+            (default), `"ads"`, `"ewds"`, `"ecds"` or `"xds"`. Inherited by every child
             variable and used to route the retrieve URL.
         grid_resolution: Native grid spacing in degrees (e.g. `0.05`
             for GloFAS), or `None` to use the ERA5 default. Inherited
@@ -668,7 +668,7 @@ class Catalog(AbstractCatalog):
 
     Attributes:
         available_datasets: Informational list of every dataset id across
-            the three Copernicus stores (CDS + ADS + EWDS), unioned from the
+            all five stores (CDS + ADS + EWDS + ECDS + XDS), unioned from the
             per-store `available_datasets:` block in `_index.yaml`; runtime
             code does not consume it.
         datasets: Structural map keyed by CDS dataset short name. Each
@@ -713,12 +713,12 @@ class Catalog(AbstractCatalog):
             ['divergence', 'fraction-of-cloud-cover', 'geopotential']
 
             ```
-        - Inspect what CDS hosts overall:
+        - Inspect what the five stores host overall:
 
             ```python
             >>> from earthlens.ecmwf import Catalog
             >>> len(Catalog().available_datasets)
-            169
+            174
 
             ```
     """
@@ -731,7 +731,7 @@ class Catalog(AbstractCatalog):
     providers: dict[str, Provider] = Field(default_factory=dict)
 
     def store_for(self, dataset_id: str) -> str | None:
-        """Return the Copernicus store (`cds` / `ads` / `ewds`) hosting a dataset.
+        """Return the store slug (e.g. `cds` / `ewds` / `xds`) hosting a dataset.
 
         Reads the per-store availability index. Used to auto-resolve the
         `endpoint` for a raw-request passthrough when the caller omits it.
@@ -934,7 +934,7 @@ class Catalog(AbstractCatalog):
     # `__getitem__` / `__contains__` / `__iter__` / `__len__` / `__repr__`
     # / `__str__` dunders are inherited from
     # :class:`earthlens.base.AbstractCatalog` (M1 in
-    # planning/catalog-cross-backend-comparison.md).
+    # the cross-backend catalog comparison).
 
     def health(self) -> dict[str, list[str]]:
         """Report structural hygiene issues across the loaded catalog (L1).

@@ -16,7 +16,7 @@ pytestmark = [pytest.mark.e2e]
 class TestCamsE2E:
     """Live EAC4 retrieve on the ADS endpoint."""
 
-    def test_live_eac4_returns_file(self, tmp_path):
+    def test_live_eac4_returns_file(self, tmp_path, download_within_budget):
         """A tiny EAC4 retrieve returns a non-empty (zipped NetCDF) file."""
         lens = EarthLens(
             data_source="ecmwf",
@@ -28,7 +28,7 @@ class TestCamsE2E:
             lon_lim=[0.0, 1.0],
             path=str(tmp_path),
         )
-        out = lens.download()
+        out = download_within_budget(lens)
         assert out
         assert out[0].exists()
         assert out[0].stat().st_size > 0

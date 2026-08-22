@@ -1,0 +1,93 @@
+# ECMWF Cross Data Store (XDS) datasets for the ECMWF backend.
+#
+# Reached via the XDS endpoint (`endpoint: xds`) with the shared CDS Personal
+# Access Token — the same token authenticates against CDS / ADS / EWDS / ECDS /
+# XDS; only the URL differs (probing `profiles/v1/account` on each returns the
+# same account). See `earthlens.ecmwf.endpoints`.
+#
+# XDS is ECMWF-hosted rather than Copernicus-branded, but it runs the same CADS
+# software: the catalogue publishes `form.json` and `constraints.json` at the
+# usual paths, so the shipped pre-flight `RequestValidator` works unchanged.
+#
+# Service caveat: every XDS response carries the notice "XDS is not an
+# operational service and is provided for research use as is. ECMWF does not
+# guarantee full service support, ongoing maintenance, or operational-level
+# assistance for these datasets." Treat XDS output as research-grade.
+#
+# Both datasets are delivered as a ZIP wrapping a single NetCDF whose member
+# name encodes the requested area subset (e.g.
+# `LFMC_MAP_2000_01.area-subset.51.10.50.9.nc`); the shipped
+# `_unpack_netcdf_archive` unwraps that in place.
+#
+# Neither dataset has a `day` or `time` selector, and the burned-area dataset
+# has no `month` either, so those template keys are dropped with explicit
+# `null` opt-outs in `extras` rather than by inventing a new `request_kind`.
+#
+# Verified live 2026-08-16 by retrieving each variable and reading the file:
+#   derived-fire-fuel-biomass         live_fuel_moisture_content_group -> LFMC
+#                                     (units `%`), ZIP -> NetCDF, dims time/lat/lon
+#   projections-fire-fuel-burned-area burned_area -> BAF_pred, ZIP -> NetCDF,
+#                                     dims time/lat/lon (units: see the row below)
+#
+# Deliberately NOT curated yet — these variables exist in the live constraints
+# but have not been retrieved, and this plan forbids `units: unknown`
+# placeholders, so they are left out until a real download pins their units:
+#   derived-fire-fuel-biomass        : dead_fuel_moisture_content_group,
+#                                      fuel_group
+#   projections-fire-fuel-burned-area: dead_foliage_load,
+#                                      dead_foliage_moisture_content,
+#                                      dead_wood_load, dead_wood_moisture_content,
+#                                      high_vegetation_leaf_area_index,
+#                                      live_fuel_moisture_content, live_leaf_load,
+#                                      live_wood_load,
+#                                      low_vegetation_leaf_area_index
+
+datasets:
+  derived-fire-fuel-biomass:
+    endpoint: xds
+    request_kind: form
+    extras:
+      # Pinned from the live constraints (2026-08-16): version 2 spans
+      # 1999-2025 and is the newer of the two (`1` / `2`). Note the STAC
+      # `extent` advertises 2003-2021, which is narrower than what the
+      # constraints actually serve - the constraints are authoritative, and a
+      # 2000-01 retrieve succeeded.
+      version: ["2"]
+      # This form exposes no day/time/data_format widgets - drop the template
+      # keys rather than sending selectors the store does not accept.
+      day: null
+      time: null
+      data_format: null
+    variables:
+      live-fuel-moisture-content-group:
+        cds_variable: live_fuel_moisture_content_group
+        nc_variable: LFMC
+        units: "%"
+
+  projections-fire-fuel-burned-area:
+    endpoint: xds
+    request_kind: form
+    extras:
+      # Pinned from the live constraints (2026-08-16). `experiment` also
+      # accepts six SSP scenarios (ssp1_1_9 .. ssp5_8_5) and the form exposes a
+      # `model` widget with 12+ CMIP6 models; neither is pinned here because
+      # only the `historical` / default-model combination has been retrieved.
+      # Use the passthrough for another scenario or model.
+      experiment: [historical]
+      version: ["1_0"]
+      # Annual data: this form exposes no month/day/time/data_format widgets.
+      month: null
+      day: null
+      time: null
+      data_format: null
+    variables:
+      burned-area:
+        cds_variable: burned_area
+        nc_variable: BAF_pred
+        # INFERRED, not observed: the NetCDF carries no `units` attribute and
+        # the catalogue metadata documents none. The inference is from the
+        # file's own CF-1.9 declaration plus `long_name` "Burned Area Fraction"
+        # and observed values inside [0, 1] (3.3e-06 .. 2.4e-03), so `1` (the
+        # CF dimensionless unit for a fraction) is the best-supported value.
+        # Replace it if the provider ever documents a unit.
+        units: "1"

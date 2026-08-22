@@ -2,7 +2,7 @@
 #
 # Historical reanalysis + seasonal forecast of the Canadian FWI components on
 # the EWDS store. Request shapes + valid combos are pinned from the live
-# `constraints.json` (`planning/ecmwf/captures/a1_constraints_cems-fire-*.json`,
+# `constraints.json` (the A1 gate captures,
 # 2026-08-01): fire-historical requires `dataset_type: intermediate_dataset`
 # and a `grid` selector (`0.25/0.25`) — a naive request without them 400s.
 # `nc_variable` (`fwinx`) is best-effort; the gated live e2e confirms it (every

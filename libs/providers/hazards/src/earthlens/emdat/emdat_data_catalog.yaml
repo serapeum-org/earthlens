@@ -5,7 +5,7 @@
 # routes. Each dataset row pins its provider, its output_kind (tabular ->
 # DataFrame, vector -> FeatureCollection), the transport detail needed to fetch
 # it, and its licence. Routes live-verified 2026-08-01 (see
-# planning/flood-risk/captures/emdat-a1-routes-2026-08-01.json).
+# the A1 gate captures).
 #
 # Two providers:
 #

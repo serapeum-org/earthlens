@@ -61,8 +61,10 @@ class TestApi:
         assert isinstance(args[1], dict), (
             f"Second arg must be a request dict, got {type(args[1])}"
         )
-        assert args[2] == str(target), (
-            f"Third arg must equal str(target); got {args[2]!r} vs {str(target)!r}"
+        # The retrieve writes a sidecar that is moved onto `target` on success,
+        # so a failed attempt cannot truncate a good file already there.
+        assert args[2] == f"{target}.part", (
+            f"Third arg must be the sidecar for {target!r}; got {args[2]!r}"
         )
 
     def test_request_carries_required_default_keys(

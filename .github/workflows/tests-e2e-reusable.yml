@@ -113,7 +113,7 @@ jobs:
             '{"name":"osm","path":"libs/providers/hazards/(src/earthlens|tests)/osm/","marker":"e2e and osm","groups":"groups: dev, extras: osm","pkg":"libs/providers/hazards/tests/osm"}'
             )
             catchall_marker="e2e and not emdat and not osm and not osm_pbf"
-            catchall_deselect="tests/admin/test_admin_e2e.py::TestAdminLiveFetch::test_geoboundaries_country_adm1"
+            catchall_deselect=""
             dedicated_backends="emdat|osm"
             ;;
             *)

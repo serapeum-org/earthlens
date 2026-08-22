@@ -17,7 +17,9 @@ pytestmark = [pytest.mark.e2e]
 class TestPassthroughE2E:
     """Live passthrough retrieve through the resolved store."""
 
-    def test_live_cds_passthrough_returns_netcdf(self, tmp_path):
+    def test_live_cds_passthrough_returns_netcdf(
+        self, tmp_path, download_within_budget
+    ):
         """A raw CDS request downloads and reads back as NetCDF, no curated row."""
         lens = EarthLens(
             data_source="ecmwf",
@@ -33,7 +35,7 @@ class TestPassthroughE2E:
             },
             path=str(tmp_path),
         )
-        out = lens.download()
+        out = download_within_budget(lens)
         assert len(out) == 1, "one file written"
         target = out[0]
         assert target.exists()

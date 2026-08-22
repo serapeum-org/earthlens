@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import glob
 import os
+import pathlib
 import shutil
 from collections.abc import Mapping
 from typing import List
@@ -269,6 +270,9 @@ class TestECMWFBackend:
         class FakeClient:
             def retrieve(self, dataset, request, target):
                 retrieved.append((dataset, request, target))
+                # cdsapi always writes the file it is handed; the backend
+                # treats a retrieve that wrote nothing as a failed download.
+                pathlib.Path(target).write_bytes(b"")
 
         monkeypatch.setattr(cdsapi, "Client", FakeClient)
 
