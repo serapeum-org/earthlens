@@ -66,6 +66,72 @@ _GLOBAL_LAT: list[float] = [-90.0, 90.0]
 _GLOBAL_LON: list[float] = [-180.0, 180.0]
 
 
+def _resolve_ids(variables: list[str] | None) -> list[str]:
+    """Reduce `variables` to the single dataset id this instance serves.
+
+    Args:
+        variables: The `variables=` argument as passed.
+
+    Returns:
+        list[str]: A one-element list holding the dataset id.
+
+    Raises:
+        TypeError: If `variables` is a mapping (the other backends accept one;
+            this one takes a list of a single id).
+        ValueError: If it does not name exactly one dataset.
+    """
+    if isinstance(variables, dict):
+        raise TypeError(
+            "RiskIndicators `variables` must be a one-element list naming "
+            "the dataset id (e.g. ['thinkhazard:flood_river']), not a mapping."
+        )
+    ids = list(dict.fromkeys(variables)) if variables else []
+    if len(ids) != 1:
+        raise ValueError(
+            "RiskIndicators needs exactly one dataset id in variables= "
+            "(OUTPUT_KIND is per instance); got "
+            f"{ids!r}. Available: {Catalog().available()}."
+        )
+    return ids
+
+
+def _validate_options(
+    source: InformSource, output_format: OutputFormat, workflow_id: int | None
+) -> None:
+    """Check the per-request options that do not depend on the resolved dataset.
+
+    Args:
+        source: The requested INFORM channel.
+        output_format: The requested on-disk format.
+        workflow_id: The requested INFORM WorkflowId override.
+
+    Raises:
+        ValueError: If `source` or `output_format` is unrecognised, or
+            `workflow_id` is not a positive integer.
+    """
+    if source not in INFORM_SOURCES:
+        raise ValueError(
+            f"source must be one of {list(INFORM_SOURCES)}, got {source!r}."
+        )
+    if output_format not in OUTPUT_FORMATS:
+        raise ValueError(
+            f"output_format must be one of {list(OUTPUT_FORMATS)}, "
+            f"got {output_format!r}."
+        )
+    # The id goes straight into the query string, where a string, a float or a
+    # non-positive number would 200 with an empty body rather than fail -
+    # indistinguishable from a withdrawn workflow. bool is an int subclass.
+    if workflow_id is not None and (
+        isinstance(workflow_id, bool)
+        or not isinstance(workflow_id, int)
+        or workflow_id <= 0
+    ):
+        raise ValueError(
+            f"workflow_id must be a positive INFORM WorkflowId integer, got "
+            f"{workflow_id!r}."
+        )
+
+
 class RiskIndicators(AbstractDataSource):
     """Country/admin-indexed risk-indicator backend (mixed output).
 
@@ -216,39 +282,8 @@ class RiskIndicators(AbstractDataSource):
                 / admin selector for the resolved provider is missing (`G7`).
             AuthenticationError: For a `gfw` dataset when no key resolves (`G3`).
         """
-        if isinstance(variables, dict):
-            raise TypeError(
-                "RiskIndicators `variables` must be a one-element list naming "
-                "the dataset id (e.g. ['thinkhazard:flood_river']), not a mapping."
-            )
-        ids = list(dict.fromkeys(variables)) if variables else []
-        if len(ids) != 1:
-            raise ValueError(
-                "RiskIndicators needs exactly one dataset id in variables= "
-                "(OUTPUT_KIND is per instance); got "
-                f"{ids!r}. Available: {Catalog().available()}."
-            )
-        if source not in INFORM_SOURCES:
-            raise ValueError(
-                f"source must be one of {list(INFORM_SOURCES)}, got {source!r}."
-            )
-        if output_format not in OUTPUT_FORMATS:
-            raise ValueError(
-                f"output_format must be one of {list(OUTPUT_FORMATS)}, "
-                f"got {output_format!r}."
-            )
-        # The id goes straight into the query string, where a string or a float
-        # would 200 with an empty body rather than fail - indistinguishable from
-        # a withdrawn workflow. Reject it here instead. bool is an int subclass.
-        if workflow_id is not None and (
-            isinstance(workflow_id, bool)
-            or not isinstance(workflow_id, int)
-            or workflow_id <= 0
-        ):
-            raise ValueError(
-                f"workflow_id must be a positive INFORM WorkflowId integer, got "
-                f"{workflow_id!r}."
-            )
+        ids = _resolve_ids(variables)
+        _validate_options(source, output_format, workflow_id)
 
         self._catalog = Catalog()
         self._dataset: Dataset = self._catalog.get(ids[0])

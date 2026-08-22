@@ -710,8 +710,6 @@ def inform_to_frame(
     ]
     frame = _inform_frame(
         {name: [row[name] for row in records] for name in INFORM_COLUMNS}
-        if records
-        else dict.fromkeys(INFORM_COLUMNS, [])
     )
     frame["iso3"] = frame["iso3"].str.strip().str.upper()
     frame.attrs["served_rows"] = len(frame)
