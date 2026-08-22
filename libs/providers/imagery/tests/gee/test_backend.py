@@ -304,6 +304,42 @@ def _write_then_fail(path):
     raise RuntimeError("write failed")
 
 
+class _FlakyReplace:
+    """Fail one rename, then move the file by hand as a real one would."""
+
+    def __init__(self) -> None:
+        self.attempts = 0
+
+    def __call__(self, source, target) -> None:
+        self.attempts += 1
+        if self.attempts == 1:
+            raise PermissionError("file is in use")
+        Path(target).write_bytes(Path(source).read_bytes())
+        Path(source).unlink()
+
+
+class _WriteWithSidecar:
+    """Write a staged raster and drop a GDAL sidecar beside it."""
+
+    def __init__(self, sidecar: Path) -> None:
+        self.sidecar = sidecar
+
+    def __call__(self, path) -> None:
+        Path(path).write_bytes(b"eedai-tif")
+        self.sidecar.write_text("<PAMDataset/>")
+
+
+_REAL_EEDAI_PLAN = backend_module.GEE._eedai_plan
+_PLANS_SEEN: list = []
+
+
+def _recording_plan(self, var_info, band_count):
+    """Delegate to the real plan, recording every verdict it hands back."""
+    result = _REAL_EEDAI_PLAN(self, var_info, band_count)
+    _PLANS_SEEN.append(result)
+    return result
+
+
 def _plan_for(gee, var_info, bands=1):
     """Return the routing plan the backend would compute for this request."""
     return gee._eedai_plan(var_info, bands)
@@ -2223,22 +2259,14 @@ class TestExportViaEedai:
         The rename happens after every tile has been fetched, so failing there
         would throw away the whole read.
         """
-        attempts: list[int] = []
-
-        def flaky_replace(source, target):
-            attempts.append(1)
-            if len(attempts) == 1:
-                raise PermissionError("file is in use")
-            Path(target).write_bytes(Path(source).read_bytes())
-            Path(source).unlink()
-
+        flaky_replace = _FlakyReplace()
         monkeypatch.setattr(backend_module.os, "replace", flaky_replace)
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         target = gee._export_via_eedai(
             var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
         )
-        assert len(attempts) == 2, "the rename was not retried"
+        assert flaky_replace.attempts == 2, "the rename was not retried"
         assert target.exists()
 
     def test_a_persistent_lock_is_not_swallowed(
@@ -2259,40 +2287,27 @@ class TestExportViaEedai:
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         sidecar = gee.root_dir / "srtm_elev.partial.tif.aux.xml"
 
-        def write_with_sidecar(path):
-            Path(path).write_bytes(b"eedai-tif")
-            sidecar.write_text("<PAMDataset/>")
-
-        fake_reader.dataset.to_file = write_with_sidecar
+        fake_reader.dataset.to_file = _WriteWithSidecar(sidecar)
         gee._export_via_eedai(
             var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
         )
         assert not sidecar.exists(), "the .aux.xml sidecar leaked"
         assert not list(gee.root_dir.glob("*.partial*"))
 
-    def test_the_plan_is_computed_once_per_bucket(self, make_gee, fake_reader):
+    def test_the_plan_is_computed_once_per_bucket(
+        self, make_gee, fake_reader, monkeypatch
+    ):
         """`_api` plans once and hands the verdict down, rather than re-deriving it.
 
         Recomputing in the exporter reprojects the region again and lets the
         routing decision and the read disagree.
         """
-        plans: list[tuple] = []
-        original = backend_module.GEE._eedai_plan
-
-        def counting_plan(self, var_info, band_count):
-            result = original(self, var_info, band_count)
-            plans.append(result)
-            return result
-
+        _PLANS_SEEN.clear()
+        monkeypatch.setattr(backend_module.GEE, "_eedai_plan", _recording_plan)
         gee = make_gee()
-        monkeypatch_target = backend_module.GEE
-        setattr(monkeypatch_target, "_eedai_plan", counting_plan)
-        try:
-            var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-            gee._api(_FakeImage(), var_info, ["elevation"], dt.datetime(2000, 2, 11))
-        finally:
-            setattr(monkeypatch_target, "_eedai_plan", original)
-        assert len(plans) == 1, f"the plan was computed {len(plans)} times"
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._api(_FakeImage(), var_info, ["elevation"], dt.datetime(2000, 2, 11))
+        assert len(_PLANS_SEEN) == 1, f"the plan was computed {len(_PLANS_SEEN)} times"
 
     def test_an_empty_band_request_budgets_for_every_band(self, make_gee, fake_reader):
         """No bands means upstream opens them all, so the budget must say so."""
