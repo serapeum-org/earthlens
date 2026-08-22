@@ -19,7 +19,7 @@ catalog lookup, request shaping, and writing the output.
 
 <video autoplay loop muted playsinline width="100%"
        poster="_images/branding/earthlens-brand-kit/docs/docs-hero.png">
-  <source src="_images/showcase/earthlens-satellites-night.mp4" type="video/mp4">
+  <source src="_images/animation/earthlens-satellites-night-1280.mp4" type="video/mp4">
 </video>
 
 <figcaption markdown>

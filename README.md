@@ -29,7 +29,7 @@ earthlens — a unified Python client for satellite & climate data
 =====================================================================
 
 <p align="center">
-  <img src="docs/_images/showcase/earthlens-satellites-night.gif" width="820"
+  <img src="docs/_images/animation/earthlens-satellites-night.gif" width="820"
        alt="The satellite fleet earthlens can reach, in orbit — ground swaths sweeping a night-lit Earth">
 </p>
 
