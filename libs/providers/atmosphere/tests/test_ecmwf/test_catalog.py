@@ -1113,7 +1113,17 @@ class TestDenotesTemporalAggregate:
 
     @pytest.mark.parametrize(
         "value",
-        ["instantaneous", "instant", "1_hour", "hourly", "6_hourly", "3-hourly"],
+        [
+            "instantaneous",
+            "instant",
+            "1_hour",
+            "hourly",
+            "6_hourly",
+            "3-hourly",
+            "sub-daily",
+            "sub_daily",
+            "subdaily",
+        ],
     )
     def test_sub_daily_and_instantaneous_values_are_not_aggregates(self, value):
         """Instantaneous / sub-daily (hourly) values are treated as raw.

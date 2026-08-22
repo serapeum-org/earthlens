@@ -451,7 +451,6 @@ _TEMPORAL_AGGREGATE_TOKENS = (
     "avg",
     "climatolog",
     "daily",
-    "day",
     "dekad",
     "pentad",
     "week",
@@ -498,7 +497,10 @@ def _denotes_temporal_aggregate(value: Any) -> bool:
         return False
     items = value if isinstance(value, (list, tuple)) else [value]
     text = " ".join(str(item).lower() for item in items)
-    if "instant" in text or "hour" in text:
+    # Sub-daily / instantaneous samples are raw, not aggregates. This veto must
+    # run before the token match — a `sub-daily` value contains the `daily`
+    # token — and any new sub-daily spelling must be added here.
+    if any(marker in text for marker in ("instant", "hour", "sub")):
         return False
     return any(token in text for token in _TEMPORAL_AGGREGATE_TOKENS)
 
