@@ -298,6 +298,12 @@ def _always_permission_error(source, target):
     raise PermissionError("file is in use")
 
 
+def _cog_then_fail(path, **kwargs):
+    """Write the COG staging file then fail, as a driver dying mid-write would."""
+    Path(path).write_bytes(b"trunc-cog")
+    raise RuntimeError("cog conversion failed")
+
+
 def _write_then_fail(path):
     """Write a truncated raster then fail, as a driver dying mid-write would."""
     Path(path).write_bytes(b"trunc")
@@ -2206,6 +2212,28 @@ class TestExportViaEedai:
         assert kwargs["tile_size"] >= 1
         assert target.read_bytes() == b"eedai-cog"
         assert not list(target.parent.glob("*.partial*.tif"))
+
+    def test_a_failed_cog_conversion_leaves_no_staging_file(
+        self, make_gee, fake_reader
+    ):
+        """A COG conversion that dies mid-write takes both staging files with it.
+
+        The COG path stages through a second name, so a failure there can leave
+        a truncated raster the next read would find and trust.
+        """
+        gee = make_gee(cog=True)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        fake_reader.dataset.cog.to_cog = _cog_then_fail
+        with pytest.raises(RuntimeError, match="cog conversion failed"):
+            gee._export_via_eedai(
+                var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+            )
+        assert not list(gee.root_dir.glob("*.partial*")), (
+            "a staging file survived the failed conversion"
+        )
+        assert not (gee.root_dir / "srtm_elev.tif").exists(), (
+            "a failed conversion still produced an output"
+        )
 
     def test_a_failed_tiled_write_leaves_no_staging_file(
         self, make_gee, fake_reader, monkeypatch
