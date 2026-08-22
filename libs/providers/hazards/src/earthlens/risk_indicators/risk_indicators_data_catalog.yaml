@@ -94,11 +94,18 @@ datasets:
     selector: country
     long_name: All ThinkHazard! hazard levels for a division
     citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
+  # INFORM workflow pin. The JRC Scores route stopped serving the INFORM2026
+  # group on 2026-08-18: workflow 505 ("INFORM Risk 2026") answers 200 [] for
+  # every indicator, as do 515 and 481, while the 2026 release itself is still
+  # published (INFORM_Risk_2026_v072.xlsx). The four rows below therefore pin
+  # 503 ("INFORM Risk Mid 2025", published 2025-08-28) - the newest workflow the
+  # API still serves - so the scores are one release behind the site until JRC
+  # restores 505. Pass workflow_id= to select another workflow per request.
   inform:risk:
     provider: inform
     output_kind: tabular
     selector: country
-    workflow_id: 505
+    workflow_id: 503
     indicator_id: INFORM
     long_name: INFORM Risk composite index
     citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
@@ -106,7 +113,7 @@ datasets:
     provider: inform
     output_kind: tabular
     selector: country
-    workflow_id: 505
+    workflow_id: 503
     indicator_id: HA
     long_name: INFORM Hazard & Exposure dimension
     citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
@@ -114,7 +121,7 @@ datasets:
     provider: inform
     output_kind: tabular
     selector: country
-    workflow_id: 505
+    workflow_id: 503
     indicator_id: VU
     long_name: INFORM Vulnerability dimension
     citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
@@ -122,7 +129,7 @@ datasets:
     provider: inform
     output_kind: tabular
     selector: country
-    workflow_id: 505
+    workflow_id: 503
     indicator_id: CC
     long_name: INFORM Lack of Coping Capacity dimension
     citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."

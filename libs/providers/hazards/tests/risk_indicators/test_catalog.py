@@ -75,7 +75,7 @@ class TestGet:
     def test_inform_row(self):
         """An INFORM row carries a workflow id and indicator id."""
         row = Catalog().get("inform:risk")
-        assert row.workflow_id == 505
+        assert row.workflow_id == 503
         assert row.indicator_id == "INFORM"
 
     def test_unknown_id_raises_did_you_mean(self):
