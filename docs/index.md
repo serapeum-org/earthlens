@@ -25,6 +25,11 @@ catalog lookup, request shaping, and writing the output.
 <figcaption markdown>
 34 of the spacecraft behind earthlens' providers, drawn on their published orbits. Each trailing band is
 that instrument's real ground swath, and the trapezoid above it is the field of view sweeping it out.
+
+The clock counts **simulated orbital time at 270&times; real**: the 20-second clip covers 1.5 hours. Earth
+turns 22.6&deg; in that window and a low orbiter completes about nine tenths of a circuit, which is how its
+~90-minute period can be read straight off the screen. The geostationary satellites appear frozen because
+they are turning at exactly Earth's rate, holding station over the same ground.
 </figcaption>
 
 ## Supported data sources
