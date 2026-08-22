@@ -363,6 +363,32 @@ class TestCatalog:
         assert spec.nc_variable == "t"
         assert spec.cds_pressure_level == ["1000"]
 
+    def test_is_pre_aggregated_flags_daily_statistics_and_monthly_means(self):
+        """`Variable.is_pre_aggregated` is True for the two pre-aggregated families (#43).
+
+        Daily-statistics variables carry a `daily_statistic` extra and monthly-means
+        variables a `monthly_averaged_*` product type; a raw hourly ERA5 variable
+        (same physical quantity, same `types: flux`) is not pre-aggregated, so
+        `op="auto"` still sums it.
+        """
+        cat = Catalog()
+        daily_tp = cat.datasets[
+            "derived-era5-single-levels-daily-statistics"
+        ].variables["total-precipitation-daily"]
+        monthly_tp = cat.datasets[
+            "reanalysis-era5-single-levels-monthly-means"
+        ].variables["total-precipitation"]
+        raw_tp = cat.datasets["reanalysis-era5-single-levels"].variables[
+            "total-precipitation"
+        ]
+        # All three are flux; only the pre-aggregated two must flag.
+        assert daily_tp.is_flux, "daily-statistics tp should be flux"
+        assert monthly_tp.is_flux, "monthly-means tp should be flux"
+        assert raw_tp.is_flux, "raw ERA5 tp should be flux"
+        assert daily_tp.is_pre_aggregated is True, "daily-statistics flux var"
+        assert monthly_tp.is_pre_aggregated is True, "monthly-means flux var"
+        assert raw_tp.is_pre_aggregated is False, "raw hourly ERA5 flux var"
+
     def test_minimal_valid_request_picks_entry_with_variable(self, monkeypatch):
         """`minimal_valid_request` returns a known-valid request dict."""
         from earthlens.ecmwf import constraints as constraints_module

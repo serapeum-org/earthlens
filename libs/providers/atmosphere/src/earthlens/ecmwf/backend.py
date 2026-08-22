@@ -983,14 +983,19 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 `0.003 m` (the average 6-hour accumulation, **not**
                 a daily total).
 
+                * **Pre-aggregated** (`Variable.is_pre_aggregated` —
+                  the `derived-era5-*-daily-statistics` and
+                  `reanalysis-era5-*-monthly-means` families, where
+                  each NetCDF sample is already a server-side daily /
+                  monthly aggregate). `auto` → `"mean"`, overriding
+                  the flux rule: a `"sum"` would re-accumulate the
+                  aggregates and multiply by the number of samples in
+                  the window (~30× for a monthly window over daily
+                  statistics).
+
                 Pass an explicit `op="mean"` / `"sum"` / `"min"` /
-                `"max"` / `"std"` to bypass auto-routing — for
-                example, on pre-aggregated CDS datasets like
-                `derived-era5-single-levels-daily-statistics` where
-                each NetCDF sample is already a daily aggregate and
-                summing four of them would multiply by 4. See
-                `docs/reference/aggregation.md` for the full
-                walkthrough.
+                `"max"` / `"std"` to bypass auto-routing entirely. See
+                `docs/aggregation.md` for the full walkthrough.
         Returns:
             list[Path]: The written output paths — one per-variable
             NetCDF at `<self.root_dir>/<cds_variable>_<dataset_id>.nc`
