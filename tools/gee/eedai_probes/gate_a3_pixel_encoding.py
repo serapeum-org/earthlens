@@ -68,7 +68,8 @@ def main() -> None:
     for asset, bands, lon, lat in CANDIDATES:
         try:
             ds = open_eedai(asset, bands=bands, block=BLOCK)
-        except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
+        # The probe reports, it does not recover.
+        except Exception as exc:  # noqa: BLE001
             print(f"  {asset:42s} UNAVAILABLE: {type(exc).__name__}")
             continue
         types = {

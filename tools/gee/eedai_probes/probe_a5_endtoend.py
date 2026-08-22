@@ -75,7 +75,8 @@ def main() -> None:
                     asset, bands=[band], bbox=bbox, shape=shape, credentials=KEY
                 )
                 arr = np.asarray(ds.read_array(), dtype="float64")
-            except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
+            # The probe reports, it does not recover.
+            except Exception as exc:  # noqa: BLE001
                 anomalies.append(
                     f"{asset} try{attempt}: {type(exc).__name__}: {str(exc)[:90]}"
                 )

@@ -33,13 +33,17 @@ from _common import (
 )
 from pyramids_eo.earthengine import from_earthengine
 
+SRTM = "USGS/SRTMGL1_003"
+NASADEM = "NASA/NASADEM_HGT/001"
+GSW = "JRC/GSW1_4/GlobalSurfaceWater"
+
 ROUNDS = int(sys.argv[1]) if len(sys.argv) > 1 else 6
 WINDOWS = [BLOCK * 2, BLOCK * 4]
 
 # asset, band, plausible bounds, fill sentinels, sample locations
 TARGETS = [
     (
-        "USGS/SRTMGL1_003",
+        SRTM,
         "elevation",
         (-500.0, 9000.0),
         (-32768.0, -32767.0),
@@ -50,7 +54,7 @@ TARGETS = [
         ],
     ),
     (
-        "NASA/NASADEM_HGT/001",
+        NASADEM,
         "elevation",
         (-500.0, 9000.0),
         (-32768.0, -32767.0),
@@ -61,7 +65,7 @@ TARGETS = [
     ),
     # GSW `occurrence` is a 0-100 percentage; Int8 -128 is its unobserved fill.
     (
-        "JRC/GSW1_4/GlobalSurfaceWater",
+        GSW,
         "occurrence",
         (0.0, 100.0),
         (-128.0,),
@@ -77,21 +81,21 @@ TARGETS = [
 # pixel and returns a degenerate raster - the bug earthlens resolves to `shape=`.
 END_TO_END = [
     (
-        "USGS/SRTMGL1_003",
+        SRTM,
         "elevation",
         (7.60, 45.93, 7.72, 46.02),
         (128, 128),
         (-500.0, 9000.0),
     ),
     (
-        "USGS/SRTMGL1_003",
+        SRTM,
         "elevation",
         (86.87, 27.95, 86.99, 28.03),
         (192, 192),
         (-500.0, 9000.0),
     ),
     (
-        "NASA/NASADEM_HGT/001",
+        NASADEM,
         "elevation",
         (7.60, 45.93, 7.72, 46.02),
         (128, 128),
@@ -134,7 +138,8 @@ def _soak(combos: list[tuple], anomalies: list[str]) -> None:
             try:
                 handle = open_eedai(asset, bands=[band_name])
                 got = blockwise(handle.GetRasterBand(1), x0, y0, side, side)
-            except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
+            # The probe reports, it does not recover.
+            except Exception as exc:  # noqa: BLE001
                 anomalies.append(f"round {round_} {tag}: RAISED {type(exc).__name__}")
                 marks.append(f"{tag}:ERR")
                 continue

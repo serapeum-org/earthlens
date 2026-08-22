@@ -88,7 +88,8 @@ def _report(label: str, connection: str, bands: list[str] | None) -> None:
         ds = gdal.OpenEx(
             connection, gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts
         )
-    except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
+    # The probe reports, it does not recover.
+    except Exception as exc:  # noqa: BLE001
         print(f"    RAISED {type(exc).__name__}: {str(exc)[:110]}")
         return
     if ds is None:

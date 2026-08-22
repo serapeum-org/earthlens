@@ -70,7 +70,8 @@ def main() -> None:
         started = time.time()
         try:
             arr = blockwise(band, x0, y0, SIDE, SIDE, block=actual)
-        except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
+        # The probe reports, it does not recover.
+        except Exception as exc:  # noqa: BLE001
             print(
                 f"  {block:>6} {actual:>7} {calls:>6} {'-':>7} {'-':>7}  "
                 f"RAISED {type(exc).__name__}"
@@ -79,7 +80,12 @@ def main() -> None:
         secs = time.time() - started
         ok, detail = judge(arr, BOUNDS, FILL)
         same = matches(arr, reference)
-        verdict = "ok" if ok and same else ("MISMATCH" if ok else "BAD")
+        if not ok:
+            verdict = "BAD"
+        elif not same:
+            verdict = "MISMATCH"
+        else:
+            verdict = "ok"
         print(
             f"  {block:>6} {actual:>7} {calls:>6} {len(_MESSAGES):>7} {secs:>7.1f}  "
             f"{verdict:>8} {detail}"

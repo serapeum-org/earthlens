@@ -270,7 +270,8 @@ def main() -> None:
         )
         try:
             run()
-        except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
+        # The probe reports, it does not recover.
+        except Exception as exc:  # noqa: BLE001
             print(f"  UNEXPECTED {type(exc).__name__}: {str(exc)[:130]}")
 
 

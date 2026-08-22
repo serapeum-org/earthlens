@@ -41,7 +41,8 @@ ROUNDS = int(sys.argv[1]) if len(sys.argv) > 1 else 25
 _LOG: deque[str] = deque(maxlen=400)
 
 
-def _collect(err_class, err_no, msg):  # noqa: ARG001 - GDAL's handler signature
+# GDAL's handler signature.
+def _collect(err_class, err_no, msg):  # noqa: ARG001
     """Keep a rolling window of GDAL debug and error lines."""
     _LOG.append(f"[{err_class}/{err_no}] {msg}")
 
@@ -83,7 +84,8 @@ def main() -> None:
             references[level] = blockwise(ov, ox0, oy0, ow, oh)
             ok, detail = judge(references[level], BOUNDS, FILL)
             print(f"  reference ov[{level}]: {'ok ' if ok else 'BAD'} {detail}")
-        except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
+        # The probe reports, it does not recover.
+        except Exception as exc:  # noqa: BLE001
             print(
                 f"  reference ov[{level}]: RAISED {type(exc).__name__}: {str(exc)[:70]}"
             )
