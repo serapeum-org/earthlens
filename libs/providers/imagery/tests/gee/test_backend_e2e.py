@@ -85,9 +85,8 @@ def _download_srtm(tmp_path, engine: str):
 
 
 def _record_plan(plan, sink):
-    """Record a plan's tile size, then hand the plan back unchanged."""
-    _can_serve, tile_size, _reason = plan
-    sink.append(tile_size)
+    """Record how a plan tiled, then hand it back unchanged."""
+    sink.append(plan.tiles if plan.tile_size is not None else 0)
     return plan
 
 
@@ -189,7 +188,7 @@ def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
     monkeypatch.setattr(
         backend_module.GEE,
         "_eedai_plan",
-        lambda self, var_info, band_count=1: _record_plan(
+        lambda self, var_info, band_count: _record_plan(
             original_plan(self, var_info, band_count), tiled_calls
         ),
     )
@@ -197,8 +196,8 @@ def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
     # Without this the test would silently compare two single-pass reads and
     # pass, proving nothing about tiling.
     assert tiled_calls, "no read was planned at all"
-    assert all(size is not None for size in tiled_calls), (
-        f"the read was not tiled: planned tile sizes {tiled_calls}"
+    assert all(count > 1 for count in tiled_calls), (
+        f"the read was not cut into multiple tiles: tile counts {tiled_calls}"
     )
 
     assert tiled.is_file(), f"tiled output missing: {tiled}"

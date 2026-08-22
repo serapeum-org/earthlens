@@ -52,7 +52,7 @@ import math
 import os
 from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple
 
 import ee
 import pandas as pd
@@ -92,7 +92,13 @@ if TYPE_CHECKING:  # pragma: no cover - typing only
 
     from earthlens.base.http import HttpClient
 
-__all__ = ["GEE", "AuthenticationError", "CloudMask", "CollectionFilter"]
+__all__ = [
+    "GEE",
+    "AuthenticationError",
+    "CloudMask",
+    "CollectionFilter",
+    "EedaiPlan",
+]
 
 # `temporal_resolution` → pandas frequency alias for the per-bucket
 # date range. `"raw"` is special-cased (one bucket spanning the whole
@@ -314,6 +320,25 @@ def _validate_filters(
                 f"{type(image_filter).__name__}"
             )
     return collection_filters
+
+
+class EedaiPlan(NamedTuple):
+    """How the EEDAI reader should serve one request, or why it should not.
+
+    Attributes:
+        can_serve: Whether the reader takes this read at all.
+        tile_size: Output pixels per tile side when the read is streamed, or
+            `None` for a single pass (and when `can_serve` is `False`).
+        tiles: How many tiles the streamed read is cut into; `1` for a single
+            pass. Carried here so the exporter never re-derives it — a second
+            derivation is free to disagree with the one that was routed on.
+        reason: Why the reader declined, empty when it did not.
+    """
+
+    can_serve: bool
+    tile_size: int | None
+    tiles: int
+    reason: str
 
 
 class GEE(LazyClientMixin, AbstractDataSource):
@@ -1216,9 +1241,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             and self.crs.upper() == _EEDAI_NATIVE_CRS
         )
 
-    def _eedai_plan(
-        self, var_info: Dataset, band_count: int
-    ) -> tuple[bool, int | None, str]:
+    def _eedai_plan(self, var_info: Dataset, band_count: int) -> EedaiPlan:
         """Decide how — or whether — the reader can serve this request.
 
         A window too large to materialise is no longer a dead end: the reader
@@ -1251,25 +1274,28 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 them all, so they divide the per-tile budget.
 
         Returns:
-            `(can_serve, tile_size, reason)` — `tile_size` is `None` for a
+            an :class:`EedaiPlan` — `tile_size` is `None` for a
             single read, and `reason` explains a `False` for the fallback log
             line or the forced-engine error.
         """
         bbox, cutline = self._eedai_window()
         fits, reason = self._eedai_native_fits(var_info, bbox, band_count)
         if fits:
-            return True, None, ""
+            return EedaiPlan(True, None, 1, "")
         native_scale = var_info.spatial_resolution
         if not native_scale:
-            return False, None, reason
+            return EedaiPlan(False, None, 0, reason)
         if cutline is not None:
-            return False, None, f"{reason}, and it cannot be tiled behind a cutline"
+            return EedaiPlan(
+                False, None, 0, f"{reason}, and it cannot be tiled behind a cutline"
+            )
         scale_m = float(self.scale or native_scale)
         native_ratio = max(scale_m / float(native_scale), 1.0)
         if native_ratio > _EEDAI_MAX_TILING_RATIO:
-            return (
+            return EedaiPlan(
                 False,
                 None,
+                0,
                 (
                     f"{reason}, and tiling it would be worse than Earth Engine: at "
                     f"scale={scale_m:g} m over a {native_scale:g} m asset the reader "
@@ -1280,9 +1306,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         native_rows, native_cols = self._eedai_grid(bbox, float(native_scale))
         native_total = native_rows * native_cols * max(band_count, 1)
         if native_total > _EEDAI_MAX_NATIVE_PIXELS:
-            return (
+            return EedaiPlan(
                 False,
                 None,
+                0,
                 (
                     f"{reason}, and tiling it would still fetch about "
                     f"{native_total:,} native px, over the "
@@ -1290,9 +1317,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 ),
             )
         if self.resample != _EEDAI_TILING_RESAMPLE:
-            return (
+            return EedaiPlan(
                 False,
                 None,
+                0,
                 (
                     f"{reason}, and it cannot be tiled with resample="
                     f"{self.resample!r} — an interpolating resampler would differ "
@@ -1306,10 +1334,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # Budgets are on the *native* footprint, which is the nominal window
         # plus the reader's block alignment and pad, so the allowance is
         # spent before dividing back into output pixels.
-        axis_allowance = max(EE_MAX_DIMENSION - _EEDAI_WINDOW_PAD, 1)
-        area_allowance = max(
-            math.sqrt(_EEDAI_MAX_PIXELS / max(band_count, 1)) - _EEDAI_WINDOW_PAD, 1.0
+        axis_allowance = EE_MAX_DIMENSION - _EEDAI_WINDOW_PAD
+        area_allowance = (
+            math.sqrt(_EEDAI_MAX_PIXELS / max(band_count, 1)) - _EEDAI_WINDOW_PAD
         )
+        # Not floored: an allowance the padding has already exhausted must
+        # reach the guard below, not be rounded up into a one-pixel tile.
         tile_size = int(
             min(
                 _EEDAI_TILE_PIXELS,
@@ -1322,9 +1352,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
             # workable tile, but this guard is deliberately kept — it was
             # removed once as unreachable, and the next change to the padding
             # made the plan divide by a zero-sized tile.
-            return (
+            return EedaiPlan(
                 False,
                 None,
+                0,
                 (
                     f"{reason}, and no tile is small enough: the reader's "
                     f"{_EEDAI_WINDOW_PAD}-px window padding already exceeds the "
@@ -1334,20 +1365,21 @@ class GEE(LazyClientMixin, AbstractDataSource):
         rows, cols = self._eedai_grid(bbox, scale_m)
         tiles = math.ceil(rows / tile_size) * math.ceil(cols / tile_size)
         if tiles > _EEDAI_MAX_TILES:
-            return (
+            return EedaiPlan(
                 False,
                 None,
+                0,
                 (
                     f"{reason}, and tiling it would take {tiles:,} tiles (over the "
                     f"{_EEDAI_MAX_TILES:,}-tile ceiling); every tile is its own "
                     "fetch and they are opened together to mosaic"
                 ),
             )
-        return True, tile_size, ""
+        return EedaiPlan(True, tile_size, tiles, "")
 
     def _use_eedai(
         self, var_info: Dataset, band_count: int
-    ) -> tuple[bool, tuple[bool, int | None, str] | None]:
+    ) -> tuple[bool, EedaiPlan | None]:
         """Resolve the configured `engine` against this request's eligibility.
 
         Args:
@@ -1384,10 +1416,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     "engine='auto' or engine='ee'."
                 )
             plan = self._eedai_plan(var_info, band_count)
-            can_serve, _tile_size, reason = plan
-            if not can_serve:
+            if not plan.can_serve:
                 raise ValueError(
-                    f"engine='eedai' cannot serve {var_info.id}: {reason}. Use a "
+                    f"engine='eedai' cannot serve {var_info.id}: {plan.reason}. Use a "
                     "smaller bbox, engine='ee' (with auto_split=True to tile), or "
                     "export_via='drive'."
                 )
@@ -1395,11 +1426,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
         if not (eligible and eedai_available()):
             return False, None
         plan = self._eedai_plan(var_info, band_count)
-        can_serve, _tile_size, reason = plan
-        if not can_serve:
+        if not plan.can_serve:
             logger.info(
                 f"Serving {var_info.id} through Earth Engine rather than the EEDAI "
-                f"reader: {reason}."
+                f"reader: {plan.reason}."
             )
             return False, None
         return True, plan
@@ -1669,7 +1699,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         bands: list[str],
         scale: float,
         prefix: str,
-        plan: tuple[bool, int | None, str],
+        plan: EedaiPlan,
     ) -> Path:
         """Materialise one raw asset through the pyramids-eo EEDAI reader.
 
@@ -1695,7 +1725,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bands: Band ids to read.
             scale: Output pixel size in metres.
             prefix: Output filename stem (no extension).
-            plan: The `(can_serve, tile_size, reason)` verdict from
+            plan: The verdict from
                 :meth:`_eedai_plan`, computed once by the caller so the
                 routing decision and the read it performs cannot disagree.
 
@@ -1718,21 +1748,21 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # second name rather than using its source as its own destination.
         cog_staged = self.root_dir / f"{prefix}.partial-cog.tif"
         bbox, cutline = self._eedai_window()
-        can_serve, tile_size, reason = plan
-        if not can_serve:
+        if not plan.can_serve:
             # Only reachable if a caller bypasses `_use_eedai`; taking the read
             # anyway would be the unguarded path the plan exists to prevent.
-            raise ValueError(f"the EEDAI reader cannot serve {var_info.id}: {reason}")
+            raise ValueError(
+                f"the EEDAI reader cannot serve {var_info.id}: {plan.reason}"
+            )
         read_options: dict[str, Any] = {}
+        tile_size = plan.tile_size
         if tile_size is not None:
             # Too large for one pass: have the reader stream the mosaic to disk
             # a tile at a time rather than hold the whole window in memory.
             read_options = {"tile_size": tile_size, "path": str(staged)}
-            rows, cols = self._eedai_grid(bbox, scale)
-            tiles = math.ceil(rows / tile_size) * math.ceil(cols / tile_size)
             logger.info(
-                f"Streaming {var_info.id} through the EEDAI reader as {tiles:,} "
-                f"tile(s) of {tile_size} px into a {cols}x{rows} mosaic."
+                f"Streaming {var_info.id} through the EEDAI reader as {plan.tiles:,} "
+                f"tile(s) of {tile_size} px."
             )
         # The tiled read writes `staged` itself, so it belongs inside the same
         # `try` as the write: a mosaic that fails partway would otherwise leave
@@ -1756,6 +1786,10 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     dataset.to_file(str(staged))
             finally:
                 close_quietly(dataset)
+                # Drop the last reference before the rename: closing alone
+                # leaves the GDAL object alive in this frame, so a collect
+                # inside the retry would have nothing to free.
+                dataset = None
             _rename_when_unlocked(cog_staged if self.cog else staged, target)
         finally:
             _discard_quietly(staged)
