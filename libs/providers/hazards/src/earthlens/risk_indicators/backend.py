@@ -324,12 +324,7 @@ class RiskIndicators(AbstractDataSource):
             )
         if dataset.provider == "inform":
             payload = _helpers.inform_query(
-                cast(
-                    "int",
-                    self._workflow_id
-                    if self._workflow_id is not None
-                    else dataset.workflow_id,
-                ),
+                cast("int", self._resolved_workflow_id),
                 cast("str", dataset.indicator_id),
             )
             self._upstream_rows = len(payload)
@@ -393,35 +388,45 @@ class RiskIndicators(AbstractDataSource):
             )
         return result
 
+    @property
+    def _resolved_workflow_id(self) -> int | None:
+        """The INFORM WorkflowId this request uses: the override, else the pin."""
+        if self._workflow_id is not None:
+            return self._workflow_id
+        return self._dataset.workflow_id
+
     def _empty_hint(self) -> str:
         """Explain an empty INFORM result, so the cause is not left ambiguous.
 
         An INFORM request comes back empty for two very different reasons: the
         workflow served no scores at all (the pinned release was withdrawn or
         never published upstream), or it served the global table and the
-        `country=` filter matched none of it (a wrong ISO3). The written table
-        looks identical either way, so the warning says which one happened.
+        `country=` filter matched none of it. The written table looks identical
+        either way, so the warning says which one happened.
 
         Returns:
-            str: A sentence to append to the empty-result warning, or `""` for a
-                non-INFORM dataset.
+            str: A sentence to append to the empty-result warning; `""` for a
+                non-INFORM dataset, or when no INFORM request has been issued
+                yet (nothing has been observed to explain).
         """
-        if self._dataset.provider != "inform":
+        if self._dataset.provider != "inform" or self._upstream_rows is None:
             return ""
-        workflow = (
-            self._workflow_id
-            if self._workflow_id is not None
-            else self._dataset.workflow_id
-        )
-        if self._upstream_rows:
+        workflow = self._resolved_workflow_id
+        if self._upstream_rows == 0:
             return (
-                f" INFORM workflow {workflow} served {self._upstream_rows} row(s), "
-                f"none of them country={self._country!r} — check the ISO3 code."
+                f" INFORM workflow {workflow} served no rows at all; it may have "
+                "been withdrawn upstream — pass workflow_id= to read another "
+                "workflow (/workflows lists them)."
+            )
+        if self._country is None:
+            return (
+                f" INFORM workflow {workflow} served {self._upstream_rows} row(s) "
+                "that did not survive shaping."
             )
         return (
-            f" INFORM workflow {workflow} served no rows at all; it may have been "
-            "withdrawn upstream — pass workflow_id= to read another workflow "
-            "(/workflows lists them)."
+            f" INFORM workflow {workflow} served {self._upstream_rows} row(s), none "
+            f"for country={self._country!r}; INFORM scores ~191 countries, so the "
+            "code may be misspelt or outside its coverage."
         )
 
     def _write_table(self, df: pd.DataFrame) -> Path:

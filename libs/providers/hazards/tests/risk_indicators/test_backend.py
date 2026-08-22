@@ -313,8 +313,8 @@ class TestDownloadSemantics:
         b = _build(monkeypatch, variables=["inform:risk"], country="ZMB", path=tmp_path)
         b.download()
         hint = b._empty_hint()
-        assert "none of them country='ZMB'" in hint
-        assert "check the ISO3 code" in hint
+        assert "none for country='ZMB'" in hint
+        assert "outside its coverage" in hint
 
     def test_empty_hint_blames_the_workflow(self, fake_http, monkeypatch, tmp_path):
         """An upstream that serves nothing names the workflow and the override."""
