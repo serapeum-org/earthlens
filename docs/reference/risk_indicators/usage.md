@@ -55,6 +55,31 @@ df = EarthLens(
 
 Omitting `country=` returns the score for **every** country in one frame.
 
+### Which release you get
+
+Each INFORM dataset reads one *workflow* — an INFORM model release. The catalog
+currently pins workflow `503` ("INFORM Risk Mid 2025"), because the 2026
+workflows stopped serving scores on 2026-08-18, so the values are one release
+behind the JRC site until that is restored. Pass `workflow_id=` to read a
+different release (the INFORM API's `/workflows` lists every id):
+
+```python
+df = EarthLens(
+    data_source="inform",
+    variables=["inform:risk"],
+    country="KEN",
+    workflow_id=493,        # "INFORM 2025 2nd edition" instead of the pinned 503
+).download()
+```
+
+INFORM leaves `validity_year` at `0` on every row, so the frame does not record
+which release produced it — the pin (or the `workflow_id=` you passed) is the
+only signal. When a workflow serves nothing, the empty result is logged with the
+workflow id and this override, rather than as an unexplained empty table.
+
+`inform:climate_risk` is unserved upstream and returns an empty table; see the
+[dataset list](datasets.md).
+
 ## Global Forest Watch (needs a key)
 
 GFW datasets need a free API key. Create one with a MyGFW account and pass it as
