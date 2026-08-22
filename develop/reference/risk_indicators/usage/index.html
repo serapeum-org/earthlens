@@ -6183,23 +6183,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="INFORM Risk (public, tabular)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#which-release-you-get" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Which release you get
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -23522,23 +23505,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="INFORM Risk (public, tabular)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#which-release-you-get" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Which release you get
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -23669,40 +23635,21 @@ the mnemonic (<code>VLO</code> / <code>LOW</code> / <code>MED</code> / <code>HIG
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1"># columns: iso3, indicator_id, indicator_score, validity_year</span>
 </code></pre></div>
 <p>Omitting <code>country=</code> returns the score for <strong>every</strong> country in one frame.</p>
-<h3 id="which-release-you-get"><a class="toclink" href="#which-release-you-get">Which release you get</a><a class="headerlink" href="#which-release-you-get" title="Permanent link">#</a></h3>
-<p>Each INFORM dataset reads one <em>workflow</em> — an INFORM model release. The catalog
-currently pins workflow <code>503</code> ("INFORM Risk Mid 2025"), because the 2026
-workflows stopped serving scores on 2026-08-18, so the values are one release
-behind the JRC site until that is restored. Pass <code>workflow_id=</code> to read a
-different release (the INFORM API's <code>/workflows</code> lists every id):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;inform&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;inform:risk&quot;</span><span class="p">],</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">workflow_id</span><span class="o">=</span><span class="mi">493</span><span class="p">,</span>        <span class="c1"># &quot;INFORM 2025 2nd edition&quot; instead of the pinned 503</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<p>INFORM leaves <code>validity_year</code> at <code>0</code> on every row, so the frame does not record
-which release produced it — the pin (or the <code>workflow_id=</code> you passed) is the
-only signal. When a workflow serves nothing, the empty result is logged with the
-workflow id and this override, rather than as an unexplained empty table.</p>
-<p><code>inform:climate_risk</code> is unserved upstream and returns an empty table; see the
-<a href="../datasets/">dataset list</a>.</p>
 <h2 id="global-forest-watch-needs-a-key"><a class="toclink" href="#global-forest-watch-needs-a-key">Global Forest Watch (needs a key)</a><a class="headerlink" href="#global-forest-watch-needs-a-key" title="Permanent link">#</a></h2>
 <p>GFW datasets need a free API key. Create one with a MyGFW account and pass it as
 <code>api_key=</code> or set <code>GFW_API_KEY</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gfw&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;gfw:tree_cover_loss&quot;</span><span class="p">],</span>   <span class="c1"># tabular: annual tree-cover loss (ha) by year</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;&lt;your-gfw-key&gt;&quot;</span><span class="p">,</span>            <span class="c1"># or set GFW_API_KEY</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">fc</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gfw&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;gfw:admin_boundary&quot;</span><span class="p">],</span>    <span class="c1"># vector: the GADM admin polygon</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>                              <span class="c1"># -&gt; a FeatureCollection</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gfw&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;gfw:tree_cover_loss&quot;</span><span class="p">],</span>   <span class="c1"># tabular: annual tree-cover loss (ha) by year</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;&lt;your-gfw-key&gt;&quot;</span><span class="p">,</span>            <span class="c1"># or set GFW_API_KEY</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">fc</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gfw&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;gfw:admin_boundary&quot;</span><span class="p">],</span>    <span class="c1"># vector: the GADM admin polygon</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>                              <span class="c1"># -&gt; a FeatureCollection</span>
 </code></pre></div>
 <p>A GFW request with no key raises an <code>AuthenticationError</code> naming <code>GFW_API_KEY</code>.</p>
 <h3 id="creating-a-gfw-api-key"><a class="toclink" href="#creating-a-gfw-api-key">Creating a GFW API key</a><a class="headerlink" href="#creating-a-gfw-api-key" title="Permanent link">#</a></h3>
