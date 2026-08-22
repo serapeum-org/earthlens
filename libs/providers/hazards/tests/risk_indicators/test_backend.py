@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from loguru import logger
 from pyramids.feature.collection import FeatureCollection
 
 import earthlens.risk_indicators
@@ -231,7 +232,7 @@ class TestRouting:
     def test_workflow_id_ignored_for_other_providers(
         self, fake_http, monkeypatch, tmp_path
     ):
-        """A workflow_id= on a ThinkHazard request changes nothing."""
+        """A workflow_id= on a ThinkHazard request reaches no request parameter."""
         _build(
             monkeypatch,
             variables=["thinkhazard:flood_river"],
@@ -239,7 +240,37 @@ class TestRouting:
             workflow_id=493,
             path=tmp_path,
         ).download()
-        assert fake_http.calls[0]["url"].endswith("/report/133/FL.json")
+        call = fake_http.calls[0]
+        assert call["url"].endswith("/report/133/FL.json")
+        assert "WorkflowId" not in call["params"]
+
+    def test_workflow_id_on_other_provider_warns(self, monkeypatch, tmp_path):
+        """A workflow_id= that cannot apply is reported, not silently dropped."""
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING")
+        try:
+            _build(
+                monkeypatch,
+                variables=["thinkhazard:flood_river"],
+                country="KEN",
+                workflow_id=493,
+                path=tmp_path,
+            )
+        finally:
+            logger.remove(sink_id)
+        assert any("applies to INFORM datasets only" in message for message in messages)
+
+    @pytest.mark.parametrize("bad", ["503", 503.0, True])
+    def test_workflow_id_must_be_an_integer(self, monkeypatch, tmp_path, bad):
+        """A non-integer workflow_id is rejected instead of reaching the query string."""
+        with pytest.raises(ValueError, match="workflow_id must be an INFORM"):
+            _build(
+                monkeypatch,
+                variables=["inform:risk"],
+                country="KEN",
+                workflow_id=bad,
+                path=tmp_path,
+            )
 
     def test_gfw_tabular_forwards_key_and_iso(self, fake_http, monkeypatch, tmp_path):
         """A GFW tabular request sends the key header and the iso in the SQL."""

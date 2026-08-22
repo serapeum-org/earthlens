@@ -137,8 +137,9 @@ class RiskIndicators(AbstractDataSource):
         Raises:
             TypeError: If `variables` is a mapping (pass a list of one id).
             ValueError: If `variables` is not exactly one dataset id, if
-                `output_format` is unrecognised, or if the required country /
-                admin selector for the resolved provider is missing (`G7`).
+                `output_format` is unrecognised, if `workflow_id` is not an
+                integer, or if the required country / admin selector for the
+                resolved provider is missing (`G7`).
             AuthenticationError: For a `gfw` dataset when no key resolves (`G3`).
         """
         if isinstance(variables, dict):
@@ -158,6 +159,16 @@ class RiskIndicators(AbstractDataSource):
                 f"output_format must be one of {list(OUTPUT_FORMATS)}, "
                 f"got {output_format!r}."
             )
+        # The id goes straight into the query string, where a string or a float
+        # would 200 with an empty body rather than fail - indistinguishable from
+        # a withdrawn workflow. Reject it here instead. bool is an int subclass.
+        if workflow_id is not None and (
+            isinstance(workflow_id, bool) or not isinstance(workflow_id, int)
+        ):
+            raise ValueError(
+                f"workflow_id must be an INFORM WorkflowId integer, got "
+                f"{workflow_id!r}."
+            )
 
         self._catalog = Catalog()
         self._dataset: Dataset = self._catalog.get(ids[0])
@@ -175,6 +186,13 @@ class RiskIndicators(AbstractDataSource):
         self.OUTPUT_KIND = self._dataset.output_kind
 
         self._validate_selector()
+
+        if workflow_id is not None and self._dataset.provider != "inform":
+            logger.warning(
+                f"RiskIndicators {self._dataset.id}: workflow_id={workflow_id} "
+                f"applies to INFORM datasets only, and this row is a "
+                f"{self._dataset.provider} one - the request ignores it."
+            )
 
         # G3 — only a GFW dataset needs (and builds) auth. Configuring here so a
         # missing key fails fast at construction of a gfw request.
