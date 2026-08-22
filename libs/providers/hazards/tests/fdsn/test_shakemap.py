@@ -1288,7 +1288,9 @@ class TestNegativeCacheExpiry:
 
         manifest_path = tmp_path / "shakemap" / "us6000jlqa" / _helpers.MANIFEST_NAME
         payload = json.loads(manifest_path.read_text(encoding="utf-8"))
-        payload["checked"] -= fdsn_backend._NEGATIVE_CACHE_SECONDS + 1
+        # A fixed epoch value, not one derived from the constant under test:
+        # deriving it means the test passes for any TTL, including an absurd one.
+        payload["checked"] = 1.0
         manifest_path.write_text(json.dumps(payload), encoding="utf-8")
 
         fake_http.detail = _detail()
@@ -1515,10 +1517,14 @@ class TestCachedRastersSemantics:
         _helpers.write_manifest(event_dir, ["mmi_mean"], [], checked=time.time())
         assert backend._is_cached(event_id) is True
 
-    def test_unparseable_id_is_not_cached(self, tmp_path: Path):
-        """An id yielding no ComCat id counts as work, not as a hit."""
+    def test_unparseable_id_is_not_fetchable(self, tmp_path: Path):
+        """An id yielding no ComCat id is dropped before the ceiling counts it.
+
+        It can never become cached, so treating it as pending work would let it
+        occupy the ceiling on every run and starve the events behind it.
+        """
         backend = _backend(tmp_path, with_shakemap=True)
-        assert backend._is_cached("smi:local/whatever") is False
+        assert backend._is_fetchable("smi:local/whatever") is False
 
 
 class TestStagingIsProcessUnique:
@@ -1548,3 +1554,336 @@ class TestStagingIsProcessUnique:
         assert seen[0] == f"_staging-{os.getpid()}", (
             f"the scratch directory should be process-unique, got {seen[0]}"
         )
+
+
+class TestCeilingIsNotStarved:
+    """Events that can never be fetched must not occupy the ceiling."""
+
+    def test_unparseable_ids_do_not_consume_budget(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """Three dead ids plus one good event still fetches the good one."""
+        from obspy.core.event import Catalog
+
+        events = []
+        for index in range(3):
+            event = make_event(lon=139.0 + index, lat=35.0 + index)
+            event.resource_id = f"smi:local/dead-{index}"
+            events.append(event)
+        good = make_event(lon=150.0, lat=40.0)
+        good.resource_id = _quakeml_id("us6000jlqa")
+        events.append(good)
+        fake_fdsn.default_result = Catalog(events=events)
+
+        _backend(tmp_path, with_shakemap=True, max_shakemap_events=2).download(
+            progress_bar=False
+        )
+
+        assert fake_http.json_urls, "the fetchable event must not be starved out"
+        assert list((tmp_path / "shakemap").rglob("*.tif")), "its raster is written"
+
+    def test_permanent_failures_are_retried_not_cached(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """An event failing every run is retried rather than cached as dead."""
+        fake_fdsn.default_result = _usgs_catalog(make_event, "us1111", "us2222")
+        fake_http.fail_json_for = {"us1111", "us2222"}
+
+        backend = _backend(tmp_path, with_shakemap=True, max_shakemap_events=2)
+        backend.download(progress_bar=False)
+        backend.download(progress_bar=False)
+
+        assert len(fake_http.json_urls) == 4, (
+            "a transient failure must not become a permanent negative"
+        )
+
+
+class TestPartialProductionExpires:
+    """The TTL applies per requested layer, not only to a total blank."""
+
+    def test_missing_layer_is_rechecked_after_the_window(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A layer published upstream later is picked up once the record ages."""
+        fake_http.archive = _make_archive(layers=("mmi_mean",))
+        backend = _backend(
+            tmp_path, with_shakemap=True, shakemap_layers=["mmi_mean", "pga_mean"]
+        )
+        backend.download(progress_bar=False)
+
+        manifest_path = tmp_path / "shakemap" / "us6000jlqa" / _helpers.MANIFEST_NAME
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        payload["checked"] = 1.0
+        manifest_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        fake_http.archive = _make_archive(layers=("mmi_mean", "pga_mean"))
+        backend.download(progress_bar=False)
+
+        event_dir = tmp_path / "shakemap" / "us6000jlqa"
+        written = sorted(p.name for p in event_dir.glob("*.tif"))
+        assert written == ["mmi_mean.tif", "pga_mean.tif"], (
+            f"the late-published layer should be picked up, got {written}"
+        )
+
+    def test_short_result_is_warned_about(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """Returning fewer layers than requested is announced."""
+        from loguru import logger as loguru_logger
+
+        fake_http.archive = _make_archive(layers=("mmi_mean",))
+        backend = _backend(
+            tmp_path, with_shakemap=True, shakemap_layers=["mmi_mean", "pga_mean"]
+        )
+        backend.download(progress_bar=False)
+
+        messages: list[str] = []
+        sink_id = loguru_logger.add(lambda message: messages.append(str(message)))
+        try:
+            backend.download(progress_bar=False)
+        finally:
+            loguru_logger.remove(sink_id)
+
+        assert any("are not available for this event" in m for m in messages), (
+            f"a short result should be reported, got: {messages}"
+        )
+
+    @pytest.mark.parametrize("stamp", [4102444800.0, "soon", None])
+    def test_untrustworthy_timestamp_refetches(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp, stamp: Any
+    ):
+        """A future or unusable stamp fails towards refetching."""
+        fake_http.detail = {"properties": {"products": {}}}
+        backend = _backend(tmp_path, with_shakemap=True)
+        backend.download(progress_bar=False)
+        first = len(fake_http.json_urls)
+
+        manifest_path = tmp_path / "shakemap" / "us6000jlqa" / _helpers.MANIFEST_NAME
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        payload["checked"] = stamp
+        manifest_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        backend.download(progress_bar=False)
+        assert len(fake_http.json_urls) > first, (
+            f"a {stamp!r} timestamp must not cache the answer forever"
+        )
+
+
+class TestRoundFourHardening:
+    """The remaining round-4 guards."""
+
+    def test_non_https_archive_url_is_refused(self):
+        """An archive URL that is not https is not handed to the downloader."""
+        detail = {
+            "properties": {
+                "products": {
+                    "shakemap": [
+                        {"contents": {"download/raster.zip": {"url": "http://x/r.zip"}}}
+                    ]
+                }
+            }
+        }
+        assert _helpers.shakemap_raster_url(detail) is None
+
+    def test_product_version_must_be_a_string(self, tmp_path: Path):
+        """A non-string product_version invalidates the manifest."""
+        (tmp_path / _helpers.MANIFEST_NAME).write_text(
+            json.dumps(
+                {
+                    "schema": _helpers.MANIFEST_SCHEMA,
+                    "requested": [],
+                    "produced": [],
+                    "checked": 0.0,
+                    "product_version": 12,
+                }
+            ),
+            encoding="utf-8",
+        )
+        assert _helpers.read_manifest(tmp_path) is None
+
+    def test_product_version_is_recorded(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """The ShakeMap updateTime reaches the manifest."""
+        detail = _detail()
+        detail["properties"]["products"]["shakemap"][0]["updateTime"] = 1756575631263
+        fake_http.detail = detail
+
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+
+        manifest = _helpers.read_manifest(tmp_path / "shakemap" / "us6000jlqa")
+        assert manifest["product_version"] == "1756575631263"
+
+    def test_manifest_write_is_atomic(self, tmp_path: Path):
+        """The staged manifest is process-unique and does not survive."""
+        _helpers.write_manifest(tmp_path, ["mmi_mean"], ["mmi_mean"], checked=1.0)
+        leftovers = [p.name for p in tmp_path.iterdir() if "partial" in p.name]
+        assert leftovers == [], f"no staged manifest should survive: {leftovers}"
+        assert (tmp_path / _helpers.MANIFEST_NAME).is_file()
+
+    def test_write_does_not_warn_about_refetching(self, tmp_path: Path):
+        """Repairing a malformed manifest is not a read, so it does not warn."""
+        from loguru import logger as loguru_logger
+
+        (tmp_path / _helpers.MANIFEST_NAME).write_text("{oops", encoding="utf-8")
+
+        messages: list[str] = []
+        sink_id = loguru_logger.add(lambda message: messages.append(str(message)))
+        try:
+            _helpers.write_manifest(tmp_path, ["mmi_mean"], [], checked=1.0)
+        finally:
+            loguru_logger.remove(sink_id)
+
+        assert not [m for m in messages if "refetching" in m], (
+            f"a write should not log a reader remedy: {messages}"
+        )
+
+    def test_empty_shakemap_root_is_removed(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A run that produced nothing leaves no shakemap directory."""
+        fake_http.archive = b"not a zip at all"
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+        assert not (tmp_path / "shakemap").exists(), (
+            "an unproductive run should not leave an empty root behind"
+        )
+
+    def test_orphaned_staging_is_reported(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A scratch directory from another process is announced, not deleted."""
+        from loguru import logger as loguru_logger
+
+        event_dir = tmp_path / "shakemap" / "us6000jlqa"
+        orphan = event_dir / "_staging-999999"
+        orphan.mkdir(parents=True)
+        (orphan / "leftover.flt").write_bytes(b"x")
+        fake_http.archive = b"not a zip at all"
+
+        messages: list[str] = []
+        sink_id = loguru_logger.add(lambda message: messages.append(str(message)))
+        try:
+            _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+        finally:
+            loguru_logger.remove(sink_id)
+
+        assert orphan.exists(), "another process scratch space is not ours to delete"
+        assert any("orphaned scratch" in m for m in messages), (
+            f"the orphan should be reported, got: {messages}"
+        )
+
+    def test_repeated_event_id_is_fetched_once(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """The same ComCat event reported twice costs one fetch."""
+        from obspy.core.event import Catalog
+
+        first = make_event()
+        first.resource_id = _quakeml_id("us6000jlqa")
+        second = make_event(lon=140.0, lat=36.0)
+        second.resource_id = _quakeml_id("us6000jlqa")
+        fake_fdsn.default_result = Catalog(events=[first, second])
+
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+        assert len(fake_http.downloads) == 1, "a duplicate id should not refetch"
+
+    @pytest.mark.parametrize("bad", ["ten", 3.5, None])
+    def test_ceiling_rejects_non_integer(self, tmp_path: Path, bad: Any):
+        """A non-integer ceiling is refused with a TypeError."""
+        with pytest.raises(TypeError, match="must be an integer"):
+            _backend(tmp_path, with_shakemap=True, max_shakemap_events=bad)
+
+
+class TestDefensiveGuardsDirectly:
+    """Guards `_is_fetchable` now shields, exercised on their own.
+
+    The filter added for the ceiling means these branches are unreachable
+    through `download()`, but both methods are callable directly and keep the
+    checks, so they are pinned here rather than left untested.
+    """
+
+    def test_is_cached_refuses_an_unparseable_id(self, tmp_path: Path):
+        """`_is_cached` still declines an id it cannot resolve."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        assert backend._is_cached("smi:local/whatever") is False
+
+    def test_is_cached_refuses_an_escaping_id(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """`_is_cached` declines an id whose directory escapes the root."""
+        monkeypatch.setattr(fdsn_backend._helpers, "parse_comcat_id", lambda _id: "..")
+        backend = _backend(tmp_path, with_shakemap=True)
+        assert backend._is_cached(_quakeml_id("us6000jlqa")) is False
+
+    def test_shakemap_for_event_refuses_an_unparseable_id(self, tmp_path: Path):
+        """Called directly, the fetch still declines an unresolvable id."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        assert backend._shakemap_for_event("smi:local/whatever") == []
+
+    def test_shakemap_for_event_refuses_an_escaping_id(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """Called directly, the fetch still declines an escaping directory."""
+        monkeypatch.setattr(fdsn_backend._helpers, "parse_comcat_id", lambda _id: "..")
+        backend = _backend(tmp_path, with_shakemap=True)
+        assert backend._shakemap_for_event(_quakeml_id("us6000jlqa")) == []
+
+    def test_event_directory_with_real_leftovers_is_kept_quietly(
+        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+    ):
+        """A directory holding a real file is neither removed nor reported."""
+        from loguru import logger as loguru_logger
+
+        event_dir = tmp_path / "shakemap" / "us6000jlqa"
+        event_dir.mkdir(parents=True)
+        (event_dir / "notes.txt").write_text("keep me", encoding="utf-8")
+        fake_http.archive = b"not a zip at all"
+
+        messages: list[str] = []
+        sink_id = loguru_logger.add(lambda message: messages.append(str(message)))
+        try:
+            _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
+        finally:
+            loguru_logger.remove(sink_id)
+
+        assert (event_dir / "notes.txt").is_file(), "an unrelated file must survive"
+        assert not [m for m in messages if "orphaned scratch" in m], (
+            "a real file is not an orphaned scratch directory"
+        )
+
+
+class TestRecordIsStale:
+    """The staleness predicate, exercised directly.
+
+    read_manifest rejects a non-numeric `checked`, so these shapes cannot
+    reach the predicate through a manifest; it keeps the check anyway and it
+    is pinned here.
+    """
+
+    @pytest.mark.parametrize("stamp", ["soon", None, True, [1]])
+    def test_unusable_stamp_is_stale(self, tmp_path: Path, stamp: Any):
+        """A stamp that is not a real number reads as stale."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        assert backend._record_is_stale({"checked": stamp}) is True
+
+    def test_recent_stamp_is_fresh(self, tmp_path: Path):
+        """A stamp from a moment ago is not stale."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        assert backend._record_is_stale({"checked": time.time()}) is False
+
+    def test_future_stamp_is_stale(self, tmp_path: Path):
+        """A stamp from the future fails towards refetching."""
+        backend = _backend(tmp_path, with_shakemap=True)
+        assert backend._record_is_stale({"checked": time.time() + 86400}) is True
