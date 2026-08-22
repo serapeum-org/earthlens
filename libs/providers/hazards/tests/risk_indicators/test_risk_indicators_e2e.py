@@ -103,7 +103,8 @@ def test_inform_climate_risk_live(tmp_path: Path) -> None:
         country="KEN",
         path=str(tmp_path),
     ).download()
-    assert len(df) == 1 and df.iloc[0]["iso3"] == "KEN"
+    assert len(df) == 1
+    assert df.iloc[0]["iso3"] == "KEN"
     assert 0.0 <= float(df.iloc[0]["indicator_score"]) <= 10.0
     # The climate projection is a separate, static 2022-era model, so the row
     # must come from workflow 451 - not from whichever Risk workflow is pinned.
