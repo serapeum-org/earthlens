@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23633,10 +23633,17 @@ to one country; omit it for every country.</p>
 <tr>
 <td><code>inform:climate_risk</code></td>
 <td>tabular</td>
-<td>INFORM Climate Change Risk (SSP5 2050)</td>
+<td>INFORM Climate Change Risk 2050 (RCP4.5-SSP1)</td>
 </tr>
 </tbody>
 </table>
+<p><code>inform:climate_risk</code> reads INFORM's separate Climate Change model, not the Risk release the
+other four rows come from. INFORM publishes two pathways — "optimistic" (RCP4.5-SSP1) and
+"pessimistic" (RCP8.5-SSP3), at 2050 and 2080 — but its API serves scores for only the
+optimistic 2050 run, so that is the one this dataset returns. The pessimistic runs are
+available from the <a href="https://drmkc.jrc.ec.europa.eu/inform-index/INFORM-Climate-Change/Results-and-data">Climate Change results
+page</a>
+as a spreadsheet.</p>
 <h2 id="global-forest-watch-needs-gfw_api_key"><a class="toclink" href="#global-forest-watch-needs-gfw_api_key">Global Forest Watch (needs <code>GFW_API_KEY</code>)</a><a class="headerlink" href="#global-forest-watch-needs-gfw_api_key" title="Permanent link">#</a></h2>
 <p>Forest indicators and the GADM admin geometry. Needs <code>country=</code> (ISO3) and a key.</p>
 <table>

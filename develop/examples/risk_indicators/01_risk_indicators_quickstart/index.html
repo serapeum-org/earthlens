@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24489,7 +24489,8 @@ risk</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>One row per country: <code>indicator_score</code> is the 0–10 composite (higher =
-more at risk), <code>iso3</code> the country, <code>validity_year</code> the model release tag.</p>
+more at risk), <code>iso3</code> the country. <code>validity_year</code> is always <code>0</code> — INFORM does not
+populate it, so the frame does not say which model release it came from.</p>
 <p><strong>Omit <code>country=</code> and INFORM returns every country</strong> — the whole global
 table in one frame, ready to rank or join.</p>
 </div>
