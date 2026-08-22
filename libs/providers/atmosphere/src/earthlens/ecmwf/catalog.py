@@ -443,6 +443,75 @@ def _validate_grid_resolution(value: float | None) -> float | None:
     return value
 
 
+# Tokens in a `time_aggregation` / `temporal_resolution` value that mark the
+# samples as a server-side temporal aggregate (a daily-or-coarser mean). Both the
+# `day` and `daily` spellings appear in the catalog, so both are listed.
+_TEMPORAL_AGGREGATE_TOKENS = (
+    "mean",
+    "average",
+    "avg",
+    "climatolog",
+    "daily",
+    "day",
+    "dekad",
+    "pentad",
+    "week",
+    "month",
+    "season",
+    "annual",
+    "year",
+)
+
+
+def _denotes_temporal_aggregate(value: Any) -> bool:
+    """Whether a `time_aggregation` / `temporal_resolution` value marks an aggregate.
+
+    Returns `True` for a daily-or-coarser mean (`"daily"`, `"1_month_mean"`,
+    `"monthly_mean"`, ...) and `False` for a raw / sub-daily / instantaneous value
+    (`"instantaneous"`, `"1_hour"`, `"sub-daily"`, ...) or an empty one. Accepts a
+    scalar or a list (CDS spells these both ways). Cadence-only values (`"daily"`,
+    `"monthly"`) are assumed to name a mean — sum tokens are deliberately excluded,
+    since the flag routes `op="auto"` to `"mean"` (see `is_pre_aggregated`).
+
+    Args:
+        value: The `time_aggregation` / `temporal_resolution` extra, or `None`.
+
+    Returns:
+        `True` when the value denotes a temporal aggregate.
+
+    Examples:
+        - Daily-or-coarser means are aggregates; raw / sub-daily values are not:
+
+            ```python
+            >>> from earthlens.ecmwf.catalog import _denotes_temporal_aggregate
+            >>> _denotes_temporal_aggregate("1_month_mean")
+            True
+            >>> _denotes_temporal_aggregate("daily")
+            True
+            >>> _denotes_temporal_aggregate("instantaneous")
+            False
+            >>> _denotes_temporal_aggregate("1_hour")
+            False
+            >>> _denotes_temporal_aggregate(None)
+            False
+
+            ```
+    """
+    if not value:
+        return False
+    items = value if isinstance(value, (list, tuple)) else [value]
+    text = " ".join(str(item).lower() for item in items)
+    # Sub-daily / instantaneous samples are raw, not aggregates. This veto must
+    # run before the token match — a `sub-daily` value contains the `daily`
+    # token. Match the sub-daily spellings specifically (compacting separators)
+    # so a coarser-than-daily `subseasonal` value is not swallowed; any new
+    # sub-daily spelling must be added here.
+    compact = text.replace("-", "").replace("_", "")
+    if "instant" in text or "hour" in text or "subdaily" in compact:
+        return False
+    return any(token in text for token in _TEMPORAL_AGGREGATE_TOKENS)
+
+
 class Variable(FluxableLeaf):
     """Per-variable catalog entry consumed by :class:`ECMWF`.
 
@@ -566,23 +635,116 @@ class Variable(FluxableLeaf):
     def is_pre_aggregated(self) -> bool:
         """Whether each NetCDF sample is already a server-side temporal aggregate.
 
-        `True` for the two CDS families whose samples are aggregated on the
-        server, so re-accumulating them over a coarser window over-counts:
+        `True` for the CDS families whose samples are aggregated on the server,
+        so re-accumulating them over a coarser window over-counts:
 
         * the daily-statistics family (`derived-era5-*-daily-statistics`), whose
           dataset-level `daily_statistic` request extra is merged into every
-          child variable's `extras`; and
+          child variable's `extras`;
         * the ERA5 monthly-means family (`reanalysis-era5-*-monthly-means`),
-          whose product type is `monthly_averaged_*`.
+          whose product type is `monthly_averaged_*`;
+        * families carrying a `time_aggregation` / `temporal_resolution` extra
+          that denotes a daily-or-coarser mean (`ecv-for-climate-change`,
+          `reanalysis-carra-means` / `-pan-carra-means`,
+          `projections-cordex-domains-single-levels`); and
+        * monthly datasets whose only marker is a `-monthly` dataset id — the
+          CMIP5 monthly projections (`projections-cmip5-monthly-*`) and the
+          seasonal monthly-mean forecasts (`seasonal-monthly-single-levels`,
+          whose `monthly_mean` lives in `extras["product_type"]`).
+
+        The `time_aggregation` / `temporal_resolution` markers live in `extras`
+        (or the dataset id), not the `product_type` field, which stays
+        `[reanalysis]` on these rows — hence the extra checks below.
+
+        Every flagged family is treated as a temporal **mean**, mirroring the
+        established `reanalysis-era5-*-monthly-means` convention: the flagged
+        flux families are all mean products — `ecv-for-climate-change`
+        (`1_month_mean`), `-cordex-` (`monthly_mean`), CMIP5 monthly
+        (`mean-*-flux` variables), CARRA / pan-CARRA (the `*-means` datasets) and
+        `seasonal-monthly-single-levels` (`extras["product_type"] ==
+        ["monthly_mean"]`).
+        A family whose samples were pre-aggregated as a *total* (accumulation)
+        would need `sum`, not `mean`, and so must not be flagged here; none
+        exists in the shipped catalog. The extra-based branch additionally flags
+        many non-flux (`state`) satellite / in-situ / CMIP6 rows, where the flag
+        is a functional no-op (`_resolve_op` maps `state` to `mean` regardless).
 
         `earthlens.aggregate._resolve_op` reads this so `op="auto"` reduces such
         variables with `"mean"` rather than `"sum"` — a plain `sum` over samples
         that are themselves daily/monthly aggregates multiplies by the number of
         samples per window (e.g. ~30× for monthly windows over daily statistics).
+
+        Returns:
+            `True` when each sample is a server-side temporal aggregate — so
+            `op="auto"` should average rather than sum — and `False` otherwise.
+
+        Examples:
+            - An ERA5 monthly-means flux variable is pre-aggregated (its product
+              type is `monthly_averaged_*`):
+
+                ```python
+                >>> from earthlens.ecmwf.catalog import Variable
+                >>> monthly = Variable(
+                ...     cds_dataset="reanalysis-era5-single-levels-monthly-means",
+                ...     cds_variable="total_precipitation",
+                ...     nc_variable="tp",
+                ...     units="m",
+                ...     product_type=["monthly_averaged_reanalysis"],
+                ...     types="flux",
+                ... )
+                >>> monthly.is_pre_aggregated
+                True
+
+                ```
+            - A CARRA-means variable is flagged via its `time_aggregation` extra,
+              even though its product type is not `monthly_averaged_*`:
+
+                ```python
+                >>> from earthlens.ecmwf.catalog import Variable
+                >>> carra = Variable(
+                ...     cds_dataset="reanalysis-carra-means",
+                ...     cds_variable="10m_wind_gust",
+                ...     nc_variable="fg10",
+                ...     units="m s**-1",
+                ...     types="flux",
+                ...     extras={"time_aggregation": "daily"},
+                ... )
+                >>> carra.is_pre_aggregated
+                True
+
+                ```
+            - A raw hourly ERA5 flux variable is not, so `op="auto"` still sums it:
+
+                ```python
+                >>> from earthlens.ecmwf.catalog import Variable
+                >>> raw = Variable(
+                ...     cds_dataset="reanalysis-era5-single-levels",
+                ...     cds_variable="total_precipitation",
+                ...     nc_variable="tp",
+                ...     units="m",
+                ...     product_type=["reanalysis"],
+                ...     types="flux",
+                ... )
+                >>> raw.is_pre_aggregated
+                False
+
+                ```
         """
         if self.extras.get("daily_statistic"):
             return True
-        return any(pt.startswith("monthly_averaged") for pt in self.product_type)
+        if any(pt.startswith("monthly_averaged") for pt in self.product_type):
+            return True
+        if _denotes_temporal_aggregate(self.extras.get("time_aggregation")):
+            return True
+        if _denotes_temporal_aggregate(self.extras.get("temporal_resolution")):
+            return True
+        # CMIP5 monthly projections and seasonal monthly-mean forecasts carry no
+        # in-row time_aggregation marker (the seasonal family's `monthly_mean`
+        # lives in extras["product_type"]), so fall back to the `-monthly`
+        # dataset-id suffix. Validated against the shipped catalog: every
+        # `-monthly` id is a genuine monthly aggregate (no raw / sub-monthly id
+        # contains `-monthly`); a future id that did would need an explicit marker.
+        return "-monthly" in self.cds_dataset
 
 
 class Dataset(BaseModel):
