@@ -87,7 +87,7 @@ jobs:
             ;;
           imagery)
             providers=(
-            '{"name":"gee","path":"libs/providers/imagery/(src/earthlens|tests)/gee/","marker":"e2e and gee","groups":"groups: dev, extras: gee","pkg":"libs/providers/imagery/tests/gee"}'
+            '{"name":"gee","path":"libs/providers/imagery/(src/earthlens|tests)/gee/","marker":"e2e and gee","groups":"groups: dev, extras: gee,eedai","pkg":"libs/providers/imagery/tests/gee"}'
             '{"name":"stac","path":"libs/providers/imagery/(src/earthlens|tests)/stac/","marker":"stac and e2e","groups":"groups: dev, extras: stac","pkg":"libs/providers/imagery/tests/stac"}'
             '{"name":"sentinel_hub","path":"libs/providers/imagery/(src/earthlens|tests)/sentinel_hub/","marker":"sentinel_hub and e2e","groups":"groups: dev, extras: sentinel-hub","pkg":"libs/providers/imagery/tests/sentinel_hub"}'
             '{"name":"earthdata","path":"libs/providers/imagery/(src/earthlens|tests)/earthdata/","marker":"e2e and earthdata","groups":"groups: dev, extras: earthdata","pkg":"libs/providers/imagery/tests/earthdata"}'

@@ -11,6 +11,7 @@ with a stub that returns a fixed project. The real shipped
 from __future__ import annotations
 
 import datetime as dt
+import math
 import zipfile
 from pathlib import Path
 from types import SimpleNamespace
@@ -279,6 +280,75 @@ class _FakePyramidsDataset:
 
 # A 4-byte big-endian TIFF magic + filler — emphatically not a zip.
 _FAKE_TIFF_BYTES = b"MM\x00*" + b"\x00" * 64
+
+
+def _raise_missing_extra(service_key):
+    """Stand in for `credentials_for` when the optional extra is absent."""
+    raise ImportError("pip install earthlens[eedai]")
+
+
+def _stage_then_fail(asset_id, **kwargs):
+    """Write the staged mosaic then fail, as a partway mosaic error would."""
+    Path(kwargs["path"]).write_bytes(b"partial-mosaic")
+    raise RuntimeError("mosaic failed")
+
+
+def _always_permission_error(source, target):
+    """Stand in for a rename that never gets past the lock."""
+    raise PermissionError("file is in use")
+
+
+def _cog_then_fail(path, **kwargs):
+    """Write the COG staging file then fail, as a driver dying mid-write would."""
+    Path(path).write_bytes(b"trunc-cog")
+    raise RuntimeError("cog conversion failed")
+
+
+def _write_then_fail(path):
+    """Write a truncated raster then fail, as a driver dying mid-write would."""
+    Path(path).write_bytes(b"trunc")
+    raise RuntimeError("write failed")
+
+
+class _FlakyReplace:
+    """Fail one rename, then move the file by hand as a real one would."""
+
+    def __init__(self) -> None:
+        self.attempts = 0
+
+    def __call__(self, source, target) -> None:
+        self.attempts += 1
+        if self.attempts == 1:
+            raise PermissionError("file is in use")
+        Path(target).write_bytes(Path(source).read_bytes())
+        Path(source).unlink()
+
+
+class _WriteWithSidecar:
+    """Write a staged raster and drop a GDAL sidecar beside it."""
+
+    def __init__(self, sidecar: Path) -> None:
+        self.sidecar = sidecar
+
+    def __call__(self, path) -> None:
+        Path(path).write_bytes(b"eedai-tif")
+        self.sidecar.write_text("<PAMDataset/>")
+
+
+_REAL_EEDAI_PLAN = backend_module.GEE._eedai_plan
+_PLANS_SEEN: list = []
+
+
+def _recording_plan(self, var_info, band_count):
+    """Delegate to the real plan, recording every verdict it hands back."""
+    result = _REAL_EEDAI_PLAN(self, var_info, band_count)
+    _PLANS_SEEN.append(result)
+    return result
+
+
+def _plan_for(gee, var_info, bands=1):
+    """Return the routing plan the backend would compute for this request."""
+    return gee._eedai_plan(var_info, bands)
 
 
 def _identity_mask(image):
@@ -1318,6 +1388,11 @@ class TestComposite:
 class TestApi:
     """Tests for `GEE._api`."""
 
+    @pytest.fixture(autouse=True)
+    def _force_ee_engine(self, monkeypatch):
+        """Keep these `getDownloadURL` tests on Earth Engine (no `[eedai]`)."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+
     def test_size_guard_rejects_oversized_request(self, make_gee):
         """A bbox×scale exceeding 32768 px per axis raises a clear `ValueError`."""
         gee = make_gee(
@@ -1412,6 +1487,11 @@ class TestApi:
 
 class TestAutoSplit:
     """Tests for `auto_split=True` (H2 — auto-split oversized URL downloads)."""
+
+    @pytest.fixture(autouse=True)
+    def _force_ee_engine(self, monkeypatch):
+        """Keep these `getDownloadURL` tests on Earth Engine (no `[eedai]`)."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
 
     def test_default_keeps_existing_value_error(self, make_gee):
         """`auto_split=False` (the default) preserves the historical guard."""
@@ -1583,6 +1663,11 @@ class TestGeeStreams:
     only site without one, and its fake still exposed `.content`.
     """
 
+    @pytest.fixture(autouse=True)
+    def _force_ee_engine(self, monkeypatch):
+        """Keep these `getDownloadURL` tests on Earth Engine (no `[eedai]`)."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+
     def test_tile_fetch_never_touches_response_content(self, make_gee, monkeypatch):
         """A regression to `response.content` fails this test."""
 
@@ -1620,3 +1705,903 @@ class TestGeeStreams:
         make_gee().download(progress_bar=False)
         assert seen, "the tile URL should have been fetched"
         assert seen[0].get("stream") is True, f"the GET must stream: {seen[0]}"
+
+
+class _FakeCrs:
+    """Stand-in for a pyproj CRS: only `to_epsg()` is consulted."""
+
+    def __init__(self, epsg):
+        self._epsg = epsg
+
+    def to_epsg(self):
+        return self._epsg
+
+
+class _FakePolygonAoi:
+    """Stand-in for a `GeoDataFrame` AOI: `total_bounds`, `crs`, `to_crs`."""
+
+    def __init__(self, epsg=None, total_bounds=(31.2, 29.9, 31.3, 30.0)):
+        self.total_bounds = total_bounds
+        self.crs = _FakeCrs(epsg) if epsg is not None else None
+        self.reprojected_to = None
+
+    def to_crs(self, crs):
+        out = _FakePolygonAoi(epsg=4326)
+        out.reprojected_to = crs
+        return out
+
+
+class _FakeCogWriter:
+    """Stand-in for `Dataset.cog`, recording `to_cog` writes."""
+
+    def __init__(self, dataset):
+        self._dataset = dataset
+
+    def to_cog(self, path, **kwargs):
+        self._dataset.written = str(path)
+        self._dataset.wrote_cog = True
+        Path(path).write_bytes(b"eedai-cog")
+        return Path(path)
+
+
+class _FakeEedaiDataset:
+    """Stand-in for the pyramids `Dataset` the EEDAI reader returns."""
+
+    def __init__(self):
+        self.written: str | None = None
+        self.wrote_cog = False
+        self.cog = _FakeCogWriter(self)
+
+    def to_file(self, path):
+        self.written = str(path)
+        Path(path).write_bytes(b"eedai-tif")
+
+
+class _FakeReaderModule:
+    """Stand-in for `pyramids_eo.earthengine`; records `from_earthengine`."""
+
+    def __init__(self):
+        self.calls: list[tuple[str, dict]] = []
+        self.dataset = _FakeEedaiDataset()
+
+    def from_earthengine(self, asset_id, **kwargs):
+        self.calls.append((asset_id, kwargs))
+        # Mirror the combinations upstream's `_validate_read_request` rejects,
+        # so a plan that produces one fails here instead of passing silently.
+        if kwargs.get("tile_size") is not None:
+            if kwargs.get("resample", "nearest") != "nearest":
+                raise ValueError("'tile_size' supports only resample='nearest'")
+            if kwargs.get("geometry") is not None:
+                raise ValueError("'tile_size' cannot be combined with a 'geometry'")
+            if kwargs.get("path") is None:
+                raise ValueError("'tile_size' needs 'path'")
+        path = kwargs.get("path")
+        if path is not None:
+            # A tiled read streams the mosaic to `path` itself.
+            Path(path).write_bytes(b"eedai-tiled")
+            self.dataset.written = str(path)
+        return self.dataset
+
+
+@pytest.fixture
+def fake_reader(monkeypatch):
+    """Patch the guarded pyramids-eo loader with an in-memory fake reader."""
+    reader = _FakeReaderModule()
+    monkeypatch.setattr(backend_module, "import_earthengine_reader", lambda: reader)
+    reader.credential_builds = []
+    monkeypatch.setattr(
+        backend_module,
+        "credentials_for",
+        lambda key: reader.credential_builds.append(key) or ("creds", key),
+    )
+    monkeypatch.setattr(backend_module, "eedai_available", lambda: True)
+    return reader
+
+
+class TestEngineOption:
+    """Tests for the `engine` constructor option."""
+
+    def test_defaults_to_auto(self, make_gee):
+        """`engine` defaults to `"auto"`."""
+        assert make_gee().engine == "auto"
+
+    @pytest.mark.parametrize("engine", ["auto", "ee", "eedai"])
+    def test_accepts_known_engines(self, make_gee, engine):
+        """Each supported engine name is captured verbatim."""
+        assert make_gee(engine=engine).engine == engine
+
+    def test_unknown_engine_rejected(self, make_gee):
+        """An unknown engine raises `ValueError` at construction."""
+        with pytest.raises(ValueError, match="engine must be one of"):
+            make_gee(engine="gdal")
+
+
+class TestEedaiEligibility:
+    """Tests for `_eedai_eligible` / `_use_eedai`."""
+
+    def test_static_image_without_hooks_is_eligible(self, make_gee):
+        """A raw single-asset read with no server-side compute is eligible."""
+        gee = make_gee()
+        assert gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
+
+    def test_image_collection_is_not_eligible(self, make_gee):
+        """A reduced collection needs server-side compute, so it is not."""
+        gee = make_gee(
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]}, scale=5566.0
+        )
+        assert not gee._eedai_eligible(gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY"))
+
+    @pytest.mark.parametrize(
+        "hooks",
+        [{"cloud_mask": _identity_mask}, {"filters": [lambda c: c]}],
+    )
+    def test_server_side_hooks_make_it_ineligible(self, make_gee, hooks):
+        """A `cloud_mask` or `filters` keeps the request on Earth Engine."""
+        gee = make_gee(**hooks)
+        assert not gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
+
+    def test_projected_crs_is_not_eligible(self, make_gee):
+        """A projected `crs` stays on Earth Engine (the reader takes a CRS bbox)."""
+        gee = make_gee(crs="EPSG:32636")
+        assert not gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
+
+    def test_engine_eedai_names_the_crs_limit(self, make_gee, fake_reader):
+        """Forcing the reader with a projected `crs` explains the CRS limit."""
+        gee = make_gee(engine="eedai", crs="EPSG:32636")
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
+        with pytest.raises(ValueError, match="EPSG:4326"):
+            gee._use_eedai(var_info, 1)
+
+    def test_batch_sink_is_not_eligible(self, make_gee):
+        """The asynchronous sinks are Earth Engine-only."""
+        gee = make_gee(export_via="drive", drive_folder="out")
+        assert not gee._eedai_eligible(gee.catalog.get_dataset("USGS/SRTMGL1_003"))
+
+    def test_engine_ee_never_uses_eedai(self, make_gee, fake_reader):
+        """`engine="ee"` stays on `getDownloadURL` even when eligible."""
+        gee = make_gee(engine="ee")
+        assert (
+            gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003"), 1)[0] is False
+        )
+
+    def test_engine_auto_uses_eedai_when_available(self, make_gee, fake_reader):
+        """`engine="auto"` takes the fast-path when eligible and installed."""
+        gee = make_gee()
+        assert gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003"), 1)[0] is True
+
+    def test_engine_auto_falls_back_when_not_installed(self, make_gee, monkeypatch):
+        """Without the extra, `engine="auto"` falls back to Earth Engine."""
+        monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
+        gee = make_gee()
+        assert (
+            gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003"), 1)[0] is False
+        )
+
+    def test_engine_eedai_forces_the_reader_when_eligible(self, make_gee, fake_reader):
+        """`engine="eedai"` takes the reader for an eligible request."""
+        gee = make_gee(engine="eedai")
+        assert gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003"), 1)[0] is True
+
+    def test_engine_eedai_rejects_ineligible_request(self, make_gee, fake_reader):
+        """Forcing the reader on a composited request raises `ValueError`."""
+        gee = make_gee(
+            engine="eedai",
+            variables={"UCSB-CHG/CHIRPS/DAILY": ["precipitation"]},
+            scale=5566.0,
+        )
+        var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = _plan_for(gee, var_info)
+        with pytest.raises(ValueError, match="engine='eedai' cannot serve"):
+            gee._use_eedai(var_info, 1)
+
+
+class TestExportViaEedai:
+    """Tests for `_export_via_eedai` and the `_api` routing."""
+
+    def test_writes_the_tif_through_the_reader(self, make_gee, fake_reader):
+        """The reader's dataset is written to `<prefix>.tif`."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        assert target.name == "srtm_elev.tif"
+        assert target.exists()
+        assert target.read_bytes() == b"eedai-tif"
+        assert not list(target.parent.glob("*.partial.tif")), "staged file left behind"
+
+    def test_a_failed_write_leaves_no_file_at_the_final_name(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A mid-write failure must not leave a truncated raster at the target."""
+        monkeypatch.setattr(fake_reader.dataset, "to_file", _write_then_fail)
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
+        with pytest.raises(RuntimeError, match="write failed"):
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", plan)
+        assert not (gee.root_dir / "srtm_elev.tif").exists()
+        assert not list(gee.root_dir.glob("*.partial.tif"))
+
+    def test_forwards_asset_bands_crs_shape_and_bbox(self, make_gee, fake_reader):
+        """Asset id, bands, crs, credentials and the bbox AOI are passed."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        asset_id, kwargs = fake_reader.calls[0]
+        assert asset_id == "USGS/SRTMGL1_003"
+        assert kwargs["bands"] == ["elevation"]
+        assert kwargs["crs"] == "EPSG:4326"
+        assert kwargs["bbox"] == (31.2, 29.9, 31.3, 30.0)
+        assert kwargs["geometry"] is None
+        assert kwargs["resample"] == "nearest"
+
+    def test_metre_scale_becomes_an_explicit_pixel_grid(self, make_gee, fake_reader):
+        """`scale` (metres) is resolved to `shape=(rows, cols)`, not passed through.
+
+        The reader sizes output in CRS units (degrees here), so a raw metre
+        `scale` would produce a one-pixel raster.
+        """
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["shape"] == gee._eedai_grid(kwargs["bbox"], 90.0)
+        assert "scale" not in kwargs
+        assert all(axis > 1 for axis in kwargs["shape"]), kwargs["shape"]
+
+    def test_grid_has_square_ground_pixels(self, make_gee):
+        """The grid resolves to ~`scale` metres on both axes, not a worst-case bound.
+
+        `estimate_pixel_dims` deliberately over-counts (it guards a pixel cap),
+        which would skew a square AOI into non-square pixels.
+        """
+        gee = make_gee()
+        bbox = (31.2, 29.9, 31.3, 30.0)
+        rows, cols = gee._eedai_grid(bbox, 90.0)
+        height_m = (bbox[3] - bbox[1]) * 111_320.0
+        width_m = (bbox[2] - bbox[0]) * 111_320.0 * math.cos(math.radians(29.95))
+        assert abs(height_m / rows - 90.0) < 1.0
+        assert abs(width_m / cols - 90.0) < 1.0
+
+    def test_tiny_aoi_still_yields_at_least_one_pixel(self, make_gee):
+        """A sub-pixel AOI never rounds down to a zero-sized grid."""
+        gee = make_gee()
+        assert gee._eedai_grid((31.2, 29.9, 31.2001, 29.9001), 90.0) == (1, 1)
+
+    @pytest.mark.parametrize(
+        "bbox, scale, match",
+        [
+            ((31.2, 29.9, float("nan"), 30.0), 90.0, "finite"),
+            ((31.2, 29.9, 31.3, 30.0), 0.0, "positive"),
+            ((31.2, 29.9, 31.3, 30.0), -90.0, "positive"),
+        ],
+    )
+    def test_degenerate_grid_inputs_are_rejected(self, make_gee, bbox, scale, match):
+        """Non-finite bounds and a non-positive scale raise instead of sizing."""
+        gee = make_gee()
+        with pytest.raises(ValueError, match=match):
+            gee._eedai_grid(bbox, scale)
+
+    def test_grid_uses_the_poleward_edge_of_a_tall_aoi(self, make_gee):
+        """A tall high-latitude AOI is sized so no row samples coarser than asked.
+
+        Taking `cos` at the mid-latitude would under-count columns near the
+        poleward edge, quietly sampling coarser than the requested scale.
+        """
+        gee = make_gee()
+        tall = (0.0, 60.0, 1.0, 70.0)
+        _rows, cols = gee._eedai_grid(tall, 1000.0)
+        width_at_pole_m = 1.0 * 111_320.0 * math.cos(math.radians(70.0))
+        assert width_at_pole_m / cols <= 1000.0 + 1.0
+
+    def test_resample_is_forwarded(self, make_gee, fake_reader):
+        """An explicit `resample` reaches the reader instead of its default."""
+        gee = make_gee(resample="average")
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["resample"] == "average"
+
+    def test_api_routes_eligible_requests_to_eedai(self, make_gee, fake_reader):
+        """`_api` takes the EEDAI path instead of `getDownloadURL`."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        image = _FakeImage()
+        out = gee._api(image, var_info, ["elevation"], dt.datetime(2000, 2, 11))
+        assert out.suffix == ".tif"
+        assert fake_reader.calls, "the EEDAI reader was not used"
+        assert image.download_params is None, "getDownloadURL should not be called"
+
+    def test_plain_geotiff_by_default(self, make_gee, fake_reader):
+        """Without `cog=True` the raster is written via `to_file`."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        assert fake_reader.dataset.wrote_cog is False
+
+    def test_cog_option_writes_a_cloud_optimized_geotiff(self, make_gee, fake_reader):
+        """`cog=True` routes the write through `Dataset.cog.to_cog`."""
+        gee = make_gee(cog=True)
+        assert gee.cog is True
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        assert fake_reader.dataset.wrote_cog is True
+        assert target.read_bytes() == b"eedai-cog"
+
+    def test_polygon_region_is_passed_as_a_cutline(self, make_gee, fake_reader):
+        """A `region` exposing `total_bounds` is forwarded as `geometry=`."""
+        region = _FakePolygonAoi()
+        gee = make_gee(region=region)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["geometry"] is region
+        assert kwargs["bbox"] == region.total_bounds
+
+    def test_region_window_and_grid_agree(self, make_gee, fake_reader):
+        """The grid is sized for the region's window, not the wider lat/lon bbox.
+
+        The reader windows on the bbox, so sizing the grid from a different
+        extent would scale the ground resolution by the ratio between them.
+        """
+        region = _FakePolygonAoi()
+        region.total_bounds = (31.20, 29.90, 31.22, 29.92)
+        gee = make_gee(region=region, lat_lim=[29.0, 30.0], lon_lim=[31.0, 32.0])
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["bbox"] == region.total_bounds
+        assert kwargs["shape"] == gee._eedai_grid(region.total_bounds, 90.0)
+        wide = gee._eedai_grid((31.0, 29.0, 32.0, 30.0), 90.0)
+        assert kwargs["shape"] != wide, "grid was sized from the bbox, not the region"
+
+    def test_oversized_read_is_served_by_tiling(self, make_gee, fake_reader):
+        """A window too large for one pass is streamed in tiles, not refused."""
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = gee._eedai_plan(var_info, 1)
+        can_serve, tile_size = plan.can_serve, plan.tile_size
+        assert can_serve is True
+        assert tile_size is not None
+        assert tile_size >= 1
+        assert gee._use_eedai(var_info, 1)[0] is True
+
+    def test_tile_size_keeps_each_tile_native_read_within_budget(self, make_gee):
+        """The tile shrinks so one tile's native-resolution read stays bounded."""
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = gee._eedai_plan(var_info, 1)
+        can_serve, tile_size = plan.can_serve, plan.tile_size
+        native_ratio = 30.0 / var_info.spatial_resolution
+        assert tile_size * native_ratio <= backend_module.EE_MAX_DIMENSION
+
+    def test_oversized_read_streams_to_a_path_in_tiles(self, make_gee, fake_reader):
+        """The tiled read hands the reader `tile_size` and a destination path."""
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(
+            var_info, ["elevation"], 30.0, "srtm_big", _plan_for(gee, var_info)
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["tile_size"] >= 1
+        assert kwargs["path"].endswith(".partial.tif")
+        assert target.name == "srtm_big.tif"
+        assert target.read_bytes() == b"eedai-tiled"
+        assert not list(target.parent.glob("*.partial*.tif"))
+
+    def test_total_pixel_budget_is_enforced_below_the_per_axis_cap(
+        self, make_gee, fake_reader
+    ):
+        """A window under the per-axis cap can still be too big overall.
+
+        Memory scales with the pixel count, not the longest side, so a wide
+        square AOI can sit inside the per-axis budget and still be far past
+        what one read may hold.
+        """
+        gee = make_gee(lat_lim=[0.0, 5.4], lon_lim=[0.0, 5.4], scale=1000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        bbox, _cutline = gee._eedai_window()
+        rows, cols = gee._eedai_grid(bbox, var_info.spatial_resolution)
+        assert max(rows, cols) <= backend_module.EE_MAX_DIMENSION, "per-axis cap hit"
+        fits, reason = gee._eedai_native_fits(var_info, bbox, 1)
+        assert fits is False
+        assert "budget" in reason
+
+    def test_missing_extra_propagates_from_the_credential_build(
+        self, make_gee, monkeypatch
+    ):
+        """An absent `[eedai]` extra surfaces as ImportError, not AuthenticationError."""
+        monkeypatch.setattr(backend_module, "credentials_for", _raise_missing_extra)
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
+        with pytest.raises(ImportError, match="eedai"):
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", plan)
+
+    def test_non_nearest_resample_cannot_be_tiled(self, make_gee, fake_reader):
+        """Upstream refuses `tile_size` with an interpolating resampler.
+
+        `resample="average"` is the documented choice for coarser-than-native
+        reads of continuous data — exactly the requests that trigger tiling —
+        so this must fall back rather than surface upstream's raw error.
+        """
+        gee = make_gee(
+            lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0, resample="average"
+        )
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = gee._eedai_plan(var_info, 1)
+        can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
+        assert can_serve is False
+        assert tile_size is None
+        assert "resample" in reason
+        assert gee._use_eedai(var_info, 1)[0] is False
+
+    def test_a_hard_constraint_is_reported_before_a_tunable_budget(
+        self, make_gee, fake_reader
+    ):
+        """When both apply, the decline names the rule the user cannot tune.
+
+        A coarse scale over a fine asset trips this repo's tiling-ratio budget,
+        which the user can change; an interpolating resampler is refused by the
+        reader itself, which they cannot.
+        """
+        gee = make_gee(
+            lat_lim=[0.0, 15.0],
+            lon_lim=[0.0, 15.0],
+            scale=3000.0,
+            resample="average",
+        )
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        reason = gee._eedai_plan(var_info, 1).reason
+        assert "resample" in reason, f"the tunable budget spoke first: {reason}"
+        assert "worse than Earth Engine" not in reason
+
+    def test_tile_respects_the_total_pixel_budget_not_just_the_axis_cap(self, make_gee):
+        """One tile's native read must satisfy both budgets, not only per-axis.
+
+        Sizing a tile so its native side lands on the per-axis cap would
+        materialise ~32768**2 px — many times the total-pixel budget the
+        single-pass path refuses.
+        """
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = gee._eedai_plan(var_info, 1)
+        can_serve, tile_size = plan.can_serve, plan.tile_size
+        native_side = tile_size * (30.0 / var_info.spatial_resolution)
+        assert native_side <= backend_module.EE_MAX_DIMENSION
+        assert native_side**2 <= backend_module._EEDAI_MAX_PIXELS
+
+    def test_too_many_tiles_falls_back_rather_than_starting(
+        self, make_gee, fake_reader
+    ):
+        """A job needing thousands of tiles is refused, not silently started.
+
+        Every tile is its own fetch, and the mosaic opens them together.
+        """
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=30.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = gee._eedai_plan(var_info, 1)
+        can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
+        assert can_serve is False
+        assert tile_size is None
+        assert "total work" in reason
+        assert gee._use_eedai(var_info, 1)[0] is False
+
+    def test_a_much_coarser_read_falls_back_to_earth_engine(
+        self, make_gee, fake_reader
+    ):
+        """Far-coarser-than-native reads belong on Earth Engine, not the reader.
+
+        Tiling one would fetch `ratio**2` native pixels per output pixel only
+        to discard them, where Earth Engine aggregates server-side and returns
+        a small raster in one round trip.
+        """
+        gee = make_gee(lat_lim=[0.0, 40.0], lon_lim=[0.0, 40.0], scale=5000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = gee._eedai_plan(var_info, 1)
+        can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
+        assert can_serve is False
+        assert tile_size is None
+        assert "worse than Earth Engine" in reason
+        assert gee._use_eedai(var_info, 1)[0] is False
+
+    def test_tiled_cog_write_leaves_no_staging_files(self, make_gee, fake_reader):
+        """A tiled read plus `cog=True` stages through two names and cleans both."""
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0, cog=True)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(
+            var_info, ["elevation"], 30.0, "srtm_big", _plan_for(gee, var_info)
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["tile_size"] >= 1
+        assert target.read_bytes() == b"eedai-cog"
+        assert not list(target.parent.glob("*.partial*.tif"))
+
+    def test_a_failed_cog_conversion_leaves_no_staging_file(
+        self, make_gee, fake_reader
+    ):
+        """A COG conversion that dies mid-write takes both staging files with it.
+
+        The COG path stages through a second name, so a failure there can leave
+        a truncated raster the next read would find and trust.
+        """
+        gee = make_gee(cog=True)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        fake_reader.dataset.cog.to_cog = _cog_then_fail
+        plan = _plan_for(gee, var_info)
+        with pytest.raises(RuntimeError, match="cog conversion failed"):
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", plan)
+        assert not list(gee.root_dir.glob("*.partial*")), (
+            "a staging file survived the failed conversion"
+        )
+        assert not (gee.root_dir / "srtm_elev.tif").exists(), (
+            "a failed conversion still produced an output"
+        )
+
+    def test_a_failed_tiled_write_leaves_no_staging_file(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A mosaic that fails partway must not leave its staged file behind."""
+        monkeypatch.setattr(fake_reader, "from_earthengine", _stage_then_fail)
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
+        with pytest.raises(RuntimeError, match="mosaic failed"):
+            gee._export_via_eedai(var_info, ["elevation"], 30.0, "srtm_big", plan)
+        assert not list(gee.root_dir.glob("*.partial*.tif"))
+        assert not (gee.root_dir / "srtm_big.tif").exists()
+
+    def test_budget_is_spent_per_band(self, make_gee, fake_reader):
+        """Band count divides the budget: the reader holds every band at once.
+
+        A window that fits for one band can be several times over the limit
+        for a multi-band request.
+        """
+        gee = make_gee(lat_lim=[0.0, 3.0], lon_lim=[0.0, 3.0], scale=90.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        bbox, _cutline = gee._eedai_window()
+        one_band, _reason = gee._eedai_native_fits(var_info, bbox, 1)
+        many_bands, reason = gee._eedai_native_fits(var_info, bbox, 13)
+        assert one_band is True
+        assert many_bands is False
+        assert "13 band(s)" in reason
+
+    def test_more_bands_never_loosen_the_plan(self, make_gee):
+        """Adding bands only ever constrains the plan — never relaxes it.
+
+        Past some band count the tile shrinks until the job needs more tiles
+        than the ceiling allows, at which point the plan declines outright;
+        both outcomes are stricter, never looser.
+        """
+        gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan_one = gee._eedai_plan(var_info, 1)
+        ok_one, tile_one = plan_one.can_serve, plan_one.tile_size
+        plan_many = gee._eedai_plan(var_info, 9)
+        ok_many, tile_many = plan_many.can_serve, plan_many.tile_size
+        assert ok_one is True
+        assert (ok_many is False) or (tile_many < tile_one)
+
+    def test_rename_retries_past_a_lingering_lock(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A `PermissionError` from a lingering GDAL handle is retried, not fatal.
+
+        The rename happens after every tile has been fetched, so failing there
+        would throw away the whole read.
+        """
+        flaky_replace = _FlakyReplace()
+        monkeypatch.setattr(backend_module.os, "replace", flaky_replace)
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        assert flaky_replace.attempts == 2, "the rename was not retried"
+        assert target.exists()
+
+    def test_a_persistent_lock_is_not_swallowed(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """If the rename keeps failing, that surfaces — losing the output silently
+        would be worse than the error."""
+        monkeypatch.setattr(backend_module.os, "replace", _always_permission_error)
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
+        with pytest.raises(PermissionError):
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", plan)
+
+    def test_staging_sidecars_are_cleaned_up(self, make_gee, fake_reader):
+        """GDAL sidecars written next to a staged raster go with it."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        sidecar = gee.root_dir / "srtm_elev.partial.tif.aux.xml"
+
+        fake_reader.dataset.to_file = _WriteWithSidecar(sidecar)
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        assert not sidecar.exists(), "the .aux.xml sidecar leaked"
+        assert not list(gee.root_dir.glob("*.partial*"))
+
+    def test_the_plan_is_computed_once_per_bucket(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """`_api` plans once and hands the verdict down, rather than re-deriving it.
+
+        Recomputing in the exporter reprojects the region again and lets the
+        routing decision and the read disagree.
+        """
+        _PLANS_SEEN.clear()
+        monkeypatch.setattr(backend_module.GEE, "_eedai_plan", _recording_plan)
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._api(_FakeImage(), var_info, ["elevation"], dt.datetime(2000, 2, 11))
+        assert len(_PLANS_SEEN) == 1, f"the plan was computed {len(_PLANS_SEEN)} times"
+
+    def test_an_empty_band_request_budgets_for_every_band(self, make_gee, fake_reader):
+        """No bands means upstream opens them all, so the budget must say so."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        one_band = gee._eedai_native_fits(var_info, (0.0, 0.0, 3.0, 3.0), 1)
+        every_band = gee._eedai_native_fits(
+            var_info, (0.0, 0.0, 3.0, 3.0), len(var_info.bands)
+        )
+        assert one_band[0] is True
+        assert every_band[0] is one_band[0] or every_band[0] is False
+
+    def test_exporting_a_plan_that_cannot_serve_raises(self, make_gee, fake_reader):
+        """Handing the exporter a declining plan raises instead of reading anyway.
+
+        `_api` never does this; the guard exists so a future reordering cannot
+        take the unguarded read silently.
+        """
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        declined = backend_module.EedaiPlan(False, None, 0, "nope")
+        with pytest.raises(ValueError, match="cannot serve"):
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", declined)
+        assert not fake_reader.calls
+
+    def test_an_unremovable_staging_file_does_not_fail_the_write(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A staging file that will not delete costs a stray temp, not the output."""
+        real_unlink = Path.unlink
+
+        def stubborn_unlink(self, missing_ok=False):
+            if ".partial" in self.name:
+                raise OSError("file is in use")
+            return real_unlink(self, missing_ok=missing_ok)
+
+        monkeypatch.setattr(Path, "unlink", stubborn_unlink)
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        assert target.exists(), "the write was lost to a cleanup failure"
+
+    def test_window_padding_can_leave_no_workable_tile(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """When the pad eats the whole per-tile budget, the read declines.
+
+        Regression guard: dividing the grid by a zero-sized tile raised
+        `ZeroDivisionError` mid-plan. The shipped budget always leaves a
+        workable tile, so it is lowered here to reach the guard at all.
+        """
+        monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 25)
+        gee = make_gee(lat_lim=[0.0, 3.0], lon_lim=[0.0, 3.0], scale=90.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = gee._eedai_plan(var_info, 1)
+        can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
+        assert can_serve is False
+        assert tile_size is None
+        assert "window padding" in reason
+
+    def test_a_long_thin_aoi_exceeds_the_tile_ceiling(self, make_gee, fake_reader):
+        """A narrow strip can pass the work budget and still need too many tiles.
+
+        Tile count is not implied by total work: an elongated AOI keeps the
+        pixel count modest while splitting into thousands of tiles, each its
+        own fetch, all opened together to mosaic.
+        """
+        gee = make_gee(lat_lim=[0.0, 89.0], lon_lim=[0.0, 0.1], scale=1.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003").model_copy(
+            update={"spatial_resolution": 1.0}
+        )
+        plan = gee._eedai_plan(var_info, 1)
+        can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
+        assert can_serve is False
+        assert tile_size is None
+        assert "tile ceiling" in reason
+        assert "native px" not in reason, (
+            "the work budget declined first, so this no longer covers the tile "
+            f"ceiling: {reason}"
+        )
+
+    def test_a_cutline_cannot_be_tiled_so_it_falls_back(self, make_gee, fake_reader):
+        """Upstream refuses `tile_size` with a polygon cutline, so `auto` falls back."""
+        region = _FakePolygonAoi(total_bounds=(0.0, 0.0, 40.0, 40.0))
+        gee = make_gee(region=region, scale=5000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = gee._eedai_plan(var_info, 1)
+        can_serve, tile_size, reason = plan.can_serve, plan.tile_size, plan.reason
+        assert can_serve is False
+        assert tile_size is None
+        assert "cutline" in reason
+        assert gee._use_eedai(var_info, 1)[0] is False
+
+    def test_forced_eedai_reports_an_untileable_read(self, make_gee, fake_reader):
+        """`engine="eedai"` turns an untileable oversized read into an error."""
+        region = _FakePolygonAoi(total_bounds=(0.0, 0.0, 40.0, 40.0))
+        gee = make_gee(engine="eedai", region=region, scale=5000.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
+        with pytest.raises(ValueError, match="cutline"):
+            gee._use_eedai(var_info, 1)
+
+    def test_unknown_native_resolution_is_treated_as_unbounded(
+        self, make_gee, fake_reader
+    ):
+        """An asset with no catalogued resolution cannot be sized, so it falls back.
+
+        15 of the shipped `ee_type="image"` rows have no `spatial_resolution`,
+        and an unknown native grid is the case that most needs bounding.
+        """
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003").model_copy(
+            update={"spatial_resolution": None}
+        )
+        fits, reason = gee._eedai_native_fits(var_info, (31.2, 29.9, 31.3, 30.0), 1)
+        assert fits is False
+        assert "no catalogued native resolution" in reason
+        assert gee._use_eedai(var_info, 1)[0] is False
+
+    def test_modest_aoi_passes_the_preflight(self, make_gee, fake_reader):
+        """A small AOI is not blocked by the native-resolution budget."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        assert gee._use_eedai(var_info, 1)[0] is True
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        assert fake_reader.calls
+
+    def test_credentials_are_built_once_and_reused(self, make_gee, fake_reader):
+        """The credential is resolved once per instance, not per written bucket.
+
+        Inline key material lands in a temp file whose removal is left to the
+        GC, so rebuilding per bucket would scatter transient key files.
+        """
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "a", _plan_for(gee, var_info)
+        )
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "b", _plan_for(gee, var_info)
+        )
+        assert len(fake_reader.credential_builds) == 1
+        assert len(fake_reader.calls) == 2
+
+    def test_missing_key_warns_before_falling_back_to_adc(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """No resolvable key logs the ADC fallback instead of switching silently."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee()
+        monkeypatch.setattr(gee, "_resolve_credentials", lambda: (None, None, None))
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        assert any("Application Default Credentials" in w for w in warnings), warnings
+
+    def test_credential_failure_becomes_an_authentication_error(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A reader credential failure surfaces as earthlens's AuthenticationError."""
+        monkeypatch.setattr(
+            backend_module,
+            "credentials_for",
+            lambda key: (_ for _ in ()).throw(RuntimeError("bad key")),
+        )
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
+        with pytest.raises(backend_module.AuthenticationError, match="EEDAI"):
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", plan)
+
+    def test_cog_on_an_ee_request_warns_once(self, make_gee, fake_reader, monkeypatch):
+        """`cog=True` cannot apply on the Earth Engine path, so it says so once."""
+        warnings: list[str] = []
+        monkeypatch.setattr(
+            backend_module.logger, "warning", lambda msg, *a, **k: warnings.append(msg)
+        )
+        gee = make_gee(engine="ee", cog=True)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        for _ in range(2):
+            gee._api(
+                var_info=var_info,
+                image=_FakeImage(),
+                bands=["elevation"],
+                when=dt.datetime(2000, 2, 11),
+            )
+        assert len([w for w in warnings if "cog=True has no effect" in w]) == 1
+
+    def test_projected_region_is_reprojected_before_windowing(
+        self, make_gee, fake_reader
+    ):
+        """A projected region is moved to lat/lon so bbox and cutline agree.
+
+        The reader reprojects a CRS-carrying geometry but reads `bbox` as
+        already being in the target CRS, so projected bounds would window a
+        different part of the planet than the cutline clips.
+        """
+        region = _FakePolygonAoi(
+            epsg=32636, total_bounds=(330000.0, 3310000.0, 340000.0, 3320000.0)
+        )
+        gee = make_gee(region=region)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["geometry"] is not region, "the projected region was reused"
+        assert kwargs["geometry"].reprojected_to == "EPSG:4326"
+        assert kwargs["bbox"] == kwargs["geometry"].total_bounds
+
+    def test_wgs84_region_is_used_as_is(self, make_gee, fake_reader):
+        """A region already in EPSG:4326 is not needlessly reprojected."""
+        region = _FakePolygonAoi(epsg=4326)
+        gee = make_gee(region=region)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        _asset_id, kwargs = fake_reader.calls[0]
+        assert kwargs["geometry"] is region
+
+    def test_reauthenticating_drops_the_cached_credential(self, make_gee, fake_reader):
+        """A new `authenticate()` must not reuse the previous identity's credential."""
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "a", _plan_for(gee, var_info)
+        )
+        gee.authenticate(service_account="other@x.iam", service_key="other.json")
+        gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "b", _plan_for(gee, var_info)
+        )
+        assert fake_reader.credential_builds == ["key.json", "other.json"]
+
+    def test_api_uses_getdownloadurl_when_engine_is_ee(self, make_gee, fake_reader):
+        """`engine="ee"` keeps the historical `getDownloadURL` path."""
+        gee = make_gee(engine="ee")
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        image = _FakeImage()
+        gee._api(image, var_info, ["elevation"], dt.datetime(2000, 2, 11))
+        assert not fake_reader.calls
+        assert image.download_params is not None

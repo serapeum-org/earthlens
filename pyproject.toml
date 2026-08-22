@@ -49,6 +49,7 @@ earthdata = ["earthlens-imagery[earthdata]"]
 ecmwf = ["earthlens-atmosphere[ecmwf]"]
 ecmwf-modern = ["earthlens-atmosphere[ecmwf-modern]"]
 eea_aq = ["earthlens-atmosphere[eea_aq]"]
+eedai = ["earthlens-imagery[eedai]"]
 emdat = ["earthlens-hazards[emdat]"]
 erddap = ["earthlens-ocean[erddap]"]
 eumetsat = ["earthlens-imagery[eumetsat]"]
@@ -80,7 +81,10 @@ worldpop = ["earthlens-land[worldpop]"]
 # own extra on earthlens itself. `argo` (xarray clash with openeo -- see #789)
 # and `osm-pbf` (pyrosm's transitive cykhash dep is sdist-only) stay out; `osm`
 # is included because openeo already pins pandas<3, so ohsome's pandas<3 no
-# longer collides.
+# longer collides. `eedai` stays out deliberately: installing it flips the GEE
+# backend's default `engine="auto"` onto the pyramids-eo reader, which samples
+# and grids differently from Earth Engine, so it is opt-in rather than
+# something `all` turns on under an existing user.
 all = [
     "earthlens[asf]",
     "earthlens[cmems]",
@@ -162,6 +166,12 @@ dev = [
     "notebook",
     "jupyter",
     "commitizen>=4.8.4",
+    # pyramids-eo: the GEE backend's optional EEDAI reader. It is deliberately
+    # out of the `all` extra (installing it activates engine="auto"), so it is
+    # pulled in here instead -- otherwise the tests that pin its
+    # `from_earthengine` signature would skip everywhere and a 0.x contract
+    # change would only surface on a live run.
+    "pyramids-eo >=0.2.0,<0.3",
 ]
 # The eclipse showcase notebooks need a heavy geostationary-imagery stack that the
 # rest of the project does not. It is kept out of `dev` deliberately: pulling satpy

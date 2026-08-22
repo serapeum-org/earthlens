@@ -135,7 +135,73 @@ locations = gee.download()   # blocks while the batch tasks run; pull the files 
 > charges; `"drive"` and `"url"` do not (see the cost notes in the
 > [Introduction](introduction.md)).
 
-## 4. Via the `EarthLens` facade
+## 4. Fetch engine (`engine`) and Cloud Optimized GeoTIFFs (`cog`)
+
+Raw reads of a single materialised asset can skip `getDownloadURL`
+entirely and pull pixels through GDAL's Earth Engine driver, via the
+optional [`pyramids-eo`](https://pypi.org/project/pyramids-eo/) reader:
+
+```bash
+pip install "earthlens[eedai]"
+```
+
+`earthlens[all]` deliberately does **not** include it: installing the
+extra flips the default `engine="auto"` onto the reader, and the two
+engines sample differently (see below), so it is opt-in.
+
+```python
+gee = GEE(
+    start="2000-02-11", end="2000-02-12",
+    variables={"USGS/SRTMGL1_003": ["elevation"]},
+    lat_lim=[29.9, 30.0], lon_lim=[31.2, 31.3],
+    path="data/gee", scale=90,
+    engine="eedai",   # or "auto" (default) / "ee"
+    cog=True,         # write a Cloud Optimized GeoTIFF
+)
+```
+
+| `engine` | Behaviour |
+|----------|-----------|
+| `"auto"` (default) | Use the reader when the request qualifies **and** `[eedai]` is installed; otherwise Earth Engine. |
+| `"ee"` | Always `getDownloadURL` — the historical path. |
+| `"eedai"` | Force the reader; raises if the request does not qualify. |
+
+A request qualifies only when nothing server-side shapes the image:
+a single `ee_type="image"` asset (not a reduced collection), no
+`cloud_mask`, no `filters`, `export_via="url"`, and `crs="EPSG:4326"`.
+Everything else stays on Earth Engine, which is the only engine that can
+run a computation graph or export to Drive / GCS / an asset.
+
+What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
+so `auto_split` is unnecessary. What to know before switching:
+
+- **The extra does not replace `[gee]`.** The request is still built
+  through `earthengine-api`, so Earth Engine credentials are still
+  required.
+- **The reader fetches at the asset's native resolution** (its overviews
+  are unreliable) and downsamples locally, so a wide AOI over a fine
+  asset is a large read. A window too big to hold in memory is streamed
+  to disk one tile at a time and mosaicked, so `auto_split` is not needed
+  here. Tiling is reserved for reads at or near the asset's own
+  resolution — the case Earth Engine's 32768-px cap would otherwise
+  refuse. A request falls back to Earth Engine when it is much coarser
+  than the asset (Earth Engine aggregates server-side and returns a small
+  raster instead of fetching many native pixels per output pixel), when
+  the whole read would still fetch more than the total-work ceiling, when
+  `resample` is not `"nearest"` (upstream forbids that with tiling), when
+  a polygon cutline is set (likewise), or when the catalog does not record
+  the asset's native resolution, which leaves the read unsizeable.
+- **Pixels are not byte-identical to the Earth Engine path.** Earth
+  Engine reads `scale` in a geographic CRS as a uniform
+  degree-equivalent, while the EEDAI grid is sized for square metres on
+  the ground, so column counts differ away from the equator; and the
+  reader resamples locally (nearest by default) where Earth Engine
+  aggregates server-side. The AOI, CRS and values agree — the sampling
+  does not.
+- **`cog=True` applies to this path only.** A request served by Earth
+  Engine writes a plain GeoTIFF (and logs that it did).
+
+## 5. Via the `EarthLens` facade
 
 Once the GEE backend is registered in the facade you'll also be able to
 do `EarthLens(data_source="gee", variables={...}, ...).download()`; until
