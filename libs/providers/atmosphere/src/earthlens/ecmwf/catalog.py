@@ -642,8 +642,10 @@ class Variable(FluxableLeaf):
           that denotes a daily-or-coarser mean (`ecv-for-climate-change`,
           `reanalysis-carra-means` / `-pan-carra-means`,
           `projections-cordex-domains-single-levels`); and
-        * monthly-projection datasets whose only marker is a `-monthly` dataset
-          id (`projections-cmip5-monthly-*`).
+        * monthly datasets whose only marker is a `-monthly` dataset id — the
+          CMIP5 monthly projections (`projections-cmip5-monthly-*`) and the
+          seasonal monthly-mean forecasts (`seasonal-monthly-single-levels`,
+          whose `monthly_mean` lives in `extras["product_type"]`).
 
         The `time_aggregation` / `temporal_resolution` markers live in `extras`
         (or the dataset id), not the `product_type` field, which stays
@@ -653,7 +655,9 @@ class Variable(FluxableLeaf):
         established `reanalysis-era5-*-monthly-means` convention: the flagged
         flux families are all mean products — `ecv-for-climate-change`
         (`1_month_mean`), `-cordex-` (`monthly_mean`), CMIP5 monthly
-        (`mean-*-flux` variables) and CARRA / pan-CARRA (the `*-means` datasets).
+        (`mean-*-flux` variables), CARRA / pan-CARRA (the `*-means` datasets) and
+        `seasonal-monthly-single-levels` (`extras["product_type"] ==
+        ["monthly_mean"]`).
         A family whose samples were pre-aggregated as a *total* (accumulation)
         would need `sum`, not `mean`, and so must not be flagged here; none
         exists in the shipped catalog. The extra-based branch additionally flags
@@ -729,11 +733,12 @@ class Variable(FluxableLeaf):
             return True
         if _denotes_temporal_aggregate(self.extras.get("temporal_resolution")):
             return True
-        # CMIP5 monthly projections carry no in-row aggregation marker, so fall
-        # back to the `-monthly` dataset-id suffix. Validated against the shipped
-        # catalog: every `-monthly` id is a genuine monthly aggregate (no raw /
-        # sub-monthly dataset id contains `-monthly`); a future id that did would
-        # need an explicit `time_aggregation` / `temporal_resolution` marker.
+        # CMIP5 monthly projections and seasonal monthly-mean forecasts carry no
+        # in-row time_aggregation marker (the seasonal family's `monthly_mean`
+        # lives in extras["product_type"]), so fall back to the `-monthly`
+        # dataset-id suffix. Validated against the shipped catalog: every
+        # `-monthly` id is a genuine monthly aggregate (no raw / sub-monthly id
+        # contains `-monthly`); a future id that did would need an explicit marker.
         return "-monthly" in self.cds_dataset
 
 

@@ -407,6 +407,7 @@ class TestCatalog:
             ),
             ("reanalysis-carra-means", "10m-wind-gust-carra-means"),
             ("reanalysis-pan-carra-means", "evaporation-pancarra-means"),
+            ("seasonal-monthly-single-levels", "total-precipitation-seasonal"),
         ],
     )
     def test_is_pre_aggregated_flags_extra_and_monthly_id_families(self, dataset, code):
