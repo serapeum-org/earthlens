@@ -1887,3 +1887,63 @@ class TestRecordIsStale:
         """A stamp from the future fails towards refetching."""
         backend = _backend(tmp_path, with_shakemap=True)
         assert backend._record_is_stale({"checked": time.time() + 86400}) is True
+
+
+class TestSurvivorGuards:
+    """Guards a mutation pass found unpinned by the round-4 tests."""
+
+    def test_duplicate_ids_do_not_consume_extra_ceiling(
+        self,
+        tmp_path: Path,
+        fake_fdsn: _FakeFdsn,
+        fake_http: _FakeHttp,
+        make_event: Any,
+    ):
+        """A repeated event must not spend the ceiling twice.
+
+        Counting the duplicate would defer a distinct event that the run had
+        budget for. The download count alone cannot show this — the manifest
+        already stops the second copy being fetched — so the assertion is on
+        which events were reached.
+        """
+        from obspy.core.event import Catalog
+
+        first = make_event(lon=139.0, lat=35.0)
+        first.resource_id = _quakeml_id("us1111")
+        duplicate = make_event(lon=139.5, lat=35.5)
+        duplicate.resource_id = _quakeml_id("us1111")
+        other = make_event(lon=141.0, lat=37.0)
+        other.resource_id = _quakeml_id("us2222")
+        fake_fdsn.default_result = Catalog(events=[first, duplicate, other])
+
+        _backend(tmp_path, with_shakemap=True, max_shakemap_events=2).download(
+            progress_bar=False
+        )
+
+        reached = sorted(p.name for p in (tmp_path / "shakemap").iterdir())
+        assert reached == ["us1111", "us2222"], (
+            f"the duplicate must not push us2222 past the ceiling, got {reached}"
+        )
+
+    def test_staged_manifest_name_is_process_unique(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
+        """The manifest is staged under a name carrying this process id.
+
+        Two runs sharing an output root would otherwise stage the same path and
+        rename each other half-written file into place.
+        """
+        staged_names: list[str] = []
+        original_replace = Path.replace
+
+        def _record(self, target):
+            staged_names.append(self.name)
+            return original_replace(self, target)
+
+        monkeypatch.setattr(Path, "replace", _record)
+        _helpers.write_manifest(tmp_path, ["mmi_mean"], ["mmi_mean"], checked=1.0)
+
+        assert staged_names, "the manifest should be staged then renamed"
+        assert str(os.getpid()) in staged_names[0], (
+            f"the staged name should carry the pid, got {staged_names[0]}"
+        )
