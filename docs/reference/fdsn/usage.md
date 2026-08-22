@@ -183,15 +183,21 @@ layer you asked for, which would otherwise be refetched forever.
 Three consequences worth knowing:
 
 - **Reuse requires the earlier run to have asked for at least what you now ask
-  for.** Widening `shakemap_layers` refetches; narrowing it does not, and does
-  not discard what is already on disk.
-- **"This event published no ShakeMap" is remembered only for a week.** ShakeMap
-  is generated minutes to hours after an event, so a query over a recent window
-  is re-checked on a later run rather than cached as empty forever. Such an
-  event leaves a directory containing only the hidden manifest.
+  for.** The manifest merges across runs, so asking for `mmi_mean`, then
+  `pga_mean`, then both is served from disk — nothing already fetched is
+  discarded or fetched twice.
+- **A layer the archive did not carry is re-checked after a week.** That covers
+  both an event with no ShakeMap at all and one whose archive carried only some
+  of the layers you asked for — ShakeMap is generated minutes to hours after an
+  event, so neither is cached as final. A run returning fewer layers than
+  requested says so in a warning. An event with no grid at all leaves a
+  directory holding only the hidden manifest.
 - **A revised grid is not detected.** USGS republishes ShakeMaps for years (the
   2023 Kahramanmaraş grid is on its twelfth version). A run with the rasters
   already on disk does not re-check; pass `download(force=True)` to refetch.
+- **The ceiling counts fetches, not events.** Events already on disk cost no
+  budget, so re-running advances through a long list. An event that fails every
+  time keeps its place rather than being skipped.
 
 To clear one event's cache, delete its directory under `out/shakemap/`.
 
