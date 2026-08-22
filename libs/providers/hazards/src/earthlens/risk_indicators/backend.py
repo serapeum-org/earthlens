@@ -106,14 +106,16 @@ class RiskIndicators(AbstractDataSource):
             'vector'
 
             ```
-        - A workflow id that is not an integer is refused before it reaches the
-          query string, where INFORM would answer 200 with an empty body:
+        - A workflow id outside the valid domain is refused before it reaches
+          the query string, where INFORM would answer 200 with an empty body:
             ```python
             >>> from earthlens.risk_indicators import RiskIndicators
-            >>> RiskIndicators(variables=["inform:risk"], country="KEN", workflow_id="503")
+            >>> RiskIndicators(
+            ...     variables=["inform:risk"], country="KEN", workflow_id=0
+            ... )
             Traceback (most recent call last):
                 ...
-            ValueError: workflow_id must be an INFORM WorkflowId integer, got '503'.
+            ValueError: workflow_id must be a positive INFORM WorkflowId integer, got 0.
 
             ```
     """

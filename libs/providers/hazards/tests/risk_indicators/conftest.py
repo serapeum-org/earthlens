@@ -9,14 +9,31 @@ captured payloads under `data/` are real responses with the GFW key removed.
 from __future__ import annotations
 
 import json
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
 import pytest
+from loguru import logger
 
 from earthlens.risk_indicators import _helpers
 
 DATA = Path(__file__).parent / "data"
+
+
+@pytest.fixture
+def captured_warnings() -> Iterator[list[str]]:
+    """Collect the loguru WARNING lines a test provokes.
+
+    Yields:
+        list[str]: The formatted records, appended as they are emitted.
+    """
+    messages: list[str] = []
+    sink_id = logger.add(messages.append, level="WARNING")
+    try:
+        yield messages
+    finally:
+        logger.remove(sink_id)
 
 
 def load_json(name: str) -> Any:

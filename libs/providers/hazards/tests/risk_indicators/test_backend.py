@@ -7,7 +7,6 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-from loguru import logger
 from pyramids.feature.collection import FeatureCollection
 
 import earthlens.risk_indicators
@@ -264,21 +263,18 @@ class TestRouting:
         assert call["url"].endswith("/report/133/FL.json")
         assert "WorkflowId" not in call["params"]
 
-    def test_workflow_id_on_other_provider_warns(self, monkeypatch, tmp_path):
+    def test_workflow_id_on_other_provider_warns(
+        self, captured_warnings, monkeypatch, tmp_path
+    ):
         """A workflow_id= that cannot apply is reported, not silently dropped."""
-        messages: list[str] = []
-        sink_id = logger.add(messages.append, level="WARNING")
-        try:
-            _build(
-                monkeypatch,
-                variables=["thinkhazard:flood_river"],
-                country="KEN",
-                workflow_id=493,
-                path=tmp_path,
-            )
-        finally:
-            logger.remove(sink_id)
-        assert any("applies to INFORM datasets only" in message for message in messages)
+        _build(
+            monkeypatch,
+            variables=["thinkhazard:flood_river"],
+            country="KEN",
+            workflow_id=493,
+            path=tmp_path,
+        )
+        assert "applies to INFORM datasets only" in "".join(captured_warnings)
 
     @pytest.mark.parametrize("bad", ["503", 503.0, True, 0, -5])
     def test_workflow_id_must_be_a_positive_integer(self, monkeypatch, tmp_path, bad):
@@ -436,34 +432,26 @@ class TestEmptyHint:
         )
         assert b._empty_hint() == ""
 
-    def test_warning_carries_the_dead_workflow(self, fake_http, monkeypatch, tmp_path):
+    def test_warning_carries_the_dead_workflow(
+        self, fake_http, captured_warnings, monkeypatch, tmp_path
+    ):
         """The warning users see, not just the helper, names the unserved workflow."""
         monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
-        messages: list[str] = []
-        sink_id = logger.add(messages.append, level="WARNING")
-        try:
-            _build(
-                monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
-            ).download()
-        finally:
-            logger.remove(sink_id)
-        warning = "".join(messages)
+        _build(
+            monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
+        ).download()
+        warning = "".join(captured_warnings)
         assert "no rows matched" in warning
         assert "workflow 503 served no rows at all" in warning
 
     def test_warning_carries_the_country_diagnosis(
-        self, fake_http, monkeypatch, tmp_path
+        self, fake_http, captured_warnings, monkeypatch, tmp_path
     ):
         """A country that the served rows do not cover is named in the warning."""
-        messages: list[str] = []
-        sink_id = logger.add(messages.append, level="WARNING")
-        try:
-            _build(
-                monkeypatch, variables=["inform:risk"], country="GRL", path=tmp_path
-            ).download()
-        finally:
-            logger.remove(sink_id)
-        assert "none for country='GRL'" in "".join(messages)
+        _build(
+            monkeypatch, variables=["inform:risk"], country="GRL", path=tmp_path
+        ).download()
+        assert "none for country='GRL'" in "".join(captured_warnings)
 
 
 class TestSubpackageHygiene:
