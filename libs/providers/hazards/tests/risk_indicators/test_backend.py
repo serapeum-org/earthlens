@@ -260,10 +260,10 @@ class TestRouting:
             logger.remove(sink_id)
         assert any("applies to INFORM datasets only" in message for message in messages)
 
-    @pytest.mark.parametrize("bad", ["503", 503.0, True])
-    def test_workflow_id_must_be_an_integer(self, monkeypatch, tmp_path, bad):
-        """A non-integer workflow_id is rejected instead of reaching the query string."""
-        with pytest.raises(ValueError, match="workflow_id must be an INFORM"):
+    @pytest.mark.parametrize("bad", ["503", 503.0, True, 0, -5])
+    def test_workflow_id_must_be_a_positive_integer(self, monkeypatch, tmp_path, bad):
+        """A non-integer or non-positive workflow_id never reaches the query string."""
+        with pytest.raises(ValueError, match="workflow_id must be a positive"):
             _build(
                 monkeypatch,
                 variables=["inform:risk"],
@@ -366,7 +366,7 @@ class TestEmptyHint:
         b.download()
         hint = b._empty_hint()
         assert "none for country='GRL'" in hint
-        assert "outside its coverage" in hint
+        assert "outside the country set INFORM scores" in hint
 
     def test_blames_the_workflow(self, fake_http, monkeypatch, tmp_path):
         """An upstream that serves nothing names the workflow and the override."""
@@ -390,18 +390,21 @@ class TestEmptyHint:
         b.download()
         assert "workflow 515 served no rows" in b._empty_hint()
 
+    def test_state_does_not_leak_between_requests(
+        self, fake_http, monkeypatch, tmp_path
+    ):
+        """A second download diagnoses its own result, not the previous one."""
+        b = _build(monkeypatch, variables=["inform:risk"], country="GRL", path=tmp_path)
+        b.download()
+        assert "none for country='GRL'" in b._empty_hint()
+        monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
+        b.download()
+        assert "served no rows at all" in b._empty_hint()
+
     def test_silent_before_any_request(self, monkeypatch, tmp_path):
         """A backend that has issued no request diagnoses nothing."""
         b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
         assert b._empty_hint() == ""
-
-    def test_rows_without_a_country_filter_are_not_blamed_on_a_country(
-        self, monkeypatch, tmp_path
-    ):
-        """Served rows that vanish with no country filter are reported as shaping."""
-        b = _build(monkeypatch, variables=["inform:risk"], path=tmp_path)
-        b._upstream_rows = 5
-        assert "did not survive shaping" in b._empty_hint()
 
     def test_silent_for_other_providers(self, monkeypatch, tmp_path):
         """A non-INFORM dataset gets no INFORM-specific hint."""

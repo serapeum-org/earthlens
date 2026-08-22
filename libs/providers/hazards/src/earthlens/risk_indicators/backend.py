@@ -175,8 +175,8 @@ class RiskIndicators(AbstractDataSource):
         Raises:
             TypeError: If `variables` is a mapping (pass a list of one id).
             ValueError: If `variables` is not exactly one dataset id, if
-                `output_format` is unrecognised, if `workflow_id` is not an
-                integer, or if the required country / admin selector for the
+                `output_format` is unrecognised, if `workflow_id` is not a
+                positive integer, or if the required country / admin selector for the
                 resolved provider is missing (`G7`).
             AuthenticationError: For a `gfw` dataset when no key resolves (`G3`).
         """
@@ -201,10 +201,12 @@ class RiskIndicators(AbstractDataSource):
         # would 200 with an empty body rather than fail - indistinguishable from
         # a withdrawn workflow. Reject it here instead. bool is an int subclass.
         if workflow_id is not None and (
-            isinstance(workflow_id, bool) or not isinstance(workflow_id, int)
+            isinstance(workflow_id, bool)
+            or not isinstance(workflow_id, int)
+            or workflow_id <= 0
         ):
             raise ValueError(
-                f"workflow_id must be an INFORM WorkflowId integer, got "
+                f"workflow_id must be a positive INFORM WorkflowId integer, got "
                 f"{workflow_id!r}."
             )
 
@@ -372,6 +374,9 @@ class RiskIndicators(AbstractDataSource):
         dataset = self._dataset
         country = product.metadata.get("country")
         admin_code = product.metadata.get("admin_code")
+        # Cleared per fetch: the count describes the request in flight, so a
+        # reused instance cannot diagnose this result from the previous one.
+        self._upstream_rows = None
         if dataset.provider == "thinkhazard":
             code = admin_code or self._catalog.resolve_admin(cast("str", country))
             payload = _helpers.thinkhazard_query(code, dataset.hazard)
@@ -379,9 +384,14 @@ class RiskIndicators(AbstractDataSource):
                 payload, admin_code=code, hazard=dataset.hazard, country=country
             )
         if dataset.provider == "inform":
+            workflow_id = self._resolved_workflow_id
+            if workflow_id is None:
+                raise ValueError(
+                    f"INFORM dataset {dataset.id!r} resolves to no workflow id; "
+                    "the catalog row is missing workflow_id and none was passed."
+                )
             payload = _helpers.inform_query(
-                cast("int", self._resolved_workflow_id),
-                cast("str", dataset.indicator_id),
+                workflow_id, cast("str", dataset.indicator_id)
             )
             self._upstream_rows = len(payload)
             return _helpers.inform_to_frame(payload, country=country)
@@ -474,15 +484,12 @@ class RiskIndicators(AbstractDataSource):
                 "been withdrawn upstream — pass workflow_id= to read another "
                 "workflow (/workflows lists them)."
             )
-        if self._country is None:
-            return (
-                f" INFORM workflow {workflow} served {self._upstream_rows} row(s) "
-                "that did not survive shaping."
-            )
+        # Rows were served, so only the country filter can have emptied the
+        # frame - without one, shaping keeps every row.
         return (
             f" INFORM workflow {workflow} served {self._upstream_rows} row(s), none "
-            f"for country={self._country!r}; INFORM scores ~191 countries, so the "
-            "code may be misspelt or outside its coverage."
+            f"for country={self._country!r}; the code may be misspelt or outside "
+            "the country set INFORM scores."
         )
 
     def _write_table(self, df: pd.DataFrame) -> Path:
