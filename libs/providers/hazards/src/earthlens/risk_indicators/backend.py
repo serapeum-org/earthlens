@@ -41,6 +41,7 @@ from earthlens.base import (
     TemporalExtent,
     to_datetime,
 )
+from earthlens.config import cache_dir as _shared_cache_dir
 from earthlens.risk_indicators import _helpers
 from earthlens.risk_indicators.auth import GfwAuth, GfwCredentials
 from earthlens.risk_indicators.catalog import Catalog, Dataset
@@ -53,6 +54,12 @@ OutputFormat = Literal["csv", "parquet"]
 #: Accepted on-disk output formats for a written tabular result.
 OUTPUT_FORMATS: tuple[str, ...] = ("csv", "parquet")
 
+InformSource = Literal["auto", "release", "api"]
+
+#: Where an INFORM dataset reads its scores. The published release workbook is
+#: the current release; the Scores API serves the workflow the catalog pins.
+INFORM_SOURCES: tuple[str, ...] = ("auto", "release", "api")
+
 #: Global sentinel bounds — risk indicators are country/admin-indexed, not
 #: gridded, so the spatial extent is the whole globe (`G7`).
 _GLOBAL_LAT: list[float] = [-90.0, 90.0]
@@ -62,62 +69,65 @@ _GLOBAL_LON: list[float] = [-180.0, 180.0]
 class RiskIndicators(AbstractDataSource):
     """Country/admin-indexed risk-indicator backend (mixed output).
 
-    Resolves one dataset id to its catalog row, routes the request to that
-    row's provider (ThinkHazard / INFORM / GFW), and returns a
-    :class:`pandas.DataFrame` (`tabular`) or a
-    :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) per the
-    row's `output_kind`. The query is a search/fetch split: :meth:`_search`
-    pins the one product (dataset + resolved selector), and :meth:`_fetch`
-    issues the provider call and parses it.
+        Resolves one dataset id to its catalog row, routes the request to that
+        row's provider (ThinkHazard / INFORM / GFW), and returns a
+        :class:`pandas.DataFrame` (`tabular`) or a
+        :class:`~pyramids.feature.collection.FeatureCollection` (`vector`) per the
+        row's `output_kind`. The query is a search/fetch split: :meth:`_search`
+        pins the one product (dataset + resolved selector), and :meth:`_fetch`
+        issues the provider call and parses it.
 
-    Auth is conditional: only a `gfw` dataset builds a :class:`GfwAuth` (`G3`);
-    ThinkHazard / INFORM need no credentials. `aggregate=` is rejected — these
-    are pre-computed indices, not gridded rasters (`G8`).
+        Auth is conditional: only a `gfw` dataset builds a :class:`GfwAuth` (`G3`);
+        ThinkHazard / INFORM need no credentials. `aggregate=` is rejected — these
+        are pre-computed indices, not gridded rasters (`G8`).
 
-    An INFORM row reads one model release, identified upstream by a WorkflowId.
-    The catalog pins one per dataset; `workflow_id=` overrides that pin for a
-    single request, which is the way out when a pinned release stops serving
-    scores (JRC has withdrawn one mid-cycle before) or when an older release is
-    wanted deliberately.
+    An INFORM row has two possible channels: the release workbook JRC publishes
+        on its results page — the current release, and the default for the rows the
+        workbook covers — and the Scores API, which serves one model release per
+        request, identified by a WorkflowId. `source=` picks the channel and
+        `workflow_id=` picks the API's release; the returned rows record both, so a
+        table says which channel produced it. The split exists because the two
+        disagree: the API stopped serving the 2026 workflows while the results page
+        kept publishing the 2026 release.
 
-    Attributes:
-        OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved
-            dataset's `output_kind` (`"tabular"` or `"vector"`). The facade
-            reads it to gate `aggregate=` and to know the return shape.
+        Attributes:
+            OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved
+                dataset's `output_kind` (`"tabular"` or `"vector"`). The facade
+                reads it to gate `aggregate=` and to know the return shape.
 
-    Examples:
-        - Resolve an INFORM dataset and read the shape it will return:
-            ```python
-            >>> from earthlens.risk_indicators import RiskIndicators
-            >>> backend = RiskIndicators(variables=["inform:risk"], country="KEN")
-            >>> backend.OUTPUT_KIND
-            'tabular'
-            >>> backend.vars
-            ['inform:risk']
+        Examples:
+            - Resolve an INFORM dataset and read the shape it will return:
+                ```python
+                >>> from earthlens.risk_indicators import RiskIndicators
+                >>> backend = RiskIndicators(variables=["inform:risk"], country="KEN")
+                >>> backend.OUTPUT_KIND
+                'tabular'
+                >>> backend.vars
+                ['inform:risk']
 
-            ```
-        - A GFW geometry dataset resolves to the vector shape instead:
-            ```python
-            >>> from earthlens.risk_indicators import RiskIndicators
-            >>> backend = RiskIndicators(
-            ...     variables=["gfw:admin_boundary"], country="KEN", api_key="k"
-            ... )
-            >>> backend.OUTPUT_KIND
-            'vector'
+                ```
+            - A GFW geometry dataset resolves to the vector shape instead:
+                ```python
+                >>> from earthlens.risk_indicators import RiskIndicators
+                >>> backend = RiskIndicators(
+                ...     variables=["gfw:admin_boundary"], country="KEN", api_key="k"
+                ... )
+                >>> backend.OUTPUT_KIND
+                'vector'
 
-            ```
-        - A workflow id outside the valid domain is refused before it reaches
-          the query string, where INFORM would answer 200 with an empty body:
-            ```python
-            >>> from earthlens.risk_indicators import RiskIndicators
-            >>> RiskIndicators(
-            ...     variables=["inform:risk"], country="KEN", workflow_id=0
-            ... )
-            Traceback (most recent call last):
-                ...
-            ValueError: workflow_id must be a positive INFORM WorkflowId integer, got 0.
+                ```
+            - A workflow id outside the valid domain is refused before it reaches
+              the query string, where INFORM would answer 200 with an empty body:
+                ```python
+                >>> from earthlens.risk_indicators import RiskIndicators
+                >>> RiskIndicators(
+                ...     variables=["inform:risk"], country="KEN", workflow_id=0
+                ... )
+                Traceback (most recent call last):
+                    ...
+                ValueError: workflow_id must be a positive INFORM WorkflowId integer, got 0.
 
-            ```
+                ```
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
@@ -142,6 +152,8 @@ class RiskIndicators(AbstractDataSource):
         admin_code: str | None = None,
         api_key: str | None = None,
         workflow_id: int | None = None,
+        source: InformSource = "auto",
+        cache_dir: Path | str | None = None,
         output_format: OutputFormat = "csv",
     ):
         """Initialise a risk-indicators backend instance.
@@ -168,18 +180,28 @@ class RiskIndicators(AbstractDataSource):
             api_key: The GFW `x-api-key`; only consulted for a `gfw` dataset.
                 Falls back to the `GFW_API_KEY` env var.
             workflow_id: An INFORM model WorkflowId overriding the catalog pin;
-                only consulted for an `inform` dataset. Use it when the pinned
-                workflow stops serving scores, or to read an older release
-                (`/workflows` lists every WorkflowId).
+                only consulted for an `inform` dataset read from the API. Use it
+                to read a release other than the pinned one (`/workflows` lists
+                every WorkflowId). Implies `source="api"` when `source` is
+                `"auto"`.
+            source: Where an `inform` dataset reads its scores. `"auto"` (the
+                default) reads the published release workbook when the row
+                declares a `release_column` — the current release — and the API
+                otherwise. `"release"` forces the workbook, `"api"` forces the
+                Scores endpoint and the pinned (or overridden) workflow.
+            cache_dir: Directory for the downloaded release workbook. Defaults
+                to `risk_indicators/` under the shared earthlens cache
+                (`set_cache_dir()` / `EARTHLENS_CACHE`), not under `path`.
             output_format: On-disk format for a tabular result — `"csv"`
                 (default) or `"parquet"`.
 
         Raises:
             TypeError: If `variables` is a mapping (pass a list of one id).
             ValueError: If `variables` is not exactly one dataset id, if
-                `output_format` is unrecognised, if `workflow_id` is not a
-                positive integer, or if the required country / admin selector for the
-                resolved provider is missing (`G7`).
+                `output_format` or `source` is unrecognised, if `workflow_id`
+                is not a positive integer, if `source="release"` names a dataset
+                the release workbook does not cover, or if the required country
+                / admin selector for the resolved provider is missing (`G7`).
             AuthenticationError: For a `gfw` dataset when no key resolves (`G3`).
         """
         if isinstance(variables, dict):
@@ -193,6 +215,10 @@ class RiskIndicators(AbstractDataSource):
                 "RiskIndicators needs exactly one dataset id in variables= "
                 "(OUTPUT_KIND is per instance); got "
                 f"{ids!r}. Available: {Catalog().available()}."
+            )
+        if source not in INFORM_SOURCES:
+            raise ValueError(
+                f"source must be one of {list(INFORM_SOURCES)}, got {source!r}."
             )
         if output_format not in OUTPUT_FORMATS:
             raise ValueError(
@@ -218,6 +244,8 @@ class RiskIndicators(AbstractDataSource):
         self._admin_code = admin_code
         self._api_key = api_key
         self._workflow_id = workflow_id
+        self._source: InformSource = source
+        self._cache_dir = Path(cache_dir) if cache_dir is not None else None
         # Row count of the last INFORM payload, before the country filter, so an
         # empty result can say which of the two causes produced it.
         self._upstream_rows: int | None = None
@@ -386,6 +414,8 @@ class RiskIndicators(AbstractDataSource):
                 payload, admin_code=code, hazard=dataset.hazard, country=country
             )
         if dataset.provider == "inform":
+            if self._reads_release:
+                return self._fetch_inform_release(country)
             workflow_id = self._resolved_workflow_id
             if workflow_id is None:
                 raise ValueError(
@@ -459,6 +489,85 @@ class RiskIndicators(AbstractDataSource):
         return result
 
     @property
+    def _cache_root(self) -> Path:
+        """Directory holding the downloaded release workbook.
+
+        Defaults to `risk_indicators/` under the shared earthlens cache
+        (`set_cache_dir()` / `EARTHLENS_CACHE`), overridden by `cache_dir=`. The
+        workbook is a reusable ~2.5 MB download shared by the four Risk
+        datasets, so it belongs in the cache rather than beside the results.
+        """
+        return self._cache_dir or (_shared_cache_dir() / "risk_indicators")
+
+    @property
+    def _reads_release(self) -> bool:
+        """Whether this request reads the published workbook rather than the API.
+
+        `"auto"` prefers the workbook for a row the release covers, because that
+        is the current published release — but an explicit `workflow_id=` names
+        an API workflow, so it keeps the API. `"release"` and `"api"` force the
+        choice, and `"release"` on a row the workbook does not cover is rejected
+        at construction rather than silently answered from the API.
+
+        Returns:
+            bool: True when the release workbook is the source for this request.
+
+        Raises:
+            ValueError: If `source="release"` names a dataset the workbook does
+                not cover (the Climate Change model is published separately).
+        """
+        if self._dataset.provider != "inform":
+            return False
+        covered = self._dataset.release_column is not None
+        if self._source == "release":
+            if not covered:
+                raise ValueError(
+                    f"source='release' is not available for {self._dataset.id!r}: "
+                    "the INFORM Risk release workbook does not carry it. Use "
+                    "source='api'."
+                )
+            return True
+        if self._source == "api":
+            return False
+        return covered and self._workflow_id is None
+
+    def _fetch_inform_release(self, country: str | None) -> pd.DataFrame:
+        """Read this dataset's scores from the published release workbook.
+
+        Discovers the newest workbook on the JRC results page, caches the
+        download under :attr:`_cache_root`, and reshapes one score column into
+        the canonical table.
+
+        Args:
+            country: ISO3 to filter to, or `None` for every country.
+
+        Returns:
+            pd.DataFrame: Columns `_helpers.INFORM_COLUMNS`.
+
+        Raises:
+            requests.RequestException: If the page or the workbook cannot be
+                fetched after retries.
+            ValueError: If the page carries no workbook link, or the workbook
+                has no matching sheet / column.
+        """
+        url, year = _helpers.inform_release_url()
+        workbook = _helpers.inform_download_release(
+            url, self._cache_root / url.rsplit("/", 1)[-1]
+        )
+        logger.info(
+            f"RiskIndicators {self._dataset.id}: reading the INFORM {year} "
+            f"release workbook ({workbook.name})."
+        )
+        scores = _helpers.inform_release_to_frame(
+            workbook,
+            cast("str", self._dataset.release_column),
+            indicator_id=cast("str", self._dataset.indicator_id),
+            release_year=year,
+        )
+        self._upstream_rows = len(scores)
+        return _helpers.filter_iso3(scores, country)
+
+    @property
     def _resolved_workflow_id(self) -> int | None:
         """The INFORM WorkflowId this request uses: the override, else the pin."""
         if self._workflow_id is not None:
@@ -481,19 +590,23 @@ class RiskIndicators(AbstractDataSource):
         """
         if self._dataset.provider != "inform" or self._upstream_rows is None:
             return ""
-        workflow = self._resolved_workflow_id
+        workflow = (
+            "the release workbook"
+            if self._reads_release
+            else f"workflow {self._resolved_workflow_id}"
+        )
         if self._upstream_rows == 0:
             return (
-                f" INFORM workflow {workflow} served no rows at all; it may have "
-                "been withdrawn upstream — pass workflow_id= to read another "
-                "workflow (/workflows lists them)."
+                f" INFORM {workflow} served no rows at all; it may have been "
+                "withdrawn upstream — pass workflow_id= (or source=) to read "
+                "another release."
             )
         # Rows were served, so only the country filter can have emptied the
         # frame - without one, shaping keeps every row.
         return (
-            f" INFORM workflow {workflow} served {self._upstream_rows} row(s), none "
-            f"for country={self._country!r}; the code may be misspelt or outside "
-            "the country set INFORM scores."
+            f" INFORM {workflow} served {self._upstream_rows} row(s), none for "
+            f"country={self._country!r}; the code may be misspelt or outside the "
+            "country set INFORM scores."
         )
 
     def _write_table(self, df: pd.DataFrame) -> Path:

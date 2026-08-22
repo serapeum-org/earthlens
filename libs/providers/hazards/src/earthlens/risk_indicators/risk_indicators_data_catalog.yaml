@@ -94,27 +94,34 @@ datasets:
     selector: country
     long_name: All ThinkHazard! hazard levels for a division
     citation: "GFDRR ThinkHazard! — https://thinkhazard.org (public domain)."
-  # INFORM workflow pin. The JRC Scores route stopped serving the INFORM2026
-  # group on 2026-08-18: workflow 505 ("INFORM Risk 2026") answers 200 [] for
-  # every indicator, as do 515 and 481, while the 2026 release itself is still
-  # published (INFORM_Risk_2026_v072.xlsx). inform:risk, inform:hazard_exposure,
-  # inform:vulnerability and inform:coping_capacity therefore pin 503 ("INFORM
-  # Risk Mid 2025", published 2025-08-28), the newest workflow the API still
-  # serves, so their scores are one release behind the site. inform:climate_risk
-  # reads a different model - see its own note. Pass workflow_id= to select
-  # another workflow per request.
+  # INFORM has two publication channels and they disagree. The Scores API
+  # stopped serving the INFORM2026 group on 2026-08-18 - workflow 505 ("INFORM
+  # Risk 2026") answers 200 [] for every indicator, as do 515 and 481 - while
+  # the results page kept publishing the 2026 release as a spreadsheet
+  # (INFORM_Risk_2026_v072.xlsx, 31 March 2026).
   #
-  # To unwind this: re-probe /countries/Scores/?WorkflowId=505&IndicatorId=INFORM
-  # (JRC's own /workflows/Default still names 505, so that pointer is no signal).
-  # A non-empty answer means the 2026 group is back - repin these four rows and
-  # delete this note. test_inform_live asserts the workflow the rows came from,
-  # so it fails the moment a repin and this comment disagree.
+  # So the four Risk rows below carry BOTH: a release_column, which reads the
+  # current release straight from that spreadsheet (the default), and a
+  # workflow_id pin of 503 ("INFORM Risk Mid 2025", published 2025-08-28) - the
+  # newest workflow the API still serves - used when source="api" or a
+  # workflow_id= override asks for a specific model release. Scores differ
+  # between the two: KEN is 6.2 in the 2026 workbook and 5.8 under workflow 503,
+  # and every returned row carries a `source` column saying which it came from.
+  #
+  # To unwind the API pin when JRC restores the 2026 group: re-probe
+  # /countries/Scores/?WorkflowId=505&IndicatorId=INFORM (their own
+  # /workflows/Default still names 505, so that pointer is no signal). A
+  # non-empty answer means it is back - repin these four rows and update this
+  # note. test_inform_api_live asserts which workflow the rows came from, so it
+  # fails the moment a repin and this comment disagree. inform:climate_risk
+  # reads a different model and a different channel - see its own note.
   inform:risk:
     provider: inform
     output_kind: tabular
     selector: country
     workflow_id: 503
     indicator_id: INFORM
+    release_column: "INFORM RISK"
     long_name: INFORM Risk composite index
     citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
   inform:hazard_exposure:
@@ -123,6 +130,7 @@ datasets:
     selector: country
     workflow_id: 503
     indicator_id: HA
+    release_column: "HAZARD & EXPOSURE"
     long_name: INFORM Hazard & Exposure dimension
     citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
   inform:vulnerability:
@@ -131,6 +139,7 @@ datasets:
     selector: country
     workflow_id: 503
     indicator_id: VU
+    release_column: "VULNERABILITY"
     long_name: INFORM Vulnerability dimension
     citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
   inform:coping_capacity:
@@ -139,6 +148,7 @@ datasets:
     selector: country
     workflow_id: 503
     indicator_id: CC
+    release_column: "LACK OF COPING CAPACITY"
     long_name: INFORM Lack of Coping Capacity dimension
     citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
   # Climate Change is a separate model, not part of the Risk release above.
@@ -152,7 +162,10 @@ datasets:
   # catalog row. 451 is the "optimistic" RCP4.5-SSP1 pathway at 2050, one of the
   # two scenarios INFORM publishes on its Climate Change results page, and the
   # long_name now names that scenario: the old label described 435's SSP5 run,
-  # which is not one of the two published pathways.
+  # which is not one of the two published pathways. No release_column: the
+  # Climate Change results are published as their own brochure spreadsheet with
+  # a different layout, not in the INFORM Risk release workbook, so this row is
+  # API-only and source="release" is rejected for it.
   inform:climate_risk:
     provider: inform
     output_kind: tabular
