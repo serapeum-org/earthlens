@@ -5,9 +5,17 @@ the `e2e` marker plus a network-reachability skip — and the Global Forest Watc
 Data API, additionally gated on a `GFW_API_KEY` in the environment. A default
 `pytest` run skips them all.
 
+The JRC host drops connections without a response after roughly two requests in
+quick succession, and this module makes three contacts with it — the reachability
+probe at import, then the two INFORM pulls. `HttpClient` retries a dropped
+connection at 1s and 2s, which covers it in practice; a drop that outlasts that
+budget surfaces as a transport error, which the shared `pytest_runtest_call` hook
+classifies as an availability skip rather than a failure. If it ever does turn
+flaky, merge the two INFORM tests into one pull with a pause between the rows.
+
 Run with:
 
-    pixi run -e dev pytest -m "e2e and risk_indicators"
+    uv run pytest -m "e2e and risk_indicators"
 """
 
 from __future__ import annotations
