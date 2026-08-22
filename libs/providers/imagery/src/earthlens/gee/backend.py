@@ -248,6 +248,8 @@ def _rename_when_unlocked(source: Path, target: Path) -> None:
     try:
         os.replace(source, target)
     except PermissionError:
+        # Collecting only helps once the caller has dropped its own reference
+        # to the dataset — see `_export_via_eedai`, which clears it first.
         gc.collect()
         os.replace(source, target)
 
@@ -264,7 +266,9 @@ def _discard_quietly(path: Path) -> None:
     Args:
         path: The staging raster to remove; a missing file is not an error.
     """
-    for stray in (path, *path.parent.glob(f"{path.name}.*")):
+    # Sidecars either append to the name (`x.tif.aux.xml`) or replace the
+    # extension (`x.tfw`, `x.prj`), so both shapes are swept.
+    for stray in (path, *path.parent.glob(f"{path.stem}.*")):
         try:
             stray.unlink(missing_ok=True)
         except OSError as exc:
