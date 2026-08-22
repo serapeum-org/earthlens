@@ -21,6 +21,52 @@ from earthlens.risk_indicators import _helpers
 DATA = Path(__file__).parent / "data"
 
 
+def build_release_workbook(path: Path, rows: list[tuple[str, str, object]]) -> Path:
+    """Write a minimal stand-in for the INFORM Risk release workbook.
+
+    Mirrors the published layout the parser relies on: a year-named score sheet,
+    a banner row above the header, and one column per dimension.
+
+    Args:
+        path: The `.xlsx` path to write.
+        rows: `(country, iso3, inform_score)` triples; the dimension columns are
+            derived so each row is internally consistent.
+
+    Returns:
+        Path: The written workbook.
+    """
+    from openpyxl import Workbook
+
+    book = Workbook()
+    sheet = book.active
+    sheet.title = "INFORM Risk 2026 (a-z)"
+    sheet.append(["INFORM Risk 2026 - results"])
+    sheet.append(
+        [
+            "COUNTRY",
+            "ISO3",
+            "INFORM RISK",
+            "HAZARD & EXPOSURE",
+            "VULNERABILITY",
+            "LACK OF COPING CAPACITY",
+        ]
+    )
+    for country, iso3, score in rows:
+        sheet.append([country, iso3, score, score, score, score])
+    book.create_sheet("About")
+    book.save(path)
+    return path
+
+
+@pytest.fixture(scope="session")
+def release_workbook(tmp_path_factory) -> Path:
+    """A three-country stand-in workbook, built once for the session."""
+    target = tmp_path_factory.mktemp("inform-release") / "INFORM_Risk_2026_v072.xlsx"
+    return build_release_workbook(
+        target, [("Kenya", "KEN", 6.2), ("Zambia", "ZMB", 5.1), ("Nowhere", "NOW", "x")]
+    )
+
+
 @pytest.fixture
 def captured_warnings() -> Iterator[list[str]]:
     """Collect the loguru WARNING lines a test provokes.
@@ -61,6 +107,15 @@ class _FakeResponse:
     def json(self) -> Any:
         """Return the captured payload."""
         return self._payload
+
+    @property
+    def text(self) -> str:
+        """Return the payload as text, for the HTML the results page serves."""
+        return (
+            self._payload
+            if isinstance(self._payload, str)
+            else json.dumps(self._payload)
+        )
 
 
 class FakeHttp:

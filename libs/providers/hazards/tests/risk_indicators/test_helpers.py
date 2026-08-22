@@ -294,6 +294,13 @@ class TestThinkhazardToFrame:
         assert df.iloc[0]["level_title"] == "High"
 
 
+class _TextResponse:
+    """A stand-in for the HTML response the results page returns."""
+
+    def __init__(self, text: str) -> None:
+        self.text = text
+
+
 class TestInformToFrame:
     """inform_to_frame renames columns and filters by country."""
 
@@ -370,3 +377,113 @@ class TestResolveAdminAndEmpty:
         """empty_canonical returns a zero-row frame with the given columns."""
         df = _helpers.empty_canonical(["a", "b"])
         assert df.empty and list(df.columns) == ["a", "b"]
+
+
+class TestInformRelease:
+    """Discovery and parsing of the published INFORM Risk release workbook."""
+
+    def test_release_url_picks_the_newest_link(self, monkeypatch):
+        """The newest year and version win when the page lists several workbooks."""
+        html = (
+            '<a href="/inform-index/Portals/0/InfoRM/2025/INFORM_Risk_2025_v050.xlsx">2025</a>'
+            '<a href="/inform-index/Portals/0/InfoRM/2026/INFORM_Risk_2026_v072.xlsx">2026</a>'
+            '<a href="/inform-index/Portals/0/InfoRM/2026/INFORM2026_TREND_2017_2026_v72_ALL.xlsx">trend</a>'
+        )
+        monkeypatch.setattr(
+            _helpers.HttpClient, "get", lambda self, url, **kwargs: _TextResponse(html)
+        )
+        url, year = _helpers.inform_release_url()
+        assert url.endswith("/INFORM_Risk_2026_v072.xlsx")
+        assert url.startswith(_helpers.INFORM_SITE)
+        assert year == 2026
+
+    def test_release_url_without_a_link_raises(self, monkeypatch):
+        """A page carrying no workbook link is reported, not silently empty."""
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "get",
+            lambda self, url, **kwargs: _TextResponse("<p>no downloads</p>"),
+        )
+        with pytest.raises(ValueError, match="No INFORM Risk release workbook"):
+            _helpers.inform_release_url()
+
+    def test_download_reuses_a_cached_workbook(self, monkeypatch, release_workbook):
+        """An already-downloaded workbook is reused instead of re-fetched."""
+
+        def _explode(self, *args, **kwargs):
+            raise AssertionError("the cached workbook should not be re-downloaded")
+
+        monkeypatch.setattr(_helpers.HttpClient, "download", _explode)
+        assert (
+            _helpers.inform_download_release("https://x/wb.xlsx", release_workbook)
+            == release_workbook
+        )
+
+    def test_download_fetches_on_a_cache_miss(self, monkeypatch, tmp_path):
+        """A missing workbook is streamed, and only a real xlsx is accepted."""
+        seen: dict[str, object] = {}
+
+        def _record(self, url, dest, **kwargs):
+            seen.update(url=url, dest=Path(dest), magic=kwargs.get("expect_magic"))
+            Path(dest).write_bytes(b"PK\x03\x04 stand-in")
+            return Path(dest)
+
+        monkeypatch.setattr(_helpers.HttpClient, "download", _record)
+        target = tmp_path / "INFORM_Risk_2026_v072.xlsx"
+        assert _helpers.inform_download_release("https://x/wb.xlsx", target) == target
+        assert seen["url"] == "https://x/wb.xlsx"
+        assert seen["magic"] == _helpers.XLSX_MAGIC
+
+    def test_release_frame_without_a_score_sheet_raises(self, tmp_path):
+        """A workbook with no year-named sheet is reported with what it does have."""
+        from openpyxl import Workbook
+
+        book = Workbook()
+        book.active.title = "Something Else"
+        path = tmp_path / "wrong.xlsx"
+        book.save(path)
+        with pytest.raises(ValueError, match="No INFORM Risk score sheet"):
+            _helpers.inform_release_to_frame(path, "INFORM RISK", indicator_id="INFORM")
+
+    def test_release_frame_shapes_the_scores(self, release_workbook):
+        """A parsed workbook carries the canonical columns and the release year."""
+        df = _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert list(df.columns) == _helpers.INFORM_COLUMNS
+        assert set(df["iso3"]) == {"KEN", "ZMB"}
+        assert (df["validity_year"] == 2026).all()
+        assert (df["source"] == "release").all()
+        assert df["workflow_id"].isna().all()
+
+    def test_release_frame_drops_non_numeric_scores(self, release_workbook):
+        """A country whose score is a footnote marker is dropped, not coerced to NaN."""
+        df = _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert "NOW" not in set(df["iso3"])
+
+    def test_release_frame_filters_country(self, release_workbook):
+        """A country filter keeps the one matching row."""
+        df = _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM", country="ken"
+        )
+        assert len(df) == 1
+        assert df.iloc[0]["indicator_score"] == 6.2
+
+    def test_release_frame_reads_any_dimension(self, release_workbook):
+        """Each dimension is a column of the same sheet, tagged with its indicator."""
+        df = _helpers.inform_release_to_frame(
+            release_workbook,
+            "LACK OF COPING CAPACITY",
+            indicator_id="CC",
+            country="KEN",
+        )
+        assert df.iloc[0]["indicator_id"] == "CC"
+
+    def test_release_frame_unknown_column_raises(self, release_workbook):
+        """A missing score column names what it looked for."""
+        with pytest.raises(ValueError, match="has no 'NOT A COLUMN'"):
+            _helpers.inform_release_to_frame(
+                release_workbook, "NOT A COLUMN", indicator_id="INFORM"
+            )

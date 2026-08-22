@@ -23,6 +23,18 @@ def _build(monkeypatch, **kwargs):
     return RiskIndicators(**kwargs)
 
 
+def _stub_release(monkeypatch, workbook):
+    """Route the release discovery and download at a local stand-in workbook."""
+    monkeypatch.setattr(
+        _helpers,
+        "inform_release_url",
+        lambda **kwargs: (f"https://x/{workbook.name}", 2026),
+    )
+    monkeypatch.setattr(
+        _helpers, "inform_download_release", lambda url, dest, **kwargs: workbook
+    )
+
+
 class TestConstruction:
     """Constructor validation and per-instance OUTPUT_KIND."""
 
@@ -199,19 +211,113 @@ class TestRouting:
     def test_inform_returns_country_row(self, fake_http, monkeypatch, tmp_path):
         """An INFORM request returns the filtered country score."""
         df = _build(
-            monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="KEN",
+            path=tmp_path,
         ).download()
         assert len(df) == 1 and df.iloc[0]["iso3"] == "KEN"
 
     def test_inform_without_country_returns_all(self, fake_http, monkeypatch, tmp_path):
         """An INFORM request with no country returns every country."""
-        df = _build(monkeypatch, variables=["inform:risk"], path=tmp_path).download()
+        df = _build(
+            monkeypatch, source="api", variables=["inform:risk"], path=tmp_path
+        ).download()
         assert len(df) > 1
+
+    def test_inform_defaults_to_the_release_workbook(
+        self, fake_http, monkeypatch, tmp_path, release_workbook
+    ):
+        """With no source given, an INFORM Risk row reads the published release."""
+        _stub_release(monkeypatch, release_workbook)
+        df = _build(
+            monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
+        ).download()
+        assert df.iloc[0]["source"] == "release"
+        assert df.iloc[0]["validity_year"] == 2026
+        assert fake_http.calls == []
+
+    def test_source_release_forces_the_workbook(
+        self, fake_http, monkeypatch, tmp_path, release_workbook
+    ):
+        """source='release' reads the workbook even for a row that also has a pin."""
+        _stub_release(monkeypatch, release_workbook)
+        df = _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            source="release",
+            path=tmp_path,
+        ).download()
+        assert df.iloc[0]["source"] == "release"
+        assert fake_http.calls == []
+
+    def test_non_inform_never_reads_the_release(self, monkeypatch, tmp_path):
+        """The release channel is INFORM-only; another provider never routes to it."""
+        b = _build(
+            monkeypatch,
+            variables=["thinkhazard:flood_river"],
+            country="KEN",
+            source="release",
+            path=tmp_path,
+        )
+        assert b._reads_release is False
+
+    def test_source_api_reads_the_scores_endpoint(
+        self, fake_http, monkeypatch, tmp_path
+    ):
+        """source='api' goes back to the pinned workflow."""
+        df = _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            source="api",
+            path=tmp_path,
+        ).download()
+        assert df.iloc[0]["source"] == "api"
+        assert fake_http.calls[0]["params"]["WorkflowId"] == 503
+
+    def test_workflow_id_implies_the_api(self, fake_http, monkeypatch, tmp_path):
+        """Naming a workflow asks for a model release, so auto keeps the API."""
+        df = _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            workflow_id=493,
+            path=tmp_path,
+        ).download()
+        assert df.iloc[0]["source"] == "api"
+        assert fake_http.calls[0]["params"]["WorkflowId"] == 493
+
+    def test_climate_risk_stays_on_the_api(self, fake_http, monkeypatch, tmp_path):
+        """The climate row is not in the Risk workbook, so auto reads the API."""
+        df = _build(
+            monkeypatch, variables=["inform:climate_risk"], country="KEN", path=tmp_path
+        ).download()
+        assert df.iloc[0]["source"] == "api"
+        assert fake_http.calls[0]["params"]["WorkflowId"] == 451
+
+    def test_source_release_rejected_for_climate_risk(self, monkeypatch, tmp_path):
+        """Forcing the workbook on a row it does not cover says so."""
+        b = _build(
+            monkeypatch,
+            variables=["inform:climate_risk"],
+            country="KEN",
+            source="release",
+            path=tmp_path,
+        )
+        with pytest.raises(ValueError, match="source='release' is not available"):
+            b.download()
 
     def test_inform_uses_catalog_workflow(self, fake_http, monkeypatch, tmp_path):
         """An INFORM request sends the workflow the catalog pins."""
         _build(
-            monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="KEN",
+            path=tmp_path,
         ).download()
         assert fake_http.calls[0]["params"]["WorkflowId"] == 503
 
@@ -219,7 +325,13 @@ class TestRouting:
         self, fake_http, monkeypatch, tmp_path
     ):
         """A row that resolves to no workflow says so instead of querying for one."""
-        b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
+        b = _build(
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="KEN",
+            path=tmp_path,
+        )
         b._dataset = b._dataset.model_copy(update={"workflow_id": None})
         with pytest.raises(ValueError, match="resolves to no workflow id"):
             b.download()
@@ -227,7 +339,11 @@ class TestRouting:
     def test_inform_frame_records_the_workflow(self, fake_http, monkeypatch, tmp_path):
         """The returned rows carry the workflow they were fetched with."""
         df = _build(
-            monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="KEN",
+            path=tmp_path,
         ).download()
         assert df.iloc[0]["workflow_id"] == 503
 
@@ -284,6 +400,17 @@ class TestRouting:
             path=tmp_path,
         )
         assert "applies to INFORM datasets only" in "".join(captured_warnings)
+
+    def test_unknown_source_rejected(self, monkeypatch, tmp_path):
+        """An unrecognised source= is rejected at construction."""
+        with pytest.raises(ValueError, match="source must be one of"):
+            _build(
+                monkeypatch,
+                variables=["inform:risk"],
+                country="KEN",
+                source="spreadsheet",
+                path=tmp_path,
+            )
 
     @pytest.mark.parametrize("bad", ["503", 503.0, True, 0, -5])
     def test_workflow_id_must_be_a_positive_integer(self, monkeypatch, tmp_path, bad):
@@ -343,7 +470,11 @@ class TestDownloadSemantics:
     def test_tabular_writes_csv(self, fake_http, monkeypatch, tmp_path):
         """A tabular download writes a CSV to the output directory."""
         _build(
-            monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="KEN",
+            path=tmp_path,
         ).download()
         assert (tmp_path / "risk_inform_risk.csv").exists()
 
@@ -357,14 +488,24 @@ class TestDownloadSemantics:
     def test_empty_result_writes_schema_only(self, fake_http, monkeypatch, tmp_path):
         """A country absent from the INFORM payload yields an empty table."""
         df = _build(
-            monkeypatch, variables=["inform:risk"], country="ZMB", path=tmp_path
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="ZMB",
+            path=tmp_path,
         ).download()
         assert df.empty
         assert (tmp_path / "risk_inform_risk.csv").exists()
 
     def test_citationless_dataset_logs_nothing(self, fake_http, monkeypatch, tmp_path):
         """A dataset with no citation skips the citation log line."""
-        b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
+        b = _build(
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="KEN",
+            path=tmp_path,
+        )
         b._dataset = b._dataset.model_copy(update={"citation": ""})
         b.download()
         assert b._dataset.citation == ""
@@ -374,6 +515,7 @@ class TestDownloadSemantics:
         pytest.importorskip("pyarrow")
         _build(
             monkeypatch,
+            source="api",
             variables=["inform:risk"],
             country="KEN",
             output_format="parquet",
@@ -387,7 +529,13 @@ class TestEmptyHint:
 
     def test_blames_the_country_filter(self, fake_http, monkeypatch, tmp_path):
         """An unmatched country is reported as a country problem, not a dead workflow."""
-        b = _build(monkeypatch, variables=["inform:risk"], country="GRL", path=tmp_path)
+        b = _build(
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="GRL",
+            path=tmp_path,
+        )
         b.download()
         hint = b._empty_hint()
         assert "none for country='GRL'" in hint
@@ -396,7 +544,13 @@ class TestEmptyHint:
     def test_blames_the_workflow(self, fake_http, monkeypatch, tmp_path):
         """An upstream that serves nothing names the workflow and the override."""
         monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
-        b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
+        b = _build(
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="KEN",
+            path=tmp_path,
+        )
         b.download()
         hint = b._empty_hint()
         assert "workflow 503 served no rows at all" in hint
@@ -419,7 +573,13 @@ class TestEmptyHint:
         self, fake_http, monkeypatch, tmp_path
     ):
         """A second download diagnoses its own result, not the previous one."""
-        b = _build(monkeypatch, variables=["inform:risk"], country="GRL", path=tmp_path)
+        b = _build(
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="GRL",
+            path=tmp_path,
+        )
         b.download()
         assert "none for country='GRL'" in b._empty_hint()
         monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
@@ -447,7 +607,11 @@ class TestEmptyHint:
         """The warning users see, not just the helper, names the unserved workflow."""
         monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
         _build(
-            monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="KEN",
+            path=tmp_path,
         ).download()
         warning = "".join(captured_warnings)
         assert "no rows matched" in warning
@@ -458,7 +622,11 @@ class TestEmptyHint:
     ):
         """A country that the served rows do not cover is named in the warning."""
         _build(
-            monkeypatch, variables=["inform:risk"], country="GRL", path=tmp_path
+            monkeypatch,
+            source="api",
+            variables=["inform:risk"],
+            country="GRL",
+            path=tmp_path,
         ).download()
         assert "none for country='GRL'" in "".join(captured_warnings)
 
