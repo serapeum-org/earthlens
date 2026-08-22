@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -6182,23 +6182,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="INFORM Risk (public, tabular)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#which-release-you-get" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Which release you get
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -12859,7 +12842,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/eclipse_geometry_3d/" class="md-nav__link">
+      <a href="../../../examples/showcase/earthlens-satellites/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every satellite earthlens can reach, in orbit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../examples/showcase/eclipse/eclipse_geometry_3d/" class="md-nav__link">
         
   
   
@@ -12887,7 +12898,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+      <a href="../../../examples/showcase/eclipse/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
         
   
   
@@ -12915,7 +12926,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/solar_eclipse_2026_goes/" class="md-nav__link">
+      <a href="../../../examples/showcase/eclipse/solar_eclipse_2026_goes/" class="md-nav__link">
         
   
   
@@ -23522,23 +23533,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="INFORM Risk (public, tabular)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#which-release-you-get" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Which release you get
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -23663,77 +23657,27 @@ the mnemonic (<code>VLO</code> / <code>LOW</code> / <code>MED</code> / <code>HIG
 <h2 id="inform-risk-public-tabular"><a class="toclink" href="#inform-risk-public-tabular">INFORM Risk (public, tabular)</a><a class="headerlink" href="#inform-risk-public-tabular" title="Permanent link">#</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;inform&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;inform:risk&quot;</span><span class="p">],</span>     <span class="c1"># or hazard_exposure / vulnerability / coping_capacity</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;inform:risk&quot;</span><span class="p">],</span>     <span class="c1"># or hazard_exposure / vulnerability / coping_capacity / climate_risk</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1"># columns: iso3, indicator_id, indicator_score, validity_year, workflow_id, source</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1"># columns: iso3, indicator_id, indicator_score, validity_year</span>
 </code></pre></div>
 <p>Omitting <code>country=</code> returns the score for <strong>every</strong> country in one frame.</p>
-<h3 id="which-release-you-get"><a class="toclink" href="#which-release-you-get">Which release you get</a><a class="headerlink" href="#which-release-you-get" title="Permanent link">#</a></h3>
-<p>JRC publishes INFORM Risk through two channels, and they do not always agree:</p>
-<ul>
-<li>the <strong>release workbook</strong> on the <a href="https://drmkc.jrc.ec.europa.eu/inform-index/INFORM-Risk/Results-and-data">results
-  page</a> — the
-  current release (2026 at the time of writing);</li>
-<li>the <strong>Scores API</strong>, which serves one <em>workflow</em> (model release) per request.</li>
-</ul>
-<p>By default the four Risk datasets read the <strong>workbook</strong>, so you get the release
-JRC currently publishes. The workbook is downloaded once and cached (under the
-shared earthlens cache, or <code>cache_dir=</code>), then reused by all four datasets.</p>
-<p><code>source=</code> chooses explicitly, and <code>workflow_id=</code> implies the API:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">current</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>                       <span class="c1"># the published release (default)</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;inform&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;inform:risk&quot;</span><span class="p">],</span> <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">pinned</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>                        <span class="c1"># the API&#39;s pinned workflow, 503</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;inform&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;inform:risk&quot;</span><span class="p">],</span> <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="s2">&quot;api&quot;</span><span class="p">,</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">older</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>                         <span class="c1"># a specific model release</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;inform&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;inform:risk&quot;</span><span class="p">],</span> <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span> <span class="n">workflow_id</span><span class="o">=</span><span class="mi">493</span><span class="p">,</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-</code></pre></div>
-<p>Every row records where it came from: <code>source</code> is <code>release</code> or <code>api</code>,
-<code>workflow_id</code> is the workflow an API row was fetched with (empty for a workbook
-row), and <code>validity_year</code> carries the workbook's release year (the API leaves it
-at <code>0</code>). The values differ between channels — Kenya scores 6.2 in the 2026
-workbook and 5.8 under workflow 503 — so that provenance matters when comparing
-tables.</p>
-<p>Why both: the API stopped serving the 2026 workflows on 2026-08-18 while the
-results page kept publishing the 2026 release, so the workbook is the reliable
-route to the current release and the API is the route to any other one. When a
-source serves nothing, the empty result says which one it was rather than
-writing an unexplained empty table.</p>
-<div class="admonition warning">
-<p class="admonition-title">The four Risk datasets changed what they return</p>
-<p>They previously answered from the Scores API. They now read the release
-workbook by default, so the <strong>values change</strong> (Kenya 5.8 → 6.2), the frame
-gains a <code>source</code> column, <code>validity_year</code> carries a real year instead of <code>0</code>,
-and <code>workflow_id</code> is empty on a workbook row. Pass <code>source="api"</code> to get the
-previous behaviour, and compare tables by their <code>source</code> rather than
-assuming two files came from the same channel.</p>
-</div>
-<p><code>inform:climate_risk</code> reads a different model — INFORM's Climate Change
-projection for 2050 under the optimistic RCP4.5-SSP1 pathway (workflow <code>451</code>) —
-so it is not a drop-in swap for the four Risk datasets above and its scores are
-not comparable with theirs. It is published separately from the Risk workbook,
-so it is API-only: <code>source="release"</code> is rejected for it. See the
-<a href="../datasets/">dataset list</a>.</p>
 <h2 id="global-forest-watch-needs-a-key"><a class="toclink" href="#global-forest-watch-needs-a-key">Global Forest Watch (needs a key)</a><a class="headerlink" href="#global-forest-watch-needs-a-key" title="Permanent link">#</a></h2>
 <p>GFW datasets need a free API key. Create one with a MyGFW account and pass it as
 <code>api_key=</code> or set <code>GFW_API_KEY</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gfw&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;gfw:tree_cover_loss&quot;</span><span class="p">],</span>   <span class="c1"># tabular: annual tree-cover loss (ha) by year</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;&lt;your-gfw-key&gt;&quot;</span><span class="p">,</span>            <span class="c1"># or set GFW_API_KEY</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">fc</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gfw&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;gfw:admin_boundary&quot;</span><span class="p">],</span>    <span class="c1"># vector: the GADM admin polygon</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>                              <span class="c1"># -&gt; a FeatureCollection</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gfw&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;gfw:tree_cover_loss&quot;</span><span class="p">],</span>   <span class="c1"># tabular: annual tree-cover loss (ha) by year</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;&lt;your-gfw-key&gt;&quot;</span><span class="p">,</span>            <span class="c1"># or set GFW_API_KEY</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">fc</span> <span class="o">=</span> <span class="n">EarthLens</span><span class="p">(</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">data_source</span><span class="o">=</span><span class="s2">&quot;gfw&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;gfw:admin_boundary&quot;</span><span class="p">],</span>    <span class="c1"># vector: the GADM admin polygon</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;KEN&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>                              <span class="c1"># -&gt; a FeatureCollection</span>
 </code></pre></div>
 <p>A GFW request with no key raises an <code>AuthenticationError</code> naming <code>GFW_API_KEY</code>.</p>
 <h3 id="creating-a-gfw-api-key"><a class="toclink" href="#creating-a-gfw-api-key">Creating a GFW API key</a><a class="headerlink" href="#creating-a-gfw-api-key" title="Permanent link">#</a></h3>
