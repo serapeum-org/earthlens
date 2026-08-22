@@ -85,6 +85,19 @@ def test_inform_live(tmp_path: Path) -> None:
     assert 0.0 <= float(df.iloc[0]["indicator_score"]) <= 10.0
 
 
+@_inform_skip
+def test_inform_climate_risk_live(tmp_path: Path) -> None:
+    """A live INFORM climate-change pull for Kenya returns a numeric 2050 score."""
+    df = EarthLens(
+        data_source="inform",
+        variables=["inform:climate_risk"],
+        country="KEN",
+        path=str(tmp_path),
+    ).download()
+    assert len(df) == 1 and df.iloc[0]["iso3"] == "KEN"
+    assert 0.0 <= float(df.iloc[0]["indicator_score"]) <= 10.0
+
+
 @_gfw_skip
 def test_gfw_tree_cover_loss_live(tmp_path: Path) -> None:
     """A live GFW tree-cover-loss query for Kenya returns per-year loss rows."""

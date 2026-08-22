@@ -87,10 +87,11 @@ class TestGet:
         assert row.workflow_id == 503
         assert row.indicator_id == indicator_id
 
-    def test_climate_risk_keeps_its_own_pin(self):
-        """The climate row is left on 435 rather than swept into the repin."""
+    def test_climate_risk_pins_the_served_scenario(self):
+        """The climate row reads the one Climate Change workflow that holds scores."""
         row = Catalog().get("inform:climate_risk")
-        assert row.workflow_id == 435
+        assert row.workflow_id == 451
+        assert "RCP4.5-SSP1" in row.long_name
 
     def test_unknown_id_raises_did_you_mean(self):
         """An unknown but close id raises with a did-you-mean hint."""

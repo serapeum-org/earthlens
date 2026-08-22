@@ -46,15 +46,15 @@ to one country; omit it for every country.
 | `inform:hazard_exposure` | tabular | Hazard & Exposure dimension |
 | `inform:vulnerability` | tabular | Vulnerability dimension |
 | `inform:coping_capacity` | tabular | Lack of Coping Capacity dimension |
-| `inform:climate_risk` | tabular | INFORM Climate Change Risk (SSP5 2050) — **currently returns no rows** (see the note below) |
+| `inform:climate_risk` | tabular | INFORM Climate Change Risk 2050 (RCP4.5-SSP1) |
 
-!!! warning "`inform:climate_risk` is unserved upstream"
-    The JRC Scores endpoint has answered `200 []` for workflow `435` since at least
-    2026-08-22, so this dataset writes an empty (schema-only) table. Every other
-    Climate Change workflow is empty too, except one that models a different
-    scenario (RCP4.5-SSP1), so the row is kept as-is rather than repinned to
-    something it does not describe. The other four `inform:*` datasets are
-    unaffected — they pin a workflow that still serves scores.
+`inform:climate_risk` reads INFORM's separate Climate Change model, not the Risk release the
+other four rows come from. INFORM publishes two pathways — "optimistic" (RCP4.5-SSP1) and
+"pessimistic" (RCP8.5-SSP3), at 2050 and 2080 — but its API serves scores for only the
+optimistic 2050 run, so that is the one this dataset returns. The pessimistic runs are
+available from the [Climate Change results
+page](https://drmkc.jrc.ec.europa.eu/inform-index/INFORM-Climate-Change/Results-and-data)
+as a spreadsheet.
 
 ## Global Forest Watch (needs `GFW_API_KEY`)
 

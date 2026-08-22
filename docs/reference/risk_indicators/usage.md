@@ -77,7 +77,9 @@ which release produced it — the pin (or the `workflow_id=` you passed) is the
 only signal. When a workflow serves nothing, the empty result is logged with the
 workflow id and this override, rather than as an unexplained empty table.
 
-`inform:climate_risk` is unserved upstream and returns an empty table; see the
+`inform:climate_risk` reads a different model — INFORM's Climate Change
+projection for 2050 under the optimistic RCP4.5-SSP1 pathway — so its scores are
+not comparable with the four Risk datasets above. See the
 [dataset list](datasets.md).
 
 ## Global Forest Watch (needs a key)
