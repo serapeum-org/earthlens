@@ -562,6 +562,28 @@ class Variable(FluxableLeaf):
     # `is_flux` property is inherited from `FluxableLeaf` (N1 in
     # the cross-backend catalog comparison).
 
+    @property
+    def is_pre_aggregated(self) -> bool:
+        """Whether each NetCDF sample is already a server-side temporal aggregate.
+
+        `True` for the two CDS families whose samples are aggregated on the
+        server, so re-accumulating them over a coarser window over-counts:
+
+        * the daily-statistics family (`derived-era5-*-daily-statistics`), whose
+          dataset-level `daily_statistic` request extra is merged into every
+          child variable's `extras`; and
+        * the ERA5 monthly-means family (`reanalysis-era5-*-monthly-means`),
+          whose product type is `monthly_averaged_*`.
+
+        `earthlens.aggregate._resolve_op` reads this so `op="auto"` reduces such
+        variables with `"mean"` rather than `"sum"` — a plain `sum` over samples
+        that are themselves daily/monthly aggregates multiplies by the number of
+        samples per window (e.g. ~30× for monthly windows over daily statistics).
+        """
+        if self.extras.get("daily_statistic"):
+            return True
+        return any(pt.startswith("monthly_averaged") for pt in self.product_type)
+
 
 class Dataset(BaseModel):
     """One CDS dataset's section in the catalog.

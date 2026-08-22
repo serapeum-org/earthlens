@@ -632,6 +632,43 @@ class TestResolveOp:
         result = _resolve_op("auto", SimpleNamespace(is_flux=False))
         assert result == "mean", f"Expected 'mean', got {result!r}"
 
+    def test_auto_with_pre_aggregated_flux_returns_mean(self):
+        """`op="auto"` + pre-aggregated flux resolves to `"mean"`, not `"sum"` (#43).
+
+        A flux variable from a daily-statistics / monthly-means dataset is
+        already a server-side aggregate; summing it over a window over-counts,
+        so pre-aggregation wins over the flux rule.
+        """
+        result = _resolve_op(
+            "auto", SimpleNamespace(is_flux=True, is_pre_aggregated=True)
+        )
+        assert result == "mean", (
+            f"Expected 'mean' for pre-aggregated flux, got {result!r}"
+        )
+
+    def test_auto_with_pre_aggregated_state_stays_mean(self):
+        """`op="auto"` + pre-aggregated state stays `"mean"`."""
+        result = _resolve_op(
+            "auto", SimpleNamespace(is_flux=False, is_pre_aggregated=True)
+        )
+        assert result == "mean", f"Expected 'mean', got {result!r}"
+
+    def test_auto_without_is_pre_aggregated_attr_falls_back_to_flux(self):
+        """A `var_info` lacking `is_pre_aggregated` keeps the flux rule.
+
+        `is_pre_aggregated` is read defensively (`getattr`, default `False`), so
+        a stub without it resolves purely on `is_flux`.
+        """
+        result = _resolve_op("auto", SimpleNamespace(is_flux=True))
+        assert result == "sum", f"Expected 'sum' fallback, got {result!r}"
+
+    def test_explicit_op_ignores_pre_aggregated(self):
+        """An explicit op passes through even for a pre-aggregated variable."""
+        result = _resolve_op(
+            "sum", SimpleNamespace(is_flux=False, is_pre_aggregated=True)
+        )
+        assert result == "sum", f"Expected 'sum' passthrough, got {result!r}"
+
     @pytest.mark.parametrize("explicit_op", ["mean", "sum", "min", "max", "std"])
     def test_explicit_op_passthrough(self, explicit_op):
         """Any non-`auto` op is returned verbatim regardless of `is_flux`.

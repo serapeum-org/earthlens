@@ -32,7 +32,7 @@ rather than silently using the default.
 | Field | Type | Default | Purpose |
 |---|---|---|---|
 | `freq` | `str` (required) | — | Pandas offset alias defining the window. |
-| `op` | `Literal["mean","sum","min","max","std","auto"]` | `"auto"` | Reduction within each window. `"auto"` reads `Variable.is_flux`. |
+| `op` | `Literal["mean","sum","min","max","std","auto"]` | `"auto"` | Reduction within each window. `"auto"` reads `Variable.is_pre_aggregated` then `Variable.is_flux`. |
 | `out_dir` | `Path \| None` | `None` | Where per-window GeoTIFFs are written. `None` skips the write step. |
 | `cell_size` | `float` | `0.125` | Pixel size in degrees (informational; the geotransform is read off the NetCDF). |
 | `level` | `int \| float \| None` | `None` | Pin a pressure level for 4-D inputs. |
@@ -54,7 +54,7 @@ Arguments:
 
 - `nc_path` — path to the NetCDF on disk.
 - `var_info` — :class:`earthlens.ecmwf.Variable` row (resolves
-  `op="auto"` via `is_flux`, drives the output filename via
+  `op="auto"` via `is_pre_aggregated` / `is_flux`, drives the output filename via
   `cds_variable`, picks the variable from the NetCDF via
   `nc_variable`).
 - `config` — :class:`AggregationConfig` describing the window,
@@ -112,7 +112,7 @@ a single bad variable does not abort the rest of the loop.
 | `"min"` | `np.nanmin` | `np.min` |
 | `"max"` | `np.nanmax` | `np.max` |
 | `"std"` | `np.nanstd` | `np.std` |
-| `"auto"` | resolves to `"mean"` (state) or `"sum"` (flux) | same |
+| `"auto"` | `"mean"` (pre-aggregated or state) or `"sum"` (flux) | same |
 
 ## Supported `freq` values
 
@@ -140,13 +140,20 @@ catalog. The resolver is `_resolve_op` in `earthlens.aggregate`:
 def _resolve_op(op, var_info):
     if op != "auto":
         return op
+    if getattr(var_info, "is_pre_aggregated", False):
+        return "mean"
     return "sum" if var_info.is_flux else "mean"
 ```
 
-Two-line decision:
+Decision order (first match wins):
 
 - An **explicit** `op` (`"mean"`, `"sum"`, `"min"`, `"max"`, `"std"`)
   is returned unchanged. User choice always wins.
+- `op="auto"` + `var_info.is_pre_aggregated` → `"mean"`. The
+  `derived-era5-*-daily-statistics` and `reanalysis-era5-*-monthly-means`
+  families are already server-side daily / monthly aggregates, so a
+  `"sum"` would re-accumulate them (~30× for a monthly window over daily
+  statistics). This wins over the flux rule below.
 - `op="auto"` reads `var_info.is_flux`:
   - `True` → `"sum"`
   - `False` → `"mean"`
@@ -227,7 +234,7 @@ different semantics:
 | Reproduce the legacy buggy daily-flux output | `"mean"` |
 | Daily *max* / *min* temperature | `"max"` / `"min"` |
 | Per-window standard deviation | `"std"` |
-| Pre-aggregated CDS datasets like `derived-era5-*-daily-statistics` (each NetCDF sample is *already* a daily aggregate; summing 4 of them would multiply by 4) | `"mean"` |
+| A monthly *sum* from a pre-aggregated dataset — `op="auto"` already resolves the `derived-era5-*-daily-statistics` / `reanalysis-era5-*-monthly-means` families to `"mean"` via `is_pre_aggregated`, so you only override to force a total | `"sum"` |
 
 ## Pressure-level support (`level=`)
 
