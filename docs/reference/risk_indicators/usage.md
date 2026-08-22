@@ -97,6 +97,14 @@ route to the current release and the API is the route to any other one. When a
 source serves nothing, the empty result says which one it was rather than
 writing an unexplained empty table.
 
+!!! warning "The four Risk datasets changed what they return"
+    They previously answered from the Scores API. They now read the release
+    workbook by default, so the **values change** (Kenya 5.8 → 6.2), the frame
+    gains a `source` column, `validity_year` carries a real year instead of `0`,
+    and `workflow_id` is empty on a workbook row. Pass `source="api"` to get the
+    previous behaviour, and compare tables by their `source` rather than
+    assuming two files came from the same channel.
+
 `inform:climate_risk` reads a different model — INFORM's Climate Change
 projection for 2050 under the optimistic RCP4.5-SSP1 pathway (workflow `451`) —
 so it is not a drop-in swap for the four Risk datasets above and its scores are

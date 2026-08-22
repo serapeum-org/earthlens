@@ -11,6 +11,7 @@ from pyramids.feature.collection import FeatureCollection
 
 import earthlens.risk_indicators
 from earthlens.risk_indicators import AuthenticationError, RiskIndicators, _helpers
+from earthlens.risk_indicators import backend as backend_module
 
 pytestmark = pytest.mark.risk_indicators
 
@@ -263,6 +264,56 @@ class TestRouting:
                 source="release",
                 path=tmp_path,
             )
+
+    def test_cache_dir_overrides_the_shared_cache(self, monkeypatch, tmp_path):
+        """An explicit cache_dir is where the workbook lands."""
+        b = _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            cache_dir=tmp_path / "wb",
+            path=tmp_path,
+        )
+        assert b._cache_root == tmp_path / "wb"
+
+    def test_cache_root_defaults_under_the_shared_cache(self, monkeypatch, tmp_path):
+        """Without cache_dir the workbook goes to the shared cache, not the output dir."""
+        from earthlens import config
+
+        monkeypatch.setattr(config, "cache_dir", lambda: tmp_path / "shared")
+        monkeypatch.setattr(
+            backend_module, "_shared_cache_dir", lambda: tmp_path / "shared"
+        )
+        b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
+        assert b._cache_root == tmp_path / "shared" / "risk_indicators"
+
+    def test_release_download_lands_in_the_cache_root(
+        self, fake_http, monkeypatch, tmp_path, release_workbook
+    ):
+        """The discovered file name is what gets written under the cache root."""
+        seen: dict[str, object] = {}
+        monkeypatch.setattr(
+            _helpers,
+            "inform_release_url",
+            lambda **kwargs: (
+                "https://drmkc.jrc.ec.europa.eu/x/INFORM_Risk_2026_v072.xlsx",
+                2026,
+            ),
+        )
+
+        def _capture(url, dest, **kwargs):
+            seen["dest"] = Path(dest)
+            return release_workbook
+
+        monkeypatch.setattr(_helpers, "inform_download_release", _capture)
+        _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            cache_dir=tmp_path / "wb",
+            path=tmp_path,
+        ).download()
+        assert seen["dest"] == tmp_path / "wb" / "INFORM_Risk_2026_v072.xlsx"
 
     def test_source_api_reads_the_scores_endpoint(
         self, fake_http, monkeypatch, tmp_path

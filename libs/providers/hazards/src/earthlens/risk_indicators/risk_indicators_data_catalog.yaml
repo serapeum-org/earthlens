@@ -112,8 +112,8 @@ datasets:
   # /countries/Scores/?WorkflowId=505&IndicatorId=INFORM (their own
   # /workflows/Default still names 505, so that pointer is no signal). A
   # non-empty answer means it is back - repin these four rows and update this
-  # note. test_inform_api_live asserts which workflow the rows came from, so it
-  # fails the moment a repin and this comment disagree. inform:climate_risk
+  # note; every returned row records the workflow it came from, so a repin that
+  # contradicts this comment is visible in the data. inform:climate_risk
   # reads a different model and a different channel - see its own note.
   inform:risk:
     provider: inform
