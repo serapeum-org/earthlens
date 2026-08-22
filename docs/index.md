@@ -17,6 +17,18 @@ feeds, air quality, biodiversity, population, and more. Pick a `data_source`, de
 and dates you want, and call `download()`; the matching backend handles auth,
 catalog lookup, request shaping, and writing the output.
 
+<video autoplay loop muted playsinline width="100%"
+       poster="_images/branding/earthlens-brand-kit/docs/docs-hero.png">
+  <source src="_images/showcase/earthlens-satellites-night.mp4" type="video/mp4">
+</video>
+
+<figcaption markdown>
+34 of the spacecraft behind earthlens' providers, drawn on their published orbits. Each trailing band is
+that instrument's real ground swath, and the trapezoid above it is the field of view sweeping it out.
+Basemap: VIIRS Earth at Night, NASA GIBS / EOSDIS.
+[How it is built](examples/showcase/earthlens-satellites.ipynb)
+</figcaption>
+
 ## Supported data sources
 
 Every backend is reached through the same `EarthLens` facade by passing its key

@@ -28,6 +28,18 @@ Current release info
 earthlens — a unified Python client for satellite & climate data
 =====================================================================
 
+<p align="center">
+  <img src="docs/_images/showcase/earthlens-satellites-night.gif" width="820"
+       alt="The satellite fleet earthlens can reach, in orbit — ground swaths sweeping a night-lit Earth">
+</p>
+
+<p align="center">
+  <sub>34 of the spacecraft behind earthlens' providers, on their real orbits. The trailing bands are each
+  instrument's true ground swath. Basemap: VIIRS Earth at Night, NASA GIBS / EOSDIS ·
+  <a href="docs/examples/showcase/earthlens-satellites.ipynb">how it is built</a></sub>
+</p>
+
+
 **earthlens** gives you one consistent Python API for downloading satellite,
 climate, and geospatial data from **61 providers** — climate reanalysis,
 satellite imagery, ocean models, weather forecasts, natural-hazard feeds, air
