@@ -12710,35 +12710,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcase/earthlens-satellites/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Every satellite earthlens can reach, in orbit
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../showcase/eclipse/eclipse_geometry_3d/" class="md-nav__link">
+      <a href="../../showcase/eclipse_geometry_3d/" class="md-nav__link">
         
   
   
@@ -12766,7 +12738,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcase/eclipse/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+      <a href="../../showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
         
   
   
@@ -12794,7 +12766,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../showcase/eclipse/solar_eclipse_2026_goes/" class="md-nav__link">
+      <a href="../../showcase/solar_eclipse_2026_goes/" class="md-nav__link">
         
   
   
@@ -24465,6 +24437,8 @@ profile</div>
 <h2 id="inform-risk-a-composite-country-score">INFORM Risk — a composite country score<a class="anchor-link" href="#inform-risk-a-composite-country-score">¶</a></h2><p><code>inform:risk</code> is the headline INFORM composite index (0–10). The
 <code>"inform"</code> alias and the <code>"risk-indicators"</code> key both reach the same
 backend, so either works as <code>data_source=</code>.</p>
+<p>The first call downloads JRC's release workbook (a few MB) and caches
+it, so the later INFORM cells reuse it rather than re-downloading.</p>
 </div>
 </div>
 </div>
@@ -24517,7 +24491,11 @@ risk</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>One row per country: <code>indicator_score</code> is the 0–10 composite (higher =
-more at risk), <code>iso3</code> the country, <code>validity_year</code> the model release tag.</p>
+more at risk), <code>iso3</code> the country. The last three columns record where the numbers came
+from: <code>source</code> is <code>release</code> (JRC's published workbook, the default and the
+current release) or <code>api</code>, <code>workflow_id</code> names the model release an API row
+used, and <code>validity_year</code> carries the workbook's release year — the API
+leaves it at <code>0</code>. Pass <code>source="api"</code> or <code>workflow_id=</code> to switch.</p>
 <p><strong>Omit <code>country=</code> and INFORM returns every country</strong> — the whole global
 table in one frame, ready to rank or join.</p>
 </div>
