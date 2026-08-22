@@ -1,5 +1,5 @@
 {
-    "_comment": "Snapshot of valid EUMETSAT Data Tailor product ids from GET https://api.eumetsat.int/epcs/products, captured 2026-07-01. Regenerate from planning/eumetsat/captures/epcs_products.json.",
+    "_comment": "Snapshot of valid EUMETSAT Data Tailor product ids from GET https://api.eumetsat.int/epcs/products, captured 2026-07-01. Regenerate with GET https://api.eumetsat.int/epcs/products.",
     "product_ids": [
         "AMSAL1",
         "ASCATL1SZF",

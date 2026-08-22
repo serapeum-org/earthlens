@@ -10,9 +10,8 @@ The loader merges every file at construction time (the `ghsl` / `cmems` /
 
 Each row pins the layer's `atlas` (`"gsa"` / `"gwa"`), its `transport`
 (`"vsicurl"` windowed COG read for the wind layers, `"download_zip"`
-download-then-localise for the solar layers — see the A1 gate,
-`planning/solar_wind_atlas/captures/solar-wind-sdk-facts.md`), and the download
-`url`.
+download-then-localise for the solar layers — see the A1 gate), and the
+download `url`.
 """
 
 from __future__ import annotations

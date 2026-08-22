@@ -2431,8 +2431,8 @@ datasets:
         units: unknown
       monthly-sea-level-pressure:
         cds_variable: monthly_sea_level_pressure
-        nc_variable: monthly_sea_level_pressure
-        units: unknown
+        nc_variable: psl
+        units: hPa
   projections-climate-atlas:
     endpoint: cds
     request_kind: form
@@ -2679,8 +2679,8 @@ datasets:
         units: unknown
       specific-humidity:
         cds_variable: specific_humidity
-        nc_variable: specific_humidity
-        units: unknown
+        nc_variable: hus
+        units: '1'
       surface-air-pressure:
         cds_variable: surface_air_pressure
         nc_variable: surface_air_pressure
@@ -2767,8 +2767,8 @@ datasets:
     variables:
       near-surface-air-temperature:
         cds_variable: near_surface_air_temperature
-        nc_variable: near_surface_air_temperature
-        units: unknown
+        nc_variable: tas
+        units: K
       daily-maximum-near-surface-air-temperature:
         cds_variable: daily_maximum_near_surface_air_temperature
         nc_variable: daily_maximum_near_surface_air_temperature
@@ -2876,8 +2876,8 @@ datasets:
     variables:
       pressure:
         cds_variable: pressure
-        nc_variable: pressure
-        units: unknown
+        nc_variable: pres
+        units: Pa
       relative-humidity:
         cds_variable: relative_humidity
         nc_variable: relative_humidity
@@ -2905,8 +2905,8 @@ datasets:
     variables:
       geopotential:
         cds_variable: geopotential
-        nc_variable: geopotential
-        units: unknown
+        nc_variable: z
+        units: m**2 s**-2
       geopotential-height:
         cds_variable: geopotential_height
         nc_variable: geopotential_height
@@ -3028,8 +3028,8 @@ datasets:
         units: unknown
       volumetric-soil-moisture:
         cds_variable: volumetric_soil_moisture
-        nc_variable: volumetric_soil_moisture
-        units: unknown
+        nc_variable: voltso
+        units: m**3 m**-3
       volumetric-transpiration-stress-onset:
         cds_variable: volumetric_transpiration_stress_onset
         nc_variable: volumetric_transpiration_stress_onset
@@ -3056,8 +3056,8 @@ datasets:
     variables:
       biologically-effective-degree-days:
         cds_variable: biologically_effective_degree_days
-        nc_variable: biologically_effective_degree_days
-        units: unknown
+        nc_variable: BEDD
+        units: degrees_C
       growing-season-length:
         cds_variable: growing_season_length
         nc_variable: growing_season_length
@@ -3361,8 +3361,8 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
         nc_variable: mean_diurnal_range
@@ -3546,8 +3546,8 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
         nc_variable: mean_diurnal_range
@@ -3711,8 +3711,8 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
         nc_variable: mean_diurnal_range
@@ -3894,8 +3894,8 @@ datasets:
     variables:
       annual-mean-temperature:
         cds_variable: annual_mean_temperature
-        nc_variable: annual_mean_temperature
-        units: unknown
+        nc_variable: BIO01
+        units: K
       mean-diurnal-range:
         cds_variable: mean_diurnal_range
         nc_variable: mean_diurnal_range

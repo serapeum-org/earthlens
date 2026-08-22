@@ -1,8 +1,8 @@
 """Unit tests for per-endpoint CADS client routing (`earthlens.ecmwf.endpoints`).
 
-Covers URL/key resolution for cds / ads / ewds, the shared-PAT fallback, the
-missing-credential error, and the backend's per-endpoint client cache. No
-network: `cdsapi.Client` is always faked.
+Covers URL/key resolution for cds / ads / ewds / ecds / xds, the shared-PAT
+fallback, the missing-credential error, and the backend's per-endpoint client
+cache. No network: `cdsapi.Client` is always faked.
 """
 
 from __future__ import annotations
@@ -12,12 +12,23 @@ from pathlib import Path
 import cdsapi
 import pytest
 
-from earthlens.ecmwf import ECMWF, AuthenticationError
+from earthlens.ecmwf import ECMWF, AuthenticationError, Variable
 from earthlens.ecmwf import endpoints as ep
 
 pytestmark = [pytest.mark.unit]
 
-_ENV_VARS = ("CDSAPI_URL", "CDSAPI_KEY", "EWDS_URL", "EWDS_KEY", "ADS_URL", "ADS_KEY")
+_ENV_VARS = (
+    "CDSAPI_URL",
+    "CDSAPI_KEY",
+    "EWDS_URL",
+    "EWDS_KEY",
+    "ADS_URL",
+    "ADS_KEY",
+    "ECDS_URL",
+    "ECDS_KEY",
+    "XDS_URL",
+    "XDS_KEY",
+)
 
 
 class _RecordingClient:
@@ -120,9 +131,68 @@ class TestOpenClient:
         with pytest.raises(ValueError, match="unknown ECMWF endpoint"):
             ep.open_client("mars")
 
-    def test_endpoints_registry_has_the_three_cads_instances(self):
-        """The endpoint registry enumerates cds, ads, and ewds."""
-        assert set(ep.ENDPOINTS) == {"cds", "ads", "ewds"}
+    def test_endpoints_registry_has_the_five_cads_instances(self):
+        """The endpoint registry enumerates cds, ads, ewds, ecds and xds."""
+        assert set(ep.ENDPOINTS) == {"cds", "ads", "ewds", "ecds", "xds"}
+
+    def test_ecds_uses_endpoint_url_and_key(self, monkeypatch):
+        """ECDS builds `Client(url=ecds, key=ECDS_KEY)` from its own env key."""
+        _clear_cads_env(monkeypatch)
+        monkeypatch.setenv("ECDS_KEY", "ecds-token")
+        monkeypatch.setattr(cdsapi, "Client", _RecordingClient)
+        client = ep.open_client("ecds")
+        assert client.url == "https://ecds.ecmwf.int/api"
+        assert client.key == "ecds-token"
+
+    def test_xds_uses_endpoint_url_and_key(self, monkeypatch):
+        """XDS builds `Client(url=xds, key=XDS_KEY)` from its own env key."""
+        _clear_cads_env(monkeypatch)
+        monkeypatch.setenv("XDS_KEY", "xds-token")
+        monkeypatch.setattr(cdsapi, "Client", _RecordingClient)
+        client = ep.open_client("xds")
+        assert client.url == "https://xds.ecmwf.int/api"
+        assert client.key == "xds-token"
+
+    @pytest.mark.parametrize("endpoint", ["ecds", "xds"])
+    def test_ecmwf_stores_fall_back_to_shared_pat(self, monkeypatch, endpoint):
+        """With no store-specific key, the shared CDS token authenticates."""
+        _clear_cads_env(monkeypatch)
+        monkeypatch.setenv("CDSAPI_KEY", "shared-pat")
+        monkeypatch.setattr(cdsapi, "Client", _RecordingClient)
+        assert ep.open_client(endpoint).key == "shared-pat"
+
+    @pytest.mark.parametrize("endpoint", ["ecds", "xds"])
+    def test_ecmwf_stores_fall_back_to_cdsapirc_key(
+        self, monkeypatch, tmp_path, endpoint
+    ):
+        """With no env keys, the store reads the shared token from `~/.cdsapirc`."""
+        _clear_cads_env(monkeypatch)
+        _write_cdsapirc(tmp_path, "dotfile-pat")
+        monkeypatch.setattr(Path, "home", lambda: tmp_path)
+        monkeypatch.setattr(cdsapi, "Client", _RecordingClient)
+        assert ep.open_client(endpoint).key == "dotfile-pat"
+
+    def test_ecds_url_env_override(self, monkeypatch):
+        """`ECDS_URL` overrides the built-in ECDS URL."""
+        _clear_cads_env(monkeypatch)
+        monkeypatch.setenv("ECDS_KEY", "ecds-token")
+        monkeypatch.setenv("ECDS_URL", "https://staging.ecds.invalid/api")
+        monkeypatch.setattr(cdsapi, "Client", _RecordingClient)
+        assert ep.open_client("ecds").url == "https://staging.ecds.invalid/api"
+
+    @pytest.mark.parametrize(
+        "endpoint, host",
+        [("ecds", "ecds.ecmwf.int"), ("xds", "xds.ecmwf.int")],
+    )
+    def test_missing_key_error_names_the_store_profile(
+        self, monkeypatch, tmp_path, endpoint, host
+    ):
+        """The missing-credential error points at the right store's profile page."""
+        _clear_cads_env(monkeypatch)
+        _home_without_dotfile(monkeypatch, tmp_path)
+        with pytest.raises(AuthenticationError) as excinfo:
+            ep.open_client(endpoint)
+        assert f"{host}/profile" in str(excinfo.value)
 
     def test_read_cdsapirc_key_none_when_no_key_line(self, monkeypatch, tmp_path):
         """A `~/.cdsapirc` without a `key:` line resolves to no token."""
@@ -131,6 +201,62 @@ class TestOpenClient:
         )
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
         assert ep._read_cdsapirc_key() is None
+
+
+class TestConstraintsHost:
+    """Constraints/URL resolution per endpoint."""
+
+    @pytest.mark.parametrize(
+        "endpoint, expected",
+        [
+            ("ecds", "https://ecds.ecmwf.int/api"),
+            ("xds", "https://xds.ecmwf.int/api"),
+        ],
+    )
+    def test_constraints_base_url_is_the_store_host(
+        self, monkeypatch, endpoint, expected
+    ):
+        """A non-CDS store validates against its own constraints host."""
+        _clear_cads_env(monkeypatch)
+        assert ep.constraints_base_url(endpoint) == expected
+
+    def test_cds_constraints_base_url_stays_none(self, monkeypatch):
+        """CDS keeps its historic `None` so the default template is used."""
+        _clear_cads_env(monkeypatch)
+        assert ep.constraints_base_url("cds") is None
+
+    def test_endpoint_url_rejects_an_unknown_slug(self, monkeypatch):
+        """`endpoint_url` names the valid slugs when given an unknown one."""
+        _clear_cads_env(monkeypatch)
+        with pytest.raises(ValueError, match="unknown ECMWF endpoint") as excinfo:
+            ep.endpoint_url("mars")
+        assert "ecds" in str(excinfo.value)
+
+    def test_constraints_host_follows_url_override(self, monkeypatch):
+        """Pointing `XDS_URL` at a staging host moves the constraints host too."""
+        _clear_cads_env(monkeypatch)
+        monkeypatch.setenv("XDS_URL", "https://staging.xds.invalid/api")
+        assert ep.constraints_base_url("xds") == "https://staging.xds.invalid/api"
+
+    @pytest.mark.parametrize(
+        "endpoint, dataset, cds_variable",
+        [
+            ("ecds", "tigge-forecasts", "2_m_temperature"),
+            ("xds", "derived-fire-fuel-biomass", "live_fuel_moisture_content_group"),
+        ],
+    )
+    def test_catalog_accepts_the_new_endpoint_slugs(
+        self, endpoint, dataset, cds_variable
+    ):
+        """A catalog row may declare the new stores without a validation error."""
+        variable = Variable(
+            cds_dataset=dataset,
+            cds_variable=cds_variable,
+            nc_variable="t2m",
+            units="K",
+            endpoint=endpoint,
+        )
+        assert variable.endpoint == endpoint
 
 
 class TestClientFor:

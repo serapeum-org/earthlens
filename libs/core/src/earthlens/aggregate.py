@@ -426,11 +426,20 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
     accumulations — and `False` for state variables (temperature,
     pressure, humidity, ...).
 
-    Resolution rules:
+    Resolution rules (first match wins):
 
+    * `op="auto"` + `var_info.is_pre_aggregated=True` → `"mean"`
     * `op="auto"` + `var_info.is_flux=True` → `"sum"`
     * `op="auto"` + `var_info.is_flux=False` → `"mean"`
     * any explicit op → returned unchanged
+
+    `is_pre_aggregated` wins over `is_flux`: a flux variable from a
+    `derived-era5-*-daily-statistics` / `reanalysis-era5-*-monthly-means`
+    dataset is already a server-side daily / monthly aggregate, so `"auto"`
+    resolves to `"mean"` — a plain `"sum"` would re-accumulate the aggregates
+    and multiply by the number of samples per window (~30× for a monthly
+    window over daily statistics). `is_pre_aggregated` is read defensively
+    (`getattr`, default `False`) so a `var_info` without it behaves as before.
 
     This **replaces** the legacy `mean × days_later` scaling that
     `examples/post_process_ecmwf_netcdf.py:226` (pre-rewrite) used.
@@ -442,7 +451,8 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
     Args:
         op: The :attr:`AggregationConfig.op` value, possibly `"auto"`.
         var_info: Catalog entry for the variable being aggregated.
-            Only `is_flux` is consulted; the rest is ignored.
+            Only `is_pre_aggregated` (if present) and `is_flux` are
+            consulted; the rest is ignored.
 
     Returns:
         str: The concrete operator name (`"mean"`, `"sum"`, `"min"`,
@@ -467,6 +477,18 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
             'sum'
 
             ```
+        - A pre-aggregated flux variable resolves to `"mean"`, not `"sum"`:
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.aggregate import _resolve_op
+            >>> _resolve_op(
+            ...     "auto",
+            ...     SimpleNamespace(is_flux=True, is_pre_aggregated=True),
+            ... )
+            'mean'
+
+            ```
         - Explicit ops pass through verbatim:
 
             ```python
@@ -479,6 +501,8 @@ def _resolve_op(op: OperationLiteral, var_info: Variable) -> str:
     """
     if op != "auto":
         return op
+    if getattr(var_info, "is_pre_aggregated", False):
+        return "mean"
     return "sum" if var_info.is_flux else "mean"
 
 

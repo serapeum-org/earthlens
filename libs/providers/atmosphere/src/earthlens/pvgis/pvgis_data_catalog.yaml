@@ -7,7 +7,7 @@
 # radiation / PV power) and `tmy` (typical meteorological year). The
 # non-time-series tools (PVcalc / MRcalc / DRcalc) are catalog follow-ons.
 #
-# Facts pinned from the live API in planning/pvgis/captures/pvgis-sdk-facts.md.
+# Facts pinned from the live API in the A1 gate captures.
 products:
   seriescalc:
     tool: seriescalc

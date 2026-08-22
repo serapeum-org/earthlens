@@ -632,6 +632,43 @@ class TestResolveOp:
         result = _resolve_op("auto", SimpleNamespace(is_flux=False))
         assert result == "mean", f"Expected 'mean', got {result!r}"
 
+    def test_auto_with_pre_aggregated_flux_returns_mean(self):
+        """`op="auto"` + pre-aggregated flux resolves to `"mean"`, not `"sum"` (#43).
+
+        A flux variable from a daily-statistics / monthly-means dataset is
+        already a server-side aggregate; summing it over a window over-counts,
+        so pre-aggregation wins over the flux rule.
+        """
+        result = _resolve_op(
+            "auto", SimpleNamespace(is_flux=True, is_pre_aggregated=True)
+        )
+        assert result == "mean", (
+            f"Expected 'mean' for pre-aggregated flux, got {result!r}"
+        )
+
+    def test_auto_with_pre_aggregated_state_stays_mean(self):
+        """`op="auto"` + pre-aggregated state stays `"mean"`."""
+        result = _resolve_op(
+            "auto", SimpleNamespace(is_flux=False, is_pre_aggregated=True)
+        )
+        assert result == "mean", f"Expected 'mean', got {result!r}"
+
+    def test_auto_without_is_pre_aggregated_attr_falls_back_to_flux(self):
+        """A `var_info` lacking `is_pre_aggregated` keeps the flux rule.
+
+        `is_pre_aggregated` is read defensively (`getattr`, default `False`), so
+        a stub without it resolves purely on `is_flux`.
+        """
+        result = _resolve_op("auto", SimpleNamespace(is_flux=True))
+        assert result == "sum", f"Expected 'sum' fallback, got {result!r}"
+
+    def test_explicit_op_ignores_pre_aggregated(self):
+        """An explicit op passes through even for a pre-aggregated variable."""
+        result = _resolve_op(
+            "sum", SimpleNamespace(is_flux=False, is_pre_aggregated=True)
+        )
+        assert result == "sum", f"Expected 'sum' passthrough, got {result!r}"
+
     @pytest.mark.parametrize("explicit_op", ["mean", "sum", "min", "max", "std"])
     def test_explicit_op_passthrough(self, explicit_op):
         """Any non-`auto` op is returned verbatim regardless of `is_flux`.
@@ -745,8 +782,9 @@ class _FakeNetCDF:
 class _RealVariable(SimpleNamespace):
     """Lightweight stand-in for `earthlens.ecmwf.Variable` in tests.
 
-    Exposes only the four attributes `aggregate_netcdf` reads
-    (`is_flux`, `cds_variable`, `nc_variable`, `units`) so the
+    Exposes the attributes `aggregate_netcdf` reads (`is_flux`,
+    `cds_variable`, `nc_variable`, `units`, and the optional
+    `is_pre_aggregated` that `_resolve_op` consults via `getattr`) so the
     round-trip tests don't have to construct a full pydantic model.
     """
 
@@ -906,6 +944,39 @@ class TestAggregateNetcdfRoundTrip:
         _, arr, _ = results[0]
         assert arr[0, 0] == pytest.approx(10.0), (
             f"Auto on flux var should sum to 1+2+3+4=10.0, got {arr[0, 0]}"
+        )
+
+    def test_op_auto_routes_pre_aggregated_flux_to_mean(self, monkeypatch, tmp_path):
+        """`op="auto"` + pre-aggregated flux → mean, not sum (#43, end-to-end).
+
+        A flux var from a daily-statistics / monthly-means dataset is already a
+        server-side aggregate; `op="auto"` must reduce it with `"mean"` (2.5),
+        not re-sum it (10.0) as a raw flux var would.
+        """
+        pre_aggregated_flux_var = _RealVariable(
+            is_flux=True,
+            is_pre_aggregated=True,
+            cds_variable="total_precipitation",
+            nc_variable="tp",
+            units="m",
+        )
+        cube = self._daily_six_hourly_array(n_days=1)
+        nc = _FakeNetCDF(
+            array=cube,
+            time_strs_by_var={"time": self._date_strings_six_hourly(1)},
+            dimension_names=["time", "lat", "lon"],
+        )
+        _patch_netcdf_read(monkeypatch, nc)
+        _patch_geotiff_write(monkeypatch)
+
+        results = aggregate_netcdf(
+            tmp_path / "fake.nc",
+            pre_aggregated_flux_var,
+            AggregationConfig(freq="1D", op="auto", out_dir=None),
+        )
+        _, arr, _ = results[0]
+        assert arr[0, 0] == pytest.approx(2.5), (
+            f"Auto on pre-aggregated flux should mean to 2.5, not sum; got {arr[0, 0]}"
         )
 
     def test_min_count_emits_nan_for_partial_windows(

@@ -12,7 +12,7 @@ loader merges every file at construction time (the ghsl / bathymetry sharded
 pattern) through a `(path, mtime_ns)` parse cache.
 
 Every shipped row is reached through one of the four transports pinned in the A1
-gate (`planning/admin/captures/admin-sdk-facts.md`); the actual URL resolution
+gate; the actual URL resolution
 lives in `earthlens.admin._helpers`, and the read always goes through pyramids
 `FeatureCollection.read_file` (never a bare `geopandas.read_file`). `GADM` is
 deliberately omitted (its no-commercial / no-redistribute license is

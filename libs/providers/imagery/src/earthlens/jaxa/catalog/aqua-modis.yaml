@@ -1,6 +1,6 @@
 # Aqua/MODIS NASA cross-archive products distributed via G-Portal.
 # AUTO-GENERATED from the upstream SDK catalog by
-# `python planning/jaxa/captures/build_catalog.py`. Hand-edit the script
+# the JAXA catalog build script. Hand-edit the script
 # (e.g. friendly slugs, descriptions, default bands) rather than this file,
 # or new ids will revert on the next regeneration.
 

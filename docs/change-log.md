@@ -1,5 +1,20 @@
 # Change Log
 
+## 0.17.0 (2026-08-22)
+
+### Feat
+
+- **ecmwf**: add the ECDS and XDS data stores (#1055)
+- **gee**: add cloud_mask and filters hooks to the GEE backend (#1090)
+
+### Fix
+
+- **admin**: re-enable geoBoundaries ADM1 e2e via pyramids-gis 0.54.0 (#1081)
+
+### Refactor
+
+- **auth**: resolve single-secret credentials via a shared base (#1084)
+
 ## 0.16.0 (2026-08-20)
 
 ### BREAKING CHANGE

@@ -11,10 +11,10 @@ ghsl / cmems sharded pattern) through a `(path, mtime_ns)` parse cache.
 
 Two transports ship today, both pinned live in an A1 gate:
 
-* `erddap-griddap` (GEBCO / ETOPO — `planning/bathymetry/captures/`): a NOAA
+* `erddap-griddap` (GEBCO / ETOPO — the A1 gate captures): a NOAA
   ERDDAP `griddap` coverage subset by bbox to a NetCDF the backend reads with
   pyramids and writes to GeoTIFF.
-* `wcs` (EMODnet Bathymetry — `planning/flood-risk/captures/`): an OGC WCS
+* `wcs` (EMODnet Bathymetry — the A1 gate captures): an OGC WCS
   coverage read over pyramids `Dataset.from_wcs` and cropped to the AOI.
 
 The `transport` field also admits the reserved `gebco-api` / `opendap` values

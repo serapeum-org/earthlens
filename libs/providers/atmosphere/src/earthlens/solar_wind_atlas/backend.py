@@ -6,7 +6,7 @@ bbox plus a list of layer ids (`variables=["ghi", "wind_100m"]`); `download()`
 writes one cropped GeoTIFF per layer under `root_dir` and returns their paths.
 
 Each layer is fetched by the transport its catalog row declares (pinned in the
-A1 gate, `planning/solar_wind_atlas/captures/solar-wind-sdk-facts.md`):
+A1 gate):
 
 * **Global Wind Atlas** layers (`transport="vsicurl"`) are range-accessible COGs
   read **windowed** over `/vsicurl/` — only the AOI's byte ranges transfer.

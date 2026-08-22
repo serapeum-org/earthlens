@@ -19,6 +19,7 @@ from typer.testing import CliRunner
 import earthlens.ecmwf._hydrate as hydrate_mod
 import earthlens.ecmwf._seed as seed_mod
 import earthlens.ecmwf.cli as ecmwf_cli
+import earthlens.ecmwf.endpoints as endpoints
 from earthlens.cli.adapter import list_backends, load_catalog
 from earthlens.cli.app import app
 from earthlens.cli.curate import probe_dataset
@@ -51,21 +52,54 @@ def _catalog_copy(tmp_path, monkeypatch):
     return info, module, dst
 
 
+def _store_of(url):
+    """Resolve which store a collections URL belongs to.
+
+    Each store is matched on its full host, so the checks are order-independent
+    and an unrecognised host raises instead of silently defaulting — the
+    earlier `else: cds` fallback quietly handed the two ECMWF hosts CDS's
+    dataset ids when the stores were added.
+    """
+    for host, store in (
+        ("cds.climate.copernicus.eu", "cds"),
+        ("ads.atmosphere.copernicus.eu", "ads"),
+        ("ewds.climate.copernicus.eu", "ewds"),
+        ("ecds.ecmwf.int", "ecds"),
+        ("xds.ecmwf.int", "xds"),
+    ):
+        if host in url:
+            return store
+    raise AssertionError(f"unrecognised store URL in test stub: {url}")
+
+
+_STORE_SAMPLE_ID = {
+    "cds": "reanalysis-era5-land",
+    "ads": "cams-global-reanalysis-eac4",
+    "ewds": "cems-glofas-forecast",
+    "ecds": "tigge-forecasts",
+    "xds": "derived-fire-fuel-biomass",
+}
+
+_STORE_PREFIX = {
+    "cds": "reanalysis",
+    "ads": "cams",
+    "ewds": "cems",
+    "ecds": "tigge",
+    "xds": "fuel",
+}
+
+
 def _per_store_get_json(url, **kw):
-    """Return a distinct single collection id per Copernicus store host."""
-    if "ads.atmosphere" in url:
-        cid = "cams-global-reanalysis-eac4"
-    elif "ewds" in url:
-        cid = "cems-glofas-forecast"
-    else:
-        cid = "reanalysis-era5-land"
-    return {"collections": [{"id": cid}], "links": []}
+    """Return a distinct single collection id per store host."""
+    return {
+        "collections": [{"id": _STORE_SAMPLE_ID[_store_of(url)]}],
+        "links": [],
+    }
 
 
 def _paginated_get_json(url, **kw):
-    """Two pages per Copernicus store — page 1 links to page 2 via `rel=next`."""
-    store = "ads" if "ads.atmosphere" in url else "ewds" if "ewds" in url else "cds"
-    prefix = {"cds": "reanalysis", "ads": "cams", "ewds": "cems"}[store]
+    """Two pages per store — page 1 links to page 2 via `rel=next`."""
+    prefix = _STORE_PREFIX[_store_of(url)]
     if "page2" in url:
         return {"collections": [{"id": f"{prefix}-two"}], "links": []}
     return {
@@ -89,7 +123,7 @@ class TestRefresher:
         assert outcome.live_count == 1, "one CDS dataset id listed"
 
     def test_writes_per_store_index_from_live_fetch(self, tmp_path, monkeypatch):
-        """ecmwf --write persists per-store (cds/ads/ewds) ids into available_datasets."""
+        """ecmwf --write persists every store's ids into available_datasets."""
         info, module, dst = _catalog_copy(tmp_path, monkeypatch)
         monkeypatch.setattr(ecmwf_cli, "get_json", _per_store_get_json)
         outcome = refresh_one(info, write=True)
@@ -101,13 +135,11 @@ class TestRefresher:
             "cds": ["reanalysis-era5-land"],
             "ads": ["cams-global-reanalysis-eac4"],
             "ewds": ["cems-glofas-forecast"],
+            "ecds": ["tigge-forecasts"],
+            "xds": ["derived-fire-fuel-biomass"],
         }, "per-store ids persisted"
         catalog = load_catalog(info)
-        for expected in (
-            "reanalysis-era5-land",
-            "cams-global-reanalysis-eac4",
-            "cems-glofas-forecast",
-        ):
+        for expected in _STORE_SAMPLE_ID.values():
             assert expected in catalog.available_datasets, f"{expected} unioned"
 
     def test_pagination_follows_rel_next_across_pages(self, tmp_path, monkeypatch):
@@ -122,6 +154,8 @@ class TestRefresher:
             "cds": ["reanalysis-one", "reanalysis-two"],
             "ads": ["cams-one", "cams-two"],
             "ewds": ["cems-one", "cems-two"],
+            "ecds": ["tigge-one", "tigge-two"],
+            "xds": ["fuel-one", "fuel-two"],
         }, "both pages' ids per store persisted"
 
 
@@ -173,6 +207,22 @@ class TestProber:
         assert ecmwf_cli._ecmwf_constraints("x") == [{"variable": []}]
 
 
+def _stub_client(monkeypatch, captured=None, seen_endpoints=None):
+    """Replace the shared client factory with one that writes an empty target."""
+
+    def _retrieve(dataset, request, target):
+        if captured is not None:
+            captured.update(request)
+        open(target, "w").close()
+
+    def _open_client(endpoint="cds"):
+        if seen_endpoints is not None:
+            seen_endpoints.append(endpoint)
+        return types.SimpleNamespace(retrieve=_retrieve)
+
+    monkeypatch.setattr(endpoints, "open_client", _open_client)
+
+
 class TestDeepProber:
     """Tests for the credentialed ecmwf `--deep` sampler."""
 
@@ -194,11 +244,7 @@ class TestDeepProber:
             "_ecmwf_constraints",
             lambda d: [{"variable": ["2m_temperature"], "year": ["2020"]}],
         )
-        cdsapi = types.ModuleType("cdsapi")
-        cdsapi.Client = lambda: types.SimpleNamespace(
-            retrieve=lambda ds, req, target: open(target, "w").close()
-        )
-        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        _stub_client(monkeypatch)
         monkeypatch.setattr(
             ecmwf_cli,
             "_read_netcdf_var_meta",
@@ -220,14 +266,7 @@ class TestDeepProber:
         }
         monkeypatch.setattr(ecmwf_cli, "_ecmwf_constraints", lambda d: [entry])
         captured: dict[str, object] = {}
-        cdsapi = types.ModuleType("cdsapi")
-        cdsapi.Client = lambda: types.SimpleNamespace(
-            retrieve=lambda ds, req, target: (
-                captured.update(req),
-                open(target, "w").close(),
-            )
-        )
-        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        _stub_client(monkeypatch, captured)
         monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
         ecmwf_cli._ecmwf_deep_sample("satellite-soil-moisture")
         assert captured["type_of_sensor"] == ["passive"]
@@ -242,14 +281,7 @@ class TestDeepProber:
             ecmwf_cli, "_ecmwf_constraints", lambda d: [{"lake": ["achit"]}]
         )
         captured: dict[str, object] = {}
-        cdsapi = types.ModuleType("cdsapi")
-        cdsapi.Client = lambda: types.SimpleNamespace(
-            retrieve=lambda ds, req, target: (
-                captured.update(req),
-                open(target, "w").close(),
-            )
-        )
-        monkeypatch.setitem(sys.modules, "cdsapi", cdsapi)
+        _stub_client(monkeypatch, captured)
         monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
         ecmwf_cli._ecmwf_deep_sample("satellite-lake-water-level")
         assert captured["variable"] == ["all"]
@@ -274,10 +306,53 @@ class TestDeepProber:
         meta = ecmwf_cli._read_netcdf_var_meta(str(path))
         assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
 
+    @pytest.mark.parametrize(
+        "dataset, expected",
+        [
+            ("reanalysis-era5-single-levels", "cds"),
+            ("cams-global-emission-inventories", "ads"),
+            ("cems-glofas-forecast", "ewds"),
+            ("tigge-forecasts", "ecds"),
+            ("derived-fire-fuel-biomass", "xds"),
+        ],
+    )
+    def test_deep_sample_retrieves_from_the_datasets_own_store(
+        self, monkeypatch, dataset, expected
+    ):
+        """The sample goes to the row's store; a bare client would 404 off-CDS."""
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda d: [{"variable": ["x"]}]
+        )
+        seen: list[str] = []
+        _stub_client(monkeypatch, seen_endpoints=seen)
+        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
+        ecmwf_cli._ecmwf_deep_sample(dataset)
+        assert seen == [expected]
+
+    def test_deep_sample_uses_the_index_for_an_uncurated_dataset(self, monkeypatch):
+        """An uncurated id resolves via the index, not the CDS default."""
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda d: [{"variable": ["x"]}]
+        )
+        seen: list[str] = []
+        _stub_client(monkeypatch, seen_endpoints=seen)
+        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
+        ecmwf_cli._ecmwf_deep_sample("cams-europe-air-quality-forecasts")
+        assert seen == ["ads"]
+
+    def test_deep_sample_unknown_dataset_falls_back_to_cds(self, monkeypatch):
+        """An id in neither the rows nor the index still samples, against CDS."""
+        monkeypatch.setattr(
+            ecmwf_cli, "_ecmwf_constraints", lambda d: [{"variable": ["x"]}]
+        )
+        seen: list[str] = []
+        _stub_client(monkeypatch, seen_endpoints=seen)
+        monkeypatch.setattr(ecmwf_cli, "_read_netcdf_var_meta", lambda path: {})
+        ecmwf_cli._ecmwf_deep_sample("not-a-real-dataset-anywhere")
+        assert seen == ["cds"]
+
     def test_deep_sample_no_constraints(self, monkeypatch):
         """No constraints rows yields an empty schema (after the SDK imports)."""
-        monkeypatch.setitem(sys.modules, "cdsapi", types.ModuleType("cdsapi"))
-        monkeypatch.setitem(sys.modules, "netCDF4", types.ModuleType("netCDF4"))
         monkeypatch.setattr(ecmwf_cli, "_ecmwf_constraints", lambda d: [])
         assert ecmwf_cli._ecmwf_deep_sample("x") == {}
 
@@ -586,3 +661,35 @@ class TestCommands:
         payload = json.loads(result.output)
         assert payload["status"] == "ok"
         assert payload["assets"]["t2m"]["units"] == "K"
+
+
+class TestStoreTables:
+    """The CLI store tables cover every store, at its real URL."""
+
+    def test_every_store_has_an_api_root(self):
+        """All five slugs resolve to their documented API root."""
+        assert ecmwf_cli._store_urls() == {
+            "cds": "https://cds.climate.copernicus.eu/api",
+            "ads": "https://ads.atmosphere.copernicus.eu/api",
+            "ewds": "https://ewds.climate.copernicus.eu/api",
+            "ecds": "https://ecds.ecmwf.int/api",
+            "xds": "https://xds.ecmwf.int/api",
+        }
+
+    def test_every_store_has_a_collections_url(self):
+        """Each catalogue URL is its store's root plus the collections path."""
+        assert ecmwf_cli._store_collections_urls() == {
+            "cds": "https://cds.climate.copernicus.eu/api/catalogue/v1/collections",
+            "ads": "https://ads.atmosphere.copernicus.eu/api/catalogue/v1/collections",
+            "ewds": "https://ewds.climate.copernicus.eu/api/catalogue/v1/collections",
+            "ecds": "https://ecds.ecmwf.int/api/catalogue/v1/collections",
+            "xds": "https://xds.ecmwf.int/api/catalogue/v1/collections",
+        }
+
+    def test_url_override_reaches_the_catalog_tooling(self, monkeypatch):
+        """A `<ENDPOINT>_URL` override applies to the CLI, not just the client."""
+        monkeypatch.setenv("ECDS_URL", "https://staging.ecds.invalid/api")
+        assert ecmwf_cli._store_urls()["ecds"] == "https://staging.ecds.invalid/api"
+        assert ecmwf_cli._store_collections_urls()["ecds"] == (
+            "https://staging.ecds.invalid/api/catalogue/v1/collections"
+        )

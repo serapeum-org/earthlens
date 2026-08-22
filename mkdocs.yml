@@ -218,8 +218,9 @@ nav:
     - ECMWF:
       - Introduction: reference/ecmwf/introduction.md
       - Usage: reference/ecmwf/usage.md
-      - Data stores (CDS + ADS + EWDS): reference/ecmwf/datastores.md
+      - Data stores (CDS + ADS + EWDS + ECDS + XDS): reference/ecmwf/datastores.md
       - EWDS (GloFAS / floods): reference/ecmwf/ewds.md
+      - ECDS + XDS (TIGGE / S2S / fire fuel): reference/ecmwf/ecds.md
       - Catalog & tooling: reference/ecmwf/catalog.md
       - Reference: reference/ecmwf/ecmwf.md
     - EUMETSAT (Data Store):
@@ -572,6 +573,7 @@ nav:
     - CDS / ECMWF:
       - Quickstart: examples/ecmwf/cds_quickstart.ipynb
       - Floods — GloFAS forecast (EWDS): examples/ecmwf/floods_glofas_forecast.ipynb
+      - TIGGE + fire fuel (ECDS / XDS): examples/ecmwf/ecds_xds_stores.ipynb
       - Floods — GloFAS historical intermediate (EWDS): examples/ecmwf/glofas_historical_intermediate.ipynb
       - Hydrology — water balance: examples/ecmwf/hydrology_water_balance.ipynb
       - Oceanography — SST & sea ice: examples/ecmwf/oceanography_sst_sea_ice.ipynb

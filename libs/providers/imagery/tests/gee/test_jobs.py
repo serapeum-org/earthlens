@@ -756,7 +756,7 @@ class TestTerminalStates:
         """`TERMINAL_TASK_STATES` is exactly `COMPLETED / FAILED / CANCELLED`.
 
         `CANCEL_REQUESTED` is deliberately excluded — see M2 in
-        `planning/gee/pr-diff-review-feat-gee-2026-05-17-3.md`. Treating
+        the GEE PR review. Treating
         it as terminal would short-circuit `wait_for_task_id` before
         the real `CANCELLED` arrives.
         """
