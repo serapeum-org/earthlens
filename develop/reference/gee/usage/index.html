@@ -3305,10 +3305,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-via-the-earthlens-facade" class="md-nav__link">
+  <a href="#4-fetch-engine-engine-and-cloud-optimized-geotiffs-cog" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Via the EarthLens facade
+        4. Fetch engine (engine) and Cloud Optimized GeoTIFFs (cog)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-via-the-earthlens-facade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Via the EarthLens facade
       
     </span>
   </a>
@@ -23547,10 +23558,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-via-the-earthlens-facade" class="md-nav__link">
+  <a href="#4-fetch-engine-engine-and-cloud-optimized-geotiffs-cog" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Via the EarthLens facade
+        4. Fetch engine (engine) and Cloud Optimized GeoTIFFs (cog)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-via-the-earthlens-facade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Via the EarthLens facade
       
     </span>
   </a>
@@ -23733,7 +23755,81 @@ large AOIs use <code>"drive"</code> / <code>"gcs"</code>:</p>
 charges; <code>"drive"</code> and <code>"url"</code> do not (see the cost notes in the
 <a href="../introduction/">Introduction</a>).</p>
 </blockquote>
-<h2 id="4-via-the-earthlens-facade"><a class="toclink" href="#4-via-the-earthlens-facade">4. Via the <code>EarthLens</code> facade</a><a class="headerlink" href="#4-via-the-earthlens-facade" title="Permanent link">#</a></h2>
+<h2 id="4-fetch-engine-engine-and-cloud-optimized-geotiffs-cog"><a class="toclink" href="#4-fetch-engine-engine-and-cloud-optimized-geotiffs-cog">4. Fetch engine (<code>engine</code>) and Cloud Optimized GeoTIFFs (<code>cog</code>)</a><a class="headerlink" href="#4-fetch-engine-engine-and-cloud-optimized-geotiffs-cog" title="Permanent link">#</a></h2>
+<p>Raw reads of a single materialised asset can skip <code>getDownloadURL</code>
+entirely and pull pixels through GDAL's Earth Engine driver, via the
+optional <a href="https://pypi.org/project/pyramids-eo/"><code>pyramids-eo</code></a> reader:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;earthlens[eedai]&quot;</span>
+</code></pre></div>
+<p><code>earthlens[all]</code> deliberately does <strong>not</strong> include it: installing the
+extra flips the default <code>engine="auto"</code> onto the reader, and the two
+engines sample differently (see below), so it is opt-in.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">gee</span> <span class="o">=</span> <span class="n">GEE</span><span class="p">(</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">start</span><span class="o">=</span><span class="s2">&quot;2000-02-11&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;2000-02-12&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;USGS/SRTMGL1_003&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;elevation&quot;</span><span class="p">]},</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">lat_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">29.9</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">],</span> <span class="n">lon_lim</span><span class="o">=</span><span class="p">[</span><span class="mf">31.2</span><span class="p">,</span> <span class="mf">31.3</span><span class="p">],</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;data/gee&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;eedai&quot;</span><span class="p">,</span>   <span class="c1"># or &quot;auto&quot; (default) / &quot;ee&quot;</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">cog</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>         <span class="c1"># write a Cloud Optimized GeoTIFF</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th><code>engine</code></th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"auto"</code> (default)</td>
+<td>Use the reader when the request qualifies <strong>and</strong> <code>[eedai]</code> is installed; otherwise Earth Engine.</td>
+</tr>
+<tr>
+<td><code>"ee"</code></td>
+<td>Always <code>getDownloadURL</code> — the historical path.</td>
+</tr>
+<tr>
+<td><code>"eedai"</code></td>
+<td>Force the reader; raises if the request does not qualify.</td>
+</tr>
+</tbody>
+</table>
+<p>A request qualifies only when nothing server-side shapes the image:
+a single <code>ee_type="image"</code> asset (not a reduced collection), no
+<code>cloud_mask</code>, no <code>filters</code>, <code>export_via="url"</code>, and <code>crs="EPSG:4326"</code>.
+Everything else stays on Earth Engine, which is the only engine that can
+run a computation graph or export to Drive / GCS / an asset.</p>
+<p>What you gain: no 32768-px synchronous cap and no HTTP/zip round-trip,
+so <code>auto_split</code> is unnecessary. What to know before switching:</p>
+<ul>
+<li><strong>The extra does not replace <code>[gee]</code>.</strong> The request is still built
+  through <code>earthengine-api</code>, so Earth Engine credentials are still
+  required.</li>
+<li><strong>The reader fetches at the asset's native resolution</strong> (its overviews
+  are unreliable) and downsamples locally, so a wide AOI over a fine
+  asset is a large read. A window too big to hold in memory is streamed
+  to disk one tile at a time and mosaicked, so <code>auto_split</code> is not needed
+  here. Tiling is reserved for reads at or near the asset's own
+  resolution — the case Earth Engine's 32768-px cap would otherwise
+  refuse. A request falls back to Earth Engine when it is much coarser
+  than the asset (Earth Engine aggregates server-side and returns a small
+  raster instead of fetching many native pixels per output pixel), when
+  the whole read would still fetch more than the total-work ceiling, when
+  <code>resample</code> is not <code>"nearest"</code> (upstream forbids that with tiling), when
+  a polygon cutline is set (likewise), or when the catalog does not record
+  the asset's native resolution, which leaves the read unsizeable.</li>
+<li><strong>Pixels are not byte-identical to the Earth Engine path.</strong> Earth
+  Engine reads <code>scale</code> in a geographic CRS as a uniform
+  degree-equivalent, while the EEDAI grid is sized for square metres on
+  the ground, so column counts differ away from the equator; and the
+  reader resamples locally (nearest by default) where Earth Engine
+  aggregates server-side. The AOI, CRS and values agree — the sampling
+  does not.</li>
+<li><strong><code>cog=True</code> applies to this path only.</strong> A request served by Earth
+  Engine writes a plain GeoTIFF (and logs that it did).</li>
+</ul>
+<h2 id="5-via-the-earthlens-facade"><a class="toclink" href="#5-via-the-earthlens-facade">5. Via the <code>EarthLens</code> facade</a><a class="headerlink" href="#5-via-the-earthlens-facade" title="Permanent link">#</a></h2>
 <p>Once the GEE backend is registered in the facade you'll also be able to
 do <code>EarthLens(data_source="gee", variables={...}, ...).download()</code>; until
 then use <code>earthlens.gee.GEE</code> directly as above. (Tracking: plan task
