@@ -204,8 +204,8 @@ def inform_query(
     """Fetch INFORM country scores for one indicator (public, no key).
 
     Args:
-        workflow_id: The INFORM model WorkflowId (e.g. `505` for INFORM Risk
-            2026).
+        workflow_id: The INFORM model WorkflowId (e.g. `503` for INFORM Risk
+            Mid 2025).
         indicator_id: The indicator id (`"INFORM"`, `"HA"`, `"VU"`, `"CC"`).
         base: The INFORM API base URL (overridable for tests).
         timeout: Per-request timeout in seconds.

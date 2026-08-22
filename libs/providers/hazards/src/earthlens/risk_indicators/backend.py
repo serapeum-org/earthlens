@@ -101,6 +101,7 @@ class RiskIndicators(AbstractDataSource):
         country: str | None = None,
         admin_code: str | None = None,
         api_key: str | None = None,
+        workflow_id: int | None = None,
         output_format: OutputFormat = "csv",
     ):
         """Initialise a risk-indicators backend instance.
@@ -126,6 +127,10 @@ class RiskIndicators(AbstractDataSource):
                 code resolution (enables sub-national ThinkHazard divisions).
             api_key: The GFW `x-api-key`; only consulted for a `gfw` dataset.
                 Falls back to the `GFW_API_KEY` env var.
+            workflow_id: An INFORM model WorkflowId overriding the catalog pin;
+                only consulted for an `inform` dataset. Use it when the pinned
+                workflow stops serving scores, or to read an older release
+                (`/workflows` lists every WorkflowId).
             output_format: On-disk format for a tabular result — `"csv"`
                 (default) or `"parquet"`.
 
@@ -159,6 +164,10 @@ class RiskIndicators(AbstractDataSource):
         self._country = country
         self._admin_code = admin_code
         self._api_key = api_key
+        self._workflow_id = workflow_id
+        # Row count of the last INFORM payload, before the country filter, so an
+        # empty result can say which of the two causes produced it.
+        self._upstream_rows: int | None = None
         self._output_format: OutputFormat = output_format
         self._auth: GfwAuth | None = None
 
@@ -315,8 +324,15 @@ class RiskIndicators(AbstractDataSource):
             )
         if dataset.provider == "inform":
             payload = _helpers.inform_query(
-                cast("int", dataset.workflow_id), cast("str", dataset.indicator_id)
+                cast(
+                    "int",
+                    self._workflow_id
+                    if self._workflow_id is not None
+                    else dataset.workflow_id,
+                ),
+                cast("str", dataset.indicator_id),
             )
+            self._upstream_rows = len(payload)
             return _helpers.inform_to_frame(payload, country=country)
         # provider == "gfw" — GFW keys on upper-case ISO3, so normalise the
         # country before interpolating it (the other two providers already
@@ -373,9 +389,40 @@ class RiskIndicators(AbstractDataSource):
         else:
             logger.warning(
                 f"RiskIndicators {self._dataset.id}: no rows matched; wrote an "
-                f"empty (schema-only) table to {out_path}."
+                f"empty (schema-only) table to {out_path}.{self._empty_hint()}"
             )
         return result
+
+    def _empty_hint(self) -> str:
+        """Explain an empty INFORM result, so the cause is not left ambiguous.
+
+        An INFORM request comes back empty for two very different reasons: the
+        workflow served no scores at all (the pinned release was withdrawn or
+        never published upstream), or it served the global table and the
+        `country=` filter matched none of it (a wrong ISO3). The written table
+        looks identical either way, so the warning says which one happened.
+
+        Returns:
+            str: A sentence to append to the empty-result warning, or `""` for a
+                non-INFORM dataset.
+        """
+        if self._dataset.provider != "inform":
+            return ""
+        workflow = (
+            self._workflow_id
+            if self._workflow_id is not None
+            else self._dataset.workflow_id
+        )
+        if self._upstream_rows:
+            return (
+                f" INFORM workflow {workflow} served {self._upstream_rows} row(s), "
+                f"none of them country={self._country!r} — check the ISO3 code."
+            )
+        return (
+            f" INFORM workflow {workflow} served no rows at all; it may have been "
+            "withdrawn upstream — pass workflow_id= to read another workflow "
+            "(/workflows lists them)."
+        )
 
     def _write_table(self, df: pd.DataFrame) -> Path:
         """Write a tabular result to `root_dir` and return the path.

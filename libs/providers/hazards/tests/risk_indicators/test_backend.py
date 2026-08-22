@@ -10,7 +10,7 @@ import pytest
 from pyramids.feature.collection import FeatureCollection
 
 import earthlens.risk_indicators
-from earthlens.risk_indicators import AuthenticationError, RiskIndicators
+from earthlens.risk_indicators import AuthenticationError, RiskIndicators, _helpers
 
 pytestmark = pytest.mark.risk_indicators
 
@@ -208,6 +208,39 @@ class TestRouting:
         df = _build(monkeypatch, variables=["inform:risk"], path=tmp_path).download()
         assert len(df) > 1
 
+    def test_inform_uses_catalog_workflow(self, fake_http, monkeypatch, tmp_path):
+        """An INFORM request sends the workflow the catalog pins."""
+        _build(
+            monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
+        ).download()
+        assert fake_http.calls[0]["params"]["WorkflowId"] == 503
+
+    def test_inform_workflow_id_overrides_catalog(
+        self, fake_http, monkeypatch, tmp_path
+    ):
+        """A workflow_id= argument replaces the catalog pin in the request."""
+        _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            workflow_id=493,
+            path=tmp_path,
+        ).download()
+        assert fake_http.calls[0]["params"]["WorkflowId"] == 493
+
+    def test_workflow_id_ignored_for_other_providers(
+        self, fake_http, monkeypatch, tmp_path
+    ):
+        """A workflow_id= on a ThinkHazard request changes nothing."""
+        _build(
+            monkeypatch,
+            variables=["thinkhazard:flood_river"],
+            country="KEN",
+            workflow_id=493,
+            path=tmp_path,
+        ).download()
+        assert fake_http.calls[0]["url"].endswith("/report/133/FL.json")
+
     def test_gfw_tabular_forwards_key_and_iso(self, fake_http, monkeypatch, tmp_path):
         """A GFW tabular request sends the key header and the iso in the SQL."""
         df = _build(
@@ -272,6 +305,50 @@ class TestDownloadSemantics:
         ).download()
         assert df.empty
         assert (tmp_path / "risk_inform_risk.csv").exists()
+
+    def test_empty_hint_blames_the_country_filter(
+        self, fake_http, monkeypatch, tmp_path
+    ):
+        """An unmatched country is reported as a country problem, not a dead workflow."""
+        b = _build(monkeypatch, variables=["inform:risk"], country="ZMB", path=tmp_path)
+        b.download()
+        hint = b._empty_hint()
+        assert "none of them country='ZMB'" in hint
+        assert "check the ISO3 code" in hint
+
+    def test_empty_hint_blames_the_workflow(self, fake_http, monkeypatch, tmp_path):
+        """An upstream that serves nothing names the workflow and the override."""
+        monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
+        b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
+        b.download()
+        hint = b._empty_hint()
+        assert "workflow 503 served no rows at all" in hint
+        assert "workflow_id=" in hint
+
+    def test_empty_hint_names_the_overridden_workflow(
+        self, fake_http, monkeypatch, tmp_path
+    ):
+        """The hint reports the override, not the catalog pin, when one is given."""
+        monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
+        b = _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            workflow_id=515,
+            path=tmp_path,
+        )
+        b.download()
+        assert "workflow 515 served no rows" in b._empty_hint()
+
+    def test_empty_hint_silent_for_other_providers(self, monkeypatch, tmp_path):
+        """A non-INFORM dataset gets no INFORM-specific hint."""
+        b = _build(
+            monkeypatch,
+            variables=["thinkhazard:flood_river"],
+            country="KEN",
+            path=tmp_path,
+        )
+        assert b._empty_hint() == ""
 
     def test_citationless_dataset_logs_nothing(self, fake_http, monkeypatch, tmp_path):
         """A dataset with no citation skips the citation log line."""
