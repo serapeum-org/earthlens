@@ -1809,7 +1809,7 @@ class TestEedaiEligibility:
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         plan = _plan_for(gee, var_info)
         with pytest.raises(ValueError, match="EPSG:4326"):
-            gee._use_eedai(var_info, plan)
+            gee._use_eedai(var_info, 1)
 
     def test_batch_sink_is_not_eligible(self, make_gee):
         """The asynchronous sinks are Earth Engine-only."""
@@ -1820,46 +1820,26 @@ class TestEedaiEligibility:
         """`engine="ee"` stays on `getDownloadURL` even when eligible."""
         gee = make_gee(engine="ee")
         assert (
-            gee._use_eedai(
-                gee.catalog.get_dataset("USGS/SRTMGL1_003"),
-                _plan_for(gee, gee.catalog.get_dataset("USGS/SRTMGL1_003")),
-            )
-            is False
+            gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003"), 1)[0] is False
         )
 
     def test_engine_auto_uses_eedai_when_available(self, make_gee, fake_reader):
         """`engine="auto"` takes the fast-path when eligible and installed."""
         gee = make_gee()
-        assert (
-            gee._use_eedai(
-                gee.catalog.get_dataset("USGS/SRTMGL1_003"),
-                _plan_for(gee, gee.catalog.get_dataset("USGS/SRTMGL1_003")),
-            )
-            is True
-        )
+        assert gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003"), 1)[0] is True
 
     def test_engine_auto_falls_back_when_not_installed(self, make_gee, monkeypatch):
         """Without the extra, `engine="auto"` falls back to Earth Engine."""
         monkeypatch.setattr(backend_module, "eedai_available", lambda: False)
         gee = make_gee()
         assert (
-            gee._use_eedai(
-                gee.catalog.get_dataset("USGS/SRTMGL1_003"),
-                _plan_for(gee, gee.catalog.get_dataset("USGS/SRTMGL1_003")),
-            )
-            is False
+            gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003"), 1)[0] is False
         )
 
     def test_engine_eedai_forces_the_reader_when_eligible(self, make_gee, fake_reader):
         """`engine="eedai"` takes the reader for an eligible request."""
         gee = make_gee(engine="eedai")
-        assert (
-            gee._use_eedai(
-                gee.catalog.get_dataset("USGS/SRTMGL1_003"),
-                _plan_for(gee, gee.catalog.get_dataset("USGS/SRTMGL1_003")),
-            )
-            is True
-        )
+        assert gee._use_eedai(gee.catalog.get_dataset("USGS/SRTMGL1_003"), 1)[0] is True
 
     def test_engine_eedai_rejects_ineligible_request(self, make_gee, fake_reader):
         """Forcing the reader on a composited request raises `ValueError`."""
@@ -1871,7 +1851,7 @@ class TestEedaiEligibility:
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
         plan = _plan_for(gee, var_info)
         with pytest.raises(ValueError, match="engine='eedai' cannot serve"):
-            gee._use_eedai(var_info, plan)
+            gee._use_eedai(var_info, 1)
 
 
 class TestExportViaEedai:
@@ -2057,7 +2037,7 @@ class TestExportViaEedai:
         assert can_serve is True
         assert tile_size is not None
         assert tile_size >= 1
-        assert gee._use_eedai(var_info, _plan_for(gee, var_info)) is True
+        assert gee._use_eedai(var_info, 1)[0] is True
 
     def test_tile_size_keeps_each_tile_native_read_within_budget(self, make_gee):
         """The tile shrinks so one tile's native-resolution read stays bounded."""
@@ -2125,7 +2105,7 @@ class TestExportViaEedai:
         assert can_serve is False
         assert tile_size is None
         assert "resample" in reason
-        assert gee._use_eedai(var_info, _plan_for(gee, var_info)) is False
+        assert gee._use_eedai(var_info, 1)[0] is False
 
     def test_tile_respects_the_total_pixel_budget_not_just_the_axis_cap(self, make_gee):
         """One tile's native read must satisfy both budgets, not only per-axis.
@@ -2154,7 +2134,7 @@ class TestExportViaEedai:
         assert can_serve is False
         assert tile_size is None
         assert "total work" in reason
-        assert gee._use_eedai(var_info, _plan_for(gee, var_info)) is False
+        assert gee._use_eedai(var_info, 1)[0] is False
 
     def test_a_much_coarser_read_falls_back_to_earth_engine(
         self, make_gee, fake_reader
@@ -2171,7 +2151,7 @@ class TestExportViaEedai:
         assert can_serve is False
         assert tile_size is None
         assert "worse than Earth Engine" in reason
-        assert gee._use_eedai(var_info, _plan_for(gee, var_info)) is False
+        assert gee._use_eedai(var_info, 1)[0] is False
 
     def test_tiled_cog_write_leaves_no_staging_files(self, make_gee, fake_reader):
         """A tiled read plus `cog=True` stages through two names and cleans both."""
@@ -2349,21 +2329,22 @@ class TestExportViaEedai:
         )
         assert target.exists(), "the write was lost to a cleanup failure"
 
-    def test_block_padding_can_leave_no_workable_tile(
+    def test_window_padding_can_leave_no_workable_tile(
         self, make_gee, fake_reader, monkeypatch
     ):
         """When the pad eats the whole per-tile budget, the read declines.
 
         Regression guard: dividing the grid by a zero-sized tile raised
-        `ZeroDivisionError` mid-plan.
+        `ZeroDivisionError` mid-plan. The shipped budget always leaves a
+        workable tile, so it is lowered here to reach the guard at all.
         """
-        monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 20_000)
+        monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 25)
         gee = make_gee(lat_lim=[0.0, 3.0], lon_lim=[0.0, 3.0], scale=90.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         can_serve, tile_size, reason = gee._eedai_plan(var_info, 1)
         assert can_serve is False
         assert tile_size is None
-        assert "block padding" in reason
+        assert "window padding" in reason
 
     def test_a_long_thin_aoi_exceeds_the_tile_ceiling(self, make_gee, fake_reader):
         """A narrow strip can pass the work budget and still need too many tiles.
@@ -2390,7 +2371,7 @@ class TestExportViaEedai:
         assert can_serve is False
         assert tile_size is None
         assert "cutline" in reason
-        assert gee._use_eedai(var_info, _plan_for(gee, var_info)) is False
+        assert gee._use_eedai(var_info, 1)[0] is False
 
     def test_forced_eedai_reports_an_untileable_read(self, make_gee, fake_reader):
         """`engine="eedai"` turns an untileable oversized read into an error."""
@@ -2399,7 +2380,7 @@ class TestExportViaEedai:
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
         plan = _plan_for(gee, var_info)
         with pytest.raises(ValueError, match="cutline"):
-            gee._use_eedai(var_info, plan)
+            gee._use_eedai(var_info, 1)
 
     def test_unknown_native_resolution_is_treated_as_unbounded(
         self, make_gee, fake_reader
@@ -2416,13 +2397,13 @@ class TestExportViaEedai:
         fits, reason = gee._eedai_native_fits(var_info, (31.2, 29.9, 31.3, 30.0), 1)
         assert fits is False
         assert "no catalogued native resolution" in reason
-        assert gee._use_eedai(var_info, _plan_for(gee, var_info)) is False
+        assert gee._use_eedai(var_info, 1)[0] is False
 
     def test_modest_aoi_passes_the_preflight(self, make_gee, fake_reader):
         """A small AOI is not blocked by the native-resolution budget."""
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
-        assert gee._use_eedai(var_info, _plan_for(gee, var_info)) is True
+        assert gee._use_eedai(var_info, 1)[0] is True
         gee._export_via_eedai(
             var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
         )

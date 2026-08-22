@@ -120,11 +120,12 @@ _EEDAI_TILE_PIXELS: int = 2048
 #: 32768-px cap, which is the case tiling exists for.
 _EEDAI_MAX_TILES: int = 1024
 
-#: Native pixels the reader adds around each tile's window. It reads
-#: block-aligned and pads a pixel, so a tile's true native footprint is its
-#: nominal size plus up to a block on each side — budget for that, or a
-#: maximum-size tile overshoots.
-_EEDAI_BLOCK_PAD: int = 2 * 256
+#: Native pixels the reader adds around each tile's window: it widens the
+#: window by one pixel at the start and two at the end (`_native_pixel_window`)
+#: and allocates exactly that window. Block alignment governs how the window is
+#: *walked*, not how much is held, so the footprint is the window plus three
+#: pixels per axis — not a block per side.
+_EEDAI_WINDOW_PAD: int = 3
 
 #: How much coarser than the asset's own resolution a read may be and still be
 #: worth tiling. Above this Earth Engine wins outright: it aggregates
@@ -1130,13 +1131,13 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         prefix = f"{slug_asset_id(var_info.id)}_{'-'.join(bands)}_{when:%Y%m%d}"
         if self.export_via == "url":
-            # Plan once and pass the verdict down: recomputing it in the
-            # exporter reprojects the region again and lets the two callers
-            # disagree if anything in between mutates state.
             # An empty request is not one band: upstream opens every band the
             # asset has, so budget for that rather than under-counting.
-            plan = self._eedai_plan(var_info, len(bands) or len(var_info.bands))
-            if self._use_eedai(var_info, plan):
+            use_reader, plan = self._use_eedai(
+                var_info, len(bands) or len(var_info.bands)
+            )
+            if use_reader:
+                assert plan is not None  # a yes always carries its plan
                 return self._export_via_eedai(
                     var_info, bands, float(scale), prefix, plan
                 )
@@ -1301,9 +1302,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # Budgets are on the *native* footprint, which is the nominal window
         # plus the reader's block alignment and pad, so the allowance is
         # spent before dividing back into output pixels.
-        axis_allowance = max(EE_MAX_DIMENSION - _EEDAI_BLOCK_PAD, 1)
+        axis_allowance = max(EE_MAX_DIMENSION - _EEDAI_WINDOW_PAD, 1)
         area_allowance = max(
-            math.sqrt(_EEDAI_MAX_PIXELS / max(band_count, 1)) - _EEDAI_BLOCK_PAD, 1.0
+            math.sqrt(_EEDAI_MAX_PIXELS / max(band_count, 1)) - _EEDAI_WINDOW_PAD, 1.0
         )
         tile_size = int(
             min(
@@ -1313,15 +1314,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         )
         if tile_size < 1:
-            # The block pad can consume the whole allowance for a fine asset,
-            # leaving no workable tile. (The ratio bound alone does not prevent
-            # this — subtracting the pad is what makes it reachable.)
+            # Defensive: with the shipped constants the ratio bound leaves a
+            # workable tile, but this guard is deliberately kept — it was
+            # removed once as unreachable, and the next change to the padding
+            # made the plan divide by a zero-sized tile.
             return (
                 False,
                 None,
                 (
                     f"{reason}, and no tile is small enough: the reader's "
-                    f"{_EEDAI_BLOCK_PAD}-px block padding already exceeds the "
+                    f"{_EEDAI_WINDOW_PAD}-px window padding already exceeds the "
                     "per-tile budget here"
                 ),
             )
@@ -1339,16 +1341,24 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         return True, tile_size, ""
 
-    def _use_eedai(self, var_info: Dataset, plan: tuple[bool, int | None, str]) -> bool:
+    def _use_eedai(
+        self, var_info: Dataset, band_count: int
+    ) -> tuple[bool, tuple[bool, int | None, str] | None]:
         """Resolve the configured `engine` against this request's eligibility.
 
         Args:
             var_info: The catalog entry for the dataset being fetched.
+            band_count: How many bands the read asks for; the reader holds
+                them all, so they divide the per-tile budget.
 
         Returns:
-            `True` to take the EEDAI fast-path, `False` for `getDownloadURL`.
-            Under `"auto"` an unbounded native read falls back rather than
-            failing — the user asked for a download, not for this engine.
+            `(use_reader, plan)`. The plan is built here — after the
+            short-circuits, so a request that opted out of this engine never
+            pays for its sizing nor inherits its failure modes — and handed
+            back so the read that follows is the same decision rather than a
+            second one. It is `None` whenever `use_reader` is `False`.
+            Under `"auto"` a request the plan declines falls back rather than
+            failing: the user asked for a download, not for this engine.
 
         Raises:
             ValueError: If `engine="eedai"` was forced but the request needs
@@ -1357,7 +1367,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 unbounded native-resolution read.
         """
         if self.engine == "ee":
-            return False
+            return False, None
         eligible = self._eedai_eligible(var_info)
         if self.engine == "eedai":
             if not eligible:
@@ -1369,6 +1379,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     f"crs={_EEDAI_NATIVE_CRS!r} (got {self.crs!r}). Use "
                     "engine='auto' or engine='ee'."
                 )
+            plan = self._eedai_plan(var_info, band_count)
             can_serve, _tile_size, reason = plan
             if not can_serve:
                 raise ValueError(
@@ -1376,17 +1387,18 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     "smaller bbox, engine='ee' (with auto_split=True to tile), or "
                     "export_via='drive'."
                 )
-            return True
+            return True, plan
         if not (eligible and eedai_available()):
-            return False
+            return False, None
+        plan = self._eedai_plan(var_info, band_count)
         can_serve, _tile_size, reason = plan
         if not can_serve:
             logger.info(
                 f"Serving {var_info.id} through Earth Engine rather than the EEDAI "
                 f"reader: {reason}."
             )
-            return False
-        return True
+            return False, None
+        return True, plan
 
     def _eedai_window(self) -> tuple[tuple[float, float, float, float], Any]:
         """Return the AOI the reader should read, as `(bbox, cutline)`.
@@ -1619,18 +1631,19 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 f"{var_info.id} has no catalogued native resolution, so the "
                 "reader's native-resolution read cannot be bounded up front"
             )
-        rows, cols = self._eedai_grid(bbox, float(native_scale))
+        # The warp holds whichever grid is larger: a `scale` finer than the
+        # asset makes the output bigger than the native window. Fold them
+        # together before *either* budget is applied.
+        native_rows, native_cols = self._eedai_grid(bbox, float(native_scale))
+        out_rows, out_cols = self._eedai_grid(bbox, float(self.scale or native_scale))
+        rows = max(native_rows, out_rows)
+        cols = max(native_cols, out_cols)
         if max(rows, cols) > EE_MAX_DIMENSION:
             return False, (
                 f"the AOI is about {cols}x{rows} px at {var_info.id}'s native "
                 f"{native_scale} m resolution, over the {EE_MAX_DIMENSION}-px "
                 "per-axis budget the reader would hold in memory"
             )
-        # A `scale` finer than the asset's own resolution makes the warped
-        # output bigger than the native window, and the warp holds that too, so
-        # gate on whichever grid is larger.
-        out_rows, out_cols = self._eedai_grid(bbox, float(self.scale or native_scale))
-        rows, cols = max(rows, out_rows), max(cols, out_cols)
         total_px = rows * cols * max(band_count, 1)
         if total_px > _EEDAI_MAX_PIXELS:
             return False, (

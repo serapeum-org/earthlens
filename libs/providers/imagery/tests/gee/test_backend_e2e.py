@@ -181,11 +181,9 @@ def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
 
     single = _download_srtm(tmp_path / "single", "eedai")
     # Shrink the single-pass budget until this tiny AOI cannot be read in one
-    # pass. The block padding is zeroed with it: at this scale the real pad
-    # would swallow the whole per-tile allowance and the read would be
-    # declined rather than tiled.
+    # pass. Nothing else is patched: the reader's real 3-px window padding
+    # still applies, so the tile maths under test is the shipped one.
     monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 20_000)
-    monkeypatch.setattr(backend_module, "_EEDAI_BLOCK_PAD", 0)
     tiled_calls: list[int] = []
     original_plan = backend_module.GEE._eedai_plan
     monkeypatch.setattr(
