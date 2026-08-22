@@ -1109,6 +1109,13 @@ class TestDenotesTemporalAggregate:
             f"{value!r} carries no aggregate token"
         )
 
+    @pytest.mark.parametrize("value", ["subseasonal", "subseasonal_mean"])
+    def test_coarse_sub_cadence_is_not_vetoed(self, value):
+        """A coarser-than-daily `sub*` cadence (subseasonal) is not vetoed as sub-daily."""
+        assert _denotes_temporal_aggregate(value) is True, (
+            f"{value!r} is coarser than daily and should flag"
+        )
+
     @pytest.mark.parametrize("value", ["sum", "running_sum", "accumulated_sum"])
     def test_sum_type_values_are_not_aggregates(self, value):
         """A value whose only signal is a sum is not flagged (the flag forces mean)."""

@@ -503,8 +503,11 @@ def _denotes_temporal_aggregate(value: Any) -> bool:
     text = " ".join(str(item).lower() for item in items)
     # Sub-daily / instantaneous samples are raw, not aggregates. This veto must
     # run before the token match — a `sub-daily` value contains the `daily`
-    # token — and any new sub-daily spelling must be added here.
-    if any(marker in text for marker in ("instant", "hour", "sub")):
+    # token. Match the sub-daily spellings specifically (compacting separators)
+    # so a coarser-than-daily `subseasonal` value is not swallowed; any new
+    # sub-daily spelling must be added here.
+    compact = text.replace("-", "").replace("_", "")
+    if "instant" in text or "hour" in text or "subdaily" in compact:
         return False
     return any(token in text for token in _TEMPORAL_AGGREGATE_TOKENS)
 
