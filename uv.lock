@@ -2111,7 +2111,7 @@ worldpop = [
 [package.dev-dependencies]
 dev = [
     { name = "build" },
-    { name = "cleopatra" },
+    { name = "cleopatra", extra = ["tiles"] },
     { name = "commitizen" },
     { name = "coverage" },
     { name = "hypothesis" },
@@ -2131,7 +2131,7 @@ dev = [
     { name = "twine" },
 ]
 docs = [
-    { name = "cleopatra" },
+    { name = "cleopatra", extra = ["tiles"] },
     { name = "matplotlib" },
     { name = "mike" },
     { name = "mkdocs" },
@@ -2247,7 +2247,7 @@ provides-extras = ["argo", "asf", "cmems", "cmip6", "dem", "earthdata", "ecmwf",
 [package.metadata.requires-dev]
 dev = [
     { name = "build", specifier = ">=1.0.0" },
-    { name = "cleopatra", specifier = ">=0.31.0" },
+    { name = "cleopatra", extras = ["tiles"], specifier = ">=0.31.0" },
     { name = "commitizen", specifier = ">=4.8.4" },
     { name = "coverage" },
     { name = "hypothesis", specifier = ">=6.100" },
@@ -2267,7 +2267,7 @@ dev = [
     { name = "twine", specifier = ">=5.0.0" },
 ]
 docs = [
-    { name = "cleopatra", specifier = ">=0.31.0" },
+    { name = "cleopatra", extras = ["tiles"], specifier = ">=0.31.0" },
     { name = "matplotlib", specifier = ">=3.5" },
     { name = "mike", specifier = ">=2.1.3" },
     { name = "mkdocs", specifier = ">=1.5.3" },
