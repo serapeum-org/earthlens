@@ -32,6 +32,7 @@ earthlens only decides *which* grid to ask for.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import zipfile
@@ -319,7 +320,13 @@ def shakemap_raster_url(detail: Mapping[str, Any]) -> str | None:
         return None
     contents = (entries[0] or {}).get("contents") or {}
     entry = contents.get(RASTER_CONTENT_KEY) or {}
-    return entry.get("url") or None
+    url = entry.get("url") or None
+    if url is not None and not str(url).lower().startswith("https://"):
+        # The URL comes from an upstream document and is handed straight to the
+        # downloader; anything but https is refused rather than fetched.
+        logger.warning(f"refusing non-https ShakeMap archive URL {url!r}.")
+        return None
+    return url
 
 
 def extract_layers(
@@ -510,11 +517,14 @@ def flt_to_geotiff(flt_path: Path, dest: Path) -> Path:
     return dest
 
 
-def read_manifest(dest_dir: Path) -> dict[str, Any] | None:
+def read_manifest(dest_dir: Path, quiet: bool = False) -> dict[str, Any] | None:
     """Read an event directory's ShakeMap manifest, if it has one.
 
     Args:
         dest_dir: The event's output directory.
+        quiet: Suppress the warning a malformed or unreadable manifest
+            normally logs. Set by `write_manifest`, which reads the old
+            payload only to merge it and is about to replace it anyway.
 
     Returns:
         The parsed manifest, or `None` when the event has never been
@@ -572,13 +582,15 @@ def read_manifest(dest_dir: Path) -> dict[str, Any] | None:
     try:
         loaded = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
-        logger.warning(f"unreadable ShakeMap manifest at {path} — refetching.")
+        if not quiet:
+            logger.warning(f"unreadable ShakeMap manifest at {path} — refetching.")
         return None
     if not _is_valid_manifest(loaded):
         # Structurally wrong, not merely unreadable: treated as absent so the
         # event refetches and the next write repairs the file, rather than
         # letting a bad type escape as an error from somewhere downstream.
-        logger.warning(f"malformed ShakeMap manifest at {path} — refetching.")
+        if not quiet:
+            logger.warning(f"malformed ShakeMap manifest at {path} — refetching.")
         return None
     validated: dict[str, Any] = loaded
     return validated
@@ -604,8 +616,11 @@ def _is_valid_manifest(loaded: object) -> bool:
             isinstance(item, str) for item in value
         ):
             return False
+    version = loaded.get("product_version")
+    if version is not None and not isinstance(version, str):
+        return False
     checked = loaded.get("checked")
-    return isinstance(checked, (int, float))
+    return isinstance(checked, (int, float)) and not isinstance(checked, bool)
 
 
 def write_manifest(
@@ -694,7 +709,9 @@ def write_manifest(
     # requested layers on a later run would otherwise drop the record of
     # rasters still sitting on disk, so the next widening run would refetch an
     # archive it already has.
-    existing = read_manifest(dest_dir) or {}
+    # Read quietly: a malformed file being repaired by this very write should
+    # not log "refetching", which describes what a *reader* would do.
+    existing = read_manifest(dest_dir, quiet=True) or {}
     payload = {
         "schema": MANIFEST_SCHEMA,
         "requested": sorted(set(existing.get("requested", [])) | set(requested)),
@@ -704,7 +721,9 @@ def write_manifest(
     }
     # Staged and renamed, like the rasters it describes: a manifest truncated
     # by an interrupted write would otherwise be read back as malformed.
-    staged = dest_dir / f".{MANIFEST_NAME}.partial"
+    # Process-unique, like the scratch directory: two runs staging the same
+    # name would otherwise rename each other's half-written file into place.
+    staged = dest_dir / f".{MANIFEST_NAME}.{os.getpid()}.partial"
     try:
         staged.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         staged.replace(dest_dir / MANIFEST_NAME)
