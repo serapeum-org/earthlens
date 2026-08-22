@@ -1123,8 +1123,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 "GEE(...) — the catalog has no nominal spatial_resolution for it."
             )
         prefix = f"{slug_asset_id(var_info.id)}_{'-'.join(bands)}_{when:%Y%m%d}"
-        if self.export_via == "url" and self._use_eedai(var_info, len(bands)):
-            return self._export_via_eedai(var_info, bands, float(scale), prefix)
+        if self.export_via == "url":
+            # Plan once and pass the verdict down: recomputing it in the
+            # exporter reprojects the region again and lets the two callers
+            # disagree if anything in between mutates state.
+            # An empty request is not one band: upstream opens every band the
+            # asset has, so budget for that rather than under-counting.
+            plan = self._eedai_plan(var_info, len(bands) or len(var_info.bands))
+            if self._use_eedai(var_info, plan):
+                return self._export_via_eedai(
+                    var_info, bands, float(scale), prefix, plan
+                )
         self._warn_cog_ignored(var_info)
         # Only the Earth Engine paths need the `ee.Geometry`; the reader clips
         # to its own bbox / cutline.
@@ -1197,7 +1206,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         )
 
     def _eedai_plan(
-        self, var_info: Dataset, band_count: int = 1
+        self, var_info: Dataset, band_count: int
     ) -> tuple[bool, int | None, str]:
         """Decide how — or whether — the reader can serve this request.
 
@@ -1304,7 +1313,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             )
         return True, tile_size, ""
 
-    def _use_eedai(self, var_info: Dataset, band_count: int = 1) -> bool:
+    def _use_eedai(self, var_info: Dataset, plan: tuple[bool, int | None, str]) -> bool:
         """Resolve the configured `engine` against this request's eligibility.
 
         Args:
@@ -1334,7 +1343,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     f"crs={_EEDAI_NATIVE_CRS!r} (got {self.crs!r}). Use "
                     "engine='auto' or engine='ee'."
                 )
-            can_serve, _tile_size, reason = self._eedai_plan(var_info, band_count)
+            can_serve, _tile_size, reason = plan
             if not can_serve:
                 raise ValueError(
                     f"engine='eedai' cannot serve {var_info.id}: {reason}. Use a "
@@ -1344,7 +1353,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return True
         if not (eligible and eedai_available()):
             return False
-        can_serve, _tile_size, reason = self._eedai_plan(var_info, band_count)
+        can_serve, _tile_size, reason = plan
         if not can_serve:
             logger.info(
                 f"Serving {var_info.id} through Earth Engine rather than the EEDAI "
@@ -1549,7 +1558,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         self,
         var_info: Dataset,
         bbox: tuple[float, float, float, float],
-        band_count: int = 1,
+        band_count: int,
     ) -> tuple[bool, str]:
         """Report whether the reader's native-resolution read is bounded.
 
@@ -1606,7 +1615,12 @@ class GEE(LazyClientMixin, AbstractDataSource):
         return True, ""
 
     def _export_via_eedai(
-        self, var_info: Dataset, bands: list[str], scale: float, prefix: str
+        self,
+        var_info: Dataset,
+        bands: list[str],
+        scale: float,
+        prefix: str,
+        plan: tuple[bool, int | None, str],
     ) -> Path:
         """Materialise one raw asset through the pyramids-eo EEDAI reader.
 
@@ -1632,6 +1646,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bands: Band ids to read.
             scale: Output pixel size in metres.
             prefix: Output filename stem (no extension).
+            plan: The `(can_serve, tile_size, reason)` verdict from
+                :meth:`_eedai_plan`, computed once by the caller so the
+                routing decision and the read it performs cannot disagree.
 
         Returns:
             The :class:`pathlib.Path` of the written GeoTIFF.
@@ -1652,7 +1669,7 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # second name rather than using its source as its own destination.
         cog_staged = self.root_dir / f"{prefix}.partial-cog.tif"
         bbox, cutline = self._eedai_window()
-        can_serve, tile_size, reason = self._eedai_plan(var_info, len(bands))
+        can_serve, tile_size, reason = plan
         if not can_serve:
             # Only reachable if a caller bypasses `_use_eedai`; taking the read
             # anyway would be the unguarded path the plan exists to prevent.
