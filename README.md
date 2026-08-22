@@ -29,14 +29,8 @@ earthlens — a unified Python client for satellite & climate data
 =====================================================================
 
 <p align="center">
-  <img src="docs/_images/animation/earthlens-satellites-night.webp" width="820"
-       alt="The satellite fleet earthlens can reach, in orbit — ground swaths sweeping a night-lit Earth">
-</p>
-
-<p align="center">
-  <sub>34 of the spacecraft behind earthlens' providers, on their real orbits. The trailing bands are each
-  instrument's true ground swath. Basemap: VIIRS Earth at Night, NASA GIBS / EOSDIS ·
-  <a href="docs/examples/showcase/earthlens-satellites.ipynb">how it is built</a></sub>
+  <img src="docs/_images/animation/earthlens-satellites-bluemarble.webp" width="820"
+       alt="The satellite fleet earthlens can reach, in orbit — ground swaths sweeping across Earth">
 </p>
 
 
