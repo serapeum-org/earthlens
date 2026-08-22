@@ -337,50 +337,6 @@ class TestDownloadSemantics:
         assert df.empty
         assert (tmp_path / "risk_inform_risk.csv").exists()
 
-    def test_empty_hint_blames_the_country_filter(
-        self, fake_http, monkeypatch, tmp_path
-    ):
-        """An unmatched country is reported as a country problem, not a dead workflow."""
-        b = _build(monkeypatch, variables=["inform:risk"], country="ZMB", path=tmp_path)
-        b.download()
-        hint = b._empty_hint()
-        assert "none for country='ZMB'" in hint
-        assert "outside its coverage" in hint
-
-    def test_empty_hint_blames_the_workflow(self, fake_http, monkeypatch, tmp_path):
-        """An upstream that serves nothing names the workflow and the override."""
-        monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
-        b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
-        b.download()
-        hint = b._empty_hint()
-        assert "workflow 503 served no rows at all" in hint
-        assert "workflow_id=" in hint
-
-    def test_empty_hint_names_the_overridden_workflow(
-        self, fake_http, monkeypatch, tmp_path
-    ):
-        """The hint reports the override, not the catalog pin, when one is given."""
-        monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
-        b = _build(
-            monkeypatch,
-            variables=["inform:risk"],
-            country="KEN",
-            workflow_id=515,
-            path=tmp_path,
-        )
-        b.download()
-        assert "workflow 515 served no rows" in b._empty_hint()
-
-    def test_empty_hint_silent_for_other_providers(self, monkeypatch, tmp_path):
-        """A non-INFORM dataset gets no INFORM-specific hint."""
-        b = _build(
-            monkeypatch,
-            variables=["thinkhazard:flood_river"],
-            country="KEN",
-            path=tmp_path,
-        )
-        assert b._empty_hint() == ""
-
     def test_citationless_dataset_logs_nothing(self, fake_http, monkeypatch, tmp_path):
         """A dataset with no citation skips the citation log line."""
         b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
@@ -399,6 +355,84 @@ class TestDownloadSemantics:
             path=tmp_path,
         ).download()
         assert (tmp_path / "risk_inform_risk.parquet").exists()
+
+
+class TestEmptyHint:
+    """The diagnosis appended to an empty INFORM result."""
+
+    def test_blames_the_country_filter(self, fake_http, monkeypatch, tmp_path):
+        """An unmatched country is reported as a country problem, not a dead workflow."""
+        b = _build(monkeypatch, variables=["inform:risk"], country="GRL", path=tmp_path)
+        b.download()
+        hint = b._empty_hint()
+        assert "none for country='GRL'" in hint
+        assert "outside its coverage" in hint
+
+    def test_blames_the_workflow(self, fake_http, monkeypatch, tmp_path):
+        """An upstream that serves nothing names the workflow and the override."""
+        monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
+        b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
+        b.download()
+        hint = b._empty_hint()
+        assert "workflow 503 served no rows at all" in hint
+        assert "workflow_id=" in hint
+
+    def test_names_the_overridden_workflow(self, fake_http, monkeypatch, tmp_path):
+        """The hint reports the override, not the catalog pin, when one is given."""
+        monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
+        b = _build(
+            monkeypatch,
+            variables=["inform:risk"],
+            country="KEN",
+            workflow_id=515,
+            path=tmp_path,
+        )
+        b.download()
+        assert "workflow 515 served no rows" in b._empty_hint()
+
+    def test_silent_before_any_request(self, monkeypatch, tmp_path):
+        """A backend that has issued no request diagnoses nothing."""
+        b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
+        assert b._empty_hint() == ""
+
+    def test_silent_for_other_providers(self, monkeypatch, tmp_path):
+        """A non-INFORM dataset gets no INFORM-specific hint."""
+        b = _build(
+            monkeypatch,
+            variables=["thinkhazard:flood_river"],
+            country="KEN",
+            path=tmp_path,
+        )
+        assert b._empty_hint() == ""
+
+    def test_warning_carries_the_dead_workflow(self, fake_http, monkeypatch, tmp_path):
+        """The warning users see, not just the helper, names the unserved workflow."""
+        monkeypatch.setattr(_helpers, "inform_query", lambda *a, **k: [])
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING")
+        try:
+            _build(
+                monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path
+            ).download()
+        finally:
+            logger.remove(sink_id)
+        warning = "".join(messages)
+        assert "no rows matched" in warning
+        assert "workflow 503 served no rows at all" in warning
+
+    def test_warning_carries_the_country_diagnosis(
+        self, fake_http, monkeypatch, tmp_path
+    ):
+        """A country that the served rows do not cover is named in the warning."""
+        messages: list[str] = []
+        sink_id = logger.add(messages.append, level="WARNING")
+        try:
+            _build(
+                monkeypatch, variables=["inform:risk"], country="GRL", path=tmp_path
+            ).download()
+        finally:
+            logger.remove(sink_id)
+        assert "none for country='GRL'" in "".join(messages)
 
 
 class TestSubpackageHygiene:

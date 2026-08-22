@@ -82,7 +82,7 @@ class FakeHttp:
         elif "/query/json" in url:
             payload = load_json("gfw_tcl_iso_change_KEN.json")
         elif "/countries/Scores" in url:
-            payload = load_json("inform_scores_505_INFORM.json")
+            payload = load_json("inform_scores_INFORM.json")
         elif url.endswith("/FL.json"):
             payload = load_json("thinkhazard_report_133_FL.json")
         elif "/report/" in url:

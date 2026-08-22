@@ -72,11 +72,25 @@ class TestGet:
         assert row.output_kind == "tabular"
         assert row.gfw_dataset and row.gfw_version and "{iso}" in row.sql_template
 
-    def test_inform_row(self):
-        """An INFORM row carries a workflow id and indicator id."""
-        row = Catalog().get("inform:risk")
+    @pytest.mark.parametrize(
+        ("dataset_id", "indicator_id"),
+        [
+            ("inform:risk", "INFORM"),
+            ("inform:hazard_exposure", "HA"),
+            ("inform:vulnerability", "VU"),
+            ("inform:coping_capacity", "CC"),
+        ],
+    )
+    def test_inform_rows_pin_the_served_workflow(self, dataset_id, indicator_id):
+        """Every INFORM Risk row pins workflow 503 and carries its indicator id."""
+        row = Catalog().get(dataset_id)
         assert row.workflow_id == 503
-        assert row.indicator_id == "INFORM"
+        assert row.indicator_id == indicator_id
+
+    def test_climate_risk_keeps_its_own_pin(self):
+        """The climate row is left on 435 rather than swept into the repin."""
+        row = Catalog().get("inform:climate_risk")
+        assert row.workflow_id == 435
 
     def test_unknown_id_raises_did_you_mean(self):
         """An unknown but close id raises with a did-you-mean hint."""
