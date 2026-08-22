@@ -97,10 +97,12 @@ datasets:
   # INFORM workflow pin. The JRC Scores route stopped serving the INFORM2026
   # group on 2026-08-18: workflow 505 ("INFORM Risk 2026") answers 200 [] for
   # every indicator, as do 515 and 481, while the 2026 release itself is still
-  # published (INFORM_Risk_2026_v072.xlsx). The four rows below therefore pin
-  # 503 ("INFORM Risk Mid 2025", published 2025-08-28) - the newest workflow the
-  # API still serves - so the scores are one release behind the site until JRC
-  # restores 505. Pass workflow_id= to select another workflow per request.
+  # published (INFORM_Risk_2026_v072.xlsx). The next four rows - inform:risk,
+  # hazard_exposure, vulnerability and coping_capacity - therefore pin 503
+  # ("INFORM Risk Mid 2025", published 2025-08-28), the newest workflow the API
+  # still serves, so their scores are one release behind the site until JRC
+  # restores 505. The fifth row, inform:climate_risk, is NOT repinned: see its
+  # own note below. Pass workflow_id= to select another workflow per request.
   inform:risk:
     provider: inform
     output_kind: tabular
@@ -133,6 +135,11 @@ datasets:
     indicator_id: CC
     long_name: INFORM Lack of Coping Capacity dimension
     citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
+  # Unserved as of 2026-08-22: workflow 435 answers 200 [] like the 2026 group
+  # above, and so does every other Climate Change workflow except 451 - which
+  # models a different scenario (RCP4.5-SSP1) than the SSP5 2050 this row
+  # documents, so repinning cannot preserve its meaning. Kept pinned rather than
+  # repinned or removed until that is decided; requests return an empty table.
   inform:climate_risk:
     provider: inform
     output_kind: tabular

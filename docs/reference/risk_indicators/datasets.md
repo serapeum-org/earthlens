@@ -46,7 +46,15 @@ to one country; omit it for every country.
 | `inform:hazard_exposure` | tabular | Hazard & Exposure dimension |
 | `inform:vulnerability` | tabular | Vulnerability dimension |
 | `inform:coping_capacity` | tabular | Lack of Coping Capacity dimension |
-| `inform:climate_risk` | tabular | INFORM Climate Change Risk (SSP5 2050) |
+| `inform:climate_risk` | tabular | INFORM Climate Change Risk (SSP5 2050) — **currently returns no rows** (see the note below) |
+
+!!! warning "`inform:climate_risk` is unserved upstream"
+    The JRC Scores endpoint has answered `200 []` for workflow `435` since at least
+    2026-08-22, so this dataset writes an empty (schema-only) table. Every other
+    Climate Change workflow is empty too, except one that models a different
+    scenario (RCP4.5-SSP1), so the row is kept as-is rather than repinned to
+    something it does not describe. The other four `inform:*` datasets are
+    unaffected — they pin a workflow that still serves scores.
 
 ## Global Forest Watch (needs `GFW_API_KEY`)
 
