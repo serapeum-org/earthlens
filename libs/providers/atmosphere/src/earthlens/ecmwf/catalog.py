@@ -443,6 +443,67 @@ def _validate_grid_resolution(value: float | None) -> float | None:
     return value
 
 
+#: Tokens in a `time_aggregation` / `temporal_resolution` value that mark the
+#: samples as a server-side temporal aggregate (a daily-or-coarser mean / statistic).
+_TEMPORAL_AGGREGATE_TOKENS = (
+    "mean",
+    "average",
+    "avg",
+    "sum",
+    "climatolog",
+    "daily",
+    "day",
+    "dekad",
+    "pentad",
+    "week",
+    "month",
+    "season",
+    "annual",
+    "year",
+)
+
+
+def _denotes_temporal_aggregate(value: Any) -> bool:
+    """Whether a `time_aggregation` / `temporal_resolution` value marks an aggregate.
+
+    Returns `True` for a daily-or-coarser statistic (`"daily"`, `"1_month_mean"`,
+    `"monthly_mean"`, ...) and `False` for a raw / sub-daily / instantaneous value
+    (`"instantaneous"`, `"1_hour"`, ...) or an empty one. Accepts a scalar or a
+    list (CDS spells these both ways).
+
+    Args:
+        value: The `time_aggregation` / `temporal_resolution` extra, or `None`.
+
+    Returns:
+        `True` when the value denotes a temporal aggregate.
+
+    Examples:
+        - Daily-or-coarser means are aggregates; raw / sub-daily values are not:
+
+            ```python
+            >>> from earthlens.ecmwf.catalog import _denotes_temporal_aggregate
+            >>> _denotes_temporal_aggregate("1_month_mean")
+            True
+            >>> _denotes_temporal_aggregate("daily")
+            True
+            >>> _denotes_temporal_aggregate("instantaneous")
+            False
+            >>> _denotes_temporal_aggregate("1_hour")
+            False
+            >>> _denotes_temporal_aggregate(None)
+            False
+
+            ```
+    """
+    if not value:
+        return False
+    items = value if isinstance(value, (list, tuple)) else [value]
+    text = " ".join(str(item).lower() for item in items)
+    if "instant" in text or "hour" in text:
+        return False
+    return any(token in text for token in _TEMPORAL_AGGREGATE_TOKENS)
+
+
 class Variable(FluxableLeaf):
     """Per-variable catalog entry consumed by :class:`ECMWF`.
 
@@ -566,14 +627,24 @@ class Variable(FluxableLeaf):
     def is_pre_aggregated(self) -> bool:
         """Whether each NetCDF sample is already a server-side temporal aggregate.
 
-        `True` for the two CDS families whose samples are aggregated on the
-        server, so re-accumulating them over a coarser window over-counts:
+        `True` for the CDS families whose samples are aggregated on the server,
+        so re-accumulating them over a coarser window over-counts:
 
         * the daily-statistics family (`derived-era5-*-daily-statistics`), whose
           dataset-level `daily_statistic` request extra is merged into every
-          child variable's `extras`; and
+          child variable's `extras`;
         * the ERA5 monthly-means family (`reanalysis-era5-*-monthly-means`),
-          whose product type is `monthly_averaged_*`.
+          whose product type is `monthly_averaged_*`;
+        * families carrying a `time_aggregation` / `temporal_resolution` extra
+          that denotes a daily-or-coarser mean (`ecv-for-climate-change`,
+          `reanalysis-carra-means` / `-pan-carra-means`,
+          `projections-cordex-domains-single-levels`); and
+        * monthly-projection datasets whose only marker is a `-monthly` dataset
+          id (`projections-cmip5-monthly-*`).
+
+        The `time_aggregation` / `temporal_resolution` markers live in `extras`
+        (or the dataset id), not the `product_type` field, which stays
+        `[reanalysis]` on these rows — hence the extra checks below.
 
         `earthlens.aggregate._resolve_op` reads this so `op="auto"` reduces such
         variables with `"mean"` rather than `"sum"` — a plain `sum` over samples
@@ -582,7 +653,15 @@ class Variable(FluxableLeaf):
         """
         if self.extras.get("daily_statistic"):
             return True
-        return any(pt.startswith("monthly_averaged") for pt in self.product_type)
+        if any(pt.startswith("monthly_averaged") for pt in self.product_type):
+            return True
+        if _denotes_temporal_aggregate(self.extras.get("time_aggregation")):
+            return True
+        if _denotes_temporal_aggregate(self.extras.get("temporal_resolution")):
+            return True
+        # Monthly-projection datasets (CMIP5) carry no in-row aggregation marker;
+        # their only signal is the `-monthly` dataset id.
+        return "-monthly" in self.cds_dataset
 
 
 class Dataset(BaseModel):

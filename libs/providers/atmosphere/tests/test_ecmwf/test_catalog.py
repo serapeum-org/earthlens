@@ -389,6 +389,63 @@ class TestCatalog:
         assert monthly_tp.is_pre_aggregated is True, "monthly-means flux var"
         assert raw_tp.is_pre_aggregated is False, "raw hourly ERA5 flux var"
 
+    @pytest.mark.parametrize(
+        "dataset, code",
+        [
+            ("ecv-for-climate-change", "precipitation-ecv"),
+            (
+                "projections-cmip5-monthly-single-levels",
+                "mean-precipitation-flux-cmip5m",
+            ),
+            (
+                "projections-cordex-domains-single-levels",
+                "mean-precipitation-flux-cordex",
+            ),
+            ("reanalysis-carra-means", "10m-wind-gust-carra-means"),
+            ("reanalysis-pan-carra-means", "evaporation-pancarra-means"),
+        ],
+    )
+    def test_is_pre_aggregated_flags_extra_and_monthly_id_families(self, dataset, code):
+        """Flux vars whose pre-aggregation marker is a time_aggregation /
+        temporal_resolution extra or a `-monthly` dataset id are flagged (#1097).
+
+        Args:
+            dataset: The pre-aggregated dataset key.
+            code: A `types: flux` variable code within it.
+        """
+        var = Catalog().datasets[dataset].variables[code]
+        assert var.is_flux, f"{dataset}::{code} should be flux"
+        assert var.is_pre_aggregated is True, (
+            f"{dataset}::{code} should be pre-aggregated"
+        )
+
+    @pytest.mark.parametrize(
+        "dataset, code",
+        [
+            ("derived-near-surface-meteorological-variables", "rainfall-flux-nsmv"),
+            ("reanalysis-cerra-single-levels", "evaporation-cerra"),
+            ("reanalysis-carra-single-levels", "percolation-carra"),
+            ("seasonal-original-single-levels", "evaporation-seasonal-orig"),
+            ("reanalysis-era5-single-levels", "total-precipitation"),
+        ],
+    )
+    def test_is_pre_aggregated_does_not_flag_raw_flux_datasets(self, dataset, code):
+        """Raw (non-aggregated) flux datasets stay unflagged so `op="auto"` still sums.
+
+        Guards against the detection widening onto raw hourly / sub-daily / forecast
+        flux datasets (WFDE5, raw CARRA/CERRA, seasonal-original, raw ERA5), where a
+        `sum` is the correct window total.
+
+        Args:
+            dataset: A raw flux dataset key.
+            code: A `types: flux` variable code within it.
+        """
+        var = Catalog().datasets[dataset].variables[code]
+        assert var.is_flux, f"{dataset}::{code} should be flux"
+        assert var.is_pre_aggregated is False, (
+            f"{dataset}::{code} must NOT be pre-aggregated"
+        )
+
     def test_minimal_valid_request_picks_entry_with_variable(self, monkeypatch):
         """`minimal_valid_request` returns a known-valid request dict."""
         from earthlens.ecmwf import constraints as constraints_module
