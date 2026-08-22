@@ -449,7 +449,6 @@ _TEMPORAL_AGGREGATE_TOKENS = (
     "mean",
     "average",
     "avg",
-    "sum",
     "climatolog",
     "daily",
     "day",

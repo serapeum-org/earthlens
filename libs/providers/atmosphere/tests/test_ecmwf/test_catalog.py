@@ -1064,7 +1064,6 @@ class TestDenotesTemporalAggregate:
             "weekly",
             "climatology",
             "time-average",
-            "running_sum",
         ],
     )
     def test_daily_or_coarser_values_are_aggregates(self, value):
@@ -1161,6 +1160,17 @@ class TestDenotesTemporalAggregate:
         """
         assert _denotes_temporal_aggregate(value) is False, (
             f"{value!r} carries no aggregate token"
+        )
+
+    @pytest.mark.parametrize("value", ["sum", "running_sum", "accumulated_sum"])
+    def test_sum_type_values_are_not_aggregates(self, value):
+        """A value whose only signal is `sum` is not flagged, since the flag forces mean.
+
+        Args:
+            value: A value naming a temporal sum / accumulation.
+        """
+        assert _denotes_temporal_aggregate(value) is False, (
+            f"{value!r} is a sum, not a mean; it must not be flagged as pre-aggregated"
         )
 
     @pytest.mark.parametrize(
