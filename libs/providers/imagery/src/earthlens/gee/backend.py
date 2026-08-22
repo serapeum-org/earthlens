@@ -1274,9 +1274,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
                 them all, so they divide the per-tile budget.
 
         Returns:
-            an :class:`EedaiPlan` — `tile_size` is `None` for a
-            single read, and `reason` explains a `False` for the fallback log
-            line or the forced-engine error.
+            An :class:`EedaiPlan`. `tile_size` is `None` for a single read, and
+            `reason` explains a `False` for the fallback log line or the
+            forced-engine error.
         """
         bbox, cutline = self._eedai_window()
         fits, reason = self._eedai_native_fits(var_info, bbox, band_count)
@@ -1397,10 +1397,15 @@ class GEE(LazyClientMixin, AbstractDataSource):
             failing: the user asked for a download, not for this engine.
 
         Raises:
-            ValueError: If `engine="eedai"` was forced but the request needs
-                server-side compute (a reduced collection, a `cloud_mask` or
-                `filters`), targets a projected `crs`, or would trigger an
-                unbounded native-resolution read.
+            ValueError: If `engine="eedai"` was forced and the request is
+                either ineligible — it needs server-side compute (a reduced
+                collection, a `cloud_mask` or `filters`) or targets a projected
+                `crs` — or eligible but declined by :meth:`_eedai_plan`,
+                which the message names: the asset has no native resolution,
+                the window is behind a polygon cutline, `resample` is not
+                nearest-neighbour, or tiling it would cost more than Earth
+                Engine would (too coarse a `scale` over a fine asset, too many
+                native pixels, or too many tiles).
         """
         if self.engine == "ee":
             return False, None
@@ -1725,9 +1730,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
             bands: Band ids to read.
             scale: Output pixel size in metres.
             prefix: Output filename stem (no extension).
-            plan: The verdict from
-                :meth:`_eedai_plan`, computed once by the caller so the
-                routing decision and the read it performs cannot disagree.
+            plan: The :class:`EedaiPlan` verdict from :meth:`_eedai_plan`,
+                computed once by the caller so the routing decision and the
+                read it performs cannot disagree.
 
         Returns:
             The :class:`pathlib.Path` of the written GeoTIFF.
