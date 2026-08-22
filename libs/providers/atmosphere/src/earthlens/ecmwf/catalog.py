@@ -443,14 +443,16 @@ def _validate_grid_resolution(value: float | None) -> float | None:
     return value
 
 
-#: Tokens in a `time_aggregation` / `temporal_resolution` value that mark the
-#: samples as a server-side temporal aggregate (a daily-or-coarser mean / statistic).
+# Tokens in a `time_aggregation` / `temporal_resolution` value that mark the
+# samples as a server-side temporal aggregate (a daily-or-coarser mean). Both the
+# `day` and `daily` spellings appear in the catalog, so both are listed.
 _TEMPORAL_AGGREGATE_TOKENS = (
     "mean",
     "average",
     "avg",
     "climatolog",
     "daily",
+    "day",
     "dekad",
     "pentad",
     "week",
