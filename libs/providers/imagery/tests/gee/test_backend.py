@@ -2319,6 +2319,70 @@ class TestExportViaEedai:
         assert one_band[0] is True
         assert every_band[0] is one_band[0] or every_band[0] is False
 
+    def test_exporting_a_plan_that_cannot_serve_raises(self, make_gee, fake_reader):
+        """Handing the exporter a declining plan raises instead of reading anyway.
+
+        `_api` never does this; the guard exists so a future reordering cannot
+        take the unguarded read silently.
+        """
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        declined = (False, None, "nope")
+        with pytest.raises(ValueError, match="cannot serve"):
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", declined)
+        assert not fake_reader.calls
+
+    def test_an_unremovable_staging_file_does_not_fail_the_write(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """A staging file that will not delete costs a stray temp, not the output."""
+        real_unlink = Path.unlink
+
+        def stubborn_unlink(self, missing_ok=False):
+            if ".partial" in self.name:
+                raise OSError("file is in use")
+            return real_unlink(self, missing_ok=missing_ok)
+
+        monkeypatch.setattr(Path, "unlink", stubborn_unlink)
+        gee = make_gee()
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        target = gee._export_via_eedai(
+            var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
+        )
+        assert target.exists(), "the write was lost to a cleanup failure"
+
+    def test_block_padding_can_leave_no_workable_tile(
+        self, make_gee, fake_reader, monkeypatch
+    ):
+        """When the pad eats the whole per-tile budget, the read declines.
+
+        Regression guard: dividing the grid by a zero-sized tile raised
+        `ZeroDivisionError` mid-plan.
+        """
+        monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 20_000)
+        gee = make_gee(lat_lim=[0.0, 3.0], lon_lim=[0.0, 3.0], scale=90.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        can_serve, tile_size, reason = gee._eedai_plan(var_info, 1)
+        assert can_serve is False
+        assert tile_size is None
+        assert "block padding" in reason
+
+    def test_a_long_thin_aoi_exceeds_the_tile_ceiling(self, make_gee, fake_reader):
+        """A narrow strip can pass the work budget and still need too many tiles.
+
+        Tile count is not implied by total work: an elongated AOI keeps the
+        pixel count modest while splitting into thousands of tiles, each its
+        own fetch, all opened together to mosaic.
+        """
+        gee = make_gee(lat_lim=[0.0, 89.0], lon_lim=[0.0, 0.1], scale=1.0)
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003").model_copy(
+            update={"spatial_resolution": 1.0}
+        )
+        can_serve, tile_size, reason = gee._eedai_plan(var_info, 1)
+        assert can_serve is False
+        assert tile_size is None
+        assert "tile ceiling" in reason
+
     def test_a_cutline_cannot_be_tiled_so_it_falls_back(self, make_gee, fake_reader):
         """Upstream refuses `tile_size` with a polygon cutline, so `auto` falls back."""
         region = _FakePolygonAoi(total_bounds=(0.0, 0.0, 40.0, 40.0))

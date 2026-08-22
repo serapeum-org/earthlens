@@ -120,6 +120,12 @@ _EEDAI_TILE_PIXELS: int = 2048
 #: 32768-px cap, which is the case tiling exists for.
 _EEDAI_MAX_TILES: int = 1024
 
+#: Native pixels the reader adds around each tile's window. It reads
+#: block-aligned and pads a pixel, so a tile's true native footprint is its
+#: nominal size plus up to a block on each side — budget for that, or a
+#: maximum-size tile overshoots.
+_EEDAI_BLOCK_PAD: int = 2 * 256
+
 #: How much coarser than the asset's own resolution a read may be and still be
 #: worth tiling. Above this Earth Engine wins outright: it aggregates
 #: server-side and returns a small raster, where the reader would fetch
@@ -1230,9 +1236,9 @@ class GEE(LazyClientMixin, AbstractDataSource):
           interpolating kernel would disagree at the tile seams;
         * a polygon cutline is set, which upstream also refuses.
 
-        The ratio bound is what keeps a tile from ever collapsing below one
-        pixel: at four-times-native or finer, the per-tile budget always
-        leaves a workable tile.
+        A sixth case declines late: if the reader's block padding consumes the
+        whole per-tile allowance there is no workable tile to cut, so the read
+        falls back rather than dividing by a zero-sized tile.
 
         Args:
             var_info: The catalog entry being fetched.
@@ -1292,13 +1298,33 @@ class GEE(LazyClientMixin, AbstractDataSource):
         # side and is held in memory whole, so shrink the tile until that read
         # satisfies *both* budgets the single-pass gate applies — the per-axis
         # cap and the total-pixel one.
+        # Budgets are on the *native* footprint, which is the nominal window
+        # plus the reader's block alignment and pad, so the allowance is
+        # spent before dividing back into output pixels.
+        axis_allowance = max(EE_MAX_DIMENSION - _EEDAI_BLOCK_PAD, 1)
+        area_allowance = max(
+            math.sqrt(_EEDAI_MAX_PIXELS / max(band_count, 1)) - _EEDAI_BLOCK_PAD, 1.0
+        )
         tile_size = int(
             min(
                 _EEDAI_TILE_PIXELS,
-                EE_MAX_DIMENSION / native_ratio,
-                math.sqrt(_EEDAI_MAX_PIXELS / max(band_count, 1)) / native_ratio,
+                axis_allowance / native_ratio,
+                area_allowance / native_ratio,
             )
         )
+        if tile_size < 1:
+            # The block pad can consume the whole allowance for a fine asset,
+            # leaving no workable tile. (The ratio bound alone does not prevent
+            # this — subtracting the pad is what makes it reachable.)
+            return (
+                False,
+                None,
+                (
+                    f"{reason}, and no tile is small enough: the reader's "
+                    f"{_EEDAI_BLOCK_PAD}-px block padding already exceeds the "
+                    "per-tile budget here"
+                ),
+            )
         rows, cols = self._eedai_grid(bbox, scale_m)
         tiles = math.ceil(rows / tile_size) * math.ceil(cols / tile_size)
         if tiles > _EEDAI_MAX_TILES:
@@ -1448,15 +1474,16 @@ class GEE(LazyClientMixin, AbstractDataSource):
 
         Examples:
             - A 0.1° box over Cairo at 90 m is taller than it is wide in
-              pixels, because a degree of longitude is shorter there:
+              pixels: a degree of longitude is shorter at that latitude, and
+              the grid is sized at the box's poleward edge:
                 ```python
                 >>> from earthlens.gee.backend import GEE
                 >>> GEE._eedai_grid((31.2, 29.9, 31.3, 30.0), 90.0)
                 (124, 108)
 
                 ```
-            - On the equator the same span is square, since a degree of
-              longitude and one of latitude are the same length:
+            - Spanning the equator the two axes match, because the poleward
+              edge is 1° and a degree of longitude is barely shortened there:
                 ```python
                 >>> from earthlens.gee.backend import GEE
                 >>> GEE._eedai_grid((0.0, 0.0, 1.0, 1.0), 1000.0)

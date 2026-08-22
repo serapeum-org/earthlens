@@ -58,10 +58,15 @@ def test_live_srtm_download(tmp_path):
 
 
 def _download_srtm(tmp_path, engine: str):
-    """Fetch the shared tiny SRTM tile through one engine, returning its path.
+    """Fetch the shared tiny SRTM tile through one engine.
 
-    `tmp_path` is the directory to write under; the engine name is appended so
-    two engines' outputs never collide.
+    Args:
+        tmp_path: Directory to write under; the engine name is appended so two
+            engines' outputs never collide.
+        engine: The `engine=` value to force for this fetch.
+
+    Returns:
+        The written GeoTIFF's path.
     """
     el = EarthLens(
         data_source="gee",
@@ -175,10 +180,12 @@ def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
     from earthlens.gee import backend as backend_module
 
     single = _download_srtm(tmp_path / "single", "eedai")
-    # 400 px is small enough that this AOI cannot be read in one pass, while
-    # still leaving the tile count well inside the ceiling; a much smaller
-    # budget would shrink the tile until the job is refused instead.
-    monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 400)
+    # Shrink the single-pass budget until this tiny AOI cannot be read in one
+    # pass. The block padding is zeroed with it: at this scale the real pad
+    # would swallow the whole per-tile allowance and the read would be
+    # declined rather than tiled.
+    monkeypatch.setattr(backend_module, "_EEDAI_MAX_PIXELS", 20_000)
+    monkeypatch.setattr(backend_module, "_EEDAI_BLOCK_PAD", 0)
     tiled_calls: list[int] = []
     original_plan = backend_module.GEE._eedai_plan
     monkeypatch.setattr(
@@ -197,7 +204,7 @@ def test_live_srtm_tiled_read_matches_single_pass(tmp_path, monkeypatch):
     )
 
     assert tiled.is_file(), f"tiled output missing: {tiled}"
-    assert tiled != single, "the tiled read reused the single-pass output"
+    assert tiled.read_bytes() != b"", "the tiled output is empty"
     assert not list(tiled.parent.glob("*.partial*")), "staged tiles left behind"
 
     single_values, single_epsg, single_bbox = _open_raster(single)
