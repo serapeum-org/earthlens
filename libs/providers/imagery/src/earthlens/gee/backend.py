@@ -1289,6 +1289,17 @@ class GEE(LazyClientMixin, AbstractDataSource):
             return EedaiPlan(
                 False, None, 0, f"{reason}, and it cannot be tiled behind a cutline"
             )
+        if self.resample != _EEDAI_TILING_RESAMPLE:
+            return EedaiPlan(
+                False,
+                None,
+                0,
+                (
+                    f"{reason}, and it cannot be tiled with resample="
+                    f"{self.resample!r} — an interpolating resampler would differ "
+                    "from the un-tiled read at the tile seams"
+                ),
+            )
         scale_m = float(self.scale or native_scale)
         native_ratio = max(scale_m / float(native_scale), 1.0)
         if native_ratio > _EEDAI_MAX_TILING_RATIO:
@@ -1314,17 +1325,6 @@ class GEE(LazyClientMixin, AbstractDataSource):
                     f"{reason}, and tiling it would still fetch about "
                     f"{native_total:,} native px, over the "
                     f"{_EEDAI_MAX_NATIVE_PIXELS:,}-px ceiling on one read's total work"
-                ),
-            )
-        if self.resample != _EEDAI_TILING_RESAMPLE:
-            return EedaiPlan(
-                False,
-                None,
-                0,
-                (
-                    f"{reason}, and it cannot be tiled with resample="
-                    f"{self.resample!r} — an interpolating resampler would differ "
-                    "from the un-tiled read at the tile seams"
                 ),
             )
         # One tile's native read is `tile_size * scale / native_scale` px per

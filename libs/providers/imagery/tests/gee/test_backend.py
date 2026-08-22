@@ -2152,6 +2152,26 @@ class TestExportViaEedai:
         assert "resample" in reason
         assert gee._use_eedai(var_info, 1)[0] is False
 
+    def test_a_hard_constraint_is_reported_before_a_tunable_budget(
+        self, make_gee, fake_reader
+    ):
+        """When both apply, the decline names the rule the user cannot tune.
+
+        A coarse scale over a fine asset trips this repo's tiling-ratio budget,
+        which the user can change; an interpolating resampler is refused by the
+        reader itself, which they cannot.
+        """
+        gee = make_gee(
+            lat_lim=[0.0, 15.0],
+            lon_lim=[0.0, 15.0],
+            scale=3000.0,
+            resample="average",
+        )
+        var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        reason = gee._eedai_plan(var_info, 1).reason
+        assert "resample" in reason, f"the tunable budget spoke first: {reason}"
+        assert "worse than Earth Engine" not in reason
+
     def test_tile_respects_the_total_pixel_budget_not_just_the_axis_cap(self, make_gee):
         """One tile's native read must satisfy both budgets, not only per-axis.
 
