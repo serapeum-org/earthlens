@@ -463,6 +463,42 @@ class TestInformRelease:
         )
         assert "NOW" not in set(df["iso3"])
 
+    def test_release_frame_drops_the_units_legend(self, release_workbook):
+        """The legend row under the header is excluded by row shape, not by luck."""
+        df = _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert not [iso for iso in df["iso3"] if not str(iso).isalpha()]
+        assert df.attrs["served_rows"] == 3
+
+    def test_release_frame_reports_dropped_countries(
+        self, release_workbook, captured_warnings
+    ):
+        """A country dropped for an unparseable score is reported, not silently lost."""
+        _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert "carry no numeric" in "".join(captured_warnings)
+
+    def test_release_frame_upper_cases_iso3(self, tmp_path, make_release_workbook):
+        """A lower-case ISO3 in the sheet is stored upper-cased."""
+        workbook = make_release_workbook(tmp_path / "wb.xlsx", [("Kenya", "ken", 6.2)])
+        df = _helpers.inform_release_to_frame(
+            workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert df.iloc[0]["iso3"] == "KEN"
+
+    def test_both_channels_share_dtypes(self, release_workbook):
+        """An API frame and a workbook frame are comparable, not just similar."""
+        api = _helpers.inform_to_frame(
+            [{"Iso3": "KEN", "IndicatorId": "INFORM", "IndicatorScore": 5.8}],
+            workflow_id=503,
+        )
+        release = _helpers.inform_release_to_frame(
+            release_workbook, "INFORM RISK", indicator_id="INFORM"
+        )
+        assert api.dtypes.to_dict() == release.dtypes.to_dict()
+
     def test_release_frame_filters_country(self, release_workbook):
         """A country filter keeps the one matching row."""
         df = _helpers.inform_release_to_frame(

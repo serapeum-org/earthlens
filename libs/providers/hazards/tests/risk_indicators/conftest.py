@@ -51,11 +51,24 @@ def build_release_workbook(path: Path, rows: list[tuple[str, str, object]]) -> P
             "LACK OF COPING CAPACITY",
         ]
     )
+    # The published sheet puts a units legend directly under the header, so the
+    # stand-in carries one too - the parser has to drop it by row shape.
+    sheet.append(["(a-z)", "(a-z)", "(0-10)", "(0-10)", "(0-10)", "(0-10)"])
     for country, iso3, score in rows:
         sheet.append([country, iso3, score, score, score, score])
     book.create_sheet("About")
     book.save(path)
     return path
+
+
+@pytest.fixture
+def make_release_workbook():
+    """Return the stand-in release-workbook builder, for a test that needs its own.
+
+    Returns:
+        Callable: :func:`build_release_workbook`.
+    """
+    return build_release_workbook
 
 
 @pytest.fixture(scope="session")

@@ -26,12 +26,14 @@ from __future__ import annotations
 
 import re
 import time
+import warnings
 from pathlib import Path
 from typing import cast
 
 import geopandas as gpd
 import pandas as pd
 import requests
+from loguru import logger
 from pyramids.feature.collection import FeatureCollection
 
 from earthlens.base.http import HttpClient
@@ -65,6 +67,11 @@ INFORM_RELEASE_SHEET = re.compile(r"^INFORM Risk (\d{4})", re.IGNORECASE)
 
 #: The score sheet's header sits on the second row; the first is a banner.
 INFORM_RELEASE_HEADER_ROW = 1
+
+#: A data row's ISO3. The published sheet puts a units legend directly under the
+#: header (`(a-z)`, `(0-10)`, …), so rows are kept on this shape rather than on
+#: whether their score happens to parse as a number.
+INFORM_ISO3_SHAPE = re.compile(r"^[A-Za-z]{3}$")
 
 #: Leading bytes of any `.xlsx` (a zip container), so a login or error page
 #: saved under the workbook's name is rejected instead of parsed.
@@ -259,6 +266,33 @@ def inform_query(
     )
 
 
+def _inform_frame(columns: dict[str, object]) -> pd.DataFrame:
+    """Build an INFORM score table with the dtypes both channels share.
+
+    The API and the workbook produce the same columns from different raw shapes
+    (JSON scalars against spreadsheet cells), so the dtypes are pinned here -
+    otherwise the two channels return frames that compare and concatenate badly.
+
+    Args:
+        columns: Column name to values, as accepted by the `DataFrame`
+            constructor.
+
+    Returns:
+        pd.DataFrame: Columns :data:`INFORM_COLUMNS`, re-indexed from zero.
+    """
+    frame = pd.DataFrame(columns, columns=INFORM_COLUMNS).reset_index(drop=True)
+    return frame.astype(
+        {
+            "iso3": "string",
+            "indicator_id": "string",
+            "indicator_score": "Float64",
+            "validity_year": "Int64",
+            "workflow_id": "Int64",
+            "source": "string",
+        }
+    )
+
+
 def filter_iso3(frame: pd.DataFrame, country: str | None) -> pd.DataFrame:
     """Filter a score table to one ISO3, case- and whitespace-insensitively.
 
@@ -272,7 +306,9 @@ def filter_iso3(frame: pd.DataFrame, country: str | None) -> pd.DataFrame:
     if country is None:
         return frame.reset_index(drop=True)
     matches = frame["iso3"].astype("string").str.upper() == country.strip().upper()
-    return frame[matches.fillna(False)].reset_index(drop=True)
+    filtered = frame[matches.fillna(False)].reset_index(drop=True)
+    filtered.attrs = dict(frame.attrs)
+    return filtered
 
 
 def inform_release_url(
@@ -379,38 +415,59 @@ def inform_release_to_frame(
         ValueError: If no country sheet matches, or the sheet has no `column`.
         ImportError: If `openpyxl` is missing (pandas needs it to read xlsx).
     """
-    excel = pd.ExcelFile(workbook)
-    sheets = [
-        name for name in excel.sheet_names if INFORM_RELEASE_SHEET.match(name.strip())
-    ]
-    if not sheets:
-        raise ValueError(
-            f"No INFORM Risk score sheet in {Path(workbook).name}; sheets are "
-            f"{list(excel.sheet_names)}."
-        )
-    sheet = sheets[0]
-    if release_year is None:
-        matched = INFORM_RELEASE_SHEET.match(sheet.strip())
-        release_year = int(matched.group(1)) if matched else 0
-    frame = excel.parse(sheet, header=INFORM_RELEASE_HEADER_ROW)
+    with warnings.catch_warnings():
+        # openpyxl warns twice per read about drawing/conditional-formatting
+        # extensions it drops; neither touches the score cells.
+        warnings.simplefilter("ignore", UserWarning)
+        with pd.ExcelFile(workbook) as excel:
+            sheets = [
+                name
+                for name in excel.sheet_names
+                if INFORM_RELEASE_SHEET.match(name.strip())
+            ]
+            if not sheets:
+                raise ValueError(
+                    f"No INFORM Risk score sheet in {Path(workbook).name}; sheets "
+                    f"are {list(excel.sheet_names)}."
+                )
+            sheet = sheets[0]
+            frame = excel.parse(sheet, header=INFORM_RELEASE_HEADER_ROW)
+
+    matched = INFORM_RELEASE_SHEET.match(sheet.strip())
+    # The sheet is what was actually parsed, so its year wins over the caller's
+    # (which comes from the file name and can disagree with the contents).
+    year = int(matched.group(1)) if matched else (release_year or 0)
     frame.columns = [str(name).strip() for name in frame.columns]
     if column not in frame.columns or "ISO3" not in frame.columns:
         raise ValueError(
             f"Sheet {sheet!r} has no {column!r} / 'ISO3' column; found "
             f"{frame.columns.tolist()[:8]}..."
         )
-    scores = pd.DataFrame(
+    iso3 = frame["ISO3"].astype("string").str.strip().str.upper()
+    is_country = iso3.str.fullmatch(INFORM_ISO3_SHAPE.pattern).fillna(False)
+    scores = pd.to_numeric(frame[column], errors="coerce")
+    served = int(is_country.sum())
+    keep = is_country & scores.notna()
+    missing = served - int(keep.sum())
+    if missing:
+        logger.warning(
+            f"INFORM {year} release: {missing} of {served} countries carry no "
+            f"numeric {column!r} score and were dropped."
+        )
+    table = _inform_frame(
         {
-            "iso3": frame["ISO3"].astype("string").str.strip(),
+            "iso3": iso3[keep],
             "indicator_id": indicator_id,
-            "indicator_score": pd.to_numeric(frame[column], errors="coerce"),
-            "validity_year": release_year,
+            "indicator_score": scores[keep],
+            "validity_year": year,
             "workflow_id": pd.NA,
             "source": "release",
         }
     )
-    scores = scores[scores["iso3"].notna() & scores["indicator_score"].notna()]
-    return filter_iso3(scores, country)[INFORM_COLUMNS]
+    # The count of what the workbook served, before any country filter, so an
+    # empty result can be diagnosed the same way the API path is.
+    table.attrs["served_rows"] = served
+    return filter_iso3(table, country)
 
 
 def gfw_query(
@@ -593,7 +650,13 @@ def inform_to_frame(
         }
         for row in (payload or [])
     ]
-    frame = pd.DataFrame(records, columns=INFORM_COLUMNS)
+    frame = _inform_frame(
+        {name: [row[name] for row in records] for name in INFORM_COLUMNS}
+        if records
+        else dict.fromkeys(INFORM_COLUMNS, [])
+    )
+    frame["iso3"] = frame["iso3"].str.strip().str.upper()
+    frame.attrs["served_rows"] = len(frame)
     return filter_iso3(frame, country)
 
 

@@ -467,10 +467,11 @@ class RiskIndicators(AbstractDataSource):
             payload = _helpers.inform_query(
                 workflow_id, cast("str", dataset.indicator_id)
             )
-            self._upstream_rows = len(payload)
-            return _helpers.inform_to_frame(
+            frame = _helpers.inform_to_frame(
                 payload, country=country, workflow_id=workflow_id
             )
+            self._upstream_rows = frame.attrs.get("served_rows", len(payload))
+            return frame
         # provider == "gfw" — GFW keys on upper-case ISO3, so normalise the
         # country before interpolating it (the other two providers already
         # resolve / filter case-insensitively).
@@ -594,10 +595,11 @@ class RiskIndicators(AbstractDataSource):
             workbook,
             cast("str", self._dataset.release_column),
             indicator_id=cast("str", self._dataset.indicator_id),
+            country=country,
             release_year=year,
         )
-        self._upstream_rows = len(scores)
-        return _helpers.filter_iso3(scores, country)
+        self._upstream_rows = scores.attrs.get("served_rows", len(scores))
+        return scores
 
     @property
     def _resolved_workflow_id(self) -> int | None:
