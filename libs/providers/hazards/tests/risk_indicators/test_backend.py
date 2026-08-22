@@ -215,6 +215,15 @@ class TestRouting:
         ).download()
         assert fake_http.calls[0]["params"]["WorkflowId"] == 503
 
+    def test_inform_without_a_workflow_id_raises(
+        self, fake_http, monkeypatch, tmp_path
+    ):
+        """A row that resolves to no workflow says so instead of querying for one."""
+        b = _build(monkeypatch, variables=["inform:risk"], country="KEN", path=tmp_path)
+        b._dataset = b._dataset.model_copy(update={"workflow_id": None})
+        with pytest.raises(ValueError, match="resolves to no workflow id"):
+            b.download()
+
     def test_inform_frame_records_the_workflow(self, fake_http, monkeypatch, tmp_path):
         """The returned rows carry the workflow they were fetched with."""
         df = _build(
