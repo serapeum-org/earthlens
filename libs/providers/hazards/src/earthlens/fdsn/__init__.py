@@ -10,8 +10,10 @@ features (CRS `EPSG:4326`).
 
 This is the package's first `vector` backend: the result is a table of
 events, not a gridded array, so :data:`FDSN.OUTPUT_KIND` is
-`"vector"` and the :class:`earthlens.earthlens.EarthLens` facade
-rejects an `aggregate=` argument for it.
+`"vector"` and an `aggregate=` argument is refused — by the shared
+guard in :class:`earthlens.base.AbstractDataSource`, so a direct
+`FDSN(...).download(aggregate=...)` is rejected identically to one
+made through the :class:`earthlens.earthlens.EarthLens` facade.
 
 Provider selection: for this backend `variables` is a `list[str]` of
 network keys — `variables=["USGS"]`, `variables=["USGS", "EMSC"]` —
@@ -33,6 +35,9 @@ Public surface (re-exported from this package):
   FeatureCollection mapper and its empty-result counterpart.
 * :func:`resolve_earthscope_token` — optional EarthScope-token
   resolver (env / file); the public event services need no token.
+* :data:`SHAKEMAP_LAYERS` / :data:`DEFAULT_SHAKEMAP_LAYERS` — the
+  fourteen ShakeMap grids `with_shakemap=True` can write, and the
+  one written by default.
 * :data:`CATALOG_PATH` — path to the bundled provider YAML.
 
 Examples:
@@ -48,6 +53,10 @@ Examples:
 
 from __future__ import annotations
 
+from earthlens.fdsn._helpers import (
+    DEFAULT_SHAKEMAP_LAYERS,
+    SHAKEMAP_LAYERS,
+)
 from earthlens.fdsn.auth import resolve_earthscope_token
 from earthlens.fdsn.backend import FDSN
 from earthlens.fdsn.catalog import CATALOG_PATH, Catalog, Provider
@@ -55,6 +64,8 @@ from earthlens.fdsn.events import catalog_to_fc, empty_fc
 
 __all__ = [
     "CATALOG_PATH",
+    "DEFAULT_SHAKEMAP_LAYERS",
+    "SHAKEMAP_LAYERS",
     "Catalog",
     "FDSN",
     "Provider",

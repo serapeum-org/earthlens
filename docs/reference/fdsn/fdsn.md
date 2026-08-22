@@ -14,3 +14,5 @@ rendered API.
 ::: earthlens.fdsn.events
 
 ::: earthlens.fdsn.auth
+
+::: earthlens.fdsn.cli
