@@ -97,13 +97,18 @@ datasets:
   # INFORM workflow pin. The JRC Scores route stopped serving the INFORM2026
   # group on 2026-08-18: workflow 505 ("INFORM Risk 2026") answers 200 [] for
   # every indicator, as do 515 and 481, while the 2026 release itself is still
-  # published (INFORM_Risk_2026_v072.xlsx). The next four rows - inform:risk,
-  # hazard_exposure, vulnerability and coping_capacity - therefore pin 503
-  # ("INFORM Risk Mid 2025", published 2025-08-28), the newest workflow the API
-  # still serves, so their scores are one release behind the site until JRC
-  # restores 505. The fifth row, inform:climate_risk, reads a different model
-  # entirely - see its own note below. Pass workflow_id= to select another
-  # workflow per request.
+  # published (INFORM_Risk_2026_v072.xlsx). inform:risk, inform:hazard_exposure,
+  # inform:vulnerability and inform:coping_capacity therefore pin 503 ("INFORM
+  # Risk Mid 2025", published 2025-08-28), the newest workflow the API still
+  # serves, so their scores are one release behind the site. inform:climate_risk
+  # reads a different model - see its own note. Pass workflow_id= to select
+  # another workflow per request.
+  #
+  # To unwind this: re-probe /countries/Scores/?WorkflowId=505&IndicatorId=INFORM
+  # (JRC's own /workflows/Default still names 505, so that pointer is no signal).
+  # A non-empty answer means the 2026 group is back - repin these four rows and
+  # delete this note. test_inform_live asserts the workflow the rows came from,
+  # so it fails the moment a repin and this comment disagree.
   inform:risk:
     provider: inform
     output_kind: tabular
@@ -137,16 +142,17 @@ datasets:
     long_name: INFORM Lack of Coping Capacity dimension
     citation: "INFORM Risk Index, European Commission Joint Research Centre (JRC), Disaster Risk Management Knowledge Centre — https://drmkc.jrc.ec.europa.eu/inform-index."
   # Climate Change is a separate model, not part of the Risk release above.
-  # This row used to pin 435 ("INFORM Climate Change Risk SSP5 2050"), which has
-  # FlagDataSaved: null and answers 200 [] for every indicator - it never held
-  # scores, so the row never returned a row. Of the six Climate Change workflows
-  # only 451 serves: INFORM/HA/VU/CC all return 191 countries (KEN 4.8/3.1/6.0/
-  # 5.9, verified 2026-08-22). It models the "optimistic" RCP4.5-SSP1 pathway at
-  # 2050, one of the two scenarios INFORM publishes; the pessimistic RCP8.5-SSP3
-  # runs (449 at 2050, 452 at 2080) and the constant-population variant (466)
-  # are saved upstream but serve no scores, so they get no catalog row. The
-  # long_name states the scenario rather than inheriting the old SSP5 label,
-  # which named a pathway INFORM does not publish.
+  # This row used to pin 435, whose upstream name is "INFORM Climate Change Risk
+  # SSP5 2050"; it has FlagDataSaved: null and answers 200 [] for every
+  # indicator, so the row never returned anything. Six Climate Change workflows
+  # exist and only 451 serves scores (INFORM/HA/VU/CC, 191 countries each, KEN
+  # 4.8/3.1/6.0/5.9, verified 2026-08-22). The other five are empty: 435, the
+  # 2020 baseline (447), the pessimistic RCP8.5-SSP3 runs at 2050 (449) and 2080
+  # (452), and the constant-population variant (466) - so none of them gets a
+  # catalog row. 451 is the "optimistic" RCP4.5-SSP1 pathway at 2050, one of the
+  # two scenarios INFORM publishes on its Climate Change results page, and the
+  # long_name now names that scenario: the old label described 435's SSP5 run,
+  # which is not one of the two published pathways.
   inform:climate_risk:
     provider: inform
     output_kind: tabular

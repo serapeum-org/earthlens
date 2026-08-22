@@ -47,7 +47,7 @@ the mnemonic (`VLO` / `LOW` / `MED` / `HIG`) and `level_title` the word.
 ```python
 df = EarthLens(
     data_source="inform",
-    variables=["inform:risk"],     # or hazard_exposure / vulnerability / coping_capacity / climate_risk
+    variables=["inform:risk"],     # or hazard_exposure / vulnerability / coping_capacity
     country="KEN",
 ).download()
 # columns: iso3, indicator_id, indicator_score, validity_year, workflow_id
@@ -57,11 +57,12 @@ Omitting `country=` returns the score for **every** country in one frame.
 
 ### Which release you get
 
-Each INFORM dataset reads one *workflow* — an INFORM model release. The catalog
-currently pins workflow `503` ("INFORM Risk Mid 2025"), because the 2026
-workflows stopped serving scores on 2026-08-18, so the values are one release
-behind the JRC site until that is restored. Pass `workflow_id=` to read a
-different release (the INFORM API's `/workflows` lists every id):
+Each INFORM dataset reads one *workflow* — an INFORM model release. The four
+Risk datasets currently pin workflow `503` ("INFORM Risk Mid 2025"), because the
+2026 workflows stopped serving scores on 2026-08-18, so their values are one
+release behind the JRC site until that is restored; `inform:climate_risk` pins
+`451` and is unaffected. Pass `workflow_id=` to read a different release (the
+INFORM API's `/workflows` lists every id):
 
 ```python
 df = EarthLens(
@@ -79,9 +80,9 @@ nothing, the empty result is logged with that id and this override, rather than
 as an unexplained empty table.
 
 `inform:climate_risk` reads a different model — INFORM's Climate Change
-projection for 2050 under the optimistic RCP4.5-SSP1 pathway — so its scores are
-not comparable with the four Risk datasets above. See the
-[dataset list](datasets.md).
+projection for 2050 under the optimistic RCP4.5-SSP1 pathway (workflow `451`) —
+so it is not a drop-in swap for the four Risk datasets above and its scores are
+not comparable with theirs. See the [dataset list](datasets.md).
 
 ## Global Forest Watch (needs a key)
 
