@@ -74,10 +74,48 @@ class RiskIndicators(AbstractDataSource):
     ThinkHazard / INFORM need no credentials. `aggregate=` is rejected — these
     are pre-computed indices, not gridded rasters (`G8`).
 
+    An INFORM row reads one model release, identified upstream by a WorkflowId.
+    The catalog pins one per dataset; `workflow_id=` overrides that pin for a
+    single request, which is the way out when a pinned release stops serving
+    scores (JRC has withdrawn one mid-cycle before) or when an older release is
+    wanted deliberately.
+
     Attributes:
         OUTPUT_KIND: Set **per instance** in :meth:`__init__` from the resolved
             dataset's `output_kind` (`"tabular"` or `"vector"`). The facade
             reads it to gate `aggregate=` and to know the return shape.
+
+    Examples:
+        - Resolve an INFORM dataset and read the shape it will return:
+            ```python
+            >>> from earthlens.risk_indicators import RiskIndicators
+            >>> backend = RiskIndicators(variables=["inform:risk"], country="KEN")
+            >>> backend.OUTPUT_KIND
+            'tabular'
+            >>> backend.vars
+            ['inform:risk']
+
+            ```
+        - A GFW geometry dataset resolves to the vector shape instead:
+            ```python
+            >>> from earthlens.risk_indicators import RiskIndicators
+            >>> backend = RiskIndicators(
+            ...     variables=["gfw:admin_boundary"], country="KEN", api_key="k"
+            ... )
+            >>> backend.OUTPUT_KIND
+            'vector'
+
+            ```
+        - A workflow id that is not an integer is refused before it reaches the
+          query string, where INFORM would answer 200 with an empty body:
+            ```python
+            >>> from earthlens.risk_indicators import RiskIndicators
+            >>> RiskIndicators(variables=["inform:risk"], country="KEN", workflow_id="503")
+            Traceback (most recent call last):
+                ...
+            ValueError: workflow_id must be an INFORM WorkflowId integer, got '503'.
+
+            ```
     """
 
     OUTPUT_KIND: OutputKind = "tabular"
