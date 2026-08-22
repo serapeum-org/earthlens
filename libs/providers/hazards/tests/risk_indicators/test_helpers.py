@@ -299,7 +299,9 @@ class TestInformToFrame:
 
     def test_filter_to_country(self):
         """Filtering to KEN keeps a single row with its score."""
-        df = _helpers.inform_to_frame(_load("inform_scores_wf505_2026.json"), country="KEN")
+        df = _helpers.inform_to_frame(
+            _load("inform_scores_wf505_2026.json"), country="KEN"
+        )
         assert list(df.columns) == _helpers.INFORM_COLUMNS
         assert len(df) == 1 and df.iloc[0]["iso3"] == "KEN"
 

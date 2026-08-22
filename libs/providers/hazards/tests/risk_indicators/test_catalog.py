@@ -142,7 +142,7 @@ class TestDatasetValidator:
     def test_non_gfw_provider_must_be_tabular(self, provider):
         """A thinkhazard / inform row declared as vector is rejected."""
         kwargs = (
-            {"workflow_id": 505, "indicator_id": "INFORM"}
+            {"workflow_id": 503, "indicator_id": "INFORM"}
             if provider == "inform"
             else {}
         )
@@ -207,7 +207,7 @@ class TestCacheControl:
         path = _write_yaml(
             tmp_path,
             "datasets:\n  inform:risk:\n    provider: inform\n    "
-            "output_kind: tabular\n    workflow_id: 505\n    indicator_id: INFORM\n",
+            "output_kind: tabular\n    workflow_id: 503\n    indicator_id: INFORM\n",
         )
         first = Catalog.load(path)
         assert "inform:risk" in first.datasets
