@@ -19,6 +19,7 @@ import json
 import os
 
 import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
+from _common import activate
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -29,14 +30,6 @@ COLLECTION = "COPERNICUS/S2_SR_HARMONIZED"
 MIXED = ["B4", "B11", "B1"]
 AOI = (7.60, 45.93, 7.72, 46.02)
 WINDOW = ("2024-07-01", "2024-07-31")
-
-
-def _activate() -> None:
-    """Point GDAL's EEDA auth at the service-account key."""
-    with open(KEY, encoding="utf-8") as fh:
-        info = json.load(fh)
-    gdal.SetConfigOption("EEDA_PRIVATE_KEY", info["private_key"])
-    gdal.SetConfigOption("EEDA_CLIENT_EMAIL", info["client_email"])
 
 
 def _first_scene() -> str | None:
@@ -121,7 +114,7 @@ def _report(label: str, connection: str, bands: list[str] | None) -> None:
 
 def main() -> None:
     """Discover an S2 scene and record how EEDAI presents its mixed bands."""
-    _activate()
+    activate()
     print(
         f"discovering a scene from {COLLECTION} over {AOI} in {WINDOW[0]}..{WINDOW[1]}"
     )

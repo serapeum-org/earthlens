@@ -19,7 +19,6 @@ fault is gone, only that it did not appear here.
 
 from __future__ import annotations
 
-import json
 import os
 import sys
 import time
@@ -27,6 +26,7 @@ from collections import deque
 
 import numpy as np
 import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
+from _common import BLOCK, activate, blockwise, judge, open_eedai
 from osgeo import gdal
 
 gdal.UseExceptions()
@@ -34,7 +34,6 @@ gdal.UseExceptions()
 KEY = os.environ["GEE_SERVICE_KEY"]
 ASSET, BAND, LON, LAT = "USGS/SRTMGL1_003", "elevation", 86.925, 27.988
 BOUNDS, FILL = (-500.0, 9000.0), (-32768.0, -32767.0)
-BLOCK = 256
 SIDE = 1024
 LEVELS = (0, 1, 2)
 ROUNDS = int(sys.argv[1]) if len(sys.argv) > 1 else 25
@@ -45,57 +44,6 @@ _LOG: deque[str] = deque(maxlen=400)
 def _collect(err_class, err_no, msg):  # noqa: ARG001 - GDAL's handler signature
     """Keep a rolling window of GDAL debug and error lines."""
     _LOG.append(f"[{err_class}/{err_no}] {msg}")
-
-
-def _activate() -> None:
-    """Point GDAL's EEDA auth at the service-account key."""
-    with open(KEY, encoding="utf-8") as fh:
-        info = json.load(fh)
-    gdal.SetConfigOption("EEDA_PRIVATE_KEY", info["private_key"])
-    gdal.SetConfigOption("EEDA_CLIENT_EMAIL", info["client_email"])
-
-
-def _open():
-    """Open the probe asset exactly as pyramids-eo does."""
-    return gdal.OpenEx(
-        f"EEDAI:{ASSET}",
-        gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR,
-        open_options=[f"BLOCK_SIZE={BLOCK}", f"BANDS={BAND}"],
-    )
-
-
-def _blockwise(band, x0: int, y0: int, w: int, h: int) -> np.ndarray:
-    """Read a window one block at a time."""
-    out = np.full((h, w), np.nan, dtype="float64")
-    for by in range(y0 // BLOCK * BLOCK, y0 + h, BLOCK):
-        for bx in range(x0 // BLOCK * BLOCK, x0 + w, BLOCK):
-            rx0, ry0 = max(bx, x0), max(by, y0)
-            rx1, ry1 = min(bx + BLOCK, x0 + w), min(by + BLOCK, y0 + h)
-            if rx1 <= rx0 or ry1 <= ry0:
-                continue
-            out[ry0 - y0 : ry1 - y0, rx0 - x0 : rx1 - x0] = band.ReadAsArray(
-                rx0, ry0, rx1 - rx0, ry1 - ry0
-            )
-    return out
-
-
-def _judge(arr: np.ndarray) -> tuple[bool, str]:
-    """Judge a read on fill-masked bounds and on degeneracy."""
-    observed = arr.astype("float64").copy()
-    for sentinel in FILL:
-        observed[observed == sentinel] = np.nan
-    observed = observed[np.isfinite(observed)]
-    if observed.size == 0:
-        return False, "no observed pixels"
-    outside = int(((observed < BOUNDS[0]) | (observed > BOUNDS[1])).sum())
-    if outside:
-        return False, (
-            f"{outside} px outside {BOUNDS} "
-            f"(observed [{observed.min():.0f},{observed.max():.0f}])"
-        )
-    if float(observed.std()) < 1e-6:
-        return False, "degenerate"
-    return True, f"[{observed.min():.0f},{observed.max():.0f}]"
 
 
 def _ov_window(ds, level: int, x0: int, y0: int):
@@ -113,11 +61,11 @@ def _ov_window(ds, level: int, x0: int, y0: int):
 
 def main() -> None:
     """Hammer the overview read with the transport logged, and dump on failure."""
-    _activate()
+    activate()
     gdal.SetConfigOption("CPL_DEBUG", "ON")
     gdal.PushErrorHandler(_collect)
 
-    base = _open()
+    base = open_eedai(ASSET, bands=[BAND])
     gt = base.GetGeoTransform()
     px, py = int((LON - gt[0]) / gt[1]), int((LAT - gt[3]) / gt[5])
     x0 = (px - SIDE // 2) // BLOCK * BLOCK
@@ -129,11 +77,11 @@ def main() -> None:
 
     references: dict[int, np.ndarray] = {}
     for level in LEVELS:
-        ds = _open()
+        ds = open_eedai(ASSET, bands=[BAND])
         ov, ox0, oy0, ow, oh = _ov_window(ds, level, x0, y0)
         try:
-            references[level] = _blockwise(ov, ox0, oy0, ow, oh)
-            ok, detail = _judge(references[level])
+            references[level] = blockwise(ov, ox0, oy0, ow, oh)
+            ok, detail = judge(references[level], BOUNDS, FILL)
             print(f"  reference ov[{level}]: {'ok ' if ok else 'BAD'} {detail}")
         except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
             print(
@@ -147,9 +95,9 @@ def main() -> None:
         for level in LEVELS:
             _LOG.clear()
             try:
-                ds = _open()
+                ds = open_eedai(ASSET, bands=[BAND])
                 ov, ox0, oy0, ow, oh = _ov_window(ds, level, x0, y0)
-                arr = _blockwise(ov, ox0, oy0, ow, oh)
+                arr = blockwise(ov, ox0, oy0, ow, oh)
             except Exception as exc:  # noqa: BLE001
                 caught += 1
                 marks.append(f"L{level}:{type(exc).__name__[:9]}")
@@ -160,7 +108,7 @@ def main() -> None:
                 for line in list(_LOG)[-25:]:
                     print(f"    {line[:150]}")
                 continue
-            ok, detail = _judge(arr)
+            ok, detail = judge(arr, BOUNDS, FILL)
             ref = references.get(level)
             stable = ref is None or bool(
                 np.allclose(np.nan_to_num(arr), np.nan_to_num(ref), rtol=0, atol=1e-6)

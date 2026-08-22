@@ -14,18 +14,17 @@ are offered only to Byte bands, where the driver documents them as valid.
 
 from __future__ import annotations
 
-import json
 import os
 import time
 
 import numpy as np
 import pyramids as _pyramids_bootstrap  # noqa: F401  (activates the bundled osgeo)
+from _common import BLOCK, activate, open_eedai
 from osgeo import gdal
 
 gdal.UseExceptions()
 
 KEY = os.environ["GEE_SERVICE_KEY"]
-BLOCK = 512  # A2: correct at every size tested, and far cheaper than the pinned 256
 SIDE = 1024
 REPEATS = 2
 
@@ -36,26 +35,6 @@ CANDIDATES = [
     ("JRC/GSW1_4/GlobalSurfaceWater", None, 31.23, 30.05),
 ]
 BYTE_TYPES = {"Byte", "Int8"}
-
-
-def _activate() -> None:
-    """Point GDAL's EEDA auth at the service-account key."""
-    with open(KEY, encoding="utf-8") as fh:
-        info = json.load(fh)
-    gdal.SetConfigOption("EEDA_PRIVATE_KEY", info["private_key"])
-    gdal.SetConfigOption("EEDA_CLIENT_EMAIL", info["client_email"])
-
-
-def _open(asset: str, bands: list[str] | None, encoding: str | None):
-    """Open an asset, optionally pinning bands and pixel encoding."""
-    opts = [f"BLOCK_SIZE={BLOCK}"]
-    if bands:
-        opts.append("BANDS=" + ",".join(bands))
-    if encoding:
-        opts.append(f"PIXEL_ENCODING={encoding}")
-    return gdal.OpenEx(
-        f"EEDAI:{asset}", gdal.OF_RASTER | gdal.OF_VERBOSE_ERROR, open_options=opts
-    )
 
 
 def _read(ds, x0: int, y0: int, side: int) -> np.ndarray:
@@ -83,12 +62,12 @@ def _window(ds, lon: float, lat: float) -> tuple[int, int]:
 
 def main() -> None:
     """Profile each asset under every encoding its dtype allows."""
-    _activate()
+    activate()
     print("probing candidates for dtype and band count...\n")
     profiles = []
     for asset, bands, lon, lat in CANDIDATES:
         try:
-            ds = _open(asset, bands, None)
+            ds = open_eedai(asset, bands=bands, block=BLOCK)
         except Exception as exc:  # noqa: BLE001 - the probe reports, it does not recover
             print(f"  {asset:42s} UNAVAILABLE: {type(exc).__name__}")
             continue
@@ -106,7 +85,7 @@ def main() -> None:
         print(
             f"\n{'=' * 76}\n{asset}   bands={count}  dtypes={sorted(types)}\n{'=' * 76}"
         )
-        ds0 = _open(asset, bands, "NPY")
+        ds0 = open_eedai(asset, bands=bands, block=BLOCK, encoding="NPY")
         x0, y0 = _window(ds0, lon, lat)
         reference = None
         print(f"  {'encoding':>14} {'best secs':>10} {'pixels':>34}")
@@ -116,7 +95,7 @@ def main() -> None:
             failure = None
             for _ in range(REPEATS):
                 try:
-                    ds = _open(asset, bands, enc)
+                    ds = open_eedai(asset, bands=bands, block=BLOCK, encoding=enc)
                     started = time.time()
                     arr = _read(ds, x0, y0, SIDE)
                     times.append(time.time() - started)

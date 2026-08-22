@@ -25,23 +25,38 @@ Measurements below were taken on GDAL 3.13.1, 2026-08-22.
 
 ## The A1 sequence - why there are eight of them
 
-`probe_a1_*.py` are kept in order because each one refuted the hypothesis the previous one raised, and the
-refutations are the result. Read them as a chain, not as alternatives:
+`probe_a1_chain.py` holds the eight passes as one function apiece, in order,
+because each refuted the hypothesis the previous one raised and the refutations
+*are* the result. Run the whole chain, or one pass:
 
-| Probe | Hypothesis under test | Outcome |
-|-------|----------------------|---------|
-| `probe_a1_overviews.py` | Are overviews corrupt at all? | Inconclusive - the window centred on the asset grid, which for a global DEM is ocean nodata, so every correlation was degenerate. |
-| `probe_a1_v2.py` | Same, over land with nodata masked | Levels 0-2 returned impossible elevations; levels 3-7 matched a native downsample exactly. |
-| `probe_a1_v3.py` | Multi-block reads break on overviews, as they do natively | **Refuted** - block-by-block reads were equally corrupt. |
-| `probe_a1_v4.py` | `PIXEL_ENCODING=AUTO` mangles Int16 through a byte-only codec | **Refuted** - `AUTO`, `NPY` and `GEO_TIFF` were all exact. |
-| `probe_a1_v5.py` | A prior native read poisons the handle's overview state | **Refuted** - cold and warm handles agreed. |
-| `probe_a1_v6.py` | Is the corruption intermittent? | Probe defect: the native leg built the `Dataset` inside a lambda, so GDAL collected it before the band was read. Its native column is not a result. |
-| `probe_a1_v7.py` | Same, with the lifetime bug fixed | Native stable; overviews unaffected by any preceding read. |
-| `probe_a1_v8_soak.py` | Does sustained load provoke it? | **Refuted** - 90 reads over 7 minutes, all clean. |
+```bash
+python tools/gee/eedai_probes/probe_a1_chain.py        # every pass
+python tools/gee/eedai_probes/probe_a1_chain.py v4     # one pass
+```
 
-`probe_a5_native_soak.py` and `probe_a5_endtoend.py` then asked the question that mattered for production - whether
-the same fault reaches the native path earthlens ships - across several assets, regions and window sizes, and
-through `from_earthengine` itself. 96 reads, zero anomalies.
+| Pass | Hypothesis under test | Outcome |
+|------|----------------------|---------|
+| `v1` | Are overviews corrupt at all? | Inconclusive - the window centred on the asset grid, which for a global DEM is ocean nodata, so every correlation was degenerate. |
+| `v2` | Same, over land with the fill masked | Levels 0-2 returned impossible elevations; levels 3-7 matched a native downsample exactly. |
+| `v3` | Multi-block reads break on overviews, as they do natively | **Refuted** - block-by-block reads were equally corrupt. |
+| `v4` | `PIXEL_ENCODING=AUTO` mangles Int16 through a byte-only codec | **Refuted** - `AUTO`, `NPY` and `GEO_TIFF` were all exact. |
+| `v5` | A prior native read poisons the handle's overview state | **Refuted** - cold and warm handles agreed. |
+| `v6` | Is the corruption intermittent? | A probe defect: the native leg built its `Dataset` inside a lambda, so GDAL collected it before the band was read. Kept as a warning, not a result. |
+| `v7` | Same, with the lifetime defect fixed | Native stable; overviews unaffected by any preceding read. |
+| `v8` | Does sustained load provoke it? | **Refuted** - repeated reads stayed clean. |
+
+`probe_a5_native_soak.py` and `probe_a5_endtoend.py` then asked the question that
+mattered for production - whether the same fault reaches the native path earthlens
+ships - across several assets, regions and window sizes, and through
+`from_earthengine` itself. 96 reads, zero anomalies.
+
+## Shared mechanics
+
+`_common.py` holds what every probe needs and none of them is testing: auth, an
+asset opened the way pyramids-eo opens it, a block-by-block window read, and the
+oracle. Each probe is then only the question it asks. Anything a probe *is*
+testing stays in that probe - which is why the A1 chain keeps its own window
+arithmetic and read calls.
 
 ## Writing another one
 

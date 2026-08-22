@@ -24,6 +24,7 @@ import os
 import time
 
 import numpy as np
+from _common import judge
 from pyramids_eo.earthengine import from_earthengine
 
 KEY = os.environ["GEE_SERVICE_KEY"]
@@ -59,27 +60,6 @@ CASES = [
 ]
 
 
-def _check(
-    arr: np.ndarray, bounds: tuple[float, float], fill: tuple[float, ...]
-) -> tuple[bool, str]:
-    """Judge one read on fill-masked bounds, degeneracy and finiteness."""
-    observed = arr.astype("float64").copy()
-    for sentinel in fill:
-        observed[observed == sentinel] = np.nan
-    observed = observed[np.isfinite(observed)]
-    if observed.size == 0:
-        return False, "no observed pixels once the fill was masked"
-    outside = int(((observed < bounds[0]) | (observed > bounds[1])).sum())
-    if outside:
-        return False, f"{outside} px outside {bounds}"
-    if float(observed.std()) < 1e-6:
-        return False, f"degenerate - every observed pixel is {observed.flat[0]:.1f}"
-    return True, (
-        f"range=[{observed.min():.0f},{observed.max():.0f}] "
-        f"std={observed.std():.1f} shape={arr.shape}"
-    )
-
-
 def main() -> None:
     """Call the shipped reader repeatedly and compare every result."""
     print(f"from_earthengine end-to-end, {REPEATS} repeats per case\n")
@@ -101,7 +81,7 @@ def main() -> None:
                 )
                 print(f"    try{attempt}: RAISED {type(exc).__name__}: {str(exc)[:70]}")
                 continue
-            good, detail = _check(arr, bounds, fill)
+            good, detail = judge(arr, bounds, fill)
             if reference is None:
                 reference = arr
                 stable = True
