@@ -301,6 +301,17 @@ class _TextResponse:
         self.text = text
 
 
+def _write_stub_workbook(self, url, dest, **kwargs):
+    """Stand in for `HttpClient.download`, writing a zip-shaped stub."""
+    Path(dest).write_bytes(b"PK\x03\x04 stand-in")
+    return Path(dest)
+
+
+def _explode_download(self, *args, **kwargs):
+    """Stand in for `HttpClient.download` where no download should happen."""
+    raise AssertionError("the cached workbook should not be re-downloaded")
+
+
 class TestInformToFrame:
     """inform_to_frame renames columns and filters by country."""
 
@@ -409,30 +420,33 @@ class TestInformRelease:
 
     def test_download_reuses_a_cached_workbook(self, monkeypatch, release_workbook):
         """An already-downloaded workbook is reused instead of re-fetched."""
-
-        def _explode(self, *args, **kwargs):
-            raise AssertionError("the cached workbook should not be re-downloaded")
-
-        monkeypatch.setattr(_helpers.HttpClient, "download", _explode)
+        monkeypatch.setattr(_helpers.HttpClient, "download", _explode_download)
         assert (
             _helpers.inform_download_release("https://x/wb.xlsx", release_workbook)
             == release_workbook
         )
 
     def test_download_fetches_on_a_cache_miss(self, monkeypatch, tmp_path):
-        """A missing workbook is streamed, and only a real xlsx is accepted."""
+        """A missing workbook is streamed, with the xlsx magic bytes demanded."""
         seen: dict[str, object] = {}
-
-        def _record(self, url, dest, **kwargs):
-            seen.update(url=url, dest=Path(dest), magic=kwargs.get("expect_magic"))
-            Path(dest).write_bytes(b"PK\x03\x04 stand-in")
-            return Path(dest)
-
-        monkeypatch.setattr(_helpers.HttpClient, "download", _record)
+        monkeypatch.setattr(
+            _helpers.HttpClient,
+            "download",
+            lambda self, url, dest, **kwargs: (
+                seen.update(
+                    url=url, staged=Path(dest), magic=kwargs.get("expect_magic")
+                ),
+                _write_stub_workbook(self, url, dest, **kwargs),
+            )[1],
+        )
         target = tmp_path / "INFORM_Risk_2026_v072.xlsx"
         assert _helpers.inform_download_release("https://x/wb.xlsx", target) == target
         assert seen["url"] == "https://x/wb.xlsx"
+        # The stream lands on a per-process temp and is moved into place, so two
+        # runs sharing a cache cannot write the same file.
+        assert seen["staged"] != target
         assert seen["magic"] == _helpers.XLSX_MAGIC
+        assert not list(target.parent.glob("*.part"))
 
     def test_release_frame_without_a_score_sheet_raises(self, tmp_path):
         """A workbook with no year-named sheet is reported with what it does have."""
@@ -444,6 +458,68 @@ class TestInformRelease:
         book.save(path)
         with pytest.raises(ValueError, match="No INFORM Risk score sheet"):
             _helpers.inform_release_to_frame(path, "INFORM RISK", indicator_id="INFORM")
+
+    def test_release_url_is_scraped_once_per_process(self, monkeypatch):
+        """Four datasets in one run read the results page once, not four times."""
+        calls: list[str] = []
+
+        def _count(self, url, **kwargs):
+            calls.append(url)
+            return _TextResponse(
+                '<a href="/inform-index/Portals/0/InfoRM/2026/INFORM_Risk_2026_v072.xlsx">x</a>'
+            )
+
+        monkeypatch.setattr(_helpers.HttpClient, "get", _count)
+        first = _helpers.inform_release_url()
+        second = _helpers.inform_release_url()
+        assert first == second
+        assert len(calls) == 1
+
+    def test_release_url_ignores_an_implausible_year(self, monkeypatch):
+        """A malformed year cannot win the newest-release comparison."""
+        html = (
+            '<a href="/inform-index/Portals/0/InfoRM/2026/INFORM_Risk_2026_v072.xlsx">a</a>'
+            '<a href="/inform-index/Portals/0/InfoRM/9999/INFORM_Risk_9999_v001.xlsx">b</a>'
+        )
+        monkeypatch.setattr(
+            _helpers.HttpClient, "get", lambda self, url, **kwargs: _TextResponse(html)
+        )
+        url, year = _helpers.inform_release_url()
+        assert year == 2026
+        assert url.endswith("INFORM_Risk_2026_v072.xlsx")
+
+    def test_release_url_rejects_an_off_site_link(self, monkeypatch):
+        """A workbook link pointing elsewhere is refused rather than downloaded."""
+        html = '<a href="https://example.invalid/INFORM_Risk_2026_v072.xlsx">x</a>'
+        monkeypatch.setattr(
+            _helpers.HttpClient, "get", lambda self, url, **kwargs: _TextResponse(html)
+        )
+        with pytest.raises(ValueError, match="points off the INFORM site"):
+            _helpers.inform_release_url()
+
+    def test_release_url_accepts_single_quotes(self, monkeypatch):
+        """The link pattern does not depend on the page quoting style."""
+        html = "<a href='/inform-index/Portals/0/InfoRM/2026/INFORM_Risk_2026_v072.xlsx'>x</a>"
+        monkeypatch.setattr(
+            _helpers.HttpClient, "get", lambda self, url, **kwargs: _TextResponse(html)
+        )
+        url, _year = _helpers.inform_release_url()
+        assert url.endswith("INFORM_Risk_2026_v072.xlsx")
+
+    def test_download_replaces_a_corrupt_cached_file(self, monkeypatch, tmp_path):
+        """A truncated or non-xlsx cached file is re-downloaded, not parsed."""
+        target = tmp_path / "INFORM_Risk_2026_v072.xlsx"
+        target.write_bytes(b"<html>login</html>")
+        monkeypatch.setattr(_helpers.HttpClient, "download", _write_stub_workbook)
+        assert _helpers.inform_download_release("https://x/wb.xlsx", target) == target
+        assert _helpers.is_xlsx(target)
+
+    def test_is_xlsx_reports_a_missing_or_wrong_file(self, tmp_path):
+        """The cache check answers for a missing file and a non-zip alike."""
+        assert _helpers.is_xlsx(tmp_path / "absent.xlsx") is False
+        wrong = tmp_path / "wrong.xlsx"
+        wrong.write_bytes(b"not a zip")
+        assert _helpers.is_xlsx(wrong) is False
 
     def test_release_frame_shapes_the_scores(self, release_workbook):
         """A parsed workbook carries the canonical columns and the release year."""

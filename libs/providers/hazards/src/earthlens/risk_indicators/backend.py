@@ -584,9 +584,13 @@ class RiskIndicators(AbstractDataSource):
                 has no matching sheet / column.
         """
         url, year = _helpers.inform_release_url()
-        workbook = _helpers.inform_download_release(
-            url, self._cache_root / url.rsplit("/", 1)[-1]
-        )
+        target = self._cache_root / url.rsplit("/", 1)[-1]
+        if not _helpers.is_xlsx(target):
+            logger.info(
+                f"RiskIndicators {self._dataset.id}: downloading the INFORM {year} "
+                f"release workbook to {target} (a few MB, cached for reuse)."
+            )
+        workbook = _helpers.inform_download_release(url, target)
         logger.info(
             f"RiskIndicators {self._dataset.id}: reading the INFORM {year} "
             f"release workbook ({workbook.name})."

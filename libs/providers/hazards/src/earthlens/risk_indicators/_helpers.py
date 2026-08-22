@@ -24,11 +24,13 @@ the A1 gate captures).
 
 from __future__ import annotations
 
+import os
 import re
 import time
 import warnings
 from pathlib import Path
 from typing import cast
+from urllib.parse import urljoin, urlsplit
 
 import geopandas as gpd
 import pandas as pd
@@ -59,8 +61,13 @@ INFORM_RESULTS_PAGE = f"{INFORM_SITE}/inform-index/INFORM-Risk/Results-and-data"
 #: can be picked when the page lists more than one (`INFORM_Risk_2026_v072.xlsx`).
 #: The trend workbook on the same page has a different stem and does not match.
 INFORM_RELEASE_LINK = re.compile(
-    r'href="([^"]*?INFORM_Risk_(\d{4})_v(\d+)\.xlsx)"', re.IGNORECASE
+    r"""href=["']([^"']*?INFORM_Risk_(\d{4})_v(\d+)\.xlsx[^"']*)["']""",
+    re.IGNORECASE,
 )
+
+#: Release years outside this range are ignored, so a stray or malformed link
+#: cannot win the "newest" comparison against a real release.
+INFORM_RELEASE_YEARS = range(2010, 2100)
 
 #: Sheet holding the country scores; its name carries the release year.
 INFORM_RELEASE_SHEET = re.compile(r"^INFORM Risk (\d{4})", re.IGNORECASE)
@@ -117,6 +124,28 @@ _TRANSIENT_ERRORS: tuple[type[requests.RequestException], ...] = (
 )
 
 
+def _client(timeout: float) -> HttpClient:
+    """Build the retrying HTTP client every request in this module shares.
+
+    Args:
+        timeout: Per-request timeout in seconds.
+
+    Returns:
+        HttpClient: Configured to retry 5xx and transient transport errors with
+            exponential back-off, and to raise on a 4xx.
+    """
+    return HttpClient(
+        user_agent=_USER_AGENT,
+        timeout=timeout,
+        max_retries=_HTTP_RETRIES,
+        backoff_factor=_HTTP_RETRY_BACKOFF,
+        status_forcelist=tuple(range(500, 600)),
+        retry_on_exceptions=_TRANSIENT_ERRORS,
+        raise_for_status=True,
+        sleep=lambda seconds: time.sleep(seconds),
+    )
+
+
 def _request_json(
     url: str,
     *,
@@ -145,16 +174,7 @@ def _request_json(
         requests.RequestException: When the GET still fails after the retries
             (the last error is re-raised; a 4xx fails fast without retrying).
     """
-    client = HttpClient(
-        user_agent=_USER_AGENT,
-        timeout=timeout,
-        max_retries=_HTTP_RETRIES,
-        backoff_factor=_HTTP_RETRY_BACKOFF,
-        status_forcelist=tuple(range(500, 600)),
-        retry_on_exceptions=_TRANSIENT_ERRORS,
-        raise_for_status=True,
-        sleep=lambda seconds: time.sleep(seconds),
-    )
+    client = _client(timeout)
     return cast("dict | list", client.get_json(url, params=params, headers=headers))
 
 
@@ -311,10 +331,25 @@ def filter_iso3(frame: pd.DataFrame, country: str | None) -> pd.DataFrame:
     return filtered
 
 
+#: Discovered release per results page, so four datasets in one process scrape
+#: the page once - the JRC host drops connections under rapid repeat requests.
+_RELEASE_CACHE: dict[str, tuple[str, int]] = {}
+
+
+def clear_release_cache() -> None:
+    """Forget the discovered release URLs, so the next call re-reads the page."""
+    _RELEASE_CACHE.clear()
+
+
 def inform_release_url(
     *, page: str = INFORM_RESULTS_PAGE, timeout: float = _HTTP_TIMEOUT
 ) -> tuple[str, int]:
     """Find the newest INFORM Risk release workbook published on the JRC site.
+
+    The answer is memoised per page for the life of the process
+    (:func:`clear_release_cache` forgets it): a run pulling all four Risk
+    datasets would otherwise hit the results page four times, and the host drops
+    connections under rapid repeat requests.
 
     Args:
         page: The results page to read (overridable for tests).
@@ -324,29 +359,31 @@ def inform_release_url(
         tuple[str, int]: The absolute workbook URL and its release year.
 
     Raises:
-        ValueError: If the page carries no release-workbook link, which means
-            the page layout changed and the pattern needs revisiting.
+        ValueError: If the page carries no plausible release-workbook link,
+            which means the page layout changed and the pattern needs
+            revisiting, or if a link points off the INFORM site.
         requests.RequestException: If the page cannot be fetched.
     """
-    client = HttpClient(
-        user_agent=_USER_AGENT,
-        timeout=timeout,
-        max_retries=_HTTP_RETRIES,
-        backoff_factor=_HTTP_RETRY_BACKOFF,
-        status_forcelist=tuple(range(500, 600)),
-        retry_on_exceptions=_TRANSIENT_ERRORS,
-        raise_for_status=True,
-        sleep=lambda seconds: time.sleep(seconds),
-    )
-    html = client.get(page).text
-    matches = INFORM_RELEASE_LINK.findall(html)
-    if not matches:
+    if page in _RELEASE_CACHE:
+        return _RELEASE_CACHE[page]
+    html = _client(timeout).get(page).text
+    candidates = [
+        hit
+        for hit in INFORM_RELEASE_LINK.findall(html)
+        if int(hit[1]) in INFORM_RELEASE_YEARS
+    ]
+    if not candidates:
         raise ValueError(
             f"No INFORM Risk release workbook link found on {page}; the page "
             "layout may have changed."
         )
-    href, year, version = max(matches, key=lambda hit: (int(hit[1]), int(hit[2])))
-    url = href if href.startswith("http") else f"{INFORM_SITE}{href}"
+    href, year, _version = max(candidates, key=lambda hit: (int(hit[1]), int(hit[2])))
+    url = urljoin(page, href)
+    if urlsplit(url).netloc.lower() != urlsplit(INFORM_SITE).netloc.lower():
+        raise ValueError(
+            f"Release workbook link on {page} points off the INFORM site: {url}"
+        )
+    _RELEASE_CACHE[page] = (url, int(year))
     return url, int(year)
 
 
@@ -355,9 +392,14 @@ def inform_download_release(
 ) -> Path:
     """Download a release workbook, reusing an already-cached copy.
 
+    A cached copy is checked, not just counted: a truncated or half-written file
+    (or an error page saved under the workbook's name) is re-downloaded rather
+    than handed to the parser. Releases are versioned in the file name, so a new
+    release lands beside the old one instead of having to invalidate it.
+
     Args:
         url: The workbook URL from :func:`inform_release_url`.
-        dest: Local path to write. An existing non-empty file is kept.
+        dest: Local path to write. An existing, valid file is reused.
         timeout: Per-request timeout in seconds.
 
     Returns:
@@ -368,19 +410,35 @@ def inform_download_release(
         ValueError: If the response is not a zip container, i.e. not an xlsx.
     """
     path = Path(dest)
-    if path.exists() and path.stat().st_size:
+    if is_xlsx(path):
         return path
-    client = HttpClient(
-        user_agent=_USER_AGENT,
-        timeout=timeout,
-        max_retries=_HTTP_RETRIES,
-        backoff_factor=_HTTP_RETRY_BACKOFF,
-        status_forcelist=tuple(range(500, 600)),
-        retry_on_exceptions=_TRANSIENT_ERRORS,
-        raise_for_status=True,
-        sleep=lambda seconds: time.sleep(seconds),
-    )
-    return client.download(url, path, progress=False, expect_magic=XLSX_MAGIC)
+    # Downloaded under a per-process name, then moved into place: two runs
+    # sharing a cache directory cannot write the same temp file, and the move is
+    # atomic, so a reader never sees a partial workbook.
+    staged = path.with_suffix(f"{path.suffix}.{os.getpid()}.part")
+    staged.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        _client(timeout).download(url, staged, progress=False, expect_magic=XLSX_MAGIC)
+        os.replace(staged, path)
+    finally:
+        staged.unlink(missing_ok=True)
+    return path
+
+
+def is_xlsx(path: Path) -> bool:
+    """Report whether `path` is a readable file that starts like an xlsx.
+
+    Args:
+        path: The candidate file.
+
+    Returns:
+        bool: True when the file exists and begins with the zip magic bytes.
+    """
+    try:
+        with path.open("rb") as handle:
+            return handle.read(len(XLSX_MAGIC)) == XLSX_MAGIC
+    except OSError:
+        return False
 
 
 def inform_release_to_frame(

@@ -61,6 +61,18 @@ def build_release_workbook(path: Path, rows: list[tuple[str, str, object]]) -> P
     return path
 
 
+@pytest.fixture(autouse=True)
+def _forget_discovered_release() -> Iterator[None]:
+    """Clear the process-wide release-URL memo around every test.
+
+    Yields:
+        None: Control to the test, with the memo empty on both sides.
+    """
+    _helpers.clear_release_cache()
+    yield
+    _helpers.clear_release_cache()
+
+
 @pytest.fixture
 def make_release_workbook():
     """Return the stand-in release-workbook builder, for a test that needs its own.
