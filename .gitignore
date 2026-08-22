@@ -181,6 +181,7 @@ docs/examples/showcases/out/
 # ignored without editing this list. Kept in step with the `exclude_docs`
 # globs in mkdocs.yml, which keep these out of the built site.
 docs/examples/*/out/
+docs/examples/*/*/out/
 docs/examples/*/data/
 docs/examples/*/earthlens-data/
 docs/examples/*/_nb_out/
