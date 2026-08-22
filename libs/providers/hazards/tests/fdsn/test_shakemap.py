@@ -202,6 +202,61 @@ def _backend(tmp_path: Path, **overrides: Any) -> FDSN:
     return FDSN(**params)
 
 
+def _to_file_writes_then_raises(self, path, *args, **kwargs):
+    """Write bytes then fail, as an interrupted conversion would."""
+    Path(path).write_bytes(b"partial")
+    raise RuntimeError("conversion failed")
+
+
+def _to_file_raises(self, path, *args, **kwargs):
+    """Fail before writing anything."""
+    raise RuntimeError("conversion failed")
+
+
+def _to_file_writes_nothing(self, path, *args, **kwargs):
+    """Return without producing an output file."""
+    return None
+
+
+def _write_manifest_refuses(*_args, **_kwargs):
+    """Fail as an unwritable filesystem would."""
+    raise OSError("read-only file system")
+
+
+def _backend_fixture_marker() -> None:
+    """Anchor for the module-scope helpers above."""
+
+
+class _ExtractRecorder:
+    """Records each destination directory `extract_layers` is given."""
+
+    def __init__(self, wrapped, seen: list[str]) -> None:
+        self._wrapped = wrapped
+        self._seen = seen
+
+    def __call__(self, archive, layers, dest_dir):
+        self._seen.append(dest_dir.name)
+        return self._wrapped(archive, layers, dest_dir)
+
+
+#: Names captured by `_recording_replace`; a test clears it before acting.
+_REPLACE_CALLS: list[str] = []
+
+#: Bound once at import so the recorder cannot wrap itself on a second patch.
+_ORIGINAL_REPLACE = Path.replace
+
+
+def _recording_replace(source, target):
+    """Record the staged name, then perform the real rename.
+
+    A plain function rather than a callable object: `Path.replace` is looked
+    up on the class, and only a function is a descriptor, so an instance
+    would be called without the path it was invoked on.
+    """
+    _REPLACE_CALLS.append(source.name)
+    return _ORIGINAL_REPLACE(source, target)
+
+
 class TestParseComcatId:
     """Recovering a ComCat id from a QuakeML resource identifier."""
 
@@ -1054,11 +1109,11 @@ class TestShakemapConversionFailure:
     ):
         """A conversion that dies leaves no raster and no staged partial."""
 
-        def _boom(self, path, *args, **kwargs):
-            Path(path).write_bytes(b"partial")
-            raise RuntimeError("conversion failed")
-
-        monkeypatch.setattr("pyramids.dataset.Dataset.to_file", _boom, raising=True)
+        monkeypatch.setattr(
+            "pyramids.dataset.Dataset.to_file",
+            _to_file_writes_then_raises,
+            raising=True,
+        )
 
         _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
 
@@ -1079,10 +1134,9 @@ class TestShakemapConversionFailure:
         directory survives inside the user's output.
         """
 
-        def _boom(self, path, *args, **kwargs):
-            raise RuntimeError("conversion failed")
-
-        monkeypatch.setattr("pyramids.dataset.Dataset.to_file", _boom, raising=True)
+        monkeypatch.setattr(
+            "pyramids.dataset.Dataset.to_file", _to_file_raises, raising=True
+        )
 
         _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
 
@@ -1092,13 +1146,12 @@ class TestShakemapConversionFailure:
     def test_missing_output_is_refused(self, tmp_path: Path, monkeypatch):
         """A conversion that writes nothing raises instead of renaming."""
 
-        def _silent(self, path, *args, **kwargs):
-            return None
-
         archive = tmp_path / "raster.zip"
         archive.write_bytes(_make_archive(layers=("mmi_mean",)))
         extracted = _helpers.extract_layers(archive, ["mmi_mean"], tmp_path / "in")
-        monkeypatch.setattr("pyramids.dataset.Dataset.to_file", _silent, raising=True)
+        monkeypatch.setattr(
+            "pyramids.dataset.Dataset.to_file", _to_file_writes_nothing, raising=True
+        )
 
         with pytest.raises(RuntimeError, match="produced no output"):
             _helpers.flt_to_geotiff(extracted["mmi_mean"], tmp_path / "out.tif")
@@ -1445,10 +1498,9 @@ class TestManifestWriteFailure:
         """The raster survives and the failure is reported."""
         from loguru import logger as loguru_logger
 
-        def _refuse(*_args: Any, **_kwargs: Any) -> None:
-            raise OSError("read-only file system")
-
-        monkeypatch.setattr(fdsn_backend._helpers, "write_manifest", _refuse)
+        monkeypatch.setattr(
+            fdsn_backend._helpers, "write_manifest", _write_manifest_refuses
+        )
 
         messages: list[str] = []
         sink_id = loguru_logger.add(lambda message: messages.append(str(message)))
@@ -1531,24 +1583,18 @@ class TestStagingIsProcessUnique:
     """Two runs over one output root must not share scratch space."""
 
     def test_staging_directory_carries_the_pid(
-        self, tmp_path: Path, usgs_events: _FakeFdsn, fake_http: _FakeHttp
+        self,
+        tmp_path: Path,
+        usgs_events: _FakeFdsn,
+        fake_http: _FakeHttp,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         """The scratch directory name includes the process id."""
         seen: list[str] = []
+        recorder = _ExtractRecorder(_helpers.extract_layers, seen)
+        monkeypatch.setattr(fdsn_backend._helpers, "extract_layers", recorder)
 
-        original = _helpers.extract_layers
-
-        def _record(archive: Path, layers: Any, dest_dir: Path):
-            seen.append(dest_dir.name)
-            return original(archive, layers, dest_dir)
-
-        fake_http.detail = _detail()
-        backend = _backend(tmp_path, with_shakemap=True)
-        import pytest as _pytest
-
-        with _pytest.MonkeyPatch.context() as patch:
-            patch.setattr(fdsn_backend._helpers, "extract_layers", _record)
-            backend.download(progress_bar=False)
+        _backend(tmp_path, with_shakemap=True).download(progress_bar=False)
 
         assert seen, "the archive should have been extracted"
         assert seen[0] == f"_staging-{os.getpid()}", (
@@ -1933,17 +1979,11 @@ class TestSurvivorGuards:
         Two runs sharing an output root would otherwise stage the same path and
         rename each other half-written file into place.
         """
-        staged_names: list[str] = []
-        original_replace = Path.replace
-
-        def _record(self, target):
-            staged_names.append(self.name)
-            return original_replace(self, target)
-
-        monkeypatch.setattr(Path, "replace", _record)
+        _REPLACE_CALLS.clear()
+        monkeypatch.setattr(Path, "replace", _recording_replace)
         _helpers.write_manifest(tmp_path, ["mmi_mean"], ["mmi_mean"], checked=1.0)
 
-        assert staged_names, "the manifest should be staged then renamed"
-        assert str(os.getpid()) in staged_names[0], (
-            f"the staged name should carry the pid, got {staged_names[0]}"
+        assert _REPLACE_CALLS, "the manifest should be staged then renamed"
+        assert str(os.getpid()) in _REPLACE_CALLS[0], (
+            f"the staged name should carry the pid, got {_REPLACE_CALLS[0]}"
         )
