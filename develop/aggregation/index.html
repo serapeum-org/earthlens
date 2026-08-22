@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23952,7 +23952,7 @@ rather than silently using the default.</p>
 <td><code>op</code></td>
 <td><code>Literal["mean","sum","min","max","std","auto"]</code></td>
 <td><code>"auto"</code></td>
-<td>Reduction within each window. <code>"auto"</code> reads <code>Variable.is_flux</code>.</td>
+<td>Reduction within each window. <code>"auto"</code> reads <code>Variable.is_pre_aggregated</code> then <code>Variable.is_flux</code>.</td>
 </tr>
 <tr>
 <td><code>out_dir</code></td>
@@ -24004,7 +24004,7 @@ iterator for anything large.</p>
 <ul>
 <li><code>nc_path</code> — path to the NetCDF on disk.</li>
 <li><code>var_info</code> — :class:<code>earthlens.ecmwf.Variable</code> row (resolves
-  <code>op="auto"</code> via <code>is_flux</code>, drives the output filename via
+  <code>op="auto"</code> via <code>is_pre_aggregated</code> / <code>is_flux</code>, drives the output filename via
   <code>cds_variable</code>, picks the variable from the NetCDF via
   <code>nc_variable</code>).</li>
 <li><code>config</code> — :class:<code>AggregationConfig</code> describing the window,
@@ -24082,7 +24082,7 @@ a single bad variable does not abort the rest of the loop.</p>
 </tr>
 <tr>
 <td><code>"auto"</code></td>
-<td>resolves to <code>"mean"</code> (state) or <code>"sum"</code> (flux)</td>
+<td><code>"mean"</code> (pre-aggregated or state) or <code>"sum"</code> (flux)</td>
 <td>same</td>
 </tr>
 </tbody>
@@ -24129,12 +24129,19 @@ catalog. The resolver is <code>_resolve_op</code> in <code>earthlens.aggregate</
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_resolve_op</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">var_info</span><span class="p">):</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="k">if</span> <span class="n">op</span> <span class="o">!=</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="k">return</span> <span class="n">op</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">return</span> <span class="s2">&quot;sum&quot;</span> <span class="k">if</span> <span class="n">var_info</span><span class="o">.</span><span class="n">is_flux</span> <span class="k">else</span> <span class="s2">&quot;mean&quot;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">var_info</span><span class="p">,</span> <span class="s2">&quot;is_pre_aggregated&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="k">return</span> <span class="s2">&quot;mean&quot;</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="k">return</span> <span class="s2">&quot;sum&quot;</span> <span class="k">if</span> <span class="n">var_info</span><span class="o">.</span><span class="n">is_flux</span> <span class="k">else</span> <span class="s2">&quot;mean&quot;</span>
 </code></pre></div>
-<p>Two-line decision:</p>
+<p>Decision order (first match wins):</p>
 <ul>
 <li>An <strong>explicit</strong> <code>op</code> (<code>"mean"</code>, <code>"sum"</code>, <code>"min"</code>, <code>"max"</code>, <code>"std"</code>)
   is returned unchanged. User choice always wins.</li>
+<li><code>op="auto"</code> + <code>var_info.is_pre_aggregated</code> → <code>"mean"</code>. The
+  <code>derived-era5-*-daily-statistics</code> and <code>reanalysis-era5-*-monthly-means</code>
+  families are already server-side daily / monthly aggregates, so a
+  <code>"sum"</code> would re-accumulate them (~30× for a monthly window over daily
+  statistics). This wins over the flux rule below.</li>
 <li><code>op="auto"</code> reads <code>var_info.is_flux</code>:</li>
 <li><code>True</code> → <code>"sum"</code></li>
 <li><code>False</code> → <code>"mean"</code></li>
@@ -24240,8 +24247,8 @@ different semantics:</p>
 <td><code>"std"</code></td>
 </tr>
 <tr>
-<td>Pre-aggregated CDS datasets like <code>derived-era5-*-daily-statistics</code> (each NetCDF sample is <em>already</em> a daily aggregate; summing 4 of them would multiply by 4)</td>
-<td><code>"mean"</code></td>
+<td>A monthly <em>sum</em> from a pre-aggregated dataset — <code>op="auto"</code> already resolves the <code>derived-era5-*-daily-statistics</code> / <code>reanalysis-era5-*-monthly-means</code> families to <code>"mean"</code> via <code>is_pre_aggregated</code>, so you only override to force a total</td>
+<td><code>"sum"</code></td>
 </tr>
 </tbody>
 </table>
