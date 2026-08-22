@@ -285,8 +285,11 @@ def shakemap_raster_url(detail: Mapping[str, Any]) -> str | None:
 
     Returns:
         The `download/raster.zip` URL, or `None` when the event has no
-            ShakeMap product or that product ships no raster bundle —
-            both of which are ordinary for a small or very recent event.
+            ShakeMap product, that product ships no raster bundle — both
+            ordinary for a small or very recent event — or the URL is not
+            `https`. The value comes from an upstream document and is
+            handed straight to the downloader, so any other scheme is
+            refused rather than fetched.
 
     Examples:
         - Walk a minimal detail document:

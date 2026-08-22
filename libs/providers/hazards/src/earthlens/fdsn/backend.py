@@ -300,16 +300,21 @@ class FDSN(AbstractDataSource):
                 will fetch a ShakeMap for, guarding against a broad
                 query quietly pulling gigabytes (each event is a
                 separate request plus a multi-megabyte archive). Events past
-                the ceiling are skipped with a warning naming the count
-                — never silently. The events kept are the first
+                the ceiling are deferred with a warning naming the
+                count — never silently. The ceiling counts *fetches*,
+                not events: an event already satisfied on disk costs no
+                budget, and an id that can never be fetched at all is
+                dropped before counting. So re-running the same request
+                takes the next batch, and repeating it eventually walks
+                the whole list. The one exception is an event that fails
+                on every attempt: a failure is not cached, so it is
+                retried each run and keeps its place in the queue.
+                Within a run the events kept are the first
                 `max_shakemap_events` in the order the networks returned
                 them, which `orderby=` controls (`"magnitude"` puts the
-                largest first, the usual intent when capping). Because
-                an event already on disk is skipped without spending
-                budget, re-running the same request walks further
-                through the list each time. Raise the ceiling
-                deliberately for a large job, or narrow the query with
-                `limit=` / `min_magnitude=`.
+                largest first, the usual intent when capping). Raise the
+                ceiling deliberately for a large job, or narrow the
+                query with `limit=` / `min_magnitude=`.
             shakemap_layers: Which ShakeMap grids to write when
                 `with_shakemap` is on. `None` (the default) writes
                 `["mmi_mean"]` — macroseismic intensity, the headline
