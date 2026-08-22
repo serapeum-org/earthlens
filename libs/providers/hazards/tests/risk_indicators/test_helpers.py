@@ -120,7 +120,7 @@ class TestRequestJsonRetry:
         returns_404 = _ReturnsResponse(_HttpError(404))
         monkeypatch.setattr(_helpers.requests, "get", returns_404)
         with pytest.raises(_helpers.requests.HTTPError):
-            _helpers.inform_query(505, "INFORM")
+            _helpers.inform_query(503, "INFORM")
         assert returns_404.calls == 1
 
     def test_timeout_is_retried(self, monkeypatch):
@@ -203,11 +203,11 @@ class TestInformQuery:
 
     def test_url_and_params(self, monkeypatch):
         """The query passes WorkflowId and IndicatorId, no key header."""
-        rec = _Recorder(_load("inform_scores_INFORM.json"))
+        rec = _Recorder(_load("inform_scores_wf505_2026.json"))
         monkeypatch.setattr(_helpers.requests, "get", rec)
-        _helpers.inform_query(505, "INFORM")
+        _helpers.inform_query(503, "INFORM")
         assert rec.url.endswith("/countries/Scores/")
-        assert rec.params == {"WorkflowId": 505, "IndicatorId": "INFORM"}
+        assert rec.params == {"WorkflowId": 503, "IndicatorId": "INFORM"}
         assert _helpers.GFW_KEY_HEADER not in rec.headers
 
 
@@ -299,13 +299,13 @@ class TestInformToFrame:
 
     def test_filter_to_country(self):
         """Filtering to KEN keeps a single row with its score."""
-        df = _helpers.inform_to_frame(_load("inform_scores_INFORM.json"), country="KEN")
+        df = _helpers.inform_to_frame(_load("inform_scores_wf505_2026.json"), country="KEN")
         assert list(df.columns) == _helpers.INFORM_COLUMNS
         assert len(df) == 1 and df.iloc[0]["iso3"] == "KEN"
 
     def test_no_filter_keeps_all(self):
         """Without a country filter every row is kept."""
-        rows = _load("inform_scores_INFORM.json")
+        rows = _load("inform_scores_wf505_2026.json")
         df = _helpers.inform_to_frame(rows)
         assert len(df) == len(rows)
 

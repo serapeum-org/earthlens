@@ -82,7 +82,12 @@ class FakeHttp:
         elif "/query/json" in url:
             payload = load_json("gfw_tcl_iso_change_KEN.json")
         elif "/countries/Scores" in url:
-            payload = load_json("inform_scores_INFORM.json")
+            # Captured from workflow 505 (the 2026 release) on 2026-06-27 and kept
+            # for its response *shape*, which is release-independent: the payload
+            # is a four-row truncation with no workflow field in it. Tests that
+            # assert which workflow was requested read `calls[...]["params"]`, so
+            # they are unaffected by the release this capture came from.
+            payload = load_json("inform_scores_wf505_2026.json")
         elif url.endswith("/FL.json"):
             payload = load_json("thinkhazard_report_133_FL.json")
         elif "/report/" in url:
