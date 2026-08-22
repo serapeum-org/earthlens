@@ -1807,8 +1807,9 @@ class TestEedaiEligibility:
         """Forcing the reader with a projected `crs` explains the CRS limit."""
         gee = make_gee(engine="eedai", crs="EPSG:32636")
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
         with pytest.raises(ValueError, match="EPSG:4326"):
-            gee._use_eedai(var_info, _plan_for(gee, var_info))
+            gee._use_eedai(var_info, plan)
 
     def test_batch_sink_is_not_eligible(self, make_gee):
         """The asynchronous sinks are Earth Engine-only."""
@@ -1868,8 +1869,9 @@ class TestEedaiEligibility:
             scale=5566.0,
         )
         var_info = gee.catalog.get_dataset("UCSB-CHG/CHIRPS/DAILY")
+        plan = _plan_for(gee, var_info)
         with pytest.raises(ValueError, match="engine='eedai' cannot serve"):
-            gee._use_eedai(var_info, _plan_for(gee, var_info))
+            gee._use_eedai(var_info, plan)
 
 
 class TestExportViaEedai:
@@ -1894,10 +1896,9 @@ class TestExportViaEedai:
         monkeypatch.setattr(fake_reader.dataset, "to_file", _write_then_fail)
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
         with pytest.raises(RuntimeError, match="write failed"):
-            gee._export_via_eedai(
-                var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
-            )
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", plan)
         assert not (gee.root_dir / "srtm_elev.tif").exists()
         assert not list(gee.root_dir.glob("*.partial.tif"))
 
@@ -2105,10 +2106,9 @@ class TestExportViaEedai:
         monkeypatch.setattr(backend_module, "credentials_for", _raise_missing_extra)
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
         with pytest.raises(ImportError, match="eedai"):
-            gee._export_via_eedai(
-                var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
-            )
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", plan)
 
     def test_non_nearest_resample_cannot_be_tiled(self, make_gee, fake_reader):
         """Upstream refuses `tile_size` with an interpolating resampler.
@@ -2192,10 +2192,9 @@ class TestExportViaEedai:
         monkeypatch.setattr(fake_reader, "from_earthengine", _stage_then_fail)
         gee = make_gee(lat_lim=[0.0, 15.0], lon_lim=[0.0, 15.0], scale=30.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
         with pytest.raises(RuntimeError, match="mosaic failed"):
-            gee._export_via_eedai(
-                var_info, ["elevation"], 30.0, "srtm_big", _plan_for(gee, var_info)
-            )
+            gee._export_via_eedai(var_info, ["elevation"], 30.0, "srtm_big", plan)
         assert not list(gee.root_dir.glob("*.partial*.tif"))
         assert not (gee.root_dir / "srtm_big.tif").exists()
 
@@ -2262,10 +2261,9 @@ class TestExportViaEedai:
         monkeypatch.setattr(backend_module.os, "replace", _always_permission_error)
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
         with pytest.raises(PermissionError):
-            gee._export_via_eedai(
-                var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
-            )
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", plan)
 
     def test_staging_sidecars_are_cleaned_up(self, make_gee, fake_reader):
         """GDAL sidecars written next to a staged raster go with it."""
@@ -2399,8 +2397,9 @@ class TestExportViaEedai:
         region = _FakePolygonAoi(total_bounds=(0.0, 0.0, 40.0, 40.0))
         gee = make_gee(engine="eedai", region=region, scale=5000.0)
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
         with pytest.raises(ValueError, match="cutline"):
-            gee._use_eedai(var_info, _plan_for(gee, var_info))
+            gee._use_eedai(var_info, plan)
 
     def test_unknown_native_resolution_is_treated_as_unbounded(
         self, make_gee, fake_reader
@@ -2473,10 +2472,9 @@ class TestExportViaEedai:
         )
         gee = make_gee()
         var_info = gee.catalog.get_dataset("USGS/SRTMGL1_003")
+        plan = _plan_for(gee, var_info)
         with pytest.raises(backend_module.AuthenticationError, match="EEDAI"):
-            gee._export_via_eedai(
-                var_info, ["elevation"], 90.0, "srtm_elev", _plan_for(gee, var_info)
-            )
+            gee._export_via_eedai(var_info, ["elevation"], 90.0, "srtm_elev", plan)
 
     def test_cog_on_an_ee_request_warns_once(self, make_gee, fake_reader, monkeypatch):
         """`cog=True` cannot apply on the Earth Engine path, so it says so once."""
