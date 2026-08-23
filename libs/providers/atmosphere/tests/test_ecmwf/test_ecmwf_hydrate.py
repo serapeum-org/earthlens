@@ -436,6 +436,7 @@ class TestBulkHydrateEmpty:
             "hydrated": 1,
             "skipped": 0,
             "timed_out": 0,
+            "unmatched": 0,
             "filled": ["reanalysis-era5-single-levels"],
         }
         variables = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"][
@@ -459,6 +460,26 @@ class TestBulkHydrateEmpty:
         summary = bulk_hydrate_empty()
         assert summary["hydrated"] == 0
         assert summary["skipped"] == 1
+
+    def test_a_declined_match_is_reported_apart_from_a_skip(
+        self, tmp_path, monkeypatch
+    ):
+        """A retrieve that yields nothing confident is unmatched, not skipped."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_retrieve_netcdf_vars",
+            lambda ds: {"elevation": {"long_name": "Surface elevation", "units": "m"}},
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["hydrated"] == 0
+        assert summary["unmatched"] == 1
+        assert summary["skipped"] == 1, "unmatched still counts toward skipped"
 
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the placeholder worklist."""

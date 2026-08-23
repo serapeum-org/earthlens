@@ -672,7 +672,10 @@ def _hydrate_one(
         timeout: Per-dataset retrieve deadline; `None` / `0` waits without one.
 
     Returns:
-        One of `"hydrated"`, `"timed_out"`, or `"skipped"`.
+        One of `"hydrated"`, `"unmatched"`, `"timed_out"`, or `"skipped"`.
+        `"unmatched"` is the retrieve that worked and still hydrated nothing —
+        the operator can curate that row by hand, unlike a `"skipped"` licence
+        or network failure.
     """
     try:
         nc_meta: dict[str, dict[str, Any]] | None = _retrieve_with_timeout(
@@ -691,8 +694,9 @@ def _hydrate_one(
         file_text[path] = path.read_text(encoding="utf-8")
     new_text = _rewrite_stanza(file_text[path], dataset_id, nc_meta)
     if new_text == file_text[path]:
-        typer.echo(f"{prefix}: skipped")
-        return "skipped"
+        offered = sorted(name for name in nc_meta if not _is_auxiliary(name))
+        typer.echo(f"{prefix}: retrieved, no confident match ({', '.join(offered)})")
+        return "unmatched"
     file_text[path] = new_text
     path.write_text(new_text, encoding="utf-8")
     typer.echo(f"{prefix}: hydrated -> {path.name}")
@@ -720,7 +724,10 @@ def bulk_hydrate_empty(
             without a deadline (the offline-test path).
 
     Returns:
-        A summary `{candidates, hydrated, skipped, timed_out, filled}` mapping.
+        A summary `{candidates, hydrated, skipped, timed_out, unmatched, filled}`
+        mapping. `unmatched` counts the retrieves that succeeded and still
+        hydrated nothing; those are also counted in `skipped`, which stays the
+        total of everything not hydrated.
     """
     from earthlens.ecmwf import Catalog
     from earthlens.ecmwf.catalog import CATALOG_PATH, clear_catalog_cache
@@ -740,6 +747,7 @@ def bulk_hydrate_empty(
     hydrated = 0
     skipped = 0
     timed_out = 0
+    unmatched = 0
     filled: list[str] = []
     for index, dataset_id in enumerate(empty, start=1):
         prefix = f"[{index}/{total}] {dataset_id}"
@@ -747,6 +755,9 @@ def bulk_hydrate_empty(
         if outcome == "hydrated":
             hydrated += 1
             filled.append(dataset_id)
+        elif outcome == "unmatched":
+            unmatched += 1
+            skipped += 1
         elif outcome == "timed_out":
             timed_out += 1
             skipped += 1
@@ -759,5 +770,6 @@ def bulk_hydrate_empty(
         "hydrated": hydrated,
         "skipped": skipped,
         "timed_out": timed_out,
+        "unmatched": unmatched,
         "filled": filled,
     }
