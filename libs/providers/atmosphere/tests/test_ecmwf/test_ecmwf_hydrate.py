@@ -238,15 +238,16 @@ class TestMatchVariables:
 
     def test_the_all_pseudo_slug_is_never_paired(self):
         """`all` means every variable, so it never stands in for one of them."""
-        assignments = _match_variables(
-            ["all"], {"num_covered_hours": {"long_name": "all hours", "units": "1"}}
+        meta = {"tp": {"long_name": "Total precipitation", "units": "m"}}
+        assert _match_variables(["total-precipitation"], meta) != {}, (
+            "a real slug pairs with this lone variable"
         )
-        assert assignments == {}
+        assert _match_variables(["all"], meta) == {}, "the pseudo-slug must not"
 
     def test_stopword_only_slug_is_never_paired(self):
-        """A slug that reduces to stopwords carries no evidence to match on."""
+        """Stripping stopwords leaves nothing to match on, so the shared `of` is ignored."""
         assignments = _match_variables(
-            ["of-the"], {"xx": {"long_name": "totally different", "units": "1"}}
+            ["of-the"], {"of": {"long_name": "totally different", "units": "1"}}
         )
         assert assignments == {}
 
@@ -386,7 +387,7 @@ class TestIsInitialism:
 
 
 class TestPairIsEvidenced:
-    """Tests for the four arms of the rule 4 evidence check."""
+    """Tests for the three arms of the rule 4 evidence check."""
 
     def test_short_name_token_overlap(self):
         """A token shared with the NetCDF short name is evidence."""
@@ -401,10 +402,18 @@ class TestPairIsEvidenced:
         """An initialism is evidence with no shared token at all."""
         assert _pair_is_evidenced("sea-surface-temperature", "sst", {}) is True
 
-    def test_a_generic_shared_token_is_weak_but_reservation_catches_it(self):
-        """Evidence alone can pass on one generic word; the reservation is the real guard."""
+    def test_a_generic_shared_token_counts_as_evidence(self):
+        """One shared generic word satisfies the long-name arm, which is weak by design."""
+        assert (
+            _pair_is_evidenced(
+                "land-sea-mask", "zzz", {"long_name": "Mean sea level pressure"}
+            )
+            is True
+        ), "the only thing in common is the word 'sea'"
+
+    def test_reservation_declines_a_name_a_sibling_row_owns(self):
+        """Where a hydrated sibling owns the name, reservation is what stops rule 4."""
         meta = {"msl": {"long_name": "Mean sea level pressure", "units": "Pa"}}
-        assert _pair_is_evidenced("land-sea-mask", "msl", meta) is True
         assert _match_variables(["land-sea-mask"], meta) != {}
         assert (
             _match_variables(["land-sea-mask"], meta, reserved=frozenset({"msl"})) == {}
