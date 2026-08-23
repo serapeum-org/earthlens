@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthlens-hazards"
-version = "0.17.0"
+version = "0.18.0"
 description = "hazard, humanitarian and vector-basemap backends for earthlens"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -33,7 +33,7 @@ requires-python = ">=3.11,<4"
 # this distribution brings the backends' code without their dependencies —
 # `pip install earthlens-hazards[<backend>]` adds exactly one backend's SDK.
 dependencies = [
-    "earthlens-core ==0.17.0",
+    "earthlens-core ==0.18.0",
     # Two backends read `.xlsx` with `pandas.read_excel`, which needs openpyxl:
     # `emdat:events` reads the EM-DAT archive workbook, and the `inform:*` rows
     # read JRC's published INFORM Risk release workbook (their default source).
