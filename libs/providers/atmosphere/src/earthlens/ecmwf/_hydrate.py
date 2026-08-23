@@ -265,30 +265,56 @@ _STOPWORDS = frozenset(
 )
 
 
-def _consume_initialism(rest: str, remaining: list[str]) -> bool:
-    """Return True when `rest` splits into a leading piece of every `remaining` token.
+def _consume_initialism(
+    rest: str,
+    tokens: tuple[str, ...],
+    mask: int,
+    memo: dict[tuple[int, int], bool],
+) -> bool:
+    """Return True when `rest` splits into a leading piece of every token left in `mask`.
 
-    Backtracking search over token order, because the compressed form need not
-    follow the slug's word order (`t2m` is `temperature` + `2m`). Succeeds only
-    when `rest` is fully consumed AND every token contributed, so a near-miss
-    prefix (`pressure` against `precipitation`) fails.
+    The search is order-free, because the compressed form need not follow the
+    slug's word order (`t2m` is `temperature` + `2m`), and succeeds only when
+    `rest` is fully consumed AND every token contributed, so a near-miss prefix
+    (`pressure` against `precipitation`) fails.
+
+    `rest` is always a suffix of the original name, so `(len(rest), mask)`
+    identifies a search state exactly; memoising on it bounds the work at
+    `O(2^len(tokens) * len(name))` instead of the exponential-with-no-ceiling
+    node count a plain backtracker walks when the tokens nest as prefixes of
+    one another.
 
     Args:
         rest: The still-unconsumed tail of the NetCDF short name.
-        remaining: The slug tokens not yet accounted for.
+        tokens: Every slug token, indexed by bit position in `mask`.
+        mask: Bits set for the tokens not yet accounted for.
+        memo: Shared `(len(rest), mask) -> bool` cache for one search.
 
     Returns:
         True when a full assignment exists.
     """
+    key = (len(rest), mask)
+    cached = memo.get(key)
+    if cached is not None:
+        return cached
     if not rest:
-        return not remaining
-    for index, token in enumerate(remaining):
-        for size in range(1, len(token) + 1):
-            if rest.startswith(token[:size]) and _consume_initialism(
-                rest[size:], remaining[:index] + remaining[index + 1 :]
-            ):
-                return True
-    return False
+        result = mask == 0
+    else:
+        result = False
+        for index, token in enumerate(tokens):
+            bit = 1 << index
+            if not mask & bit:
+                continue
+            for size in range(1, len(token) + 1):
+                if rest.startswith(token[:size]) and _consume_initialism(
+                    rest[size:], tokens, mask & ~bit, memo
+                ):
+                    result = True
+                    break
+            if result:
+                break
+    memo[key] = result
+    return result
 
 
 def _is_initialism(name: str, tokens: set[str]) -> bool:
@@ -326,7 +352,10 @@ def _is_initialism(name: str, tokens: set[str]) -> bool:
 
             ```
     """
-    return bool(tokens) and _consume_initialism(name.lower(), sorted(tokens))
+    if not tokens:
+        return False
+    ordered = tuple(sorted(tokens))
+    return _consume_initialism(name.lower(), ordered, (1 << len(ordered)) - 1, {})
 
 
 #: Longest product prefix a NetCDF short name may add to a slug's own spelling
