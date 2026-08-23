@@ -12,7 +12,9 @@ import yaml
 from earthlens.ecmwf import _hydrate as hydrate_mod
 from earthlens.ecmwf._hydrate import (
     _find_file_for_dataset,
+    _is_initialism,
     _match_variables,
+    _pair_is_evidenced,
     _retrieve_with_timeout,
     _rewrite_stanza,
     _yaml_value,
@@ -189,7 +191,7 @@ class TestMatchVariables:
                 True,
             ),
             ("ch4", "xch4", "column-averaged dry-air mole fraction of methane", True),
-            # False positives - unrelated names must keep the placeholder.
+            # True negatives - unrelated names must keep the placeholder.
             ("number-of-wet-days", "elevation", "", False),
             ("number-of-dry-spells", "elevation", "Surface elevation", False),
             ("glacier-area", "elevation", "", False),
@@ -248,6 +250,13 @@ class TestMatchVariables:
             ["sea-surface-temperature"], meta, reserved=frozenset({"sst"})
         )
         assert assignments == {"sea-surface-temperature": ("sst", "K")}
+
+    def test_the_all_pseudo_slug_is_never_paired(self):
+        """`all` means every variable, so it never stands in for one of them."""
+        assignments = _match_variables(
+            ["all"], {"num_covered_hours": {"long_name": "all hours", "units": "1"}}
+        )
+        assert assignments == {}
 
     def test_stopword_only_slug_is_never_paired(self):
         """A slug that reduces to stopwords carries no evidence to match on."""
@@ -321,6 +330,58 @@ class TestMatchVariables:
         assert assignments == {"temperature": ("t", "K")}, (
             "quality-flag stays unhydrated"
         )
+
+
+class TestIsInitialism:
+    """Tests for the order-free initialism predicate."""
+
+    @pytest.mark.parametrize(
+        ("name", "tokens", "expected"),
+        [
+            ("sst", {"sea", "surface", "temperature"}, True),
+            ("t2m", {"2m", "temperature"}, True),
+            ("tp", {"total", "precipitation"}, True),
+            ("pressure", {"precipitation"}, False),
+            ("elevation", {"number", "wet", "days"}, False),
+            ("sst", {"sea", "surface"}, False),
+        ],
+    )
+    def test_recognises_compressed_spellings(self, name, tokens, expected):
+        """A name qualifies only when every token contributes and none is left over."""
+        assert _is_initialism(name, tokens) is expected
+
+    def test_no_tokens_is_never_an_initialism(self):
+        """An empty token set carries nothing to compress."""
+        assert _is_initialism("sst", set()) is False
+
+
+class TestPairIsEvidenced:
+    """Tests for the four arms of the rule 4 evidence check."""
+
+    def test_short_name_token_overlap(self):
+        """A token shared with the NetCDF short name is evidence."""
+        assert _pair_is_evidenced("mean-uth", "uth", {}) is True
+
+    def test_long_name_token_overlap(self):
+        """A token shared with the variable's long name is evidence."""
+        meta = {"long_name": "Liquid Water Equivalent Thickness"}
+        assert _pair_is_evidenced("terrestrial-water-storage", "lwe_thickness", meta)
+
+    def test_initialism(self):
+        """An initialism is evidence with no shared token at all."""
+        assert _pair_is_evidenced("sea-surface-temperature", "sst", {}) is True
+
+    def test_product_prefix(self):
+        """The slug's own spelling behind a short product prefix is evidence."""
+        assert _pair_is_evidenced("co2", "xco2", {}) is True
+
+    def test_unrelated_names_carry_no_evidence(self):
+        """Two names with nothing in common are not paired."""
+        assert _pair_is_evidenced("number-of-wet-days", "elevation", {}) is False
+
+    def test_a_stopword_only_slug_carries_no_evidence(self):
+        """A slug that reduces to stopwords has nothing left to match on."""
+        assert _pair_is_evidenced("of-the", "xx", {"long_name": "of the"}) is False
 
 
 class TestRetrieveWithTimeout:
