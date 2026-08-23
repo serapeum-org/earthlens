@@ -296,6 +296,34 @@ def shape_frame(
 
     Returns:
         pd.DataFrame: The frame in the `SCHEMA` columns / dtypes.
+
+    Examples:
+        - A valid reading is kept while an invalid `-999` sentinel is masked to
+          `NaN`, its `-1` flag preserved in `validity`:
+            ```python
+            >>> import pandas as pd
+            >>> from earthlens.eea_aq._helpers import shape_frame
+            >>> raw = pd.DataFrame(
+            ...     {
+            ...         "Samplingpoint": ["MT/SPO-1", "MT/SPO-1"],
+            ...         "Pollutant": [6001, 6001],
+            ...         "Start": pd.to_datetime(["2011-06-01", "2011-06-01"]),
+            ...         "Value": ["14.6", "-999"],
+            ...         "Unit": ["ug.m-3", "ug.m-3"],
+            ...         "AggType": ["hour", "hour"],
+            ...         "Validity": [1, -1],
+            ...         "Verification": [3, 3],
+            ...     }
+            ... )
+            >>> out = shape_frame(raw, "Historical", {6001: "pm25"})
+            >>> out["value"].tolist()
+            [14.6, nan]
+            >>> out["validity"].tolist()
+            [1, -1]
+            >>> out["parameter"].tolist()
+            ['pm25', 'pm25']
+
+            ```
     """
     if raw.empty:
         return empty_frame()
