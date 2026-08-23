@@ -215,10 +215,23 @@ class TestShapeFrame:
         out = shape_frame(self._flagged("7.2", None), "Unverified", {6001: "pm25"})
         assert out.loc[0, "value"] == 7.2
 
-    def test_masked_value_column_stays_float(self):
-        """Masking keeps the value column float64 rather than upcasting to object."""
-        out = shape_frame(self._flagged("-999", -1), "Historical", {6001: "pm25"})
+    def test_masked_sentinels_are_removed_by_dropna(self):
+        """Masked no-data rows are real float NaNs, so value.dropna() now drops them."""
+        raw = pd.DataFrame(
+            {
+                "Samplingpoint": ["MT/SPO-1", "MT/SPO-1"],
+                "Pollutant": [6001, 6001],
+                "Start": pd.to_datetime(["2011-01-01T00:00", "2011-01-01T01:00"]),
+                "Value": ["14.6", "-999"],
+                "Unit": ["ug.m-3", "ug.m-3"],
+                "AggType": ["hour", "hour"],
+                "Validity": [1, -1],
+                "Verification": [3, 3],
+            }
+        )
+        out = shape_frame(raw, "Historical", {6001: "pm25"})
         assert str(out["value"].dtype) == "float64"
+        assert out["value"].dropna().tolist() == [14.6]
 
     def test_zero_flag_is_not_masked(self):
         """A zero Validity is not negative, so the reading is kept (strict < 0 boundary)."""
