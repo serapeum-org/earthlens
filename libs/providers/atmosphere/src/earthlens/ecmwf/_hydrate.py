@@ -95,6 +95,38 @@ _UNKNOWN_UNITS = re.compile(r"(?m)^ {8}units:[ \t]*unknown[ \t]*$")
 _NC_VARIABLE_LINE = re.compile(r"(?m)^( {8}nc_variable:)[^\n]*$")
 _UNITS_LINE = re.compile(r"(?m)^( {8}units:)[^\n]*$")
 
+#: Fraction of a slug's meaningful tokens the shared ones must cover before
+#: rule 4 treats the overlap as evidence. Half rejects the single-generic-word
+#: coincidence (`land-sea-mask` against `msl`, sharing only `sea`) while keeping
+#: the real one-of-two matches (`glacier-area` against `area`).
+_MIN_TOKEN_COVERAGE = 0.5
+
+#: Most retrieved variable names to name in a declined-match echo before
+#: summarising the rest, so one wide product cannot flood the sweep's output.
+_ECHO_MAX_NAMES = 8
+
+#: Function words that carry no identifying signal. Dropped before the rule 4
+#: overlap tests so `number-of-wet-days` cannot pair with a variable on `of`.
+_STOPWORDS = frozenset(
+    {
+        "a",
+        "an",
+        "and",
+        "at",
+        "by",
+        "for",
+        "from",
+        "in",
+        "of",
+        "on",
+        "or",
+        "per",
+        "the",
+        "to",
+        "with",
+    }
+)
+
 
 def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
     """Retrieve a tiny NetCDF for `dataset_id` and read its variable metadata.
@@ -242,8 +274,277 @@ def _assign_unique_subset(
                 progress = True
 
 
+def _consume_initialism(
+    rest: str,
+    tokens: tuple[str, ...],
+    mask: int,
+    memo: dict[tuple[int, int], bool],
+) -> bool:
+    """Return True when `rest` splits into a leading piece of every token in `mask`.
+
+    The memo gate. `rest` is always a suffix of the original name, so
+    `(len(rest), mask)` identifies a search state exactly, and caching on it
+    bounds the work at `O(2^len(tokens) * len(name) * len(tokens) *
+    max_token_len)` — one state per `(suffix, mask)` pair, each scanning the
+    still-unused tokens' prefixes — instead of the exponential-with-no-ceiling
+    node count a plain backtracker walks when the tokens nest as prefixes of
+    one another.
+
+    Args:
+        rest: The still-unconsumed tail of the NetCDF short name.
+        tokens: Every slug token, indexed by bit position in `mask`.
+        mask: Bits set for the tokens not yet accounted for.
+        memo: Shared `(len(rest), mask) -> bool` cache for one search.
+
+    Returns:
+        True when a full assignment exists.
+    """
+    key = (len(rest), mask)
+    cached = memo.get(key)
+    if cached is None:
+        cached = _search_initialism(rest, tokens, mask, memo)
+        memo[key] = cached
+    return cached
+
+
+def _search_initialism(
+    rest: str,
+    tokens: tuple[str, ...],
+    mask: int,
+    memo: dict[tuple[int, int], bool],
+) -> bool:
+    """Try every still-unused token as the next piece of `rest`.
+
+    The search is order-free, because the compressed form need not follow the
+    slug's word order (`t2m` is `temperature` + `2m`), and succeeds only once
+    `rest` is spent with no token left over.
+
+    Args:
+        rest: The still-unconsumed tail of the NetCDF short name.
+        tokens: Every slug token, indexed by bit position in `mask`.
+        mask: Bits set for the tokens not yet accounted for.
+        memo: Shared cache threaded through the recursion.
+
+    Returns:
+        True when some assignment of the remaining tokens consumes `rest`.
+    """
+    if not rest:
+        return mask == 0
+    return any(
+        _consume_token(rest, token, tokens, mask & ~(1 << index), memo)
+        for index, token in enumerate(tokens)
+        if mask & (1 << index)
+    )
+
+
+def _consume_token(
+    rest: str,
+    token: str,
+    tokens: tuple[str, ...],
+    mask: int,
+    memo: dict[tuple[int, int], bool],
+) -> bool:
+    """Return True when some leading piece of `token` starts `rest` and the tail resolves.
+
+    Every prefix length is tried, so a token may contribute one letter (`s` for
+    `sea`) or all of itself (`2m`); a near-miss prefix fails because the whole
+    of `rest` still has to be consumed.
+
+    Args:
+        rest: The still-unconsumed tail of the NetCDF short name.
+        token: The slug token being tried at this position.
+        tokens: Every slug token, indexed by bit position in `mask`.
+        mask: Bits set for the tokens still unused after `token`.
+        memo: Shared cache threaded through the recursion.
+
+    Returns:
+        True when `token` can start `rest` and the remainder resolves.
+    """
+    return any(
+        rest.startswith(token[:size])
+        and _consume_initialism(rest[size:], tokens, mask, memo)
+        for size in range(1, len(token) + 1)
+    )
+
+
+def _is_initialism(name: str, tokens: set[str]) -> bool:
+    """Return True when `name` is `tokens` compressed to their leading letters.
+
+    Covers the abbreviations a plain token-overlap test rejects: `sst` for
+    `sea-surface-temperature`, `t2m` for `2m-temperature`.
+
+    On its own this says nothing about how many tokens are worth compressing.
+    Given one token it reduces to "is `name` a prefix of that word", which
+    reads `co` as an abbreviation of `co2`; the two-token minimum that makes
+    the arm meaningful is applied by :func:`_pair_is_evidenced`, not here.
+
+    Args:
+        name: The NetCDF short name.
+        tokens: The slug's meaningful tokens.
+
+    Returns:
+        True when `name` is an initialism of `tokens`.
+
+    Examples:
+        - The compressed form need not follow the slug's word order:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _is_initialism
+            >>> _is_initialism("sst", {"sea", "surface", "temperature"})
+            True
+            >>> _is_initialism("t2m", {"2m", "temperature"})
+            True
+
+            ```
+        - Every token must contribute, so a near-miss prefix fails:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _is_initialism
+            >>> _is_initialism("pressure", {"precipitation"})
+            False
+            >>> _is_initialism("elevation", {"number", "wet", "days"})
+            False
+
+            ```
+        - With a single token it is only a prefix test, which is why the
+          caller requires two:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _is_initialism
+            >>> _is_initialism("co", {"co2"})
+            True
+
+            ```
+    """
+    if not tokens:
+        return False
+    ordered = tuple(sorted(tokens))
+    return _consume_initialism(name.lower(), ordered, (1 << len(ordered)) - 1, {})
+
+
+def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
+    """Return True when `slug` and `name` share evidence of being the same thing.
+
+    Rule 4's guard: being the only two left over is arity, not evidence. A pair
+    qualifies on either of two signals — the tokens it shares with the short
+    name and `long_name` covering at least :data:`_MIN_TOKEN_COVERAGE` of the
+    slug, or `name` being an initialism of the slug. Slugs reduced to nothing
+    but stopwords never qualify.
+
+    Coverage rather than mere overlap is what keeps a single generic word from
+    passing as evidence: `land-sea-mask` shares only `sea` with mean sea level
+    pressure, one token of three, and `sub-surface-runoff` only `surface` with
+    surface net solar radiation. Measured over the curated catalog, requiring
+    half the slug's tokens cuts the pairings rule 4 would get wrong from 111 to
+    38, about two thirds.
+
+    It costs the occasional real match whose names genuinely have little in
+    common — a terrestrial water storage anomaly served as a liquid water
+    equivalent thickness shares only `water` — and those rows keep their
+    placeholder and are counted as unmatched, which is the cheaper failure.
+
+    Coverage does not govern the initialism arm, which has no shared tokens to
+    measure; that arm admits 34 of the 38 wrong pairings that remain, reading
+    `msl` as m(ask) s(ea) l(and). Requiring it to consume tokens in slug order
+    would remove some, but it also rejects `2m-temperature` -> `t2m`, so the
+    residue is accepted and rule 4 stays a last resort behind the confident
+    rules.
+
+    The initialism arm needs at least two tokens. Compressing a single word
+    leaves nothing but a prefix of it, which is far too weak to pair on: it
+    would read `co` as evidence for `co2`, and `e` for `ethene`.
+
+    The evidence is a filter, not a proof. A single shared token satisfies it,
+    so two names that share a generic word can still pair; `reserved` narrows
+    that where a hydrated sibling row already owns the name, but most stanzas
+    reaching rule 4 have no hydrated sibling at all.
+
+    Args:
+        slug: The unmatched catalog variable slug.
+        name: The unused NetCDF short name.
+        meta: That variable's `{long_name, units}` metadata.
+
+    Returns:
+        True when the pairing is supported; False to keep the placeholder.
+
+    Examples:
+        - An initialism is evidence even with no shared token:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _pair_is_evidenced
+            >>> _pair_is_evidenced("sea-surface-temperature", "sst", {})
+            True
+
+            ```
+        - So are tokens shared with the variable's `long_name`, once they
+          cover half the slug:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _pair_is_evidenced
+            >>> meta = {"long_name": "Total precipitation depth"}
+            >>> _pair_is_evidenced("total-precipitation", "zzz", meta)
+            True
+
+            ```
+        - One generic word in common is coincidence, not evidence — `sea` is
+          one of the slug's three tokens, short of the coverage bar:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _pair_is_evidenced
+            >>> meta = {"long_name": "Mean sea level pressure"}
+            >>> _pair_is_evidenced("land-sea-mask", "zzz", meta)
+            False
+
+            ```
+        - The initialism arm is separate, and still reads `msl` as
+          m(ask) s(ea) l(and) — coverage does not govern it:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _pair_is_evidenced
+            >>> _pair_is_evidenced("land-sea-mask", "msl", {})
+            True
+
+            ```
+        - Two unrelated names are not paired, whatever the arity:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _pair_is_evidenced
+            >>> _pair_is_evidenced("number-of-wet-days", "elevation", {"units": "m"})
+            False
+
+            ```
+    """
+    tokens = _tokens(slug) - _STOPWORDS
+    if not tokens:
+        return False
+    shared = tokens & (_tokens(name) - _STOPWORDS)
+    shared |= tokens & (_tokens(str(meta.get("long_name") or "")) - _STOPWORDS)
+    if len(shared) >= len(tokens) * _MIN_TOKEN_COVERAGE:
+        return True
+    return len(tokens) >= 2 and _is_initialism(name, tokens)
+
+
+def _data_variables(
+    nc_meta: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Return the retrieved variables a catalog row could name, aux dropped.
+
+    The single definition of "what the matcher would consider", so the echo that
+    reports a declined pairing lists exactly the variables it weighed.
+
+    Args:
+        nc_meta: The retrieved `{nc_name: {long_name, units}}` mapping.
+
+    Returns:
+        The subset that is not a coordinate, bound, or auxiliary variable.
+    """
+    return {name: meta for name, meta in nc_meta.items() if not _is_auxiliary(name)}
+
+
 def _match_variables(
-    placeholders: list[str], nc_meta: dict[str, dict[str, Any]]
+    placeholders: list[str],
+    nc_meta: dict[str, dict[str, Any]],
+    reserved: frozenset[str] = frozenset(),
 ) -> dict[str, tuple[str, str]]:
     """Confidently map each placeholder slug to a retrieved `(nc_name, units)`.
 
@@ -258,7 +559,10 @@ def _match_variables(
     3. Token-subset — the slug's tokens are a subset of a variable's
        `long_name` tokens.
     4. The **unambiguous** leftover case only: exactly one unmatched slug and
-       exactly one unused data variable (the single-variable retrieve).
+       exactly one unused data variable (the single-variable retrieve), the
+       variable not already claimed by a hydrated row, and only when the two
+       carry evidence of being the same quantity (`_pair_is_evidenced`) —
+       arity alone is not a match.
 
     Any slug that stays unmatched keeps its placeholder — there is no arbitrary
     order-based pairing among multiple candidates.
@@ -266,14 +570,24 @@ def _match_variables(
     Args:
         placeholders: The still-`unknown` variable slugs, in catalog order.
         nc_meta: The retrieved `{nc_name: {long_name, units}}` mapping.
+        reserved: Lowercased NetCDF names already written into the stanza's
+            hydrated rows.
+            Rule 4 will not hand one of these to a second slug; the confident
+            rules still may, because one short name legitimately serves several
+            rows of the same dataset (CARRA repeats a name across level
+            families). The asymmetry is deliberate: reaching a repeated name by
+            exact match or `long_name` is evidence it belongs to both rows,
+            while reaching it by the leftover rule is a guess, and a guess
+            landing on a name another row already holds is the corruption this
+            rule was tightened to stop. The cost is that a legitimately
+            repeated name reachable ONLY by rule 4 stays a placeholder, to be
+            curated by hand.
 
     Returns:
         Mapping of slug to the `(nc_variable, units)` to write — only for the
         slugs that matched confidently.
     """
-    candidates = {
-        name: meta for name, meta in nc_meta.items() if not _is_auxiliary(name)
-    }
+    candidates = _data_variables(nc_meta)
     chosen: dict[str, str] = {}
     used: set[str] = set()
 
@@ -292,12 +606,26 @@ def _match_variables(
     # rule 4 would pair it with whatever single variable survived the auxiliary
     # filter, which is how a precipitation CDR acquired a coverage counter.
     #
-    # Rule 4's wider weakness is untouched here: with one slug and one variable
-    # left it pairs them on arity alone, so two unrelated names still match. A
-    # token-overlap requirement was tried and rejected — it also rejects the
-    # abbreviations rule 4 gets right (`2m-temperature` -> `t2m`,
-    # `sea-surface-temperature` -> `sst`). Tracked separately.
-    if len(unmatched) == 1 and len(unused) == 1 and unmatched[0] != "all":
+    # Being the last two standing is arity, not evidence, so the pair must also
+    # look like the same quantity. A plain token-overlap test was rejected for
+    # dropping the abbreviations rule 4 gets right; the initialism arm keeps
+    # them (`sea-surface-temperature` -> `sst`). It resolves the common shapes,
+    # not abbreviation in general — a selective contraction like `msl` or `u10`
+    # still fails it, and such a slug simply keeps its placeholder.
+    #
+    # `reserved` narrows the damage where a hydrated sibling row already owns
+    # the name, but it is not a general guard: of the stanzas this rule can
+    # reach in the shipped catalog, most have no hydrated sibling at all and so
+    # reserve nothing. The evidence check is what stands between a placeholder
+    # and a wrong name there, and one shared generic word satisfies it. Rule 4
+    # is a last resort behind the confident rules for exactly that reason.
+    if (
+        len(unmatched) == 1
+        and len(unused) == 1
+        and unmatched[0] != "all"
+        and unused[0].lower() not in reserved
+        and _pair_is_evidenced(unmatched[0], unused[0], candidates[unused[0]])
+    ):
         chosen[unmatched[0]] = unused[0]
 
     return {
@@ -313,6 +641,59 @@ def _placeholder_slugs(block: str) -> list[str]:
         for match in _VARIABLE_BLOCK.finditer(block)
         if _UNKNOWN_UNITS.search(match.group("body"))
     ]
+
+
+def _claimed_nc_names(block: str) -> frozenset[str]:
+    """Return the `nc_variable` values already bound by the stanza's hydrated rows.
+
+    A placeholder row carries a seeded `nc_variable` too, so only sub-blocks
+    that have lost the `units: unknown` sentinel count as having claimed a name.
+    Values are returned lowercased, because NetCDF short names vary in case
+    across products (`SST` and `sst` name one variable) and reservation has to
+    match the way the rest of this module compares names.
+
+    Args:
+        block: One dataset stanza's body text.
+
+    Returns:
+        The lowercased NetCDF short names a hydrated row of this stanza uses.
+    """
+    claimed = set()
+    for match in _VARIABLE_BLOCK.finditer(block):
+        body = match.group("body")
+        if _UNKNOWN_UNITS.search(body):
+            continue
+        line = _NC_VARIABLE_LINE.search(body)
+        if line is None:
+            continue
+        value = _scalar_after_key(body[line.start() : line.end()])
+        if value:
+            claimed.add(value.lower())
+    return frozenset(claimed)
+
+
+def _scalar_after_key(line: str) -> str:
+    """Return the plain scalar a `key: value` line carries, or `""` for none.
+
+    Handles the two shapes the catalog emits — a bare scalar with an optional
+    trailing `#` comment, and a quoted scalar — and rejects the YAML nulls, so
+    an empty or `null` `nc_variable` never reserves a name.
+
+    Args:
+        line: One `key: value` line, without its newline.
+
+    Returns:
+        The unquoted, comment-free value, or `""` when there is none.
+    """
+    raw = line.split(":", 1)[1].strip()
+    if raw[:1] in tuple('"\''):
+        quote = raw[0]
+        end = raw.find(quote, 1)
+        raw = raw[1:end] if end > 0 else raw.lstrip(quote)
+    else:
+        # A YAML inline comment needs whitespace before the `#`.
+        raw = re.split(r"\s#", raw, maxsplit=1)[0].strip()
+    return "" if raw.lower() in {"", "null", "~"} else raw
 
 
 def _fill_variable(block: str, slug: str, nc_name: str, units: str) -> str:
@@ -331,6 +712,43 @@ def _fill_variable(block: str, slug: str, nc_name: str, units: str) -> str:
     return block[: match.start()] + sub + block[match.end() :]
 
 
+def _stanza_match(text: str, dataset_id: str) -> re.Match[str] | None:
+    """Return the match spanning one dataset stanza, or None when it is absent.
+
+    Args:
+        text: The full per-family catalog shard text.
+        dataset_id: The dataset id whose stanza to isolate.
+
+    Returns:
+        The `re.Match` spanning the stanza, or `None` if `dataset_id` is absent.
+        Group 1 is the stanza body; the span is where a rewrite splices back.
+    """
+    pattern = re.compile(
+        rf"(?ms)^  {re.escape(dataset_id)}:\n(.*?)(?=^  [A-Za-z0-9/_.-]+:|\Z)"
+    )
+    return pattern.search(text)
+
+
+def _stanza_outcome(text: str, dataset_id: str) -> str | None:
+    """Return why a stanza cannot be hydrated, or None when it has work to do.
+
+    Lets the caller tell a shard that never held the dataset, or a stanza with
+    nothing left to fill, apart from one the matcher looked at and declined.
+
+    Args:
+        text: The full per-family catalog shard text.
+        dataset_id: The dataset id to inspect.
+
+    Returns:
+        `"skipped"` when the stanza is missing or holds no placeholder, else
+        `None`.
+    """
+    found = _stanza_match(text, dataset_id)
+    if found is None or not _placeholder_slugs(found.group(1)):
+        return "skipped"
+    return None
+
+
 def _rewrite_stanza(
     text: str, dataset_id: str, nc_meta: dict[str, dict[str, Any]]
 ) -> str:
@@ -346,17 +764,14 @@ def _rewrite_stanza(
         input is returned unchanged when the stanza, its placeholders, or a
         usable match are absent.
     """
-    pattern = re.compile(
-        rf"(?ms)^  {re.escape(dataset_id)}:\n(.*?)(?=^  [A-Za-z0-9/_.-]+:|\Z)"
-    )
-    match = pattern.search(text)
-    if not match:
+    match = _stanza_match(text, dataset_id)
+    if match is None:
         return text
     block = match.group(1)
     placeholders = _placeholder_slugs(block)
     if not placeholders:
         return text
-    assignments = _match_variables(placeholders, nc_meta)
+    assignments = _match_variables(placeholders, nc_meta, _claimed_nc_names(block))
     if not assignments:
         return text
     new_block = block
@@ -402,7 +817,12 @@ def _hydrate_one(
         timeout: Per-dataset retrieve deadline; `None` / `0` waits without one.
 
     Returns:
-        One of `"hydrated"`, `"timed_out"`, or `"skipped"`.
+        One of `"hydrated"`, `"unmatched"`, `"timed_out"`, or `"skipped"`.
+        `"unmatched"` is reserved for the retrieve that worked against a stanza
+        with real placeholders and still hydrated nothing — the operator can
+        curate that row by hand. A missing stanza, or one whose placeholders
+        have all been filled already, is a `"skipped"` like a licence or network
+        failure: there was nothing for the matcher to decline.
     """
     try:
         nc_meta: dict[str, dict[str, Any]] | None = _retrieve_with_timeout(
@@ -419,10 +839,21 @@ def _hydrate_one(
         return "skipped"
     if path not in file_text:
         file_text[path] = path.read_text(encoding="utf-8")
+    blocked = _stanza_outcome(file_text[path], dataset_id)
+    if blocked is not None:
+        typer.echo(f"{prefix}: {blocked}")
+        return blocked
     new_text = _rewrite_stanza(file_text[path], dataset_id, nc_meta)
     if new_text == file_text[path]:
-        typer.echo(f"{prefix}: skipped")
-        return "skipped"
+        offered = sorted(_data_variables(nc_meta))
+        if not offered:
+            detail = "no data variables, only coordinates and auxiliaries"
+        else:
+            shown = ", ".join(offered[:_ECHO_MAX_NAMES])
+            extra = len(offered) - _ECHO_MAX_NAMES
+            detail = f"{shown}, +{extra} more" if extra > 0 else shown
+        typer.echo(f"{prefix}: retrieved, no confident match ({detail})")
+        return "unmatched"
     file_text[path] = new_text
     path.write_text(new_text, encoding="utf-8")
     typer.echo(f"{prefix}: hydrated -> {path.name}")
@@ -450,7 +881,10 @@ def bulk_hydrate_empty(
             without a deadline (the offline-test path).
 
     Returns:
-        A summary `{candidates, hydrated, skipped, timed_out, filled}` mapping.
+        A summary `{candidates, hydrated, skipped, timed_out, unmatched, filled}`
+        mapping. `unmatched` counts the retrieves that succeeded and still
+        hydrated nothing; those are also counted in `skipped`, which stays the
+        total of everything not hydrated.
     """
     from earthlens.ecmwf import Catalog
     from earthlens.ecmwf.catalog import CATALOG_PATH, clear_catalog_cache
@@ -470,6 +904,7 @@ def bulk_hydrate_empty(
     hydrated = 0
     skipped = 0
     timed_out = 0
+    unmatched = 0
     filled: list[str] = []
     for index, dataset_id in enumerate(empty, start=1):
         prefix = f"[{index}/{total}] {dataset_id}"
@@ -477,6 +912,9 @@ def bulk_hydrate_empty(
         if outcome == "hydrated":
             hydrated += 1
             filled.append(dataset_id)
+        elif outcome == "unmatched":
+            unmatched += 1
+            skipped += 1
         elif outcome == "timed_out":
             timed_out += 1
             skipped += 1
@@ -489,5 +927,6 @@ def bulk_hydrate_empty(
         "hydrated": hydrated,
         "skipped": skipped,
         "timed_out": timed_out,
+        "unmatched": unmatched,
         "filled": filled,
     }

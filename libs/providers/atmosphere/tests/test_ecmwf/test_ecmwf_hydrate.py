@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import textwrap
 import time
 from types import SimpleNamespace
 
@@ -10,8 +11,11 @@ import yaml
 
 from earthlens.ecmwf import _hydrate as hydrate_mod
 from earthlens.ecmwf._hydrate import (
+    _claimed_nc_names,
     _find_file_for_dataset,
+    _is_initialism,
     _match_variables,
+    _pair_is_evidenced,
     _retrieve_with_timeout,
     _rewrite_stanza,
     _yaml_value,
@@ -99,6 +103,32 @@ class TestRewriteStanza:
         """A stanza with no `units: unknown` variable is left unchanged."""
         assert _rewrite_stanza(_STANZA, "other-dataset", _NC_META) == _STANZA
 
+    def test_a_sibling_row_keeps_its_nc_variable_to_itself(self):
+        """A leftover slug is not handed a NetCDF name a hydrated row already claims."""
+        text = textwrap.dedent(
+            """
+            datasets:
+              demo-dataset:
+                variables:
+                  total-precipitation:
+                    cds_variable: total_precipitation
+                    nc_variable: tp
+                    units: m
+                  precipitation-rate:
+                    cds_variable: precipitation_rate
+                    nc_variable: precipitation_rate
+                    units: unknown
+            """
+        ).lstrip()
+        out = _rewrite_stanza(
+            text,
+            "demo-dataset",
+            {"tp": {"long_name": "Total precipitation", "units": "m"}},
+        )
+        variables = yaml.safe_load(out)["datasets"]["demo-dataset"]["variables"]
+        assert variables["precipitation-rate"]["units"] == "unknown"
+        assert [v["nc_variable"] for v in variables.values()].count("tp") == 1
+
     def test_empty_retrieve_returns_input(self):
         """No usable retrieved variable leaves the placeholders as-is."""
         assert _rewrite_stanza(_STANZA, "reanalysis-era5-single-levels", {}) == _STANZA
@@ -123,13 +153,105 @@ class TestMatchVariables:
         )
         assert assignments == {}
 
-    def test_order_fallback_pairs_leftovers(self):
-        """One unmatched slug + one leftover variable is the unambiguous 1:1 case."""
+    def test_unrelated_leftovers_are_not_paired(self):
+        """A lone slug and a lone variable that share no evidence keep the placeholder."""
         assignments = _match_variables(
             ["mystery-variable"],
             {"xx": {"long_name": "totally different", "units": "1"}},
         )
-        assert assignments == {"mystery-variable": ("xx", "1")}
+        assert assignments == {}
+
+    def test_leftover_pairs_when_the_short_name_shares_a_token(self):
+        """The 1:1 leftover case still resolves when the names agree."""
+        assignments = _match_variables(
+            ["wind-speed-of-gusts"],
+            {"wind_speed_gust": {"long_name": "", "units": "m s-1"}},
+        )
+        assert assignments == {"wind-speed-of-gusts": ("wind_speed_gust", "m s-1")}
+
+    @pytest.mark.parametrize(
+        ("slug", "nc_name", "long_name", "expected"),
+        [
+            # True positives - abbreviations a token-overlap test would reject.
+            ("2m-temperature", "t2m", "", True),
+            ("sea-surface-temperature", "sst", "", True),
+            ("total-precipitation", "tp", "", True),
+            # True positives - a shared token with the short or long name.
+            ("mean-uth", "uth", "", True),
+            # Only `water` of four tokens: real, but below the coverage bar, so
+            # it keeps its placeholder rather than being guessed at.
+            (
+                "terrestrial-water-storage-anomaly",
+                "lwe_thickness",
+                "Liquid Water Equivalent Thickness",
+                False,
+            ),
+            # True negatives - unrelated names must keep the placeholder.
+            ("number-of-wet-days", "elevation", "", False),
+            ("number-of-dry-spells", "elevation", "Surface elevation", False),
+            ("glacier-area", "elevation", "", False),
+            # A near-miss prefix is not an initialism.
+            ("precipitation", "pressure", "", False),
+        ],
+    )
+    def test_leftover_pairing_table(self, slug, nc_name, long_name, expected):
+        """The lone-slug/lone-variable rule pairs only on real name evidence."""
+        assignments = _match_variables(
+            [slug], {nc_name: {"long_name": long_name, "units": "1"}}
+        )
+        assert bool(assignments) is expected
+        if expected:
+            assert assignments == {slug: (nc_name, "1")}
+
+    def test_two_leftovers_are_never_paired(self):
+        """The leftover rule needs exactly one of each, so a 2x2 residue stays unhydrated."""
+        assignments = _match_variables(
+            ["first-mystery", "second-mystery"],
+            {
+                "xx": {"long_name": "totally different", "units": "1"},
+                "yy": {"long_name": "also unrelated", "units": "1"},
+            },
+        )
+        assert assignments == {}
+
+    def test_initialism_ignores_case(self):
+        """An upper-case NetCDF short name is still recognised as an initialism."""
+        assignments = _match_variables(
+            ["sea-surface-temperature"], {"SST": {"long_name": "", "units": "K"}}
+        )
+        assert assignments == {"sea-surface-temperature": ("SST", "K")}
+
+    def test_reserved_names_are_withheld_from_the_leftover_rule(self):
+        """A reserved NetCDF name is not offered to the lone leftover slug."""
+        meta = {"t2m": {"long_name": "", "units": "K"}}
+        assert _match_variables(["2m-temperature"], meta) != {}
+        assert (
+            _match_variables(["2m-temperature"], meta, reserved=frozenset({"t2m"}))
+            == {}
+        )
+
+    def test_reserved_names_still_reach_the_confident_rules(self):
+        """Reservation gates only the leftover guess; a long-name match still binds."""
+        meta = {"sst": {"long_name": "Sea surface temperature", "units": "K"}}
+        assignments = _match_variables(
+            ["sea-surface-temperature"], meta, reserved=frozenset({"sst"})
+        )
+        assert assignments == {"sea-surface-temperature": ("sst", "K")}
+
+    def test_the_all_pseudo_slug_is_never_paired(self):
+        """`all` means every variable, so it never stands in for one of them."""
+        meta = {"tp": {"long_name": "Total precipitation", "units": "m"}}
+        assert _match_variables(["total-precipitation"], meta) != {}, (
+            "a real slug pairs with this lone variable"
+        )
+        assert _match_variables(["all"], meta) == {}, "the pseudo-slug must not"
+
+    def test_stopword_only_slug_is_never_paired(self):
+        """Stripping stopwords leaves nothing to match on, so the shared `of` is ignored."""
+        assignments = _match_variables(
+            ["of-the"], {"of": {"long_name": "totally different", "units": "1"}}
+        )
+        assert assignments == {}
 
     def test_exact_short_name_never_swaps(self):
         """Multiple data vars map by exact short name, never zipped/swapped."""
@@ -196,6 +318,138 @@ class TestMatchVariables:
         assert assignments == {"temperature": ("t", "K")}, (
             "quality-flag stays unhydrated"
         )
+
+
+_CLAIMED_BLOCK = """      total-precipitation:
+        cds_variable: total_precipitation
+        nc_variable: tp  # ERA5 short name
+        units: m
+      quoted-row:
+        cds_variable: x
+        nc_variable: 'SST'
+        units: K
+      empty-row:
+        cds_variable: y
+        nc_variable: null
+        units: K
+      still-a-placeholder:
+        cds_variable: z
+        nc_variable: z
+        units: unknown
+"""
+
+
+class TestClaimedNcNames:
+    """Tests for the reservation set read out of a stanza's hydrated rows."""
+
+    def test_an_inline_comment_does_not_become_part_of_the_name(self):
+        """A trailing YAML comment is stripped, so the bare name is reserved."""
+        assert "tp" in _claimed_nc_names(_CLAIMED_BLOCK)
+
+    def test_a_quoted_value_is_unquoted_and_lowercased(self):
+        """Quotes are dropped and case folded, so SST and sst reserve alike."""
+        assert "sst" in _claimed_nc_names(_CLAIMED_BLOCK)
+
+    def test_a_null_value_reserves_nothing(self):
+        """A null nc_variable is not a claim on any name."""
+        claimed = _claimed_nc_names(_CLAIMED_BLOCK)
+        assert "null" not in claimed
+        assert "" not in claimed
+
+    def test_a_placeholder_row_claims_nothing(self):
+        """A row still carrying the unknown sentinel has not bound its name yet."""
+        assert "z" not in _claimed_nc_names(_CLAIMED_BLOCK)
+
+    def test_a_row_without_an_nc_variable_key_reserves_nothing(self):
+        """A hydrated row that never names a variable has claimed none."""
+        block = """      keyless-row:
+        cds_variable: k
+        units: m
+"""
+        assert _claimed_nc_names(block) == frozenset()
+
+    def test_an_empty_block_reserves_nothing(self):
+        """A stanza with no variables reserves nothing."""
+        assert _claimed_nc_names("") == frozenset()
+
+
+class TestIsInitialism:
+    """Tests for the order-free initialism predicate."""
+
+    @pytest.mark.parametrize(
+        ("name", "tokens", "expected"),
+        [
+            ("sst", {"sea", "surface", "temperature"}, True),
+            ("t2m", {"2m", "temperature"}, True),
+            ("tp", {"total", "precipitation"}, True),
+            ("pressure", {"precipitation"}, False),
+            ("elevation", {"number", "wet", "days"}, False),
+            ("sst", {"sea", "surface"}, False),
+        ],
+    )
+    def test_recognises_compressed_spellings(self, name, tokens, expected):
+        """A name qualifies only when every token contributes and none is left over."""
+        assert _is_initialism(name, tokens) is expected
+
+    def test_no_tokens_is_never_an_initialism(self):
+        """An empty token set carries nothing to compress."""
+        assert _is_initialism("sst", set()) is False
+
+
+class TestPairIsEvidenced:
+    """Tests for the three arms of the rule 4 evidence check."""
+
+    def test_short_name_token_overlap(self):
+        """A token shared with the NetCDF short name is evidence."""
+        assert _pair_is_evidenced("mean-uth", "uth", {}) is True
+
+    def test_long_name_token_overlap(self):
+        """Tokens shared with the long name are evidence once they cover the slug."""
+        meta = {"long_name": "Total precipitation depth"}
+        assert _pair_is_evidenced("total-precipitation", "zzz", meta) is True
+
+    def test_initialism(self):
+        """An initialism is evidence with no shared token at all."""
+        assert _pair_is_evidenced("sea-surface-temperature", "sst", {}) is True
+
+    @pytest.mark.parametrize(
+        ("slug", "long_name"),
+        [
+            ("land-sea-mask", "Mean sea level pressure"),
+            ("sub-surface-runoff", "Surface net solar radiation"),
+        ],
+    )
+    def test_one_generic_word_does_not_cover_enough_of_the_slug(self, slug, long_name):
+        """A lone generic word shared with the long name is coincidence, not evidence."""
+        assert _pair_is_evidenced(slug, "zzz", {"long_name": long_name}) is False
+
+    def test_shared_tokens_covering_half_the_slug_are_evidence(self):
+        """Half the slug's tokens is the bar, so a two-token slug needs one of them."""
+        assert _pair_is_evidenced("glacier-area", "area", {}) is True
+
+    def test_reservation_declines_a_name_a_sibling_row_owns(self):
+        """Where a hydrated sibling owns the name, reservation is what stops rule 4."""
+        meta = {"msl": {"long_name": "Mean sea level pressure", "units": "Pa"}}
+        assert _match_variables(["land-sea-mask"], meta) != {}
+        assert (
+            _match_variables(["land-sea-mask"], meta, reserved=frozenset({"msl"})) == {}
+        )
+
+    @pytest.mark.parametrize(
+        ("slug", "name"),
+        [("co2", "co"), ("ethene", "e"), ("methane", "met")],
+    )
+    def test_a_single_word_slug_is_not_abbreviated_by_a_prefix(self, slug, name):
+        """Compressing one word leaves only a prefix of it, which is not evidence."""
+        assert _pair_is_evidenced(slug, name, {}) is False
+
+    def test_unrelated_names_carry_no_evidence(self):
+        """Two names with nothing in common are not paired."""
+        assert _pair_is_evidenced("number-of-wet-days", "elevation", {}) is False
+
+    def test_a_stopword_only_slug_carries_no_evidence(self):
+        """A slug that reduces to stopwords has nothing left to match on."""
+        assert _pair_is_evidenced("of-the", "xx", {"long_name": "of the"}) is False
 
 
 class TestRetrieveWithTimeout:
@@ -311,6 +565,7 @@ class TestBulkHydrateEmpty:
             "hydrated": 1,
             "skipped": 0,
             "timed_out": 0,
+            "unmatched": 0,
             "filled": ["reanalysis-era5-single-levels"],
         }
         variables = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"][
@@ -334,6 +589,78 @@ class TestBulkHydrateEmpty:
         summary = bulk_hydrate_empty()
         assert summary["hydrated"] == 0
         assert summary["skipped"] == 1
+
+    def test_a_declined_match_is_reported_apart_from_a_skip(
+        self, tmp_path, monkeypatch
+    ):
+        """A retrieve that yields nothing confident is unmatched, not skipped."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_retrieve_netcdf_vars",
+            lambda ds: {"elevation": {"long_name": "Surface elevation", "units": "m"}},
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["hydrated"] == 0
+        assert summary["unmatched"] == 1
+        assert summary["skipped"] == 1, "unmatched still counts toward skipped"
+
+    def test_a_missing_stanza_is_a_skip_not_a_declined_match(
+        self, tmp_path, monkeypatch
+    ):
+        """A shard that never held the dataset had nothing for the matcher to decline."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        monkeypatch.setattr(hydrate_mod, "_find_file_for_dataset", lambda *a: None)
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_netcdf_vars", lambda ds: dict(_NC_META)
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["unmatched"] == 0
+        assert summary["skipped"] == 1
+
+    def test_a_stanza_with_nothing_left_to_fill_is_a_skip(self, tmp_path, monkeypatch):
+        """A stanza whose placeholders are already filled is not a declined match."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"other-dataset": _placeholder_dataset("total-precipitation")},
+        )
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_netcdf_vars", lambda ds: dict(_NC_META)
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["unmatched"] == 0
+        assert summary["skipped"] == 1
+
+    def test_a_retrieve_of_only_auxiliaries_says_so(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        """When nothing retrieved is a data variable, the echo names that case."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_retrieve_netcdf_vars",
+            lambda ds: {"latitude": {"long_name": "latitude", "units": "degrees"}},
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["unmatched"] == 1
+        assert "only coordinates and auxiliaries" in capsys.readouterr().out
 
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the placeholder worklist."""

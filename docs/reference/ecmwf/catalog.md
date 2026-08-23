@@ -710,6 +710,32 @@ from a live tiny retrieve. Licence-gated and best-effort — a dataset
 whose licence you have not accepted is left untouched rather than
 guessed at.
 
+Matching is deliberately conservative. The confident rules come first: an
+exact short-name match, then a token-subset match against the variable's
+`long_name`. Only a single leftover slug facing a single unused variable
+reaches the last-resort rule, and it pairs them only when the two names
+carry evidence of describing the same quantity — shared tokens covering
+at least half the slug, or an initialism (`sst` for
+`sea-surface-temperature`).
+
+Two limits of that last rule are worth knowing before you trust its
+output. Its evidence is a filter, not a proof. The coverage bar rejects
+the single-generic-word coincidence — `land-sea-mask` shares only `sea`
+with mean sea level pressure — but it cannot police the initialism arm,
+which has no shared tokens to measure and will still read `msl` as
+m(ask) s(ea) l(and). And it leans heavily on the retrieved variable's
+`long_name` — across the curated catalog, 89% of the rows that need more
+than an exact name match would fail the check if the retrieve carried no
+`long_name` at all. A NetCDF name that an already-hydrated row of the same
+dataset claims is withheld from it, so a re-run cannot make two rows fight
+over one variable, but most datasets reaching this rule have no hydrated
+row yet and so withhold nothing.
+
+A slug that stays ambiguous keeps its `unknown` placeholder, because a
+wrong `nc_variable` silently mis-extracts at `aggregate=` time, which is
+worse than an obvious gap. Those rows are counted separately in the
+command's summary, so they can be curated by hand.
+
 ## Adding a new dataset
 
 The typical sequence to extend the catalog with a brand-new dataset
