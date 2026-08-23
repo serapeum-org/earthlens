@@ -25,7 +25,12 @@ from __future__ import annotations
 
 import requests
 
-from earthlens.base import UpstreamUnavailableError, http_status
+from earthlens.base import (
+    UpstreamUnavailableError,
+    exception_chain,
+    response_status,
+    status_in_message,
+)
 
 #: HTTP statuses that mark the GDACS *service* — not the request — as the
 #: problem. The transient gateway / rate-limit family (`408` request timeout,
@@ -96,12 +101,14 @@ class GdacsUnavailableError(UpstreamUnavailableError):
 def gdacs_http_status(exc: BaseException) -> int | None:
     """Best-effort HTTP status behind a failed SEARCH call.
 
-    A thin wrapper over :func:`earthlens.base.http_status`: reads the status from
-    a `requests`-style `response.status_code` when the exception carries a
-    response, and otherwise from a `NNN Server/Client Error` in the message — the
-    shape a `raise_for_status`-built `requests.HTTPError` has before it is
-    attached to a response. Walks the `__cause__` / `__context__` chain
-    (cycle-safe) so a wrapped error still yields its status.
+    Composed from the shared `earthlens.base` helpers: walks the `__cause__` /
+    `__context__` chain (`exception_chain`, cycle-safe) and, per link, reads a
+    `requests`-style `response.status_code` (`response_status`), else parses a
+    *leading* `NNN Server/Client Error` out of the message
+    (`status_in_message(anchored=True)`) — the shape a `raise_for_status`-built
+    `requests.HTTPError` has before it is attached to a response. The anchored
+    parse matches gdacs's original reader (a status must lead the message, not be
+    buried mid-string).
 
     Args:
         exc: The exception raised by a SEARCH call.
@@ -122,7 +129,14 @@ def gdacs_http_status(exc: BaseException) -> int | None:
 
             ```
     """
-    return http_status(exc)
+    for link in exception_chain(exc):
+        found = response_status(link)
+        if found is not None:
+            return found
+        found = status_in_message(str(link), anchored=True)
+        if found is not None:
+            return found
+    return None
 
 
 def service_failure_reason(exc: BaseException) -> str | None:
