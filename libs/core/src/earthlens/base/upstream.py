@@ -267,11 +267,14 @@ def http_status(exc: BaseException) -> int | None:
 
             ```
     """
+    # `# NOSONAR` below suppresses a python:S112 false positive: SonarPython
+    # flags the `link` argument as a raised generic exception, but nothing is
+    # raised here — both lines are plain reads of a chain link's status.
     for link in exception_chain(exc):
-        found = response_status(link)  # NOSONAR: S112 false positive (no raise)
+        found = response_status(link)  # NOSONAR
         if found is not None:
             return found
-        found = status_in_message(str(link))  # NOSONAR: S112 false positive (no raise)
+        found = status_in_message(str(link))  # NOSONAR
         if found is not None:
             return found
     return None
