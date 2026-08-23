@@ -167,6 +167,59 @@ class TestShapeFrame:
         logger.remove(sink)
         assert any("schema drift" in message.lower() for message in messages)
 
+    def _flagged(self, value, validity):
+        """One MT pm25 row carrying value/validity for the no-data masking tests."""
+        return pd.DataFrame(
+            {
+                "Samplingpoint": ["MT/SPO-1"],
+                "Pollutant": [6001],
+                "Start": pd.to_datetime(["2011-01-01T00:00"]),
+                "Value": [value],
+                "Unit": ["ug.m-3"],
+                "AggType": ["hour"],
+                "Validity": [validity],
+                "Verification": [3],
+            }
+        )
+
+    def test_negative_flag_masks_sentinel_to_nan(self):
+        """A -999 reading flagged invalid comes back as NaN with the flag preserved."""
+        out = shape_frame(self._flagged("-999", -1), "Historical", {6001: "pm25"})
+        assert pd.isna(out.loc[0, "value"])
+        assert out.loc[0, "validity"] == -1
+
+    def test_negative_flag_masks_zero_value(self):
+        """An invalid row published as 0.0 is masked too, gated on the flag not the value."""
+        out = shape_frame(self._flagged("0.0", -1), "Historical", {6001: "pm25"})
+        assert pd.isna(out.loc[0, "value"])
+
+    def test_maintenance_flag_masks_value(self):
+        """A -99 maintenance flag also masks the reading."""
+        out = shape_frame(self._flagged("12.0", -99), "Historical", {6001: "pm25"})
+        assert pd.isna(out.loc[0, "value"])
+
+    def test_valid_row_keeps_value_including_small_negative(self):
+        """A valid row keeps its value, small near-zero instrument noise included."""
+        out = shape_frame(self._flagged("-5.3", 1), "Verified", {6001: "pm25"})
+        assert out.loc[0, "value"] == -5.3
+        assert out.loc[0, "validity"] == 1
+
+    def test_null_flag_sentinel_is_masked(self):
+        """A -999 sentinel carried under a null flag is masked, not passed through."""
+        out = shape_frame(self._flagged("-999", None), "Historical", {6001: "pm25"})
+        assert pd.isna(out.loc[0, "value"])
+        assert pd.isna(out.loc[0, "validity"])
+
+    def test_null_flag_real_value_is_kept(self):
+        """A genuine reading with a null flag is not over-masked."""
+        out = shape_frame(self._flagged("7.2", None), "Unverified", {6001: "pm25"})
+        assert out.loc[0, "value"] == 7.2
+
+    def test_masked_value_column_stays_float(self):
+        """Masking keeps the value column float64 rather than upcasting to object."""
+        out = shape_frame(self._flagged("-999", -1), "Historical", {6001: "pm25"})
+        assert str(out["value"].dtype) == "float64"
+
 
 @pytest.mark.eea
 def test_empty_frame_schema():
