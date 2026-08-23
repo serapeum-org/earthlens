@@ -373,6 +373,11 @@ def _is_initialism(name: str, tokens: set[str]) -> bool:
     Covers the abbreviations a plain token-overlap test rejects: `sst` for
     `sea-surface-temperature`, `t2m` for `2m-temperature`.
 
+    On its own this says nothing about how many tokens are worth compressing.
+    Given one token it reduces to "is `name` a prefix of that word", which
+    reads `co` as an abbreviation of `co2`; the two-token minimum that makes
+    the arm meaningful is applied by :func:`_pair_is_evidenced`, not here.
+
     Args:
         name: The NetCDF short name.
         tokens: The slug's meaningful tokens.
@@ -399,6 +404,15 @@ def _is_initialism(name: str, tokens: set[str]) -> bool:
             False
             >>> _is_initialism("elevation", {"number", "wet", "days"})
             False
+
+            ```
+        - With a single token it is only a prefix test, which is why the
+          caller requires two:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _is_initialism
+            >>> _is_initialism("co", {"co2"})
+            True
 
             ```
     """
