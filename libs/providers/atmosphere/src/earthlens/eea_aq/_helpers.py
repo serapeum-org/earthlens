@@ -364,7 +364,11 @@ def shape_frame(
     # reading that merely lacks a flag untouched.
     invalid_flag = (out["validity"] < 0).fillna(False)
     unflagged_sentinel = out["validity"].isna() & out["value"].isin(_NODATA_SENTINELS)
-    out.loc[invalid_flag | unflagged_sentinel, "value"] = pd.NA
+    # `value` is a numpy float column, so use a float NaN rather than `pd.NA`:
+    # pd.NA is the marker for pandas nullable dtypes and can upcast the column
+    # to object, which would make the trailing astype(SCHEMA) raise instead of
+    # coerce on older pandas. float("nan") settles to float64 unconditionally.
+    out.loc[invalid_flag | unflagged_sentinel, "value"] = float("nan")
     out["dataset"] = dataset
     out["provider"] = "EEA"
     return out.reset_index(drop=True).astype(SCHEMA)
