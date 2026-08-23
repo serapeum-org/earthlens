@@ -23,9 +23,14 @@ the EMODnet-WCS `is_wcs_service_failure` classifier: a live e2e test catches
 
 from __future__ import annotations
 
-import re
-
 import requests
+
+from earthlens.base import (
+    UpstreamUnavailableError,
+    exception_chain,
+    response_status,
+    status_in_message,
+)
 
 #: HTTP statuses that mark the GDACS *service* — not the request — as the
 #: problem. The transient gateway / rate-limit family (`408` request timeout,
@@ -55,15 +60,8 @@ GDACS_RETRY_EXCEPTIONS: tuple[type[BaseException], ...] = (
     requests.Timeout,
 )
 
-#: `NNN Server Error` / `NNN Client Error` at the head of a `requests.HTTPError`
-#: message — the fallback when the exception carries no `response` object (as a
-#: hand-built `requests.HTTPError("500 Server Error")` in a test does).
-_STATUS_IN_MESSAGE = re.compile(
-    r"\s*(\d{3})\s+(?:server|client)\s+error", re.IGNORECASE
-)
 
-
-class GdacsUnavailableError(RuntimeError):
+class GdacsUnavailableError(UpstreamUnavailableError):
     """The GDACS SEARCH feed was unavailable after the backend's retries.
 
     Raised by the GDACS backend when a combined SEARCH request fails for a
@@ -94,30 +92,23 @@ class GdacsUnavailableError(RuntimeError):
             True
 
             ```
+
+    The `(message, status_code)` constructor is inherited from
+    :class:`~earthlens.base.UpstreamUnavailableError`.
     """
-
-    def __init__(self, message: str, status_code: int | None = None) -> None:
-        """Store the actionable message and the originating HTTP status.
-
-        Args:
-            message: Human-facing explanation — what happened and what to do.
-            status_code: The HTTP status that triggered it, or `None` when the
-                failure was a transport error (no status) or the status could
-                not be recovered from the exception.
-        """
-        super().__init__(message)
-        self.status_code = status_code
 
 
 def gdacs_http_status(exc: BaseException) -> int | None:
     """Best-effort HTTP status behind a failed SEARCH call.
 
-    Reads the status from a `requests`-style `response.status_code` when the
-    exception carries a response, and otherwise parses a leading
-    `NNN Server/Client Error` out of the message — the shape a
-    `raise_for_status`-built `requests.HTTPError` has before it is attached to a
-    response. Walks the `__cause__` / `__context__` chain (cycle-safe) so a
-    wrapped error still yields its status.
+    Composed from the shared `earthlens.base` helpers: walks the `__cause__` /
+    `__context__` chain (`exception_chain`, cycle-safe) and, per link, reads a
+    `requests`-style `response.status_code` (`response_status`), else parses a
+    *leading* `NNN Server/Client Error` out of the message
+    (`status_in_message(anchored=True)`) — the shape a `raise_for_status`-built
+    `requests.HTTPError` has before it is attached to a response. The anchored
+    parse matches gdacs's original reader (a status must lead the message, not be
+    buried mid-string).
 
     Args:
         exc: The exception raised by a SEARCH call.
@@ -138,27 +129,13 @@ def gdacs_http_status(exc: BaseException) -> int | None:
 
             ```
     """
-    seen: set[int] = set()
-    current: BaseException | None = exc
-    while current is not None and id(current) not in seen:
-        seen.add(id(current))
-        response = getattr(current, "response", None)
-        status = getattr(response, "status_code", None)
-        if isinstance(status, int) and not isinstance(status, bool):
-            return status
-        match = _STATUS_IN_MESSAGE.match(str(current))
-        if match is not None:
-            return int(match.group(1))
-        # Honour `raise … from None` like `testing._exception_chain`: an explicit
-        # cause wins; otherwise follow the implicit context unless it was
-        # suppressed, so a deliberately surfaced error is not reclassified via a
-        # context it asked to hide.
-        if current.__cause__ is not None:
-            current = current.__cause__
-        elif current.__suppress_context__:
-            current = None
-        else:
-            current = current.__context__
+    for link in exception_chain(exc):
+        found = response_status(link)
+        if found is not None:
+            return found
+        found = status_in_message(str(link), anchored=True)
+        if found is not None:
+            return found
     return None
 
 

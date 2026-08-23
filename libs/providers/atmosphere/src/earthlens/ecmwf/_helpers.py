@@ -10,14 +10,13 @@ its own `_helpers` (`gdacs`, `osm`, `bathymetry`).
 from __future__ import annotations
 
 import os
-import re
 import time
-from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
 from loguru import logger
 
+from earthlens.base import UpstreamUnavailableError, http_status
 from earthlens.ecmwf.endpoints import endpoint_url
 
 
@@ -82,7 +81,7 @@ def endpoint_for(dataset: str) -> str:
     return "cds"
 
 
-class CadsUnavailableError(RuntimeError):
+class CadsUnavailableError(UpstreamUnavailableError):
     """A CADS store refused the retrieve after the backend's retries.
 
     Raised when a store rejects a request for a reason that is the *service*,
@@ -112,18 +111,10 @@ class CadsUnavailableError(RuntimeError):
             True
 
             ```
+
+    The `(message, status_code)` constructor is inherited from
+    :class:`~earthlens.base.UpstreamUnavailableError`.
     """
-
-    def __init__(self, message: str, status_code: int | None = None) -> None:
-        """Store the actionable message and the originating HTTP status.
-
-        Args:
-            message: What the store refused and why, in the caller's terms.
-            status_code: The HTTP status when one could be read off the
-                failure, else `None`.
-        """
-        super().__init__(message)
-        self.status_code = status_code
 
 
 def _looks_like_throttled(exc: BaseException) -> bool:
@@ -158,83 +149,23 @@ def _looks_like_throttled(exc: BaseException) -> bool:
     return "temporarily limited" in message or "queued requests" in message
 
 
-def _exception_chain(exc: BaseException) -> Iterator[Exception]:
-    """Yield `exc` then each linked `__cause__` / `__context__`, cycle-safe.
-
-    Only `Exception` links are yielded. A `KeyboardInterrupt` or `SystemExit`
-    caught up in a chain carries no HTTP status and must not be message-sniffed
-    for one — the same reasoning that keeps `_looks_like_throttled` off
-    `ValueError` and `AssertionError`. The walk still traverses *through* such a
-    link, so a status further down the chain is not lost.
-
-    Args:
-        exc: The exception to walk.
-
-    Yields:
-        Exception: Each `Exception` in the chain, most recent first.
-    """
-    seen: set[int] = set()
-    current: BaseException | None = exc
-    while current is not None and id(current) not in seen:
-        seen.add(id(current))
-        if isinstance(current, Exception):
-            yield current
-        # Honour `raise ... from None`: an explicit cause wins, otherwise follow
-        # the implicit context unless the author suppressed it (matching
-        # Python's own traceback display), so a deliberately surfaced failure is
-        # not reclassified through a context it asked to hide.
-        if current.__cause__ is not None:
-            current = current.__cause__
-        elif current.__suppress_context__:
-            current = None
-        else:
-            current = current.__context__
-
-
 def _status_of(exc: BaseException) -> int | None:
     """Return the HTTP status behind a failed retrieve, when discernible.
 
-    Walks the exception chain, because `cdsapi` wraps the `requests` error that
-    carries the `response` — reading only the outermost exception would answer
-    `None` for most real refusals.
+    A thin wrapper over :func:`earthlens.base.http_status`: it walks the
+    exception chain, because `cdsapi` wraps the `requests` error that carries the
+    `response` — reading only the outermost exception would answer `None` for
+    most real refusals. The status comes from a `response` object when one is
+    reachable and otherwise from a `NNN Server/Client Error` in a link's message.
 
     Args:
         exc: The exception raised by `client.retrieve(...)`.
 
     Returns:
-        int | None: The HTTP status, from a `response` object when one is
-            reachable and otherwise parsed out of the message; `None` when
-            neither yields one, as a transport drop carries no status.
+        int | None: The HTTP status, or `None` when neither a response nor the
+            message yields one (a transport drop carries none).
     """
-    for link in _exception_chain(exc):
-        found = _status_of_one(link)
-        if found is not None:
-            return found
-    return None
-
-
-def _status_of_one(error: Exception) -> int | None:
-    """Return the HTTP status one exception carries, from `response` or text.
-
-    Args:
-        error: A single link from the exception chain.
-
-    Returns:
-        int | None: Its status, or `None` when it carries none. `bool` is
-            rejected explicitly because it is a subclass of `int`.
-    """
-    code = getattr(getattr(error, "response", None), "status_code", None)
-    if isinstance(code, int) and not isinstance(code, bool):
-        return code
-    # The status is often only in the text of the wrapped error, so each link
-    # is scanned rather than the outermost message alone.
-    return _status_in_message(str(error))
-
-
-def _status_in_message(text: str) -> int | None:
-    """Return the `NNN Client/Server Error` status in `text`, when present."""
-    match = re.search(r"\b(\d{3})\s+(?:server|client)\s+error", text, re.I)
-    return int(match.group(1)) if match else None
+    return http_status(exc)
 
 
 #: Attempts a throttled retrieve gets before the store is declared unavailable.
