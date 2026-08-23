@@ -171,6 +171,24 @@ class TestMatchVariables:
         if expected:
             assert assignments == {slug: (nc_name, "1")}
 
+    def test_two_leftovers_are_never_paired(self):
+        """The leftover rule needs exactly one of each, so a 2x2 residue stays unhydrated."""
+        assignments = _match_variables(
+            ["first-mystery", "second-mystery"],
+            {
+                "xx": {"long_name": "totally different", "units": "1"},
+                "yy": {"long_name": "also unrelated", "units": "1"},
+            },
+        )
+        assert assignments == {}
+
+    def test_initialism_ignores_case(self):
+        """An upper-case NetCDF short name is still recognised as an initialism."""
+        assignments = _match_variables(
+            ["sea-surface-temperature"], {"SST": {"long_name": "", "units": "K"}}
+        )
+        assert assignments == {"sea-surface-temperature": ("SST", "K")}
+
     def test_stopword_only_slug_is_never_paired(self):
         """A slug that reduces to stopwords carries no evidence to match on."""
         assignments = _match_variables(
