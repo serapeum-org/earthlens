@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24913,30 +24913,44 @@ _BASEMAP = None</div>
     <span class="k">return</span> <span class="n">gif</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">publish_clip</span><span class="p">(</span><span class="n">master</span><span class="p">,</span> <span class="n">web_width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">gif_width</span><span class="o">=</span><span class="mi">720</span><span class="p">,</span> <span class="n">gif_fps</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Derive the docs-site mp4 and the README gif from the rendered master.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">publish_clip</span><span class="p">(</span>
+    <span class="n">master</span><span class="p">,</span> <span class="n">web_width</span><span class="o">=</span><span class="mi">1280</span><span class="p">,</span> <span class="n">gif_width</span><span class="o">=</span><span class="mi">880</span><span class="p">,</span> <span class="n">gif_fps</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">webp_width</span><span class="o">=</span><span class="mi">1080</span><span class="p">,</span> <span class="n">webp_fps</span><span class="o">=</span><span class="mi">15</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Derive every published size from the rendered master.</span>
 
-<span class="sd">    Drawing the frames is the expensive part and it happens once, at the largest</span>
-<span class="sd">    size any target needs. Every other size is a transcode of those same frames:</span>
-<span class="sd">    scaling 1920 down to 1280, or to a 720-wide gif, takes seconds and re-renders</span>
-<span class="sd">    nothing. The gif exists because GitHub strips video tags from README markdown,</span>
-<span class="sd">    so an animation there has to be an image.</span>
+<span class="sd">    Drawing the frames is the expensive part and it happens once, at the largest size</span>
+<span class="sd">    any target needs; every other file is a transcode of those same frames.</span>
+
+<span class="sd">    Three outputs, because the three places this clip appears do not accept the same</span>
+<span class="sd">    thing. The documentation site takes an mp4, which it can embed in a `&lt;video&gt;`.</span>
+<span class="sd">    GitHub strips video tags from README markdown, so the README needs an image --</span>
+<span class="sd">    and an animated webp beats a gif on every axis here, carrying truecolour at a</span>
+<span class="sd">    wider size for fewer bytes. The gif remains as the conservative fallback.</span>
+
+<span class="sd">    The gif settings are not defaults. A 256-colour palette measured 1.8 dB better</span>
+<span class="sd">    than 128 on this material, `stats_mode=full` suits a composition that is mostly</span>
+<span class="sd">    static, and dithering is off because error diffusion speckles a dark, smooth</span>
+<span class="sd">    frame -- measured better *and* smaller than the diffused version. 880 px matches</span>
+<span class="sd">    GitHub's README column, so nothing is scaled in either direction.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        master: Path to the rendered master mp4.</span>
 <span class="sd">        web_width: Width of the mp4 the documentation site embeds.</span>
 <span class="sd">        gif_width: Width of the gif. Below about 700 px the satellite labels stop</span>
-<span class="sd">            being legible, which is the floor rather than a size preference.</span>
+<span class="sd">            being legible, so this is a floor rather than a preference.</span>
 <span class="sd">        gif_fps: Frame rate of the gif; halving it halves the file with no visible</span>
 <span class="sd">            judder, since the clip's duration is unchanged.</span>
+<span class="sd">        webp_width: Width of the animated webp used in the README.</span>
+<span class="sd">        webp_fps: Frame rate of the webp, which can afford more than the gif.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        tuple: The `(web_mp4, gif)` paths that were written.</span>
+<span class="sd">        tuple: The `(web_mp4, gif, webp)` paths that were written.</span>
 <span class="sd">    """</span>
     <span class="n">master</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">master</span><span class="p">)</span>
     <span class="n">exe</span> <span class="o">=</span> <span class="n">imageio_ffmpeg</span><span class="o">.</span><span class="n">get_ffmpeg_exe</span><span class="p">()</span>
     <span class="n">stem</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">master</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">""</span><span class="p">))</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">"-1920"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">web</span><span class="p">,</span> <span class="n">gif</span><span class="p">,</span> <span class="n">palette</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">web_width</span><span class="si">}</span><span class="s2">.mp4"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.gif"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">_palette.png"</span>
+    <span class="n">web</span><span class="p">,</span> <span class="n">gif</span><span class="p">,</span> <span class="n">webp</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">web_width</span><span class="si">}</span><span class="s2">.mp4"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.gif"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">.webp"</span>
+    <span class="n">palette</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">_palette.png"</span>
 
     <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
         <span class="p">[</span>
@@ -24958,6 +24972,29 @@ _BASEMAP = None</div>
         <span class="p">],</span>
         <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">exe</span><span class="p">,</span>
+            <span class="s2">"-y"</span><span class="p">,</span>
+            <span class="s2">"-v"</span><span class="p">,</span>
+            <span class="s2">"error"</span><span class="p">,</span>
+            <span class="s2">"-i"</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">master</span><span class="p">),</span>
+            <span class="s2">"-vf"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"fps=</span><span class="si">{</span><span class="n">webp_fps</span><span class="si">}</span><span class="s2">,scale=</span><span class="si">{</span><span class="n">webp_width</span><span class="si">}</span><span class="s2">:-1:flags=lanczos"</span><span class="p">,</span>
+            <span class="s2">"-c:v"</span><span class="p">,</span>
+            <span class="s2">"libwebp"</span><span class="p">,</span>
+            <span class="s2">"-lossless"</span><span class="p">,</span>
+            <span class="s2">"0"</span><span class="p">,</span>
+            <span class="s2">"-q:v"</span><span class="p">,</span>
+            <span class="s2">"72"</span><span class="p">,</span>
+            <span class="s2">"-loop"</span><span class="p">,</span>
+            <span class="s2">"0"</span><span class="p">,</span>
+            <span class="s2">"-an"</span><span class="p">,</span>
+            <span class="n">webp</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">scale</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"fps=</span><span class="si">{</span><span class="n">gif_fps</span><span class="si">}</span><span class="s2">,scale=</span><span class="si">{</span><span class="n">gif_width</span><span class="si">}</span><span class="s2">:-1:flags=lanczos"</span>
     <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
         <span class="p">[</span>
@@ -24968,7 +25005,7 @@ _BASEMAP = None</div>
             <span class="s2">"-i"</span><span class="p">,</span>
             <span class="nb">str</span><span class="p">(</span><span class="n">master</span><span class="p">),</span>
             <span class="s2">"-vf"</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">,palettegen=max_colors=128:stats_mode=diff"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">,palettegen=max_colors=256:stats_mode=full"</span><span class="p">,</span>
             <span class="n">palette</span><span class="p">,</span>
         <span class="p">],</span>
         <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -24984,13 +25021,13 @@ _BASEMAP = None</div>
             <span class="s2">"-i"</span><span class="p">,</span>
             <span class="n">palette</span><span class="p">,</span>
             <span class="s2">"-lavfi"</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2"> [x]; [x][1:v] paletteuse=dither=sierra2_4a:diff_mode=rectangle"</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2"> [x]; [x][1:v] paletteuse=dither=none:diff_mode=rectangle"</span><span class="p">,</span>
             <span class="n">gif</span><span class="p">,</span>
         <span class="p">],</span>
         <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">palette</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">web</span><span class="p">,</span> <span class="n">gif</span>
+    <span class="k">return</span> <span class="n">web</span><span class="p">,</span> <span class="n">gif</span><span class="p">,</span> <span class="n">webp</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_glyph_rect</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">):</span>
@@ -25344,30 +25381,44 @@ def save_clip(
     return gif
 
 
-def publish_clip(master, web_width=1280, gif_width=720, gif_fps=12):
-    """Derive the docs-site mp4 and the README gif from the rendered master.
+def publish_clip(
+    master, web_width=1280, gif_width=880, gif_fps=12, webp_width=1080, webp_fps=15
+):
+    """Derive every published size from the rendered master.
 
-    Drawing the frames is the expensive part and it happens once, at the largest
-    size any target needs. Every other size is a transcode of those same frames:
-    scaling 1920 down to 1280, or to a 720-wide gif, takes seconds and re-renders
-    nothing. The gif exists because GitHub strips video tags from README markdown,
-    so an animation there has to be an image.
+    Drawing the frames is the expensive part and it happens once, at the largest size
+    any target needs; every other file is a transcode of those same frames.
+
+    Three outputs, because the three places this clip appears do not accept the same
+    thing. The documentation site takes an mp4, which it can embed in a `&lt;video&gt;`.
+    GitHub strips video tags from README markdown, so the README needs an image --
+    and an animated webp beats a gif on every axis here, carrying truecolour at a
+    wider size for fewer bytes. The gif remains as the conservative fallback.
+
+    The gif settings are not defaults. A 256-colour palette measured 1.8 dB better
+    than 128 on this material, `stats_mode=full` suits a composition that is mostly
+    static, and dithering is off because error diffusion speckles a dark, smooth
+    frame -- measured better *and* smaller than the diffused version. 880 px matches
+    GitHub's README column, so nothing is scaled in either direction.
 
     Args:
         master: Path to the rendered master mp4.
         web_width: Width of the mp4 the documentation site embeds.
         gif_width: Width of the gif. Below about 700 px the satellite labels stop
-            being legible, which is the floor rather than a size preference.
+            being legible, so this is a floor rather than a preference.
         gif_fps: Frame rate of the gif; halving it halves the file with no visible
             judder, since the clip's duration is unchanged.
+        webp_width: Width of the animated webp used in the README.
+        webp_fps: Frame rate of the webp, which can afford more than the gif.
 
     Returns:
-        tuple: The `(web_mp4, gif)` paths that were written.
+        tuple: The `(web_mp4, gif, webp)` paths that were written.
     """
     master = Path(master)
     exe = imageio_ffmpeg.get_ffmpeg_exe()
     stem = str(master.with_suffix("")).rsplit("-1920", 1)[0]
-    web, gif, palette = f"{stem}-{web_width}.mp4", f"{stem}.gif", f"{stem}_palette.png"
+    web, gif, webp = f"{stem}-{web_width}.mp4", f"{stem}.gif", f"{stem}.webp"
+    palette = f"{stem}_palette.png"
 
     subprocess.run(
         [
@@ -25389,6 +25440,29 @@ def publish_clip(master, web_width=1280, gif_width=720, gif_fps=12):
         ],
         check=True,
     )
+    subprocess.run(
+        [
+            exe,
+            "-y",
+            "-v",
+            "error",
+            "-i",
+            str(master),
+            "-vf",
+            f"fps={webp_fps},scale={webp_width}:-1:flags=lanczos",
+            "-c:v",
+            "libwebp",
+            "-lossless",
+            "0",
+            "-q:v",
+            "72",
+            "-loop",
+            "0",
+            "-an",
+            webp,
+        ],
+        check=True,
+    )
     scale = f"fps={gif_fps},scale={gif_width}:-1:flags=lanczos"
     subprocess.run(
         [
@@ -25399,7 +25473,7 @@ def publish_clip(master, web_width=1280, gif_width=720, gif_fps=12):
             "-i",
             str(master),
             "-vf",
-            f"{scale},palettegen=max_colors=128:stats_mode=diff",
+            f"{scale},palettegen=max_colors=256:stats_mode=full",
             palette,
         ],
         check=True,
@@ -25415,13 +25489,13 @@ def publish_clip(master, web_width=1280, gif_width=720, gif_fps=12):
             "-i",
             palette,
             "-lavfi",
-            f"{scale} [x]; [x][1:v] paletteuse=dither=sierra2_4a:diff_mode=rectangle",
+            f"{scale} [x]; [x][1:v] paletteuse=dither=none:diff_mode=rectangle",
             gif,
         ],
         check=True,
     )
     os.remove(palette)
-    return web, gif
+    return web, gif, webp
 
 
 def _glyph_rect(x0, y0, x1, y1):
@@ -25803,6 +25877,14 @@ and the node fixed to the longitude it is parked over.</p>
 
 <span class="n">TRACKS</span> <span class="o">=</span> <span class="p">[</span><span class="n">satellite_track</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">SATELLITES</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">SATELLITES</span><span class="p">)]</span>
 
+<span class="c1">#: The catalogue split by the one thing about a satellite that never changes.</span>
+<span class="c1">#: Every frame draws these two populations separately -- beams, swaths and</span>
+<span class="c1">#: near-side names belong to the low orbiters, the parked-longitude labels to the</span>
+<span class="c1">#: geostationary ring -- so the split is taken once here rather than re-derived</span>
+<span class="c1">#: inside the draw loop on each of the 480 frames.</span>
+<span class="n">GEO_TRACKS</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">TRACKS</span> <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="s2">"kind"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"geo"</span><span class="p">]</span>
+<span class="n">LOW_ORBIT_TRACKS</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">TRACKS</span> <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="s2">"kind"</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"geo"</span><span class="p">]</span>
+
 <span class="n">geo</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">TRACKS</span> <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="s2">"kind"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"geo"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span>
     <span class="sa">f</span><span class="s2">"geostationary period : </span><span class="si">{</span><span class="n">geo</span><span class="p">[</span><span class="s1">'period'</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">3600</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> h   (one sidereal day = 23.934 h)"</span>
@@ -25955,6 +26037,14 @@ def satellite_track(sat, index, n_planes):
 
 
 TRACKS = [satellite_track(s, i, len(SATELLITES)) for i, s in enumerate(SATELLITES)]
+
+#: The catalogue split by the one thing about a satellite that never changes.
+#: Every frame draws these two populations separately -- beams, swaths and
+#: near-side names belong to the low orbiters, the parked-longitude labels to the
+#: geostationary ring -- so the split is taken once here rather than re-derived
+#: inside the draw loop on each of the 480 frames.
+GEO_TRACKS = [t for t in TRACKS if t["kind"] == "geo"]
+LOW_ORBIT_TRACKS = [t for t in TRACKS if t["kind"] != "geo"]
 
 geo = next(t for t in TRACKS if t["kind"] == "geo")
 print(
@@ -26494,9 +26584,7 @@ def stamp_logo(fig, frac=LOGO_FRAC, margin=LOGO_MARGIN):
     <span class="c1"># The instrument's field of view: a flat sheet from the spacecraft down to the</span>
     <span class="c1"># strip it is imaging right now. Drawn before the trail so the trail's older,</span>
     <span class="c1"># fainter ground reads as behind it.</span>
-    <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">TRACKS</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">track</span><span class="p">[</span><span class="s2">"kind"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"geo"</span><span class="p">:</span>
-            <span class="k">continue</span>
+    <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">LOW_ORBIT_TRACKS</span><span class="p">:</span>
         <span class="n">quad</span> <span class="o">=</span> <span class="n">sensor_beam</span><span class="p">(</span><span class="n">track</span><span class="p">,</span> <span class="n">t_hours</span><span class="p">,</span> <span class="n">spin</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">quad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">continue</span>
@@ -26512,9 +26600,7 @@ def stamp_logo(fig, frac=LOGO_FRAC, margin=LOGO_MARGIN):
     <span class="c1"># The ground each low orbiter has swept recently, fading out behind it. This</span>
     <span class="c1"># is the point of a sun-synchronous orbit: a narrow strip at a time, a new one</span>
     <span class="c1"># every pass. Geostationary satellites are skipped -- they stare at one face.</span>
-    <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">TRACKS</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">track</span><span class="p">[</span><span class="s2">"kind"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"geo"</span><span class="p">:</span>
-            <span class="k">continue</span>
+    <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">LOW_ORBIT_TRACKS</span><span class="p">:</span>
         <span class="n">swept</span> <span class="o">=</span> <span class="n">ground_swath</span><span class="p">(</span><span class="n">track</span><span class="p">,</span> <span class="n">t_hours</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">swept</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">continue</span>
@@ -26544,9 +26630,7 @@ def stamp_logo(fig, frac=LOGO_FRAC, margin=LOGO_MARGIN):
     <span class="c1"># names would sit on satellites the eye is not following. A satellite fades</span>
     <span class="c1"># its label in as it comes round, rather than popping, so the set of names</span>
     <span class="c1"># changes smoothly instead of flickering.</span>
-    <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">TRACKS</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">track</span><span class="p">[</span><span class="s2">"kind"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"geo"</span><span class="p">:</span>
-            <span class="k">continue</span>
+    <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">LOW_ORBIT_TRACKS</span><span class="p">:</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">position</span><span class="p">(</span><span class="n">track</span><span class="p">,</span> <span class="n">t_hours</span><span class="p">,</span> <span class="n">spin</span><span class="p">)</span>
         <span class="n">depth</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">EYE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">EYE</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">EYE</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">track</span><span class="p">[</span><span class="s2">"r_draw"</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="o">&lt;=</span> <span class="n">NEAR_LABEL_FADE</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
@@ -26575,9 +26659,7 @@ def stamp_logo(fig, frac=LOGO_FRAC, margin=LOGO_MARGIN):
     <span class="c1"># Name the geostationary satellites. Meteosat-12/-9/-11 sit within 9.5 deg</span>
     <span class="c1"># of each other, so their labels are pushed out to different radii instead</span>
     <span class="c1"># of overlapping on the ring.</span>
-    <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">TRACKS</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">track</span><span class="p">[</span><span class="s2">"kind"</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"geo"</span><span class="p">:</span>
-            <span class="k">continue</span>
+    <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">GEO_TRACKS</span><span class="p">:</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">position</span><span class="p">(</span><span class="n">track</span><span class="p">,</span> <span class="n">t_hours</span><span class="p">,</span> <span class="n">spin</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">LABEL_OFFSET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">track</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span> <span class="mf">1.10</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
@@ -26872,9 +26954,7 @@ def draw_frame(i):
     # The instrument's field of view: a flat sheet from the spacecraft down to the
     # strip it is imaging right now. Drawn before the trail so the trail's older,
     # fainter ground reads as behind it.
-    for track in TRACKS:
-        if track["kind"] == "geo":
-            continue
+    for track in LOW_ORBIT_TRACKS:
         quad = sensor_beam(track, t_hours, spin)
         if quad is None:
             continue
@@ -26890,9 +26970,7 @@ def draw_frame(i):
     # The ground each low orbiter has swept recently, fading out behind it. This
     # is the point of a sun-synchronous orbit: a narrow strip at a time, a new one
     # every pass. Geostationary satellites are skipped -- they stare at one face.
-    for track in TRACKS:
-        if track["kind"] == "geo":
-            continue
+    for track in LOW_ORBIT_TRACKS:
         swept = ground_swath(track, t_hours)
         if swept is None:
             continue
@@ -26922,9 +27000,7 @@ def draw_frame(i):
     # names would sit on satellites the eye is not following. A satellite fades
     # its label in as it comes round, rather than popping, so the set of names
     # changes smoothly instead of flickering.
-    for track in TRACKS:
-        if track["kind"] == "geo":
-            continue
+    for track in LOW_ORBIT_TRACKS:
         p = position(track, t_hours, spin)
         depth = (p[0] * EYE[0] + p[1] * EYE[1] + p[2] * EYE[2]) / track["r_draw"]
         if depth &lt;= NEAR_LABEL_FADE[0]:
@@ -26953,9 +27029,7 @@ def draw_frame(i):
     # Name the geostationary satellites. Meteosat-12/-9/-11 sit within 9.5 deg
     # of each other, so their labels are pushed out to different radii instead
     # of overlapping on the ring.
-    for track in TRACKS:
-        if track["kind"] != "geo":
-            continue
+    for track in GEO_TRACKS:
         p = position(track, t_hours, spin)
         out = LABEL_OFFSET.get(track["name"], 1.10)
         ax.text(
@@ -27055,9 +27129,9 @@ radial compression above squeezes that gap to fit the frame, but it cannot inven
     <span class="n">gif_width</span><span class="o">=</span><span class="mi">720</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">"all"</span><span class="p">)</span>
-<span class="n">web</span><span class="p">,</span> <span class="n">gif</span> <span class="o">=</span> <span class="n">publish_clip</span><span class="p">(</span><span class="n">OUT</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">".mp4"</span><span class="p">))</span>
+<span class="n">web</span><span class="p">,</span> <span class="n">gif</span><span class="p">,</span> <span class="n">webp</span> <span class="o">=</span> <span class="n">publish_clip</span><span class="p">(</span><span class="n">OUT</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">".mp4"</span><span class="p">))</span>
 
-<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">(</span><span class="n">OUT</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">".mp4"</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="n">web</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="n">gif</span><span class="p">)):</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">(</span><span class="n">OUT</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">".mp4"</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="n">web</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="n">gif</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="n">webp</span><span class="p">)):</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;44</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e6</span><span class="si">:</span><span class="s2">6.1f</span><span class="si">}</span><span class="s2"> MB"</span><span class="p">)</span>
 <span class="n">display</span><span class="p">(</span><span class="n">Image</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">gif</span><span class="p">))</span>
 </pre></div>
@@ -27081,9 +27155,9 @@ save_clip(
     gif_width=720,
 )
 plt.close("all")
-web, gif = publish_clip(OUT.with_suffix(".mp4"))
+web, gif, webp = publish_clip(OUT.with_suffix(".mp4"))
 
-for f in (OUT.with_suffix(".mp4"), Path(web), Path(gif)):
+for f in (OUT.with_suffix(".mp4"), Path(web), Path(gif), Path(webp)):
     print(f"{f.name:&lt;44} {f.stat().st_size / 1e6:6.1f} MB")
 display(Image(filename=gif))</div>
 </div>
