@@ -183,14 +183,6 @@ class TestMatchVariables:
                 "Liquid Water Equivalent Thickness",
                 True,
             ),
-            # True positives - a chemical formula behind a product prefix.
-            (
-                "co2",
-                "xco2",
-                "column-averaged dry-air mole fraction of carbon dioxide",
-                True,
-            ),
-            ("ch4", "xch4", "column-averaged dry-air mole fraction of methane", True),
             # True negatives - unrelated names must keep the placeholder.
             ("number-of-wet-days", "elevation", "", False),
             ("number-of-dry-spells", "elevation", "Surface elevation", False),
@@ -225,14 +217,6 @@ class TestMatchVariables:
             ["sea-surface-temperature"], {"SST": {"long_name": "", "units": "K"}}
         )
         assert assignments == {"sea-surface-temperature": ("SST", "K")}
-
-    def test_a_buried_token_is_not_a_prefixed_form(self):
-        """A slug token appearing inside an unrelated name is not evidence on its own."""
-        assignments = _match_variables(
-            ["specific-cloud-ice-water-content"],
-            {"iicethic": {"long_name": "", "units": "1"}},
-        )
-        assert assignments == {}
 
     def test_reserved_names_are_withheld_from_the_leftover_rule(self):
         """A reserved NetCDF name is not offered to the lone leftover slug."""
@@ -371,9 +355,14 @@ class TestPairIsEvidenced:
         """An initialism is evidence with no shared token at all."""
         assert _pair_is_evidenced("sea-surface-temperature", "sst", {}) is True
 
-    def test_product_prefix(self):
-        """The slug's own spelling behind a short product prefix is evidence."""
-        assert _pair_is_evidenced("co2", "xco2", {}) is True
+    def test_a_generic_shared_token_is_weak_but_reservation_catches_it(self):
+        """Evidence alone can pass on one generic word; the reservation is the real guard."""
+        meta = {"msl": {"long_name": "Mean sea level pressure", "units": "Pa"}}
+        assert _pair_is_evidenced("land-sea-mask", "msl", meta) is True
+        assert _match_variables(["land-sea-mask"], meta) != {}
+        assert (
+            _match_variables(["land-sea-mask"], meta, reserved=frozenset({"msl"})) == {}
+        )
 
     def test_unrelated_names_carry_no_evidence(self):
         """Two names with nothing in common are not paired."""

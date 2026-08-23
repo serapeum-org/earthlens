@@ -714,12 +714,13 @@ Matching is deliberately conservative. The confident rules come first: an
 exact short-name match, then a token-subset match against the variable's
 `long_name`. Only a single leftover slug facing a single unused variable
 reaches the last-resort rule, and it pairs them only when the two names
-carry evidence of describing the same quantity — a shared token, an
-initialism (`sst` for `sea-surface-temperature`), or a product prefix
-(`xco2` for `co2`). That evidence is a filter, not a proof: a single
-shared token is enough, so the last-resort rule can still be wrong where
-two names share a generic word. It is the weakest of the four and only
-ever applies to the one-slug, one-variable case. A slug that stays ambiguous keeps its
+carry evidence of describing the same quantity — a shared token, or an
+initialism (`sst` for `sea-surface-temperature`). That evidence is a
+filter, not a proof: a single shared token is enough, so on names alone
+the last-resort rule could still be wrong where two names share a generic
+word. What stops it is the reservation described above — every NetCDF
+name a hydrated row of the dataset already owns is off the table, which
+removes every such mis-pairing the shipped catalog can produce. A slug that stays ambiguous keeps its
 `unknown` placeholder, because a wrong `nc_variable` silently
 mis-extracts at `aggregate=` time, which is worse than an obvious gap.
 A NetCDF name an already-hydrated row of the same dataset claims is not

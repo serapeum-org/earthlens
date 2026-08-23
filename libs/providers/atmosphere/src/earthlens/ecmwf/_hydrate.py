@@ -117,11 +117,6 @@ _STOPWORDS = frozenset(
     }
 )
 
-#: Longest product prefix a NetCDF short name may add to a slug's own spelling
-#: and still be recognised as the same quantity (`xco2` for `co2`, `tcno2` for
-#: `no2`). Two characters covers the `x` / `tc` / `t` families the CDS serves.
-_PRODUCT_PREFIX_MAX = 2
-
 
 def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
     """Retrieve a tiny NetCDF for `dataset_id` and read its variable metadata.
@@ -362,65 +357,15 @@ def _is_initialism(name: str, tokens: set[str]) -> bool:
     return _consume_initialism(name.lower(), ordered, (1 << len(ordered)) - 1, {})
 
 
-def _compact(text: str) -> str:
-    """Return `text` reduced to its lowercase alphanumerics, separators dropped."""
-    return "".join(char for char in text.lower() if char.isalnum())
-
-
-def _is_prefixed_form(name: str, slug: str) -> bool:
-    """Return True when `name` is the slug's own spelling behind a short product prefix.
-
-    The C3S greenhouse-gas CDRs serve a column-average mole fraction as the
-    chemical formula behind an `x` (`co2` -> `xco2`), and the whole compacted
-    slug has to survive for the pair to qualify — matching a single token as a
-    substring would pair `specific-cloud-ice-water-content` with `iicethic`.
-
-    Args:
-        name: The NetCDF short name.
-        slug: The catalog variable slug.
-
-    Returns:
-        True when one compacted spelling is the other behind at most
-        :data:`_PRODUCT_PREFIX_MAX` extra leading characters.
-
-    Examples:
-        - A product prefix in front of the slug's own spelling:
-
-            ```python
-            >>> from earthlens.ecmwf._hydrate import _is_prefixed_form
-            >>> _is_prefixed_form("xco2", "co2")
-            True
-            >>> _is_prefixed_form("xch4", "ch4")
-            True
-
-            ```
-        - A token buried inside an unrelated name does not qualify:
-
-            ```python
-            >>> from earthlens.ecmwf._hydrate import _is_prefixed_form
-            >>> _is_prefixed_form("iicethic", "specific-cloud-ice-water-content")
-            False
-
-            ```
-    """
-    short, full = _compact(slug), _compact(name)
-    if len(short) < 3 or len(full) < 3:
-        return False
-    if full.endswith(short):
-        return len(full) - len(short) <= _PRODUCT_PREFIX_MAX
-    if short.endswith(full):
-        return len(short) - len(full) <= _PRODUCT_PREFIX_MAX
-    return False
-
-
 def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
     """Return True when `slug` and `name` share evidence of being the same thing.
 
     Rule 4's guard: being the only two left over is arity, not evidence. A pair
-    qualifies on any one of four signals, cheapest first — a shared token with
-    the short name, a shared token with its `long_name`, `name` being an
-    initialism of the slug, or `name` being the slug's own spelling behind a
-    short product prefix. Slugs reduced to nothing but stopwords never qualify.
+    qualifies on any one of three signals, cheapest first — a shared token with
+    the short name, a shared token with its `long_name`, or `name` being an
+    initialism of the slug. Slugs reduced to nothing but stopwords never
+    qualify. The evidence is a filter, not a proof: rule 4 leans on `reserved`
+    to keep a slug off a name a hydrated sibling row already owns.
 
     Args:
         slug: The unmatched catalog variable slug.
@@ -464,7 +409,7 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
         return True
     if tokens & (_tokens(str(meta.get("long_name") or "")) - _STOPWORDS):
         return True
-    return _is_initialism(name, tokens) or _is_prefixed_form(name, slug)
+    return _is_initialism(name, tokens)
 
 
 def _match_variables(
@@ -529,12 +474,13 @@ def _match_variables(
     #
     # Being the last two standing is arity, not evidence, so the pair must also
     # look like the same quantity. A plain token-overlap test was rejected for
-    # dropping the abbreviations rule 4 gets right; the initialism and product
-    # prefix arms keep the shapes it lost (`sea-surface-temperature` -> `sst`,
-    # `co2` -> `xco2`). Those arms resolve the common shapes, not abbreviation
-    # in general — a selective contraction like `msl` or `u10` still fails
-    # them, and such a slug simply keeps its placeholder. Rule 4 stays a last
-    # resort: the confident rules above carry most of the catalog.
+    # dropping the abbreviations rule 4 gets right; the initialism arm keeps
+    # them (`sea-surface-temperature` -> `sst`). It resolves the common shapes,
+    # not abbreviation in general — a selective contraction like `msl` or `u10`
+    # still fails it, and such a slug simply keeps its placeholder. What stops
+    # a weak shared token from mis-binding is `reserved`: every name a hydrated
+    # sibling row owns is off the table, which is where the real protection
+    # lives. Rule 4 stays a last resort behind the confident rules above.
     if (
         len(unmatched) == 1
         and len(unused) == 1
