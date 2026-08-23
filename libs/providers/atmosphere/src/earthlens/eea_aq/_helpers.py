@@ -126,6 +126,14 @@ SCHEMA: dict[str, str] = {
     "provider": "object",
 }
 
+#: `Value` literals the EEA writes to mean "no reading" rather than a real
+#: concentration. The legacy Historical export fills an invalid row's `Value`
+#: with `-999`; a negatively-flagged row is masked regardless of its value, so
+#: this set is consulted only to catch a sentinel on a row whose `Validity`
+#: flag is null (where the flag cannot betray it). Kept deliberately small — a
+#: real reading must never be clipped — so it lists only the documented `-999`.
+_NODATA_SENTINELS: frozenset[float] = frozenset({-999.0})
+
 
 def countries_in_bbox(
     lat_lim: tuple[float, float],
@@ -271,6 +279,15 @@ def shape_frame(
     to UTC. Rows whose numeric code is not in `code_to_name` are dropped
     (a pollutant the request did not ask for).
 
+    A reading the EEA does not vouch for has its `value` masked to `NaN` so
+    a no-data sentinel never masquerades as a measured concentration: a row
+    with a negative `Validity` flag (`-1` invalid, `-99` maintenance) is
+    masked whatever its `Value` (catching both the `-999` sentinel and the
+    plain `0.0` some invalid rows carry), and a row with a null flag is
+    masked when its `Value` is a known sentinel. The flag itself is kept in
+    `validity`; valid rows keep their published value, small near-zero
+    negatives included.
+
     Args:
         raw: One Parquet file read with `pandas.read_parquet`.
         dataset: The dataset era this frame came from (`"Verified"`),
@@ -279,6 +296,34 @@ def shape_frame(
 
     Returns:
         pd.DataFrame: The frame in the `SCHEMA` columns / dtypes.
+
+    Examples:
+        - A valid reading is kept while an invalid `-999` sentinel is masked to
+          `NaN`, its `-1` flag preserved in `validity`:
+            ```python
+            >>> import pandas as pd
+            >>> from earthlens.eea_aq._helpers import shape_frame
+            >>> raw = pd.DataFrame(
+            ...     {
+            ...         "Samplingpoint": ["MT/SPO-1", "MT/SPO-1"],
+            ...         "Pollutant": [6001, 6001],
+            ...         "Start": pd.to_datetime(["2011-06-01", "2011-06-01"]),
+            ...         "Value": ["14.6", "-999"],
+            ...         "Unit": ["ug.m-3", "ug.m-3"],
+            ...         "AggType": ["hour", "hour"],
+            ...         "Validity": [1, -1],
+            ...         "Verification": [3, 3],
+            ...     }
+            ... )
+            >>> out = shape_frame(raw, "Historical", {6001: "pm25"})
+            >>> out["value"].tolist()
+            [14.6, nan]
+            >>> out["validity"].tolist()
+            [1, -1]
+            >>> out["parameter"].tolist()
+            ['pm25', 'pm25']
+
+            ```
     """
     if raw.empty:
         return empty_frame()
@@ -308,6 +353,22 @@ def shape_frame(
     out["agg_type"] = keep["AggType"]
     out["validity"] = keep["Validity"].astype("Int64")
     out["verification"] = keep["Verification"].astype("Int64")
+    # Mask no-data readings to NaN so a caller's mean / percentile is not
+    # silently skewed by them; a bare `value.dropna()` cannot help because the
+    # sentinels are numbers, not nulls. EEA flags a reading it does not vouch
+    # for with a negative `Validity` (-1 invalid, -99 maintenance) and fills its
+    # `Value` with a sentinel (-999) or a plain 0.0 -- gate on the flag, not the
+    # literal, so both are caught, while the flag itself is preserved in
+    # `validity`. A null flag is trusted for neither verdict, so a null-flag row
+    # is masked only when its value is a known sentinel, leaving a genuine
+    # reading that merely lacks a flag untouched.
+    invalid_flag = (out["validity"] < 0).fillna(False)
+    unflagged_sentinel = out["validity"].isna() & out["value"].isin(_NODATA_SENTINELS)
+    # `value` is a numpy float column, so use a float NaN rather than `pd.NA`:
+    # pd.NA is the marker for pandas nullable dtypes and can upcast the column
+    # to object, which would make the trailing astype(SCHEMA) raise instead of
+    # coerce on older pandas. float("nan") settles to float64 unconditionally.
+    out.loc[invalid_flag | unflagged_sentinel, "value"] = float("nan")
     out["dataset"] = dataset
     out["provider"] = "EEA"
     return out.reset_index(drop=True).astype(SCHEMA)
