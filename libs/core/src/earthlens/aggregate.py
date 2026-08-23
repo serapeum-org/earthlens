@@ -667,14 +667,15 @@ class AggregatedWindow:
 def _output_stem(var_info: Variable) -> str:
     """Filename stem for a variable's aggregated GeoTIFF windows.
 
-    Normally just `var_info.cds_variable`. When the row curates a second config
-    of one CDS dataset under a distinct `dataset_id` — the override case, e.g.
-    GloFAS's `cems-glofas-historical-intermediate` stream, which shares
-    `cds_variable` and `cds_dataset` with the consolidated stream — the
-    `dataset_id` is appended (`<cds_variable>_<dataset_id>`) so aggregating both
-    streams into one `out_dir` yields distinct files instead of colliding.
-    Ordinary rows (`dataset_id` absent, or equal to `cds_dataset`) keep the bare
-    `cds_variable` stem, so existing single-config output paths are unchanged.
+    `<cds_variable>_<dataset_id or cds_dataset>` when the row carries either id,
+    mirroring the ECMWF backend's `.nc` naming so two datasets that share a
+    `cds_variable` never collide in one `out_dir` — whether that is two ordinary
+    datasets (ERA5 single-levels vs ERA5-Land `total_precipitation`) or the two
+    curated GloFAS streams (`cems-glofas-historical` consolidated vs
+    `-intermediate`, which also share `cds_dataset` and are told apart by
+    `dataset_id`). Falls back to the bare `cds_variable` for a `var_info` that
+    carries neither id — the s3 / erddap adapters — leaving those backends'
+    filenames unchanged.
 
     Args:
         var_info: The catalog row being aggregated. Read structurally
@@ -685,40 +686,52 @@ def _output_stem(var_info: Variable) -> str:
         The filename stem, without the trailing `_<freq>_<window>.tif`.
 
     Examples:
-        - An ordinary row (no override) keeps the bare variable name:
+        - An ECMWF row appends its dataset id (`dataset_id` == `cds_dataset` for
+          an ordinary row):
 
             ```python
             >>> from types import SimpleNamespace
             >>> from earthlens.aggregate import _output_stem
-            >>> ordinary = SimpleNamespace(
-            ...     cds_variable="2m_temperature",
+            >>> era5 = SimpleNamespace(
+            ...     cds_variable="total_precipitation",
             ...     cds_dataset="reanalysis-era5-single-levels",
             ...     dataset_id="reanalysis-era5-single-levels",
             ... )
-            >>> _output_stem(ordinary)
-            '2m_temperature'
+            >>> _output_stem(era5)
+            'total_precipitation_reanalysis-era5-single-levels'
 
             ```
-        - A curated override (a `dataset_id` differing from `cds_dataset`)
-          appends it, so two configs of one dataset do not collide:
+        - A curated override (a `dataset_id` differing from `cds_dataset`) uses
+          the `dataset_id`, so two configs of one dataset stay distinct:
 
             ```python
             >>> from types import SimpleNamespace
             >>> from earthlens.aggregate import _output_stem
-            >>> override = SimpleNamespace(
+            >>> glofas = SimpleNamespace(
             ...     cds_variable="average_river_discharge_in_the_last_24_hours",
             ...     cds_dataset="cems-glofas-historical",
             ...     dataset_id="cems-glofas-historical-intermediate",
             ... )
-            >>> _output_stem(override)
+            >>> _output_stem(glofas)
             'average_river_discharge_in_the_last_24_hours_cems-glofas-historical-intermediate'
+
+            ```
+        - A backend row carrying neither id keeps the bare variable name:
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.aggregate import _output_stem
+            >>> _output_stem(SimpleNamespace(cds_variable="elevation"))
+            'elevation'
 
             ```
     """
     stem: str = var_info.cds_variable
-    dataset_id = getattr(var_info, "dataset_id", None)
-    if dataset_id and dataset_id != getattr(var_info, "cds_dataset", None):
-        stem = f"{stem}_{dataset_id}"
+    dataset = getattr(var_info, "dataset_id", None) or getattr(
+        var_info, "cds_dataset", None
+    )
+    if dataset:
+        stem = f"{stem}_{dataset}"
     return stem
 
 

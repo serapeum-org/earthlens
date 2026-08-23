@@ -703,33 +703,33 @@ class TestResolveOp:
 
 
 class TestOutputStem:
-    """`_output_stem` appends dataset_id only for a curated override (#1040)."""
+    """`_output_stem` appends the dataset id (dataset_id or cds_dataset) (#1040)."""
 
-    def test_bare_when_dataset_id_absent(self):
-        """A var_info without a dataset_id keeps the bare cds_variable stem."""
+    def test_bare_when_no_dataset_ids(self):
+        """A var_info carrying neither id (s3/erddap) keeps the bare stem."""
         stem = _output_stem(SimpleNamespace(cds_variable="tp"))
         assert stem == "tp", f"Expected bare stem 'tp', got {stem!r}"
 
-    def test_bare_when_dataset_id_equals_cds_dataset(self):
-        """An ordinary row (dataset_id == cds_dataset) keeps the bare stem."""
+    def test_ordinary_row_appends_its_dataset_id(self):
+        """An ordinary row (dataset_id == cds_dataset) appends that id."""
         var = SimpleNamespace(cds_variable="tp", cds_dataset="ds", dataset_id="ds")
         stem = _output_stem(var)
-        assert stem == "tp", f"Ordinary row should stay 'tp', got {stem!r}"
+        assert stem == "tp_ds", f"Ordinary row should append its id, got {stem!r}"
 
-    def test_appends_dataset_id_on_override(self):
-        """A dataset_id differing from cds_dataset is appended to the stem."""
+    def test_override_uses_dataset_id(self):
+        """A dataset_id differing from cds_dataset is the one appended."""
         var = SimpleNamespace(
             cds_variable="tp", cds_dataset="ds", dataset_id="ds-intermediate"
         )
         stem = _output_stem(var)
         assert stem == "tp_ds-intermediate", (
-            f"Override should append dataset_id, got {stem!r}"
+            f"Override should use dataset_id, got {stem!r}"
         )
 
-    def test_appends_dataset_id_when_cds_dataset_absent(self):
-        """dataset_id present but no cds_dataset attribute still appends it."""
-        stem = _output_stem(SimpleNamespace(cds_variable="tp", dataset_id="ds-x"))
-        assert stem == "tp_ds-x", f"Expected appended stem, got {stem!r}"
+    def test_falls_back_to_cds_dataset(self):
+        """With no dataset_id, cds_dataset is appended instead."""
+        stem = _output_stem(SimpleNamespace(cds_variable="tp", cds_dataset="ds"))
+        assert stem == "tp_ds", f"Expected cds_dataset fallback, got {stem!r}"
 
 
 class TestAggregateNetcdf:
@@ -1188,12 +1188,63 @@ class TestAggregateNetcdfRoundTrip:
             f"The two streams must not collide; both wrote {written[0]!r}"
         )
         assert written[0].endswith(
-            "average_river_discharge_in_the_last_24_hours_1D_20220101.tif"
-        ), f"Consolidated keeps the bare stem, got {written[0]!r}"
+            "average_river_discharge_in_the_last_24_hours_"
+            "cems-glofas-historical_1D_20220101.tif"
+        ), f"Consolidated carries its dataset id, got {written[0]!r}"
         assert written[1].endswith(
             "average_river_discharge_in_the_last_24_hours_"
             "cems-glofas-historical-intermediate_1D_20220101.tif"
-        ), f"Intermediate includes dataset_id, got {written[1]!r}"
+        ), f"Intermediate carries its dataset_id, got {written[1]!r}"
+
+    def test_two_datasets_sharing_a_cds_variable_do_not_collide(
+        self, monkeypatch, tmp_path
+    ):
+        """Two ordinary datasets sharing a cds_variable write distinct .tif files (#1040 H1)."""
+        # ERA5 single-levels vs ERA5-Land total_precipitation: distinct datasets,
+        # same cds_variable, each dataset_id == cds_dataset — aggregated to one out_dir.
+        single_levels = _RealVariable(
+            is_flux=True,
+            cds_variable="total_precipitation",
+            nc_variable="tp",
+            units="m",
+            cds_dataset="reanalysis-era5-single-levels",
+            dataset_id="reanalysis-era5-single-levels",
+        )
+        land = _RealVariable(
+            is_flux=True,
+            cds_variable="total_precipitation",
+            nc_variable="tp",
+            units="m",
+            cds_dataset="reanalysis-era5-land",
+            dataset_id="reanalysis-era5-land",
+        )
+        out_dir = tmp_path / "agg"
+        written: list[str] = []
+        for var in (single_levels, land):
+            nc = _FakeNetCDF(
+                array=self._daily_six_hourly_array(n_days=1),
+                time_strs_by_var={"time": self._date_strings_six_hourly(1)},
+                dimension_names=["time", "lat", "lon"],
+            )
+            _patch_netcdf_read(monkeypatch, nc)
+            writes = _patch_geotiff_write(monkeypatch)
+            aggregate_netcdf(
+                tmp_path / "fake.nc",
+                var,
+                AggregationConfig(freq="1D", op="mean", out_dir=out_dir),
+            )
+            written.append(writes[0][3])
+
+        assert written[0] != written[1], (
+            f"Two datasets sharing a cds_variable must not collide; both wrote "
+            f"{written[0]!r}"
+        )
+        assert written[0].endswith(
+            "total_precipitation_reanalysis-era5-single-levels_1D_20220101.tif"
+        ), f"single-levels should carry its dataset id, got {written[0]!r}"
+        assert written[1].endswith(
+            "total_precipitation_reanalysis-era5-land_1D_20220101.tif"
+        ), f"land should carry its dataset id, got {written[1]!r}"
 
     def test_valid_time_variable_is_picked_over_time(
         self, monkeypatch, tmp_path, state_var
