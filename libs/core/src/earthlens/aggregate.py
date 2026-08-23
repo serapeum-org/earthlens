@@ -526,10 +526,10 @@ class AggregationConfig(BaseModel):
         out_dir: Directory the per-window GeoTIFFs are written to.
             Created (with parents) if absent. `None` skips the write
             step entirely and returns arrays in memory only.
-        cell_size: Pixel size in degrees, embedded in the output
-            filename as a metadata note. `0.125` for ERA5 native,
-            `0.1` for ERA5-Land. The geotransform itself is read off
-            the NetCDF — this is informational only.
+        cell_size: Pixel size in degrees, informational only. `0.125`
+            for ERA5 native, `0.1` for ERA5-Land. The geotransform
+            written to each GeoTIFF is read off the NetCDF, not from
+            this value, and it is not encoded in the filename.
         level: When the NetCDF has a `pressure_level` dimension, pin
             this level via :meth:`pyramids.netcdf.NetCDF.sel`. `None`
             (default) requires a 3-D NetCDF; pass an explicit level

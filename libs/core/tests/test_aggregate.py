@@ -814,9 +814,10 @@ class _RealVariable(SimpleNamespace):
     """Lightweight stand-in for `earthlens.ecmwf.Variable` in tests.
 
     Exposes the attributes `aggregate_netcdf` reads (`is_flux`,
-    `cds_variable`, `nc_variable`, `units`, and the optional
-    `is_pre_aggregated` that `_resolve_op` consults via `getattr`) so the
-    round-trip tests don't have to construct a full pydantic model.
+    `cds_variable`, `nc_variable`, `units`, the optional `is_pre_aggregated`
+    that `_resolve_op` consults, and the optional `cds_dataset` / `dataset_id`
+    that `_output_stem` consults — all via `getattr`) so the round-trip tests
+    don't have to construct a full pydantic model.
     """
 
 
