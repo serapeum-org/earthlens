@@ -12,6 +12,8 @@ import yaml
 from earthlens.ecmwf import _hydrate as hydrate_mod
 from earthlens.ecmwf._hydrate import (
     _claimed_nc_names,
+    _dataset_extras,
+    _fill_variable_extras,
     _find_file_for_dataset,
     _hydrate_stanza_per_variable,
     _is_initialism,
@@ -19,6 +21,9 @@ from earthlens.ecmwf._hydrate import (
     _pair_is_evidenced,
     _retrieve_with_timeout,
     _rewrite_stanza,
+    _selector_override,
+    _stanza_match,
+    _yaml_inline_list,
     _yaml_value,
     bulk_hydrate_empty,
 )
@@ -595,6 +600,164 @@ _GLOFAS_PROBES = {
         {"timespan": ["instantaneous"], "system_version": ["version_4_0"]},
     ),
 }
+
+
+_DEMO_HEADER = """datasets:
+  demo-dataset:
+"""
+
+_EXTRAS_STANZA = """datasets:
+  demo-dataset:
+    endpoint: ewds
+    extras:
+      # a comment the reader must skip
+      timespan: [time_mean]
+
+      system_version: [version_4_0]
+    variables:
+      already-overridden:
+        cds_variable: already_overridden
+        nc_variable: already_overridden
+        units: unknown
+        extras:
+          timespan: [stale]
+          keep_me: [yes]
+      no-cds-variable:
+        nc_variable: mystery
+        units: unknown
+"""
+
+
+class TestSelectorPlumbing:
+    """Tests for the pieces that turn a probe's selectors into a row override."""
+
+    def test_dataset_extras_skips_comments_and_blank_lines(self):
+        """The dataset-level extras are read past comments and spacing."""
+        block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
+        assert _dataset_extras(block) == {
+            "timespan": "[time_mean]",
+            "system_version": "[version_4_0]",
+        }
+
+    def test_dataset_extras_is_empty_without_the_block(self):
+        """A stanza with no dataset-level extras yields nothing to compare against."""
+        no_extras = """      a-row:
+        units: unknown
+"""
+        assert _dataset_extras(no_extras) == {}
+
+    @pytest.mark.parametrize(
+        ("selectors", "expected"),
+        [
+            ({"timespan": ["instantaneous"]}, {"timespan": ["instantaneous"]}),
+            ({"timespan": ["time_mean"]}, {}),
+            ({"unknown_key": ["x"]}, {}),
+            ({"system_version": ["version_4_0"]}, {}),
+        ],
+    )
+    def test_only_a_differing_declared_selector_is_written(self, selectors, expected):
+        """A selector is an override only when the stanza declares it and disagrees."""
+        block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
+        assert _selector_override(selectors, _dataset_extras(block)) == expected
+
+    @pytest.mark.parametrize(
+        ("value", "expected"),
+        [(["a"], "[a]"), (["a", "b"], "[a, b]"), ("unarchived", "unarchived")],
+    )
+    def test_selector_values_render_the_way_the_catalog_writes_them(
+        self, value, expected
+    ):
+        """A list becomes an inline sequence; a scalar stays a scalar."""
+        assert _yaml_inline_list(value) == expected
+
+    def test_an_existing_override_is_merged_not_replaced(self):
+        """A hand-set selector survives unless the probe contradicts it."""
+        block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
+        out = _fill_variable_extras(
+            block, "already-overridden", {"timespan": ["instantaneous"]}
+        )
+        document = _DEMO_HEADER + out
+        row = yaml.safe_load(document)["datasets"]["demo-dataset"]["variables"][
+            "already-overridden"
+        ]
+        assert row["extras"]["timespan"] == ["instantaneous"], "probe wins"
+        assert row["extras"]["keep_me"] == [True], "untouched key survives"
+
+    def test_an_empty_override_leaves_the_block_alone(self):
+        """Nothing to record means nothing is written."""
+        block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
+        assert _fill_variable_extras(block, "already-overridden", {}) == block
+
+    def test_an_absent_slug_leaves_the_block_alone(self):
+        """A slug that is not in the stanza cannot be given an override."""
+        block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
+        assert _fill_variable_extras(block, "not-here", {"timespan": ["x"]}) == block
+
+    def test_a_row_without_a_cds_variable_is_declined(self):
+        """A probe needs the request-side name, so a row lacking one is skipped."""
+        out, filled, declined = _hydrate_stanza_per_variable(
+            _EXTRAS_STANZA,
+            "demo-dataset",
+            lambda cds: ({"x": {"long_name": "x", "units": "1"}}, {}),
+        )
+        assert "no-cds-variable" in declined
+
+    def test_a_missing_stanza_is_a_no_op(self):
+        """Hydrating a dataset the shard does not hold changes nothing."""
+        out, filled, declined = _hydrate_stanza_per_variable(
+            _EXTRAS_STANZA, "not-a-dataset", lambda cds: ({}, {})
+        )
+        assert (out, filled, declined) == (_EXTRAS_STANZA, [], [])
+
+
+class TestHydrateStanzaWhole:
+    """Tests for the whole-dataset fallback used when no block names a row."""
+
+    def test_a_timeout_is_recorded_on_the_session(self, monkeypatch):
+        """The deadline is reported as a timeout, not a generic failure."""
+        session = hydrate_mod._ProbeSession("demo-dataset", 1.0)
+
+        def _stall(dataset_id, timeout):
+            raise TimeoutError("stuck")
+
+        monkeypatch.setattr(hydrate_mod, "_retrieve_with_timeout", _stall)
+        out, filled, declined = hydrate_mod._hydrate_stanza_whole(
+            _EXTRAS_STANZA, "demo-dataset", session
+        )
+        assert session.timed_out is True
+        assert (out, filled, declined) == (_EXTRAS_STANZA, [], [])
+
+    def test_a_refusal_is_recorded_without_claiming_a_timeout(self, monkeypatch):
+        """A licence refusal sets the error but leaves timed_out false."""
+        session = hydrate_mod._ProbeSession("demo-dataset", 1.0)
+
+        def _refuse(dataset_id, timeout):
+            raise RuntimeError("licence not accepted")
+
+        monkeypatch.setattr(hydrate_mod, "_retrieve_with_timeout", _refuse)
+        hydrate_mod._hydrate_stanza_whole(_EXTRAS_STANZA, "demo-dataset", session)
+        assert session.timed_out is False
+        assert isinstance(session.error, RuntimeError)
+
+
+class TestRetrieveVariableMeta:
+    """Tests for the credentialed per-variable seam."""
+
+    def test_it_forwards_to_the_ecmwf_deep_sampler(self, monkeypatch):
+        """The seam only delegates, so the credentialed call stays in one place."""
+        import earthlens.ecmwf.cli as ecmwf_cli
+
+        seen = {}
+
+        def _fake(dataset_id, cds_variable):
+            seen["args"] = (dataset_id, cds_variable)
+            return {"t2m": {"units": "K"}}, {"timespan": ["time_mean"]}
+
+        monkeypatch.setattr(ecmwf_cli, "_ecmwf_deep_sample_variable", _fake)
+        meta, selectors = hydrate_mod._retrieve_variable_meta("ds", "2m_temperature")
+        assert seen["args"] == ("ds", "2m_temperature")
+        assert meta == {"t2m": {"units": "K"}}
+        assert selectors == {"timespan": ["time_mean"]}
 
 
 class TestHydrateStanzaPerVariable:
