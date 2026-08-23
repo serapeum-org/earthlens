@@ -220,6 +220,36 @@ class TestShapeFrame:
         out = shape_frame(self._flagged("-999", -1), "Historical", {6001: "pm25"})
         assert str(out["value"].dtype) == "float64"
 
+    def test_zero_flag_is_not_masked(self):
+        """A zero Validity is not negative, so the reading is kept (strict < 0 boundary)."""
+        out = shape_frame(self._flagged("3.0", 0), "Verified", {6001: "pm25"})
+        assert out.loc[0, "value"] == 3.0
+        assert out.loc[0, "validity"] == 0
+
+    def test_masks_only_the_flagged_rows_in_a_mixed_frame(self):
+        """Masking is row-selective: only the no-data rows in a mixed frame become NaN."""
+        raw = pd.DataFrame(
+            {
+                "Samplingpoint": ["MT/SPO-1"] * 4,
+                "Pollutant": [6001] * 4,
+                "Start": pd.to_datetime(["2011-01-01T00:00"] * 4),
+                "Value": ["14.6", "-999", "-999", "-5.3"],
+                "Unit": ["ug.m-3"] * 4,
+                "AggType": ["hour"] * 4,
+                "Validity": [
+                    1,
+                    -1,
+                    None,
+                    1,
+                ],  # valid / invalid / null-flag / valid-negative
+                "Verification": [3] * 4,
+            }
+        )
+        out = shape_frame(raw, "Historical", {6001: "pm25"})
+        assert list(out["value"].isna()) == [False, True, True, False]
+        assert out.loc[0, "value"] == 14.6
+        assert out.loc[3, "value"] == -5.3
+
 
 @pytest.mark.eea
 def test_empty_frame_schema():
