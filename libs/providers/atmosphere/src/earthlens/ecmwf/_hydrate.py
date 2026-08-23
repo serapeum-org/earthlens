@@ -902,6 +902,36 @@ def _selector_override(
     Returns:
         The subset of `selectors` that differs from `dataset_extras`, keyed the
         same way; empty when the dataset defaults already cover the variable.
+
+    Examples:
+        - A selector the stanza sets differently is worth recording:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _selector_override
+            >>> _selector_override(
+            ...     {"timespan": ["instantaneous"]}, {"timespan": "[time_mean]"}
+            ... )
+            {'timespan': ['instantaneous']}
+
+            ```
+        - One the stanza already agrees with would be noise:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _selector_override
+            >>> _selector_override(
+            ...     {"timespan": ["time_mean"]}, {"timespan": "[time_mean]"}
+            ... )
+            {}
+
+            ```
+        - And one the stanza never declares is not this row's business:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _selector_override
+            >>> _selector_override({"hyear": ["2020"]}, {"timespan": "[time_mean]"})
+            {}
+
+            ```
     """
     override: dict[str, Any] = {}
     for key, value in selectors.items():
@@ -915,7 +945,32 @@ def _selector_override(
 
 
 def _yaml_inline_list(value: Any) -> str:
-    """Render a selector value the way the catalog writes it, as `[a]` or a scalar."""
+    """Render a selector value the way the catalog writes it, as `[a]` or a scalar.
+
+    Args:
+        value: The selector value from a constraints block.
+
+    Returns:
+        The inline YAML text for `value`.
+
+    Examples:
+        - A selector list becomes an inline sequence, matching the shipped rows:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _yaml_inline_list
+            >>> _yaml_inline_list(["instantaneous"])
+            '[instantaneous]'
+
+            ```
+        - A scalar stays a scalar:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _yaml_inline_list
+            >>> _yaml_inline_list("unarchived")
+            'unarchived'
+
+            ```
+    """
     if isinstance(value, list):
         return "[" + ", ".join(str(item) for item in value) + "]"
     return str(value)
