@@ -718,8 +718,9 @@ quantity (a shared token, or an initialism such as `sst` for
 `sea-surface-temperature`). A slug that stays ambiguous keeps its
 `unknown` placeholder, because a wrong `nc_variable` silently
 mis-extracts at `aggregate=` time, which is worse than an obvious gap.
-Re-running the command after the catalog gains more context is safe and
-idempotent.
+A NetCDF name an already-hydrated row of the same dataset claims is not
+offered to a second slug by the leftover rule, so re-running the command
+cannot make two rows fight over one variable.
 
 ## Adding a new dataset
 

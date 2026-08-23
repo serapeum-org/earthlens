@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import textwrap
 import time
 from types import SimpleNamespace
 
@@ -98,6 +99,32 @@ class TestRewriteStanza:
     def test_no_placeholders_returns_input(self):
         """A stanza with no `units: unknown` variable is left unchanged."""
         assert _rewrite_stanza(_STANZA, "other-dataset", _NC_META) == _STANZA
+
+    def test_a_sibling_row_keeps_its_nc_variable_to_itself(self):
+        """A leftover slug is not handed a NetCDF name a hydrated row already claims."""
+        text = textwrap.dedent(
+            """
+            datasets:
+              demo-dataset:
+                variables:
+                  total-precipitation:
+                    cds_variable: total_precipitation
+                    nc_variable: tp
+                    units: m
+                  precipitation-rate:
+                    cds_variable: precipitation_rate
+                    nc_variable: precipitation_rate
+                    units: unknown
+            """
+        ).lstrip()
+        out = _rewrite_stanza(
+            text,
+            "demo-dataset",
+            {"tp": {"long_name": "Total precipitation", "units": "m"}},
+        )
+        variables = yaml.safe_load(out)["datasets"]["demo-dataset"]["variables"]
+        assert variables["precipitation-rate"]["units"] == "unknown"
+        assert [v["nc_variable"] for v in variables.values()].count("tp") == 1
 
     def test_empty_retrieve_returns_input(self):
         """No usable retrieved variable leaves the placeholders as-is."""
@@ -204,6 +231,23 @@ class TestMatchVariables:
             {"iicethic": {"long_name": "", "units": "1"}},
         )
         assert assignments == {}
+
+    def test_reserved_names_are_withheld_from_the_leftover_rule(self):
+        """A reserved NetCDF name is not offered to the lone leftover slug."""
+        meta = {"t2m": {"long_name": "", "units": "K"}}
+        assert _match_variables(["2m-temperature"], meta) != {}
+        assert (
+            _match_variables(["2m-temperature"], meta, reserved=frozenset({"t2m"}))
+            == {}
+        )
+
+    def test_reserved_names_still_reach_the_confident_rules(self):
+        """Reservation gates only the leftover guess; a long-name match still binds."""
+        meta = {"sst": {"long_name": "Sea surface temperature", "units": "K"}}
+        assignments = _match_variables(
+            ["sea-surface-temperature"], meta, reserved=frozenset({"sst"})
+        )
+        assert assignments == {"sea-surface-temperature": ("sst", "K")}
 
     def test_stopword_only_slug_is_never_paired(self):
         """A slug that reduces to stopwords carries no evidence to match on."""

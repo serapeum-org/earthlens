@@ -441,7 +441,9 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
 
 
 def _match_variables(
-    placeholders: list[str], nc_meta: dict[str, dict[str, Any]]
+    placeholders: list[str],
+    nc_meta: dict[str, dict[str, Any]],
+    reserved: frozenset[str] = frozenset(),
 ) -> dict[str, tuple[str, str]]:
     """Confidently map each placeholder slug to a retrieved `(nc_name, units)`.
 
@@ -456,9 +458,10 @@ def _match_variables(
     3. Token-subset — the slug's tokens are a subset of a variable's
        `long_name` tokens.
     4. The **unambiguous** leftover case only: exactly one unmatched slug and
-       exactly one unused data variable (the single-variable retrieve), and
-       only when the two carry evidence of being the same quantity
-       (:func:`_pair_is_evidenced`) — arity alone is not a match.
+       exactly one unused data variable (the single-variable retrieve), the
+       variable not already claimed by a hydrated row, and only when the two
+       carry evidence of being the same quantity (`_pair_is_evidenced`) —
+       arity alone is not a match.
 
     Any slug that stays unmatched keeps its placeholder — there is no arbitrary
     order-based pairing among multiple candidates.
@@ -466,6 +469,11 @@ def _match_variables(
     Args:
         placeholders: The still-`unknown` variable slugs, in catalog order.
         nc_meta: The retrieved `{nc_name: {long_name, units}}` mapping.
+        reserved: NetCDF names already written into the stanza's hydrated rows.
+            Rule 4 will not hand one of these to a second slug; the confident
+            rules still may, because one short name legitimately serves several
+            rows of the same dataset (CARRA repeats a name across level
+            families).
 
     Returns:
         Mapping of slug to the `(nc_variable, units)` to write — only for the
@@ -500,6 +508,7 @@ def _match_variables(
         len(unmatched) == 1
         and len(unused) == 1
         and unmatched[0] != "all"
+        and unused[0] not in reserved
         and _pair_is_evidenced(unmatched[0], unused[0], candidates[unused[0]])
     ):
         chosen[unmatched[0]] = unused[0]
@@ -517,6 +526,32 @@ def _placeholder_slugs(block: str) -> list[str]:
         for match in _VARIABLE_BLOCK.finditer(block)
         if _UNKNOWN_UNITS.search(match.group("body"))
     ]
+
+
+def _claimed_nc_names(block: str) -> frozenset[str]:
+    """Return the `nc_variable` values already bound by the stanza's hydrated rows.
+
+    A placeholder row carries a seeded `nc_variable` too, so only sub-blocks
+    that have lost the `units: unknown` sentinel count as having claimed a name.
+
+    Args:
+        block: One dataset stanza's body text.
+
+    Returns:
+        The NetCDF short names a hydrated row of this stanza already uses.
+    """
+    claimed = set()
+    for match in _VARIABLE_BLOCK.finditer(block):
+        body = match.group("body")
+        if _UNKNOWN_UNITS.search(body):
+            continue
+        line = _NC_VARIABLE_LINE.search(body)
+        if line is None:
+            continue
+        value = body[line.start() : line.end()].split(":", 1)[1].strip()
+        if value:
+            claimed.add(value.strip("\"'"))
+    return frozenset(claimed)
 
 
 def _fill_variable(block: str, slug: str, nc_name: str, units: str) -> str:
@@ -560,7 +595,7 @@ def _rewrite_stanza(
     placeholders = _placeholder_slugs(block)
     if not placeholders:
         return text
-    assignments = _match_variables(placeholders, nc_meta)
+    assignments = _match_variables(placeholders, nc_meta, _claimed_nc_names(block))
     if not assignments:
         return text
     new_block = block
