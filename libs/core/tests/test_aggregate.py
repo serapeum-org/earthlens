@@ -726,6 +726,11 @@ class TestOutputStem:
             f"Override should append dataset_id, got {stem!r}"
         )
 
+    def test_appends_dataset_id_when_cds_dataset_absent(self):
+        """dataset_id present but no cds_dataset attribute still appends it."""
+        stem = _output_stem(SimpleNamespace(cds_variable="tp", dataset_id="ds-x"))
+        assert stem == "tp_ds-x", f"Expected appended stem, got {stem!r}"
+
 
 class TestAggregateNetcdf:
     """Smoke tests for the public entry point.
