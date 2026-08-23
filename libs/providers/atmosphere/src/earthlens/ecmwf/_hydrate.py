@@ -303,6 +303,28 @@ def _is_initialism(name: str, tokens: set[str]) -> bool:
 
     Returns:
         True when `name` is an initialism of `tokens`.
+
+    Examples:
+        - The compressed form need not follow the slug's word order:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _is_initialism
+            >>> _is_initialism("sst", {"sea", "surface", "temperature"})
+            True
+            >>> _is_initialism("t2m", {"2m", "temperature"})
+            True
+
+            ```
+        - Every token must contribute, so a near-miss prefix fails:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _is_initialism
+            >>> _is_initialism("pressure", {"precipitation"})
+            False
+            >>> _is_initialism("elevation", {"number", "wet", "days"})
+            False
+
+            ```
     """
     return bool(tokens) and _consume_initialism(name.lower(), sorted(tokens))
 
@@ -323,6 +345,33 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
 
     Returns:
         True when the pairing is supported; False to keep the placeholder.
+
+    Examples:
+        - An initialism is evidence even with no shared token:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _pair_is_evidenced
+            >>> _pair_is_evidenced("sea-surface-temperature", "sst", {})
+            True
+
+            ```
+        - So is a token shared with the variable's `long_name`:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _pair_is_evidenced
+            >>> meta = {"long_name": "Liquid Water Equivalent Thickness"}
+            >>> _pair_is_evidenced("terrestrial-water-storage", "lwe_thickness", meta)
+            True
+
+            ```
+        - Two unrelated names are not paired, whatever the arity:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _pair_is_evidenced
+            >>> _pair_is_evidenced("number-of-wet-days", "elevation", {"units": "m"})
+            False
+
+            ```
     """
     tokens = _tokens(slug) - _STOPWORDS
     if not tokens:
