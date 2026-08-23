@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -24783,21 +24783,6 @@ Per-row <code>extras</code> override the parent's <code>level_type</code> / <cod
 from a live tiny retrieve. Licence-gated and best-effort — a dataset
 whose licence you have not accepted is left untouched rather than
 guessed at.</p>
-<p>Matching is deliberately conservative. The confident rules come first: an
-exact short-name match, then a token-subset match against the variable's
-<code>long_name</code>. Only a single leftover slug facing a single unused variable
-reaches the last-resort rule, and it pairs them only when the two names
-carry evidence of describing the same quantity — a shared token, an
-initialism (<code>sst</code> for <code>sea-surface-temperature</code>), or a product prefix
-(<code>xco2</code> for <code>co2</code>). That evidence is a filter, not a proof: a single
-shared token is enough, so the last-resort rule can still be wrong where
-two names share a generic word. It is the weakest of the four and only
-ever applies to the one-slug, one-variable case. A slug that stays ambiguous keeps its
-<code>unknown</code> placeholder, because a wrong <code>nc_variable</code> silently
-mis-extracts at <code>aggregate=</code> time, which is worse than an obvious gap.
-A NetCDF name an already-hydrated row of the same dataset claims is not
-offered to a second slug by the leftover rule, so re-running the command
-cannot make two rows fight over one variable.</p>
 <h2 id="adding-a-new-dataset"><a class="toclink" href="#adding-a-new-dataset">Adding a new dataset</a><a class="headerlink" href="#adding-a-new-dataset" title="Permanent link">#</a></h2>
 <p>The typical sequence to extend the catalog with a brand-new dataset
 the package doesn't yet support:</p>
