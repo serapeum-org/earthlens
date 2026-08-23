@@ -857,7 +857,10 @@ def _curate_fill_empty(
     summary = hydrate(limit=limit, timeout=timeout or None)
 
     timed_out = summary.get("timed_out") or 0
+    unmatched = summary.get("unmatched") or 0
     tail = f", {timed_out} timed out" if timed_out else ""
+    if unmatched:
+        tail += f", {unmatched} retrieved with no confident match"
     out_console().print(
         f"[green]hydrated {summary['hydrated']}[/green] / "
         f"{summary['candidates']} placeholder rows "

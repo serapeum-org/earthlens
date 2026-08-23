@@ -585,6 +585,24 @@ class TestBulkHydrateEmpty:
         assert summary["unmatched"] == 1
         assert summary["skipped"] == 1, "unmatched still counts toward skipped"
 
+    def test_a_missing_stanza_is_a_skip_not_a_declined_match(
+        self, tmp_path, monkeypatch
+    ):
+        """A shard that never held the dataset had nothing for the matcher to decline."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        monkeypatch.setattr(hydrate_mod, "_find_file_for_dataset", lambda *a: None)
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_netcdf_vars", lambda ds: dict(_NC_META)
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["unmatched"] == 0
+        assert summary["skipped"] == 1
+
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the placeholder worklist."""
         (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")

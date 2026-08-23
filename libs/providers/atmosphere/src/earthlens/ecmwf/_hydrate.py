@@ -420,6 +420,23 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
     return len(tokens) >= 2 and _is_initialism(name, tokens)
 
 
+def _data_variables(
+    nc_meta: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Return the retrieved variables a catalog row could name, aux dropped.
+
+    The single definition of "what the matcher would consider", so the echo that
+    reports a declined pairing lists exactly the variables it weighed.
+
+    Args:
+        nc_meta: The retrieved `{nc_name: {long_name, units}}` mapping.
+
+    Returns:
+        The subset that is not a coordinate, bound, or auxiliary variable.
+    """
+    return {name: meta for name, meta in nc_meta.items() if not _is_auxiliary(name)}
+
+
 def _match_variables(
     placeholders: list[str],
     nc_meta: dict[str, dict[str, Any]],
@@ -460,9 +477,7 @@ def _match_variables(
         Mapping of slug to the `(nc_variable, units)` to write — only for the
         slugs that matched confidently.
     """
-    candidates = {
-        name: meta for name, meta in nc_meta.items() if not _is_auxiliary(name)
-    }
+    candidates = _data_variables(nc_meta)
     chosen: dict[str, str] = {}
     used: set[str] = set()
 
@@ -583,6 +598,43 @@ def _fill_variable(block: str, slug: str, nc_name: str, units: str) -> str:
     return block[: match.start()] + sub + block[match.end() :]
 
 
+def _stanza_match(text: str, dataset_id: str) -> re.Match[str] | None:
+    """Return the match spanning one dataset stanza, or None when it is absent.
+
+    Args:
+        text: The full per-family catalog shard text.
+        dataset_id: The dataset id whose stanza to isolate.
+
+    Returns:
+        The `re.Match` spanning the stanza, or `None` if `dataset_id` is absent.
+        Group 1 is the stanza body; the span is where a rewrite splices back.
+    """
+    pattern = re.compile(
+        rf"(?ms)^  {re.escape(dataset_id)}:\n(.*?)(?=^  [A-Za-z0-9/_.-]+:|\Z)"
+    )
+    return pattern.search(text)
+
+
+def _stanza_outcome(text: str, dataset_id: str) -> str | None:
+    """Return why a stanza cannot be hydrated, or None when it has work to do.
+
+    Lets the caller tell a shard that never held the dataset, or a stanza with
+    nothing left to fill, apart from one the matcher looked at and declined.
+
+    Args:
+        text: The full per-family catalog shard text.
+        dataset_id: The dataset id to inspect.
+
+    Returns:
+        `"skipped"` when the stanza is missing or holds no placeholder, else
+        `None`.
+    """
+    found = _stanza_match(text, dataset_id)
+    if found is None or not _placeholder_slugs(found.group(1)):
+        return "skipped"
+    return None
+
+
 def _rewrite_stanza(
     text: str, dataset_id: str, nc_meta: dict[str, dict[str, Any]]
 ) -> str:
@@ -598,11 +650,8 @@ def _rewrite_stanza(
         input is returned unchanged when the stanza, its placeholders, or a
         usable match are absent.
     """
-    pattern = re.compile(
-        rf"(?ms)^  {re.escape(dataset_id)}:\n(.*?)(?=^  [A-Za-z0-9/_.-]+:|\Z)"
-    )
-    match = pattern.search(text)
-    if not match:
+    match = _stanza_match(text, dataset_id)
+    if match is None:
         return text
     block = match.group(1)
     placeholders = _placeholder_slugs(block)
@@ -655,9 +704,11 @@ def _hydrate_one(
 
     Returns:
         One of `"hydrated"`, `"unmatched"`, `"timed_out"`, or `"skipped"`.
-        `"unmatched"` is the retrieve that worked and still hydrated nothing —
-        the operator can curate that row by hand, unlike a `"skipped"` licence
-        or network failure.
+        `"unmatched"` is reserved for the retrieve that worked against a stanza
+        with real placeholders and still hydrated nothing — the operator can
+        curate that row by hand. A missing stanza, or one whose placeholders
+        have all been filled already, is a `"skipped"` like a licence or network
+        failure: there was nothing for the matcher to decline.
     """
     try:
         nc_meta: dict[str, dict[str, Any]] | None = _retrieve_with_timeout(
@@ -674,9 +725,13 @@ def _hydrate_one(
         return "skipped"
     if path not in file_text:
         file_text[path] = path.read_text(encoding="utf-8")
+    blocked = _stanza_outcome(file_text[path], dataset_id)
+    if blocked is not None:
+        typer.echo(f"{prefix}: {blocked}")
+        return blocked
     new_text = _rewrite_stanza(file_text[path], dataset_id, nc_meta)
     if new_text == file_text[path]:
-        offered = sorted(name for name in nc_meta if not _is_auxiliary(name))
+        offered = sorted(_data_variables(nc_meta))
         typer.echo(f"{prefix}: retrieved, no confident match ({', '.join(offered)})")
         return "unmatched"
     file_text[path] = new_text
