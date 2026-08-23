@@ -26,6 +26,7 @@ from earthlens.aggregate import (
     _TIME_VAR_CANDIDATES,
     AggregationConfig,
     _find_level_dim,
+    _output_stem,
     _read_time_axis,
     _resolve_op,
     _resolve_pressure_level,
@@ -701,6 +702,31 @@ class TestResolveOp:
         assert var.accessed is False, "Explicit op should not consult var_info.is_flux"
 
 
+class TestOutputStem:
+    """`_output_stem` appends dataset_id only for a curated override (#1040)."""
+
+    def test_bare_when_dataset_id_absent(self):
+        """A var_info without a dataset_id keeps the bare cds_variable stem."""
+        stem = _output_stem(SimpleNamespace(cds_variable="tp"))
+        assert stem == "tp", f"Expected bare stem 'tp', got {stem!r}"
+
+    def test_bare_when_dataset_id_equals_cds_dataset(self):
+        """An ordinary row (dataset_id == cds_dataset) keeps the bare stem."""
+        var = SimpleNamespace(cds_variable="tp", cds_dataset="ds", dataset_id="ds")
+        stem = _output_stem(var)
+        assert stem == "tp", f"Ordinary row should stay 'tp', got {stem!r}"
+
+    def test_appends_dataset_id_on_override(self):
+        """A dataset_id differing from cds_dataset is appended to the stem."""
+        var = SimpleNamespace(
+            cds_variable="tp", cds_dataset="ds", dataset_id="ds-intermediate"
+        )
+        stem = _output_stem(var)
+        assert stem == "tp_ds-intermediate", (
+            f"Override should append dataset_id, got {stem!r}"
+        )
+
+
 class TestAggregateNetcdf:
     """Smoke tests for the public entry point.
 
@@ -1113,6 +1139,56 @@ class TestAggregateNetcdfRoundTrip:
             f"Filename should match `<var>_<freq>_<window>.tif` shape, "
             f"got {target_path!r}"
         )
+
+    def test_dataset_id_override_disambiguates_output_filenames(
+        self, monkeypatch, tmp_path
+    ):
+        """Two configs of one dataset (distinct dataset_id) write distinct .tif files (#1040)."""
+        # Mirrors the GloFAS consolidated vs `-intermediate` streams: same
+        # cds_variable + cds_dataset, distinct dataset_id, aggregated to one out_dir.
+        consolidated = _RealVariable(
+            is_flux=False,
+            cds_variable="average_river_discharge_in_the_last_24_hours",
+            nc_variable="dis24",
+            units="m3 s-1",
+            cds_dataset="cems-glofas-historical",
+            dataset_id="cems-glofas-historical",
+        )
+        intermediate = _RealVariable(
+            is_flux=False,
+            cds_variable="average_river_discharge_in_the_last_24_hours",
+            nc_variable="dis24",
+            units="m3 s-1",
+            cds_dataset="cems-glofas-historical",
+            dataset_id="cems-glofas-historical-intermediate",
+        )
+        out_dir = tmp_path / "agg"
+        written: list[str] = []
+        for var in (consolidated, intermediate):
+            nc = _FakeNetCDF(
+                array=self._daily_six_hourly_array(n_days=1),
+                time_strs_by_var={"time": self._date_strings_six_hourly(1)},
+                dimension_names=["time", "lat", "lon"],
+            )
+            _patch_netcdf_read(monkeypatch, nc)
+            writes = _patch_geotiff_write(monkeypatch)
+            aggregate_netcdf(
+                tmp_path / "fake.nc",
+                var,
+                AggregationConfig(freq="1D", op="mean", out_dir=out_dir),
+            )
+            written.append(writes[0][3])
+
+        assert written[0] != written[1], (
+            f"The two streams must not collide; both wrote {written[0]!r}"
+        )
+        assert written[0].endswith(
+            "average_river_discharge_in_the_last_24_hours_1D_20220101.tif"
+        ), f"Consolidated keeps the bare stem, got {written[0]!r}"
+        assert written[1].endswith(
+            "average_river_discharge_in_the_last_24_hours_"
+            "cems-glofas-historical-intermediate_1D_20220101.tif"
+        ), f"Intermediate includes dataset_id, got {written[1]!r}"
 
     def test_valid_time_variable_is_picked_over_time(
         self, monkeypatch, tmp_path, state_var

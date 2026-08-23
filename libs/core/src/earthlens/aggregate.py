@@ -664,6 +664,64 @@ class AggregatedWindow:
     path: Path | None
 
 
+def _output_stem(var_info: Variable) -> str:
+    """Filename stem for a variable's aggregated GeoTIFF windows.
+
+    Normally just `var_info.cds_variable`. When the row curates a second config
+    of one CDS dataset under a distinct `dataset_id` — the override case, e.g.
+    GloFAS's `cems-glofas-historical-intermediate` stream, which shares
+    `cds_variable` and `cds_dataset` with the consolidated stream — the
+    `dataset_id` is appended (`<cds_variable>_<dataset_id>`) so aggregating both
+    streams into one `out_dir` yields distinct files instead of colliding.
+    Ordinary rows (`dataset_id` absent, or equal to `cds_dataset`) keep the bare
+    `cds_variable` stem, so existing single-config output paths are unchanged.
+
+    Args:
+        var_info: The catalog row being aggregated. Read structurally
+            (`cds_variable`, and the optional `dataset_id` / `cds_dataset`), so a
+            row from any backend works.
+
+    Returns:
+        The filename stem, without the trailing `_<freq>_<window>.tif`.
+
+    Examples:
+        - An ordinary row (no override) keeps the bare variable name:
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.aggregate import _output_stem
+            >>> ordinary = SimpleNamespace(
+            ...     cds_variable="2m_temperature",
+            ...     cds_dataset="reanalysis-era5-single-levels",
+            ...     dataset_id="reanalysis-era5-single-levels",
+            ... )
+            >>> _output_stem(ordinary)
+            '2m_temperature'
+
+            ```
+        - A curated override (a `dataset_id` differing from `cds_dataset`)
+          appends it, so two configs of one dataset do not collide:
+
+            ```python
+            >>> from types import SimpleNamespace
+            >>> from earthlens.aggregate import _output_stem
+            >>> override = SimpleNamespace(
+            ...     cds_variable="average_river_discharge_in_the_last_24_hours",
+            ...     cds_dataset="cems-glofas-historical",
+            ...     dataset_id="cems-glofas-historical-intermediate",
+            ... )
+            >>> _output_stem(override)
+            'average_river_discharge_in_the_last_24_hours_cems-glofas-historical-intermediate'
+
+            ```
+    """
+    stem: str = var_info.cds_variable
+    dataset_id = getattr(var_info, "dataset_id", None)
+    if dataset_id and dataset_id != getattr(var_info, "cds_dataset", None):
+        stem = f"{stem}_{dataset_id}"
+    return stem
+
+
 def aggregate_netcdf(
     nc_path: Path | str,
     var_info: Variable,
@@ -682,7 +740,8 @@ def aggregate_netcdf(
         var_info: Catalog row for the variable being aggregated. Used
             to pick the variable from the NetCDF
             (`var_info.nc_variable`), seed the output filename
-            (`var_info.cds_variable`), and resolve `op="auto"`
+            (`var_info.cds_variable`, plus `dataset_id` for a curated
+            override — see :func:`_output_stem`), and resolve `op="auto"`
             (`var_info.is_flux`).
         config: Frozen :class:`AggregationConfig` describing the
             window, reduction, and output location.
@@ -747,7 +806,8 @@ def iter_aggregate_netcdf(
         nc_path: Path to the NetCDF on disk.
         var_info: Catalog row for the variable being aggregated. Used to
             pick the variable from the NetCDF (`var_info.nc_variable`),
-            seed the output filename (`var_info.cds_variable`), and resolve
+            seed the output filename (`_output_stem` — `var_info.cds_variable`,
+            plus `dataset_id` for a curated override), and resolve
             `op="auto"` (`var_info.is_flux`).
         config: Frozen :class:`AggregationConfig` describing the window,
             reduction, output location, and whether to retain arrays.
@@ -800,6 +860,7 @@ def iter_aggregate_netcdf(
         if var is not opened[-1]:
             opened.append(var)
 
+        stem = _output_stem(var_info)
         for window_label, mask in window_groups(time_axis, config.freq):
             slice_ = _read_window(var, mask)
             reduced = reduce_time_axis(
@@ -808,9 +869,7 @@ def iter_aggregate_netcdf(
 
             target: Path | None = None
             if out_dir is not None:
-                target = out_dir / (
-                    f"{var_info.cds_variable}_{config.freq}_{window_label:%Y%m%d}.tif"
-                )
+                target = out_dir / (f"{stem}_{config.freq}_{window_label:%Y%m%d}.tif")
                 Dataset.create_from_array(arr=reduced, geo=geo, epsg=4326).to_file(
                     str(target)
                 )
