@@ -715,17 +715,23 @@ exact short-name match, then a token-subset match against the variable's
 `long_name`. Only a single leftover slug facing a single unused variable
 reaches the last-resort rule, and it pairs them only when the two names
 carry evidence of describing the same quantity — a shared token, or an
-initialism (`sst` for `sea-surface-temperature`). That evidence is a
-filter, not a proof: a single shared token is enough, so on names alone
-the last-resort rule could still be wrong where two names share a generic
-word. What stops it is the reservation described above — every NetCDF
-name a hydrated row of the dataset already owns is off the table, which
-removes every such mis-pairing the shipped catalog can produce. A slug that stays ambiguous keeps its
-`unknown` placeholder, because a wrong `nc_variable` silently
-mis-extracts at `aggregate=` time, which is worse than an obvious gap.
-A NetCDF name an already-hydrated row of the same dataset claims is not
-offered to a second slug by the leftover rule, so re-running the command
-cannot make two rows fight over one variable.
+initialism (`sst` for `sea-surface-temperature`).
+
+Two limits of that last rule are worth knowing before you trust its
+output. Its evidence is a filter, not a proof: one shared word satisfies
+it, so it can still be wrong where two names share a generic term such as
+`sea` or `surface`. And it leans heavily on the retrieved variable's
+`long_name` — across the curated catalog, 89% of the rows that need more
+than an exact name match would fail the check if the retrieve carried no
+`long_name` at all. A NetCDF name that an already-hydrated row of the same
+dataset claims is withheld from it, so a re-run cannot make two rows fight
+over one variable, but most datasets reaching this rule have no hydrated
+row yet and so withhold nothing.
+
+A slug that stays ambiguous keeps its `unknown` placeholder, because a
+wrong `nc_variable` silently mis-extracts at `aggregate=` time, which is
+worse than an obvious gap. Those rows are counted separately in the
+command's summary, so they can be curated by hand.
 
 ## Adding a new dataset
 

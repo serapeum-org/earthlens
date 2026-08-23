@@ -279,7 +279,9 @@ def _consume_initialism(
 
     `rest` is always a suffix of the original name, so `(len(rest), mask)`
     identifies a search state exactly; memoising on it bounds the work at
-    `O(2^len(tokens) * len(name))` instead of the exponential-with-no-ceiling
+    `O(2^len(tokens) * len(name) * len(tokens) * max_token_len)` — one state per
+    `(suffix, mask)` pair, each scanning the still-unused tokens' prefixes —
+    instead of the exponential-with-no-ceiling
     node count a plain backtracker walks when the tokens nest as prefixes of
     one another.
 
@@ -501,10 +503,14 @@ def _match_variables(
     # dropping the abbreviations rule 4 gets right; the initialism arm keeps
     # them (`sea-surface-temperature` -> `sst`). It resolves the common shapes,
     # not abbreviation in general — a selective contraction like `msl` or `u10`
-    # still fails it, and such a slug simply keeps its placeholder. What stops
-    # a weak shared token from mis-binding is `reserved`: every name a hydrated
-    # sibling row owns is off the table, which is where the real protection
-    # lives. Rule 4 stays a last resort behind the confident rules above.
+    # still fails it, and such a slug simply keeps its placeholder.
+    #
+    # `reserved` narrows the damage where a hydrated sibling row already owns
+    # the name, but it is not a general guard: of the stanzas this rule can
+    # reach in the shipped catalog, most have no hydrated sibling at all and so
+    # reserve nothing. The evidence check is what stands between a placeholder
+    # and a wrong name there, and one shared generic word satisfies it. Rule 4
+    # is a last resort behind the confident rules for exactly that reason.
     if (
         len(unmatched) == 1
         and len(unused) == 1
