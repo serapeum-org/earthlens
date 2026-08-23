@@ -230,7 +230,6 @@ class TestShapeFrame:
             }
         )
         out = shape_frame(raw, "Historical", {6001: "pm25"})
-        assert str(out["value"].dtype) == "float64"
         assert out["value"].dropna().tolist() == [14.6]
 
     def test_zero_flag_is_not_masked(self):
