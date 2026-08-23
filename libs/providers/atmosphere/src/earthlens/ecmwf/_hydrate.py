@@ -364,8 +364,16 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
     qualifies on any one of three signals, cheapest first — a shared token with
     the short name, a shared token with its `long_name`, or `name` being an
     initialism of the slug. Slugs reduced to nothing but stopwords never
-    qualify. The evidence is a filter, not a proof: rule 4 leans on `reserved`
-    to keep a slug off a name a hydrated sibling row already owns.
+    qualify.
+
+    The initialism arm needs at least two tokens. Compressing a single word
+    leaves nothing but a prefix of it, which is far too weak to pair on: it
+    would read `co` as evidence for `co2`, and `e` for `ethene`.
+
+    The evidence is a filter, not a proof. A single shared token satisfies it,
+    so two names that share a generic word can still pair; `reserved` narrows
+    that where a hydrated sibling row already owns the name, but most stanzas
+    reaching rule 4 have no hydrated sibling at all.
 
     Args:
         slug: The unmatched catalog variable slug.
@@ -409,7 +417,7 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
         return True
     if tokens & (_tokens(str(meta.get("long_name") or "")) - _STOPWORDS):
         return True
-    return _is_initialism(name, tokens)
+    return len(tokens) >= 2 and _is_initialism(name, tokens)
 
 
 def _match_variables(

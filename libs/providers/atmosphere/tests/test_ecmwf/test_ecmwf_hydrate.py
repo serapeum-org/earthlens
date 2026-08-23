@@ -364,6 +364,14 @@ class TestPairIsEvidenced:
             _match_variables(["land-sea-mask"], meta, reserved=frozenset({"msl"})) == {}
         )
 
+    @pytest.mark.parametrize(
+        ("slug", "name"),
+        [("co2", "co"), ("ethene", "e"), ("methane", "met")],
+    )
+    def test_a_single_word_slug_is_not_abbreviated_by_a_prefix(self, slug, name):
+        """Compressing one word leaves only a prefix of it, which is not evidence."""
+        assert _pair_is_evidenced(slug, name, {}) is False
+
     def test_unrelated_names_carry_no_evidence(self):
         """Two names with nothing in common are not paired."""
         assert _pair_is_evidenced("number-of-wet-days", "elevation", {}) is False
