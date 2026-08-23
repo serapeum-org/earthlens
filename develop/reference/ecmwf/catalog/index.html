@@ -13069,35 +13069,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/earthlens-satellites/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Every satellite earthlens can reach, in orbit
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../examples/showcase/eclipse/eclipse_geometry_3d/" class="md-nav__link">
+      <a href="../../../examples/showcase/eclipse_geometry_3d/" class="md-nav__link">
         
   
   
@@ -13125,7 +13097,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/eclipse/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+      <a href="../../../examples/showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
         
   
   
@@ -13153,7 +13125,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../examples/showcase/eclipse/solar_eclipse_2026_goes/" class="md-nav__link">
+      <a href="../../../examples/showcase/solar_eclipse_2026_goes/" class="md-nav__link">
         
   
   
@@ -24811,6 +24783,16 @@ Per-row <code>extras</code> override the parent's <code>level_type</code> / <cod
 from a live tiny retrieve. Licence-gated and best-effort — a dataset
 whose licence you have not accepted is left untouched rather than
 guessed at.</p>
+<p>Matching is deliberately conservative: a slug is hydrated only when it
+confidently identifies one retrieved variable — by exact short name, by a
+token-subset match against the variable's <code>long_name</code>, or, for the lone
+leftover slug, when the two names carry evidence of describing the same
+quantity (a shared token, or an initialism such as <code>sst</code> for
+<code>sea-surface-temperature</code>). A slug that stays ambiguous keeps its
+<code>unknown</code> placeholder, because a wrong <code>nc_variable</code> silently
+mis-extracts at <code>aggregate=</code> time, which is worse than an obvious gap.
+Re-running the command after the catalog gains more context is safe and
+idempotent.</p>
 <h2 id="adding-a-new-dataset"><a class="toclink" href="#adding-a-new-dataset">Adding a new dataset</a><a class="headerlink" href="#adding-a-new-dataset" title="Permanent link">#</a></h2>
 <p>The typical sequence to extend the catalog with a brand-new dataset
 the package doesn't yet support:</p>
