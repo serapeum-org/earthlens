@@ -279,8 +279,8 @@ earthlens.download(
 The retrieved NetCDF lands at
 `out/era5/2m_temperature_reanalysis-era5-single-levels.nc`; the
 aggregated GeoTIFF lands at
-`out/era5/aggregated/2m_temperature_1MS_20220101.tif` (default
-`out_dir = <root_dir>/aggregated/`).
+`out/era5/aggregated/2m_temperature_reanalysis-era5-single-levels_1MS_20220101.tif`
+(default `out_dir = <root_dir>/aggregated/`).
 
 ## Worked example — aggregate later, separately
 
@@ -343,14 +343,20 @@ the full list.
 Per-window GeoTIFFs are named:
 
 ```
-<cds_variable>_<freq>_<window-label-as-YYYYMMDD>.tif
+<cds_variable>_<dataset_id>_<freq>_<window-label-as-YYYYMMDD>.tif
 ```
+
+The `<dataset_id>` (the requested catalog id, e.g. `reanalysis-era5-single-levels`)
+is included so datasets sharing a `cds_variable` — or the two GloFAS streams that
+also share `cds_dataset` — never overwrite one another in a shared `out_dir`,
+matching the `.nc` naming. It is omitted only for a `var_info` that carries no
+dataset id (a plain caller passing a bare stand-in to `aggregate_netcdf`).
 
 Examples:
 
-- `2m_temperature_1D_20220101.tif` — daily mean for 2022-01-01.
-- `total_precipitation_1MS_20220101.tif` — monthly sum for 2022-01.
-- `temperature_QS-DEC_20220301.tif` — MAM seasonal mean.
+- `2m_temperature_reanalysis-era5-single-levels_1D_20220101.tif` — daily mean for 2022-01-01.
+- `total_precipitation_reanalysis-era5-single-levels_1MS_20220101.tif` — monthly sum for 2022-01.
+- `temperature_reanalysis-era5-pressure-levels_QS-DEC_20220301.tif` — MAM seasonal mean.
 
 ## Related
 

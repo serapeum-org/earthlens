@@ -1004,7 +1004,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
             intermediate stream — which is named by its own id so it does
             not collide with the consolidated stream),
             or, when `aggregate` is set, the per-window GeoTIFFs at
-            `<aggregate.out_dir or self.root_dir/aggregated>/<cds_variable>_<freq>_<window>.tif`.
+            `<aggregate.out_dir or self.root_dir/aggregated>/<cds_variable>_<dataset_id>_<freq>_<window>.tif`
+            (the `dataset_id` is carried for the same collision-avoidance reason
+            as the `.nc` name above — datasets sharing a `cds_variable` reduce
+            into one `aggregated/` dir and would otherwise overwrite one another).
             A zip-of-NetCDF response (satellite CDRs, CAMS `netcdf_zip`)
             that unpacks to more than one member is returned as every
             member under a sibling `<cds_variable>_<dataset_id>/`
