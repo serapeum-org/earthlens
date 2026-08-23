@@ -268,10 +268,10 @@ def http_status(exc: BaseException) -> int | None:
             ```
     """
     for link in exception_chain(exc):
-        found = response_status(link)
+        found = response_status(link)  # NOSONAR: S112 false positive (no raise)
         if found is not None:
             return found
-        found = status_in_message(str(link))
+        found = status_in_message(str(link))  # NOSONAR: S112 false positive (no raise)
         if found is not None:
             return found
     return None
