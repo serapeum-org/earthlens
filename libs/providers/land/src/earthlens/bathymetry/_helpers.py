@@ -19,9 +19,9 @@ from typing import TYPE_CHECKING
 
 import requests
 
-if TYPE_CHECKING:
-    from collections.abc import Iterator
+from earthlens.base import UpstreamUnavailableError, exception_chain, response_status
 
+if TYPE_CHECKING:
     from earthlens.base import SpatialExtent
 
 #: Default sampling stride for a griddap axis range (`1` = full resolution).
@@ -116,7 +116,7 @@ _STATUS_IN_TEXT_RE = re.compile(
 )
 
 
-class WcsServiceUnavailableError(RuntimeError):
+class WcsServiceUnavailableError(UpstreamUnavailableError):
     """A WCS coverage read failed because the OGC service was unavailable.
 
     Raised by the bathymetry backend's WCS path when `pyramids.Dataset.from_wcs`
@@ -139,55 +139,6 @@ class WcsServiceUnavailableError(RuntimeError):
 
             ```
     """
-
-
-def _exception_chain(exc: Exception) -> Iterator[Exception]:
-    """Yield `exc` then each linked `__cause__` / `__context__`, cycle-safe.
-
-    Honours `__suppress_context__`, so a deliberate `raise … from None` hides the
-    implicit context (matching stdlib `traceback`): an explicit `__cause__` wins,
-    otherwise the `__context__` is followed only when the author did not suppress
-    it. The walk stops at any non-`Exception` link (a `KeyboardInterrupt` /
-    `SystemExit` in the chain is never a service or request signal).
-
-    Args:
-        exc: The exception to walk.
-
-    Yields:
-        Each exception in the chain, most recent first.
-    """
-    seen: set[int] = set()
-    current: Exception | None = exc
-    while current is not None and id(current) not in seen:
-        seen.add(id(current))
-        yield current
-        if current.__cause__ is not None:
-            following: BaseException | None = current.__cause__
-        elif current.__suppress_context__:
-            following = None
-        else:
-            following = current.__context__
-        current = following if isinstance(following, Exception) else None
-
-
-def _http_status(exc: Exception) -> int | None:
-    """Return the HTTP status `exc` carries, from its type or a `response`.
-
-    Reads the two SDK shapes directly — `urllib.error.HTTPError.code` and
-    `requests` `.response.status_code` — so a status is used structurally rather
-    than parsed out of free text (which a URL or a pixel count could spoof).
-
-    Args:
-        exc: The exception to inspect.
-
-    Returns:
-        The status code, or `None` when the exception carries none.
-    """
-    if isinstance(exc, urllib.error.HTTPError):
-        return exc.code
-    response = getattr(exc, "response", None)
-    code = getattr(response, "status_code", None)
-    return code if isinstance(code, int) else None
 
 
 def is_wcs_service_failure(exc: Exception) -> bool:
@@ -237,17 +188,14 @@ def is_wcs_service_failure(exc: Exception) -> bool:
 
             ```
     """
-    for link in _exception_chain(exc):
-        # `link` is intentionally the generic `Exception` type: a service-failure
-        # classifier must inspect any chained exception, and there is no
-        # more-specific type that fits.
+    for link in exception_chain(exc):
         verdict = _link_verdict(link)  # NOSONAR
         if verdict is not None:
             return verdict
     return False
 
 
-def _link_verdict(link: Exception) -> bool | None:
+def _link_verdict(link: BaseException) -> bool | None:
     """Classify one exception-chain link as service / request / undecided.
 
     Args:
@@ -259,7 +207,7 @@ def _link_verdict(link: Exception) -> bool | None:
         status), or `None` when this link alone does not decide it (defer to the
         rest of the chain).
     """
-    status = _http_status(link)
+    status = response_status(link)
     if status is not None:
         return status in _TRANSIENT_STATUS or 500 <= status <= 599
     if isinstance(link, _TRANSPORT_EXC):
