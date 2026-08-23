@@ -95,6 +95,12 @@ _UNKNOWN_UNITS = re.compile(r"(?m)^ {8}units:[ \t]*unknown[ \t]*$")
 _NC_VARIABLE_LINE = re.compile(r"(?m)^( {8}nc_variable:)[^\n]*$")
 _UNITS_LINE = re.compile(r"(?m)^( {8}units:)[^\n]*$")
 
+#: Fraction of a slug's meaningful tokens the shared ones must cover before
+#: rule 4 treats the overlap as evidence. Half rejects the single-generic-word
+#: coincidence (`land-sea-mask` against `msl`, sharing only `sea`) while keeping
+#: the real one-of-two matches (`glacier-area` against `area`).
+_MIN_TOKEN_COVERAGE = 0.5
+
 #: Most retrieved variable names to name in a declined-match echo before
 #: summarising the rest, so one wide product cannot flood the sweep's output.
 _ECHO_MAX_NAMES = 8
@@ -367,10 +373,29 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
     """Return True when `slug` and `name` share evidence of being the same thing.
 
     Rule 4's guard: being the only two left over is arity, not evidence. A pair
-    qualifies on any one of three signals, cheapest first — a shared token with
-    the short name, a shared token with its `long_name`, or `name` being an
-    initialism of the slug. Slugs reduced to nothing but stopwords never
-    qualify.
+    qualifies on either of two signals — the tokens it shares with the short
+    name and `long_name` covering at least :data:`_MIN_TOKEN_COVERAGE` of the
+    slug, or `name` being an initialism of the slug. Slugs reduced to nothing
+    but stopwords never qualify.
+
+    Coverage rather than mere overlap is what keeps a single generic word from
+    passing as evidence: `land-sea-mask` shares only `sea` with mean sea level
+    pressure, one token of three, and `sub-surface-runoff` only `surface` with
+    surface net solar radiation. Measured over the curated catalog, requiring
+    half the slug's tokens cuts the pairings rule 4 would get wrong from 111 to
+    38, about two thirds.
+
+    It costs the occasional real match whose names genuinely have little in
+    common — a terrestrial water storage anomaly served as a liquid water
+    equivalent thickness shares only `water` — and those rows keep their
+    placeholder and are counted as unmatched, which is the cheaper failure.
+
+    Coverage does not govern the initialism arm, which has no shared tokens to
+    measure; that arm admits 34 of the 38 wrong pairings that remain, reading
+    `msl` as m(ask) s(ea) l(and). Requiring it to consume tokens in slug order
+    would remove some, but it also rejects `2m-temperature` -> `t2m`, so the
+    residue is accepted and rule 4 stays a last resort behind the confident
+    rules.
 
     The initialism arm needs at least two tokens. Compressing a single word
     leaves nothing but a prefix of it, which is far too weak to pair on: it
@@ -398,12 +423,32 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
             True
 
             ```
-        - So is a token shared with the variable's `long_name`:
+        - So are tokens shared with the variable's `long_name`, once they
+          cover half the slug:
 
             ```python
             >>> from earthlens.ecmwf._hydrate import _pair_is_evidenced
-            >>> meta = {"long_name": "Liquid Water Equivalent Thickness"}
-            >>> _pair_is_evidenced("terrestrial-water-storage", "lwe_thickness", meta)
+            >>> meta = {"long_name": "Total precipitation depth"}
+            >>> _pair_is_evidenced("total-precipitation", "zzz", meta)
+            True
+
+            ```
+        - One generic word in common is coincidence, not evidence — `sea` is
+          one of the slug's three tokens, short of the coverage bar:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _pair_is_evidenced
+            >>> meta = {"long_name": "Mean sea level pressure"}
+            >>> _pair_is_evidenced("land-sea-mask", "zzz", meta)
+            False
+
+            ```
+        - The initialism arm is separate, and still reads `msl` as
+          m(ask) s(ea) l(and) — coverage does not govern it:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _pair_is_evidenced
+            >>> _pair_is_evidenced("land-sea-mask", "msl", {})
             True
 
             ```
@@ -419,9 +464,9 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
     tokens = _tokens(slug) - _STOPWORDS
     if not tokens:
         return False
-    if tokens & (_tokens(name) - _STOPWORDS):
-        return True
-    if tokens & (_tokens(str(meta.get("long_name") or "")) - _STOPWORDS):
+    shared = tokens & (_tokens(name) - _STOPWORDS)
+    shared |= tokens & (_tokens(str(meta.get("long_name") or "")) - _STOPWORDS)
+    if len(shared) >= len(tokens) * _MIN_TOKEN_COVERAGE:
         return True
     return len(tokens) >= 2 and _is_initialism(name, tokens)
 

@@ -178,11 +178,13 @@ class TestMatchVariables:
             ("total-precipitation", "tp", "", True),
             # True positives - a shared token with the short or long name.
             ("mean-uth", "uth", "", True),
+            # Only `water` of four tokens: real, but below the coverage bar, so
+            # it keeps its placeholder rather than being guessed at.
             (
                 "terrestrial-water-storage-anomaly",
                 "lwe_thickness",
                 "Liquid Water Equivalent Thickness",
-                True,
+                False,
             ),
             # True negatives - unrelated names must keep the placeholder.
             ("number-of-wet-days", "elevation", "", False),
@@ -394,22 +396,28 @@ class TestPairIsEvidenced:
         assert _pair_is_evidenced("mean-uth", "uth", {}) is True
 
     def test_long_name_token_overlap(self):
-        """A token shared with the variable's long name is evidence."""
-        meta = {"long_name": "Liquid Water Equivalent Thickness"}
-        assert _pair_is_evidenced("terrestrial-water-storage", "lwe_thickness", meta)
+        """Tokens shared with the long name are evidence once they cover the slug."""
+        meta = {"long_name": "Total precipitation depth"}
+        assert _pair_is_evidenced("total-precipitation", "zzz", meta) is True
 
     def test_initialism(self):
         """An initialism is evidence with no shared token at all."""
         assert _pair_is_evidenced("sea-surface-temperature", "sst", {}) is True
 
-    def test_a_generic_shared_token_counts_as_evidence(self):
-        """One shared generic word satisfies the long-name arm, which is weak by design."""
-        assert (
-            _pair_is_evidenced(
-                "land-sea-mask", "zzz", {"long_name": "Mean sea level pressure"}
-            )
-            is True
-        ), "the only thing in common is the word 'sea'"
+    @pytest.mark.parametrize(
+        ("slug", "long_name"),
+        [
+            ("land-sea-mask", "Mean sea level pressure"),
+            ("sub-surface-runoff", "Surface net solar radiation"),
+        ],
+    )
+    def test_one_generic_word_does_not_cover_enough_of_the_slug(self, slug, long_name):
+        """A lone generic word shared with the long name is coincidence, not evidence."""
+        assert _pair_is_evidenced(slug, "zzz", {"long_name": long_name}) is False
+
+    def test_shared_tokens_covering_half_the_slug_are_evidence(self):
+        """Half the slug's tokens is the bar, so a two-token slug needs one of them."""
+        assert _pair_is_evidenced("glacier-area", "area", {}) is True
 
     def test_reservation_declines_a_name_a_sibling_row_owns(self):
         """Where a hydrated sibling owns the name, reservation is what stops rule 4."""
