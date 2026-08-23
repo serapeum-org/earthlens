@@ -710,6 +710,17 @@ from a live tiny retrieve. Licence-gated and best-effort — a dataset
 whose licence you have not accepted is left untouched rather than
 guessed at.
 
+Matching is deliberately conservative: a slug is hydrated only when it
+confidently identifies one retrieved variable — by exact short name, by a
+token-subset match against the variable's `long_name`, or, for the lone
+leftover slug, when the two names carry evidence of describing the same
+quantity (a shared token, or an initialism such as `sst` for
+`sea-surface-temperature`). A slug that stays ambiguous keeps its
+`unknown` placeholder, because a wrong `nc_variable` silently
+mis-extracts at `aggregate=` time, which is worse than an obvious gap.
+Re-running the command after the catalog gains more context is safe and
+idempotent.
+
 ## Adding a new dataset
 
 The typical sequence to extend the catalog with a brand-new dataset

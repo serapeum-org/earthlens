@@ -242,6 +242,98 @@ def _assign_unique_subset(
                 progress = True
 
 
+#: Function words that carry no identifying signal. Dropped before the rule 4
+#: overlap tests so `number-of-wet-days` cannot pair with a variable on `of`.
+_STOPWORDS = frozenset(
+    {
+        "a",
+        "an",
+        "and",
+        "at",
+        "by",
+        "for",
+        "from",
+        "in",
+        "of",
+        "on",
+        "or",
+        "per",
+        "the",
+        "to",
+        "with",
+    }
+)
+
+
+def _consume_initialism(rest: str, remaining: list[str]) -> bool:
+    """Return True when `rest` splits into a leading piece of every `remaining` token.
+
+    Backtracking search over token order, because the compressed form need not
+    follow the slug's word order (`t2m` is `temperature` + `2m`). Succeeds only
+    when `rest` is fully consumed AND every token contributed, so a near-miss
+    prefix (`pressure` against `precipitation`) fails.
+
+    Args:
+        rest: The still-unconsumed tail of the NetCDF short name.
+        remaining: The slug tokens not yet accounted for.
+
+    Returns:
+        True when a full assignment exists.
+    """
+    if not rest:
+        return not remaining
+    for index, token in enumerate(remaining):
+        for size in range(1, len(token) + 1):
+            if rest.startswith(token[:size]) and _consume_initialism(
+                rest[size:], remaining[:index] + remaining[index + 1 :]
+            ):
+                return True
+    return False
+
+
+def _is_initialism(name: str, tokens: set[str]) -> bool:
+    """Return True when `name` is `tokens` compressed to their leading letters.
+
+    Covers the abbreviations a plain token-overlap test rejects: `sst` for
+    `sea-surface-temperature`, `t2m` for `2m-temperature`.
+
+    Args:
+        name: The NetCDF short name.
+        tokens: The slug's meaningful tokens.
+
+    Returns:
+        True when `name` is an initialism of `tokens`.
+    """
+    return bool(tokens) and _consume_initialism(name.lower(), sorted(tokens))
+
+
+def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
+    """Return True when `slug` and `name` share evidence of being the same thing.
+
+    Rule 4's guard: being the only two left over is arity, not evidence. A pair
+    qualifies on any one of three signals, cheapest first — a shared token with
+    the short name, a shared token with its `long_name`, or `name` being an
+    initialism of the slug. Slugs reduced to nothing but stopwords never
+    qualify.
+
+    Args:
+        slug: The unmatched catalog variable slug.
+        name: The unused NetCDF short name.
+        meta: That variable's `{long_name, units}` metadata.
+
+    Returns:
+        True when the pairing is supported; False to keep the placeholder.
+    """
+    tokens = _tokens(slug) - _STOPWORDS
+    if not tokens:
+        return False
+    if tokens & (_tokens(name) - _STOPWORDS):
+        return True
+    if tokens & (_tokens(str(meta.get("long_name") or "")) - _STOPWORDS):
+        return True
+    return _is_initialism(name, tokens)
+
+
 def _match_variables(
     placeholders: list[str], nc_meta: dict[str, dict[str, Any]]
 ) -> dict[str, tuple[str, str]]:
@@ -258,7 +350,9 @@ def _match_variables(
     3. Token-subset — the slug's tokens are a subset of a variable's
        `long_name` tokens.
     4. The **unambiguous** leftover case only: exactly one unmatched slug and
-       exactly one unused data variable (the single-variable retrieve).
+       exactly one unused data variable (the single-variable retrieve), and
+       only when the two carry evidence of being the same quantity
+       (:func:`_pair_is_evidenced`) — arity alone is not a match.
 
     Any slug that stays unmatched keeps its placeholder — there is no arbitrary
     order-based pairing among multiple candidates.
@@ -292,12 +386,16 @@ def _match_variables(
     # rule 4 would pair it with whatever single variable survived the auxiliary
     # filter, which is how a precipitation CDR acquired a coverage counter.
     #
-    # Rule 4's wider weakness is untouched here: with one slug and one variable
-    # left it pairs them on arity alone, so two unrelated names still match. A
-    # token-overlap requirement was tried and rejected — it also rejects the
-    # abbreviations rule 4 gets right (`2m-temperature` -> `t2m`,
-    # `sea-surface-temperature` -> `sst`). Tracked separately.
-    if len(unmatched) == 1 and len(unused) == 1 and unmatched[0] != "all":
+    # Being the last two standing is arity, not evidence, so the pair must also
+    # look like the same quantity. A plain token-overlap test was rejected for
+    # dropping the abbreviations rule 4 gets right; `_pair_is_evidenced` keeps
+    # them via the initialism arm (`sea-surface-temperature` -> `sst`).
+    if (
+        len(unmatched) == 1
+        and len(unused) == 1
+        and unmatched[0] != "all"
+        and _pair_is_evidenced(unmatched[0], unused[0], candidates[unused[0]])
+    ):
         chosen[unmatched[0]] = unused[0]
 
     return {

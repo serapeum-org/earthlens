@@ -123,13 +123,60 @@ class TestMatchVariables:
         )
         assert assignments == {}
 
-    def test_order_fallback_pairs_leftovers(self):
-        """One unmatched slug + one leftover variable is the unambiguous 1:1 case."""
+    def test_unrelated_leftovers_are_not_paired(self):
+        """A lone slug and a lone variable that share no evidence keep the placeholder."""
         assignments = _match_variables(
             ["mystery-variable"],
             {"xx": {"long_name": "totally different", "units": "1"}},
         )
-        assert assignments == {"mystery-variable": ("xx", "1")}
+        assert assignments == {}
+
+    def test_leftover_pairs_when_the_short_name_shares_a_token(self):
+        """The 1:1 leftover case still resolves when the names agree."""
+        assignments = _match_variables(
+            ["wind-speed-of-gusts"],
+            {"wind_speed_gust": {"long_name": "", "units": "m s-1"}},
+        )
+        assert assignments == {"wind-speed-of-gusts": ("wind_speed_gust", "m s-1")}
+
+    @pytest.mark.parametrize(
+        ("slug", "nc_name", "long_name", "expected"),
+        [
+            # True positives - abbreviations a token-overlap test would reject.
+            ("2m-temperature", "t2m", "", True),
+            ("sea-surface-temperature", "sst", "", True),
+            ("total-precipitation", "tp", "", True),
+            # True positives - a shared token with the short or long name.
+            ("mean-uth", "uth", "", True),
+            (
+                "terrestrial-water-storage-anomaly",
+                "lwe_thickness",
+                "Liquid Water Equivalent Thickness",
+                True,
+            ),
+            # False positives - unrelated names must keep the placeholder.
+            ("number-of-wet-days", "elevation", "", False),
+            ("number-of-dry-spells", "elevation", "Surface elevation", False),
+            ("glacier-area", "elevation", "", False),
+            # A near-miss prefix is not an initialism.
+            ("precipitation", "pressure", "", False),
+        ],
+    )
+    def test_leftover_pairing_table(self, slug, nc_name, long_name, expected):
+        """The lone-slug/lone-variable rule pairs only on real name evidence."""
+        assignments = _match_variables(
+            [slug], {nc_name: {"long_name": long_name, "units": "1"}}
+        )
+        assert bool(assignments) is expected
+        if expected:
+            assert assignments == {slug: (nc_name, "1")}
+
+    def test_stopword_only_slug_is_never_paired(self):
+        """A slug that reduces to stopwords carries no evidence to match on."""
+        assignments = _match_variables(
+            ["of-the"], {"xx": {"long_name": "totally different", "units": "1"}}
+        )
+        assert assignments == {}
 
     def test_exact_short_name_never_swaps(self):
         """Multiple data vars map by exact short name, never zipped/swapped."""
