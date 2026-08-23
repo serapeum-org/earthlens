@@ -212,23 +212,81 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     return schema
 
 
-def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
-    """Retrieve a tiny CDS NetCDF and read each variable's long_name/units.
+def _deep_sample_row(
+    rows: list[dict[str, Any]], cds_variable: str | None = None
+) -> dict[str, Any] | None:
+    """Return the constraints entry to build a probe request from.
 
-    Builds a **complete** minimal request from the dataset's first usable
-    `constraints.json` entry — one value per selector, so the family selectors
-    a dataset requires beyond year/month/day (a satellite CDR's
-    sensor / version / record-type / aggregation, CMIP's experiment/model, ...)
-    are carried and the retrieve is a valid combination rather than a 400.
-    Only keys the entry actually enumerates are sent, so a product that does
-    not partition by day/time (obs4mips CO2/CH4) is not handed a spurious one.
+    Constraints partition a dataset into combination blocks, and a variable is
+    only retrievable under the selectors of a block that lists it — GloFAS
+    serves discharge and runoff under `timespan: time_mean` but snow depth and
+    soil wetness only under `instantaneous`. Choosing the block by the variable
+    is therefore what makes a per-variable probe a valid request rather than a
+    400, and it is also where that variable's required selectors come from.
+
+    Args:
+        rows: The dataset's `constraints.json` entries.
+        cds_variable: The variable the probe is for; `None` keeps the legacy
+            behaviour of taking the first entry that enumerates any variable.
+
+    Returns:
+        The chosen entry, or `None` when `rows` is empty or no entry serves
+        `cds_variable`.
+    """
+    if not rows:
+        return None
+    if cds_variable is None:
+        return next((entry for entry in rows if entry.get("variable")), rows[0])
+    return next(
+        (entry for entry in rows if cds_variable in (entry.get("variable") or [])),
+        None,
+    )
+
+
+def _deep_sample_request(
+    row: dict[str, Any], cds_variable: str | None = None
+) -> dict[str, Any]:
+    """Build the smallest valid retrieve request from one constraints entry.
+
+    One value per selector, so the family selectors a dataset requires beyond
+    year/month/day (a satellite CDR's sensor / version / record-type, CMIP's
+    experiment/model, ...) are carried and the retrieve is a valid combination.
+    Only keys the entry actually enumerates are sent, so a product that does not
+    partition by day/time is not handed a spurious one.
+
+    Args:
+        row: The constraints entry to reduce.
+        cds_variable: When given, the request asks for exactly this variable
+            instead of the entry's first.
+
+    Returns:
+        A `cdsapi` request mapping.
+    """
+    request: dict[str, Any] = {"data_format": "netcdf"}
+    for key, value in row.items():
+        request[key] = value[:1] if isinstance(value, list) and value else value
+    if cds_variable is not None:
+        request["variable"] = [cds_variable]
+    # A dataset with no variable dimension still needs the widget's "all".
+    request.setdefault("variable", ["all"])
+    return request
+
+
+def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Retrieve one tiny slice and read each NetCDF variable's metadata.
 
     The retrieve goes to the dataset's **own** store, resolved from the catalog
     the same way :func:`_ecmwf_constraints` resolves it: a bare client would
     always talk to CDS and every ADS / EWDS / ECDS / XDS dataset would 404 with
     `process not found`. A zip-of-NetCDF response (satellite CDRs deliver one)
-    is unwrapped to its first member before the variable metadata is read via
-    GDAL.
+    is unwrapped to its first member before the metadata is read via GDAL.
+
+    Args:
+        dataset: The Copernicus dataset id to retrieve from.
+        request: The request mapping to submit.
+
+    Returns:
+        Mapping of NetCDF short name to `{long_name, units}`.
     """
     import shutil
     import tempfile
@@ -236,17 +294,6 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
 
     from earthlens.ecmwf.endpoints import open_client
 
-    rows = _ecmwf_constraints(dataset)
-    if not rows:
-        return {}
-    # Prefer the first entry that enumerates a variable (a usable retrieve);
-    # fall back to the first entry for datasets with no variable dimension.
-    row = next((entry for entry in rows if entry.get("variable")), rows[0])
-    request: dict[str, Any] = {"data_format": "netcdf"}
-    for key, value in row.items():
-        request[key] = value[:1] if isinstance(value, list) and value else value
-    # A dataset with no variable dimension still needs the widget's "all".
-    request.setdefault("variable", ["all"])
     target = Path(tempfile.mkdtemp()) / "probe.nc"
     client = open_client(_endpoint_for(dataset))
     client.retrieve(dataset, request, str(target))
@@ -259,6 +306,61 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
                     shutil.copyfileobj(src, dst)
                 target = inner
     return _read_netcdf_var_meta(str(target))
+
+
+def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
+    """Retrieve a tiny CDS NetCDF and read each variable's long_name/units.
+
+    Probes the dataset's first usable constraints entry, asking for one value
+    per selector. What comes back describes whichever variable that entry lists
+    first, so this cannot finish a multi-variable dataset on its own — see
+    :func:`_ecmwf_deep_sample_variable` for the per-variable form the catalog
+    hydrator uses.
+
+    Args:
+        dataset: The Copernicus dataset id to sample.
+
+    Returns:
+        Mapping of NetCDF short name to `{long_name, units}`; empty when the
+        dataset publishes no constraints.
+    """
+    row = _deep_sample_row(_ecmwf_constraints(dataset))
+    if row is None:
+        return {}
+    return _retrieve_probe(dataset, _deep_sample_request(row))
+
+
+def _ecmwf_deep_sample_variable(
+    dataset: str, cds_variable: str
+) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    """Probe ONE variable and report the selectors its constraints block needs.
+
+    Asking for a single named variable is what lets the hydrator finish a
+    multi-variable dataset, and the block that serves it also carries the
+    selectors that variable requires — the GloFAS `timespan` split is exactly
+    this. Returning both together means a per-variable `extras:` override can be
+    derived rather than hand-written.
+
+    Args:
+        dataset: The Copernicus dataset id to sample.
+        cds_variable: The `cds_variable` to request.
+
+    Returns:
+        A `(metadata, selectors)` pair. `metadata` maps NetCDF short name to
+        `{long_name, units}`; `selectors` is the serving block's list-valued
+        selectors excluding `variable`, each truncated to the one value probed.
+        Both are empty when no constraints block serves `cds_variable`.
+    """
+    row = _deep_sample_row(_ecmwf_constraints(dataset), cds_variable)
+    if row is None:
+        return {}, {}
+    request = _deep_sample_request(row, cds_variable)
+    selectors = {
+        key: value
+        for key, value in request.items()
+        if key not in {"variable", "data_format"} and isinstance(value, list)
+    }
+    return _retrieve_probe(dataset, request), selectors
 
 
 def deep_prober(_catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:

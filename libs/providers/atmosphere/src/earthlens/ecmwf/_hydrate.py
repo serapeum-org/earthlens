@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import re
 import threading
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -146,6 +147,104 @@ def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
     from earthlens.ecmwf.cli import _ecmwf_deep_sample
 
     return _ecmwf_deep_sample(dataset_id)
+
+
+def _probe_into(dataset_id: str, cds_variable: str, box: dict[str, Any]) -> None:
+    """Thread body: probe one variable, storing its result or error in `box`.
+
+    Args:
+        dataset_id: The Copernicus dataset id to sample.
+        cds_variable: The `cds_variable` to request.
+        box: Mutable result cell shared with the caller thread.
+    """
+    try:
+        box["result"] = _retrieve_variable_meta(dataset_id, cds_variable)
+    except Exception as exc:  # noqa: BLE001 — surfaced to the caller thread verbatim
+        box["error"] = exc
+
+
+def _probe_with_timeout(
+    dataset_id: str, cds_variable: str, timeout: float | None
+) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    """Probe one variable under a deadline, so a stuck request cannot wedge the pass.
+
+    Args:
+        dataset_id: The Copernicus dataset id to sample.
+        cds_variable: The `cds_variable` to request.
+        timeout: Seconds to wait; `None` or `0` waits without one.
+
+    Returns:
+        The `(metadata, selectors)` pair for `cds_variable`.
+
+    Raises:
+        TimeoutError: If the probe does not finish within `timeout` seconds.
+    """
+    if not timeout:
+        return _retrieve_variable_meta(dataset_id, cds_variable)
+    box: dict[str, Any] = {}
+    thread = threading.Thread(
+        target=_probe_into, args=(dataset_id, cds_variable, box), daemon=True
+    )
+    thread.start()
+    thread.join(timeout)
+    if thread.is_alive():
+        raise TimeoutError(
+            f"probe of {cds_variable!r} in {dataset_id!r} exceeded {timeout:.0f}s"
+        )
+    if "error" in box:
+        raise box["error"]
+    return box.get("result") or ({}, {})
+
+
+class _ProbeSession:
+    """Per-variable probes for one dataset, abandoned after the first failure.
+
+    A dataset's placeholders share one licence and one queue, so a refusal on
+    the first variable will refuse the rest too. Recording the failure and
+    returning empty for every later variable turns what would be N pointless
+    retrieves into one, while the rows already filled in this pass are kept.
+
+    Args:
+        dataset_id: The Copernicus dataset id being hydrated.
+        timeout: Per-probe deadline in seconds; `None` / `0` waits without one.
+
+    Attributes:
+        error: The failure that abandoned the session, or `None`.
+        timed_out: Whether that failure was the deadline rather than the store.
+        offered: Every data variable any probe in this session returned, so a
+            dataset that hydrated nothing can report what it was actually given.
+        answered: How many probes came back describing something. Zero means no
+            constraints block names these rows at all, which is a different
+            problem from a probe that answered with nothing usable.
+    """
+
+    def __init__(self, dataset_id: str, timeout: float | None) -> None:
+        self.dataset_id = dataset_id
+        self.timeout = timeout
+        self.error: BaseException | None = None
+        self.timed_out = False
+        self.offered: set[str] = set()
+        self.answered = 0
+
+    def __call__(
+        self, cds_variable: str
+    ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+        """Probe `cds_variable`, or return empty once the session has failed."""
+        if self.error is not None:
+            return {}, {}
+        try:
+            meta, selectors = _probe_with_timeout(
+                self.dataset_id, cds_variable, self.timeout
+            )
+            self.offered.update(_data_variables(meta))
+            self.answered += bool(meta)
+            return meta, selectors
+        except TimeoutError as exc:
+            self.timed_out = True
+            self.error = exc
+        except Exception as exc:  # noqa: BLE001 — a licence-gated dataset is skipped
+            self.error = exc
+        return {}, {}
 
 
 def _retrieve_into(dataset_id: str, box: dict[str, Any]) -> None:
@@ -541,6 +640,287 @@ def _data_variables(
     return {name: meta for name, meta in nc_meta.items() if not _is_auxiliary(name)}
 
 
+def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> str:
+    """Write a per-variable `extras:` override into one variable sub-block.
+
+    Merges into an existing override rather than replacing it, so a selector a
+    maintainer set by hand survives unless the probe contradicts it.
+
+    Args:
+        block: One dataset stanza's body text.
+        slug: The variable sub-block to edit.
+        override: Selector keys and values to record.
+
+    Returns:
+        The stanza body with the override written; unchanged when `slug` is
+        absent or `override` is empty.
+    """
+    if not override:
+        return block
+    for match in _VARIABLE_BLOCK.finditer(block):
+        if match.group("slug") != slug:
+            continue
+        lines = match.group("body").splitlines(keepends=True)
+        rendered = [
+            f"          {key}: {_yaml_inline_list(value)}\n"
+            for key, value in override.items()
+        ]
+        start = next(
+            (
+                index
+                for index, line in enumerate(lines)
+                if line.strip() == "extras:" and _indent_of(line) == 8
+            ),
+            None,
+        )
+        if start is None:
+            lines = lines + ["        extras:\n"] + rendered
+        else:
+            end = start + 1
+            while (
+                end < len(lines) and lines[end].strip() and _indent_of(lines[end]) > 8
+            ):
+                end += 1
+            kept = [
+                line
+                for line in lines[start + 1 : end]
+                if line.strip().partition(":")[0].strip() not in override
+            ]
+            lines = lines[: start + 1] + kept + rendered + lines[end:]
+        body = "".join(lines)
+        return block[: match.start("body")] + body + block[match.end("body") :]
+    return block
+
+
+def _hydrate_stanza_per_variable(
+    text: str,
+    dataset_id: str,
+    probe: Callable[[str], tuple[dict[str, dict[str, Any]], dict[str, Any]]],
+) -> tuple[str, list[str], list[str]]:
+    """Fill every placeholder of one stanza, probing each variable on its own.
+
+    One probe per placeholder is what lets a multi-variable dataset finish: the
+    single-request sampler only ever reveals the variable its constraints list
+    first, so a stanza with several placeholders could never be completed. Each
+    probe asks for one named variable, so a lone data variable coming back
+    identifies that row outright rather than being matched by name similarity,
+    and the serving block's selectors are recorded as a per-variable override
+    when they differ from the stanza's defaults.
+
+    Names bound by rows filled earlier in the same pass are withheld from later
+    ones, so two rows cannot end up claiming one NetCDF variable.
+
+    Args:
+        text: The full per-family catalog shard text.
+        dataset_id: The dataset id whose stanza to hydrate.
+        probe: Callable taking a `cds_variable` and returning the
+            `(metadata, selectors)` pair :func:`_retrieve_variable_meta` returns.
+
+    Returns:
+        A `(text, filled, declined)` triple — the rewritten shard text, the
+        slugs hydrated, and the slugs left as placeholders.
+    """
+    match = _stanza_match(text, dataset_id)
+    if match is None:
+        return text, [], []
+    block = match.group(1)
+    placeholders = _placeholder_slugs(block)
+    if not placeholders:
+        return text, [], []
+    cds_names = _slug_cds_variables(block)
+    dataset_extras = _dataset_extras(block)
+    new_block = block
+    filled: list[str] = []
+    declined: list[str] = []
+    for slug in placeholders:
+        cds_variable = cds_names.get(slug)
+        if cds_variable is None:
+            declined.append(slug)
+            continue
+        meta, selectors = probe(cds_variable)
+        chosen = _choose_for_slug(slug, meta, _claimed_nc_names(new_block))
+        if chosen is None:
+            declined.append(slug)
+            continue
+        name, units = chosen
+        new_block = _fill_variable(new_block, slug, name, units)
+        new_block = _fill_variable_extras(
+            new_block, slug, _selector_override(selectors, dataset_extras)
+        )
+        filled.append(slug)
+    if new_block == block:
+        return text, filled, declined
+    rewritten = (
+        text[: match.start()] + f"  {dataset_id}:\n" + new_block + text[match.end() :]
+    )
+    return rewritten, filled, declined
+
+
+def _choose_for_slug(
+    slug: str,
+    meta: dict[str, dict[str, Any]],
+    reserved: frozenset[str],
+) -> tuple[str, str] | None:
+    """Pick the NetCDF variable a single-variable probe identifies for `slug`.
+
+    When the probe asked for one variable and one data variable came back, the
+    correspondence is established by the request rather than inferred from the
+    names, so no evidence check is needed. Anything else falls back to the
+    ordinary matcher, which declines rather than guess.
+
+    Args:
+        slug: The placeholder slug being hydrated.
+        meta: The probe's `{nc_name: {long_name, units}}` mapping.
+        reserved: Lowercased names already bound by hydrated rows.
+
+    Returns:
+        The `(nc_variable, units)` to write, or `None` to keep the placeholder.
+    """
+    candidates = {
+        name: info
+        for name, info in _data_variables(meta).items()
+        if name.lower() not in reserved
+    }
+    if len(candidates) == 1:
+        name, info = next(iter(candidates.items()))
+        return name, str(info.get("units") or "")
+    matched = _match_variables([slug], meta, reserved)
+    return matched.get(slug)
+
+
+def _retrieve_variable_meta(
+    dataset_id: str, cds_variable: str
+) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    """Probe one variable of a dataset; the second credentialed seam.
+
+    Mirrors :func:`_retrieve_netcdf_vars` but asks for a named variable, so a
+    dataset with several placeholders can be finished one row at a time instead
+    of only ever revealing whichever variable its constraints list first.
+
+    Args:
+        dataset_id: The Copernicus dataset id to sample.
+        cds_variable: The `cds_variable` to request.
+
+    Returns:
+        A `(metadata, selectors)` pair as :func:`_ecmwf_deep_sample_variable`
+        returns them.
+    """
+    from earthlens.ecmwf.cli import _ecmwf_deep_sample_variable
+
+    return _ecmwf_deep_sample_variable(dataset_id, cds_variable)
+
+
+def _slug_cds_variables(block: str) -> dict[str, str]:
+    """Map each variable slug in a stanza to its `cds_variable`.
+
+    A probe has to ask for the request-side name, which is not derivable from
+    the slug — `average-river-discharge-in-the-last-24-hours` is a slug whose
+    `cds_variable` differs from a naive de-hyphenation in several families.
+
+    Args:
+        block: One dataset stanza's body text.
+
+    Returns:
+        Mapping of slug to `cds_variable`, omitting rows that declare none.
+    """
+    names: dict[str, str] = {}
+    for match in _VARIABLE_BLOCK.finditer(block):
+        for line in match.group("body").splitlines():
+            stripped = line.strip()
+            if stripped.startswith("cds_variable:"):
+                value = _scalar_after_key(line)
+                if value:
+                    names[match.group("slug")] = value
+                break
+    return names
+
+
+def _indent_of(line: str) -> int:
+    """Return the number of leading spaces on `line`."""
+    return len(line) - len(line.lstrip(" "))
+
+
+def _mapping_under(lines: list[str], start: int) -> dict[str, str]:
+    """Read the `key: value` children indented under `lines[start]`.
+
+    Values are kept as their raw YAML text so a selector can be compared and
+    re-emitted without round-tripping through a parser that would reformat the
+    rest of the shard.
+
+    Args:
+        lines: The stanza's lines.
+        start: Index of the parent key line.
+
+    Returns:
+        Mapping of child key to its raw value text.
+    """
+    parent = _indent_of(lines[start])
+    found: dict[str, str] = {}
+    for line in lines[start + 1 :]:
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if _indent_of(line) <= parent:
+            break
+        key, _, value = line.strip().partition(":")
+        if _:
+            found[key.strip()] = value.split("#", 1)[0].strip()
+    return found
+
+
+def _dataset_extras(block: str) -> dict[str, str]:
+    """Return the stanza's dataset-level `extras:` mapping, as raw text values.
+
+    Args:
+        block: One dataset stanza's body text.
+
+    Returns:
+        Mapping of extra key to raw value text; empty when the stanza has no
+        dataset-level `extras:`.
+    """
+    lines = block.splitlines()
+    for index, line in enumerate(lines):
+        if line.strip() == "extras:" and _indent_of(line) == 4:
+            return _mapping_under(lines, index)
+    return {}
+
+
+def _selector_override(
+    selectors: dict[str, Any], dataset_extras: dict[str, str]
+) -> dict[str, Any]:
+    """Return the selectors a variable needs that the stanza does not already set.
+
+    Only a selector the dataset-level `extras:` disagrees with is worth writing
+    as a per-variable override; anything the stanza already sets identically
+    would be noise. This is what turns the GloFAS `timespan` split — discharge
+    under `time_mean`, snow depth under `instantaneous` — into a recorded row
+    override instead of a hand-written comment.
+
+    Args:
+        selectors: The serving constraints block's selectors for this variable.
+        dataset_extras: The stanza's dataset-level `extras:` mapping.
+
+    Returns:
+        The subset of `selectors` that differs from `dataset_extras`, keyed the
+        same way; empty when the dataset defaults already cover the variable.
+    """
+    override: dict[str, Any] = {}
+    for key, value in selectors.items():
+        if key not in dataset_extras:
+            continue
+        current = dataset_extras[key]
+        wanted = _yaml_inline_list(value)
+        if current != wanted:
+            override[key] = value
+    return override
+
+
+def _yaml_inline_list(value: Any) -> str:
+    """Render a selector value the way the catalog writes it, as `[a]` or a scalar."""
+    if isinstance(value, list):
+        return "[" + ", ".join(str(item) for item in value) + "]"
+    return str(value)
+
+
 def _match_variables(
     placeholders: list[str],
     nc_meta: dict[str, dict[str, Any]],
@@ -795,6 +1175,66 @@ def _find_file_for_dataset(catalog_dir: Path, dataset_id: str) -> Path | None:
     return None
 
 
+def _hydrate_stanza_whole(
+    text: str, dataset_id: str, session: _ProbeSession
+) -> tuple[str, list[str], list[str]]:
+    """Hydrate a stanza from ONE whole-dataset probe, the pre-per-variable path.
+
+    Kept for the datasets per-variable probing cannot reach: a product whose
+    constraints do not partition by variable has no block to look a row up in,
+    so asking for a named variable finds nothing while a plain probe still
+    describes the product. Matching is by name here, so it goes through the
+    ordinary evidence rules rather than trusting a lone result.
+
+    Args:
+        text: The full per-family catalog shard text.
+        dataset_id: The dataset id whose stanza to hydrate.
+        session: The probe session, reused so a failure is recorded once.
+
+    Returns:
+        A `(text, filled, declined)` triple, as
+        :func:`_hydrate_stanza_per_variable` returns.
+    """
+    try:
+        nc_meta = _retrieve_with_timeout(dataset_id, session.timeout)
+    except TimeoutError as exc:
+        session.timed_out = True
+        session.error = exc
+        return text, [], []
+    except Exception as exc:  # noqa: BLE001 — a licence-gated dataset is skipped
+        session.error = exc
+        return text, [], []
+    session.offered.update(_data_variables(nc_meta))
+    match = _stanza_match(text, dataset_id)
+    placeholders = _placeholder_slugs(match.group(1)) if match else []
+    new_text = _rewrite_stanza(text, dataset_id, nc_meta)
+    rewritten = _stanza_match(new_text, dataset_id)
+    if new_text == text or rewritten is None:
+        return text, [], placeholders
+    remaining = _placeholder_slugs(rewritten.group(1))
+    filled = [slug for slug in placeholders if slug not in remaining]
+    return new_text, filled, remaining
+
+
+def _declined_detail(session: _ProbeSession, declined: list[str]) -> str:
+    """Describe why a dataset that retrieved cleanly still hydrated nothing.
+
+    Args:
+        session: The probe session that ran, carrying what the store offered.
+        declined: The slugs left as placeholders.
+
+    Returns:
+        A phrase naming either the missing data variables or the declined rows.
+    """
+    if not session.offered:
+        return "no data variables, only coordinates and auxiliaries"
+    offered = sorted(session.offered)
+    shown = ", ".join(offered[:_ECHO_MAX_NAMES])
+    extra = len(offered) - _ECHO_MAX_NAMES
+    listed = f"{shown}, +{extra} more" if extra > 0 else shown
+    return f"no confident match for {declined} (offered: {listed})"
+
+
 def _hydrate_one(
     dataset_id: str,
     prefix: str,
@@ -824,17 +1264,8 @@ def _hydrate_one(
         have all been filled already, is a `"skipped"` like a licence or network
         failure: there was nothing for the matcher to decline.
     """
-    try:
-        nc_meta: dict[str, dict[str, Any]] | None = _retrieve_with_timeout(
-            dataset_id, timeout
-        )
-    except TimeoutError:
-        typer.echo(f"{prefix}: timed out, skipped")
-        return "timed_out"
-    except Exception:  # noqa: BLE001 — a licence-gated / unreachable dataset is skipped
-        nc_meta = None
-    path = _find_file_for_dataset(catalog_dir, dataset_id) if nc_meta else None
-    if not nc_meta or path is None:
+    path = _find_file_for_dataset(catalog_dir, dataset_id)
+    if path is None:
         typer.echo(f"{prefix}: skipped")
         return "skipped"
     if path not in file_text:
@@ -843,20 +1274,31 @@ def _hydrate_one(
     if blocked is not None:
         typer.echo(f"{prefix}: {blocked}")
         return blocked
-    new_text = _rewrite_stanza(file_text[path], dataset_id, nc_meta)
+    session = _ProbeSession(dataset_id, timeout)
+    new_text, filled, declined = _hydrate_stanza_per_variable(
+        file_text[path], dataset_id, session
+    )
+    if not filled and session.error is None and not session.answered:
+        # No constraints block names these rows, which is how a product with no
+        # variable dimension looks (obs4mips CO2/CH4 partition by nothing the
+        # slug can be found under). One whole-dataset probe still describes it,
+        # so fall back rather than leave such a stanza permanently unhydratable.
+        new_text, filled, declined = _hydrate_stanza_whole(
+            file_text[path], dataset_id, session
+        )
+    if session.timed_out and not filled:
+        typer.echo(f"{prefix}: timed out, skipped")
+        return "timed_out"
     if new_text == file_text[path]:
-        offered = sorted(_data_variables(nc_meta))
-        if not offered:
-            detail = "no data variables, only coordinates and auxiliaries"
-        else:
-            shown = ", ".join(offered[:_ECHO_MAX_NAMES])
-            extra = len(offered) - _ECHO_MAX_NAMES
-            detail = f"{shown}, +{extra} more" if extra > 0 else shown
-        typer.echo(f"{prefix}: retrieved, no confident match ({detail})")
+        if session.error is not None:
+            typer.echo(f"{prefix}: skipped ({type(session.error).__name__})")
+            return "skipped"
+        typer.echo(f"{prefix}: retrieved, {_declined_detail(session, declined)}")
         return "unmatched"
     file_text[path] = new_text
     path.write_text(new_text, encoding="utf-8")
-    typer.echo(f"{prefix}: hydrated -> {path.name}")
+    left = f", {len(declined)} left" if declined else ""
+    typer.echo(f"{prefix}: hydrated {len(filled)}{left} -> {path.name}")
     return "hydrated"
 
 

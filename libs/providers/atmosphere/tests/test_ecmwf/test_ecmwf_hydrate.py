@@ -13,6 +13,7 @@ from earthlens.ecmwf import _hydrate as hydrate_mod
 from earthlens.ecmwf._hydrate import (
     _claimed_nc_names,
     _find_file_for_dataset,
+    _hydrate_stanza_per_variable,
     _is_initialism,
     _match_variables,
     _pair_is_evidenced,
@@ -53,6 +54,20 @@ _NC_META = {
     "sst": {"long_name": "Sea surface temperature", "units": "K"},
     "t2m": {"long_name": "2 metre temperature", "units": "K"},
 }
+
+_PROBE_BY_CDS = {
+    "2m_temperature": {"t2m": {"long_name": "2 metre temperature", "units": "K"}},
+    "sea_surface_temperature": {
+        "sst": {"long_name": "Sea surface temperature", "units": "K"}
+    },
+    "total_precipitation": {"tp": {"long_name": "Total precipitation", "units": "m"}},
+}
+
+
+def _fake_probe(dataset_id, cds_variable):
+    """Answer a per-variable probe with just that variable, as a real one does."""
+    return dict(_PROBE_BY_CDS.get(cds_variable, {})), {}
+
 
 _TWO_STANZA = """datasets:
   a-dataset:
@@ -537,6 +552,147 @@ def _placeholder_dataset(*slugs):
     )
 
 
+_GLOFAS_STANZA = """datasets:
+  cems-glofas-historical:
+    endpoint: ewds
+    extras:
+      system_version: [version_4_0]
+      timespan: [time_mean]
+    variables:
+      average-river-discharge-in-the-last-24-hours:
+        cds_variable: average_river_discharge_in_the_last_24_hours
+        nc_variable: average_river_discharge_in_the_last_24_hours
+        units: unknown
+      runoff-water-equivalent:
+        cds_variable: runoff_water_equivalent
+        nc_variable: runoff_water_equivalent
+        units: unknown
+      snow-depth-water-equivalent:
+        cds_variable: snow_depth_water_equivalent
+        nc_variable: snow_depth_water_equivalent
+        units: unknown
+      soil-wetness-index:
+        cds_variable: soil_wetness_index
+        nc_variable: soil_wetness_index
+        units: unknown
+"""
+
+_GLOFAS_PROBES = {
+    "average_river_discharge_in_the_last_24_hours": (
+        {"avg_dis": {"long_name": "Average river discharge", "units": "m3 s-1"}},
+        {"timespan": ["time_mean"], "system_version": ["version_4_0"]},
+    ),
+    "runoff_water_equivalent": (
+        {"rowe": {"long_name": "Runoff water equivalent", "units": "kg m-2"}},
+        {"timespan": ["time_mean"], "system_version": ["version_4_0"]},
+    ),
+    "snow_depth_water_equivalent": (
+        {"sd": {"long_name": "Snow depth water equivalent", "units": "kg m-2"}},
+        {"timespan": ["instantaneous"], "system_version": ["version_4_0"]},
+    ),
+    "soil_wetness_index": (
+        {"swir": {"long_name": "Soil wetness index", "units": "1"}},
+        {"timespan": ["instantaneous"], "system_version": ["version_4_0"]},
+    ),
+}
+
+
+class TestHydrateStanzaPerVariable:
+    """Tests for the per-variable hydration of a whole stanza."""
+
+    def test_every_placeholder_of_a_multi_variable_dataset_is_filled(self):
+        """One probe per row is what lets a four-variable dataset finish."""
+        asked = []
+
+        def probe(cds_variable):
+            asked.append(cds_variable)
+            return _GLOFAS_PROBES[cds_variable]
+
+        out, filled, declined = _hydrate_stanza_per_variable(
+            _GLOFAS_STANZA, "cems-glofas-historical", probe
+        )
+        assert len(asked) == 4, "one probe per placeholder"
+        assert len(filled) == 4
+        assert declined == []
+        variables = yaml.safe_load(out)["datasets"]["cems-glofas-historical"][
+            "variables"
+        ]
+        assert (
+            variables["average-river-discharge-in-the-last-24-hours"]["nc_variable"]
+            == "avg_dis"
+        )
+        assert variables["soil-wetness-index"]["units"] == "1"
+
+    def test_a_selector_the_dataset_default_covers_is_not_written(self):
+        """Discharge runs under the stanza's own timespan, so it needs no override."""
+        out, _, _ = _hydrate_stanza_per_variable(
+            _GLOFAS_STANZA,
+            "cems-glofas-historical",
+            lambda cds: _GLOFAS_PROBES[cds],
+        )
+        variables = yaml.safe_load(out)["datasets"]["cems-glofas-historical"][
+            "variables"
+        ]
+        row = variables["average-river-discharge-in-the-last-24-hours"]
+        assert "extras" not in row
+
+    def test_a_selector_that_differs_becomes_a_per_variable_override(self):
+        """Snow depth is only served under instantaneous, and that is recorded."""
+        out, _, _ = _hydrate_stanza_per_variable(
+            _GLOFAS_STANZA,
+            "cems-glofas-historical",
+            lambda cds: _GLOFAS_PROBES[cds],
+        )
+        variables = yaml.safe_load(out)["datasets"]["cems-glofas-historical"][
+            "variables"
+        ]
+        assert variables["snow-depth-water-equivalent"]["extras"] == {
+            "timespan": ["instantaneous"]
+        }
+        assert variables["soil-wetness-index"]["extras"] == {
+            "timespan": ["instantaneous"]
+        }
+
+    def test_a_row_the_store_cannot_serve_keeps_its_placeholder(self):
+        """A variable no constraints block serves is declined, not guessed at."""
+        out, filled, declined = _hydrate_stanza_per_variable(
+            _GLOFAS_STANZA,
+            "cems-glofas-historical",
+            lambda cds: ({}, {}) if "snow" in cds else _GLOFAS_PROBES[cds],
+        )
+        assert "snow-depth-water-equivalent" in declined
+        assert len(filled) == 3
+        variables = yaml.safe_load(out)["datasets"]["cems-glofas-historical"][
+            "variables"
+        ]
+        assert variables["snow-depth-water-equivalent"]["units"] == "unknown"
+
+    def test_two_rows_cannot_claim_one_netcdf_variable(self):
+        """A name bound earlier in the pass is withheld from later rows."""
+        one = (
+            {"avg_dis": {"long_name": "Average river discharge", "units": "m3 s-1"}},
+            {},
+        )
+        out, filled, declined = _hydrate_stanza_per_variable(
+            _GLOFAS_STANZA, "cems-glofas-historical", lambda cds: one
+        )
+        variables = yaml.safe_load(out)["datasets"]["cems-glofas-historical"][
+            "variables"
+        ]
+        bound = [v["nc_variable"] for v in variables.values()]
+        assert bound.count("avg_dis") == 1, "only the first row may take it"
+        assert len(declined) == 3
+
+    def test_a_stanza_without_placeholders_is_left_alone(self):
+        """Nothing to fill means no probes and no rewrite."""
+        filled_text = _GLOFAS_STANZA.replace("units: unknown", "units: m")
+        out, filled, declined = _hydrate_stanza_per_variable(
+            filled_text, "cems-glofas-historical", lambda cds: ({}, {})
+        )
+        assert out == filled_text
+        assert filled == [] and declined == []
+
+
 class TestBulkHydrateEmpty:
     """Tests for the catalog-wide hydrate driver (retrieve + catalog mocked)."""
 
@@ -555,9 +711,7 @@ class TestBulkHydrateEmpty:
                 ),
             },
         )
-        monkeypatch.setattr(
-            hydrate_mod, "_retrieve_netcdf_vars", lambda ds: dict(_NC_META)
-        )
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
 
         summary = bulk_hydrate_empty()
         assert summary == {
@@ -582,10 +736,10 @@ class TestBulkHydrateEmpty:
             {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
         )
 
-        def _boom(dataset_id):
+        def _boom(dataset_id, cds_variable):
             raise RuntimeError("licence not accepted")
 
-        monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", _boom)
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _boom)
         summary = bulk_hydrate_empty()
         assert summary["hydrated"] == 0
         assert summary["skipped"] == 1
@@ -602,8 +756,14 @@ class TestBulkHydrateEmpty:
         )
         monkeypatch.setattr(
             hydrate_mod,
-            "_retrieve_netcdf_vars",
-            lambda ds: {"elevation": {"long_name": "Surface elevation", "units": "m"}},
+            "_retrieve_variable_meta",
+            lambda ds, cds: (
+                {
+                    "elevation": {"long_name": "Surface elevation", "units": "m"},
+                    "orography": {"long_name": "Orography", "units": "m"},
+                },
+                {},
+            ),
         )
         summary = bulk_hydrate_empty()
         assert summary["hydrated"] == 0
@@ -621,9 +781,7 @@ class TestBulkHydrateEmpty:
             {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
         )
         monkeypatch.setattr(hydrate_mod, "_find_file_for_dataset", lambda *a: None)
-        monkeypatch.setattr(
-            hydrate_mod, "_retrieve_netcdf_vars", lambda ds: dict(_NC_META)
-        )
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 0
         assert summary["skipped"] == 1
@@ -636,9 +794,7 @@ class TestBulkHydrateEmpty:
             tmp_path,
             {"other-dataset": _placeholder_dataset("total-precipitation")},
         )
-        monkeypatch.setattr(
-            hydrate_mod, "_retrieve_netcdf_vars", lambda ds: dict(_NC_META)
-        )
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 0
         assert summary["skipped"] == 1
@@ -655,12 +811,62 @@ class TestBulkHydrateEmpty:
         )
         monkeypatch.setattr(
             hydrate_mod,
-            "_retrieve_netcdf_vars",
-            lambda ds: {"latitude": {"long_name": "latitude", "units": "degrees"}},
+            "_retrieve_variable_meta",
+            lambda ds, cds: (
+                {"latitude": {"long_name": "latitude", "units": "degrees"}},
+                {},
+            ),
         )
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 1
         assert "only coordinates and auxiliaries" in capsys.readouterr().out
+
+    def test_a_dataset_no_block_names_falls_back_to_one_whole_probe(
+        self, tmp_path, monkeypatch
+    ):
+        """A product that does not partition by variable is still hydratable."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        # No constraints block names the row, so every per-variable probe is empty.
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_variable_meta", lambda ds, cds: ({}, {})
+        )
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_with_timeout", lambda ds, timeout: dict(_NC_META)
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["hydrated"] == 1, "the whole-dataset probe finished it"
+        variables = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"][
+            "reanalysis-era5-single-levels"
+        ]["variables"]
+        assert variables["2m-temperature"]["nc_variable"] == "t2m"
+
+    def test_the_fallback_is_not_used_when_a_probe_answered(
+        self, tmp_path, monkeypatch
+    ):
+        """A probe that answered with nothing usable must not trigger a second pass."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_retrieve_variable_meta",
+            lambda ds, cds: ({"latitude": {"long_name": "lat", "units": "deg"}}, {}),
+        )
+
+        def _must_not_run(dataset_id, timeout):
+            raise AssertionError("the whole-dataset fallback should not have run")
+
+        monkeypatch.setattr(hydrate_mod, "_retrieve_with_timeout", _must_not_run)
+        summary = bulk_hydrate_empty()
+        assert summary["unmatched"] == 1
 
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the placeholder worklist."""
@@ -673,7 +879,9 @@ class TestBulkHydrateEmpty:
                 "other-dataset": _placeholder_dataset("total-precipitation"),
             },
         )
-        monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", lambda ds: {})
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_variable_meta", lambda ds, cds: ({}, {})
+        )
         summary = bulk_hydrate_empty(limit=1)
         assert summary["candidates"] == 1, "limit applied to the worklist"
 
@@ -691,12 +899,12 @@ class TestBulkHydrateEmpty:
             },
         )
 
-        def _hydrate_then_abort(dataset_id):
+        def _hydrate_then_abort(dataset_id, cds_variable):
             if dataset_id == "z-dataset":
                 raise KeyboardInterrupt
-            return dict(_NC_META)
+            return _fake_probe(dataset_id, cds_variable)
 
-        monkeypatch.setattr(hydrate_mod, "_retrieve_netcdf_vars", _hydrate_then_abort)
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _hydrate_then_abort)
         with pytest.raises(KeyboardInterrupt):
             bulk_hydrate_empty(timeout=0)
         on_disk = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"]
@@ -715,10 +923,10 @@ class TestBulkHydrateEmpty:
             {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
         )
 
-        def _stall(dataset_id, timeout):
+        def _stall(dataset_id, cds_variable, timeout):
             raise TimeoutError("stuck in the CDS queue")
 
-        monkeypatch.setattr(hydrate_mod, "_retrieve_with_timeout", _stall)
+        monkeypatch.setattr(hydrate_mod, "_probe_with_timeout", _stall)
         summary = bulk_hydrate_empty()
         assert summary["timed_out"] == 1, "the timed-out dataset is counted"
         assert summary["skipped"] == 1, "a timeout also counts as skipped"
