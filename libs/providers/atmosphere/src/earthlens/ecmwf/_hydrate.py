@@ -280,18 +280,13 @@ def _consume_initialism(
     mask: int,
     memo: dict[tuple[int, int], bool],
 ) -> bool:
-    """Return True when `rest` splits into a leading piece of every token left in `mask`.
+    """Return True when `rest` splits into a leading piece of every token in `mask`.
 
-    The search is order-free, because the compressed form need not follow the
-    slug's word order (`t2m` is `temperature` + `2m`), and succeeds only when
-    `rest` is fully consumed AND every token contributed, so a near-miss prefix
-    (`pressure` against `precipitation`) fails.
-
-    `rest` is always a suffix of the original name, so `(len(rest), mask)`
-    identifies a search state exactly; memoising on it bounds the work at
-    `O(2^len(tokens) * len(name) * len(tokens) * max_token_len)` — one state per
-    `(suffix, mask)` pair, each scanning the still-unused tokens' prefixes —
-    instead of the exponential-with-no-ceiling
+    The memo gate. `rest` is always a suffix of the original name, so
+    `(len(rest), mask)` identifies a search state exactly, and caching on it
+    bounds the work at `O(2^len(tokens) * len(name) * len(tokens) *
+    max_token_len)` — one state per `(suffix, mask)` pair, each scanning the
+    still-unused tokens' prefixes — instead of the exponential-with-no-ceiling
     node count a plain backtracker walks when the tokens nest as prefixes of
     one another.
 
@@ -306,26 +301,70 @@ def _consume_initialism(
     """
     key = (len(rest), mask)
     cached = memo.get(key)
-    if cached is not None:
-        return cached
+    if cached is None:
+        cached = _search_initialism(rest, tokens, mask, memo)
+        memo[key] = cached
+    return cached
+
+
+def _search_initialism(
+    rest: str,
+    tokens: tuple[str, ...],
+    mask: int,
+    memo: dict[tuple[int, int], bool],
+) -> bool:
+    """Try every still-unused token as the next piece of `rest`.
+
+    The search is order-free, because the compressed form need not follow the
+    slug's word order (`t2m` is `temperature` + `2m`), and succeeds only once
+    `rest` is spent with no token left over.
+
+    Args:
+        rest: The still-unconsumed tail of the NetCDF short name.
+        tokens: Every slug token, indexed by bit position in `mask`.
+        mask: Bits set for the tokens not yet accounted for.
+        memo: Shared cache threaded through the recursion.
+
+    Returns:
+        True when some assignment of the remaining tokens consumes `rest`.
+    """
     if not rest:
-        result = mask == 0
-    else:
-        result = False
-        for index, token in enumerate(tokens):
-            bit = 1 << index
-            if not mask & bit:
-                continue
-            for size in range(1, len(token) + 1):
-                if rest.startswith(token[:size]) and _consume_initialism(
-                    rest[size:], tokens, mask & ~bit, memo
-                ):
-                    result = True
-                    break
-            if result:
-                break
-    memo[key] = result
-    return result
+        return mask == 0
+    return any(
+        _consume_token(rest, token, tokens, mask & ~(1 << index), memo)
+        for index, token in enumerate(tokens)
+        if mask & (1 << index)
+    )
+
+
+def _consume_token(
+    rest: str,
+    token: str,
+    tokens: tuple[str, ...],
+    mask: int,
+    memo: dict[tuple[int, int], bool],
+) -> bool:
+    """Return True when some leading piece of `token` starts `rest` and the tail resolves.
+
+    Every prefix length is tried, so a token may contribute one letter (`s` for
+    `sea`) or all of itself (`2m`); a near-miss prefix fails because the whole
+    of `rest` still has to be consumed.
+
+    Args:
+        rest: The still-unconsumed tail of the NetCDF short name.
+        token: The slug token being tried at this position.
+        tokens: Every slug token, indexed by bit position in `mask`.
+        mask: Bits set for the tokens still unused after `token`.
+        memo: Shared cache threaded through the recursion.
+
+    Returns:
+        True when `token` can start `rest` and the remainder resolves.
+    """
+    return any(
+        rest.startswith(token[:size])
+        and _consume_initialism(rest[size:], tokens, mask, memo)
+        for size in range(1, len(token) + 1)
+    )
 
 
 def _is_initialism(name: str, tokens: set[str]) -> bool:
