@@ -710,12 +710,16 @@ from a live tiny retrieve. Licence-gated and best-effort — a dataset
 whose licence you have not accepted is left untouched rather than
 guessed at.
 
-Matching is deliberately conservative: a slug is hydrated only when it
-confidently identifies one retrieved variable — by exact short name, by a
-token-subset match against the variable's `long_name`, or, for the lone
-leftover slug, when the two names carry evidence of describing the same
-quantity (a shared token, or an initialism such as `sst` for
-`sea-surface-temperature`). A slug that stays ambiguous keeps its
+Matching is deliberately conservative. The confident rules come first: an
+exact short-name match, then a token-subset match against the variable's
+`long_name`. Only a single leftover slug facing a single unused variable
+reaches the last-resort rule, and it pairs them only when the two names
+carry evidence of describing the same quantity — a shared token, an
+initialism (`sst` for `sea-surface-temperature`), or a product prefix
+(`xco2` for `co2`). That evidence is a filter, not a proof: a single
+shared token is enough, so the last-resort rule can still be wrong where
+two names share a generic word. It is the weakest of the four and only
+ever applies to the one-slug, one-variable case. A slug that stays ambiguous keeps its
 `unknown` placeholder, because a wrong `nc_variable` silently
 mis-extracts at `aggregate=` time, which is worse than an obvious gap.
 A NetCDF name an already-hydrated row of the same dataset claims is not

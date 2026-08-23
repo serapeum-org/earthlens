@@ -95,6 +95,33 @@ _UNKNOWN_UNITS = re.compile(r"(?m)^ {8}units:[ \t]*unknown[ \t]*$")
 _NC_VARIABLE_LINE = re.compile(r"(?m)^( {8}nc_variable:)[^\n]*$")
 _UNITS_LINE = re.compile(r"(?m)^( {8}units:)[^\n]*$")
 
+#: Function words that carry no identifying signal. Dropped before the rule 4
+#: overlap tests so `number-of-wet-days` cannot pair with a variable on `of`.
+_STOPWORDS = frozenset(
+    {
+        "a",
+        "an",
+        "and",
+        "at",
+        "by",
+        "for",
+        "from",
+        "in",
+        "of",
+        "on",
+        "or",
+        "per",
+        "the",
+        "to",
+        "with",
+    }
+)
+
+#: Longest product prefix a NetCDF short name may add to a slug's own spelling
+#: and still be recognised as the same quantity (`xco2` for `co2`, `tcno2` for
+#: `no2`). Two characters covers the `x` / `tc` / `t` families the CDS serves.
+_PRODUCT_PREFIX_MAX = 2
+
 
 def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
     """Retrieve a tiny NetCDF for `dataset_id` and read its variable metadata.
@@ -242,29 +269,6 @@ def _assign_unique_subset(
                 progress = True
 
 
-#: Function words that carry no identifying signal. Dropped before the rule 4
-#: overlap tests so `number-of-wet-days` cannot pair with a variable on `of`.
-_STOPWORDS = frozenset(
-    {
-        "a",
-        "an",
-        "and",
-        "at",
-        "by",
-        "for",
-        "from",
-        "in",
-        "of",
-        "on",
-        "or",
-        "per",
-        "the",
-        "to",
-        "with",
-    }
-)
-
-
 def _consume_initialism(
     rest: str,
     tokens: tuple[str, ...],
@@ -356,12 +360,6 @@ def _is_initialism(name: str, tokens: set[str]) -> bool:
         return False
     ordered = tuple(sorted(tokens))
     return _consume_initialism(name.lower(), ordered, (1 << len(ordered)) - 1, {})
-
-
-#: Longest product prefix a NetCDF short name may add to a slug's own spelling
-#: and still be recognised as the same quantity (`xco2` for `co2`, `tcno2` for
-#: `no2`). Two characters covers the `x` / `tc` / `t` families the CDS serves.
-_PRODUCT_PREFIX_MAX = 2
 
 
 def _compact(text: str) -> str:
@@ -531,8 +529,12 @@ def _match_variables(
     #
     # Being the last two standing is arity, not evidence, so the pair must also
     # look like the same quantity. A plain token-overlap test was rejected for
-    # dropping the abbreviations rule 4 gets right; `_pair_is_evidenced` keeps
-    # them via the initialism arm (`sea-surface-temperature` -> `sst`).
+    # dropping the abbreviations rule 4 gets right; the initialism and product
+    # prefix arms keep the shapes it lost (`sea-surface-temperature` -> `sst`,
+    # `co2` -> `xco2`). Those arms resolve the common shapes, not abbreviation
+    # in general — a selective contraction like `msl` or `u10` still fails
+    # them, and such a slug simply keeps its placeholder. Rule 4 stays a last
+    # resort: the confident rules above carry most of the catalog.
     if (
         len(unmatched) == 1
         and len(unused) == 1
