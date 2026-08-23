@@ -95,6 +95,10 @@ _UNKNOWN_UNITS = re.compile(r"(?m)^ {8}units:[ \t]*unknown[ \t]*$")
 _NC_VARIABLE_LINE = re.compile(r"(?m)^( {8}nc_variable:)[^\n]*$")
 _UNITS_LINE = re.compile(r"(?m)^( {8}units:)[^\n]*$")
 
+#: Most retrieved variable names to name in a declined-match echo before
+#: summarising the rest, so one wide product cannot flood the sweep's output.
+_ECHO_MAX_NAMES = 8
+
 #: Function words that carry no identifying signal. Dropped before the rule 4
 #: overlap tests so `number-of-wet-days` cannot pair with a variable on `of`.
 _STOPWORDS = frozenset(
@@ -473,7 +477,13 @@ def _match_variables(
             Rule 4 will not hand one of these to a second slug; the confident
             rules still may, because one short name legitimately serves several
             rows of the same dataset (CARRA repeats a name across level
-            families).
+            families). The asymmetry is deliberate: reaching a repeated name by
+            exact match or `long_name` is evidence it belongs to both rows,
+            while reaching it by the leftover rule is a guess, and a guess
+            landing on a name another row already holds is the corruption this
+            rule was tightened to stop. The cost is that a legitimately
+            repeated name reachable ONLY by rule 4 stays a placeholder, to be
+            curated by hand.
 
     Returns:
         Mapping of slug to the `(nc_variable, units)` to write — only for the
@@ -738,7 +748,13 @@ def _hydrate_one(
     new_text = _rewrite_stanza(file_text[path], dataset_id, nc_meta)
     if new_text == file_text[path]:
         offered = sorted(_data_variables(nc_meta))
-        typer.echo(f"{prefix}: retrieved, no confident match ({', '.join(offered)})")
+        if not offered:
+            detail = "no data variables, only coordinates and auxiliaries"
+        else:
+            shown = ", ".join(offered[:_ECHO_MAX_NAMES])
+            extra = len(offered) - _ECHO_MAX_NAMES
+            detail = f"{shown}, +{extra} more" if extra > 0 else shown
+        typer.echo(f"{prefix}: retrieved, no confident match ({detail})")
         return "unmatched"
     file_text[path] = new_text
     path.write_text(new_text, encoding="utf-8")
