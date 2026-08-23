@@ -61,13 +61,21 @@ exclude_docs: |
   examples/*/out/
   examples/*/*/out/
   examples/*/data/
+  examples/*/*/data/
   examples/*/_nb_out/
+  examples/*/*/_nb_out/
   examples/*/_overture_out/
+  examples/*/*/_overture_out/
   examples/*/*_out/
+  examples/*/*/*_out/
   examples/*/*_output/
+  examples/*/*/*_output/
   examples/*/ohsome_log/
+  examples/*/*/ohsome_log/
   examples/*/insar_stack*/
+  examples/*/*/insar_stack*/
   examples/*/soilgrids_*/
+  examples/*/*/soilgrids_*/
   # Branding: publish the curated kit only. Everything loose beside it — the
   # zip of the kit, the exploration variants, and the duplicates of files the
   # kit already ships — stays out. These globs are single-level on purpose, so
