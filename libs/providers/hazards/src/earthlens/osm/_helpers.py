@@ -197,6 +197,28 @@ def ohsome_error_response(exc: Exception) -> requests.Response | None:
     Returns:
         requests.Response | None: The offending response, or `None` when none is
             recoverable from the chain.
+
+    Examples:
+        - The buried response is recovered, so its status is readable:
+            ```python
+            >>> import requests
+            >>> from earthlens.osm import ohsome_error_response
+            >>> resp = requests.Response()
+            >>> resp.status_code = 503
+            >>> err = requests.HTTPError("service unavailable")
+            >>> err.response = resp
+            >>> ohsome_error_response(err).status_code
+            503
+
+            ```
+        - A bare transport error carries no response:
+            ```python
+            >>> import requests
+            >>> from earthlens.osm import ohsome_error_response
+            >>> ohsome_error_response(requests.ConnectionError("boom")) is None
+            True
+
+            ```
     """
     for node in exception_chain(exc):
         response = getattr(node, "response", None)

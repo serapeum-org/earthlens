@@ -138,6 +138,23 @@ def is_upstream_unavailable(exc: BaseException) -> str | None:
     Returns:
         A human-readable skip reason, or `None` when `exc` is not an availability
         problem.
+
+    Examples:
+        - A dropped connection is an availability failure, named by its type:
+            ```python
+            >>> import requests
+            >>> from earthlens.testing import is_upstream_unavailable
+            >>> is_upstream_unavailable(requests.ConnectionError("boom"))
+            'upstream unreachable (ConnectionError)'
+
+            ```
+        - A request error is not, so it stays a real failure:
+            ```python
+            >>> from earthlens.testing import is_upstream_unavailable
+            >>> is_upstream_unavailable(ValueError("does not match any constraint")) is None
+            True
+
+            ```
     """
     for link in exception_chain(exc):
         # A backend that already judged its own failure an availability problem
