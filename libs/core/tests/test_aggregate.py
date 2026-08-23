@@ -1124,7 +1124,7 @@ class TestAggregateNetcdfRoundTrip:
     def test_geotiff_filename_carries_variable_freq_and_window(
         self, monkeypatch, tmp_path, state_var
     ):
-        """Output GeoTIFF filename matches `<cds_variable>_<freq>_<YYYYMMDD>.tif`."""
+        """A var_info with no dataset id writes the bare `<cds_variable>_<freq>_<YYYYMMDD>.tif`."""
         cube = self._daily_six_hourly_array(n_days=1)
         nc = _FakeNetCDF(
             array=cube,

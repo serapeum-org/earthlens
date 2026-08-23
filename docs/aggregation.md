@@ -350,7 +350,8 @@ The `<dataset_id>` (the requested catalog id, e.g. `reanalysis-era5-single-level
 is included so datasets sharing a `cds_variable` — or the two GloFAS streams that
 also share `cds_dataset` — never overwrite one another in a shared `out_dir`,
 matching the `.nc` naming. It is omitted only for a `var_info` that carries no
-dataset id (a plain caller passing a bare stand-in to `aggregate_netcdf`).
+dataset id — the s3 and erddap backends (whose variable adapters carry none), or
+a plain caller passing a bare stand-in to `aggregate_netcdf`.
 
 Examples:
 

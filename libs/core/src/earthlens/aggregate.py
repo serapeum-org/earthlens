@@ -631,14 +631,14 @@ class AggregatedWindow:
             >>> window = AggregatedWindow(
             ...     label=pd.Timestamp("2020-01-01"),
             ...     array=np.array([[1.0, 2.0]]),
-            ...     path=Path("out/t2m_1D_20200101.tif"),
+            ...     path=Path("out/t2m_reanalysis-era5-single-levels_1D_20200101.tif"),
             ... )
             >>> window.label.strftime("%Y-%m-%d")
             '2020-01-01'
             >>> float(window.array.mean())
             1.5
             >>> window.path.name
-            't2m_1D_20200101.tif'
+            't2m_reanalysis-era5-single-levels_1D_20200101.tif'
 
             ```
         - A discarded array leaves only the label and the path to read back:
@@ -649,12 +649,12 @@ class AggregatedWindow:
             >>> window = AggregatedWindow(
             ...     label=pd.Timestamp("2020-02-01"),
             ...     array=None,
-            ...     path=Path("out/t2m_1D_20200201.tif"),
+            ...     path=Path("out/t2m_reanalysis-era5-single-levels_1D_20200201.tif"),
             ... )
             >>> window.array is None
             True
             >>> window.path.name
-            't2m_1D_20200201.tif'
+            't2m_reanalysis-era5-single-levels_1D_20200201.tif'
 
             ```
     """
