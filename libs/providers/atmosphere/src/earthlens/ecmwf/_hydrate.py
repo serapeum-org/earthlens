@@ -449,7 +449,8 @@ def _match_variables(
     Args:
         placeholders: The still-`unknown` variable slugs, in catalog order.
         nc_meta: The retrieved `{nc_name: {long_name, units}}` mapping.
-        reserved: NetCDF names already written into the stanza's hydrated rows.
+        reserved: Lowercased NetCDF names already written into the stanza's
+            hydrated rows.
             Rule 4 will not hand one of these to a second slug; the confident
             rules still may, because one short name legitimately serves several
             rows of the same dataset (CARRA repeats a name across level
@@ -493,7 +494,7 @@ def _match_variables(
         len(unmatched) == 1
         and len(unused) == 1
         and unmatched[0] != "all"
-        and unused[0] not in reserved
+        and unused[0].lower() not in reserved
         and _pair_is_evidenced(unmatched[0], unused[0], candidates[unused[0]])
     ):
         chosen[unmatched[0]] = unused[0]
@@ -518,12 +519,15 @@ def _claimed_nc_names(block: str) -> frozenset[str]:
 
     A placeholder row carries a seeded `nc_variable` too, so only sub-blocks
     that have lost the `units: unknown` sentinel count as having claimed a name.
+    Values are returned lowercased, because NetCDF short names vary in case
+    across products (`SST` and `sst` name one variable) and reservation has to
+    match the way the rest of this module compares names.
 
     Args:
         block: One dataset stanza's body text.
 
     Returns:
-        The NetCDF short names a hydrated row of this stanza already uses.
+        The lowercased NetCDF short names a hydrated row of this stanza uses.
     """
     claimed = set()
     for match in _VARIABLE_BLOCK.finditer(block):
@@ -533,10 +537,34 @@ def _claimed_nc_names(block: str) -> frozenset[str]:
         line = _NC_VARIABLE_LINE.search(body)
         if line is None:
             continue
-        value = body[line.start() : line.end()].split(":", 1)[1].strip()
+        value = _scalar_after_key(body[line.start() : line.end()])
         if value:
-            claimed.add(value.strip("\"'"))
+            claimed.add(value.lower())
     return frozenset(claimed)
+
+
+def _scalar_after_key(line: str) -> str:
+    """Return the plain scalar a `key: value` line carries, or `""` for none.
+
+    Handles the two shapes the catalog emits — a bare scalar with an optional
+    trailing `#` comment, and a quoted scalar — and rejects the YAML nulls, so
+    an empty or `null` `nc_variable` never reserves a name.
+
+    Args:
+        line: One `key: value` line, without its newline.
+
+    Returns:
+        The unquoted, comment-free value, or `""` when there is none.
+    """
+    raw = line.split(":", 1)[1].strip()
+    if raw[:1] in tuple('"\''):
+        quote = raw[0]
+        end = raw.find(quote, 1)
+        raw = raw[1:end] if end > 0 else raw.lstrip(quote)
+    else:
+        # A YAML inline comment needs whitespace before the `#`.
+        raw = re.split(r"\s#", raw, maxsplit=1)[0].strip()
+    return "" if raw.lower() in {"", "null", "~"} else raw
 
 
 def _fill_variable(block: str, slug: str, nc_name: str, units: str) -> str:

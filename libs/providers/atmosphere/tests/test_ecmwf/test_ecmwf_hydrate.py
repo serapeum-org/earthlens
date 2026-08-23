@@ -11,6 +11,7 @@ import yaml
 
 from earthlens.ecmwf import _hydrate as hydrate_mod
 from earthlens.ecmwf._hydrate import (
+    _claimed_nc_names,
     _find_file_for_dataset,
     _is_initialism,
     _match_variables,
@@ -314,6 +315,51 @@ class TestMatchVariables:
         assert assignments == {"temperature": ("t", "K")}, (
             "quality-flag stays unhydrated"
         )
+
+
+_CLAIMED_BLOCK = """      total-precipitation:
+        cds_variable: total_precipitation
+        nc_variable: tp  # ERA5 short name
+        units: m
+      quoted-row:
+        cds_variable: x
+        nc_variable: 'SST'
+        units: K
+      empty-row:
+        cds_variable: y
+        nc_variable: null
+        units: K
+      still-a-placeholder:
+        cds_variable: z
+        nc_variable: z
+        units: unknown
+"""
+
+
+class TestClaimedNcNames:
+    """Tests for the reservation set read out of a stanza's hydrated rows."""
+
+    def test_an_inline_comment_does_not_become_part_of_the_name(self):
+        """A trailing YAML comment is stripped, so the bare name is reserved."""
+        assert "tp" in _claimed_nc_names(_CLAIMED_BLOCK)
+
+    def test_a_quoted_value_is_unquoted_and_lowercased(self):
+        """Quotes are dropped and case folded, so SST and sst reserve alike."""
+        assert "sst" in _claimed_nc_names(_CLAIMED_BLOCK)
+
+    def test_a_null_value_reserves_nothing(self):
+        """A null nc_variable is not a claim on any name."""
+        claimed = _claimed_nc_names(_CLAIMED_BLOCK)
+        assert "null" not in claimed
+        assert "" not in claimed
+
+    def test_a_placeholder_row_claims_nothing(self):
+        """A row still carrying the unknown sentinel has not bound its name yet."""
+        assert "z" not in _claimed_nc_names(_CLAIMED_BLOCK)
+
+    def test_an_empty_block_reserves_nothing(self):
+        """A stanza with no variables reserves nothing."""
+        assert _claimed_nc_names("") == frozenset()
 
 
 class TestIsInitialism:
