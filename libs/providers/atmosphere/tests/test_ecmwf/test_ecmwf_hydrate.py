@@ -360,6 +360,14 @@ class TestClaimedNcNames:
         """A row still carrying the unknown sentinel has not bound its name yet."""
         assert "z" not in _claimed_nc_names(_CLAIMED_BLOCK)
 
+    def test_a_row_without_an_nc_variable_key_reserves_nothing(self):
+        """A hydrated row that never names a variable has claimed none."""
+        block = """      keyless-row:
+        cds_variable: k
+        units: m
+"""
+        assert _claimed_nc_names(block) == frozenset()
+
     def test_an_empty_block_reserves_nothing(self):
         """A stanza with no variables reserves nothing."""
         assert _claimed_nc_names("") == frozenset()
@@ -619,6 +627,40 @@ class TestBulkHydrateEmpty:
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 0
         assert summary["skipped"] == 1
+
+    def test_a_stanza_with_nothing_left_to_fill_is_a_skip(self, tmp_path, monkeypatch):
+        """A stanza whose placeholders are already filled is not a declined match."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"other-dataset": _placeholder_dataset("total-precipitation")},
+        )
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_netcdf_vars", lambda ds: dict(_NC_META)
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["unmatched"] == 0
+        assert summary["skipped"] == 1
+
+    def test_a_retrieve_of_only_auxiliaries_says_so(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        """When nothing retrieved is a data variable, the echo names that case."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_retrieve_netcdf_vars",
+            lambda ds: {"latitude": {"long_name": "latitude", "units": "degrees"}},
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["unmatched"] == 1
+        assert "only coordinates and auxiliaries" in capsys.readouterr().out
 
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the placeholder worklist."""
