@@ -39,12 +39,7 @@ import pandas as pd
 from pyramids.feature.collection import FeatureCollection
 from shapely.geometry import LineString, Point, Polygon, box
 
-from earthlens.base import (
-    UpstreamUnavailableError,
-    exception_chain,
-    is_http_status,
-    response_status,
-)
+from earthlens.base import exception_chain, is_http_status, response_status
 
 # `LicenseWarning` is shared across the ODbL / restrictive-license backends; it
 # lives in the biodiversity cluster's helper module (overture re-exports the same
@@ -71,7 +66,7 @@ _ID_COLUMNS = ["osm_id", "osm_type"]
 OHSOME_BODY_PREVIEW_CHARS = 200
 
 
-class OhsomeResponseError(UpstreamUnavailableError):
+class OhsomeResponseError(RuntimeError):
     """The ohsome endpoint returned a response earthlens could not use.
 
     Raised in place of a raw `JSONDecodeError` when `api.ohsome.org` answers with
@@ -80,6 +75,15 @@ class OhsomeResponseError(UpstreamUnavailableError):
     HTTP `status_code`, the response `content_type`, and a short `body_preview`
     so a caller (and the logs) can tell those cases apart, instead of guessing
     behind a decoder error (`#930`).
+
+    Deliberately a plain `RuntimeError`, **not** an
+    `earthlens.base.UpstreamUnavailableError`: this is a broad "response we could
+    not use" catch-all, and its `OhsomeUnavailableError` subtype can carry a
+    non-transient status (a `404` / `600` from a bad filter is an earthlens
+    defect, not an outage). The transient-vs-real triage is the osm backend's own
+    job (`ohsome_http_status` + the e2e `_skip_on_network` helper); subclassing
+    the shared availability type would let `is_upstream_unavailable` mask those
+    deliberate failures as skips.
     """
 
     def __init__(
@@ -99,7 +103,8 @@ class OhsomeResponseError(UpstreamUnavailableError):
             body_preview: The first characters of the response body (decoded), or
                 `None` when no response object was recoverable.
         """
-        super().__init__(message, status_code)
+        super().__init__(message)
+        self.status_code = status_code
         self.content_type = content_type
         self.body_preview = body_preview
 
