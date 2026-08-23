@@ -107,6 +107,15 @@ class TestExceptionChain:
         second.__cause__ = first
         assert list(exception_chain(first)) == [first, second]
 
+    def test_skips_non_exception_links_but_traverses_through_them(self):
+        """A KeyboardInterrupt/SystemExit link is walked past but never yielded."""
+        deep = ValueError("deep")
+        interrupt = KeyboardInterrupt("500 Server Error")
+        interrupt.__cause__ = deep
+        wrapper = RuntimeError("wrapper")
+        wrapper.__cause__ = interrupt
+        assert list(exception_chain(wrapper)) == [wrapper, deep]
+
 
 class TestResponseStatus:
     """The structural single-exception status read."""

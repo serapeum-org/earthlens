@@ -112,20 +112,24 @@ def is_http_status(value: object) -> bool:
     return isinstance(value, int) and not isinstance(value, bool)
 
 
-def exception_chain(exc: BaseException) -> Iterator[BaseException]:
-    """Yield `exc` then each linked `__cause__` / `__context__`, cycle-safe.
+def exception_chain(exc: BaseException) -> Iterator[Exception]:
+    """Yield each `Exception` in `exc`'s `__cause__` / `__context__` chain, cycle-safe.
 
-    Honours `raise … from None`: an explicit `__cause__` wins, otherwise the
-    implicit `__context__` is followed only when the author did not suppress it
-    (matching stdlib `traceback`), so a deliberately surfaced failure is not
-    reclassified through a context it asked to hide. Cycle-guarded, so a
-    self-referential chain terminates instead of looping.
+    Yields only real `Exception` links: a `KeyboardInterrupt` / `SystemExit`
+    caught in the chain carries no HTTP status and must never be message-sniffed
+    for one, so it is skipped — but the walk still traverses *through* it, so a
+    status deeper in the chain is not lost. Honours `raise … from None`: an
+    explicit `__cause__` wins, otherwise the implicit `__context__` is followed
+    only when the author did not suppress it (matching stdlib `traceback`), so a
+    deliberately surfaced failure is not reclassified through a context it asked
+    to hide. Cycle-guarded, so a self-referential chain terminates.
 
     Args:
         exc: The exception to walk.
 
     Yields:
-        Each exception in the chain, most recent first.
+        Each `Exception` in the chain, most recent first (non-`Exception` links
+        are traversed but not yielded).
 
     Examples:
         - The walk yields the wrapper then its explicit cause:
@@ -144,7 +148,8 @@ def exception_chain(exc: BaseException) -> Iterator[BaseException]:
     current: BaseException | None = exc
     while current is not None and id(current) not in seen:
         seen.add(id(current))
-        yield current
+        if isinstance(current, Exception):
+            yield current
         if current.__cause__ is not None:
             current = current.__cause__
         elif current.__suppress_context__:
