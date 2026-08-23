@@ -35,7 +35,7 @@ earthlens — a unified Python client for satellite & climate data
 
 <p align="center">
   <sub>34 of the spacecraft behind earthlens' providers, on their published orbits. The trailing band under
-  each one is its instrument's real ground swath, and the trapezoid above it is the field of view sweeping
+  each one is its instrument's real ground swath, and the trapezoid above it is the sensor footprint sweeping
   that strip out.<br>
   The clock counts <b>simulated orbital time at 270&times; real</b>, so 20 seconds of clip is 1.5 hours in
   orbit. Earth turns 22.6&deg; in that window and a low orbiter gets about nine tenths of the way round —
