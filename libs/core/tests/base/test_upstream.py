@@ -60,12 +60,7 @@ class TestIsHttpStatus:
         ],
     )
     def test_only_a_real_int_passes(self, value: object, expected: bool):
-        """An int-and-not-bool passes; a bool, None, str, or float does not.
-
-        Args:
-            value: The candidate status.
-            expected: Whether it is accepted as a real status.
-        """
+        """An int-and-not-bool passes; a bool, None, str, or float does not."""
         assert is_http_status(value) is expected, f"{value!r} -> {expected}"
 
 
@@ -152,12 +147,7 @@ class TestStatusInMessage:
         ],
     )
     def test_default_search_anywhere(self, text: str, expected: int | None):
-        """Unanchored, a status is matched wherever it appears (or not at all).
-
-        Args:
-            text: The message to scan.
-            expected: The status expected, or None.
-        """
+        """Unanchored, a status is matched wherever it appears (or not at all)."""
         assert status_in_message(text) == expected, f"{text!r} -> {expected}"
 
     def test_buried_status_needs_unanchored(self):

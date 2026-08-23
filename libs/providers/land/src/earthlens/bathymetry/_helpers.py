@@ -106,8 +106,8 @@ _SERVICE_SIGNATURES: tuple[str, ...] = (
 #: `returned`, so a request / size message (`512 x 512 grid`, `500 records
 #: returned`, `coverage returned 512 rows`) is never mistaken for a status. A
 #: bare status in free text without such a token (a raw CDN `522 …` string) is
-#: instead recognised structurally by `_http_status` when the exception carries a
-#: `.response`; the text path is only a fallback for wrapped GDAL / CURL strings.
+#: instead recognised structurally by `response_status` when the exception carries
+#: a `.response`; the text path is only a fallback for wrapped GDAL / CURL strings.
 _STATUS_IN_TEXT_RE = re.compile(
     r"(?:\bhttp\b|\bhttp/\d(?:\.\d)?\b|\bstatus\b|\bcode\b)"
     r"[^0-9A-Za-z]{0,4}(?:408|429|5\d\d)\b"
