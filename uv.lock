@@ -2132,6 +2132,7 @@ dev = [
 ]
 docs = [
     { name = "cleopatra", extra = ["tiles"] },
+    { name = "imageio-ffmpeg" },
     { name = "matplotlib" },
     { name = "mike" },
     { name = "mkdocs" },
@@ -2146,6 +2147,8 @@ docs = [
     { name = "mkdocstrings-python" },
     { name = "pyramids-gis", extra = ["viz"] },
     { name = "python-dotenv" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-15-earthlens-ocean-argo' and extra == 'extra-17-earthlens-imagery-openeo')" },
 ]
 notebook = [
     { name = "ipykernel" },
@@ -2268,6 +2271,7 @@ dev = [
 ]
 docs = [
     { name = "cleopatra", extras = ["tiles"], specifier = ">=0.31.0" },
+    { name = "imageio-ffmpeg", specifier = ">=0.5" },
     { name = "matplotlib", specifier = ">=3.5" },
     { name = "mike", specifier = ">=2.1.3" },
     { name = "mkdocs", specifier = ">=1.5.3" },
@@ -2282,6 +2286,7 @@ docs = [
     { name = "mkdocstrings-python", specifier = ">=1.7.5" },
     { name = "pyramids-gis", extras = ["viz"], specifier = ">=0.54.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
+    { name = "scipy", specifier = ">=1.11" },
 ]
 notebook = [
     { name = "ipykernel" },

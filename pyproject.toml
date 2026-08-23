@@ -222,6 +222,14 @@ docs = [
     "cleopatra[tiles] >=0.31.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
+    # scipy: the satellite showcase blurs the logo's drop shadow with
+    # ndimage.gaussian_filter. Also in `notebooks`, for the eclipse notebooks --
+    # but that group carries satpy, pyresample and pyspectral, and this notebook
+    # needs none of them, so it must not be the only place these are declared.
+    "scipy >=1.11",
+    # imageio-ffmpeg: get_ffmpeg_exe() supplies the encoder every clip is
+    # written with, so the docs build needs it to execute the notebook.
+    "imageio-ffmpeg >=0.5",
 ]
 
 notebook = [
