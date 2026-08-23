@@ -146,7 +146,11 @@ dev = [
     # subpackages), and 0.31.0 groups ArrayGlyph's loose rgb /
     # surface_reflectance / cutoff / percentile constructor keywords into an
     # RgbBands object (pyramids 0.52.0's plot path builds on this).
-    "cleopatra >=0.31.0",
+    # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
+    # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
+    # It arrives transitively through pyramids-gis[viz], but an imported package
+    # is declared here rather than relied on to come in sideways.
+    "cleopatra[tiles] >=0.31.0",
     "pre-commit >=3.7.1",
     "pre-commit-hooks >=4.6.0",
     # mypy: the `mypy` pre-commit hook and the lint.yml `static` job type-check src.
@@ -211,9 +215,21 @@ docs = [
     "matplotlib >=3.5",
     # pyramids-gis[viz] (cleopatra): showcase notebooks plot/animate Datasets.
     "pyramids-gis[viz] >=0.54.0",
-    "cleopatra >=0.31.0",
+    # [tiles] (pyproj, xyzservices): the satellite showcase textures its globe from
+    # an XYZ basemap via cleopatra.basemap.tiles, which lives behind that extra.
+    # It arrives transitively through pyramids-gis[viz], but an imported package
+    # is declared here rather than relied on to come in sideways.
+    "cleopatra[tiles] >=0.31.0",
     # python-dotenv: showcase notebooks load credentials from a repo-root .env.
     "python-dotenv >=1.0",
+    # scipy: the satellite showcase blurs the logo's drop shadow with
+    # ndimage.gaussian_filter. Also in `notebooks`, for the eclipse notebooks --
+    # but that group carries satpy, pyresample and pyspectral, and this notebook
+    # needs none of them, so it must not be the only place these are declared.
+    "scipy >=1.11",
+    # imageio-ffmpeg: get_ffmpeg_exe() supplies the encoder every clip is
+    # written with, so the docs build needs it to execute the notebook.
+    "imageio-ffmpeg >=0.5",
 ]
 
 notebook = [

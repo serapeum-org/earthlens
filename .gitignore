@@ -181,15 +181,39 @@ docs/examples/showcases/out/
 # ignored without editing this list. Kept in step with the `exclude_docs`
 # globs in mkdocs.yml, which keep these out of the built site.
 docs/examples/*/out/
+docs/examples/*/*/out/
 docs/examples/*/data/
+docs/examples/*/*/data/
 docs/examples/*/earthlens-data/
+docs/examples/*/*/earthlens-data/
 docs/examples/*/_nb_out/
+docs/examples/*/*/_nb_out/
 docs/examples/*/_overture_out/
+docs/examples/*/*/_overture_out/
 docs/examples/*/*_out/
+docs/examples/*/*/*_out/
 docs/examples/*/*_output/
+docs/examples/*/*/*_output/
 docs/examples/*/ohsome_log/
+docs/examples/*/*/ohsome_log/
 docs/examples/*/insar_stack*/
+docs/examples/*/*/insar_stack*/
 docs/examples/*/soilgrids_*/
+docs/examples/*/*/soilgrids_*/
+
+# Loose working media in the repo root and under docs/: scratch renders and
+# source clips that are not part of the documentation. Ignored rather than
+# deleted -- they are working files, but they are large and sit exactly where
+# a `git add .` would sweep them into a commit.
+/assets/
+docs/videos/
+
+# The satellite showcase's master mp4. render_master draws every frame into it
+# once and publish_clip derives every published size from it by transcoding, so
+# the master is an intermediate: 27 MB that nothing references. Re-rendering
+# writes a byte-different copy each time, and video does not delta-compress, so
+# committing it costs its full size again on every render.
+docs/_images/animation/*-1920.mp4
 
 # Loose branding working files beside the curated kit: the zip of the kit,
 # exploration variants, and duplicates of assets the kit already ships. The

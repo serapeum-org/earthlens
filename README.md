@@ -28,6 +28,22 @@ Current release info
 earthlens — a unified Python client for satellite & climate data
 =====================================================================
 
+<p align="center">
+  <img src="docs/_images/animation/earthlens-satellites-bluemarble.webp" width="820"
+       alt="The satellite fleet earthlens can reach, in orbit — ground swaths sweeping across Earth">
+</p>
+
+<p align="center">
+  <sub>34 of the spacecraft behind earthlens' providers, on their published orbits. The trailing band under
+  each one is its instrument's real ground swath, and the trapezoid above it is the sensor footprint sweeping
+  that strip out.<br>
+  The clock counts <b>simulated orbital time at 270&times; real</b>, so 20 seconds of clip is 1.5 hours in
+  orbit. Earth turns 22.6&deg; in that window and a low orbiter gets about nine tenths of the way round —
+  which is how you read its ~90-minute period straight off the screen. The geostationary satellites look
+  frozen because they are keeping pace with the ground beneath them.</sub>
+</p>
+
+
 **earthlens** gives you one consistent Python API for downloading satellite,
 climate, and geospatial data from **61 providers** — climate reanalysis,
 satellite imagery, ocean models, weather forecasts, natural-hazard feeds, air
