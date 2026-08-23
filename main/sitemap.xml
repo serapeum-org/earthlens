@@ -829,7 +829,7 @@
          <lastmod>2026-08-23</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/main/examples/showcase/eclipse_geometry_3d/</loc>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/showcase/earthlens-satellites/</loc>
          <lastmod>2026-08-23</lastmod>
     </url>
     <url>
@@ -869,14 +869,6 @@
          <lastmod>2026-08-23</lastmod>
     </url>
     <url>
-         <loc>https://serapeum-org.github.io/earthlens/main/examples/showcase/solar_eclipse_2026_eumetsat_fci/</loc>
-         <lastmod>2026-08-23</lastmod>
-    </url>
-    <url>
-         <loc>https://serapeum-org.github.io/earthlens/main/examples/showcase/solar_eclipse_2026_goes/</loc>
-         <lastmod>2026-08-23</lastmod>
-    </url>
-    <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/showcase/species_occurrences_gbif_obis/</loc>
          <lastmod>2026-08-23</lastmod>
     </url>
@@ -898,6 +890,18 @@
     </url>
     <url>
          <loc>https://serapeum-org.github.io/earthlens/main/examples/showcase/wildfire_smoke_air_quality/</loc>
+         <lastmod>2026-08-23</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/showcase/eclipse/eclipse_geometry_3d/</loc>
+         <lastmod>2026-08-23</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/showcase/eclipse/solar_eclipse_2026_eumetsat_fci/</loc>
+         <lastmod>2026-08-23</lastmod>
+    </url>
+    <url>
+         <loc>https://serapeum-org.github.io/earthlens/main/examples/showcase/eclipse/solar_eclipse_2026_goes/</loc>
          <lastmod>2026-08-23</lastmod>
     </url>
     <url>

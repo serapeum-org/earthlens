@@ -12783,7 +12783,35 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/showcase/eclipse_geometry_3d/" class="md-nav__link">
+      <a href="examples/showcase/earthlens-satellites/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Every satellite earthlens can reach, in orbit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="examples/showcase/eclipse/eclipse_geometry_3d/" class="md-nav__link">
         
   
   
@@ -12811,7 +12839,7 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/showcase/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
+      <a href="examples/showcase/eclipse/solar_eclipse_2026_eumetsat_fci/" class="md-nav__link">
         
   
   
@@ -12839,7 +12867,7 @@
   
   
     <li class="md-nav__item">
-      <a href="examples/showcase/solar_eclipse_2026_goes/" class="md-nav__link">
+      <a href="examples/showcase/eclipse/solar_eclipse_2026_goes/" class="md-nav__link">
         
   
   
@@ -23496,6 +23524,34 @@ reanalysis, satellite imagery, ocean models, weather forecasts, natural-hazard
 feeds, air quality, biodiversity, population, and more. Pick a <code>data_source</code>, describe the area
 and dates you want, and call <code>download()</code>; the matching backend handles auth,
 catalog lookup, request shaping, and writing the output.</p>
+<figure>
+<video autoplay="autoplay" controls="controls" loop="loop" muted="muted" playsinline="playsinline" poster="_images/animation/earthlens-satellites-night.gif" width="100%">
+    <source src="_images/animation/earthlens-satellites-night-1280.mp4" type="video/mp4">
+    <img src="_images/animation/earthlens-satellites-night.gif" width="100%"
+         alt="34 satellites orbiting a night-lit Earth, each low orbiter trailing its instrument's ground swath">
+  </video>
+<figcaption>
+<p>34 of the spacecraft behind earthlens' providers, drawn on their published orbits. Each trailing band is
+that instrument's real ground swath, and the trapezoid above it is the sensor's footprint sweeping it out.</p>
+<p>The clock counts <strong>simulated orbital time at 270&times; real</strong>: the 20-second clip covers 1.5 hours. Earth
+turns 22.6&deg; in that window and a low orbiter completes about nine tenths of a circuit, which is how its
+~90-minute period can be read straight off the screen. The geostationary satellites appear frozen because
+they are turning at exactly Earth's rate, holding station over the same ground.</p>
+</figcaption>
+</figure>
+<script>
+  // A reader who has asked for reduced motion should not be handed a looping
+  // clip. autoplay is an attribute rather than a style, so CSS cannot reach it;
+  // dropping it leaves the poster frame and the controls already on the player.
+  (function () {
+    if (!window.matchMedia || !matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    document.querySelectorAll("video[autoplay]").forEach(function (v) {
+      v.removeAttribute("autoplay");
+      v.pause();
+    });
+  })();
+</script>
+
 <h2 id="supported-data-sources"><a class="toclink" href="#supported-data-sources">Supported data sources</a><a class="headerlink" href="#supported-data-sources" title="Permanent link">#</a></h2>
 <p>Every backend is reached through the same <code>EarthLens</code> facade by passing its key
 as <code>data_source=</code>.</p>
