@@ -154,6 +154,14 @@ class TestMatchVariables:
                 "Liquid Water Equivalent Thickness",
                 True,
             ),
+            # True positives - a chemical formula behind a product prefix.
+            (
+                "co2",
+                "xco2",
+                "column-averaged dry-air mole fraction of carbon dioxide",
+                True,
+            ),
+            ("ch4", "xch4", "column-averaged dry-air mole fraction of methane", True),
             # False positives - unrelated names must keep the placeholder.
             ("number-of-wet-days", "elevation", "", False),
             ("number-of-dry-spells", "elevation", "Surface elevation", False),
@@ -188,6 +196,14 @@ class TestMatchVariables:
             ["sea-surface-temperature"], {"SST": {"long_name": "", "units": "K"}}
         )
         assert assignments == {"sea-surface-temperature": ("SST", "K")}
+
+    def test_a_buried_token_is_not_a_prefixed_form(self):
+        """A slug token appearing inside an unrelated name is not evidence on its own."""
+        assignments = _match_variables(
+            ["specific-cloud-ice-water-content"],
+            {"iicethic": {"long_name": "", "units": "1"}},
+        )
+        assert assignments == {}
 
     def test_stopword_only_slug_is_never_paired(self):
         """A slug that reduces to stopwords carries no evidence to match on."""

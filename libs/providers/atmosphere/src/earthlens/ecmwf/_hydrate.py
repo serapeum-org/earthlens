@@ -329,14 +329,71 @@ def _is_initialism(name: str, tokens: set[str]) -> bool:
     return bool(tokens) and _consume_initialism(name.lower(), sorted(tokens))
 
 
+#: Longest product prefix a NetCDF short name may add to a slug's own spelling
+#: and still be recognised as the same quantity (`xco2` for `co2`, `tcno2` for
+#: `no2`). Two characters covers the `x` / `tc` / `t` families the CDS serves.
+_PRODUCT_PREFIX_MAX = 2
+
+
+def _compact(text: str) -> str:
+    """Return `text` reduced to its lowercase alphanumerics, separators dropped."""
+    return "".join(char for char in text.lower() if char.isalnum())
+
+
+def _is_prefixed_form(name: str, slug: str) -> bool:
+    """Return True when `name` is the slug's own spelling behind a short product prefix.
+
+    The C3S greenhouse-gas CDRs serve a column-average mole fraction as the
+    chemical formula behind an `x` (`co2` -> `xco2`), and the whole compacted
+    slug has to survive for the pair to qualify — matching a single token as a
+    substring would pair `specific-cloud-ice-water-content` with `iicethic`.
+
+    Args:
+        name: The NetCDF short name.
+        slug: The catalog variable slug.
+
+    Returns:
+        True when one compacted spelling is the other behind at most
+        :data:`_PRODUCT_PREFIX_MAX` extra leading characters.
+
+    Examples:
+        - A product prefix in front of the slug's own spelling:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _is_prefixed_form
+            >>> _is_prefixed_form("xco2", "co2")
+            True
+            >>> _is_prefixed_form("xch4", "ch4")
+            True
+
+            ```
+        - A token buried inside an unrelated name does not qualify:
+
+            ```python
+            >>> from earthlens.ecmwf._hydrate import _is_prefixed_form
+            >>> _is_prefixed_form("iicethic", "specific-cloud-ice-water-content")
+            False
+
+            ```
+    """
+    short, full = _compact(slug), _compact(name)
+    if len(short) < 3 or len(full) < 3:
+        return False
+    if full.endswith(short):
+        return len(full) - len(short) <= _PRODUCT_PREFIX_MAX
+    if short.endswith(full):
+        return len(short) - len(full) <= _PRODUCT_PREFIX_MAX
+    return False
+
+
 def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
     """Return True when `slug` and `name` share evidence of being the same thing.
 
     Rule 4's guard: being the only two left over is arity, not evidence. A pair
-    qualifies on any one of three signals, cheapest first — a shared token with
-    the short name, a shared token with its `long_name`, or `name` being an
-    initialism of the slug. Slugs reduced to nothing but stopwords never
-    qualify.
+    qualifies on any one of four signals, cheapest first — a shared token with
+    the short name, a shared token with its `long_name`, `name` being an
+    initialism of the slug, or `name` being the slug's own spelling behind a
+    short product prefix. Slugs reduced to nothing but stopwords never qualify.
 
     Args:
         slug: The unmatched catalog variable slug.
@@ -380,7 +437,7 @@ def _pair_is_evidenced(slug: str, name: str, meta: dict[str, Any]) -> bool:
         return True
     if tokens & (_tokens(str(meta.get("long_name") or "")) - _STOPWORDS):
         return True
-    return _is_initialism(name, tokens)
+    return _is_initialism(name, tokens) or _is_prefixed_form(name, slug)
 
 
 def _match_variables(
