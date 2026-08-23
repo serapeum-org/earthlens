@@ -619,6 +619,28 @@ class TestE2ESkipHelper:
         with pytest.raises(OhsomeUnavailableError):
             _skip_on_network(past)
 
+    def test_shared_hook_does_not_mask_deliberate_failures(self):
+        """The shared availability classifier fails what `_skip_on_network` re-raises.
+
+        `_skip_on_network` runs inside the e2e test body; a non-transient
+        `OhsomeUnavailableError` (404 / 600) or a bare non-JSON `OhsomeResponseError`
+        it re-raises then reaches the shared `pytest_runtest_call` hook, which
+        classifies via `is_upstream_unavailable`. That classifier must return
+        `None` (fail) for these, or a real ohsome request-shape regression is
+        masked as a skip (#1088).
+        """
+        from earthlens.osm import OhsomeResponseError, OhsomeUnavailableError
+        from earthlens.testing import is_upstream_unavailable
+
+        non_transient = OhsomeUnavailableError("bad filter", status_code=404)
+        beyond_5xx = OhsomeUnavailableError("odd", status_code=600)
+        non_json = OhsomeResponseError("non-JSON maintenance page")
+        assert is_upstream_unavailable(non_transient) is None, "404 must stay a failure"
+        assert is_upstream_unavailable(beyond_5xx) is None, "600 must stay a failure"
+        assert is_upstream_unavailable(non_json) is None, (
+            "bare body must stay a failure"
+        )
+
 
 class TestDownloadContract:
     """Cross-cutting download() behaviour."""
