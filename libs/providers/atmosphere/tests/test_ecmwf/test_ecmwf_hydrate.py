@@ -718,6 +718,25 @@ class TestSelectorPlumbing:
         block = "    extras:" + chr(10) + "      timespan: [time_mean]" + chr(10)
         assert _dataset_extras(block) == {"timespan": ["time_mean"]}
 
+    def test_a_blank_extras_region_reads_as_nothing(self):
+        """Whitespace under the key is not a mapping to compare selectors against."""
+        block = (
+            "    extras:" + chr(10) + "      " + chr(10) + "    variables:" + chr(10)
+        )
+        assert _dataset_extras(block) == {}
+
+    def test_a_row_whose_cds_variable_is_empty_is_not_indexed(self):
+        """A blank cds_variable gives a probe nothing to ask for."""
+        block = (
+            "      a-row:"
+            + chr(10)
+            + "        cds_variable:"
+            + chr(10)
+            + "        units: unknown"
+            + chr(10)
+        )
+        assert hydrate_mod._slug_cds_variables(block) == {}
+
     def test_dataset_extras_is_empty_without_the_block(self):
         """A stanza with no dataset-level extras yields nothing to compare against."""
         no_extras = """      a-row:
@@ -1255,6 +1274,14 @@ class TestBulkHydrateEmpty:
             hydrate_mod._take_rows(["a-dataset", "z-dataset"], rows, limit) == expected
         )
 
+    def test_limit_larger_than_the_catalog_takes_everything(self):
+        """A budget nothing reaches leaves the worklist whole."""
+        rows = {"a-dataset": 2, "z-dataset": 3}
+        assert hydrate_mod._take_rows(["a-dataset", "z-dataset"], rows, 999) == [
+            "a-dataset",
+            "z-dataset",
+        ]
+
     def test_limit_never_splits_a_dataset(self):
         """Half a hydrated stanza is not a useful stopping point, so it is a floor."""
         rows = {"wide-dataset": 82}
@@ -1285,6 +1312,33 @@ class TestBulkHydrateEmpty:
         assert summary["hydrated"] == 1, "the row it did fill still counts"
         assert summary["partial"] == 1, "and the dataset is flagged for a re-run"
         assert "timed out" in capsys.readouterr().out
+
+    def test_a_refusal_after_a_partial_fill_is_named_too(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        """A store that declines mid-way is as re-runnable as a deadline."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {
+                "reanalysis-era5-single-levels": _placeholder_dataset(
+                    "2m-temperature", "sea-surface-temperature"
+                )
+            },
+        )
+        seen = []
+
+        def _one_then_refuse(dataset_id, cds_variable, timeout):
+            seen.append(cds_variable)
+            if len(seen) == 1:
+                return _fake_probe(dataset_id, cds_variable)
+            raise RuntimeError("licence not accepted")
+
+        monkeypatch.setattr(hydrate_mod, "_probe_with_timeout", _one_then_refuse)
+        summary = bulk_hydrate_empty()
+        assert summary["partial"] == 1
+        assert "RuntimeError" in capsys.readouterr().out
 
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the placeholder worklist."""
