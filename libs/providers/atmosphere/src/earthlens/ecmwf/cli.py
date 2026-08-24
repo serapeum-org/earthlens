@@ -330,6 +330,44 @@ def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
     return _retrieve_probe(dataset, _deep_sample_request(row))
 
 
+def _required_selectors(
+    rows: list[dict[str, Any]], cds_variable: str
+) -> dict[str, Any]:
+    """Return the selectors a variable is only ever served under.
+
+    A probe request is one sampled combination, not a requirement: it takes the
+    first entry that lists the variable and keeps one value per selector. Most
+    of what it carries is a free choice the caller makes — a CMIP variable is
+    served under every model, experiment and period the dataset offers, and
+    pinning the sampled one into the row would override whatever the caller
+    later asks for.
+
+    A selector is a requirement only when every entry serving the variable
+    agrees on it. That isolates the real constraint — GloFAS serves snow depth
+    solely under `timespan: instantaneous` — and says nothing about the
+    selectors the caller is free to vary.
+
+    Args:
+        rows: The dataset's `constraints.json` entries.
+        cds_variable: The variable whose requirements to derive.
+
+    Returns:
+        The selectors common to every entry serving `cds_variable`; empty when
+        nothing is required or no entry serves it.
+    """
+    serving = [entry for entry in rows if cds_variable in (entry.get("variable") or [])]
+    if not serving:
+        return {}
+    first = serving[0]
+    return {
+        key: value
+        for key, value in first.items()
+        if key != "variable"
+        and isinstance(value, list)
+        and all(entry.get(key) == value for entry in serving)
+    }
+
+
 def _ecmwf_deep_sample_variable(
     dataset: str, cds_variable: str
 ) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
@@ -347,20 +385,17 @@ def _ecmwf_deep_sample_variable(
 
     Returns:
         A `(metadata, selectors)` pair. `metadata` maps NetCDF short name to
-        `{long_name, units}`; `selectors` is the serving block's list-valued
-        selectors excluding `variable`, each truncated to the one value probed.
-        Both are empty when no constraints block serves `cds_variable`.
+        `{long_name, units}`; `selectors` is what the variable is *only ever*
+        served under (see :func:`_required_selectors`), not the combination this
+        one probe happened to sample. Both are empty when no constraints block
+        serves `cds_variable`.
     """
-    row = _deep_sample_row(_ecmwf_constraints(dataset), cds_variable)
+    rows = _ecmwf_constraints(dataset)
+    row = _deep_sample_row(rows, cds_variable)
     if row is None:
         return {}, {}
     request = _deep_sample_request(row, cds_variable)
-    selectors = {
-        key: value
-        for key, value in request.items()
-        if key not in {"variable", "data_format"} and isinstance(value, list)
-    }
-    return _retrieve_probe(dataset, request), selectors
+    return _retrieve_probe(dataset, request), _required_selectors(rows, cds_variable)
 
 
 def deep_prober(_catalog: Any, dataset: str) -> dict[str, dict[str, Any]]:

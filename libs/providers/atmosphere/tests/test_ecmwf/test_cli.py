@@ -693,3 +693,62 @@ class TestStoreTables:
         assert ecmwf_cli._store_collections_urls()["ecds"] == (
             "https://staging.ecds.invalid/api/catalogue/v1/collections"
         )
+
+
+class TestRequiredSelectors:
+    """Tests for deriving what a variable is only ever served under."""
+
+    CMIP = [
+        {
+            "variable": ["mean_temperature"],
+            "model": ["csiro_mk3_6_0"],
+            "experiment": ["amip"],
+            "period": ["19790101-19981231"],
+        },
+        {
+            "variable": ["mean_temperature"],
+            "model": ["gfdl_esm2g"],
+            "experiment": ["historical"],
+            "period": ["18610101-18801231"],
+        },
+    ]
+    GLOFAS = [
+        {
+            "variable": ["river_discharge_in_the_last_24_hours"],
+            "timespan": ["time_mean"],
+            "hyear": ["2020"],
+        },
+        {
+            "variable": ["river_discharge_in_the_last_24_hours"],
+            "timespan": ["time_mean"],
+            "hyear": ["2021"],
+        },
+        {
+            "variable": ["snow_depth_water_equivalent"],
+            "timespan": ["instantaneous"],
+            "hyear": ["2020"],
+        },
+    ]
+
+    def test_a_selector_the_caller_may_vary_is_not_a_requirement(self):
+        """A CMIP variable is served under every model, so none may be pinned."""
+        assert ecmwf_cli._required_selectors(self.CMIP, "mean_temperature") == {}
+
+    def test_a_selector_every_serving_entry_agrees_on_is_a_requirement(self):
+        """Snow depth is served solely under instantaneous, which is the constraint."""
+        required = ecmwf_cli._required_selectors(
+            self.GLOFAS, "snow_depth_water_equivalent"
+        )
+        assert required["timespan"] == ["instantaneous"]
+
+    def test_a_selector_that_varies_is_dropped_even_when_others_hold(self):
+        """hyear differs across the serving entries, so it is not a requirement."""
+        required = ecmwf_cli._required_selectors(
+            self.GLOFAS, "river_discharge_in_the_last_24_hours"
+        )
+        assert required["timespan"] == ["time_mean"]
+        assert "hyear" not in required
+
+    def test_a_variable_no_entry_serves_requires_nothing(self):
+        """An unknown variable has no serving entry to derive a requirement from."""
+        assert ecmwf_cli._required_selectors(self.GLOFAS, "not_a_variable") == {}
