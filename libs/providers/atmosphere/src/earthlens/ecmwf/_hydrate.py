@@ -870,44 +870,44 @@ def _indent_of(line: str) -> int:
     return len(line) - len(line.lstrip(" "))
 
 
-def _mapping_under(lines: list[str], start: int) -> dict[str, str]:
-    """Read the `key: value` children indented under `lines[start]`.
+def _mapping_under(lines: list[str], start: int) -> dict[str, Any]:
+    """Read the mapping nested under `lines[start]` by parsing it as YAML.
 
-    Values are parsed, so a selector written `[ x ]`, `['x']` or as a block
-    sequence compares equal to the same selector written `[x]`. Only the values
-    are parsed — the surrounding shard text is left untouched, because a full
-    round-trip would reformat it and lose the maintainer comments the catalog
-    relies on.
+    The region is dedented and handed to the parser rather than scanned line by
+    line, so a nested mapping stays nested, a block sequence stays a list, and a
+    quoted value containing a `#` is not mistaken for a comment. Scanning was
+    tried and gets all three wrong — the last of them by raising out of the
+    sweep rather than returning something wrong.
 
     Args:
         lines: The stanza's lines.
         start: Index of the parent key line.
 
     Returns:
-        Mapping of child key to its parsed value; a block sequence is collected
-        into a list.
+        The parsed mapping; empty when the region is absent or unparseable.
     """
     parent = _indent_of(lines[start])
-    found: dict[str, Any] = {}
-    current: str | None = None
+    region = []
     for line in lines[start + 1 :]:
-        if not line.strip() or line.lstrip().startswith("#"):
-            continue
-        if _indent_of(line) <= parent:
+        if line.strip() and _indent_of(line) <= parent:
             break
-        stripped = line.strip()
-        if stripped.startswith("- ") and current is not None:
-            found.setdefault(current, []).append(
-                yaml.safe_load(stripped[2:].split(" #", 1)[0].strip())
-            )
-            continue
-        key, sep, value = stripped.partition(":")
-        if not sep:
-            continue
-        current = key.strip()
-        text = value.split(" #", 1)[0].strip()
-        found[current] = yaml.safe_load(text) if text else []
-    return found
+        region.append(line)
+    if not any(line.strip() for line in region):
+        return {}
+    indent = min(
+        (_indent_of(line) for line in region if line.strip()), default=parent + 1
+    )
+    # Callers split with and without `keepends`, so re-join explicitly rather
+    # than trusting the lines to carry their own terminators.
+    dedented = chr(10).join(
+        (line[indent:] if len(line) > indent else line.lstrip(" ")).rstrip(chr(10))
+        for line in region
+    )
+    try:
+        parsed = yaml.safe_load(dedented)
+    except yaml.YAMLError:
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
 
 
 def _dataset_extras(block: str) -> dict[str, str]:
@@ -995,7 +995,11 @@ def _selector_override(
 
 
 def _yaml_inline_list(value: Any) -> str:
-    """Render a selector value the way the catalog writes it, as `[a]` or a scalar.
+    """Render a selector value as the inline YAML the catalog writes.
+
+    Dumped by the YAML emitter, not by `str`, so a value that needs quoting
+    survives the round trip. Rendering `["yes"]` as `[yes]` reads back as a
+    boolean, `["1.0"]` as a float, and `["value #hash"]` does not parse at all.
 
     Args:
         value: The selector value from a constraints block.
@@ -1012,18 +1016,21 @@ def _yaml_inline_list(value: Any) -> str:
             '[instantaneous]'
 
             ```
-        - A scalar stays a scalar:
+        - A value that YAML would otherwise re-read as another type is quoted:
 
             ```python
             >>> from earthlens.ecmwf._hydrate import _yaml_inline_list
-            >>> _yaml_inline_list("unarchived")
-            'unarchived'
+            >>> _yaml_inline_list(["yes"])
+            "['yes']"
 
             ```
     """
-    if isinstance(value, list):
-        return "[" + ", ".join(str(item) for item in value) + "]"
-    return str(value)
+    dumped = str(
+        yaml.safe_dump(value, default_flow_style=True, allow_unicode=True, width=10**6)
+    ).strip()
+    if dumped.endswith("..."):
+        dumped = dumped[: -len("...")].strip()
+    return dumped
 
 
 def _match_variables(

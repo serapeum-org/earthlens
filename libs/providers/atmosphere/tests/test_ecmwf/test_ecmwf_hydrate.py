@@ -682,8 +682,8 @@ class TestSelectorPlumbing:
         expected = {"timespan": ["x"]} if line.endswith("}") else {}
         assert parsed == expected
 
-    def test_a_line_without_a_colon_is_skipped(self):
-        """Stray text inside an extras block is ignored rather than mis-parsed."""
+    def test_an_unparseable_extras_region_yields_nothing(self):
+        """Reading half a malformed block would compare selectors against a lie."""
         block = (
             "    extras:"
             + chr(10)
@@ -694,7 +694,24 @@ class TestSelectorPlumbing:
             + "    variables:"
             + chr(10)
         )
-        assert _dataset_extras(block) == {"timespan": ["time_mean"]}
+        assert _dataset_extras(block) == {}
+
+    @pytest.mark.parametrize(
+        ("shape", "expected"),
+        [
+            ("      area:" + chr(10) + "        north: 50", {"area": {"north": 50}}),
+            (
+                "      timespan:" + chr(10) + "        - time_mean",
+                {"timespan": ["time_mean"]},
+            ),
+            ('      note: "keep # this"', {"note": "keep # this"}),
+            ("      # only a comment", {}),
+        ],
+    )
+    def test_the_extras_region_is_parsed_as_yaml(self, shape, expected):
+        """Nesting, block sequences and quoted hashes all survive the read."""
+        block = "    extras:" + chr(10) + shape + chr(10) + "    variables:" + chr(10)
+        assert _dataset_extras(block) == expected
 
     def test_extras_running_to_the_end_of_the_block(self):
         """The reader stops cleanly when the extras are the stanza's last lines."""
