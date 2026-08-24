@@ -1432,6 +1432,120 @@ class TestAggregateNetcdfRoundTrip:
         )
         assert epsg == 4326, f"EPSG should be 4326 (WGS84); got {epsg}"
 
+    def _cross_month_cube_and_times(self):
+        """A daily cube whose axis over-covers Jun 25-Jul 5, like a CDS cross-product.
+
+        A `year`/`month`/`day` request for Jun 25-Jul 5 crosses the month
+        boundary, so CDS also returns Jun 1-5 and Jul 25-30. Each day is one
+        slice valued by its position (1-indexed), so a window's mean is a
+        recognisable number.
+        """
+        day_strs = (
+            [f"2022-06-{d:02d}" for d in range(1, 6)]  # Jun 1-5 (spurious)
+            + [f"2022-06-{d:02d}" for d in range(25, 31)]  # Jun 25-30
+            + [f"2022-07-{d:02d}" for d in range(1, 6)]  # Jul 1-5
+            + [f"2022-07-{d:02d}" for d in range(25, 31)]  # Jul 25-30 (spurious)
+        )
+        cube = np.zeros((len(day_strs), 2, 2), dtype=float)
+        for i in range(len(day_strs)):
+            cube[i, :, :] = float(i + 1)
+        return cube, day_strs
+
+    def test_date_range_trims_out_of_window_days(
+        self, monkeypatch, tmp_path, state_var
+    ):
+        """A daily aggregate drops days the cross-product pulled outside the span."""
+        cube, day_strs = self._cross_month_cube_and_times()
+        nc = _FakeNetCDF(
+            array=cube,
+            time_strs_by_var={"time": day_strs},
+            dimension_names=["time", "lat", "lon"],
+        )
+        _patch_netcdf_read(monkeypatch, nc)
+        writes = _patch_geotiff_write(monkeypatch)
+
+        results = aggregate_netcdf(
+            tmp_path / "fake.nc",
+            state_var,
+            AggregationConfig(freq="1D", op="mean", out_dir=tmp_path),
+            date_range=(pd.Timestamp("2022-06-25"), pd.Timestamp("2022-07-05")),
+        )
+
+        labels = [label for label, _, _ in results]
+        assert len(labels) == 11, f"Expected 11 in-range days, got {len(labels)}"
+        assert min(labels) == pd.Timestamp("2022-06-25")
+        assert max(labels) == pd.Timestamp("2022-07-05")
+        written = " ".join(str(target) for *_, target in writes)
+        assert "20220601" not in written and "20220725" not in written, (
+            f"out-of-range days must not be written; got {written}"
+        )
+
+    def test_date_range_prevents_monthly_window_contamination(
+        self, monkeypatch, tmp_path, state_var
+    ):
+        """A monthly window means only the in-range days, not the cross-product extras."""
+        cube, day_strs = self._cross_month_cube_and_times()
+        nc = _FakeNetCDF(
+            array=cube,
+            time_strs_by_var={"time": day_strs},
+            dimension_names=["time", "lat", "lon"],
+        )
+        _patch_netcdf_read(monkeypatch, nc)
+        _patch_geotiff_write(monkeypatch)
+
+        results = aggregate_netcdf(
+            tmp_path / "fake.nc",
+            state_var,
+            AggregationConfig(freq="1MS", op="mean", out_dir=None),
+            date_range=(pd.Timestamp("2022-06-25"), pd.Timestamp("2022-07-05")),
+        )
+
+        by_label = {label: arr for label, arr, _ in results}
+        # Jun 25-30 are cube values 6..11 -> mean 8.5; Jun 1-5 (values 1..5) excluded.
+        assert by_label[pd.Timestamp("2022-06-01")][0, 0] == pytest.approx(8.5), (
+            "June mean must exclude the spurious Jun 1-5"
+        )
+        # Jul 1-5 are cube values 12..16 -> mean 14.0; Jul 25-30 (17..22) excluded.
+        assert by_label[pd.Timestamp("2022-07-01")][0, 0] == pytest.approx(14.0), (
+            "July mean must exclude the spurious Jul 25-30"
+        )
+
+    def test_no_date_range_keeps_every_sample(self, monkeypatch, tmp_path, state_var):
+        """`date_range=None` aggregates the whole cube (backward compatible)."""
+        cube, day_strs = self._cross_month_cube_and_times()
+        nc = _FakeNetCDF(
+            array=cube,
+            time_strs_by_var={"time": day_strs},
+            dimension_names=["time", "lat", "lon"],
+        )
+        _patch_netcdf_read(monkeypatch, nc)
+        _patch_geotiff_write(monkeypatch)
+
+        results = aggregate_netcdf(
+            tmp_path / "fake.nc",
+            state_var,
+            AggregationConfig(freq="1D", op="mean", out_dir=tmp_path),
+        )
+        assert len(results) == 22, f"Expected all 22 days kept, got {len(results)}"
+
+    def test_date_range_mask_widens_to_whole_days(self):
+        """`_date_range_mask` keeps end-day sub-daily samples and drops neighbours."""
+        from earthlens.aggregate import _date_range_mask
+
+        idx = pd.to_datetime(
+            [
+                "2022-06-24 18:00",
+                "2022-06-25 00:00",
+                "2022-07-05 18:00",
+                "2022-07-06 00:00",
+            ]
+        )
+        mask = _date_range_mask(
+            idx, (pd.Timestamp("2022-06-25"), pd.Timestamp("2022-07-05"))
+        )
+        assert list(mask) == [False, True, True, False]
+        assert _date_range_mask(idx, None) is None
+
 
 class TestStreamingAggregation:
     """ARC-3/ARC-12: windows are read one at a time and handles are released."""

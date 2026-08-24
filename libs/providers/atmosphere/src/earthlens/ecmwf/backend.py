@@ -1169,7 +1169,18 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
                 f"reduce the member directory ({member_dir}) yourself, or "
                 "request a single window."
             )
-        agg = aggregate_netcdf(nc_path, var_info, aggregate)
+        # Bound the aggregation to the requested span: a daily CDS
+        # `year`/`month`/`day` request is a cross-product, so a window
+        # crossing month boundaries over-covers the range (a Jun 25-Jul 5
+        # request also returns Jun 1-5 and Jul 25-30). Trimming here keeps the
+        # written GeoTIFFs faithful to `start`/`end` and stops a stray day from
+        # skewing a window it shares (e.g. a monthly mean).
+        agg = aggregate_netcdf(
+            nc_path,
+            var_info,
+            aggregate,
+            date_range=(self.time.start_date, self.time.end_date),
+        )
         return [path for _, _, path in agg if path is not None]
 
     def _resolve_endpoint(self, dataset: str) -> str:

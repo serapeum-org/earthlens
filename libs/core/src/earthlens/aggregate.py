@@ -735,10 +735,47 @@ def _output_stem(var_info: Variable) -> str:
     return stem
 
 
+def _date_range_mask(
+    time_axis: pd.DatetimeIndex, date_range: tuple[Any, Any] | None
+) -> np.ndarray | None:
+    """Boolean mask keeping only samples within an inclusive date range.
+
+    A CDS `year`/`month`/`day` request is a cross-product, so a daily window
+    spanning month boundaries pulls samples outside the requested span — a
+    `2022-06-25`..`2022-07-05` request also returns June 1-5 and July 25-30.
+    Masking the time axis to the requested `[start, end]` before windowing keeps
+    the aggregated output faithful to the request, and — unlike dropping whole
+    windows afterwards — stops a stray sample from polluting a window it happens
+    to share (June 1-5 would otherwise skew a monthly June mean).
+
+    Both bounds widen to whole days, so a `06:00`/`12:00`/`18:00` sample on the
+    end day is kept; a `None` bound leaves that side unbounded.
+
+    Args:
+        time_axis: The cube's time coordinate.
+        date_range: Inclusive `(start, end)` bounds, or `None` for no filtering.
+
+    Returns:
+        numpy.ndarray | None: A boolean mask over `time_axis`, or `None` when
+        `date_range` is `None` (the caller then skips the intersection entirely).
+    """
+    if date_range is None:
+        return None
+    start, end = date_range
+    mask = np.ones(len(time_axis), dtype=bool)
+    if start is not None:
+        mask &= np.asarray(time_axis >= pd.Timestamp(start).normalize())
+    if end is not None:
+        upper = pd.Timestamp(end).normalize() + pd.Timedelta(days=1)
+        mask &= np.asarray(time_axis < upper)
+    return mask
+
+
 def aggregate_netcdf(
     nc_path: Path | str,
     var_info: Variable,
     config: AggregationConfig,
+    date_range: tuple[Any, Any] | None = None,
 ) -> list[tuple[pd.Timestamp, np.ndarray | None, Path | None]]:
     """Slice a CDS-shaped NetCDF into per-window aggregated outputs.
 
@@ -758,6 +795,12 @@ def aggregate_netcdf(
             (`var_info.is_flux`).
         config: Frozen :class:`AggregationConfig` describing the
             window, reduction, and output location.
+        date_range: Optional inclusive `(start, end)` bounds. When set,
+            samples outside the range are dropped before windowing, so the
+            output stays faithful to the requested span even when the source
+            cube over-covers it (a CDS `year`/`month`/`day` cross-product pulls
+            stray dates for a window spanning month boundaries). `None` keeps
+            every sample.
 
     Returns:
         list[tuple[pd.Timestamp, np.ndarray | None, Path | None]]: One
@@ -785,7 +828,9 @@ def aggregate_netcdf(
     """
     return [
         (window.label, window.array, window.path)
-        for window in iter_aggregate_netcdf(nc_path, var_info, config)
+        for window in iter_aggregate_netcdf(
+            nc_path, var_info, config, date_range=date_range
+        )
     ]
 
 
@@ -793,6 +838,7 @@ def iter_aggregate_netcdf(
     nc_path: Path | str,
     var_info: Variable,
     config: AggregationConfig,
+    date_range: tuple[Any, Any] | None = None,
 ) -> Iterator[AggregatedWindow]:
     """Yield one :class:`AggregatedWindow` per time window, streaming.
 
@@ -824,6 +870,11 @@ def iter_aggregate_netcdf(
             `op="auto"` (`var_info.is_flux`).
         config: Frozen :class:`AggregationConfig` describing the window,
             reduction, output location, and whether to retain arrays.
+        date_range: Optional inclusive `(start, end)` bounds. Samples outside
+            the range are dropped before windowing, so the streamed windows
+            match the requested span even when the source cube over-covers it;
+            a window left empty by the filter is skipped. `None` keeps every
+            sample. See :func:`_date_range_mask`.
 
     Yields:
         AggregatedWindow: One per window, in time order.
@@ -873,8 +924,15 @@ def iter_aggregate_netcdf(
         if var is not opened[-1]:
             opened.append(var)
 
+        in_range = _date_range_mask(time_axis, date_range)
         stem = _output_stem(var_info)
         for window_label, mask in window_groups(time_axis, config.freq):
+            if in_range is not None:
+                mask = np.asarray(mask) & in_range
+                if not mask.any():
+                    # The whole window fell outside the requested date range —
+                    # nothing to aggregate, so emit no GeoTIFF for it.
+                    continue
             slice_ = _read_window(var, mask)
             reduced = reduce_time_axis(
                 slice_, op=op, skipna=config.skipna, min_count=config.min_count
