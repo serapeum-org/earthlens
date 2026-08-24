@@ -159,7 +159,10 @@ def _probe_into(dataset_id: str, cds_variable: str, box: dict[str, Any]) -> None
     """
     try:
         box["result"] = _retrieve_variable_meta(dataset_id, cds_variable)
-    except Exception as exc:  # noqa: BLE001 — surfaced to the caller thread verbatim
+    except BaseException as exc:  # noqa: BLE001 — surfaced to the caller thread
+        # BaseException, not Exception: an interrupt raised in here would
+        # otherwise go to the thread excepthook and the caller would read the
+        # empty box as "no block serves this variable".
         box["error"] = exc
 
 
@@ -178,6 +181,12 @@ def _probe_with_timeout(
 
     Raises:
         TimeoutError: If the probe does not finish within `timeout` seconds.
+
+    Note:
+        The worker is a daemon thread and keeps running its request after the
+        deadline; the retrieve it holds is abandoned, not cancelled. At most one
+        such thread is left per dataset, because the session stops probing after
+        its first timeout.
     """
     if not timeout:
         return _retrieve_variable_meta(dataset_id, cds_variable)
@@ -1351,7 +1360,7 @@ def _declined_detail(session: _ProbeSession, declined: list[str]) -> str:
     shown = ", ".join(offered[:_ECHO_MAX_NAMES])
     extra = len(offered) - _ECHO_MAX_NAMES
     listed = f"{shown}, +{extra} more" if extra > 0 else shown
-    return f"no confident match for {declined} (offered: {listed})"
+    return f"no confident match for {', '.join(declined)} (offered: {listed})"
 
 
 def _parses_as_yaml(text: str) -> bool:
@@ -1403,7 +1412,9 @@ def _hydrate_one(
         timeout: Per-dataset retrieve deadline; `None` / `0` waits without one.
 
     Returns:
-        One of `"hydrated"`, `"unmatched"`, `"timed_out"`, or `"skipped"`.
+        One of `"hydrated"`, `"partial"`, `"unmatched"`, `"timed_out"`, or
+        `"skipped"`. `"partial"` is a `"hydrated"` that stopped early, so the
+        operator can see which datasets a re-run would carry further.
         `"unmatched"` is reserved for the retrieve that worked against a stanza
         with real placeholders and still hydrated nothing — the operator can
         curate that row by hand. A missing stanza, or one whose placeholders
@@ -1456,8 +1467,13 @@ def _hydrate_one(
     file_text[path] = new_text
     path.write_text(new_text, encoding="utf-8")
     left = f", {len(declined)} left" if declined else ""
-    typer.echo(f"{prefix}: hydrated {len(filled)}{left} -> {path.name}")
-    return "hydrated"
+    why = ""
+    if session.timed_out:
+        why = " (timed out; re-run to continue)"
+    elif session.error is not None:
+        why = f" ({type(session.error).__name__}; re-run to continue)"
+    typer.echo(f"{prefix}: hydrated {len(filled)}{left}{why} -> {path.name}")
+    return "partial" if session.error is not None else "hydrated"
 
 
 def _take_rows(datasets: list[str], rows: dict[str, int], limit: int) -> list[str]:
@@ -1512,10 +1528,13 @@ def bulk_hydrate_empty(
             without a deadline (the offline-test path).
 
     Returns:
-        A summary `{candidates, hydrated, skipped, timed_out, unmatched, filled}`
+        A summary
+        `{candidates, hydrated, skipped, timed_out, unmatched, partial, filled}`
         mapping. `unmatched` counts the retrieves that succeeded and still
         hydrated nothing; those are also counted in `skipped`, which stays the
-        total of everything not hydrated.
+        total of everything not hydrated. `partial` counts the datasets that
+        hydrated some rows and then stopped on a deadline or a refusal — they
+        are counted in `hydrated` too, and they are the ones a re-run continues.
     """
     from earthlens.ecmwf import Catalog
     from earthlens.ecmwf.catalog import CATALOG_PATH, clear_catalog_cache
@@ -1536,13 +1555,16 @@ def bulk_hydrate_empty(
     skipped = 0
     timed_out = 0
     unmatched = 0
+    partial = 0
     filled: list[str] = []
     for index, dataset_id in enumerate(empty, start=1):
         prefix = f"[{index}/{total}] {dataset_id}"
         outcome = _hydrate_one(dataset_id, prefix, catalog_dir, file_text, timeout)
-        if outcome == "hydrated":
+        if outcome in {"hydrated", "partial"}:
             hydrated += 1
             filled.append(dataset_id)
+            if outcome == "partial":
+                partial += 1
         elif outcome == "unmatched":
             unmatched += 1
             skipped += 1
@@ -1559,5 +1581,6 @@ def bulk_hydrate_empty(
         "skipped": skipped,
         "timed_out": timed_out,
         "unmatched": unmatched,
+        "partial": partial,
         "filled": filled,
     }

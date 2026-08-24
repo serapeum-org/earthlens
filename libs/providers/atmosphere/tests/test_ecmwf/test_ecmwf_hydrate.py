@@ -1046,6 +1046,7 @@ class TestBulkHydrateEmpty:
             "skipped": 0,
             "timed_out": 0,
             "unmatched": 0,
+            "partial": 0,
             "filled": ["reanalysis-era5-single-levels"],
         }
         variables = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"][
@@ -1258,6 +1259,32 @@ class TestBulkHydrateEmpty:
         """Half a hydrated stanza is not a useful stopping point, so it is a floor."""
         rows = {"wide-dataset": 82}
         assert hydrate_mod._take_rows(["wide-dataset"], rows, 1) == ["wide-dataset"]
+
+    def test_a_dataset_that_stops_midway_says_why(self, tmp_path, monkeypatch, capsys):
+        """A partial fill must not hide the deadline that ended it."""
+        (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {
+                "reanalysis-era5-single-levels": _placeholder_dataset(
+                    "2m-temperature", "sea-surface-temperature"
+                )
+            },
+        )
+        calls = []
+
+        def _one_then_stall(dataset_id, cds_variable, timeout):
+            calls.append(cds_variable)
+            if len(calls) == 1:
+                return _fake_probe(dataset_id, cds_variable)
+            raise TimeoutError("stuck in the CDS queue")
+
+        monkeypatch.setattr(hydrate_mod, "_probe_with_timeout", _one_then_stall)
+        summary = bulk_hydrate_empty()
+        assert summary["hydrated"] == 1, "the row it did fill still counts"
+        assert summary["partial"] == 1, "and the dataset is flagged for a re-run"
+        assert "timed out" in capsys.readouterr().out
 
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the placeholder worklist."""
