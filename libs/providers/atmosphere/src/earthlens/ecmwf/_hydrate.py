@@ -676,6 +676,54 @@ def _inline_mapping(line: str) -> dict[str, Any]:
     return parsed if isinstance(parsed, dict) else {}
 
 
+def _extras_span(lines: list[str]) -> tuple[int, int] | None:
+    """Locate a variable sub-block's own `extras:` and everything nested under it.
+
+    Args:
+        lines: One variable sub-block's lines.
+
+    Returns:
+        The `(start, stop)` half-open line range covering the override, or
+        `None` when the row has none.
+    """
+    found = next(
+        (
+            index
+            for index, line in enumerate(lines)
+            if line.strip().startswith(_EXTRAS_KEY) and _indent_of(line) == 8
+        ),
+        None,
+    )
+    if found is None:
+        return None
+    stop = found + 1
+    while stop < len(lines) and (
+        not lines[stop].strip() or _indent_of(lines[stop]) > 8
+    ):
+        stop += 1
+    return found, stop
+
+
+def _existing_override(
+    lines: list[str], span: tuple[int, int]
+) -> dict[str, Any] | None:
+    """Read the override a row already carries, whichever shape it is written in.
+
+    Args:
+        lines: One variable sub-block's lines.
+        span: The `(start, stop)` range :func:`_extras_span` found.
+
+    Returns:
+        The parsed override, or `None` when the value is not a mapping at all
+        and therefore must not be merged into or replaced.
+    """
+    head = lines[span[0]]
+    if head.strip() == _EXTRAS_KEY:
+        return _mapping_under(lines, span[0])
+    inline = _inline_mapping(head)
+    return inline or None
+
+
 def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> str:
     """Write a per-variable `extras:` override into one variable sub-block.
 
@@ -688,6 +736,10 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
     inline mapping leaves the row with two `extras:` keys. Both produce a shard
     the catalog cannot load.
 
+    An inline value that is not a mapping at all (`extras: [a, b]`, `extras:
+    null`) is left untouched: it cannot be merged into, and replacing it would
+    delete what a maintainer wrote.
+
     Comments inside a variable's own `extras:` do not survive the rewrite. That
     block is machine-managed; the dataset-level `extras:` where the catalog keeps
     its explanatory comments is never touched.
@@ -699,7 +751,7 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
 
     Returns:
         The stanza body with the override written; unchanged when `slug` is
-        absent or `override` is empty.
+        absent, `override` is empty, or the row's existing value cannot be read.
     """
     if not override:
         return block
@@ -707,38 +759,20 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
         if match.group("slug") != slug:
             continue
         lines = match.group("body").splitlines(keepends=True)
-        found = next(
-            (
-                index
-                for index, line in enumerate(lines)
-                if line.strip().startswith(_EXTRAS_KEY) and _indent_of(line) == 8
-            ),
-            None,
-        )
+        span = _extras_span(lines)
         merged: dict[str, Any] = {}
         head: list[str]
         tail: list[str]
-        if found is None:
+        if span is None:
             head, tail = lines, []
         else:
-            stop = found + 1
-            while stop < len(lines) and (
-                not lines[stop].strip() or _indent_of(lines[stop]) > 8
-            ):
-                stop += 1
-            if lines[found].strip() != _EXTRAS_KEY:
-                merged = _inline_mapping(lines[found])
-                if not merged:
-                    # An inline value that is not a mapping (`extras: [a, b]`,
-                    # `extras: null`) cannot be merged into, and replacing the
-                    # line would delete what a maintainer wrote. Leave it alone
-                    # and let the row be reported as unhydrated instead.
-                    return block
-            else:
-                merged = _mapping_under(lines, found)
-            head, tail = lines[:found], lines[stop:]
+            existing = _existing_override(lines, span)
+            if existing is None:
+                return block
+            merged = existing
+            head, tail = lines[: span[0]], lines[span[1] :]
         merged.update(override)
-        rendered = ["        extras:\n"] + [
+        rendered = [f"        {_EXTRAS_KEY}\n"] + [
             f"          {key}: {_yaml_inline_list(value)}\n"
             for key, value in merged.items()
         ]
@@ -1409,6 +1443,28 @@ def _parses_as_yaml(text: str) -> bool:
     return True
 
 
+def _hydrated_detail(session: _ProbeSession, declined: list[str]) -> str:
+    """Describe what a hydrated dataset left behind, and why it stopped.
+
+    A partial fill that hit a deadline reads the same as one whose rows the
+    store declined, unless the reason is said out loud — and only the first is
+    worth re-running, which matters because the sweep is built to be resumed.
+
+    Args:
+        session: The probe session that ran.
+        declined: The slugs left as placeholders.
+
+    Returns:
+        A suffix for the per-dataset echo, empty when everything was filled.
+    """
+    left = f", {len(declined)} left" if declined else ""
+    if session.timed_out:
+        return f"{left} (timed out; re-run to continue)"
+    if session.error is not None:
+        return f"{left} ({type(session.error).__name__}; re-run to continue)"
+    return left
+
+
 def _hydrate_one(
     dataset_id: str,
     prefix: str,
@@ -1486,13 +1542,10 @@ def _hydrate_one(
         return "unmatched"
     file_text[path] = new_text
     path.write_text(new_text, encoding="utf-8")
-    left = f", {len(declined)} left" if declined else ""
-    why = ""
-    if session.timed_out:
-        why = " (timed out; re-run to continue)"
-    elif session.error is not None:
-        why = f" ({type(session.error).__name__}; re-run to continue)"
-    typer.echo(f"{prefix}: hydrated {len(filled)}{left}{why} -> {path.name}")
+    typer.echo(
+        f"{prefix}: hydrated {len(filled)}"
+        f"{_hydrated_detail(session, declined)} -> {path.name}"
+    )
     return "partial" if session.error is not None else "hydrated"
 
 
