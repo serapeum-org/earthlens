@@ -752,3 +752,35 @@ class TestRequiredSelectors:
     def test_a_variable_no_entry_serves_requires_nothing(self):
         """An unknown variable has no serving entry to derive a requirement from."""
         assert ecmwf_cli._required_selectors(self.GLOFAS, "not_a_variable") == {}
+
+
+class TestProbeRetriesThrottling:
+    """The probe path must survive a throttled store like the download path does."""
+
+    def test_a_throttled_probe_is_retried_then_raises_typed(
+        self, monkeypatch, tmp_path
+    ):
+        """A sweep fires one probe per row, so it meets the queue limit first."""
+        from earthlens.ecmwf import CadsUnavailableError, _helpers
+
+        monkeypatch.setattr(_helpers, "CADS_BACKOFF_SECONDS", 0.0)
+        calls = []
+
+        class _Throttled:
+            def retrieve(self, dataset, request, target):
+                calls.append(dataset)
+                raise RuntimeError(
+                    "400 Client Error: Bad Request. The job has been rejected. "
+                    "Number queued requests for this dataset is temporarily limited."
+                )
+
+        monkeypatch.setattr(ecmwf_cli, "_endpoint_for", lambda ds: "ads")
+        import earthlens.ecmwf.endpoints as endpoints
+
+        monkeypatch.setattr(endpoints, "open_client", lambda endpoint: _Throttled())
+        monkeypatch.setenv("EARTHLENS_CACHE_DIR", str(tmp_path))
+        with pytest.raises(CadsUnavailableError):
+            ecmwf_cli._retrieve_probe(
+                "cams-global-emission-inventories", {"variable": ["x"]}
+            )
+        assert len(calls) == _helpers.CADS_MAX_ATTEMPTS, "retried, not single-shot"

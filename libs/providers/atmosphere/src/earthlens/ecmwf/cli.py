@@ -284,6 +284,11 @@ def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str
     Writes under `EARTHLENS_CACHE_DIR` when that is set, and removes the scratch
     directory once the metadata has been read.
 
+    Retries a throttled store the same way a download does. A sweep issues one
+    of these per placeholder row, so it is the caller most likely to meet the
+    per-dataset queue limit — and without the retry a store that accepts a job
+    and then rejects it ends the whole pass on the first refusal.
+
     Args:
         dataset: The Copernicus dataset id to retrieve from.
         request: The request mapping to submit.
@@ -296,6 +301,7 @@ def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str
     import tempfile
     import zipfile
 
+    from earthlens.ecmwf._helpers import _retrieve_with_retry
     from earthlens.ecmwf.endpoints import open_client
 
     # A probe is a minimal slice, but "minimal" is the store's judgement, not
@@ -307,8 +313,9 @@ def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str
     scratch_root = os.environ.get("EARTHLENS_CACHE_DIR") or None
     with tempfile.TemporaryDirectory(dir=scratch_root) as scratch:
         target = Path(scratch) / "probe.nc"
-        client = open_client(_endpoint_for(dataset))
-        client.retrieve(dataset, request, str(target))
+        endpoint = _endpoint_for(dataset)
+        client = open_client(endpoint)
+        _retrieve_with_retry(client, dataset, request, target, endpoint)
         if zipfile.is_zipfile(target):
             with zipfile.ZipFile(target) as archive:
                 members = [name for name in archive.namelist() if name.endswith(".nc")]
