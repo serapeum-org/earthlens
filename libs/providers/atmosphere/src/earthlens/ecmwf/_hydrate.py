@@ -1371,9 +1371,11 @@ def _parses_as_yaml(text: str) -> bool:
     edit produces a file that only fails later, when something tries to load the
     family — by which time the sweep has moved on.
 
-    Uses the catalog's own duplicate-key-rejecting loader, because the failure
-    this is most likely to catch is a duplicated key, which a permissive parser
-    accepts by silently keeping the last one.
+    Goes through the catalog's own public loader, because the failure this is
+    most likely to catch is a duplicated key, which a permissive parser accepts
+    by silently keeping the last one. That loader takes a path, so the candidate
+    text is parsed from a scratch file — a cost of nothing beside the network
+    retrieve that produced it, and it keeps a provider off core's internals.
 
     Args:
         text: The rewritten shard text.
@@ -1381,12 +1383,17 @@ def _parses_as_yaml(text: str) -> bool:
     Returns:
         True when the text is loadable as the catalog loads it.
     """
-    from earthlens.base.yaml_loader import _StrictSafeLoader
+    import tempfile
 
-    try:
-        yaml.load(text, Loader=_StrictSafeLoader)
-    except Exception:  # noqa: BLE001 — any parse failure means do not write
-        return False
+    from earthlens.base.yaml_loader import load_yaml_strict
+
+    with tempfile.TemporaryDirectory() as scratch:
+        probe = Path(scratch) / "shard.yaml"
+        probe.write_text(text, encoding="utf-8")
+        try:
+            load_yaml_strict(probe)
+        except Exception:  # noqa: BLE001 — any parse failure means do not write
+            return False
     return True
 
 
