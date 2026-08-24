@@ -871,27 +871,40 @@ def _indent_of(line: str) -> int:
 def _mapping_under(lines: list[str], start: int) -> dict[str, str]:
     """Read the `key: value` children indented under `lines[start]`.
 
-    Values are kept as their raw YAML text so a selector can be compared and
-    re-emitted without round-tripping through a parser that would reformat the
-    rest of the shard.
+    Values are parsed, so a selector written `[ x ]`, `['x']` or as a block
+    sequence compares equal to the same selector written `[x]`. Only the values
+    are parsed — the surrounding shard text is left untouched, because a full
+    round-trip would reformat it and lose the maintainer comments the catalog
+    relies on.
 
     Args:
         lines: The stanza's lines.
         start: Index of the parent key line.
 
     Returns:
-        Mapping of child key to its raw value text.
+        Mapping of child key to its parsed value; a block sequence is collected
+        into a list.
     """
     parent = _indent_of(lines[start])
-    found: dict[str, str] = {}
+    found: dict[str, Any] = {}
+    current: str | None = None
     for line in lines[start + 1 :]:
         if not line.strip() or line.lstrip().startswith("#"):
             continue
         if _indent_of(line) <= parent:
             break
-        key, _, value = line.strip().partition(":")
-        if _:
-            found[key.strip()] = value.split("#", 1)[0].strip()
+        stripped = line.strip()
+        if stripped.startswith("- ") and current is not None:
+            found.setdefault(current, []).append(
+                yaml.safe_load(stripped[2:].split(" #", 1)[0].strip())
+            )
+            continue
+        key, sep, value = stripped.partition(":")
+        if not sep:
+            continue
+        current = key.strip()
+        text = value.split(" #", 1)[0].strip()
+        found[current] = yaml.safe_load(text) if text else []
     return found
 
 
@@ -902,12 +915,14 @@ def _dataset_extras(block: str) -> dict[str, str]:
         block: One dataset stanza's body text.
 
     Returns:
-        Mapping of extra key to raw value text; empty when the stanza has no
+        Mapping of extra key to its parsed value; empty when the stanza has no
         dataset-level `extras:`.
     """
     lines = block.splitlines()
     for index, line in enumerate(lines):
-        if line.strip() == "extras:" and _indent_of(line) == 4:
+        if line.strip().startswith("extras:") and _indent_of(line) == 4:
+            if line.strip() != "extras:":
+                return _inline_mapping(line)
             return _mapping_under(lines, index)
     return {}
 
@@ -925,7 +940,8 @@ def _selector_override(
 
     Args:
         selectors: The serving constraints block's selectors for this variable.
-        dataset_extras: The stanza's dataset-level `extras:` mapping.
+        dataset_extras: The stanza's dataset-level `extras:` mapping, as parsed
+            values so that re-spelling a list does not read as a disagreement.
 
     Returns:
         The subset of `selectors` that differs from `dataset_extras`, keyed the
@@ -937,17 +953,19 @@ def _selector_override(
             ```python
             >>> from earthlens.ecmwf._hydrate import _selector_override
             >>> _selector_override(
-            ...     {"timespan": ["instantaneous"]}, {"timespan": "[time_mean]"}
+            ...     {"timespan": ["instantaneous"]}, {"timespan": ["time_mean"]}
             ... )
             {'timespan': ['instantaneous']}
 
             ```
-        - One the stanza already agrees with would be noise:
+        - One the stanza already agrees with would be noise. Both sides are
+          parsed values, so re-spelling the stanza's own list does not make it
+          look like a disagreement:
 
             ```python
             >>> from earthlens.ecmwf._hydrate import _selector_override
             >>> _selector_override(
-            ...     {"timespan": ["time_mean"]}, {"timespan": "[time_mean]"}
+            ...     {"timespan": ["time_mean"]}, {"timespan": ["time_mean"]}
             ... )
             {}
 
@@ -956,7 +974,7 @@ def _selector_override(
 
             ```python
             >>> from earthlens.ecmwf._hydrate import _selector_override
-            >>> _selector_override({"hyear": ["2020"]}, {"timespan": "[time_mean]"})
+            >>> _selector_override({"hyear": ["2020"]}, {"timespan": ["time_mean"]})
             {}
 
             ```
@@ -965,9 +983,7 @@ def _selector_override(
     for key, value in selectors.items():
         if key not in dataset_extras:
             continue
-        current = dataset_extras[key]
-        wanted = _yaml_inline_list(value)
-        if current != wanted:
+        if dataset_extras[key] != value:
             override[key] = value
     return override
 

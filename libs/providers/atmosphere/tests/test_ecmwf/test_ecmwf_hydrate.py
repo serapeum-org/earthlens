@@ -636,9 +636,34 @@ class TestSelectorPlumbing:
         """The dataset-level extras are read past comments and spacing."""
         block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
         assert _dataset_extras(block) == {
-            "timespan": "[time_mean]",
-            "system_version": "[version_4_0]",
+            "timespan": ["time_mean"],
+            "system_version": ["version_4_0"],
         }
+
+    @pytest.mark.parametrize(
+        "spelling",
+        [
+            "      timespan: [time_mean]",
+            "      timespan: [ time_mean ]",
+            "      timespan: ['time_mean']",
+            "      timespan:" + chr(10) + "        - time_mean",
+        ],
+    )
+    def test_respelling_the_stanza_list_is_not_a_disagreement(self, spelling):
+        """Selectors compare as values, so formatting cannot fake an override."""
+        block = (
+            "    extras:" + chr(10) + spelling + chr(10) + "    variables:" + chr(10)
+        )
+        extras = _dataset_extras(block)
+        assert extras["timespan"] == ["time_mean"]
+        assert _selector_override({"timespan": ["time_mean"]}, extras) == {}
+
+    def test_a_dataset_level_inline_mapping_is_read_too(self):
+        """The stanza's own extras may be inline; it still parses to values."""
+        block = (
+            "    extras: {timespan: [time_mean]}" + chr(10) + "    variables:" + chr(10)
+        )
+        assert _dataset_extras(block) == {"timespan": ["time_mean"]}
 
     def test_dataset_extras_is_empty_without_the_block(self):
         """A stanza with no dataset-level extras yields nothing to compare against."""
