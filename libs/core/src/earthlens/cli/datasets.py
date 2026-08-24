@@ -858,12 +858,15 @@ def _curate_fill_empty(
 
     timed_out = summary.get("timed_out") or 0
     unmatched = summary.get("unmatched") or 0
+    partial = summary.get("partial") or 0
     tail = f", {timed_out} timed out" if timed_out else ""
     if unmatched:
         tail += f", {unmatched} retrieved with no confident match"
+    if partial:
+        tail += f", {partial} stopped early (re-run to continue)"
     out_console().print(
         f"[green]hydrated {summary['hydrated']}[/green] / "
-        f"{summary['candidates']} placeholder rows "
+        f"{summary['candidates']} datasets "
         f"(skipped {summary['skipped']}{tail})"
     )
 
