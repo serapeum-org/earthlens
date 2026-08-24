@@ -630,13 +630,13 @@ def curate(
     limit: int = typer.Option(
         0,
         "--limit",
-        help="ecmwf --all / gee|ecmwf --fill-empty: only process the first N "
+        help="ecmwf --all: first N datasets. ecmwf --fill-empty: first N placeholder rows. gee --fill-empty: first N "
         "rows (0=all).",
     ),
     timeout: int = typer.Option(
         180,
         "--timeout",
-        help="ecmwf --fill-empty: seconds to wait for each dataset's live "
+        help="ecmwf --fill-empty: seconds to wait for each variable's live "
         "retrieve before skipping it (0 = no deadline).",
     ),
     version: str = typer.Option("", "--version", help="earthdata: collection version."),

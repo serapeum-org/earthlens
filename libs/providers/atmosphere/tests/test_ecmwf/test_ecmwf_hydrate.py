@@ -1243,6 +1243,22 @@ class TestBulkHydrateEmpty:
         assert shard.read_text(encoding="utf-8") == _STANZA, "shard untouched"
         assert "did not parse" in capsys.readouterr().out
 
+    @pytest.mark.parametrize(
+        ("limit", "expected"),
+        [(1, ["a-dataset"]), (2, ["a-dataset"]), (3, ["a-dataset", "z-dataset"])],
+    )
+    def test_limit_counts_placeholder_rows_not_datasets(self, limit, expected):
+        """One retrieve per row, so a dataset-counting limit would not bound the work."""
+        rows = {"a-dataset": 2, "z-dataset": 5}
+        assert (
+            hydrate_mod._take_rows(["a-dataset", "z-dataset"], rows, limit) == expected
+        )
+
+    def test_limit_never_splits_a_dataset(self):
+        """Half a hydrated stanza is not a useful stopping point, so it is a floor."""
+        rows = {"wide-dataset": 82}
+        assert hydrate_mod._take_rows(["wide-dataset"], rows, 1) == ["wide-dataset"]
+
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the placeholder worklist."""
         (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")

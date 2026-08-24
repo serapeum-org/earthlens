@@ -1460,6 +1460,32 @@ def _hydrate_one(
     return "hydrated"
 
 
+def _take_rows(datasets: list[str], rows: dict[str, int], limit: int) -> list[str]:
+    """Take whole datasets until `limit` placeholder rows are accounted for.
+
+    The sweep costs one retrieve per row, so a limit that counts datasets does
+    not bound the work an operator is agreeing to. A dataset is never split,
+    because half a hydrated stanza is not a useful stopping point — so the
+    first one is always taken and the count acts as a floor.
+
+    Args:
+        datasets: Candidate dataset ids, in the order they will be swept.
+        rows: Placeholder-row count per dataset id.
+        limit: How many rows to take on.
+
+    Returns:
+        The leading datasets whose rows reach `limit`.
+    """
+    taken: list[str] = []
+    budget = 0
+    for name in datasets:
+        taken.append(name)
+        budget += rows.get(name, 0)
+        if budget >= limit:
+            break
+    return taken
+
+
 def bulk_hydrate_empty(
     limit: int | None = None,
     timeout: float | None = _DEFAULT_RETRIEVE_TIMEOUT,
@@ -1476,7 +1502,12 @@ def bulk_hydrate_empty(
     cannot be matched is skipped — never fatal. Progress is echoed per dataset.
 
     Args:
-        limit: Only hydrate the first `limit` placeholder datasets (alphabetical).
+        limit: Stop once this many placeholder **rows** have been taken on,
+            in alphabetical dataset order. Rows rather than datasets because
+            the sweep issues one retrieve per row: the widest dataset holds 82
+            of them, so a dataset-counting limit of 1 could mean 82 queued
+            requests. A dataset is always taken whole, so the count is a floor
+            — the first dataset is never split.
         timeout: Per-dataset retrieve deadline in seconds; `None` / `0` waits
             without a deadline (the offline-test path).
 
@@ -1491,13 +1522,13 @@ def bulk_hydrate_empty(
 
     catalog_dir = Path(CATALOG_PATH)
     catalog = Catalog()
-    empty = sorted(
-        key
+    rows = {
+        key: sum(var.units == "unknown" for var in ds.variables.values())
         for key, ds in catalog.datasets.items()
-        if any(var.units == "unknown" for var in ds.variables.values())
-    )
+    }
+    empty = sorted(key for key, count in rows.items() if count)
     if limit:
-        empty = empty[:limit]
+        empty = _take_rows(empty, rows, limit)
 
     total = len(empty)
     file_text: dict[Path, str] = {}
