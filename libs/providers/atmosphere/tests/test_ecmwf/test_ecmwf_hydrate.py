@@ -1154,6 +1154,39 @@ class TestBulkHydrateEmpty:
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 1
 
+    def test_a_rewrite_that_does_not_parse_is_never_written(
+        self, tmp_path, monkeypatch, capsys
+    ):
+        """A splicing bug must cost one dataset's hydration, not the whole shard."""
+        shard = tmp_path / "era5.yaml"
+        shard.write_text(_STANZA, encoding="utf-8")
+        _patch_catalog(
+            monkeypatch,
+            tmp_path,
+            {"reanalysis-era5-single-levels": _placeholder_dataset("2m-temperature")},
+        )
+        monkeypatch.setattr(hydrate_mod, "_retrieve_variable_meta", _fake_probe)
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_hydrate_stanza_per_variable",
+            lambda text, ds, probe: (
+                "datasets:"
+                + chr(10)
+                + "  a:"
+                + chr(10)
+                + "    x: 1"
+                + chr(10)
+                + "    x: 2"
+                + chr(10),
+                ["2m-temperature"],
+                [],
+            ),
+        )
+        summary = bulk_hydrate_empty()
+        assert summary["hydrated"] == 0, "a shard that would not load is not written"
+        assert shard.read_text(encoding="utf-8") == _STANZA, "shard untouched"
+        assert "did not parse" in capsys.readouterr().out
+
     def test_limit_caps_candidates(self, tmp_path, monkeypatch):
         """A --limit truncates the placeholder worklist."""
         (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")

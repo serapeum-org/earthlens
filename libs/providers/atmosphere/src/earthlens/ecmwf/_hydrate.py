@@ -1340,6 +1340,33 @@ def _declined_detail(session: _ProbeSession, declined: list[str]) -> str:
     return f"no confident match for {declined} (offered: {listed})"
 
 
+def _parses_as_yaml(text: str) -> bool:
+    """Return True when `text` still loads, duplicate keys included.
+
+    The guard between a splicing bug and a broken catalog. Rewrites are spliced
+    into shard text rather than round-tripped through a YAML emitter, so a bad
+    edit produces a file that only fails later, when something tries to load the
+    family — by which time the sweep has moved on.
+
+    Uses the catalog's own duplicate-key-rejecting loader, because the failure
+    this is most likely to catch is a duplicated key, which a permissive parser
+    accepts by silently keeping the last one.
+
+    Args:
+        text: The rewritten shard text.
+
+    Returns:
+        True when the text is loadable as the catalog loads it.
+    """
+    from earthlens.base.yaml_loader import _StrictSafeLoader
+
+    try:
+        yaml.load(text, Loader=_StrictSafeLoader)
+    except Exception:  # noqa: BLE001 — any parse failure means do not write
+        return False
+    return True
+
+
 def _hydrate_one(
     dataset_id: str,
     prefix: str,
@@ -1399,6 +1426,12 @@ def _hydrate_one(
             typer.echo(f"{prefix}: skipped ({type(session.error).__name__})")
             return "skipped"
         typer.echo(f"{prefix}: retrieved, {_declined_detail(session, declined)}")
+        return "unmatched"
+    if not _parses_as_yaml(new_text):
+        # The rewrite is spliced into shard text, so a splicing bug would put an
+        # unloadable family file on disk and only surface later, far from here.
+        # Refusing to write costs one dataset's hydration; writing costs the shard.
+        typer.echo(f"{prefix}: rewrite did not parse, shard left untouched")
         return "unmatched"
     file_text[path] = new_text
     path.write_text(new_text, encoding="utf-8")
