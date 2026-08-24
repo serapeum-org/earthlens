@@ -660,7 +660,10 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
     """Write a per-variable `extras:` override into one variable sub-block.
 
     Merges into an existing override rather than replacing it, so a selector a
-    maintainer set by hand survives unless the probe contradicts it.
+    maintainer set by hand survives unless the probe contradicts it. An override
+    already written as an inline mapping is parsed and re-emitted as a block:
+    appending beside it would leave the row with two `extras:` keys, which the
+    catalog loader rejects outright rather than silently keeping the last.
 
     Args:
         block: One dataset stanza's body text.
@@ -909,7 +912,11 @@ def _mapping_under(lines: list[str], start: int) -> dict[str, str]:
 
 
 def _dataset_extras(block: str) -> dict[str, str]:
-    """Return the stanza's dataset-level `extras:` mapping, as raw text values.
+    """Return the stanza's dataset-level `extras:` mapping, as parsed values.
+
+    Reads either spelling the catalog allows — a block mapping under `extras:`
+    or an inline one on the key's own line — so a selector is compared by value
+    rather than by how it happens to be written.
 
     Args:
         block: One dataset stanza's body text.
