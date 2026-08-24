@@ -17,6 +17,7 @@ from earthlens.ecmwf._hydrate import (
     _find_file_for_dataset,
     _hydrate_stanza_per_variable,
     _indent_of,
+    _inline_mapping,
     _is_initialism,
     _match_variables,
     _pair_is_evidenced,
@@ -663,6 +664,40 @@ class TestSelectorPlumbing:
         block = (
             "    extras: {timespan: [time_mean]}" + chr(10) + "    variables:" + chr(10)
         )
+        assert _dataset_extras(block) == {"timespan": ["time_mean"]}
+
+    @pytest.mark.parametrize(
+        "line",
+        [
+            "        extras: {timespan: [x]}",
+            "        extras:",
+            "        extras: not-a-mapping",
+            "        extras: [a, b]",
+        ],
+    )
+    def test_only_a_real_inline_mapping_parses(self, line):
+        """A block key, a scalar or a sequence carries no inline mapping to read."""
+        parsed = _inline_mapping(line)
+        expected = {"timespan": ["x"]} if line.endswith("}") else {}
+        assert parsed == expected
+
+    def test_a_line_without_a_colon_is_skipped(self):
+        """Stray text inside an extras block is ignored rather than mis-parsed."""
+        block = (
+            "    extras:"
+            + chr(10)
+            + "      timespan: [time_mean]"
+            + chr(10)
+            + "      stray-text-with-no-colon"
+            + chr(10)
+            + "    variables:"
+            + chr(10)
+        )
+        assert _dataset_extras(block) == {"timespan": ["time_mean"]}
+
+    def test_extras_running_to_the_end_of_the_block(self):
+        """The reader stops cleanly when the extras are the stanza's last lines."""
+        block = "    extras:" + chr(10) + "      timespan: [time_mean]" + chr(10)
         assert _dataset_extras(block) == {"timespan": ["time_mean"]}
 
     def test_dataset_extras_is_empty_without_the_block(self):
