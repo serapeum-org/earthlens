@@ -7,12 +7,13 @@ writes), retrieve a tiny NetCDF via `cdsapi`, read each variable's real
 the comments and ordering of the surrounding rows are preserved, only the
 placeholder fields are rewritten.
 
-Credentialed and licence-gated: the CDS retrieve sits behind
-:func:`_retrieve_netcdf_vars`, an isolated seam that keeps the
-stanza-rewriting core (:func:`_rewrite_stanza`) pure and offline. A dataset
-whose retrieve fails (unaccepted licence, CDS outage) is skipped, never fatal —
-the fill is best-effort and partial by design (one retrieve confirms the
-variable it sampled).
+Credentialed and licence-gated: the CDS retrieves sit behind
+`_retrieve_variable_meta` and `_retrieve_netcdf_vars`, isolated seams that keep
+the stanza-rewriting core pure and offline. A dataset whose retrieve fails
+(unaccepted licence, CDS outage) is skipped, never fatal — the fill is
+best-effort and resumable by design: each placeholder row is probed by name, a
+dataset is abandoned after its first refusal, and the rows already filled are
+written before the pass moves on.
 """
 
 from __future__ import annotations
@@ -151,6 +152,10 @@ def _retrieve_netcdf_vars(dataset_id: str) -> dict[str, dict[str, Any]]:
 
 def _probe_into(dataset_id: str, cds_variable: str, box: dict[str, Any]) -> None:
     """Thread body: probe one variable, storing its result or error in `box`.
+
+    Catches `BaseException`, not `Exception`: anything raised in here has to
+    reach the caller through the box, because a thread cannot propagate it and
+    an empty box is indistinguishable from "no block serves this variable".
 
     Args:
         dataset_id: The Copernicus dataset id to sample.
@@ -1306,13 +1311,14 @@ def _find_file_for_dataset(catalog_dir: Path, dataset_id: str) -> Path | None:
 def _hydrate_stanza_whole(
     text: str, dataset_id: str, session: _ProbeSession
 ) -> tuple[str, list[str], list[str]]:
-    """Hydrate a stanza from ONE whole-dataset probe, the pre-per-variable path.
+    """Hydrate a stanza from ONE whole-dataset probe, by name rather than by request.
 
-    Kept for the datasets per-variable probing cannot reach: a product whose
-    constraints do not partition by variable has no block to look a row up in,
-    so asking for a named variable finds nothing while a plain probe still
-    describes the product. Matching is by name here, so it goes through the
-    ordinary evidence rules rather than trusting a lone result.
+    Runs for whatever the per-variable pass declined. A row it could not place
+    is one no constraints block names — a product that does not partition by
+    variable has no block to look a row up in, and a stale request-side name has
+    none either — and a plain probe can still describe the product. Matching
+    here is by name, so it goes through the ordinary evidence rules rather than
+    trusting a lone result the way a named request may.
 
     Args:
         text: The full per-family catalog shard text.
@@ -1406,9 +1412,10 @@ def _hydrate_one(
 ) -> str:
     """Hydrate one placeholder dataset in place; return its outcome tag.
 
-    Retrieves the dataset under `timeout`, matches the sampled variables into
-    its shard, and — on a real change — updates `file_text` and writes the shard
-    to disk immediately. Progress is echoed. Never raises for a licence-gated,
+    Probes each placeholder row by name under `timeout`, writes what it can
+    identify into the shard and — on a real change that still parses — updates
+    `file_text` and writes to disk immediately. Progress is echoed, naming the
+    reason when a dataset stopped early. Never raises for a licence-gated,
     unreachable, timed-out, or unmatchable dataset: those return a skip tag.
 
     Args:
