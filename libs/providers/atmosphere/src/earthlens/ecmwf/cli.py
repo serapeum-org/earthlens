@@ -281,6 +281,9 @@ def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str
     `process not found`. A zip-of-NetCDF response (satellite CDRs deliver one)
     is unwrapped to its first member before the metadata is read via GDAL.
 
+    Writes under `EARTHLENS_CACHE_DIR` when that is set, and removes the scratch
+    directory once the metadata has been read.
+
     Args:
         dataset: The Copernicus dataset id to retrieve from.
         request: The request mapping to submit.
@@ -288,24 +291,33 @@ def _retrieve_probe(dataset: str, request: dict[str, Any]) -> dict[str, dict[str
     Returns:
         Mapping of NetCDF short name to `{long_name, units}`.
     """
+    import os
     import shutil
     import tempfile
     import zipfile
 
     from earthlens.ecmwf.endpoints import open_client
 
-    target = Path(tempfile.mkdtemp()) / "probe.nc"
-    client = open_client(_endpoint_for(dataset))
-    client.retrieve(dataset, request, str(target))
-    if zipfile.is_zipfile(target):
-        with zipfile.ZipFile(target) as archive:
-            members = [name for name in archive.namelist() if name.endswith(".nc")]
-            if members:
-                inner = target.parent / Path(members[0]).name
-                with archive.open(members[0]) as src, inner.open("wb") as dst:
-                    shutil.copyfileobj(src, dst)
-                target = inner
-    return _read_netcdf_var_meta(str(target))
+    # A probe is a minimal slice, but "minimal" is the store's judgement, not
+    # ours: one CAMS inventory answers a single-variable request with a 425 MB
+    # zip. A sweep issues one of these per placeholder row, so they are written
+    # under EARTHLENS_CACHE_DIR when set - a data volume, not the system disk -
+    # and through TemporaryDirectory so each is removed once it has been read
+    # rather than accumulating until something runs out of space.
+    scratch_root = os.environ.get("EARTHLENS_CACHE_DIR") or None
+    with tempfile.TemporaryDirectory(dir=scratch_root) as scratch:
+        target = Path(scratch) / "probe.nc"
+        client = open_client(_endpoint_for(dataset))
+        client.retrieve(dataset, request, str(target))
+        if zipfile.is_zipfile(target):
+            with zipfile.ZipFile(target) as archive:
+                members = [name for name in archive.namelist() if name.endswith(".nc")]
+                if members:
+                    inner = target.parent / Path(members[0]).name
+                    with archive.open(members[0]) as src, inner.open("wb") as dst:
+                        shutil.copyfileobj(src, dst)
+                    target = inner
+        return _read_netcdf_var_meta(str(target))
 
 
 def _ecmwf_deep_sample(dataset: str) -> dict[str, dict[str, Any]]:
