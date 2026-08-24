@@ -1409,7 +1409,7 @@ def _hydrate_one(
         prefix: The `[k/total] id` label echoed with the outcome.
         catalog_dir: The `catalog/` shard directory to locate the stanza in.
         file_text: The per-shard text cache, updated in place on a hydration.
-        timeout: Per-dataset retrieve deadline; `None` / `0` waits without one.
+        timeout: Per-probe retrieve deadline; `None` / `0` waits without one.
 
     Returns:
         One of `"hydrated"`, `"partial"`, `"unmatched"`, `"timed_out"`, or
@@ -1509,13 +1509,14 @@ def bulk_hydrate_empty(
     """Fill every placeholder curated ECMWF row from a live retrieve, in place.
 
     Loads the curated catalog, finds datasets with any `units: unknown`
-    variable, retrieves a tiny NetCDF per dataset, and rewrites the stanza in
+    variable, retrieves a tiny NetCDF per placeholder variable, and rewrites the stanza in
     its per-family shard (preserving the rest). Hardened for the full-catalog
     sweep: each retrieve runs under `timeout` so one request stuck in the CDS
     queue is skipped rather than wedging the pass, and each hydrated shard is
     **written the moment it changes** so an interrupted run keeps the progress
     it already made. A dataset whose retrieve fails, times out, or whose stanza
-    cannot be matched is skipped — never fatal. Progress is echoed per dataset.
+    cannot be matched is skipped — never fatal. Progress is echoed per dataset,
+    one line summarising that dataset's per-variable probes.
 
     Args:
         limit: Stop once this many placeholder **rows** have been taken on,
@@ -1524,7 +1525,7 @@ def bulk_hydrate_empty(
             of them, so a dataset-counting limit of 1 could mean 82 queued
             requests. A dataset is always taken whole, so the count is a floor
             — the first dataset is never split.
-        timeout: Per-dataset retrieve deadline in seconds; `None` / `0` waits
+        timeout: Per-probe retrieve deadline in seconds; `None` / `0` waits
             without a deadline (the offline-test path).
 
     Returns:

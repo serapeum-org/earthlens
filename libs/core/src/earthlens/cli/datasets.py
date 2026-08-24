@@ -748,7 +748,7 @@ def _run_bulk_curation(
         fill_empty: Run the bulk-hydrate pass (`curate gee/ecmwf --fill-empty`).
         write: Whether the mutating `--write` flag was given.
         limit: Cap on rows processed (0 = all).
-        timeout: Per-dataset retrieve deadline for `--fill-empty` (0 = none).
+        timeout: Per-probe retrieve deadline for `--fill-empty` (0 = none).
 
     Returns:
         True when a bulk pass ran (the caller should return), else False.
@@ -845,7 +845,7 @@ def _curate_fill_empty(
         info: The backend (gee or ecmwf).
         write: `--fill-empty` mutates the catalog, so `--write` is required.
         limit: Only hydrate the first N placeholder rows (None = all).
-        timeout: Per-dataset retrieve deadline in seconds (ecmwf only; 0 = none).
+        timeout: Per-probe retrieve deadline in seconds (ecmwf only; 0 = none).
     """
     if not write:
         raise typer.BadParameter("--fill-empty rewrites the catalog; pass --write")
