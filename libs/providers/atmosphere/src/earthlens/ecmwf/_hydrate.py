@@ -660,10 +660,17 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
     """Write a per-variable `extras:` override into one variable sub-block.
 
     Merges into an existing override rather than replacing it, so a selector a
-    maintainer set by hand survives unless the probe contradicts it. An override
-    already written as an inline mapping is parsed and re-emitted as a block:
-    appending beside it would leave the row with two `extras:` keys, which the
-    catalog loader rejects outright rather than silently keeping the last.
+    maintainer set by hand survives unless the probe contradicts it. Whatever
+    shape that override is written in — a block mapping, a block sequence value,
+    or an inline mapping — it is parsed and re-emitted as one canonical block.
+    Editing it line by line instead is what breaks: removing a superseded key's
+    line leaves its `- item` continuation lines orphaned, and appending beside an
+    inline mapping leaves the row with two `extras:` keys. Both produce a shard
+    the catalog cannot load.
+
+    Comments inside a variable's own `extras:` do not survive the rewrite. That
+    block is machine-managed; the dataset-level `extras:` where the catalog keeps
+    its explanatory comments is never touched.
 
     Args:
         block: One dataset stanza's body text.
@@ -680,11 +687,7 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
         if match.group("slug") != slug:
             continue
         lines = match.group("body").splitlines(keepends=True)
-        rendered = [
-            f"          {key}: {_yaml_inline_list(value)}\n"
-            for key, value in override.items()
-        ]
-        start = next(
+        found = next(
             (
                 index
                 for index, line in enumerate(lines)
@@ -692,33 +695,29 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
             ),
             None,
         )
-        if start is None:
-            lines = lines + ["        extras:\n"] + rendered
-        elif lines[start].strip() != "extras:":
-            # An inline mapping (`extras: {timespan: [x]}`) carries its children
-            # on the key's own line, so appending a block beside it would leave
-            # the row with two `extras:` keys — which the catalog loader rejects
-            # outright, breaking the whole shard. Merge into it and re-emit as a
-            # block instead.
-            merged = _inline_mapping(lines[start])
-            merged.update(override)
-            lines[start : start + 1] = ["        extras:\n"] + [
-                f"          {key}: {_yaml_inline_list(value)}\n"
-                for key, value in merged.items()
-            ]
+        merged: dict[str, Any] = {}
+        head: list[str]
+        tail: list[str]
+        if found is None:
+            head, tail = lines, []
         else:
-            end = start + 1
-            while (
-                end < len(lines) and lines[end].strip() and _indent_of(lines[end]) > 8
+            stop = found + 1
+            while stop < len(lines) and (
+                not lines[stop].strip() or _indent_of(lines[stop]) > 8
             ):
-                end += 1
-            kept = [
-                line
-                for line in lines[start + 1 : end]
-                if line.strip().partition(":")[0].strip() not in override
-            ]
-            lines = lines[: start + 1] + kept + rendered + lines[end:]
-        body = "".join(lines)
+                stop += 1
+            merged = (
+                _inline_mapping(lines[found])
+                if lines[found].strip() != "extras:"
+                else _mapping_under(lines, found)
+            )
+            head, tail = lines[:found], lines[stop:]
+        merged.update(override)
+        rendered = ["        extras:\n"] + [
+            f"          {key}: {_yaml_inline_list(value)}\n"
+            for key, value in merged.items()
+        ]
+        body = "".join(head + rendered + tail)
         return block[: match.start("body")] + body + block[match.end("body") :]
     return block
 

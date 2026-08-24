@@ -9,6 +9,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from earthlens.base.yaml_loader import load_yaml_strict
 from earthlens.ecmwf import _hydrate as hydrate_mod
 from earthlens.ecmwf._hydrate import (
     _claimed_nc_names,
@@ -769,6 +770,41 @@ class TestSelectorPlumbing:
         ]["already-overridden"]
         assert row["extras"]["timespan"] == ["instantaneous"]
         assert row["extras"]["keep_me"] == [True], "the other inline key survives"
+
+    @pytest.mark.parametrize(
+        ("shape", "existing"),
+        [
+            (
+                "block sequence",
+                "        extras:\n          timespan:\n            - old\n"
+                "          keep_me: [yes]\n",
+            ),
+            (
+                "block mapping",
+                "        extras:\n          timespan: [old]\n          keep_me: [yes]\n",
+            ),
+            ("inline mapping", "        extras: {timespan: [old], keep_me: [yes]}\n"),
+            ("absent", ""),
+        ],
+    )
+    def test_every_extras_shape_survives_an_override(self, tmp_path, shape, existing):
+        """Editing line by line orphans continuation lines; re-emitting cannot."""
+        text = (
+            "datasets:\n  demo:\n    variables:\n"
+            "      a-row:\n        cds_variable: a_row\n        units: unknown\n"
+            + existing
+            + "      b-row:\n        cds_variable: b_row\n        units: unknown\n"
+        )
+        match = _stanza_match(text, "demo")
+        out = _fill_variable_extras(match.group(1), "a-row", {"timespan": ["new"]})
+        doc = text[: match.start()] + "  demo:\n" + out + text[match.end() :]
+        path = tmp_path / "shard.yaml"
+        path.write_text(doc, encoding="utf-8")
+        variables = load_yaml_strict(path)["datasets"]["demo"]["variables"]
+        assert variables["a-row"]["extras"]["timespan"] == ["new"], shape
+        assert "b-row" in variables, "the neighbouring row must survive"
+        if existing:
+            assert variables["a-row"]["extras"]["keep_me"] == [True]
 
     def test_an_empty_override_leaves_the_block_alone(self):
         """Nothing to record means nothing is written."""
