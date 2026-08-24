@@ -640,6 +640,22 @@ def _data_variables(
     return {name: meta for name, meta in nc_meta.items() if not _is_auxiliary(name)}
 
 
+def _inline_mapping(line: str) -> dict[str, Any]:
+    """Return the mapping an inline `key: {a: 1, b: 2}` line carries.
+
+    Args:
+        line: One `key: value` line whose value may be an inline mapping.
+
+    Returns:
+        The parsed mapping, empty when the value is not one.
+    """
+    value = line.split(":", 1)[1].strip()
+    if not value.startswith("{"):
+        return {}
+    parsed = yaml.safe_load(value)
+    return parsed if isinstance(parsed, dict) else {}
+
+
 def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> str:
     """Write a per-variable `extras:` override into one variable sub-block.
 
@@ -669,12 +685,24 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
             (
                 index
                 for index, line in enumerate(lines)
-                if line.strip() == "extras:" and _indent_of(line) == 8
+                if line.strip().startswith("extras:") and _indent_of(line) == 8
             ),
             None,
         )
         if start is None:
             lines = lines + ["        extras:\n"] + rendered
+        elif lines[start].strip() != "extras:":
+            # An inline mapping (`extras: {timespan: [x]}`) carries its children
+            # on the key's own line, so appending a block beside it would leave
+            # the row with two `extras:` keys — which the catalog loader rejects
+            # outright, breaking the whole shard. Merge into it and re-emit as a
+            # block instead.
+            merged = _inline_mapping(lines[start])
+            merged.update(override)
+            lines[start : start + 1] = ["        extras:\n"] + [
+                f"          {key}: {_yaml_inline_list(value)}\n"
+                for key, value in merged.items()
+            ]
         else:
             end = start + 1
             while (

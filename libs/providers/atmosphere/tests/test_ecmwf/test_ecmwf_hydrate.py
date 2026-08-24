@@ -16,6 +16,7 @@ from earthlens.ecmwf._hydrate import (
     _fill_variable_extras,
     _find_file_for_dataset,
     _hydrate_stanza_per_variable,
+    _indent_of,
     _is_initialism,
     _match_variables,
     _pair_is_evidenced,
@@ -682,6 +683,32 @@ class TestSelectorPlumbing:
         ]
         assert row["extras"]["timespan"] == ["instantaneous"], "probe wins"
         assert row["extras"]["keep_me"] == [True], "untouched key survives"
+
+    def test_an_inline_mapping_extras_is_merged_not_duplicated(self):
+        """Appending beside an inline mapping would give the row two extras keys."""
+        inline = _EXTRAS_STANZA.replace(
+            "        extras:"
+            + chr(10)
+            + "          timespan: [stale]"
+            + chr(10)
+            + "          keep_me: [yes]",
+            "        extras: {timespan: [stale], keep_me: [yes]}",
+        )
+        block = _stanza_match(inline, "demo-dataset").group(1)
+        out = _fill_variable_extras(
+            block, "already-overridden", {"timespan": ["instantaneous"]}
+        )
+        keys = [
+            line
+            for line in out.splitlines()
+            if line.strip().startswith("extras:") and _indent_of(line) == 8
+        ]
+        assert len(keys) == 1, "a second extras key makes the shard unloadable"
+        row = yaml.safe_load(_DEMO_HEADER + out)["datasets"]["demo-dataset"][
+            "variables"
+        ]["already-overridden"]
+        assert row["extras"]["timespan"] == ["instantaneous"]
+        assert row["extras"]["keep_me"] == [True], "the other inline key survives"
 
     def test_an_empty_override_leaves_the_block_alone(self):
         """Nothing to record means nothing is written."""
