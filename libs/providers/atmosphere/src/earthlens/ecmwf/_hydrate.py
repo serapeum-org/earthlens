@@ -103,6 +103,9 @@ _UNITS_LINE = re.compile(r"(?m)^( {8}units:)[^\n]*$")
 #: the real one-of-two matches (`glacier-area` against `area`).
 _MIN_TOKEN_COVERAGE = 0.5
 
+#: The per-variable override key, read and written in several places.
+_EXTRAS_KEY = "extras:"
+
 #: Most retrieved variable names to name in a declined-match echo before
 #: summarising the rest, so one wide product cannot flood the sweep's output.
 _ECHO_MAX_NAMES = 8
@@ -164,11 +167,14 @@ def _probe_into(dataset_id: str, cds_variable: str, box: dict[str, Any]) -> None
     """
     try:
         box["result"] = _retrieve_variable_meta(dataset_id, cds_variable)
-    except BaseException as exc:  # noqa: BLE001 — surfaced to the caller thread
-        # BaseException, not Exception: an interrupt raised in here would
-        # otherwise go to the thread excepthook and the caller would read the
-        # empty box as "no block serves this variable".
+    except Exception as exc:  # noqa: BLE001 — surfaced to the caller thread
         box["error"] = exc
+    except BaseException as exc:
+        # An interrupt has to reach the caller through the box as well: a thread
+        # cannot propagate it, and an empty box is indistinguishable from "no
+        # block serves this variable". Re-raised so this thread still unwinds.
+        box["error"] = exc
+        raise
 
 
 def _probe_with_timeout(
@@ -705,7 +711,7 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
             (
                 index
                 for index, line in enumerate(lines)
-                if line.strip().startswith("extras:") and _indent_of(line) == 8
+                if line.strip().startswith(_EXTRAS_KEY) and _indent_of(line) == 8
             ),
             None,
         )
@@ -720,7 +726,7 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
                 not lines[stop].strip() or _indent_of(lines[stop]) > 8
             ):
                 stop += 1
-            if lines[found].strip() != "extras:":
+            if lines[found].strip() != _EXTRAS_KEY:
                 merged = _inline_mapping(lines[found])
                 if not merged:
                     # An inline value that is not a mapping (`extras: [a, b]`,
@@ -947,8 +953,8 @@ def _dataset_extras(block: str) -> dict[str, str]:
     """
     lines = block.splitlines()
     for index, line in enumerate(lines):
-        if line.strip().startswith("extras:") and _indent_of(line) == 4:
-            if line.strip() != "extras:":
+        if line.strip().startswith(_EXTRAS_KEY) and _indent_of(line) == 4:
+            if line.strip() != _EXTRAS_KEY:
                 return _inline_mapping(line)
             return _mapping_under(lines, index)
     return {}

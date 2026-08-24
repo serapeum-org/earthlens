@@ -1035,7 +1035,8 @@ class TestHydrateStanzaPerVariable:
             filled_text, "cems-glofas-historical", lambda cds: ({}, {})
         )
         assert out == filled_text
-        assert filled == [] and declined == []
+        assert filled == []
+        assert declined == []
 
 
 class TestBulkHydrateEmpty:
