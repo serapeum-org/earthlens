@@ -1476,8 +1476,11 @@ class TestAggregateNetcdfRoundTrip:
         assert min(labels) == pd.Timestamp("2022-06-25")
         assert max(labels) == pd.Timestamp("2022-07-05")
         written = " ".join(str(target) for *_, target in writes)
-        assert "20220601" not in written and "20220725" not in written, (
-            f"out-of-range days must not be written; got {written}"
+        assert "20220601" not in written, (
+            f"spurious Jun 1-5 must not be written; got {written}"
+        )
+        assert "20220725" not in written, (
+            f"spurious Jul 25-30 must not be written; got {written}"
         )
 
     def test_date_range_prevents_monthly_window_contamination(
