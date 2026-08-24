@@ -823,6 +823,29 @@ class TestSelectorPlumbing:
         if existing:
             assert variables["a-row"]["extras"]["keep_me"] == [True]
 
+    @pytest.mark.parametrize(
+        "inline", ["        extras: [a, b]" + chr(10), "        extras: null" + chr(10)]
+    )
+    def test_a_non_mapping_inline_extras_is_left_alone(self, inline):
+        """What cannot be merged into must not be replaced; it is not ours to delete."""
+        text = (
+            "datasets:"
+            + chr(10)
+            + "  demo:"
+            + chr(10)
+            + "    variables:"
+            + chr(10)
+            + "      a-row:"
+            + chr(10)
+            + "        cds_variable: a_row"
+            + chr(10)
+            + "        units: unknown"
+            + chr(10)
+            + inline
+        )
+        block = _stanza_match(text, "demo").group(1)
+        assert _fill_variable_extras(block, "a-row", {"timespan": ["new"]}) == block
+
     def test_an_empty_override_leaves_the_block_alone(self):
         """Nothing to record means nothing is written."""
         block = _stanza_match(_EXTRAS_STANZA, "demo-dataset").group(1)
@@ -1068,6 +1091,14 @@ class TestBulkHydrateEmpty:
                 {},
             ),
         )
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_retrieve_with_timeout",
+            lambda ds, timeout: {
+                "elevation": {"long_name": "Surface elevation", "units": "m"},
+                "orography": {"long_name": "Orography", "units": "m"},
+            },
+        )
         summary = bulk_hydrate_empty()
         assert summary["hydrated"] == 0
         assert summary["unmatched"] == 1
@@ -1120,6 +1151,11 @@ class TestBulkHydrateEmpty:
                 {},
             ),
         )
+        monkeypatch.setattr(
+            hydrate_mod,
+            "_retrieve_with_timeout",
+            lambda ds, timeout: {"latitude": {"long_name": "latitude", "units": "deg"}},
+        )
         summary = bulk_hydrate_empty()
         assert summary["unmatched"] == 1
         assert "only coordinates and auxiliaries" in capsys.readouterr().out
@@ -1148,10 +1184,10 @@ class TestBulkHydrateEmpty:
         ]["variables"]
         assert variables["2m-temperature"]["nc_variable"] == "t2m"
 
-    def test_the_fallback_is_not_used_when_a_probe_answered(
+    def test_the_fallback_recovers_a_row_the_per_variable_pass_declined(
         self, tmp_path, monkeypatch
     ):
-        """A probe that answered with nothing usable must not trigger a second pass."""
+        """A row no block serves is still reachable by name after siblings answer."""
         (tmp_path / "era5.yaml").write_text(_STANZA, encoding="utf-8")
         _patch_catalog(
             monkeypatch,
@@ -1164,12 +1200,15 @@ class TestBulkHydrateEmpty:
             lambda ds, cds: ({"latitude": {"long_name": "lat", "units": "deg"}}, {}),
         )
 
-        def _must_not_run(dataset_id, timeout):
-            raise AssertionError("the whole-dataset fallback should not have run")
-
-        monkeypatch.setattr(hydrate_mod, "_retrieve_with_timeout", _must_not_run)
+        monkeypatch.setattr(
+            hydrate_mod, "_retrieve_with_timeout", lambda ds, timeout: dict(_NC_META)
+        )
         summary = bulk_hydrate_empty()
-        assert summary["unmatched"] == 1
+        assert summary["hydrated"] == 1, "the fallback matched it by name"
+        variables = yaml.safe_load((tmp_path / "era5.yaml").read_text())["datasets"][
+            "reanalysis-era5-single-levels"
+        ]["variables"]
+        assert variables["2m-temperature"]["nc_variable"] == "t2m"
 
     def test_a_rewrite_that_does_not_parse_is_never_written(
         self, tmp_path, monkeypatch, capsys

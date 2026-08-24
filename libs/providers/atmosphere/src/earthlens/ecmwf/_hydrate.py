@@ -706,11 +706,16 @@ def _fill_variable_extras(block: str, slug: str, override: dict[str, Any]) -> st
                 not lines[stop].strip() or _indent_of(lines[stop]) > 8
             ):
                 stop += 1
-            merged = (
-                _inline_mapping(lines[found])
-                if lines[found].strip() != "extras:"
-                else _mapping_under(lines, found)
-            )
+            if lines[found].strip() != "extras:":
+                merged = _inline_mapping(lines[found])
+                if not merged:
+                    # An inline value that is not a mapping (`extras: [a, b]`,
+                    # `extras: null`) cannot be merged into, and replacing the
+                    # line would delete what a maintainer wrote. Leave it alone
+                    # and let the row be reported as unhydrated instead.
+                    return block
+            else:
+                merged = _mapping_under(lines, found)
             head, tail = lines[:found], lines[stop:]
         merged.update(override)
         rendered = ["        extras:\n"] + [
@@ -737,8 +742,10 @@ def _hydrate_stanza_per_variable(
     and the serving block's selectors are recorded as a per-variable override
     when they differ from the stanza's defaults.
 
-    Names bound by rows filled earlier in the same pass are withheld from later
-    ones, so two rows cannot end up claiming one NetCDF variable.
+    Names bound by rows filled earlier in the same pass are withheld from the
+    leftover rule, so a guess cannot land on a name another row already holds.
+    The confident rules may still share one — a short name legitimately serves
+    several rows where CARRA repeats it across level families.
 
     Args:
         text: The full per-family catalog shard text.
@@ -1417,14 +1424,20 @@ def _hydrate_one(
     new_text, filled, declined = _hydrate_stanza_per_variable(
         file_text[path], dataset_id, session
     )
-    if not filled and session.error is None and not session.answered:
-        # No constraints block names these rows, which is how a product with no
-        # variable dimension looks (obs4mips CO2/CH4 partition by nothing the
-        # slug can be found under). One whole-dataset probe still describes it,
-        # so fall back rather than leave such a stanza permanently unhydratable.
-        new_text, filled, declined = _hydrate_stanza_whole(
-            file_text[path], dataset_id, session
+    if declined and session.error is None:
+        # A row no constraints block names is declined outright by the
+        # per-variable pass: that is how a product with no variable dimension
+        # looks (obs4mips CO2/CH4 partition by nothing the slug can be found
+        # under), and also how a stale request-side name looks. One
+        # whole-dataset probe can still describe those rows by name, so it runs
+        # whenever anything was declined — not only when the whole stanza was,
+        # which would strand such a row the moment a sibling answered.
+        recovered, also_filled, declined = _hydrate_stanza_whole(
+            new_text, dataset_id, session
         )
+        if also_filled:
+            new_text = recovered
+            filled = filled + also_filled
     if session.timed_out and not filled:
         typer.echo(f"{prefix}: timed out, skipped")
         return "timed_out"
