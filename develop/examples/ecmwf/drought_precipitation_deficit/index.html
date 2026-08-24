@@ -24753,7 +24753,7 @@ metres to millimetres — one precipitation total per month.</p>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">agg</span> <span class="o">=</span> <span class="n">OUT</span> <span class="o">/</span> <span class="s2">"aggregated"</span>
-<span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"total_precipitation_1MS_*.tif"</span><span class="p">))</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"total_precipitation_*_1MS_*.tif"</span><span class="p">))</span>
 <span class="n">monthly_mm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
     <span class="p">[</span>
         <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">())</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># m -&gt; mm</span>
@@ -24763,7 +24763,7 @@ metres to millimetres — one precipitation total per month.</p>
 <span class="n">months</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s2">"1999-01-01"</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">monthly_mm</span><span class="p">),</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"MS"</span><span class="p">)</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">agg = OUT / "aggregated"
-paths = sorted(agg.glob("total_precipitation_1MS_*.tif"))
+paths = sorted(agg.glob("total_precipitation_*_1MS_*.tif"))
 monthly_mm = np.array(
     [
         np.nanmean(Dataset.read_file(str(p)).read_array()) * 1000  # m -&gt; mm
