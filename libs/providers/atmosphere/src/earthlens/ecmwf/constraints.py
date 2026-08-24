@@ -40,6 +40,7 @@ Examples:
 
 from __future__ import annotations
 
+import datetime
 import difflib
 import itertools
 import json
@@ -310,6 +311,51 @@ def _date_within(request: str, constraint: str) -> bool:
     return lo <= req_lo and req_hi <= hi
 
 
+def _impossible_calendar_date(tuple_dict: dict[str, Any]) -> bool:
+    """Return True when a request tuple names a date that cannot exist.
+
+    CDS silently drops calendar-impossible `(year, month, day)` tuples from an
+    exhaustive enumeration — a request listing `day=[01..31]` against `month=06`
+    is served as June 1-30, with the nonexistent June 31 quietly ignored (verified
+    against the live store). The combinatorial cover check must do the same, or it
+    rejects requests the server accepts: real `constraints.json` documents partition
+    `day` by month length, so no entry serves `(month=06, day=31)`. This mirrors
+    :class:`Dates`, which already tolerates `day=[01..31]` spanning shorter months.
+
+    Only `(month, day)` tuples are judged. A tuple missing either key, or carrying a
+    non-numeric value (e.g. `"all"`), is never impossible. A numeric `year` is
+    honoured — so Feb 29 of a common year is impossible — otherwise a leap year is
+    assumed so a genuine Feb 29 request is kept.
+
+    Args:
+        tuple_dict: One cross-product tuple mapping request key to a single
+            enumerated value.
+
+    Returns:
+        bool: True if the tuple pins a month/day (and optional year) that is not a
+        real calendar date.
+    """
+    if "month" not in tuple_dict or "day" not in tuple_dict:
+        return False
+    try:
+        month = int(tuple_dict["month"])
+        day = int(tuple_dict["day"])
+    except (TypeError, ValueError):
+        return False
+    # A leap year keeps a genuine Feb 29 request; a specific common year rules it out.
+    year = 2000
+    if "year" in tuple_dict:
+        try:
+            year = int(tuple_dict["year"])
+        except (TypeError, ValueError):
+            year = 2000
+    try:
+        datetime.date(year, month, day)
+    except ValueError:
+        return True
+    return False
+
+
 class RequestValidator:
     """End-to-end pre-flight validator for a CDS retrieve request.
 
@@ -481,6 +527,12 @@ class RequestValidator:
 
         for combo in itertools.product(*[sorted(req_norm[k]) for k in keys]):
             tuple_dict = dict(zip(keys, combo))
+            if _impossible_calendar_date(tuple_dict):
+                # CDS drops nonexistent dates (e.g. June 31) from an exhaustive
+                # `day=[01..31]` enumeration, so a real `constraints.json` — which
+                # partitions `day` by month length — never serves them. Skip them
+                # here or the check rejects requests the server accepts.
+                continue
             served = any(self._entry_serves(tuple_dict, es, keys) for es in entry_sets)
             if served:
                 continue
