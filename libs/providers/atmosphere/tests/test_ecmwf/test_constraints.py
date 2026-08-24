@@ -535,18 +535,19 @@ class TestCalendarImpossibleDates:
     def test_calendar_valid_but_unserved_date_still_rejected(self, monkeypatch):
         """A real date no entry serves (year 1850) still raises."""
         _stub_urlopen(monkeypatch, self._month_length_constraints())
+        validator = RequestValidator(
+            "reanalysis-era5-single-levels",
+            {
+                "variable": ["2m_temperature"],
+                "product_type": ["reanalysis"],
+                "year": ["1850"],
+                "month": ["06"],
+                "day": ["15"],
+                "time": ["00:00"],
+            },
+        )
         with pytest.raises(ValueError, match="year"):
-            RequestValidator(
-                "reanalysis-era5-single-levels",
-                {
-                    "variable": ["2m_temperature"],
-                    "product_type": ["reanalysis"],
-                    "year": ["1850"],
-                    "month": ["06"],
-                    "day": ["15"],
-                    "time": ["00:00"],
-                },
-            ).check()
+            validator.check()
 
     def test_helper_flags_only_impossible_dates(self):
         """`_impossible_calendar_date` is True only for nonexistent dates."""
