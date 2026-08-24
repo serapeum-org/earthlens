@@ -24632,7 +24632,7 @@ array and convert from kelvin to °C.</p>
     <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"2m_temperature_*_1D_*.tif"</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"2m_temperature_1D_*.tif"</span><span class="p">))</span>
         <span class="p">]</span>
     <span class="p">)</span>
     <span class="o">-</span> <span class="mf">273.15</span>
@@ -24641,7 +24641,7 @@ array and convert from kelvin to °C.</p>
     <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="n">Dataset</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"2m_dewpoint_temperature_*_1D_*.tif"</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">agg</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"2m_dewpoint_temperature_1D_*.tif"</span><span class="p">))</span>
         <span class="p">]</span>
     <span class="p">)</span>
     <span class="o">-</span> <span class="mf">273.15</span>
@@ -24652,7 +24652,7 @@ t_air = (
     np.stack(
         [
             Dataset.read_file(str(p)).read_array()
-            for p in sorted(agg.glob("2m_temperature_*_1D_*.tif"))
+            for p in sorted(agg.glob("2m_temperature_1D_*.tif"))
         ]
     )
     - 273.15
@@ -24661,7 +24661,7 @@ t_dew = (
     np.stack(
         [
             Dataset.read_file(str(p)).read_array()
-            for p in sorted(agg.glob("2m_dewpoint_temperature_*_1D_*.tif"))
+            for p in sorted(agg.glob("2m_dewpoint_temperature_1D_*.tif"))
         ]
     )
     - 273.15
