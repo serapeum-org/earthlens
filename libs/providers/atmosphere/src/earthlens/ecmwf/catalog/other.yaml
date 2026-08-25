@@ -1789,40 +1789,67 @@ datasets:
     variables:
       mean-temperature:
         cds_variable: mean_temperature
-        nc_variable: mean_temperature
-        units: unknown
+        nc_variable: tg
+        units: Celsius
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       minimum-temperature:
         cds_variable: minimum_temperature
-        nc_variable: minimum_temperature
-        units: unknown
+        nc_variable: tn
+        units: Celsius
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       maximum-temperature:
         cds_variable: maximum_temperature
-        nc_variable: maximum_temperature
-        units: unknown
+        nc_variable: tx
+        units: Celsius
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       precipitation-amount:
         cds_variable: precipitation_amount
-        nc_variable: precipitation_amount
-        units: unknown
+        nc_variable: rr
+        units: mm
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       sea-level-pressure:
         cds_variable: sea_level_pressure
-        nc_variable: sea_level_pressure
-        units: unknown
+        nc_variable: pp
+        units: hPa
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       surface-shortwave-downwelling-radiation:
         cds_variable: surface_shortwave_downwelling_radiation
-        nc_variable: surface_shortwave_downwelling_radiation
-        units: unknown
+        nc_variable: qq
+        units: W/m2
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       relative-humidity:
         cds_variable: relative_humidity
-        nc_variable: relative_humidity
-        units: unknown
+        nc_variable: hu
+        units: '%'
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       wind-speed:
         cds_variable: wind_speed
-        nc_variable: wind_speed
-        units: unknown
+        nc_variable: fg
+        units: m/s
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          product_type: [ensemble_mean, ensemble_spread]
       land-surface-elevation:
         cds_variable: land_surface_elevation
-        nc_variable: land_surface_elevation
-        units: unknown
+        nc_variable: elevation
+        units: metres
+        extras:
+          grid_resolution: [0_1deg, 0_25deg]
+          version: [27_0e, 28_0e, 29_0e, 30_0e, 31_0e, 32_0e, 33_0e]
   insitu-gridded-observations-global-and-regional:
     endpoint: cds
     request_kind: form
@@ -1840,8 +1867,14 @@ datasets:
     variables:
       temperature:
         cds_variable: temperature
-        nc_variable: temperature
-        units: unknown
+        nc_variable: tasmax
+        units: degrees Celsius
+        extras:
+          horizontal_aggregation: [0_5_x_0_5, 1_x_1, 2_5_x_2_5]
+          origin: [cru]
+          region: [global]
+          time_aggregation: [monthly]
+          version: [v4_03]
       temperature-anomaly:
         cds_variable: temperature_anomaly
         nc_variable: temperature_anomaly
@@ -1862,20 +1895,26 @@ datasets:
     variables:
       precipitation:
         cds_variable: precipitation
-        nc_variable: precipitation
-        units: unknown
+        nc_variable: RR
+        units: kg/m^2
+        extras:
+          spatial_interpolation_method: [type_1, type_2]
       mean-temperature:
         cds_variable: mean_temperature
-        nc_variable: mean_temperature
-        units: unknown
+        nc_variable: TG
+        units: K
+        extras:
+          spatial_interpolation_method: [type_1, type_2]
       maximum-temperature:
         cds_variable: maximum_temperature
         nc_variable: TX
         units: K
       minimum-temperature:
         cds_variable: minimum_temperature
-        nc_variable: minimum_temperature
-        units: unknown
+        nc_variable: TN
+        units: K
+        extras:
+          spatial_interpolation_method: [type_1, type_2]
   insitu-observations-gnss:
     endpoint: cds
     request_kind: form

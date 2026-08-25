@@ -1539,8 +1539,10 @@ datasets:
     variables:
       global-horizontal-irradiation:
         cds_variable: global_horizontal_irradiation
-        nc_variable: global_horizontal_irradiation
-        units: unknown
+        nc_variable: global_horizontal_clear_sky_irradiation
+        units: W h m-2
+        extras:
+          sky_type: [clear, observed_cloud]
       # The hydrated name below is specific to the `sky_type: [clear]` pinned
       # in this row's extras — under `sky_type: [all]` the file carries no
       # `beam_horizontal_clear_sky_irradiation`, so changing that pin means
@@ -1551,12 +1553,16 @@ datasets:
         units: W h m-2
       diffuse-horizontal-irradiation:
         cds_variable: diffuse_horizontal_irradiation
-        nc_variable: diffuse_horizontal_irradiation
-        units: unknown
+        nc_variable: diffuse_horizontal_clear_sky_irradiation
+        units: W h m-2
+        extras:
+          sky_type: [clear, observed_cloud]
       direct-normal-irradiation:
         cds_variable: direct_normal_irradiation
-        nc_variable: direct_normal_irradiation
-        units: unknown
+        nc_variable: beam_normal_clear_sky_irradiation
+        units: W h m-2
+        extras:
+          sky_type: [clear, observed_cloud]
   cams-solar-radiation-timeseries:
     endpoint: ads
     request_kind: cams_date
