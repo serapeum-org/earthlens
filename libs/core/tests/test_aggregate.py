@@ -26,6 +26,7 @@ from earthlens.aggregate import (
     _TIME_VAR_CANDIDATES,
     AggregationConfig,
     _find_level_dim,
+    _output_stem,
     _read_time_axis,
     _resolve_op,
     _resolve_pressure_level,
@@ -701,6 +702,36 @@ class TestResolveOp:
         assert var.accessed is False, "Explicit op should not consult var_info.is_flux"
 
 
+class TestOutputStem:
+    """`_output_stem` appends the dataset id (dataset_id or cds_dataset) (#1040)."""
+
+    def test_bare_when_no_dataset_ids(self):
+        """A var_info carrying neither id (s3/erddap) keeps the bare stem."""
+        stem = _output_stem(SimpleNamespace(cds_variable="tp"))
+        assert stem == "tp", f"Expected bare stem 'tp', got {stem!r}"
+
+    def test_ordinary_row_appends_its_dataset_id(self):
+        """An ordinary row (dataset_id == cds_dataset) appends that id."""
+        var = SimpleNamespace(cds_variable="tp", cds_dataset="ds", dataset_id="ds")
+        stem = _output_stem(var)
+        assert stem == "tp_ds", f"Ordinary row should append its id, got {stem!r}"
+
+    def test_override_uses_dataset_id(self):
+        """A dataset_id differing from cds_dataset is the one appended."""
+        var = SimpleNamespace(
+            cds_variable="tp", cds_dataset="ds", dataset_id="ds-intermediate"
+        )
+        stem = _output_stem(var)
+        assert stem == "tp_ds-intermediate", (
+            f"Override should use dataset_id, got {stem!r}"
+        )
+
+    def test_falls_back_to_cds_dataset(self):
+        """With no dataset_id, cds_dataset is appended instead."""
+        stem = _output_stem(SimpleNamespace(cds_variable="tp", cds_dataset="ds"))
+        assert stem == "tp_ds", f"Expected cds_dataset fallback, got {stem!r}"
+
+
 class TestAggregateNetcdf:
     """Smoke tests for the public entry point.
 
@@ -783,9 +814,10 @@ class _RealVariable(SimpleNamespace):
     """Lightweight stand-in for `earthlens.ecmwf.Variable` in tests.
 
     Exposes the attributes `aggregate_netcdf` reads (`is_flux`,
-    `cds_variable`, `nc_variable`, `units`, and the optional
-    `is_pre_aggregated` that `_resolve_op` consults via `getattr`) so the
-    round-trip tests don't have to construct a full pydantic model.
+    `cds_variable`, `nc_variable`, `units`, the optional `is_pre_aggregated`
+    that `_resolve_op` consults, and the optional `cds_dataset` / `dataset_id`
+    that `_output_stem` consults — all via `getattr`) so the round-trip tests
+    don't have to construct a full pydantic model.
     """
 
 
@@ -1092,7 +1124,7 @@ class TestAggregateNetcdfRoundTrip:
     def test_geotiff_filename_carries_variable_freq_and_window(
         self, monkeypatch, tmp_path, state_var
     ):
-        """Output GeoTIFF filename matches `<cds_variable>_<freq>_<YYYYMMDD>.tif`."""
+        """A var_info with no dataset id writes the bare `<cds_variable>_<freq>_<YYYYMMDD>.tif`."""
         cube = self._daily_six_hourly_array(n_days=1)
         nc = _FakeNetCDF(
             array=cube,
@@ -1113,6 +1145,107 @@ class TestAggregateNetcdfRoundTrip:
             f"Filename should match `<var>_<freq>_<window>.tif` shape, "
             f"got {target_path!r}"
         )
+
+    def test_dataset_id_override_disambiguates_output_filenames(
+        self, monkeypatch, tmp_path
+    ):
+        """Two configs of one dataset (distinct dataset_id) write distinct .tif files (#1040)."""
+        # Mirrors the GloFAS consolidated vs `-intermediate` streams: same
+        # cds_variable + cds_dataset, distinct dataset_id, aggregated to one out_dir.
+        consolidated = _RealVariable(
+            is_flux=False,
+            cds_variable="average_river_discharge_in_the_last_24_hours",
+            nc_variable="dis24",
+            units="m3 s-1",
+            cds_dataset="cems-glofas-historical",
+            dataset_id="cems-glofas-historical",
+        )
+        intermediate = _RealVariable(
+            is_flux=False,
+            cds_variable="average_river_discharge_in_the_last_24_hours",
+            nc_variable="dis24",
+            units="m3 s-1",
+            cds_dataset="cems-glofas-historical",
+            dataset_id="cems-glofas-historical-intermediate",
+        )
+        out_dir = tmp_path / "agg"
+        written: list[str] = []
+        for var in (consolidated, intermediate):
+            nc = _FakeNetCDF(
+                array=self._daily_six_hourly_array(n_days=1),
+                time_strs_by_var={"time": self._date_strings_six_hourly(1)},
+                dimension_names=["time", "lat", "lon"],
+            )
+            _patch_netcdf_read(monkeypatch, nc)
+            writes = _patch_geotiff_write(monkeypatch)
+            aggregate_netcdf(
+                tmp_path / "fake.nc",
+                var,
+                AggregationConfig(freq="1D", op="mean", out_dir=out_dir),
+            )
+            written.append(writes[0][3])
+
+        assert written[0] != written[1], (
+            f"The two streams must not collide; both wrote {written[0]!r}"
+        )
+        assert written[0].endswith(
+            "average_river_discharge_in_the_last_24_hours_"
+            "cems-glofas-historical_1D_20220101.tif"
+        ), f"Consolidated carries its dataset id, got {written[0]!r}"
+        assert written[1].endswith(
+            "average_river_discharge_in_the_last_24_hours_"
+            "cems-glofas-historical-intermediate_1D_20220101.tif"
+        ), f"Intermediate carries its dataset_id, got {written[1]!r}"
+
+    def test_two_datasets_sharing_a_cds_variable_do_not_collide(
+        self, monkeypatch, tmp_path
+    ):
+        """Two ordinary datasets sharing a cds_variable write distinct .tif files (#1040 H1)."""
+        # ERA5 single-levels vs ERA5-Land total_precipitation: distinct datasets,
+        # same cds_variable, each dataset_id == cds_dataset — aggregated to one out_dir.
+        single_levels = _RealVariable(
+            is_flux=True,
+            cds_variable="total_precipitation",
+            nc_variable="tp",
+            units="m",
+            cds_dataset="reanalysis-era5-single-levels",
+            dataset_id="reanalysis-era5-single-levels",
+        )
+        land = _RealVariable(
+            is_flux=True,
+            cds_variable="total_precipitation",
+            nc_variable="tp",
+            units="m",
+            cds_dataset="reanalysis-era5-land",
+            dataset_id="reanalysis-era5-land",
+        )
+        out_dir = tmp_path / "agg"
+        written: list[str] = []
+        for var in (single_levels, land):
+            nc = _FakeNetCDF(
+                array=self._daily_six_hourly_array(n_days=1),
+                time_strs_by_var={"time": self._date_strings_six_hourly(1)},
+                dimension_names=["time", "lat", "lon"],
+            )
+            _patch_netcdf_read(monkeypatch, nc)
+            writes = _patch_geotiff_write(monkeypatch)
+            aggregate_netcdf(
+                tmp_path / "fake.nc",
+                var,
+                AggregationConfig(freq="1D", op="mean", out_dir=out_dir),
+            )
+            written.append(writes[0][3])
+
+        assert written[0] != written[1], (
+            f"Two datasets sharing a cds_variable must not collide; both wrote "
+            f"{written[0]!r}"
+        )
+        assert written[0].endswith(
+            "total_precipitation_reanalysis-era5-single-levels_1D_20220101.tif"
+        ), f"single-levels should carry its dataset id, got {written[0]!r}"
+        assert written[1].endswith(
+            "total_precipitation_reanalysis-era5-land_1D_20220101.tif"
+        ), f"land should carry its dataset id, got {written[1]!r}"
 
     def test_valid_time_variable_is_picked_over_time(
         self, monkeypatch, tmp_path, state_var
@@ -1298,6 +1431,123 @@ class TestAggregateNetcdfRoundTrip:
             f"expected {source_geo}, got {geo}"
         )
         assert epsg == 4326, f"EPSG should be 4326 (WGS84); got {epsg}"
+
+    def _cross_month_cube_and_times(self):
+        """A daily cube whose axis over-covers Jun 25-Jul 5, like a CDS cross-product.
+
+        A `year`/`month`/`day` request for Jun 25-Jul 5 crosses the month
+        boundary, so CDS also returns Jun 1-5 and Jul 25-30. Each day is one
+        slice valued by its position (1-indexed), so a window's mean is a
+        recognisable number.
+        """
+        day_strs = (
+            [f"2022-06-{d:02d}" for d in range(1, 6)]  # Jun 1-5 (spurious)
+            + [f"2022-06-{d:02d}" for d in range(25, 31)]  # Jun 25-30
+            + [f"2022-07-{d:02d}" for d in range(1, 6)]  # Jul 1-5
+            + [f"2022-07-{d:02d}" for d in range(25, 31)]  # Jul 25-30 (spurious)
+        )
+        cube = np.zeros((len(day_strs), 2, 2), dtype=float)
+        for i in range(len(day_strs)):
+            cube[i, :, :] = float(i + 1)
+        return cube, day_strs
+
+    def test_date_range_trims_out_of_window_days(
+        self, monkeypatch, tmp_path, state_var
+    ):
+        """A daily aggregate drops days the cross-product pulled outside the span."""
+        cube, day_strs = self._cross_month_cube_and_times()
+        nc = _FakeNetCDF(
+            array=cube,
+            time_strs_by_var={"time": day_strs},
+            dimension_names=["time", "lat", "lon"],
+        )
+        _patch_netcdf_read(monkeypatch, nc)
+        writes = _patch_geotiff_write(monkeypatch)
+
+        results = aggregate_netcdf(
+            tmp_path / "fake.nc",
+            state_var,
+            AggregationConfig(freq="1D", op="mean", out_dir=tmp_path),
+            date_range=(pd.Timestamp("2022-06-25"), pd.Timestamp("2022-07-05")),
+        )
+
+        labels = [label for label, _, _ in results]
+        assert len(labels) == 11, f"Expected 11 in-range days, got {len(labels)}"
+        assert min(labels) == pd.Timestamp("2022-06-25")
+        assert max(labels) == pd.Timestamp("2022-07-05")
+        written = " ".join(str(target) for *_, target in writes)
+        assert "20220601" not in written, (
+            f"spurious Jun 1-5 must not be written; got {written}"
+        )
+        assert "20220725" not in written, (
+            f"spurious Jul 25-30 must not be written; got {written}"
+        )
+
+    def test_date_range_prevents_monthly_window_contamination(
+        self, monkeypatch, tmp_path, state_var
+    ):
+        """A monthly window means only the in-range days, not the cross-product extras."""
+        cube, day_strs = self._cross_month_cube_and_times()
+        nc = _FakeNetCDF(
+            array=cube,
+            time_strs_by_var={"time": day_strs},
+            dimension_names=["time", "lat", "lon"],
+        )
+        _patch_netcdf_read(monkeypatch, nc)
+        _patch_geotiff_write(monkeypatch)
+
+        results = aggregate_netcdf(
+            tmp_path / "fake.nc",
+            state_var,
+            AggregationConfig(freq="1MS", op="mean", out_dir=None),
+            date_range=(pd.Timestamp("2022-06-25"), pd.Timestamp("2022-07-05")),
+        )
+
+        by_label = {label: arr for label, arr, _ in results}
+        # Jun 25-30 are cube values 6..11 -> mean 8.5; Jun 1-5 (values 1..5) excluded.
+        assert by_label[pd.Timestamp("2022-06-01")][0, 0] == pytest.approx(8.5), (
+            "June mean must exclude the spurious Jun 1-5"
+        )
+        # Jul 1-5 are cube values 12..16 -> mean 14.0; Jul 25-30 (17..22) excluded.
+        assert by_label[pd.Timestamp("2022-07-01")][0, 0] == pytest.approx(14.0), (
+            "July mean must exclude the spurious Jul 25-30"
+        )
+
+    def test_no_date_range_keeps_every_sample(self, monkeypatch, tmp_path, state_var):
+        """`date_range=None` aggregates the whole cube (backward compatible)."""
+        cube, day_strs = self._cross_month_cube_and_times()
+        nc = _FakeNetCDF(
+            array=cube,
+            time_strs_by_var={"time": day_strs},
+            dimension_names=["time", "lat", "lon"],
+        )
+        _patch_netcdf_read(monkeypatch, nc)
+        _patch_geotiff_write(monkeypatch)
+
+        results = aggregate_netcdf(
+            tmp_path / "fake.nc",
+            state_var,
+            AggregationConfig(freq="1D", op="mean", out_dir=tmp_path),
+        )
+        assert len(results) == 22, f"Expected all 22 days kept, got {len(results)}"
+
+    def test_date_range_mask_widens_to_whole_days(self):
+        """`_date_range_mask` keeps end-day sub-daily samples and drops neighbours."""
+        from earthlens.aggregate import _date_range_mask
+
+        idx = pd.to_datetime(
+            [
+                "2022-06-24 18:00",
+                "2022-06-25 00:00",
+                "2022-07-05 18:00",
+                "2022-07-06 00:00",
+            ]
+        )
+        mask = _date_range_mask(
+            idx, (pd.Timestamp("2022-06-25"), pd.Timestamp("2022-07-05"))
+        )
+        assert list(mask) == [False, True, True, False]
+        assert _date_range_mask(idx, None) is None
 
 
 class TestStreamingAggregation:
