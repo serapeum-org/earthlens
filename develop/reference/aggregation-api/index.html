@@ -100,7 +100,7 @@
   
 
   <meta name="panzoom-theme" content="material">
-<meta name="panzoom-data" content='{"selectors": [".mermaid", ".d2"], "initial_zoom_level": 1.0}'> </head>
+<meta name="panzoom-data" content='{"selectors": [".d2", ".mermaid"], "initial_zoom_level": 1.0}'> </head>
   
   
     
@@ -23787,10 +23787,10 @@ step entirely and returns arrays in memory only.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Pixel size in degrees, embedded in the output
-filename as a metadata note. <code>0.125</code> for ERA5 native,
-<code>0.1</code> for ERA5-Land. The geotransform itself is read off
-the NetCDF — this is informational only.</p>
+                <p>Pixel size in degrees, informational only. <code>0.125</code>
+for ERA5 native, <code>0.1</code> for ERA5-Land. The geotransform
+written to each GeoTIFF is read off the NetCDF, not from
+this value, and it is not encoded in the filename.</p>
               </div>
             </td>
           </tr>
@@ -23999,10 +23999,10 @@ NaN. <code>None</code> (default) means no minimum.</p>
 <a id="__codelineno-0-526" name="__codelineno-0-526"></a><span class="sd">        out_dir: Directory the per-window GeoTIFFs are written to.</span>
 <a id="__codelineno-0-527" name="__codelineno-0-527"></a><span class="sd">            Created (with parents) if absent. `None` skips the write</span>
 <a id="__codelineno-0-528" name="__codelineno-0-528"></a><span class="sd">            step entirely and returns arrays in memory only.</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">        cell_size: Pixel size in degrees, embedded in the output</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">            filename as a metadata note. `0.125` for ERA5 native,</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">            `0.1` for ERA5-Land. The geotransform itself is read off</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">            the NetCDF — this is informational only.</span>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a><span class="sd">        cell_size: Pixel size in degrees, informational only. `0.125`</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a><span class="sd">            for ERA5 native, `0.1` for ERA5-Land. The geotransform</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a><span class="sd">            written to each GeoTIFF is read off the NetCDF, not from</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a><span class="sd">            this value, and it is not encoded in the filename.</span>
 <a id="__codelineno-0-533" name="__codelineno-0-533"></a><span class="sd">        level: When the NetCDF has a `pressure_level` dimension, pin</span>
 <a id="__codelineno-0-534" name="__codelineno-0-534"></a><span class="sd">            this level via :meth:`pyramids.netcdf.NetCDF.sel`. `None`</span>
 <a id="__codelineno-0-535" name="__codelineno-0-535"></a><span class="sd">            (default) requires a 3-D NetCDF; pass an explicit level</span>
@@ -24100,7 +24100,7 @@ NaN. <code>None</code> (default) means no minimum.</p>
 
 
 <h2 id="earthlens.core.aggregate_netcdf" class="doc doc-heading"><a href="#earthlens.core.aggregate_netcdf" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">date_range</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.core.aggregate_netcdf" class="headerlink" title="Permanent link">#</a></h2>
 
@@ -24154,7 +24154,8 @@ further processing without re-opening the files.</p>
                 <p>Catalog row for the variable being aggregated. Used
 to pick the variable from the NetCDF
 (<code>var_info.nc_variable</code>), seed the output filename
-(<code>var_info.cds_variable</code>), and resolve <code>op="auto"</code>
+(<code>var_info.cds_variable</code>, plus <code>dataset_id</code> for a curated
+override — see :func:<code>_output_stem</code>), and resolve <code>op="auto"</code>
 (<code>var_info.is_flux</code>).</p>
               </div>
             </td>
@@ -24177,6 +24178,27 @@ window, reduction, and output location.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>date_range</code>
+            </td>
+            <td>
+                  <code><span title="tuple">tuple</span>[<span title="typing.Any">Any</span>, <span title="typing.Any">Any</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional inclusive <code>(start, end)</code> bounds. When set,
+samples outside the range are dropped before windowing, so the
+output stays faithful to the requested span even when the source
+cube over-covers it (a CDS <code>year</code>/<code>month</code>/<code>day</code> cross-product pulls
+stray dates for a window spanning month boundaries). <code>None</code> keeps
+every sample.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -24307,107 +24329,127 @@ when <code>config.freq</code> is not a recognised offset alias.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/aggregate.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-667">667</a></span>
-<span class="normal"><a href="#__codelineno-0-668">668</a></span>
-<span class="normal"><a href="#__codelineno-0-669">669</a></span>
-<span class="normal"><a href="#__codelineno-0-670">670</a></span>
-<span class="normal"><a href="#__codelineno-0-671">671</a></span>
-<span class="normal"><a href="#__codelineno-0-672">672</a></span>
-<span class="normal"><a href="#__codelineno-0-673">673</a></span>
-<span class="normal"><a href="#__codelineno-0-674">674</a></span>
-<span class="normal"><a href="#__codelineno-0-675">675</a></span>
-<span class="normal"><a href="#__codelineno-0-676">676</a></span>
-<span class="normal"><a href="#__codelineno-0-677">677</a></span>
-<span class="normal"><a href="#__codelineno-0-678">678</a></span>
-<span class="normal"><a href="#__codelineno-0-679">679</a></span>
-<span class="normal"><a href="#__codelineno-0-680">680</a></span>
-<span class="normal"><a href="#__codelineno-0-681">681</a></span>
-<span class="normal"><a href="#__codelineno-0-682">682</a></span>
-<span class="normal"><a href="#__codelineno-0-683">683</a></span>
-<span class="normal"><a href="#__codelineno-0-684">684</a></span>
-<span class="normal"><a href="#__codelineno-0-685">685</a></span>
-<span class="normal"><a href="#__codelineno-0-686">686</a></span>
-<span class="normal"><a href="#__codelineno-0-687">687</a></span>
-<span class="normal"><a href="#__codelineno-0-688">688</a></span>
-<span class="normal"><a href="#__codelineno-0-689">689</a></span>
-<span class="normal"><a href="#__codelineno-0-690">690</a></span>
-<span class="normal"><a href="#__codelineno-0-691">691</a></span>
-<span class="normal"><a href="#__codelineno-0-692">692</a></span>
-<span class="normal"><a href="#__codelineno-0-693">693</a></span>
-<span class="normal"><a href="#__codelineno-0-694">694</a></span>
-<span class="normal"><a href="#__codelineno-0-695">695</a></span>
-<span class="normal"><a href="#__codelineno-0-696">696</a></span>
-<span class="normal"><a href="#__codelineno-0-697">697</a></span>
-<span class="normal"><a href="#__codelineno-0-698">698</a></span>
-<span class="normal"><a href="#__codelineno-0-699">699</a></span>
-<span class="normal"><a href="#__codelineno-0-700">700</a></span>
-<span class="normal"><a href="#__codelineno-0-701">701</a></span>
-<span class="normal"><a href="#__codelineno-0-702">702</a></span>
-<span class="normal"><a href="#__codelineno-0-703">703</a></span>
-<span class="normal"><a href="#__codelineno-0-704">704</a></span>
-<span class="normal"><a href="#__codelineno-0-705">705</a></span>
-<span class="normal"><a href="#__codelineno-0-706">706</a></span>
-<span class="normal"><a href="#__codelineno-0-707">707</a></span>
-<span class="normal"><a href="#__codelineno-0-708">708</a></span>
-<span class="normal"><a href="#__codelineno-0-709">709</a></span>
-<span class="normal"><a href="#__codelineno-0-710">710</a></span>
-<span class="normal"><a href="#__codelineno-0-711">711</a></span>
-<span class="normal"><a href="#__codelineno-0-712">712</a></span>
-<span class="normal"><a href="#__codelineno-0-713">713</a></span>
-<span class="normal"><a href="#__codelineno-0-714">714</a></span>
-<span class="normal"><a href="#__codelineno-0-715">715</a></span>
-<span class="normal"><a href="#__codelineno-0-716">716</a></span>
-<span class="normal"><a href="#__codelineno-0-717">717</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-667" name="__codelineno-0-667"></a><span class="k">def</span><span class="w"> </span><span class="nf">aggregate_netcdf</span><span class="p">(</span>
-<a id="__codelineno-0-668" name="__codelineno-0-668"></a>    <span class="n">nc_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-669" name="__codelineno-0-669"></a>    <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
-<a id="__codelineno-0-670" name="__codelineno-0-670"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span><span class="p">,</span>
-<a id="__codelineno-0-671" name="__codelineno-0-671"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]:</span>
-<a id="__codelineno-0-672" name="__codelineno-0-672"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Slice a CDS-shaped NetCDF into per-window aggregated outputs.</span>
-<a id="__codelineno-0-673" name="__codelineno-0-673"></a>
-<a id="__codelineno-0-674" name="__codelineno-0-674"></a><span class="sd">    Reads the NetCDF, groups its time axis by `config.freq`, reduces</span>
-<a id="__codelineno-0-675" name="__codelineno-0-675"></a><span class="sd">    each group with `config.op`, and (when `config.out_dir` is set)</span>
-<a id="__codelineno-0-676" name="__codelineno-0-676"></a><span class="sd">    writes one GeoTIFF per window. Returns the per-window arrays</span>
-<a id="__codelineno-0-677" name="__codelineno-0-677"></a><span class="sd">    alongside their timestamps and output paths so callers can chain</span>
-<a id="__codelineno-0-678" name="__codelineno-0-678"></a><span class="sd">    further processing without re-opening the files.</span>
-<a id="__codelineno-0-679" name="__codelineno-0-679"></a>
-<a id="__codelineno-0-680" name="__codelineno-0-680"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-681" name="__codelineno-0-681"></a><span class="sd">        nc_path: Path to the NetCDF on disk.</span>
-<a id="__codelineno-0-682" name="__codelineno-0-682"></a><span class="sd">        var_info: Catalog row for the variable being aggregated. Used</span>
-<a id="__codelineno-0-683" name="__codelineno-0-683"></a><span class="sd">            to pick the variable from the NetCDF</span>
-<a id="__codelineno-0-684" name="__codelineno-0-684"></a><span class="sd">            (`var_info.nc_variable`), seed the output filename</span>
-<a id="__codelineno-0-685" name="__codelineno-0-685"></a><span class="sd">            (`var_info.cds_variable`), and resolve `op=&quot;auto&quot;`</span>
-<a id="__codelineno-0-686" name="__codelineno-0-686"></a><span class="sd">            (`var_info.is_flux`).</span>
-<a id="__codelineno-0-687" name="__codelineno-0-687"></a><span class="sd">        config: Frozen :class:`AggregationConfig` describing the</span>
-<a id="__codelineno-0-688" name="__codelineno-0-688"></a><span class="sd">            window, reduction, and output location.</span>
-<a id="__codelineno-0-689" name="__codelineno-0-689"></a>
-<a id="__codelineno-0-690" name="__codelineno-0-690"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-691" name="__codelineno-0-691"></a><span class="sd">        list[tuple[pd.Timestamp, np.ndarray | None, Path | None]]: One</span>
-<a id="__codelineno-0-692" name="__codelineno-0-692"></a><span class="sd">        entry per window. The first item is the window&#39;s left-edge</span>
-<a id="__codelineno-0-693" name="__codelineno-0-693"></a><span class="sd">        timestamp; the second is the reduced 2-D array — `None` only when</span>
-<a id="__codelineno-0-694" name="__codelineno-0-694"></a><span class="sd">        the request set `keep_arrays=False` and the window was written to</span>
-<a id="__codelineno-0-695" name="__codelineno-0-695"></a><span class="sd">        disk; the third is the GeoTIFF path (or `None` when</span>
-<a id="__codelineno-0-696" name="__codelineno-0-696"></a><span class="sd">        `config.out_dir` was `None`).</span>
-<a id="__codelineno-0-697" name="__codelineno-0-697"></a>
-<a id="__codelineno-0-698" name="__codelineno-0-698"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-699" name="__codelineno-0-699"></a><span class="sd">        KeyError: If the NetCDF has no recognised time variable</span>
-<a id="__codelineno-0-700" name="__codelineno-0-700"></a><span class="sd">            (`valid_time` / `time`); see :func:`_read_time_axis`.</span>
-<a id="__codelineno-0-701" name="__codelineno-0-701"></a><span class="sd">        ValueError: If `config.level` is set but the NetCDF has no</span>
-<a id="__codelineno-0-702" name="__codelineno-0-702"></a><span class="sd">            pressure-level dimension, or vice versa; see</span>
-<a id="__codelineno-0-703" name="__codelineno-0-703"></a><span class="sd">            :func:`_resolve_pressure_level`. Also raised by pandas</span>
-<a id="__codelineno-0-704" name="__codelineno-0-704"></a><span class="sd">            when `config.freq` is not a recognised offset alias.</span>
-<a id="__codelineno-0-705" name="__codelineno-0-705"></a>
-<a id="__codelineno-0-706" name="__codelineno-0-706"></a><span class="sd">    See Also:</span>
-<a id="__codelineno-0-707" name="__codelineno-0-707"></a><span class="sd">        - :class:`AggregationConfig`: the frozen request payload.</span>
-<a id="__codelineno-0-708" name="__codelineno-0-708"></a><span class="sd">        - :class:`earthlens.ecmwf.Catalog`: resolves `(dataset, code)`</span>
-<a id="__codelineno-0-709" name="__codelineno-0-709"></a><span class="sd">          pairs to the :class:`earthlens.ecmwf.Variable` rows that</span>
-<a id="__codelineno-0-710" name="__codelineno-0-710"></a><span class="sd">          drive `var_info.is_flux` and the output filename.</span>
-<a id="__codelineno-0-711" name="__codelineno-0-711"></a><span class="sd">        - `examples/post_process_ecmwf_netcdf.py`: thin CLI demo of</span>
-<a id="__codelineno-0-712" name="__codelineno-0-712"></a><span class="sd">          this function (after task L1).</span>
-<a id="__codelineno-0-713" name="__codelineno-0-713"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-714" name="__codelineno-0-714"></a>    <span class="k">return</span> <span class="p">[</span>
-<a id="__codelineno-0-715" name="__codelineno-0-715"></a>        <span class="p">(</span><span class="n">window</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">window</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">window</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-<a id="__codelineno-0-716" name="__codelineno-0-716"></a>        <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">iter_aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
-<a id="__codelineno-0-717" name="__codelineno-0-717"></a>    <span class="p">]</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-774">774</a></span>
+<span class="normal"><a href="#__codelineno-0-775">775</a></span>
+<span class="normal"><a href="#__codelineno-0-776">776</a></span>
+<span class="normal"><a href="#__codelineno-0-777">777</a></span>
+<span class="normal"><a href="#__codelineno-0-778">778</a></span>
+<span class="normal"><a href="#__codelineno-0-779">779</a></span>
+<span class="normal"><a href="#__codelineno-0-780">780</a></span>
+<span class="normal"><a href="#__codelineno-0-781">781</a></span>
+<span class="normal"><a href="#__codelineno-0-782">782</a></span>
+<span class="normal"><a href="#__codelineno-0-783">783</a></span>
+<span class="normal"><a href="#__codelineno-0-784">784</a></span>
+<span class="normal"><a href="#__codelineno-0-785">785</a></span>
+<span class="normal"><a href="#__codelineno-0-786">786</a></span>
+<span class="normal"><a href="#__codelineno-0-787">787</a></span>
+<span class="normal"><a href="#__codelineno-0-788">788</a></span>
+<span class="normal"><a href="#__codelineno-0-789">789</a></span>
+<span class="normal"><a href="#__codelineno-0-790">790</a></span>
+<span class="normal"><a href="#__codelineno-0-791">791</a></span>
+<span class="normal"><a href="#__codelineno-0-792">792</a></span>
+<span class="normal"><a href="#__codelineno-0-793">793</a></span>
+<span class="normal"><a href="#__codelineno-0-794">794</a></span>
+<span class="normal"><a href="#__codelineno-0-795">795</a></span>
+<span class="normal"><a href="#__codelineno-0-796">796</a></span>
+<span class="normal"><a href="#__codelineno-0-797">797</a></span>
+<span class="normal"><a href="#__codelineno-0-798">798</a></span>
+<span class="normal"><a href="#__codelineno-0-799">799</a></span>
+<span class="normal"><a href="#__codelineno-0-800">800</a></span>
+<span class="normal"><a href="#__codelineno-0-801">801</a></span>
+<span class="normal"><a href="#__codelineno-0-802">802</a></span>
+<span class="normal"><a href="#__codelineno-0-803">803</a></span>
+<span class="normal"><a href="#__codelineno-0-804">804</a></span>
+<span class="normal"><a href="#__codelineno-0-805">805</a></span>
+<span class="normal"><a href="#__codelineno-0-806">806</a></span>
+<span class="normal"><a href="#__codelineno-0-807">807</a></span>
+<span class="normal"><a href="#__codelineno-0-808">808</a></span>
+<span class="normal"><a href="#__codelineno-0-809">809</a></span>
+<span class="normal"><a href="#__codelineno-0-810">810</a></span>
+<span class="normal"><a href="#__codelineno-0-811">811</a></span>
+<span class="normal"><a href="#__codelineno-0-812">812</a></span>
+<span class="normal"><a href="#__codelineno-0-813">813</a></span>
+<span class="normal"><a href="#__codelineno-0-814">814</a></span>
+<span class="normal"><a href="#__codelineno-0-815">815</a></span>
+<span class="normal"><a href="#__codelineno-0-816">816</a></span>
+<span class="normal"><a href="#__codelineno-0-817">817</a></span>
+<span class="normal"><a href="#__codelineno-0-818">818</a></span>
+<span class="normal"><a href="#__codelineno-0-819">819</a></span>
+<span class="normal"><a href="#__codelineno-0-820">820</a></span>
+<span class="normal"><a href="#__codelineno-0-821">821</a></span>
+<span class="normal"><a href="#__codelineno-0-822">822</a></span>
+<span class="normal"><a href="#__codelineno-0-823">823</a></span>
+<span class="normal"><a href="#__codelineno-0-824">824</a></span>
+<span class="normal"><a href="#__codelineno-0-825">825</a></span>
+<span class="normal"><a href="#__codelineno-0-826">826</a></span>
+<span class="normal"><a href="#__codelineno-0-827">827</a></span>
+<span class="normal"><a href="#__codelineno-0-828">828</a></span>
+<span class="normal"><a href="#__codelineno-0-829">829</a></span>
+<span class="normal"><a href="#__codelineno-0-830">830</a></span>
+<span class="normal"><a href="#__codelineno-0-831">831</a></span>
+<span class="normal"><a href="#__codelineno-0-832">832</a></span>
+<span class="normal"><a href="#__codelineno-0-833">833</a></span>
+<span class="normal"><a href="#__codelineno-0-834">834</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-774" name="__codelineno-0-774"></a><span class="k">def</span><span class="w"> </span><span class="nf">aggregate_netcdf</span><span class="p">(</span>
+<a id="__codelineno-0-775" name="__codelineno-0-775"></a>    <span class="n">nc_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-776" name="__codelineno-0-776"></a>    <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
+<a id="__codelineno-0-777" name="__codelineno-0-777"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span><span class="p">,</span>
+<a id="__codelineno-0-778" name="__codelineno-0-778"></a>    <span class="n">date_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-779" name="__codelineno-0-779"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]:</span>
+<a id="__codelineno-0-780" name="__codelineno-0-780"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Slice a CDS-shaped NetCDF into per-window aggregated outputs.</span>
+<a id="__codelineno-0-781" name="__codelineno-0-781"></a>
+<a id="__codelineno-0-782" name="__codelineno-0-782"></a><span class="sd">    Reads the NetCDF, groups its time axis by `config.freq`, reduces</span>
+<a id="__codelineno-0-783" name="__codelineno-0-783"></a><span class="sd">    each group with `config.op`, and (when `config.out_dir` is set)</span>
+<a id="__codelineno-0-784" name="__codelineno-0-784"></a><span class="sd">    writes one GeoTIFF per window. Returns the per-window arrays</span>
+<a id="__codelineno-0-785" name="__codelineno-0-785"></a><span class="sd">    alongside their timestamps and output paths so callers can chain</span>
+<a id="__codelineno-0-786" name="__codelineno-0-786"></a><span class="sd">    further processing without re-opening the files.</span>
+<a id="__codelineno-0-787" name="__codelineno-0-787"></a>
+<a id="__codelineno-0-788" name="__codelineno-0-788"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-789" name="__codelineno-0-789"></a><span class="sd">        nc_path: Path to the NetCDF on disk.</span>
+<a id="__codelineno-0-790" name="__codelineno-0-790"></a><span class="sd">        var_info: Catalog row for the variable being aggregated. Used</span>
+<a id="__codelineno-0-791" name="__codelineno-0-791"></a><span class="sd">            to pick the variable from the NetCDF</span>
+<a id="__codelineno-0-792" name="__codelineno-0-792"></a><span class="sd">            (`var_info.nc_variable`), seed the output filename</span>
+<a id="__codelineno-0-793" name="__codelineno-0-793"></a><span class="sd">            (`var_info.cds_variable`, plus `dataset_id` for a curated</span>
+<a id="__codelineno-0-794" name="__codelineno-0-794"></a><span class="sd">            override — see :func:`_output_stem`), and resolve `op=&quot;auto&quot;`</span>
+<a id="__codelineno-0-795" name="__codelineno-0-795"></a><span class="sd">            (`var_info.is_flux`).</span>
+<a id="__codelineno-0-796" name="__codelineno-0-796"></a><span class="sd">        config: Frozen :class:`AggregationConfig` describing the</span>
+<a id="__codelineno-0-797" name="__codelineno-0-797"></a><span class="sd">            window, reduction, and output location.</span>
+<a id="__codelineno-0-798" name="__codelineno-0-798"></a><span class="sd">        date_range: Optional inclusive `(start, end)` bounds. When set,</span>
+<a id="__codelineno-0-799" name="__codelineno-0-799"></a><span class="sd">            samples outside the range are dropped before windowing, so the</span>
+<a id="__codelineno-0-800" name="__codelineno-0-800"></a><span class="sd">            output stays faithful to the requested span even when the source</span>
+<a id="__codelineno-0-801" name="__codelineno-0-801"></a><span class="sd">            cube over-covers it (a CDS `year`/`month`/`day` cross-product pulls</span>
+<a id="__codelineno-0-802" name="__codelineno-0-802"></a><span class="sd">            stray dates for a window spanning month boundaries). `None` keeps</span>
+<a id="__codelineno-0-803" name="__codelineno-0-803"></a><span class="sd">            every sample.</span>
+<a id="__codelineno-0-804" name="__codelineno-0-804"></a>
+<a id="__codelineno-0-805" name="__codelineno-0-805"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-806" name="__codelineno-0-806"></a><span class="sd">        list[tuple[pd.Timestamp, np.ndarray | None, Path | None]]: One</span>
+<a id="__codelineno-0-807" name="__codelineno-0-807"></a><span class="sd">        entry per window. The first item is the window&#39;s left-edge</span>
+<a id="__codelineno-0-808" name="__codelineno-0-808"></a><span class="sd">        timestamp; the second is the reduced 2-D array — `None` only when</span>
+<a id="__codelineno-0-809" name="__codelineno-0-809"></a><span class="sd">        the request set `keep_arrays=False` and the window was written to</span>
+<a id="__codelineno-0-810" name="__codelineno-0-810"></a><span class="sd">        disk; the third is the GeoTIFF path (or `None` when</span>
+<a id="__codelineno-0-811" name="__codelineno-0-811"></a><span class="sd">        `config.out_dir` was `None`).</span>
+<a id="__codelineno-0-812" name="__codelineno-0-812"></a>
+<a id="__codelineno-0-813" name="__codelineno-0-813"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-814" name="__codelineno-0-814"></a><span class="sd">        KeyError: If the NetCDF has no recognised time variable</span>
+<a id="__codelineno-0-815" name="__codelineno-0-815"></a><span class="sd">            (`valid_time` / `time`); see :func:`_read_time_axis`.</span>
+<a id="__codelineno-0-816" name="__codelineno-0-816"></a><span class="sd">        ValueError: If `config.level` is set but the NetCDF has no</span>
+<a id="__codelineno-0-817" name="__codelineno-0-817"></a><span class="sd">            pressure-level dimension, or vice versa; see</span>
+<a id="__codelineno-0-818" name="__codelineno-0-818"></a><span class="sd">            :func:`_resolve_pressure_level`. Also raised by pandas</span>
+<a id="__codelineno-0-819" name="__codelineno-0-819"></a><span class="sd">            when `config.freq` is not a recognised offset alias.</span>
+<a id="__codelineno-0-820" name="__codelineno-0-820"></a>
+<a id="__codelineno-0-821" name="__codelineno-0-821"></a><span class="sd">    See Also:</span>
+<a id="__codelineno-0-822" name="__codelineno-0-822"></a><span class="sd">        - :class:`AggregationConfig`: the frozen request payload.</span>
+<a id="__codelineno-0-823" name="__codelineno-0-823"></a><span class="sd">        - :class:`earthlens.ecmwf.Catalog`: resolves `(dataset, code)`</span>
+<a id="__codelineno-0-824" name="__codelineno-0-824"></a><span class="sd">          pairs to the :class:`earthlens.ecmwf.Variable` rows that</span>
+<a id="__codelineno-0-825" name="__codelineno-0-825"></a><span class="sd">          drive `var_info.is_flux` and the output filename.</span>
+<a id="__codelineno-0-826" name="__codelineno-0-826"></a><span class="sd">        - `examples/post_process_ecmwf_netcdf.py`: thin CLI demo of</span>
+<a id="__codelineno-0-827" name="__codelineno-0-827"></a><span class="sd">          this function (after task L1).</span>
+<a id="__codelineno-0-828" name="__codelineno-0-828"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-829" name="__codelineno-0-829"></a>    <span class="k">return</span> <span class="p">[</span>
+<a id="__codelineno-0-830" name="__codelineno-0-830"></a>        <span class="p">(</span><span class="n">window</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">window</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">window</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+<a id="__codelineno-0-831" name="__codelineno-0-831"></a>        <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">iter_aggregate_netcdf</span><span class="p">(</span>
+<a id="__codelineno-0-832" name="__codelineno-0-832"></a>            <span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">date_range</span><span class="o">=</span><span class="n">date_range</span>
+<a id="__codelineno-0-833" name="__codelineno-0-833"></a>        <span class="p">)</span>
+<a id="__codelineno-0-834" name="__codelineno-0-834"></a>    <span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24421,7 +24463,7 @@ on a long time series.</p>
 
 
 <h2 id="earthlens.core.iter_aggregate_netcdf" class="doc doc-heading"><a href="#earthlens.core.iter_aggregate_netcdf" class="toclink">
-            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">iter_aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">earthlens</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">iter_aggregate_netcdf</span><span class="p">(</span><span class="n">nc_path</span><span class="p">,</span> <span class="n">var_info</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">date_range</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </a><a href="#earthlens.core.iter_aggregate_netcdf" class="headerlink" title="Permanent link">#</a></h2>
 
@@ -24487,7 +24529,8 @@ its own handle, and one left open keeps a Windows lock on the file.</p>
               <div class="doc-md-description">
                 <p>Catalog row for the variable being aggregated. Used to
 pick the variable from the NetCDF (<code>var_info.nc_variable</code>),
-seed the output filename (<code>var_info.cds_variable</code>), and resolve
+seed the output filename (<code>_output_stem</code> — <code>var_info.cds_variable</code>,
+plus <code>dataset_id</code> for a curated override), and resolve
 <code>op="auto"</code> (<code>var_info.is_flux</code>).</p>
               </div>
             </td>
@@ -24510,6 +24553,26 @@ reduction, output location, and whether to retain arrays.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>date_range</code>
+            </td>
+            <td>
+                  <code><span title="tuple">tuple</span>[<span title="typing.Any">Any</span>, <span title="typing.Any">Any</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional inclusive <code>(start, end)</code> bounds. Samples outside
+the range are dropped before windowing, so the streamed windows
+match the requested span even when the source cube over-covers it;
+a window left empty by the filter is skipped. <code>None</code> keeps every
+sample. See :func:<code>_date_range_mask</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -24591,219 +24654,245 @@ pressure-level dimension, or vice versa; see
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>libs/core/src/earthlens/aggregate.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-720">720</a></span>
-<span class="normal"><a href="#__codelineno-0-721">721</a></span>
-<span class="normal"><a href="#__codelineno-0-722">722</a></span>
-<span class="normal"><a href="#__codelineno-0-723">723</a></span>
-<span class="normal"><a href="#__codelineno-0-724">724</a></span>
-<span class="normal"><a href="#__codelineno-0-725">725</a></span>
-<span class="normal"><a href="#__codelineno-0-726">726</a></span>
-<span class="normal"><a href="#__codelineno-0-727">727</a></span>
-<span class="normal"><a href="#__codelineno-0-728">728</a></span>
-<span class="normal"><a href="#__codelineno-0-729">729</a></span>
-<span class="normal"><a href="#__codelineno-0-730">730</a></span>
-<span class="normal"><a href="#__codelineno-0-731">731</a></span>
-<span class="normal"><a href="#__codelineno-0-732">732</a></span>
-<span class="normal"><a href="#__codelineno-0-733">733</a></span>
-<span class="normal"><a href="#__codelineno-0-734">734</a></span>
-<span class="normal"><a href="#__codelineno-0-735">735</a></span>
-<span class="normal"><a href="#__codelineno-0-736">736</a></span>
-<span class="normal"><a href="#__codelineno-0-737">737</a></span>
-<span class="normal"><a href="#__codelineno-0-738">738</a></span>
-<span class="normal"><a href="#__codelineno-0-739">739</a></span>
-<span class="normal"><a href="#__codelineno-0-740">740</a></span>
-<span class="normal"><a href="#__codelineno-0-741">741</a></span>
-<span class="normal"><a href="#__codelineno-0-742">742</a></span>
-<span class="normal"><a href="#__codelineno-0-743">743</a></span>
-<span class="normal"><a href="#__codelineno-0-744">744</a></span>
-<span class="normal"><a href="#__codelineno-0-745">745</a></span>
-<span class="normal"><a href="#__codelineno-0-746">746</a></span>
-<span class="normal"><a href="#__codelineno-0-747">747</a></span>
-<span class="normal"><a href="#__codelineno-0-748">748</a></span>
-<span class="normal"><a href="#__codelineno-0-749">749</a></span>
-<span class="normal"><a href="#__codelineno-0-750">750</a></span>
-<span class="normal"><a href="#__codelineno-0-751">751</a></span>
-<span class="normal"><a href="#__codelineno-0-752">752</a></span>
-<span class="normal"><a href="#__codelineno-0-753">753</a></span>
-<span class="normal"><a href="#__codelineno-0-754">754</a></span>
-<span class="normal"><a href="#__codelineno-0-755">755</a></span>
-<span class="normal"><a href="#__codelineno-0-756">756</a></span>
-<span class="normal"><a href="#__codelineno-0-757">757</a></span>
-<span class="normal"><a href="#__codelineno-0-758">758</a></span>
-<span class="normal"><a href="#__codelineno-0-759">759</a></span>
-<span class="normal"><a href="#__codelineno-0-760">760</a></span>
-<span class="normal"><a href="#__codelineno-0-761">761</a></span>
-<span class="normal"><a href="#__codelineno-0-762">762</a></span>
-<span class="normal"><a href="#__codelineno-0-763">763</a></span>
-<span class="normal"><a href="#__codelineno-0-764">764</a></span>
-<span class="normal"><a href="#__codelineno-0-765">765</a></span>
-<span class="normal"><a href="#__codelineno-0-766">766</a></span>
-<span class="normal"><a href="#__codelineno-0-767">767</a></span>
-<span class="normal"><a href="#__codelineno-0-768">768</a></span>
-<span class="normal"><a href="#__codelineno-0-769">769</a></span>
-<span class="normal"><a href="#__codelineno-0-770">770</a></span>
-<span class="normal"><a href="#__codelineno-0-771">771</a></span>
-<span class="normal"><a href="#__codelineno-0-772">772</a></span>
-<span class="normal"><a href="#__codelineno-0-773">773</a></span>
-<span class="normal"><a href="#__codelineno-0-774">774</a></span>
-<span class="normal"><a href="#__codelineno-0-775">775</a></span>
-<span class="normal"><a href="#__codelineno-0-776">776</a></span>
-<span class="normal"><a href="#__codelineno-0-777">777</a></span>
-<span class="normal"><a href="#__codelineno-0-778">778</a></span>
-<span class="normal"><a href="#__codelineno-0-779">779</a></span>
-<span class="normal"><a href="#__codelineno-0-780">780</a></span>
-<span class="normal"><a href="#__codelineno-0-781">781</a></span>
-<span class="normal"><a href="#__codelineno-0-782">782</a></span>
-<span class="normal"><a href="#__codelineno-0-783">783</a></span>
-<span class="normal"><a href="#__codelineno-0-784">784</a></span>
-<span class="normal"><a href="#__codelineno-0-785">785</a></span>
-<span class="normal"><a href="#__codelineno-0-786">786</a></span>
-<span class="normal"><a href="#__codelineno-0-787">787</a></span>
-<span class="normal"><a href="#__codelineno-0-788">788</a></span>
-<span class="normal"><a href="#__codelineno-0-789">789</a></span>
-<span class="normal"><a href="#__codelineno-0-790">790</a></span>
-<span class="normal"><a href="#__codelineno-0-791">791</a></span>
-<span class="normal"><a href="#__codelineno-0-792">792</a></span>
-<span class="normal"><a href="#__codelineno-0-793">793</a></span>
-<span class="normal"><a href="#__codelineno-0-794">794</a></span>
-<span class="normal"><a href="#__codelineno-0-795">795</a></span>
-<span class="normal"><a href="#__codelineno-0-796">796</a></span>
-<span class="normal"><a href="#__codelineno-0-797">797</a></span>
-<span class="normal"><a href="#__codelineno-0-798">798</a></span>
-<span class="normal"><a href="#__codelineno-0-799">799</a></span>
-<span class="normal"><a href="#__codelineno-0-800">800</a></span>
-<span class="normal"><a href="#__codelineno-0-801">801</a></span>
-<span class="normal"><a href="#__codelineno-0-802">802</a></span>
-<span class="normal"><a href="#__codelineno-0-803">803</a></span>
-<span class="normal"><a href="#__codelineno-0-804">804</a></span>
-<span class="normal"><a href="#__codelineno-0-805">805</a></span>
-<span class="normal"><a href="#__codelineno-0-806">806</a></span>
-<span class="normal"><a href="#__codelineno-0-807">807</a></span>
-<span class="normal"><a href="#__codelineno-0-808">808</a></span>
-<span class="normal"><a href="#__codelineno-0-809">809</a></span>
-<span class="normal"><a href="#__codelineno-0-810">810</a></span>
-<span class="normal"><a href="#__codelineno-0-811">811</a></span>
-<span class="normal"><a href="#__codelineno-0-812">812</a></span>
-<span class="normal"><a href="#__codelineno-0-813">813</a></span>
-<span class="normal"><a href="#__codelineno-0-814">814</a></span>
-<span class="normal"><a href="#__codelineno-0-815">815</a></span>
-<span class="normal"><a href="#__codelineno-0-816">816</a></span>
-<span class="normal"><a href="#__codelineno-0-817">817</a></span>
-<span class="normal"><a href="#__codelineno-0-818">818</a></span>
-<span class="normal"><a href="#__codelineno-0-819">819</a></span>
-<span class="normal"><a href="#__codelineno-0-820">820</a></span>
-<span class="normal"><a href="#__codelineno-0-821">821</a></span>
-<span class="normal"><a href="#__codelineno-0-822">822</a></span>
-<span class="normal"><a href="#__codelineno-0-823">823</a></span>
-<span class="normal"><a href="#__codelineno-0-824">824</a></span>
-<span class="normal"><a href="#__codelineno-0-825">825</a></span>
-<span class="normal"><a href="#__codelineno-0-826">826</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-720" name="__codelineno-0-720"></a><span class="k">def</span><span class="w"> </span><span class="nf">iter_aggregate_netcdf</span><span class="p">(</span>
-<a id="__codelineno-0-721" name="__codelineno-0-721"></a>    <span class="n">nc_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
-<a id="__codelineno-0-722" name="__codelineno-0-722"></a>    <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
-<a id="__codelineno-0-723" name="__codelineno-0-723"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span><span class="p">,</span>
-<a id="__codelineno-0-724" name="__codelineno-0-724"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">AggregatedWindow</span><span class="p">]:</span>
-<a id="__codelineno-0-725" name="__codelineno-0-725"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield one :class:`AggregatedWindow` per time window, streaming.</span>
-<a id="__codelineno-0-726" name="__codelineno-0-726"></a>
-<a id="__codelineno-0-727" name="__codelineno-0-727"></a><span class="sd">    The streaming counterpart to :func:`aggregate_netcdf`, and the</span>
-<a id="__codelineno-0-728" name="__codelineno-0-728"></a><span class="sd">    implementation it is built on. Two properties make it usable on cubes</span>
-<a id="__codelineno-0-729" name="__codelineno-0-729"></a><span class="sd">    that do not fit in memory:</span>
-<a id="__codelineno-0-730" name="__codelineno-0-730"></a>
-<a id="__codelineno-0-731" name="__codelineno-0-731"></a><span class="sd">    * **Only one window is resident at a time.** The time steps for the</span>
-<a id="__codelineno-0-732" name="__codelineno-0-732"></a><span class="sd">      current window are read band by band and stacked; the whole</span>
-<a id="__codelineno-0-733" name="__codelineno-0-733"></a><span class="sd">      `(time, y, x)` cube is never materialised. A ten-year hourly ERA5</span>
-<a id="__codelineno-0-734" name="__codelineno-0-734"></a><span class="sd">      request over Europe at 0.25° is ~33.6 GB as one array but ~9 MB per</span>
-<a id="__codelineno-0-735" name="__codelineno-0-735"></a><span class="sd">      daily window.</span>
-<a id="__codelineno-0-736" name="__codelineno-0-736"></a><span class="sd">    * **Windows are not accumulated.** Each is yielded and then dropped, so</span>
-<a id="__codelineno-0-737" name="__codelineno-0-737"></a><span class="sd">      a caller that writes and discards holds nothing. Pair it with</span>
-<a id="__codelineno-0-738" name="__codelineno-0-738"></a><span class="sd">      `keep_arrays=False` to drop the reduced array too once it is on disk.</span>
-<a id="__codelineno-0-739" name="__codelineno-0-739"></a>
-<a id="__codelineno-0-740" name="__codelineno-0-740"></a><span class="sd">    Every handle opened — the container, the variable subset, and the</span>
-<a id="__codelineno-0-741" name="__codelineno-0-741"></a><span class="sd">    level-pinned view — is closed when the generator finishes or is</span>
-<a id="__codelineno-0-742" name="__codelineno-0-742"></a><span class="sd">    abandoned, so the file can be deleted or overwritten straight after.</span>
-<a id="__codelineno-0-743" name="__codelineno-0-743"></a><span class="sd">    Closing the container alone is not sufficient: the variable subset holds</span>
-<a id="__codelineno-0-744" name="__codelineno-0-744"></a><span class="sd">    its own handle, and one left open keeps a Windows lock on the file.</span>
-<a id="__codelineno-0-745" name="__codelineno-0-745"></a>
-<a id="__codelineno-0-746" name="__codelineno-0-746"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-747" name="__codelineno-0-747"></a><span class="sd">        nc_path: Path to the NetCDF on disk.</span>
-<a id="__codelineno-0-748" name="__codelineno-0-748"></a><span class="sd">        var_info: Catalog row for the variable being aggregated. Used to</span>
-<a id="__codelineno-0-749" name="__codelineno-0-749"></a><span class="sd">            pick the variable from the NetCDF (`var_info.nc_variable`),</span>
-<a id="__codelineno-0-750" name="__codelineno-0-750"></a><span class="sd">            seed the output filename (`var_info.cds_variable`), and resolve</span>
-<a id="__codelineno-0-751" name="__codelineno-0-751"></a><span class="sd">            `op=&quot;auto&quot;` (`var_info.is_flux`).</span>
-<a id="__codelineno-0-752" name="__codelineno-0-752"></a><span class="sd">        config: Frozen :class:`AggregationConfig` describing the window,</span>
-<a id="__codelineno-0-753" name="__codelineno-0-753"></a><span class="sd">            reduction, output location, and whether to retain arrays.</span>
-<a id="__codelineno-0-754" name="__codelineno-0-754"></a>
-<a id="__codelineno-0-755" name="__codelineno-0-755"></a><span class="sd">    Yields:</span>
-<a id="__codelineno-0-756" name="__codelineno-0-756"></a><span class="sd">        AggregatedWindow: One per window, in time order.</span>
-<a id="__codelineno-0-757" name="__codelineno-0-757"></a>
-<a id="__codelineno-0-758" name="__codelineno-0-758"></a><span class="sd">    Raises:</span>
-<a id="__codelineno-0-759" name="__codelineno-0-759"></a><span class="sd">        KeyError: If the NetCDF has no recognised time variable</span>
-<a id="__codelineno-0-760" name="__codelineno-0-760"></a><span class="sd">            (`valid_time` / `time`); see :func:`_read_time_axis`.</span>
-<a id="__codelineno-0-761" name="__codelineno-0-761"></a><span class="sd">        ValueError: If `config.level` is set but the NetCDF has no</span>
-<a id="__codelineno-0-762" name="__codelineno-0-762"></a><span class="sd">            pressure-level dimension, or vice versa; see</span>
-<a id="__codelineno-0-763" name="__codelineno-0-763"></a><span class="sd">            :func:`_resolve_pressure_level`. Also raised by pandas when</span>
-<a id="__codelineno-0-764" name="__codelineno-0-764"></a><span class="sd">            `config.freq` is not a recognised offset alias.</span>
-<a id="__codelineno-0-765" name="__codelineno-0-765"></a>
-<a id="__codelineno-0-766" name="__codelineno-0-766"></a><span class="sd">    See Also:</span>
-<a id="__codelineno-0-767" name="__codelineno-0-767"></a><span class="sd">        - :func:`aggregate_netcdf`: the eager `list` form of this function.</span>
-<a id="__codelineno-0-768" name="__codelineno-0-768"></a><span class="sd">        - :class:`AggregationConfig`: the frozen request payload.</span>
-<a id="__codelineno-0-769" name="__codelineno-0-769"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-770" name="__codelineno-0-770"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
-<a id="__codelineno-0-771" name="__codelineno-0-771"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
-<a id="__codelineno-0-772" name="__codelineno-0-772"></a>
-<a id="__codelineno-0-773" name="__codelineno-0-773"></a>    <span class="n">out_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">out_dir</span>
-<a id="__codelineno-0-774" name="__codelineno-0-774"></a>    <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-775" name="__codelineno-0-775"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
-<a id="__codelineno-0-776" name="__codelineno-0-776"></a>        <span class="n">out_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-777" name="__codelineno-0-777"></a>
-<a id="__codelineno-0-778" name="__codelineno-0-778"></a>    <span class="n">op</span> <span class="o">=</span> <span class="n">_resolve_op</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">op</span><span class="p">,</span> <span class="n">var_info</span><span class="p">)</span>
-<a id="__codelineno-0-779" name="__codelineno-0-779"></a>
-<a id="__codelineno-0-780" name="__codelineno-0-780"></a>    <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">nc_path</span><span class="p">))</span>
-<a id="__codelineno-0-781" name="__codelineno-0-781"></a>    <span class="c1"># Every handle opened here is closed on the way out. Closing only the</span>
-<a id="__codelineno-0-782" name="__codelineno-0-782"></a>    <span class="c1"># root container is not enough: the variable subset (and the level-pinned</span>
-<a id="__codelineno-0-783" name="__codelineno-0-783"></a>    <span class="c1"># `sel()` result) each hold their own handle, and any one of them left</span>
-<a id="__codelineno-0-784" name="__codelineno-0-784"></a>    <span class="c1"># open keeps a lock on the file under Windows — so the caller could not</span>
-<a id="__codelineno-0-785" name="__codelineno-0-785"></a>    <span class="c1"># delete or overwrite the NetCDF it just aggregated.</span>
-<a id="__codelineno-0-786" name="__codelineno-0-786"></a>    <span class="n">opened</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">nc</span><span class="p">]</span>
-<a id="__codelineno-0-787" name="__codelineno-0-787"></a>    <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-788" name="__codelineno-0-788"></a>        <span class="c1"># Read time axis + geotransform from the root container — only the</span>
-<a id="__codelineno-0-789" name="__codelineno-0-789"></a>        <span class="c1"># container exposes `get_time_variable` against the underlying CF</span>
-<a id="__codelineno-0-790" name="__codelineno-0-790"></a>        <span class="c1"># metadata. The variable-subset cube returned by `get_variable`</span>
-<a id="__codelineno-0-791" name="__codelineno-0-791"></a>        <span class="c1"># tracks coords on `_band_dim_values_map` instead, but does not</span>
-<a id="__codelineno-0-792" name="__codelineno-0-792"></a>        <span class="c1"># round-trip them through `get_time_variable`. The cube is what</span>
-<a id="__codelineno-0-793" name="__codelineno-0-793"></a>        <span class="c1"># `sel()` and the band-dim-aware multi-D logic need, so use it</span>
-<a id="__codelineno-0-794" name="__codelineno-0-794"></a>        <span class="c1"># for level pinning + array read.</span>
-<a id="__codelineno-0-795" name="__codelineno-0-795"></a>        <span class="n">time_axis</span> <span class="o">=</span> <span class="n">_read_time_axis</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span>
-<a id="__codelineno-0-796" name="__codelineno-0-796"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">geotransform</span>
-<a id="__codelineno-0-797" name="__codelineno-0-797"></a>        <span class="n">var</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">nc_variable</span><span class="p">)</span>
-<a id="__codelineno-0-798" name="__codelineno-0-798"></a>        <span class="n">opened</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-<a id="__codelineno-0-799" name="__codelineno-0-799"></a>        <span class="n">var</span> <span class="o">=</span> <span class="n">_resolve_pressure_level</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">level</span><span class="p">)</span>
-<a id="__codelineno-0-800" name="__codelineno-0-800"></a>        <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">opened</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-<a id="__codelineno-0-801" name="__codelineno-0-801"></a>            <span class="n">opened</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
-<a id="__codelineno-0-802" name="__codelineno-0-802"></a>
-<a id="__codelineno-0-803" name="__codelineno-0-803"></a>        <span class="k">for</span> <span class="n">window_label</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">window_groups</span><span class="p">(</span><span class="n">time_axis</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">):</span>
-<a id="__codelineno-0-804" name="__codelineno-0-804"></a>            <span class="n">slice_</span> <span class="o">=</span> <span class="n">_read_window</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
-<a id="__codelineno-0-805" name="__codelineno-0-805"></a>            <span class="n">reduced</span> <span class="o">=</span> <span class="n">reduce_time_axis</span><span class="p">(</span>
-<a id="__codelineno-0-806" name="__codelineno-0-806"></a>                <span class="n">slice_</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">op</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">skipna</span><span class="p">,</span> <span class="n">min_count</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">min_count</span>
-<a id="__codelineno-0-807" name="__codelineno-0-807"></a>            <span class="p">)</span>
-<a id="__codelineno-0-808" name="__codelineno-0-808"></a>
-<a id="__codelineno-0-809" name="__codelineno-0-809"></a>            <span class="n">target</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-810" name="__codelineno-0-810"></a>            <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-811" name="__codelineno-0-811"></a>                <span class="n">target</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="p">(</span>
-<a id="__codelineno-0-812" name="__codelineno-0-812"></a>                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_info</span><span class="o">.</span><span class="n">cds_variable</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">window_label</span><span class="si">:</span><span class="s2">%Y%m%d</span><span class="si">}</span><span class="s2">.tif&quot;</span>
-<a id="__codelineno-0-813" name="__codelineno-0-813"></a>                <span class="p">)</span>
-<a id="__codelineno-0-814" name="__codelineno-0-814"></a>                <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">reduced</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span>
-<a id="__codelineno-0-815" name="__codelineno-0-815"></a>                    <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-<a id="__codelineno-0-816" name="__codelineno-0-816"></a>                <span class="p">)</span>
-<a id="__codelineno-0-817" name="__codelineno-0-817"></a>
-<a id="__codelineno-0-818" name="__codelineno-0-818"></a>            <span class="n">keep</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">keep_arrays</span> <span class="ow">or</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span>
-<a id="__codelineno-0-819" name="__codelineno-0-819"></a>            <span class="k">yield</span> <span class="n">AggregatedWindow</span><span class="p">(</span>
-<a id="__codelineno-0-820" name="__codelineno-0-820"></a>                <span class="n">label</span><span class="o">=</span><span class="n">window_label</span><span class="p">,</span>
-<a id="__codelineno-0-821" name="__codelineno-0-821"></a>                <span class="n">array</span><span class="o">=</span><span class="n">reduced</span> <span class="k">if</span> <span class="n">keep</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-822" name="__codelineno-0-822"></a>                <span class="n">path</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
-<a id="__codelineno-0-823" name="__codelineno-0-823"></a>            <span class="p">)</span>
-<a id="__codelineno-0-824" name="__codelineno-0-824"></a>    <span class="k">finally</span><span class="p">:</span>
-<a id="__codelineno-0-825" name="__codelineno-0-825"></a>        <span class="k">for</span> <span class="n">handle</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">opened</span><span class="p">):</span>
-<a id="__codelineno-0-826" name="__codelineno-0-826"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-837">837</a></span>
+<span class="normal"><a href="#__codelineno-0-838">838</a></span>
+<span class="normal"><a href="#__codelineno-0-839">839</a></span>
+<span class="normal"><a href="#__codelineno-0-840">840</a></span>
+<span class="normal"><a href="#__codelineno-0-841">841</a></span>
+<span class="normal"><a href="#__codelineno-0-842">842</a></span>
+<span class="normal"><a href="#__codelineno-0-843">843</a></span>
+<span class="normal"><a href="#__codelineno-0-844">844</a></span>
+<span class="normal"><a href="#__codelineno-0-845">845</a></span>
+<span class="normal"><a href="#__codelineno-0-846">846</a></span>
+<span class="normal"><a href="#__codelineno-0-847">847</a></span>
+<span class="normal"><a href="#__codelineno-0-848">848</a></span>
+<span class="normal"><a href="#__codelineno-0-849">849</a></span>
+<span class="normal"><a href="#__codelineno-0-850">850</a></span>
+<span class="normal"><a href="#__codelineno-0-851">851</a></span>
+<span class="normal"><a href="#__codelineno-0-852">852</a></span>
+<span class="normal"><a href="#__codelineno-0-853">853</a></span>
+<span class="normal"><a href="#__codelineno-0-854">854</a></span>
+<span class="normal"><a href="#__codelineno-0-855">855</a></span>
+<span class="normal"><a href="#__codelineno-0-856">856</a></span>
+<span class="normal"><a href="#__codelineno-0-857">857</a></span>
+<span class="normal"><a href="#__codelineno-0-858">858</a></span>
+<span class="normal"><a href="#__codelineno-0-859">859</a></span>
+<span class="normal"><a href="#__codelineno-0-860">860</a></span>
+<span class="normal"><a href="#__codelineno-0-861">861</a></span>
+<span class="normal"><a href="#__codelineno-0-862">862</a></span>
+<span class="normal"><a href="#__codelineno-0-863">863</a></span>
+<span class="normal"><a href="#__codelineno-0-864">864</a></span>
+<span class="normal"><a href="#__codelineno-0-865">865</a></span>
+<span class="normal"><a href="#__codelineno-0-866">866</a></span>
+<span class="normal"><a href="#__codelineno-0-867">867</a></span>
+<span class="normal"><a href="#__codelineno-0-868">868</a></span>
+<span class="normal"><a href="#__codelineno-0-869">869</a></span>
+<span class="normal"><a href="#__codelineno-0-870">870</a></span>
+<span class="normal"><a href="#__codelineno-0-871">871</a></span>
+<span class="normal"><a href="#__codelineno-0-872">872</a></span>
+<span class="normal"><a href="#__codelineno-0-873">873</a></span>
+<span class="normal"><a href="#__codelineno-0-874">874</a></span>
+<span class="normal"><a href="#__codelineno-0-875">875</a></span>
+<span class="normal"><a href="#__codelineno-0-876">876</a></span>
+<span class="normal"><a href="#__codelineno-0-877">877</a></span>
+<span class="normal"><a href="#__codelineno-0-878">878</a></span>
+<span class="normal"><a href="#__codelineno-0-879">879</a></span>
+<span class="normal"><a href="#__codelineno-0-880">880</a></span>
+<span class="normal"><a href="#__codelineno-0-881">881</a></span>
+<span class="normal"><a href="#__codelineno-0-882">882</a></span>
+<span class="normal"><a href="#__codelineno-0-883">883</a></span>
+<span class="normal"><a href="#__codelineno-0-884">884</a></span>
+<span class="normal"><a href="#__codelineno-0-885">885</a></span>
+<span class="normal"><a href="#__codelineno-0-886">886</a></span>
+<span class="normal"><a href="#__codelineno-0-887">887</a></span>
+<span class="normal"><a href="#__codelineno-0-888">888</a></span>
+<span class="normal"><a href="#__codelineno-0-889">889</a></span>
+<span class="normal"><a href="#__codelineno-0-890">890</a></span>
+<span class="normal"><a href="#__codelineno-0-891">891</a></span>
+<span class="normal"><a href="#__codelineno-0-892">892</a></span>
+<span class="normal"><a href="#__codelineno-0-893">893</a></span>
+<span class="normal"><a href="#__codelineno-0-894">894</a></span>
+<span class="normal"><a href="#__codelineno-0-895">895</a></span>
+<span class="normal"><a href="#__codelineno-0-896">896</a></span>
+<span class="normal"><a href="#__codelineno-0-897">897</a></span>
+<span class="normal"><a href="#__codelineno-0-898">898</a></span>
+<span class="normal"><a href="#__codelineno-0-899">899</a></span>
+<span class="normal"><a href="#__codelineno-0-900">900</a></span>
+<span class="normal"><a href="#__codelineno-0-901">901</a></span>
+<span class="normal"><a href="#__codelineno-0-902">902</a></span>
+<span class="normal"><a href="#__codelineno-0-903">903</a></span>
+<span class="normal"><a href="#__codelineno-0-904">904</a></span>
+<span class="normal"><a href="#__codelineno-0-905">905</a></span>
+<span class="normal"><a href="#__codelineno-0-906">906</a></span>
+<span class="normal"><a href="#__codelineno-0-907">907</a></span>
+<span class="normal"><a href="#__codelineno-0-908">908</a></span>
+<span class="normal"><a href="#__codelineno-0-909">909</a></span>
+<span class="normal"><a href="#__codelineno-0-910">910</a></span>
+<span class="normal"><a href="#__codelineno-0-911">911</a></span>
+<span class="normal"><a href="#__codelineno-0-912">912</a></span>
+<span class="normal"><a href="#__codelineno-0-913">913</a></span>
+<span class="normal"><a href="#__codelineno-0-914">914</a></span>
+<span class="normal"><a href="#__codelineno-0-915">915</a></span>
+<span class="normal"><a href="#__codelineno-0-916">916</a></span>
+<span class="normal"><a href="#__codelineno-0-917">917</a></span>
+<span class="normal"><a href="#__codelineno-0-918">918</a></span>
+<span class="normal"><a href="#__codelineno-0-919">919</a></span>
+<span class="normal"><a href="#__codelineno-0-920">920</a></span>
+<span class="normal"><a href="#__codelineno-0-921">921</a></span>
+<span class="normal"><a href="#__codelineno-0-922">922</a></span>
+<span class="normal"><a href="#__codelineno-0-923">923</a></span>
+<span class="normal"><a href="#__codelineno-0-924">924</a></span>
+<span class="normal"><a href="#__codelineno-0-925">925</a></span>
+<span class="normal"><a href="#__codelineno-0-926">926</a></span>
+<span class="normal"><a href="#__codelineno-0-927">927</a></span>
+<span class="normal"><a href="#__codelineno-0-928">928</a></span>
+<span class="normal"><a href="#__codelineno-0-929">929</a></span>
+<span class="normal"><a href="#__codelineno-0-930">930</a></span>
+<span class="normal"><a href="#__codelineno-0-931">931</a></span>
+<span class="normal"><a href="#__codelineno-0-932">932</a></span>
+<span class="normal"><a href="#__codelineno-0-933">933</a></span>
+<span class="normal"><a href="#__codelineno-0-934">934</a></span>
+<span class="normal"><a href="#__codelineno-0-935">935</a></span>
+<span class="normal"><a href="#__codelineno-0-936">936</a></span>
+<span class="normal"><a href="#__codelineno-0-937">937</a></span>
+<span class="normal"><a href="#__codelineno-0-938">938</a></span>
+<span class="normal"><a href="#__codelineno-0-939">939</a></span>
+<span class="normal"><a href="#__codelineno-0-940">940</a></span>
+<span class="normal"><a href="#__codelineno-0-941">941</a></span>
+<span class="normal"><a href="#__codelineno-0-942">942</a></span>
+<span class="normal"><a href="#__codelineno-0-943">943</a></span>
+<span class="normal"><a href="#__codelineno-0-944">944</a></span>
+<span class="normal"><a href="#__codelineno-0-945">945</a></span>
+<span class="normal"><a href="#__codelineno-0-946">946</a></span>
+<span class="normal"><a href="#__codelineno-0-947">947</a></span>
+<span class="normal"><a href="#__codelineno-0-948">948</a></span>
+<span class="normal"><a href="#__codelineno-0-949">949</a></span>
+<span class="normal"><a href="#__codelineno-0-950">950</a></span>
+<span class="normal"><a href="#__codelineno-0-951">951</a></span>
+<span class="normal"><a href="#__codelineno-0-952">952</a></span>
+<span class="normal"><a href="#__codelineno-0-953">953</a></span>
+<span class="normal"><a href="#__codelineno-0-954">954</a></span>
+<span class="normal"><a href="#__codelineno-0-955">955</a></span>
+<span class="normal"><a href="#__codelineno-0-956">956</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-837" name="__codelineno-0-837"></a><span class="k">def</span><span class="w"> </span><span class="nf">iter_aggregate_netcdf</span><span class="p">(</span>
+<a id="__codelineno-0-838" name="__codelineno-0-838"></a>    <span class="n">nc_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+<a id="__codelineno-0-839" name="__codelineno-0-839"></a>    <span class="n">var_info</span><span class="p">:</span> <span class="n">Variable</span><span class="p">,</span>
+<a id="__codelineno-0-840" name="__codelineno-0-840"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">AggregationConfig</span><span class="p">,</span>
+<a id="__codelineno-0-841" name="__codelineno-0-841"></a>    <span class="n">date_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-842" name="__codelineno-0-842"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">AggregatedWindow</span><span class="p">]:</span>
+<a id="__codelineno-0-843" name="__codelineno-0-843"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield one :class:`AggregatedWindow` per time window, streaming.</span>
+<a id="__codelineno-0-844" name="__codelineno-0-844"></a>
+<a id="__codelineno-0-845" name="__codelineno-0-845"></a><span class="sd">    The streaming counterpart to :func:`aggregate_netcdf`, and the</span>
+<a id="__codelineno-0-846" name="__codelineno-0-846"></a><span class="sd">    implementation it is built on. Two properties make it usable on cubes</span>
+<a id="__codelineno-0-847" name="__codelineno-0-847"></a><span class="sd">    that do not fit in memory:</span>
+<a id="__codelineno-0-848" name="__codelineno-0-848"></a>
+<a id="__codelineno-0-849" name="__codelineno-0-849"></a><span class="sd">    * **Only one window is resident at a time.** The time steps for the</span>
+<a id="__codelineno-0-850" name="__codelineno-0-850"></a><span class="sd">      current window are read band by band and stacked; the whole</span>
+<a id="__codelineno-0-851" name="__codelineno-0-851"></a><span class="sd">      `(time, y, x)` cube is never materialised. A ten-year hourly ERA5</span>
+<a id="__codelineno-0-852" name="__codelineno-0-852"></a><span class="sd">      request over Europe at 0.25° is ~33.6 GB as one array but ~9 MB per</span>
+<a id="__codelineno-0-853" name="__codelineno-0-853"></a><span class="sd">      daily window.</span>
+<a id="__codelineno-0-854" name="__codelineno-0-854"></a><span class="sd">    * **Windows are not accumulated.** Each is yielded and then dropped, so</span>
+<a id="__codelineno-0-855" name="__codelineno-0-855"></a><span class="sd">      a caller that writes and discards holds nothing. Pair it with</span>
+<a id="__codelineno-0-856" name="__codelineno-0-856"></a><span class="sd">      `keep_arrays=False` to drop the reduced array too once it is on disk.</span>
+<a id="__codelineno-0-857" name="__codelineno-0-857"></a>
+<a id="__codelineno-0-858" name="__codelineno-0-858"></a><span class="sd">    Every handle opened — the container, the variable subset, and the</span>
+<a id="__codelineno-0-859" name="__codelineno-0-859"></a><span class="sd">    level-pinned view — is closed when the generator finishes or is</span>
+<a id="__codelineno-0-860" name="__codelineno-0-860"></a><span class="sd">    abandoned, so the file can be deleted or overwritten straight after.</span>
+<a id="__codelineno-0-861" name="__codelineno-0-861"></a><span class="sd">    Closing the container alone is not sufficient: the variable subset holds</span>
+<a id="__codelineno-0-862" name="__codelineno-0-862"></a><span class="sd">    its own handle, and one left open keeps a Windows lock on the file.</span>
+<a id="__codelineno-0-863" name="__codelineno-0-863"></a>
+<a id="__codelineno-0-864" name="__codelineno-0-864"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-865" name="__codelineno-0-865"></a><span class="sd">        nc_path: Path to the NetCDF on disk.</span>
+<a id="__codelineno-0-866" name="__codelineno-0-866"></a><span class="sd">        var_info: Catalog row for the variable being aggregated. Used to</span>
+<a id="__codelineno-0-867" name="__codelineno-0-867"></a><span class="sd">            pick the variable from the NetCDF (`var_info.nc_variable`),</span>
+<a id="__codelineno-0-868" name="__codelineno-0-868"></a><span class="sd">            seed the output filename (`_output_stem` — `var_info.cds_variable`,</span>
+<a id="__codelineno-0-869" name="__codelineno-0-869"></a><span class="sd">            plus `dataset_id` for a curated override), and resolve</span>
+<a id="__codelineno-0-870" name="__codelineno-0-870"></a><span class="sd">            `op=&quot;auto&quot;` (`var_info.is_flux`).</span>
+<a id="__codelineno-0-871" name="__codelineno-0-871"></a><span class="sd">        config: Frozen :class:`AggregationConfig` describing the window,</span>
+<a id="__codelineno-0-872" name="__codelineno-0-872"></a><span class="sd">            reduction, output location, and whether to retain arrays.</span>
+<a id="__codelineno-0-873" name="__codelineno-0-873"></a><span class="sd">        date_range: Optional inclusive `(start, end)` bounds. Samples outside</span>
+<a id="__codelineno-0-874" name="__codelineno-0-874"></a><span class="sd">            the range are dropped before windowing, so the streamed windows</span>
+<a id="__codelineno-0-875" name="__codelineno-0-875"></a><span class="sd">            match the requested span even when the source cube over-covers it;</span>
+<a id="__codelineno-0-876" name="__codelineno-0-876"></a><span class="sd">            a window left empty by the filter is skipped. `None` keeps every</span>
+<a id="__codelineno-0-877" name="__codelineno-0-877"></a><span class="sd">            sample. See :func:`_date_range_mask`.</span>
+<a id="__codelineno-0-878" name="__codelineno-0-878"></a>
+<a id="__codelineno-0-879" name="__codelineno-0-879"></a><span class="sd">    Yields:</span>
+<a id="__codelineno-0-880" name="__codelineno-0-880"></a><span class="sd">        AggregatedWindow: One per window, in time order.</span>
+<a id="__codelineno-0-881" name="__codelineno-0-881"></a>
+<a id="__codelineno-0-882" name="__codelineno-0-882"></a><span class="sd">    Raises:</span>
+<a id="__codelineno-0-883" name="__codelineno-0-883"></a><span class="sd">        KeyError: If the NetCDF has no recognised time variable</span>
+<a id="__codelineno-0-884" name="__codelineno-0-884"></a><span class="sd">            (`valid_time` / `time`); see :func:`_read_time_axis`.</span>
+<a id="__codelineno-0-885" name="__codelineno-0-885"></a><span class="sd">        ValueError: If `config.level` is set but the NetCDF has no</span>
+<a id="__codelineno-0-886" name="__codelineno-0-886"></a><span class="sd">            pressure-level dimension, or vice versa; see</span>
+<a id="__codelineno-0-887" name="__codelineno-0-887"></a><span class="sd">            :func:`_resolve_pressure_level`. Also raised by pandas when</span>
+<a id="__codelineno-0-888" name="__codelineno-0-888"></a><span class="sd">            `config.freq` is not a recognised offset alias.</span>
+<a id="__codelineno-0-889" name="__codelineno-0-889"></a>
+<a id="__codelineno-0-890" name="__codelineno-0-890"></a><span class="sd">    See Also:</span>
+<a id="__codelineno-0-891" name="__codelineno-0-891"></a><span class="sd">        - :func:`aggregate_netcdf`: the eager `list` form of this function.</span>
+<a id="__codelineno-0-892" name="__codelineno-0-892"></a><span class="sd">        - :class:`AggregationConfig`: the frozen request payload.</span>
+<a id="__codelineno-0-893" name="__codelineno-0-893"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-894" name="__codelineno-0-894"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<a id="__codelineno-0-895" name="__codelineno-0-895"></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">pyramids.netcdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetCDF</span>
+<a id="__codelineno-0-896" name="__codelineno-0-896"></a>
+<a id="__codelineno-0-897" name="__codelineno-0-897"></a>    <span class="n">out_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">out_dir</span>
+<a id="__codelineno-0-898" name="__codelineno-0-898"></a>    <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-899" name="__codelineno-0-899"></a>        <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
+<a id="__codelineno-0-900" name="__codelineno-0-900"></a>        <span class="n">out_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-901" name="__codelineno-0-901"></a>
+<a id="__codelineno-0-902" name="__codelineno-0-902"></a>    <span class="n">op</span> <span class="o">=</span> <span class="n">_resolve_op</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">op</span><span class="p">,</span> <span class="n">var_info</span><span class="p">)</span>
+<a id="__codelineno-0-903" name="__codelineno-0-903"></a>
+<a id="__codelineno-0-904" name="__codelineno-0-904"></a>    <span class="n">nc</span> <span class="o">=</span> <span class="n">NetCDF</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">nc_path</span><span class="p">))</span>
+<a id="__codelineno-0-905" name="__codelineno-0-905"></a>    <span class="c1"># Every handle opened here is closed on the way out. Closing only the</span>
+<a id="__codelineno-0-906" name="__codelineno-0-906"></a>    <span class="c1"># root container is not enough: the variable subset (and the level-pinned</span>
+<a id="__codelineno-0-907" name="__codelineno-0-907"></a>    <span class="c1"># `sel()` result) each hold their own handle, and any one of them left</span>
+<a id="__codelineno-0-908" name="__codelineno-0-908"></a>    <span class="c1"># open keeps a lock on the file under Windows — so the caller could not</span>
+<a id="__codelineno-0-909" name="__codelineno-0-909"></a>    <span class="c1"># delete or overwrite the NetCDF it just aggregated.</span>
+<a id="__codelineno-0-910" name="__codelineno-0-910"></a>    <span class="n">opened</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">nc</span><span class="p">]</span>
+<a id="__codelineno-0-911" name="__codelineno-0-911"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-912" name="__codelineno-0-912"></a>        <span class="c1"># Read time axis + geotransform from the root container — only the</span>
+<a id="__codelineno-0-913" name="__codelineno-0-913"></a>        <span class="c1"># container exposes `get_time_variable` against the underlying CF</span>
+<a id="__codelineno-0-914" name="__codelineno-0-914"></a>        <span class="c1"># metadata. The variable-subset cube returned by `get_variable`</span>
+<a id="__codelineno-0-915" name="__codelineno-0-915"></a>        <span class="c1"># tracks coords on `_band_dim_values_map` instead, but does not</span>
+<a id="__codelineno-0-916" name="__codelineno-0-916"></a>        <span class="c1"># round-trip them through `get_time_variable`. The cube is what</span>
+<a id="__codelineno-0-917" name="__codelineno-0-917"></a>        <span class="c1"># `sel()` and the band-dim-aware multi-D logic need, so use it</span>
+<a id="__codelineno-0-918" name="__codelineno-0-918"></a>        <span class="c1"># for level pinning + array read.</span>
+<a id="__codelineno-0-919" name="__codelineno-0-919"></a>        <span class="n">time_axis</span> <span class="o">=</span> <span class="n">_read_time_axis</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span>
+<a id="__codelineno-0-920" name="__codelineno-0-920"></a>        <span class="n">geo</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">geotransform</span>
+<a id="__codelineno-0-921" name="__codelineno-0-921"></a>        <span class="n">var</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="n">var_info</span><span class="o">.</span><span class="n">nc_variable</span><span class="p">)</span>
+<a id="__codelineno-0-922" name="__codelineno-0-922"></a>        <span class="n">opened</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+<a id="__codelineno-0-923" name="__codelineno-0-923"></a>        <span class="n">var</span> <span class="o">=</span> <span class="n">_resolve_pressure_level</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">level</span><span class="p">)</span>
+<a id="__codelineno-0-924" name="__codelineno-0-924"></a>        <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">opened</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+<a id="__codelineno-0-925" name="__codelineno-0-925"></a>            <span class="n">opened</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+<a id="__codelineno-0-926" name="__codelineno-0-926"></a>
+<a id="__codelineno-0-927" name="__codelineno-0-927"></a>        <span class="n">in_range</span> <span class="o">=</span> <span class="n">_date_range_mask</span><span class="p">(</span><span class="n">time_axis</span><span class="p">,</span> <span class="n">date_range</span><span class="p">)</span>
+<a id="__codelineno-0-928" name="__codelineno-0-928"></a>        <span class="n">stem</span> <span class="o">=</span> <span class="n">_output_stem</span><span class="p">(</span><span class="n">var_info</span><span class="p">)</span>
+<a id="__codelineno-0-929" name="__codelineno-0-929"></a>        <span class="k">for</span> <span class="n">window_label</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">window_groups</span><span class="p">(</span><span class="n">time_axis</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="p">):</span>
+<a id="__codelineno-0-930" name="__codelineno-0-930"></a>            <span class="k">if</span> <span class="n">in_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-931" name="__codelineno-0-931"></a>                <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">in_range</span>
+<a id="__codelineno-0-932" name="__codelineno-0-932"></a>                <span class="k">if</span> <span class="ow">not</span> <span class="n">mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+<a id="__codelineno-0-933" name="__codelineno-0-933"></a>                    <span class="c1"># The whole window fell outside the requested date range —</span>
+<a id="__codelineno-0-934" name="__codelineno-0-934"></a>                    <span class="c1"># nothing to aggregate, so emit no GeoTIFF for it.</span>
+<a id="__codelineno-0-935" name="__codelineno-0-935"></a>                    <span class="k">continue</span>
+<a id="__codelineno-0-936" name="__codelineno-0-936"></a>            <span class="n">slice_</span> <span class="o">=</span> <span class="n">_read_window</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+<a id="__codelineno-0-937" name="__codelineno-0-937"></a>            <span class="n">reduced</span> <span class="o">=</span> <span class="n">reduce_time_axis</span><span class="p">(</span>
+<a id="__codelineno-0-938" name="__codelineno-0-938"></a>                <span class="n">slice_</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">op</span><span class="p">,</span> <span class="n">skipna</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">skipna</span><span class="p">,</span> <span class="n">min_count</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">min_count</span>
+<a id="__codelineno-0-939" name="__codelineno-0-939"></a>            <span class="p">)</span>
+<a id="__codelineno-0-940" name="__codelineno-0-940"></a>
+<a id="__codelineno-0-941" name="__codelineno-0-941"></a>            <span class="n">target</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-942" name="__codelineno-0-942"></a>            <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-943" name="__codelineno-0-943"></a>                <span class="n">target</span> <span class="o">=</span> <span class="n">out_dir</span> <span class="o">/</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">freq</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">window_label</span><span class="si">:</span><span class="s2">%Y%m%d</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-944" name="__codelineno-0-944"></a>                <span class="n">Dataset</span><span class="o">.</span><span class="n">create_from_array</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">reduced</span><span class="p">,</span> <span class="n">geo</span><span class="o">=</span><span class="n">geo</span><span class="p">,</span> <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span>
+<a id="__codelineno-0-945" name="__codelineno-0-945"></a>                    <span class="nb">str</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<a id="__codelineno-0-946" name="__codelineno-0-946"></a>                <span class="p">)</span>
+<a id="__codelineno-0-947" name="__codelineno-0-947"></a>
+<a id="__codelineno-0-948" name="__codelineno-0-948"></a>            <span class="n">keep</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">keep_arrays</span> <span class="ow">or</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span>
+<a id="__codelineno-0-949" name="__codelineno-0-949"></a>            <span class="k">yield</span> <span class="n">AggregatedWindow</span><span class="p">(</span>
+<a id="__codelineno-0-950" name="__codelineno-0-950"></a>                <span class="n">label</span><span class="o">=</span><span class="n">window_label</span><span class="p">,</span>
+<a id="__codelineno-0-951" name="__codelineno-0-951"></a>                <span class="n">array</span><span class="o">=</span><span class="n">reduced</span> <span class="k">if</span> <span class="n">keep</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-952" name="__codelineno-0-952"></a>                <span class="n">path</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+<a id="__codelineno-0-953" name="__codelineno-0-953"></a>            <span class="p">)</span>
+<a id="__codelineno-0-954" name="__codelineno-0-954"></a>    <span class="k">finally</span><span class="p">:</span>
+<a id="__codelineno-0-955" name="__codelineno-0-955"></a>        <span class="k">for</span> <span class="n">handle</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">opened</span><span class="p">):</span>
+<a id="__codelineno-0-956" name="__codelineno-0-956"></a>            <span class="n">close_quietly</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -24900,14 +24989,14 @@ retain it.</p>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">window</span> <span class="o">=</span> <span class="n">AggregatedWindow</span><span class="p">(</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="o">...</span>     <span class="n">label</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-01-01&quot;</span><span class="p">),</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="o">...</span>     <span class="n">array</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]]),</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="o">...</span>     <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;out/t2m_1D_20200101.tif&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="o">...</span>     <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;out/t2m_reanalysis-era5-single-levels_1D_20200101.tif&quot;</span><span class="p">),</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="o">...</span> <span class="p">)</span>
 <a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">window</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="s1">&#39;2020-01-01&#39;</span>
 <a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="o">&gt;&gt;&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">window</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="mf">1.5</span>
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">window</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">name</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="s1">&#39;t2m_1D_20200101.tif&#39;</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="s1">&#39;t2m_reanalysis-era5-single-levels_1D_20200101.tif&#39;</span>
 </code></pre></div></li>
 <li>A discarded array leaves only the label and the path to read back:
     <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -24916,12 +25005,12 @@ retain it.</p>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">window</span> <span class="o">=</span> <span class="n">AggregatedWindow</span><span class="p">(</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="o">...</span>     <span class="n">label</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="s2">&quot;2020-02-01&quot;</span><span class="p">),</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="o">...</span>     <span class="n">array</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="o">...</span>     <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;out/t2m_1D_20200201.tif&quot;</span><span class="p">),</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="o">...</span>     <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;out/t2m_reanalysis-era5-single-levels_1D_20200201.tif&quot;</span><span class="p">),</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="o">...</span> <span class="p">)</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">window</span><span class="o">.</span><span class="n">array</span> <span class="ow">is</span> <span class="kc">None</span>
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="kc">True</span>
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">window</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">name</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="s1">&#39;t2m_1D_20200201.tif&#39;</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="s1">&#39;t2m_reanalysis-era5-single-levels_1D_20200201.tif&#39;</span>
 </code></pre></div></li>
 </ul>
 
@@ -25026,14 +25115,14 @@ retain it.</p>
 <a id="__codelineno-0-631" name="__codelineno-0-631"></a><span class="sd">            &gt;&gt;&gt; window = AggregatedWindow(</span>
 <a id="__codelineno-0-632" name="__codelineno-0-632"></a><span class="sd">            ...     label=pd.Timestamp(&quot;2020-01-01&quot;),</span>
 <a id="__codelineno-0-633" name="__codelineno-0-633"></a><span class="sd">            ...     array=np.array([[1.0, 2.0]]),</span>
-<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            ...     path=Path(&quot;out/t2m_1D_20200101.tif&quot;),</span>
+<a id="__codelineno-0-634" name="__codelineno-0-634"></a><span class="sd">            ...     path=Path(&quot;out/t2m_reanalysis-era5-single-levels_1D_20200101.tif&quot;),</span>
 <a id="__codelineno-0-635" name="__codelineno-0-635"></a><span class="sd">            ... )</span>
 <a id="__codelineno-0-636" name="__codelineno-0-636"></a><span class="sd">            &gt;&gt;&gt; window.label.strftime(&quot;%Y-%m-%d&quot;)</span>
 <a id="__codelineno-0-637" name="__codelineno-0-637"></a><span class="sd">            &#39;2020-01-01&#39;</span>
 <a id="__codelineno-0-638" name="__codelineno-0-638"></a><span class="sd">            &gt;&gt;&gt; float(window.array.mean())</span>
 <a id="__codelineno-0-639" name="__codelineno-0-639"></a><span class="sd">            1.5</span>
 <a id="__codelineno-0-640" name="__codelineno-0-640"></a><span class="sd">            &gt;&gt;&gt; window.path.name</span>
-<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">            &#39;t2m_1D_20200101.tif&#39;</span>
+<a id="__codelineno-0-641" name="__codelineno-0-641"></a><span class="sd">            &#39;t2m_reanalysis-era5-single-levels_1D_20200101.tif&#39;</span>
 <a id="__codelineno-0-642" name="__codelineno-0-642"></a>
 <a id="__codelineno-0-643" name="__codelineno-0-643"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-644" name="__codelineno-0-644"></a><span class="sd">        - A discarded array leaves only the label and the path to read back:</span>
@@ -25044,12 +25133,12 @@ retain it.</p>
 <a id="__codelineno-0-649" name="__codelineno-0-649"></a><span class="sd">            &gt;&gt;&gt; window = AggregatedWindow(</span>
 <a id="__codelineno-0-650" name="__codelineno-0-650"></a><span class="sd">            ...     label=pd.Timestamp(&quot;2020-02-01&quot;),</span>
 <a id="__codelineno-0-651" name="__codelineno-0-651"></a><span class="sd">            ...     array=None,</span>
-<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            ...     path=Path(&quot;out/t2m_1D_20200201.tif&quot;),</span>
+<a id="__codelineno-0-652" name="__codelineno-0-652"></a><span class="sd">            ...     path=Path(&quot;out/t2m_reanalysis-era5-single-levels_1D_20200201.tif&quot;),</span>
 <a id="__codelineno-0-653" name="__codelineno-0-653"></a><span class="sd">            ... )</span>
 <a id="__codelineno-0-654" name="__codelineno-0-654"></a><span class="sd">            &gt;&gt;&gt; window.array is None</span>
 <a id="__codelineno-0-655" name="__codelineno-0-655"></a><span class="sd">            True</span>
 <a id="__codelineno-0-656" name="__codelineno-0-656"></a><span class="sd">            &gt;&gt;&gt; window.path.name</span>
-<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">            &#39;t2m_1D_20200201.tif&#39;</span>
+<a id="__codelineno-0-657" name="__codelineno-0-657"></a><span class="sd">            &#39;t2m_reanalysis-era5-single-levels_1D_20200201.tif&#39;</span>
 <a id="__codelineno-0-658" name="__codelineno-0-658"></a>
 <a id="__codelineno-0-659" name="__codelineno-0-659"></a><span class="sd">            ```</span>
 <a id="__codelineno-0-660" name="__codelineno-0-660"></a><span class="sd">    &quot;&quot;&quot;</span>
