@@ -1450,6 +1450,54 @@ def _parses_as_yaml(text: str) -> bool:
     return True
 
 
+def _written_rows_survive(text: str, dataset_id: str, filled: list[str]) -> bool:
+    """Return True when every row this pass filled reads back as it was written.
+
+    :func:`_parses_as_yaml` proves the shard still loads, which is a weaker claim
+    than it looks: a hydrated value can be perfectly valid YAML and still be the
+    wrong *type* coming back. Nitrogen monoxide's short name is `no`, which YAML
+    1.1 resolves to the boolean `False` — the file parses, and the catalog then
+    refuses to build the row. Writing that value strands every dataset swept
+    after it, because each one reloads the shard the previous one poisoned.
+
+    So the values are read back the way the catalog will read them and required
+    to still be strings. Only the rows named in `filled` are examined: a shard
+    may carry unrelated imperfections that predate the sweep, and refusing to
+    write because of one would cost hydration for a defect this pass did not
+    cause.
+
+    Args:
+        text: The rewritten shard text.
+        dataset_id: The dataset whose stanza was rewritten.
+        filled: Slugs of the variable rows filled in this pass.
+
+    Returns:
+        True when each filled row carries string `nc_variable` and `units`.
+    """
+    import tempfile
+
+    from earthlens.base.yaml_loader import load_yaml_strict
+
+    with tempfile.TemporaryDirectory() as scratch:
+        probe = Path(scratch) / "shard.yaml"
+        probe.write_text(text, encoding="utf-8")
+        try:
+            data = load_yaml_strict(probe)
+        except Exception:  # noqa: BLE001 - the parse guard reports this case
+            return False
+    variables = ((data or {}).get("datasets", {}).get(dataset_id, {}) or {}).get(
+        "variables"
+    ) or {}
+    for slug in filled:
+        row = variables.get(slug)
+        if not isinstance(row, dict):
+            return False
+        for key in ("nc_variable", "units"):
+            if not isinstance(row.get(key), str):
+                return False
+    return True
+
+
 def _hydrated_detail(session: _ProbeSession, declined: list[str]) -> str:
     """Describe what a hydrated dataset left behind, and why it stopped.
 
@@ -1546,6 +1594,12 @@ def _hydrate_one(
         # unloadable family file on disk and only surface later, far from here.
         # Refusing to write costs one dataset's hydration; writing costs the shard.
         typer.echo(f"{prefix}: rewrite did not parse, shard left untouched")
+        return "unmatched"
+    if not _written_rows_survive(new_text, dataset_id, filled):
+        # A value can be valid YAML and still come back the wrong type -- `no`
+        # reads as the boolean False -- which loads here and breaks the catalog
+        # for every dataset swept after this one. Checked before the write.
+        typer.echo(f"{prefix}: rewrite did not reload, shard left untouched")
         return "unmatched"
     file_text[path] = new_text
     path.write_text(new_text, encoding="utf-8")

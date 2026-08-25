@@ -1288,6 +1288,54 @@ class TestBulkHydrateEmpty:
         assert shard.read_text(encoding="utf-8") == _STANZA, "shard untouched"
         assert "did not parse" in capsys.readouterr().out
 
+    @pytest.mark.parametrize("bad", ["no", "yes", "null", "123", "off"])
+    def test_a_row_that_reloads_as_a_non_string_is_refused(self, bad):
+        """A written value can be valid YAML and still come back the wrong type."""
+        shard = (
+            "datasets:"
+            + chr(10)
+            + "  a-dataset:"
+            + chr(10)
+            + "    variables:"
+            + chr(10)
+            + "      2m-temperature:"
+            + chr(10)
+            + "        nc_variable: "
+            + bad
+            + chr(10)
+            + "        units: K"
+            + chr(10)
+        )
+        assert not hydrate_mod._written_rows_survive(
+            shard, "a-dataset", ["2m-temperature"]
+        ), "a non-string nc_variable breaks the catalog for every later dataset"
+
+    def test_a_pre_existing_bad_row_does_not_block_the_write(self):
+        """Only the rows this pass filled are judged; older defects are not ours."""
+        shard = (
+            "datasets:"
+            + chr(10)
+            + "  a-dataset:"
+            + chr(10)
+            + "    variables:"
+            + chr(10)
+            + "      2m-temperature:"
+            + chr(10)
+            + "        nc_variable: t2m"
+            + chr(10)
+            + "        units: K"
+            + chr(10)
+            + "      untouched:"
+            + chr(10)
+            + "        nc_variable: no"
+            + chr(10)
+            + "        units: '1'"
+            + chr(10)
+        )
+        assert hydrate_mod._written_rows_survive(
+            shard, "a-dataset", ["2m-temperature"]
+        ), "refusing here would cost hydration for a defect the sweep did not cause"
+
     @pytest.mark.parametrize(
         ("limit", "expected"),
         [(1, ["a-dataset"]), (2, ["a-dataset"]), (3, ["a-dataset", "z-dataset"])],
