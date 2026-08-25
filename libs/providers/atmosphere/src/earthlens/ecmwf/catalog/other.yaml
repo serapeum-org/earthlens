@@ -2334,80 +2334,80 @@ datasets:
     variables:
       monthly-temperature:
         cds_variable: monthly_temperature
-        nc_variable: monthly_temperature
-        units: unknown
+        nc_variable: t
+        units: degC
       monthly-daily-minimum-temperature:
         cds_variable: monthly_daily_minimum_temperature
-        nc_variable: monthly_daily_minimum_temperature
-        units: unknown
+        nc_variable: tn
+        units: degC
       monthly-daily-maximum-temperature:
         cds_variable: monthly_daily_maximum_temperature
-        nc_variable: monthly_daily_maximum_temperature
-        units: unknown
+        nc_variable: tx
+        units: degC
       monthly-daily-temperature-range:
         cds_variable: monthly_daily_temperature_range
-        nc_variable: monthly_daily_temperature_range
-        units: unknown
+        nc_variable: dtr
+        units: degC
       monthly-maximum-of-daily-maximum-temperature:
         cds_variable: monthly_maximum_of_daily_maximum_temperature
-        nc_variable: monthly_maximum_of_daily_maximum_temperature
-        units: unknown
+        nc_variable: txx
+        units: degC
       monthly-extreme-hot-days:
         cds_variable: monthly_extreme_hot_days
-        nc_variable: monthly_extreme_hot_days
-        units: unknown
+        nc_variable: tx35
+        units: '1'
       monthly-very-extreme-hot-days:
         cds_variable: monthly_very_extreme_hot_days
-        nc_variable: monthly_very_extreme_hot_days
-        units: unknown
+        nc_variable: tx40
+        units: '1'
       monthly-tropical-nights:
         cds_variable: monthly_tropical_nights
-        nc_variable: monthly_tropical_nights
-        units: unknown
+        nc_variable: tr
+        units: '1'
       annual-cooling-degree-days:
         cds_variable: annual_cooling_degree_days
-        nc_variable: annual_cooling_degree_days
-        units: unknown
+        nc_variable: cd
+        units: degC day
       monthly-minimum-of-daily-minimum-temperature:
         cds_variable: monthly_minimum_of_daily_minimum_temperature
-        nc_variable: monthly_minimum_of_daily_minimum_temperature
-        units: unknown
+        nc_variable: tnn
+        units: degC
       monthly-frost-days:
         cds_variable: monthly_frost_days
-        nc_variable: monthly_frost_days
-        units: unknown
+        nc_variable: fd
+        units: '1'
       annual-heating-degree-days:
         cds_variable: annual_heating_degree_days
-        nc_variable: annual_heating_degree_days
-        units: unknown
+        nc_variable: hd
+        units: degC day
       monthly-precipitation:
         cds_variable: monthly_precipitation
-        nc_variable: monthly_precipitation
-        units: unknown
+        nc_variable: r
+        units: mm
       monthly-wet-days:
         cds_variable: monthly_wet_days
-        nc_variable: monthly_wet_days
-        units: unknown
+        nc_variable: r01
+        units: '1'
       monthly-precipitation-intensity:
         cds_variable: monthly_precipitation_intensity
-        nc_variable: monthly_precipitation_intensity
-        units: unknown
+        nc_variable: sdii
+        units: mm
       monthly-maximum-1-day-precipitation:
         cds_variable: monthly_maximum_1_day_precipitation
-        nc_variable: monthly_maximum_1_day_precipitation
-        units: unknown
+        nc_variable: rx1day
+        units: mm
       monthly-maximum-5-day-precipitation:
         cds_variable: monthly_maximum_5_day_precipitation
-        nc_variable: monthly_maximum_5_day_precipitation
-        units: unknown
+        nc_variable: rx5day
+        units: mm
       monthly-heavy-precipitation-days:
         cds_variable: monthly_heavy_precipitation_days
-        nc_variable: monthly_heavy_precipitation_days
-        units: unknown
+        nc_variable: r10
+        units: '1'
       monthly-very-heavy-precipitation-days:
         cds_variable: monthly_very_heavy_precipitation_days
-        nc_variable: monthly_very_heavy_precipitation_days
-        units: unknown
+        nc_variable: r20
+        units: '1'
       monthly-near-surface-specific-humidity:
         cds_variable: monthly_near_surface_specific_humidity
         nc_variable: monthly_near_surface_specific_humidity

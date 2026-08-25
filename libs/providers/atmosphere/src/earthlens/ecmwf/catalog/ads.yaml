@@ -407,8 +407,10 @@ datasets:
     variables:
       downward-uv-radiation-at-the-surface:
         cds_variable: downward_uv_radiation_at_the_surface
-        nc_variable: downward_uv_radiation_at_the_surface
-        units: unknown
+        nc_variable: uvb
+        units: J m**-2
+        extras:
+          step: ['0', '12', '15', '18', '21', '3', '6', '9']
       forecast-albedo:
         cds_variable: forecast_albedo
         nc_variable: forecast_albedo
@@ -744,16 +746,16 @@ datasets:
     variables:
       snow-albedo:
         cds_variable: snow_albedo
-        nc_variable: snow_albedo
-        units: unknown
+        nc_variable: asn
+        units: (0 - 1)
       ch4-column-mean-molar-fraction:
         cds_variable: ch4_column_mean_molar_fraction
-        nc_variable: ch4_column_mean_molar_fraction
-        units: unknown
+        nc_variable: tcch4
+        units: ppb
       co2-column-mean-molar-fraction:
         cds_variable: co2_column_mean_molar_fraction
-        nc_variable: co2_column_mean_molar_fraction
-        units: unknown
+        nc_variable: tcco2
+        units: ppm
       accumulated-carbon-dioxide-ecosystem-respiration:
         cds_variable: accumulated_carbon_dioxide_ecosystem_respiration
         nc_variable: accumulated_carbon_dioxide_ecosystem_respiration
