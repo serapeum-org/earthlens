@@ -14,6 +14,7 @@ from earthlens.ecmwf import _hydrate as hydrate_mod
 from earthlens.ecmwf._hydrate import (
     _claimed_nc_names,
     _dataset_extras,
+    _fill_variable,
     _fill_variable_extras,
     _find_file_for_dataset,
     _hydrate_stanza_per_variable,
@@ -629,6 +630,29 @@ _EXTRAS_STANZA = """datasets:
         nc_variable: mystery
         units: unknown
 """
+
+
+class TestFillVariable:
+    """Tests for writing a row's nc_variable and units back into the shard."""
+
+    @pytest.mark.parametrize("nc_name", ["no", "yes", "on", "off", "null", "y", "sst"])
+    def test_a_yaml_hostile_short_name_survives(self, nc_name):
+        """Nitrogen monoxide is `no`, which bare YAML reads back as a boolean."""
+        block = (
+            "      a-row:"
+            + chr(10)
+            + "        cds_variable: a"
+            + chr(10)
+            + "        nc_variable: seeded"
+            + chr(10)
+            + "        units: unknown"
+            + chr(10)
+        )
+        out = _fill_variable(block, "a-row", nc_name, "kg kg**-1")
+        parsed = yaml.safe_load("root:" + chr(10) + out.replace("      ", "  "))
+        row = parsed["root"]["a-row"]
+        assert row["nc_variable"] == nc_name, "must stay the string it was given"
+        assert row["units"] == "kg kg**-1"
 
 
 class TestSelectorPlumbing:

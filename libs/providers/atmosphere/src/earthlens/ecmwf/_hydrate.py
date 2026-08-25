@@ -1250,7 +1250,12 @@ def _scalar_after_key(line: str) -> str:
 
 
 def _fill_variable(block: str, slug: str, nc_name: str, units: str) -> str:
-    """Rewrite one variable sub-block's `nc_variable:` / `units:` lines in place."""
+    """Rewrite one variable sub-block's `nc_variable:` / `units:` lines in place.
+
+    Both values are written through the YAML emitter. A NetCDF short name is not
+    safe to interpolate raw: nitrogen monoxide is `no`, which YAML reads back as
+    the boolean `False` and the catalog then refuses to load.
+    """
     var_pat = re.compile(
         rf"(?m)(^ {{6}}{re.escape(slug)}:[ \t]*\n(?:^ {{8}}[^\n]*\n)*)"
     )
@@ -1258,7 +1263,9 @@ def _fill_variable(block: str, slug: str, nc_name: str, units: str) -> str:
     if not match:
         return block
     sub = match.group(1)
-    sub = _NC_VARIABLE_LINE.sub(lambda mo: f"{mo.group(1)} {nc_name}", sub, count=1)
+    sub = _NC_VARIABLE_LINE.sub(
+        lambda mo: f"{mo.group(1)} {_yaml_value(nc_name)}", sub, count=1
+    )
     sub = _UNITS_LINE.sub(
         lambda mo: f"{mo.group(1)} {_yaml_value(units)}", sub, count=1
     )

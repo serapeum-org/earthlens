@@ -1469,7 +1469,7 @@ datasets:
         units: kg kg**-1
       nitrogen-monoxide:
         cds_variable: nitrogen_monoxide
-        nc_variable: no
+        nc_variable: 'no'
         units: kg kg**-1
       ozone:
         cds_variable: ozone
