@@ -24340,8 +24340,8 @@ for January 2022 over a 1° box and writes one monthly-mean GeoTIFF:</p>
 <p>The retrieved NetCDF lands at
 <code>out/era5/2m_temperature_reanalysis-era5-single-levels.nc</code>; the
 aggregated GeoTIFF lands at
-<code>out/era5/aggregated/2m_temperature_1MS_20220101.tif</code> (default
-<code>out_dir = &lt;root_dir&gt;/aggregated/</code>).</p>
+<code>out/era5/aggregated/2m_temperature_reanalysis-era5-single-levels_1MS_20220101.tif</code>
+(default <code>out_dir = &lt;root_dir&gt;/aggregated/</code>).</p>
 <h2 id="worked-example-aggregate-later-separately"><a class="toclink" href="#worked-example-aggregate-later-separately">Worked example — aggregate later, separately</a><a class="headerlink" href="#worked-example-aggregate-later-separately" title="Permanent link">#</a></h2>
 <p>If you already have the NetCDF on disk:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">earthlens.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AggregationConfig</span><span class="p">,</span> <span class="n">aggregate_netcdf</span>
@@ -24387,13 +24387,19 @@ aggregated GeoTIFF lands at
 the full list.</p>
 <h2 id="output-filename-convention"><a class="toclink" href="#output-filename-convention">Output filename convention</a><a class="headerlink" href="#output-filename-convention" title="Permanent link">#</a></h2>
 <p>Per-window GeoTIFFs are named:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>&lt;cds_variable&gt;_&lt;freq&gt;_&lt;window-label-as-YYYYMMDD&gt;.tif
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>&lt;cds_variable&gt;_&lt;dataset_id&gt;_&lt;freq&gt;_&lt;window-label-as-YYYYMMDD&gt;.tif
 </code></pre></div>
+<p>The <code>&lt;dataset_id&gt;</code> (the requested catalog id, e.g. <code>reanalysis-era5-single-levels</code>)
+is included so datasets sharing a <code>cds_variable</code> — or the two GloFAS streams that
+also share <code>cds_dataset</code> — never overwrite one another in a shared <code>out_dir</code>,
+matching the <code>.nc</code> naming. It is omitted only for a <code>var_info</code> that carries no
+dataset id — the s3 and erddap backends (whose variable adapters carry none), or
+a plain caller passing a bare stand-in to <code>aggregate_netcdf</code>.</p>
 <p>Examples:</p>
 <ul>
-<li><code>2m_temperature_1D_20220101.tif</code> — daily mean for 2022-01-01.</li>
-<li><code>total_precipitation_1MS_20220101.tif</code> — monthly sum for 2022-01.</li>
-<li><code>temperature_QS-DEC_20220301.tif</code> — MAM seasonal mean.</li>
+<li><code>2m_temperature_reanalysis-era5-single-levels_1D_20220101.tif</code> — daily mean for 2022-01-01.</li>
+<li><code>total_precipitation_reanalysis-era5-single-levels_1MS_20220101.tif</code> — monthly sum for 2022-01.</li>
+<li><code>temperature_reanalysis-era5-pressure-levels_QS-DEC_20220301.tif</code> — MAM seasonal mean.</li>
 </ul>
 <h2 id="related"><a class="toclink" href="#related">Related</a><a class="headerlink" href="#related" title="Permanent link">#</a></h2>
 <ul>
