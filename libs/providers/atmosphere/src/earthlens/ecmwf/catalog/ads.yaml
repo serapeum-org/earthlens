@@ -169,8 +169,10 @@ datasets:
         units: unknown
       ash:
         cds_variable: ash
-        nc_variable: ash
-        units: unknown
+        nc_variable: sum
+        units: kg m-2 s-1
+        extras:
+          source: [shipping]
       benzene:
         cds_variable: benzene
         nc_variable: benzene
@@ -185,8 +187,10 @@ datasets:
         units: unknown
       bromoform:
         cds_variable: bromoform
-        nc_variable: bromoform
-        units: unknown
+        nc_variable: emi_oceans
+        units: kg m-2 s-1
+        extras:
+          source: [oceanic]
       butanes:
         cds_variable: butanes
         nc_variable: butanes
@@ -229,8 +233,10 @@ datasets:
         units: unknown
       elemental-carbon:
         cds_variable: elemental_carbon
-        nc_variable: elemental_carbon
-        units: unknown
+        nc_variable: sum
+        units: kg m-2 s-1
+        extras:
+          source: [shipping]
       esters:
         cds_variable: esters
         nc_variable: esters
