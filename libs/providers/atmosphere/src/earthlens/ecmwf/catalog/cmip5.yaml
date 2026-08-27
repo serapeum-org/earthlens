@@ -102,8 +102,8 @@ datasets:
     variables:
       geopotential-height:
         cds_variable: geopotential_height
-        nc_variable: geopotential_height
-        units: unknown
+        nc_variable: zg
+        units: m
       temperature:
         cds_variable: temperature
         nc_variable: temperature
@@ -127,41 +127,41 @@ datasets:
     variables:
       10m-wind-speed:
         cds_variable: 10m_wind_speed
-        nc_variable: 10m_wind_speed
-        units: unknown
+        nc_variable: sfcWind
+        units: m s-1
       2m-temperature:
         cds_variable: 2m_temperature
-        nc_variable: 2m_temperature
-        units: unknown
+        nc_variable: tas
+        units: K
       maximum-2m-temperature-in-the-last-24-hours:
         cds_variable: maximum_2m_temperature_in_the_last_24_hours
-        nc_variable: maximum_2m_temperature_in_the_last_24_hours
-        units: unknown
+        nc_variable: tasmax
+        units: K
       mean-precipitation-flux:
         cds_variable: mean_precipitation_flux
-        nc_variable: mean_precipitation_flux
-        units: unknown
+        nc_variable: pr
+        units: kg m-2 s-1
       mean-sea-level-pressure:
         cds_variable: mean_sea_level_pressure
-        nc_variable: mean_sea_level_pressure
-        units: unknown
+        nc_variable: psl
+        units: Pa
       minimum-2m-temperature-in-the-last-24-hours:
         cds_variable: minimum_2m_temperature_in_the_last_24_hours
-        nc_variable: minimum_2m_temperature_in_the_last_24_hours
-        units: unknown
+        nc_variable: tasmin
+        units: K
       near-surface-specific-humidity:
         cds_variable: near_surface_specific_humidity
         nc_variable: huss
         units: '1'
       snowfall:
         cds_variable: snowfall
-        nc_variable: snowfall
-        units: unknown
+        nc_variable: prsn
+        units: kg m-2 s-1
       daily-near-surface-relative-humidity:
         cds_variable: daily_near_surface_relative_humidity
-        nc_variable: daily_near_surface_relative_humidity
-        units: unknown
+        nc_variable: rhs
+        units: '%'
       surface-solar-radiation-downwards:
         cds_variable: surface_solar_radiation_downwards
-        nc_variable: surface_solar_radiation_downwards
-        units: unknown
+        nc_variable: rsds
+        units: W m-2

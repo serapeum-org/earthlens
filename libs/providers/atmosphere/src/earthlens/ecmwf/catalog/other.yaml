@@ -2596,20 +2596,24 @@ datasets:
     variables:
       air-temperature:
         cds_variable: air_temperature
-        nc_variable: air_temperature
-        units: unknown
+        nc_variable: ta
+        units: K
+        extras:
+          level: ['1', '10', '100', '1000', '150', '20', '200', '250', '30', '300', '400', '5', '50', '500', '600', '70', '700', '850', '925']
       capacity-of-soil-to-store-water:
         cds_variable: capacity_of_soil_to_store_water
-        nc_variable: capacity_of_soil_to_store_water
-        units: unknown
+        nc_variable: mrsofc
+        units: kg m-2
+        extras:
+          temporal_resolution: [fixed]
       daily-maximum-near-surface-air-temperature:
         cds_variable: daily_maximum_near_surface_air_temperature
-        nc_variable: daily_maximum_near_surface_air_temperature
-        units: unknown
+        nc_variable: tasmax
+        units: K
       daily-minimum-near-surface-air-temperature:
         cds_variable: daily_minimum_near_surface_air_temperature
-        nc_variable: daily_minimum_near_surface_air_temperature
-        units: unknown
+        nc_variable: tasmin
+        units: K
       eastward-near-surface-wind:
         cds_variable: eastward_near_surface_wind
         nc_variable: eastward_near_surface_wind
