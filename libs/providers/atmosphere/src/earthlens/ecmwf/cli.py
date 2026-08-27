@@ -183,12 +183,85 @@ def _from_info(info: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return out
 
 
-def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
-    """Read each NetCDF variable's `long_name` / `units` via GDAL.
+def _variable_meta(variable: Any) -> dict[str, Any] | None:
+    """Pull `long_name` / `units` off one pyramids variable, whatever its shape.
 
-    Uses the GDAL vendored by `pyramids` (no hard `netCDF4` dependency): GDAL
-    surfaces the CF attributes as band metadata, exposing a multi-variable file
-    as one subdataset per variable.
+    A NetCDF variable reaches us as one of two objects, because not every
+    variable can be presented as a raster: a gridded one arrives as a pyramids
+    `Variable` carrying `band_units` and `global_attributes`, while a variable
+    with no x/y dimensions — an observation table's columns — arrives as the
+    underlying GDAL `MDArray`, whose unit and attributes are read through its
+    own accessors.
+
+    Args:
+        variable: The object `NetCDF.get_variable` returned.
+
+    Returns:
+        A `{"long_name": ..., "units": ...}` mapping, or None when the variable
+        carries neither.
+    """
+    units = long_name = ""
+    if hasattr(variable, "band_units"):
+        units = next(iter(variable.band_units or []), "") or ""
+        long_name = (getattr(variable, "global_attributes", None) or {}).get(
+            "long_name", ""
+        )
+    elif hasattr(variable, "GetUnit"):
+        units = variable.GetUnit() or ""
+        attributes = {
+            attribute.GetName(): attribute.ReadAsString()
+            for attribute in (variable.GetAttributes() or [])
+        }
+        units = units or attributes.get("units", "")
+        long_name = attributes.get("long_name", "")
+    if not (units or long_name):
+        return None
+    return {"long_name": long_name, "units": units}
+
+
+def _read_via_pyramids(path: str) -> dict[str, dict[str, Any]]:
+    """Read each variable's `long_name` / `units` through pyramids.
+
+    pyramids is this repository's GIS backend and owns NetCDF reading, so the
+    metadata is taken from it rather than from a hand-rolled GDAL walk. It also
+    reaches variables the classic raster API cannot: that API only surfaces what
+    it can present as a raster band, so a file whose variables are not
+    raster-shaped reads as empty through it and completely through this.
+
+    A variable whose data type cannot be exposed at all — a string column — is
+    skipped rather than failing the file, because the rest of the file is still
+    worth reading.
+
+    Args:
+        path: Path to a NetCDF file written by a `cdsapi` retrieve.
+
+    Returns:
+        A `{variable_name: {"long_name": ..., "units": ...}}` mapping for every
+        variable that carries a `long_name` or `units`.
+    """
+    from pyramids.netcdf import NetCDF
+
+    container = NetCDF.read_file(path)
+    schema: dict[str, dict[str, Any]] = {}
+    for name in container.variable_names or []:
+        try:
+            variable = container.get_variable(name)
+        except Exception:  # noqa: BLE001 — a string column cannot be exposed
+            continue
+        meta = _variable_meta(variable) if variable is not None else None
+        if meta is not None:
+            schema[str(name)] = meta
+    return schema
+
+
+def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
+    """Read each NetCDF variable's `long_name` / `units`.
+
+    Goes through pyramids first, and falls back to the classic GDAL raster walk
+    when that yields nothing. The fallback is kept because the classic API is
+    what every hydrated row in the catalog was read with: a file it can still
+    describe must keep reading the same way, whatever the newer path makes of
+    it.
 
     Args:
         path: Path to a NetCDF file written by a `cdsapi` retrieve.
@@ -197,6 +270,13 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
         A `{variable_name: {"long_name": ..., "units": ...}}` mapping for every
         variable that carries a `long_name` or `units` attribute.
     """
+    try:
+        schema = _read_via_pyramids(path)
+    except Exception:  # noqa: BLE001 — an unreadable container falls back
+        schema = {}
+    if schema:
+        return schema
+
     from osgeo import gdal
 
     gdal.UseExceptions()
@@ -205,11 +285,11 @@ def _read_netcdf_var_meta(path: str) -> dict[str, dict[str, Any]]:
     subs = top.get("metadata", {}).get("SUBDATASETS", {})
     if not subs:
         return _from_info(top)
-    schema: dict[str, dict[str, Any]] = {}
+    fallback: dict[str, dict[str, Any]] = {}
     for key, sub_path in subs.items():
         if key.endswith("_NAME"):
-            schema.update(_from_info(gdal.Info(sub_path, format="json")))
-    return schema
+            fallback.update(_from_info(gdal.Info(sub_path, format="json")))
+    return fallback
 
 
 def _deep_sample_row(

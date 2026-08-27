@@ -108,6 +108,42 @@ def _paginated_get_json(url, **kw):
     }
 
 
+class _FakeGridVariable:
+    """Stands in for the pyramids `Variable` a gridded NetCDF variable becomes."""
+
+    def __init__(self, units="K", long_name="2 metre temperature"):
+        self.band_units = [units] if units else []
+        self.global_attributes = {"long_name": long_name} if long_name else {}
+
+
+class _FakeAttribute:
+    """One GDAL attribute on an MDArray."""
+
+    def __init__(self, name, value):
+        self._name, self._value = name, value
+
+    def GetName(self):  # noqa: N802 - GDAL's own casing
+        return self._name
+
+    def ReadAsString(self):  # noqa: N802 - GDAL's own casing
+        return self._value
+
+
+class _FakeMdArray:
+    """Stands in for the GDAL MDArray a table column becomes."""
+
+    def GetUnit(self):  # noqa: N802 - GDAL's own casing
+        return "degrees_north"
+
+    def GetAttributes(self):  # noqa: N802 - GDAL's own casing
+        return [_FakeAttribute("long_name", "Latitude")]
+
+
+def _raise_unreadable(_path):
+    """Reject a container the way an unreadable file would."""
+    raise RuntimeError("container cannot be opened")
+
+
 class TestRefresher:
     """Tests for the ECMWF (CDS catalogue) lister + per-store writer."""
 
@@ -305,6 +341,73 @@ class TestDeepProber:
         ).to_netcdf(path)
         meta = ecmwf_cli._read_netcdf_var_meta(str(path))
         assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
+
+    def test_read_netcdf_var_meta_prefers_pyramids(self, monkeypatch, tmp_path):
+        """pyramids owns NetCDF reading, so its answer is the one used."""
+        path = tmp_path / "probe.nc"
+        path.write_bytes(b"not really a netcdf")
+        monkeypatch.setattr(
+            ecmwf_cli, "_read_via_pyramids", lambda p: {"tp": {"units": "m"}}
+        )
+        assert ecmwf_cli._read_netcdf_var_meta(str(path)) == {"tp": {"units": "m"}}
+
+    def test_read_netcdf_var_meta_falls_back_when_pyramids_is_empty(
+        self, monkeypatch, tmp_path
+    ):
+        """Every hydrated row was read by the classic walk; it must keep working."""
+        import numpy as np
+        import xarray as xr
+
+        path = tmp_path / "probe.nc"
+        xr.Dataset(
+            {
+                "t2m": (
+                    ("lat", "lon"),
+                    np.ones((2, 2), "f4"),
+                    {"units": "K", "long_name": "2 metre temperature"},
+                )
+            },
+            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
+        ).to_netcdf(path)
+        monkeypatch.setattr(ecmwf_cli, "_read_via_pyramids", lambda p: {})
+        meta = ecmwf_cli._read_netcdf_var_meta(str(path))
+        assert meta["t2m"] == {"long_name": "2 metre temperature", "units": "K"}
+
+    def test_read_netcdf_var_meta_falls_back_when_pyramids_raises(
+        self, monkeypatch, tmp_path
+    ):
+        """An unreadable container must not lose a file the classic walk can read."""
+        import numpy as np
+        import xarray as xr
+
+        path = tmp_path / "probe.nc"
+        xr.Dataset(
+            {"tp": (("lat", "lon"), np.ones((2, 2), "f4"), {"units": "m"})},
+            coords={"lat": [1.0, 0.0], "lon": [0.0, 1.0]},
+        ).to_netcdf(path)
+        monkeypatch.setattr(ecmwf_cli, "_read_via_pyramids", _raise_unreadable)
+        assert ecmwf_cli._read_netcdf_var_meta(str(path))["tp"]["units"] == "m"
+
+    def test_variable_meta_reads_a_gridded_variable(self):
+        """A gridded variable arrives as a pyramids Variable."""
+        assert ecmwf_cli._variable_meta(_FakeGridVariable()) == {
+            "long_name": "2 metre temperature",
+            "units": "K",
+        }
+
+    def test_variable_meta_reads_a_table_column(self):
+        """A variable with no x/y dimension arrives as the raw MDArray."""
+        assert ecmwf_cli._variable_meta(_FakeMdArray()) == {
+            "long_name": "Latitude",
+            "units": "degrees_north",
+        }
+
+    def test_variable_meta_declines_a_variable_carrying_neither(self):
+        """Nothing to record is not the same as a unitless empty string."""
+        assert (
+            ecmwf_cli._variable_meta(_FakeGridVariable(units=None, long_name=None))
+            is None
+        )
 
     @pytest.mark.parametrize(
         "dataset, expected",
