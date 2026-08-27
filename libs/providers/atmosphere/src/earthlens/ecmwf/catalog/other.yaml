@@ -2489,36 +2489,42 @@ datasets:
     variables:
       monthly-mean-of-daily-accumulated-precipitation:
         cds_variable: monthly_mean_of_daily_accumulated_precipitation
-        nc_variable: monthly_mean_of_daily_accumulated_precipitation
-        units: unknown
+        nc_variable: pr
+        units: mm
       monthly-mean-of-daily-accumulated-snowfall-precipitation:
         cds_variable: monthly_mean_of_daily_accumulated_snowfall_precipitation
-        nc_variable: monthly_mean_of_daily_accumulated_snowfall_precipitation
-        units: unknown
+        nc_variable: prsn
+        units: mm
+        extras:
+          domain: [global]
+          origin: [cmip6]
       annual-cooling-degree-days:
         cds_variable: annual_cooling_degree_days
-        nc_variable: annual_cooling_degree_days
-        units: unknown
+        nc_variable: cd
+        units: degC day
       annual-consecutive-dry-days:
         cds_variable: annual_consecutive_dry_days
-        nc_variable: annual_consecutive_dry_days
-        units: unknown
+        nc_variable: cdd
+        units: days
       monthly-count-of-frost-days:
         cds_variable: monthly_count_of_frost_days
-        nc_variable: monthly_count_of_frost_days
-        units: unknown
+        nc_variable: fd
+        units: '1'
       annual-heating-degree-days:
         cds_variable: annual_heating_degree_days
-        nc_variable: annual_heating_degree_days
-        units: unknown
+        nc_variable: hd
+        units: degC day
       monthly-mean-of-acidity-of-seawater:
         cds_variable: monthly_mean_of_acidity_of_seawater
-        nc_variable: monthly_mean_of_acidity_of_seawater
-        units: unknown
+        nc_variable: ph
+        units: '1'
+        extras:
+          domain: [global]
+          origin: [cmip6]
       monthly-maximum-of-1-day-accumulated-precipitation:
         cds_variable: monthly_maximum_of_1_day_accumulated_precipitation
-        nc_variable: monthly_maximum_of_1_day_accumulated_precipitation
-        units: unknown
+        nc_variable: rx1day
+        units: mm
       monthly-maximum-of-5-day-accumulated-precipitation:
         cds_variable: monthly_maximum_of_5_day_accumulated_precipitation
         nc_variable: monthly_maximum_of_5_day_accumulated_precipitation
