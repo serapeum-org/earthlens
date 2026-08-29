@@ -242,6 +242,20 @@ jobs:
           SENTINELHUB_CLIENT_SECRET: ${{ secrets.SENTINELHUB_CLIENT_SECRET }}
           IUCN_TOKEN: ${{ secrets.IUCN_TOKEN }}
           WDPA_TOKEN: ${{ secrets.WDPA_TOKEN }}
+          COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
+          COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
+          API_USGS_PAT: ${{ secrets.API_USGS_PAT }}
+          GPORTAL_USERNAME: ${{ secrets.GPORTAL_USERNAME }}
+          GPORTAL_PASSWORD: ${{ secrets.GPORTAL_PASSWORD }}
+          JAXA_PTREE_USERNAME: ${{ secrets.JAXA_PTREE_USERNAME }}
+          JAXA_PTREE_PASSWORD: ${{ secrets.JAXA_PTREE_PASSWORD }}
+          OPENAQ_API_KEY: ${{ secrets.OPENAQ_API_KEY }}
+          FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+          NREL_API_KEY: ${{ secrets.NREL_API_KEY }}
+          NREL_EMAIL: ${{ secrets.NREL_EMAIL }}
+          OPENEO_CLIENT_ID: ${{ secrets.OPENEO_CLIENT_ID }}
+          OPENEO_CLIENT_SECRET: ${{ secrets.OPENEO_CLIENT_SECRET }}
+          GFW_API_KEY: ${{ secrets.GFW_API_KEY }}
           PKG: ${{ matrix.pkg }}
           MARKER: ${{ matrix.marker }}
           DESELECT: ${{ matrix.deselect }}
