@@ -1658,7 +1658,10 @@ class ECMWF(LazyClientMixin, AbstractDataSource):
         )
 
         if var_info.cds_pressure_level is not None:
-            request["pressure_level"] = var_info.cds_pressure_level
+            # Copy by value: the catalog row is cached process-wide, so
+            # assigning its list would let an edit to one request rewrite the
+            # level for every later retrieve of that variable.
+            request["pressure_level"] = list(var_info.cds_pressure_level)
 
         _apply_extras_and_strips(request, var_info)
 

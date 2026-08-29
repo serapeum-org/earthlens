@@ -574,6 +574,30 @@ class TestBuildRequest:
         ecmwf_stub.pressure_level = ["500"]
         assert "pressure_level" not in ecmwf_stub._build_request(single_level_var_info)
 
+    def test_the_request_does_not_alias_the_override(
+        self, ecmwf_stub, pressure_level_var_info
+    ):
+        """One download builds a request per variable; they must not share a list."""
+        ecmwf_stub.pressure_level = ["500"]
+        request = ecmwf_stub._build_request(pressure_level_var_info)
+        request["pressure_level"].append("MUTATED")
+        assert ecmwf_stub.pressure_level == ["500"], (
+            "editing a request rewrote the override for every later variable; "
+            f"got {ecmwf_stub.pressure_level!r}"
+        )
+
+    def test_the_request_does_not_alias_the_catalog_row(
+        self, ecmwf_stub, pressure_level_var_info
+    ):
+        """The row is cached process-wide, so an edit would outlive the download."""
+        ecmwf_stub.pressure_level = None
+        request = ecmwf_stub._build_request(pressure_level_var_info)
+        request["pressure_level"].append("MUTATED")
+        assert pressure_level_var_info.cds_pressure_level == ["1000"], (
+            "editing a request rewrote the cached catalog row; got "
+            f"{pressure_level_var_info.cds_pressure_level!r}"
+        )
+
     def test_it_overrides_a_level_carried_in_extras(self, ecmwf_stub):
         """The CARRA means rows keep their level in extras, merged after the build."""
         var_info = Variable(
